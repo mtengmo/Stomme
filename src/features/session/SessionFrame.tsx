@@ -4,6 +4,8 @@ import { Tally, type TallyItem } from '../../ui/Tally';
 
 export interface SessionFrameProps {
   title: string;
+  /** Index of the current step; exposed as data-step for the e2e flow. */
+  stepId: number;
   clock: string;
   tally: { items: TallyItem[]; label: string };
   onAbort(): void;
@@ -17,6 +19,7 @@ export interface SessionFrameProps {
 /** Full-screen session layout: header, one thing in the middle, actions at the thumb. */
 export function SessionFrame({
   title,
+  stepId,
   clock,
   tally,
   onAbort,
@@ -25,7 +28,10 @@ export function SessionFrame({
   actions,
 }: SessionFrameProps) {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
+    <div
+      data-step={stepId}
+      className="mx-auto flex min-h-dvh max-w-md flex-col px-5"
+    >
       <header className="flex items-center justify-between gap-3 pt-3">
         <p className="m-0 flex items-center gap-2 text-lg font-bold">
           {title}

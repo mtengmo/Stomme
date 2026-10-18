@@ -118,6 +118,7 @@ export function Runner({ session, logs, last }: RunnerProps) {
 
   const frame = {
     title: templates[session.templateId].name,
+    stepId: cursor,
     clock: formatClock(seconds),
     tally,
     onAbort: () => setConfirmAbort(true),

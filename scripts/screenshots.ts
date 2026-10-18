@@ -5,6 +5,7 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { chromium } from '@playwright/test';
+import { playPassA } from '../tests/e2e/flow';
 
 const PORT = 4173;
 const OUT = '.impeccable/review';
@@ -126,6 +127,22 @@ try {
         });
       }
       await context.close();
+
+      // Session mode: play Pass A and shoot the first of each kind of screen.
+      const sessionContext = await browser.newContext({
+        baseURL: url,
+        viewport: { width: size.width, height: size.height },
+        colorScheme: scheme,
+        reducedMotion: 'reduce',
+      });
+      await sessionContext.addInitScript('window.__name = (f) => f;');
+      const sessionPage = await sessionContext.newPage();
+      await playPassA(sessionPage, async (stage) => {
+        await sessionPage.screenshot({
+          path: `${OUT}/${size.name}-${scheme}-session-${stage}.png`,
+        });
+      });
+      await sessionContext.close();
     }
   }
   await browser.close();
