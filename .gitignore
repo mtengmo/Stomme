@@ -2,3 +2,6 @@
 node_modules/
 dist/
 screenshots/
+.impeccable/review/
+.impeccable/questions/
+.impeccable/mocks/

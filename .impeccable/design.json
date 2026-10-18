@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T00:00:00Z",
+  "title": "Design System: Stomme",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Squared Paper", "canonical": "#eef3f0", "tonalRamp": ["#232827", "#3b4240", "#58625f", "#7b8783", "#a2aeaa", "#c5d0cc", "#e0e8e4", "#eef3f0"] },
+      "graphite-ink": { "role": "neutral", "displayName": "Graphite Ink", "canonical": "#23292b", "tonalRamp": ["#23292b", "#343c3f", "#4a5659", "#66766f", "#8a9893", "#aebab5", "#d6e2dc", "#eef3f0"] },
+      "red-pencil": { "role": "primary", "displayName": "Red Pencil", "canonical": "#c22f27", "tonalRamp": ["#4a0f0b", "#721812", "#9a211b", "#c22f27", "#da5a52", "#ea8780", "#f4b5b0", "#fae0dd"] },
+      "blue-ink": { "role": "secondary", "displayName": "Blue Ink", "canonical": "#2b4fa0", "tonalRamp": ["#0f1d3d", "#1a3170", "#2b4fa0", "#4d70c2", "#7894d6", "#a3b7e6", "#cbd6f1", "#e8edf8"] },
+      "today-amber": { "role": "tertiary", "displayName": "Today Amber", "canonical": "#f0b13a", "tonalRamp": ["#4a3207", "#74500d", "#a07015", "#c98f22", "#f0b13a", "#f4c568", "#f8d994", "#fcecc8"] },
+      "paper-dark": { "role": "neutral", "displayName": "Graphite Sheet", "canonical": "#1a1f21", "tonalRamp": ["#1a1f21", "#242b2e", "#2a3134", "#3d484b", "#66766f", "#a9b6b2", "#c3cecb", "#e8eeea"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Screen titles and the lead pass name, Barlow Condensed 800." },
+      "headline": { "displayName": "Headline", "purpose": "Receding pass names and section headings, Barlow Condensed 700." },
+      "count": { "displayName": "Count", "purpose": "Set tallies, day numbers and progress figures, tabular condensed heavy." },
+      "body": { "displayName": "Body", "purpose": "Paragraphs, list items and button text in the platform sans, 20px." },
+      "label": { "displayName": "Label", "purpose": "Chips, tab labels, notes at the 16px floor." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "tick-draw", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1) clip-path inset(0 100% 0 0) to inset(0)", "purpose": "A pencil tick drawing on when a set is newly done; disabled under prefers-reduced-motion." },
+      { "name": "press", "value": "150ms ease-out, scale(0.98)", "purpose": "Button press feedback." }
+    ],
+    "breakpoints": [
+      { "name": "content-max", "value": "28rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one full-width action per screen.",
+      "html": "<button class=\"ds-btn-primary\">Starta pass</button>",
+      "css": ".ds-btn-primary { display:flex; width:100%; align-items:center; justify-content:center; min-height:64px; padding:0 24px; border:0; border-radius:6px; background:#23292b; color:#eef3f0; font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out, opacity 150ms ease-out; } .ds-btn-primary:active { transform:scale(0.98); } .ds-btn-primary:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; border-radius:4px; } .ds-btn-primary:disabled { opacity:0.5; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Lesser action with a thick graphite outline.",
+      "html": "<button class=\"ds-btn-secondary\">Avbryt</button>",
+      "css": ".ds-btn-secondary { display:flex; width:100%; align-items:center; justify-content:center; min-height:56px; padding:0 24px; border:3px solid #23292b; border-radius:6px; background:#eef3f0; color:#23292b; font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out; } .ds-btn-secondary:active { transform:scale(0.98); } .ds-btn-secondary:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; }"
+    },
+    {
+      "name": "State Chips",
+      "kind": "chip",
+      "refersTo": "chip-today",
+      "description": "Klar, Idag, Kommande: colour plus icon plus word.",
+      "html": "<span class=\"ds-chip ds-chip-done\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 13l5 5L20 6\"/></svg>Klar</span> <span class=\"ds-chip ds-chip-today\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2\"/></svg>Idag</span>",
+      "css": ".ds-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:4px; font:700 16px/1.4 system-ui, sans-serif; } .ds-chip-done { border:2px solid #c22f27; color:#c22f27; background:#eef3f0; } .ds-chip-today { background:#f0b13a; color:#23292b; }"
+    },
+    {
+      "name": "Set Tally",
+      "kind": "custom",
+      "refersTo": "set-circle",
+      "description": "Row of set circles: digits for sets left, red pencil tick when done.",
+      "html": "<div class=\"ds-tally\"><span class=\"ds-circle\">3</span><span class=\"ds-circle\">2</span><span class=\"ds-circle\"><svg width=\"39\" height=\"39\" viewBox=\"0 0 48 48\" fill=\"#c22f27\"><path d=\"M6 27C8 25 10 25 13 30C18 19 28 9 42 4C43 5 43 6 41 8C30 15 22 26 17 39C15 41 13 40 12 38C10 34 8 31 5 29C5 28 5 27 6 27Z\"/></svg></span></div>",
+      "css": ".ds-tally { display:flex; gap:6px; } .ds-circle { display:grid; place-items:center; width:48px; height:48px; border:3px solid #23292b; border-radius:9999px; background:#eef3f0; color:#23292b; font:800 24px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; }"
+    },
+    {
+      "name": "Pass Card (lead)",
+      "kind": "card",
+      "refersTo": "pass-card-lead",
+      "description": "The next pass: graphite outline, big title and count.",
+      "html": "<div class=\"ds-card\"><h2 class=\"ds-card-title\">Pass A</h2><p class=\"ds-card-next\">Nästa pass</p><p class=\"ds-card-count\">4<span>/10 set</span></p></div>",
+      "css": ".ds-card { padding:20px; border:3px solid #23292b; border-radius:6px; background:#eef3f0; color:#23292b; } .ds-card-title { margin:0; font:700 60px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; } .ds-card-next { margin:8px 0 0; font:700 18px/1.4 system-ui, sans-serif; color:#2b4fa0; } .ds-card-count { margin:16px 0 0; font:800 72px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; } .ds-card-count span { font-size:36px; color:#4a5659; }"
+    },
+    {
+      "name": "Banner",
+      "kind": "custom",
+      "refersTo": "banner",
+      "description": "Info (blue) or warning (red) note with outline, icon and text.",
+      "html": "<div class=\"ds-banner\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8v.01\"/></svg><div>Appen ger inga medicinska råd.</div></div>",
+      "css": ".ds-banner { display:flex; gap:12px; align-items:flex-start; padding:16px; border:2px solid #2b4fa0; border-radius:6px; background:#eef3f0; color:#23292b; font:400 16px/1.4 system-ui, sans-serif; } .ds-banner svg { color:#2b4fa0; flex-shrink:0; margin-top:2px; }"
+    },
+    {
+      "name": "Bottom Nav Tab",
+      "kind": "nav",
+      "refersTo": "nav-tab-active",
+      "description": "Three equal tabs; active is bold with a red underline.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-tab-active\" href=\"#\">Vecka</a><a class=\"ds-tab\" href=\"#\">Historik</a><a class=\"ds-tab\" href=\"#\">Inställningar</a></nav>",
+      "css": ".ds-nav { display:flex; border-top:3px solid #23292b; background:#eef3f0; } .ds-tab { flex:1; display:flex; align-items:center; justify-content:center; min-height:64px; border-bottom:4px solid transparent; color:#4a5659; font:400 16px/1.4 system-ui, sans-serif; text-decoration:none; } .ds-tab-active { border-bottom-color:#c22f27; color:#23292b; font-weight:700; } .ds-tab:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Squared Notebook",
+    "overview": "Stomme is a training diary written on pale green-grey squared paper. Graphite ink carries the content, blue ink marks the working side (focus, selection, the next pass, info), and red pencil is reserved for one meaning: done. The page itself is the surface; there is no card shadow, no glass, no gradient. The 24 px grid is printed on the body and everything sits on it.\n\nThe system is built for a phone held at arm's length on the floor: heavy 3 px graphite outlines, text never below 16 px, targets 44 px and up (primary actions 56-64 px), counts set in a tall condensed heavy face so the number reads from across a room. State is always word plus icon plus colour, never colour alone. Light and dark both follow the system; dark is a deep graphite sheet with the same grid at low contrast and softened red and blue.",
+    "keyCharacteristics": [
+      "Squared paper background (24 px grid, 1 px lines) in both themes.",
+      "Thick graphite outlines (3 px) instead of shadows; hierarchy by size and outline weight.",
+      "Red is spent only on completion (pencil ticks, done chip, active-tab underline, stop-list dashes, warning banner).",
+      "Condensed heavy numerals for headings and counts; plain platform sans for everything else.",
+      "Flat, no elevation; one authored motion (a tick drawing on)."
+    ],
+    "rules": [
+      { "name": "The Red Means Done Rule", "body": "Red pencil marks completion or a hard stop. It is never decoration, never a primary button, never a link.", "section": "colors" },
+      { "name": "The Paper Is The Surface Rule", "body": "Cards, banners, nav and chips sit on `paper` with an outline; depth is never made with a different fill or a shadow.", "section": "colors" },
+      { "name": "The Word And Icon Rule", "body": "Every state colour travels with an icon and a word (Klar, Idag, Kommande).", "section": "colors" },
+      { "name": "The Hundred-Percent Tabular Rule", "body": "Tabular numerals everywhere; any number that changes (sets, dates, weights) uses them.", "section": "typography" },
+      { "name": "The Floor Rule", "body": "No text under 1rem.", "section": "typography" },
+      { "name": "The Outline Not Shadow Rule", "body": "Priority is shown by outline colour, outline weight and size.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the 24 px squared grid on the body in light and dark.",
+      "Do use 3 px outlines for primary containers and the graphite or edge-grey pair to separate lead from receding.",
+      "Do use red pencil only for done, stop and warning, and blue ink for focus, selection, next and info.",
+      "Do pair every state colour with an icon and a Swedish word.",
+      "Do keep text at 1rem or larger and primary targets at 56-64 px.",
+      "Do use `.count` (Barlow Condensed 800, tabular) for any number that is a quantity.",
+      "Do honour `prefers-reduced-motion` for any new animation; the tick draw-on is the single authored motion."
+    ],
+    "donts": [
+      "Don't add shadows, gradients, glass or tinted card fills; depth is outline and size.",
+      "Don't use the red pencil for buttons, links or decoration.",
+      "Don't use a different fill for surfaces than `paper`.",
+      "Don't replace pencil ticks with a standard check glyph in set or day marks.",
+      "Don't use colour as the only carrier of state.",
+      "Don't let the grid line colour be used for borders or text."
+    ]
+  }
+}
