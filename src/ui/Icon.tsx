@@ -11,7 +11,7 @@ export type IconName =
   | 'warning';
 
 const paths: Record<IconName, ReactNode> = {
-  check: <path className="tick-draw" d="M4 13l5 5L20 6" />,
+  check: <path d="M4 13l5 5L20 6" />,
   sun: (
     <>
       <circle cx="12" cy="12" r="4" />

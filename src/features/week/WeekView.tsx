@@ -8,7 +8,8 @@ import { formatShortDate, formatWeekday, toLocalDate } from '../../lib/dates';
 import { restStatus, weekSummary } from '../../rules/schedule';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
-import { Ring } from '../../ui/Ring';
+import { PencilTick } from '../../ui/PencilTick';
+import { Tally, type TallyItem } from '../../ui/Tally';
 import {
   isoWeekNumber,
   type PassState,
@@ -21,6 +22,20 @@ const IDS: TemplateId[] = ['A', 'B'];
 
 function setTotal(id: TemplateId): number {
   return templates[id].items.reduce((n, i) => n + i.sets, 0);
+}
+
+/** One tally item per exercise; sets done come from the pass's in-progress session logs. */
+function tallyItems(
+  id: TemplateId,
+  complete: boolean,
+  doneByExercise: Map<string, number>,
+): TallyItem[] {
+  return templates[id].items.map((it) => ({
+    id: it.exerciseId,
+    remaining: complete
+      ? 0
+      : Math.max(0, it.sets - (doneByExercise.get(it.exerciseId) ?? 0)),
+  }));
 }
 
 function restText(sessions: Session[], now: Date): string | null {
@@ -57,7 +72,8 @@ function StateChip({ state }: { state: PassState }) {
 
 export function WeekView({ now: nowProp }: { now?: Date }) {
   const sessions = useLiveQuery(() => listSessions(getDb()), []);
-  if (sessions === undefined) return null;
+  const logs = useLiveQuery(() => getDb().setLogs.toArray(), []);
+  if (sessions === undefined || logs === undefined) return null;
 
   const now = nowProp ?? new Date();
   const today = toLocalDate(now);
@@ -68,19 +84,32 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const first = summary.days[0] ?? today;
   const last = summary.days[6] ?? today;
 
+  const doneFor = (id: TemplateId): Map<string, number> => {
+    const open = sessions.find(
+      (s) => s.status === 'in_progress' && s.templateId === id,
+    );
+    const m = new Map<string, number>();
+    if (!open) return m;
+    for (const l of logs) {
+      if (l.sessionId === open.id)
+        m.set(l.exerciseId, (m.get(l.exerciseId) ?? 0) + 1);
+    }
+    return m;
+  };
+
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-6 px-5 pt-6 pb-28">
+    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-5 px-5 pt-5 pb-28">
       <header>
-        <h1 className="m-0 text-3xl leading-tight font-bold text-balance">
-          Vecka <span className="count text-4xl">{isoWeekNumber(today)}</span>
+        <h1 className="m-0 text-5xl leading-none font-extrabold">
+          Vecka {isoWeekNumber(today)}
         </h1>
-        <p className="m-0 mt-1 text-base text-ink-soft">
+        <p className="m-0 mt-2 text-base text-ink-soft">
           {formatShortDate(first)} – {formatShortDate(last)}
         </p>
       </header>
 
       <ol
-        className="m-0 grid list-none grid-cols-7 gap-1.5 p-0"
+        className="m-0 flex list-none justify-between p-0"
         aria-label="Veckans dagar"
       >
         {summary.days.map((d, i) => {
@@ -91,21 +120,23 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
               key={d}
               aria-current={isToday ? 'date' : undefined}
               aria-label={`${DAY_NAMES[i]} ${Number(d.slice(8))}${isDone ? ', pass klart' : ''}${isToday ? ', idag' : ''}`}
-              className={`flex aspect-square flex-col items-center justify-center rounded-sm border-2 text-sm ${
+              className={`relative flex size-11 flex-col items-center justify-center rounded-sm border-2 text-base leading-none ${
                 isToday
-                  ? 'border-ink bg-amber text-amber-ink font-bold'
-                  : 'border-ink-soft/50 bg-paper text-ink'
+                  ? 'border-ink bg-amber font-bold text-amber-ink'
+                  : 'border-edge bg-paper text-ink'
               }`}
             >
               <span>{DAY_NAMES[i]}</span>
-              <span className="count text-xl leading-none">
+              <span className="count mt-0.5 text-xl leading-none">
                 {Number(d.slice(8))}
               </span>
-              <span className="h-[18px]">
-                {isDone ? (
-                  <Icon name="check" size={18} className="text-red" />
-                ) : null}
-              </span>
+              {isDone ? (
+                <PencilTick
+                  size={24}
+                  variant={i}
+                  className="absolute -top-3.5 -right-3"
+                />
+              ) : null}
             </li>
           );
         })}
@@ -115,38 +146,52 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         {IDS.map((id) => {
           const state = states[id];
           const total = setTotal(id);
-          const done = state === 'done' ? total : 0;
-          const isNext = id === next && state !== 'done';
+          const items = tallyItems(id, state === 'done', doneFor(id));
+          const left = items.reduce((n, i) => n + i.remaining, 0);
+          const done = total - left;
+          const lead = id === next && state !== 'done';
+          const label = `${templates[id].name}: ${done} av ${total} set klara`;
           return (
             <li
               key={id}
               data-state={state}
-              className={`flex items-center gap-4 rounded-md border-[3px] bg-paper p-4 ${
-                isNext ? 'border-ink' : 'border-ink-soft/50'
+              className={`flex flex-col rounded-md border-[3px] bg-paper ${
+                lead ? 'gap-4 border-ink p-5' : 'gap-3 border-edge p-4'
               }`}
             >
-              <Ring
-                done={done}
-                total={total}
-                label={`${templates[id].name}: ${done} av ${total} set klara`}
-              />
-              <div className="flex min-w-0 flex-col items-start gap-2">
-                <h2 className="m-0 text-2xl leading-none font-bold">
-                  {templates[id].name}
-                </h2>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2
+                    className={`m-0 leading-none font-bold ${lead ? 'text-6xl' : 'text-4xl'}`}
+                  >
+                    {templates[id].name}
+                  </h2>
+                  {lead ? (
+                    <p className="m-0 mt-2 text-lg font-bold text-blue">
+                      Nästa pass
+                    </p>
+                  ) : null}
+                </div>
                 <StateChip state={state} />
-                {isNext ? (
-                  <p className="m-0 text-base font-bold text-blue">
-                    Nästa pass
-                  </p>
-                ) : null}
               </div>
+              {lead ? (
+                <p className="count m-0 mt-auto text-7xl leading-none">
+                  {done}
+                  <span className="text-4xl text-ink-soft">/{total} set</span>
+                </p>
+              ) : null}
+              <Tally
+                items={items}
+                label={label}
+                size={lead ? 48 : 36}
+                tone={lead ? 'ink' : 'edge'}
+              />
             </li>
           );
         })}
       </ul>
 
-      <div className="mt-auto flex flex-col gap-3">
+      <div className="sticky bottom-[5.25rem] mt-auto flex flex-col gap-2">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
         <Link href={`/pass/${next}`} className={buttonClass('primary')}>
           Starta pass

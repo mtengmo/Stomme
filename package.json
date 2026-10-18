@@ -17,6 +17,7 @@
     "shots": "npm run build && tsx scripts/screenshots.ts"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "^5.3.0",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
     "react": "^19.3.1",
