@@ -12,6 +12,39 @@
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
   "linter": { "enabled": true, "rules": { "recommended": true } },
+  "overrides": [
+    {
+      "includes": ["src/rules/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "react": "rules must stay pure: no react",
+                  "react-dom": "rules must stay pure: no react-dom",
+                  "dexie": "rules must stay pure: no dexie",
+                  "dexie-react-hooks": "rules must stay pure: no hooks"
+                },
+                "patterns": [
+                  {
+                    "group": [
+                      "**/db",
+                      "**/db/**",
+                      "**/features",
+                      "**/features/**"
+                    ],
+                    "message": "rules must not import db or features"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": { "quoteStyle": "single", "semicolons": "always" }
   },
