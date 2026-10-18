@@ -1,0 +1,43 @@
+{
+  "name": "stomme",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Stomme: a personal knee-rehab strength programme PWA (Swedish UI).",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "check": "biome check && tsc --noEmit",
+    "test": "vitest run",
+    "shots": "echo \"shots: not implemented yet (see docs/plan.md M2.8)\" && exit 0"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mtengmo/Stomme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mtengmo/Stomme/issues"
+  },
+  "homepage": "https://github.com/mtengmo/Stomme#readme"
+}
