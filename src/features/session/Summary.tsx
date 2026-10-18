@@ -37,7 +37,7 @@ export function Summary({
             ? 'Passet avbröts'
             : `${templates[session.templateId].name} klart`}
         </h1>
-        <p className="count m-0 text-4xl text-ink-soft">
+        <p className="count m-0 text-4xl text-ink">
           {formatMinutes(seconds)} · {setsDone}/{planned} set
         </p>
         <ul className="m-0 flex list-none flex-col p-0">
@@ -69,9 +69,13 @@ export function Summary({
                   </span>
                   <span className="block text-base text-ink-soft">
                     {detail}
-                    {fb?.effort ? ` · ${EFFORT_LABEL[fb.effort]}` : ''}
                   </span>
                 </span>
+                {fb?.effort ? (
+                  <span className="text-lg font-bold">
+                    {EFFORT_LABEL[fb.effort]}
+                  </span>
+                ) : null}
               </li>
             );
           })}

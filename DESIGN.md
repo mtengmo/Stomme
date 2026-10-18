@@ -43,6 +43,12 @@ typography:
     fontWeight: 800
     lineHeight: 1
     letterSpacing: "-0.01em"
+  count-rest:
+    fontFamily: "Barlow Condensed, sans-serif-condensed, sans-serif"
+    fontSize: "6rem"
+    fontWeight: 800
+    lineHeight: 1
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
     fontSize: "1.25rem"
@@ -190,6 +196,7 @@ Cool green-grey paper, graphite and chalk text, with two pen colours (red pencil
 - **Display** (800, 3rem to 3.75rem, line-height 1): screen titles ("Vecka 42", "Välkommen till Stomme"), lead pass name (3.75rem).
 - **Headline** (700, 2.25rem and 1.875rem, line-height 1): receding pass name, onboarding section heading.
 - **Count** (800, 4.5rem / 1.25rem / set-circle digits at half circle size, line-height 1, letter-spacing -0.01em): the `.count` style for set tallies, day numbers and the lead "done / total" figure.
+- **Count, rest** (800, 6rem, line-height 1): the rest countdown inside its ring; the one step above Count, set so the time reads from across the room.
 - **Body** (400, 1.25rem, line-height 1.4): onboarding paragraphs, list items, button text (weight 700).
 - **Label** (700, 1rem, line-height 1.4): chips, nav tab labels, banner text, secondary notes (regular weight). 16 px is the floor.
 

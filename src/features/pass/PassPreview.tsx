@@ -32,6 +32,9 @@ export function PassPreview({ id }: { id: TemplateId }) {
   const week = data.program ? programWeek(data.program.startDate, today) : 1;
   const plan = interimPlan(template, week);
   const active = data.active;
+  const lead =
+    plan.find((p) => p.reason !== 'first_time')?.reason ?? 'first_time';
+  const headline = reasonText(lead);
   const other = active && active.templateId !== id;
 
   const start = async () => {
@@ -60,6 +63,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
         <p className="m-0 mt-2 text-base text-ink-soft">
           Vecka {week} · {plan.reduce((n, p) => n + p.sets, 0)} set
         </p>
+        <p className="m-0 mt-1 text-base text-ink-soft">{headline}</p>
       </header>
       {other ? (
         <Banner>
@@ -75,14 +79,11 @@ export function PassPreview({ id }: { id: TemplateId }) {
               <p className="count m-0 mt-1 text-2xl text-ink">
                 {prescriptionText(p, ex)}
               </p>
-              <p className="m-0 text-base text-ink-soft">
-                {reasonText(p.reason)}
-              </p>
             </li>
           );
         })}
       </ol>
-      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto bg-paper px-5 py-3">
+      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto border-t-[3px] border-ink bg-paper px-5 py-3">
         {active ? (
           <Button onClick={start}>Fortsätt passet</Button>
         ) : (

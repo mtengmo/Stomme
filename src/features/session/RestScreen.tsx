@@ -5,6 +5,7 @@ import { formatClock } from '../../lib/format';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
+import { PencilTick } from '../../ui/PencilTick';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
 const RADIUS = 124;
@@ -17,6 +18,8 @@ interface RestScreenProps {
   nextStep: SetStep | undefined;
   nextTotalSets: number;
   onContinue(): void;
+  /** True when the rest follows a set (not an effort answer): draws the tick. */
+  afterSet: boolean;
 }
 
 /** Huge countdown on timestamps, +15 s, skip; "Nästa" tells what comes after. */
@@ -27,6 +30,7 @@ export function RestScreen({
   nextStep,
   nextTotalSets,
   onContinue,
+  afterSet,
 }: RestScreenProps) {
   const total = useRef(restSec);
   const timer = useCountdown();
@@ -64,7 +68,10 @@ export function RestScreen({
         </>
       }
     >
-      <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
+        {afterSet ? <PencilTick size={72} animate variant={1} /> : null}
+      </div>
       <div className="relative mx-auto grid size-60 place-items-center">
         <svg
           viewBox="0 0 280 280"
@@ -101,12 +108,11 @@ export function RestScreen({
       </div>
       {nextExercise && nextStep ? (
         <div>
-          <p className="m-0 text-base font-bold text-ink-soft">Nästa</p>
           <p className="m-0 text-2xl leading-tight font-bold">
             {nextExercise.name}
           </p>
           <p className="m-0 text-xl">
-            Set {nextStep.setNumber} av {nextTotalSets}
+            Nästa · Set {nextStep.setNumber} av {nextTotalSets}
             {side ? ` · ${side}` : ''}
           </p>
         </div>
