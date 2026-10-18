@@ -80,6 +80,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const summary = weekSummary(sessions, today);
   const { states, next } = passStates(sessions, today);
   const rest = restText(sessions, now);
+  const active = sessions.find((s) => s.status === 'in_progress');
   const doneDates = new Set(summary.completed.map((s) => s.date));
   const first = summary.days[0] ?? today;
   const last = summary.days[6] ?? today;
@@ -193,9 +194,18 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
 
       <div className="sticky bottom-[5.25rem] mt-auto flex flex-col gap-2">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
-        <Link href={`/pass/${next}`} className={buttonClass('primary')}>
-          Starta pass
-        </Link>
+        {active ? (
+          <Link
+            href={`/session/${active.id}`}
+            className={buttonClass('primary')}
+          >
+            Fortsätt passet
+          </Link>
+        ) : (
+          <Link href={`/pass/${next}`} className={buttonClass('primary')}>
+            Starta pass
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -8,10 +8,16 @@ export type IconName =
   | 'history'
   | 'settings'
   | 'info'
-  | 'warning';
+  | 'warning'
+  | 'minus'
+  | 'plus'
+  | 'back';
 
 const paths: Record<IconName, ReactNode> = {
   check: <path d="M4 13l5 5L20 6" />,
+  minus: <path d="M5 12h14" />,
+  plus: <path d="M5 12h14M12 5v14" />,
+  back: <path d="M15 5l-7 7 7 7" />,
   sun: (
     <>
       <circle cx="12" cy="12" r="4" />
