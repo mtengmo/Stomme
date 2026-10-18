@@ -81,15 +81,17 @@ export function Summary({
           })}
         </ul>
       </div>
-      <div className="sticky bottom-0 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="sticky bottom-0 -mx-5 flex flex-col">
         {snack}
-        {onFinish ? (
-          <Button onClick={onFinish}>Avsluta pass</Button>
-        ) : (
-          <Link href="/" className={buttonClass('primary')}>
-            Till veckan
-          </Link>
-        )}
+        <div className="flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {onFinish ? (
+            <Button onClick={onFinish}>Avsluta pass</Button>
+          ) : (
+            <Link href="/" className={buttonClass('primary')}>
+              Till veckan
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

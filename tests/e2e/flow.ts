@@ -5,6 +5,7 @@ export type Stage =
   | 'set-first'
   | 'set-side'
   | 'set-timed'
+  | 'set-after-skip'
   | 'rest'
   | 'effort'
   | 'summary';
@@ -74,4 +75,21 @@ export async function playPassA(
 
   await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
   return { sets };
+}
+
+/** Starts Pass A, skips the first exercise and reports the next set screen. */
+export async function skipFirstExercise(
+  page: Page,
+  onStage: (stage: Stage) => Promise<void>,
+): Promise<void> {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.getByRole('button', { name: 'Starta pass' }).click();
+  const frame = page.locator('[data-step]');
+  const before = await frame.getAttribute('data-step');
+  await page.getByRole('button', { name: 'Hoppa över övningen' }).click();
+  await expect(frame).not.toHaveAttribute('data-step', before ?? '');
+  await expect(page.getByRole('status')).toContainText('Hoppade över');
+  await onStage('set-after-skip');
 }

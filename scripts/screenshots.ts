@@ -5,7 +5,7 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { chromium } from '@playwright/test';
-import { playPassA } from '../tests/e2e/flow';
+import { playPassA, skipFirstExercise } from '../tests/e2e/flow';
 
 const PORT = 4173;
 const OUT = '.impeccable/review';
@@ -145,6 +145,21 @@ try {
         });
       });
       await sessionContext.close();
+
+      const skipContext = await browser.newContext({
+        baseURL: url,
+        viewport: { width: size.width, height: size.height },
+        colorScheme: scheme,
+        reducedMotion: 'reduce',
+      });
+      await skipContext.addInitScript('window.__name = (f) => f;');
+      const skipPage = await skipContext.newPage();
+      await skipFirstExercise(skipPage, async (stage) => {
+        await skipPage.screenshot({
+          path: `${OUT}/${size.name}-${scheme}-session-${stage}.png`,
+        });
+      });
+      await skipContext.close();
     }
   }
   await browser.close();

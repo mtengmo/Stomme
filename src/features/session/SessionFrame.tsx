@@ -56,9 +56,11 @@ export function SessionFrame({
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-4 pt-4 pb-4">{children}</div>
-      <div className="sticky bottom-0 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="sticky bottom-0 -mx-5 flex flex-col">
         {snack}
-        {actions}
+        <div className="flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {actions}
+        </div>
       </div>
     </div>
   );
