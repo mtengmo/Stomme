@@ -21,13 +21,13 @@ export function Snackbar({ message, onUndo, onExpire }: SnackbarProps) {
   return (
     <div
       role="status"
-      className="flex items-center justify-between gap-3 rounded-md border-[3px] border-ink bg-paper pl-4"
+      className="flex items-center justify-between gap-3 rounded-sm bg-ink pl-4 text-paper"
     >
       <span className="text-base">{message}</span>
       <button
         type="button"
         onClick={onUndo}
-        className="min-h-14 min-w-24 px-4 text-lg font-bold underline decoration-2 underline-offset-4"
+        className="min-h-12 min-w-24 px-4 text-base font-bold underline decoration-2 underline-offset-4"
       >
         Ångra
       </button>

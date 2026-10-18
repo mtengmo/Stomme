@@ -13,11 +13,13 @@ interface StepperProps {
   decDisabled?: boolean;
   incDisabled?: boolean;
   /** lg = the amount (huge numerals), md = secondary value such as the load. */
-  size?: 'lg' | 'md';
+  size?: 'lg' | 'md' | 'sm';
 }
 
 const stepBtn =
   'grid size-16 shrink-0 place-items-center rounded-md border-[3px] border-ink bg-paper text-ink transition-transform duration-150 ease-out active:scale-[0.96] disabled:opacity-40';
+
+const stepBtnSm = stepBtn.replace('size-16', 'size-12');
 
 /** Big value with minus/plus buttons (64 px targets, 8 px+ from the value). */
 export function Stepper({
@@ -37,7 +39,7 @@ export function Stepper({
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
-          className={stepBtn}
+          className={size === 'sm' ? stepBtnSm : stepBtn}
           onClick={onDec}
           disabled={decDisabled}
           aria-label={`Minska ${label.toLowerCase()}`}
@@ -46,8 +48,12 @@ export function Stepper({
         </button>
         <div className="flex min-w-0 flex-1 flex-col items-center">
           <p
-            className={`count m-0 text-center leading-none ${
-              size === 'lg' ? 'text-7xl' : 'text-4xl'
+            className={`m-0 text-center leading-none ${
+              size === 'lg'
+                ? 'count text-7xl'
+                : size === 'md'
+                  ? 'count text-4xl'
+                  : 'text-xl font-normal'
             }`}
             aria-live="polite"
           >
@@ -66,7 +72,7 @@ export function Stepper({
         </div>
         <button
           type="button"
-          className={stepBtn}
+          className={size === 'sm' ? stepBtnSm : stepBtn}
           onClick={onInc}
           disabled={incDisabled}
           aria-label={`Öka ${label.toLowerCase()}`}

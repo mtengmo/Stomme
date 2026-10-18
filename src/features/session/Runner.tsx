@@ -101,7 +101,16 @@ export function Runner({ session, logs, last }: RunnerProps) {
     let done = 0;
     let all = 0;
     session.plan.forEach((p) => {
-      if (session.feedback[p.exerciseId]?.skipped) return;
+      const active = steps[cursor]?.exerciseId === p.exerciseId;
+      if (session.feedback[p.exerciseId]?.skipped) {
+        items.push({
+          id: p.exerciseId,
+          remaining: 0,
+          skipped: true,
+          active,
+        });
+        return;
+      }
       let complete = 0;
       for (let n = 1; n <= p.sets; n++) {
         const count = logs.filter(
@@ -109,12 +118,12 @@ export function Runner({ session, logs, last }: RunnerProps) {
         ).length;
         if (count >= sidesOf(p.exerciseId)) complete += 1;
       }
-      items.push({ id: p.exerciseId, remaining: p.sets - complete });
+      items.push({ id: p.exerciseId, remaining: p.sets - complete, active });
       done += complete;
       all += p.sets;
     });
     return { items, label: `${done} av ${all} set klara` };
-  }, [session.plan, session.feedback, logs]);
+  }, [session.plan, session.feedback, logs, steps, cursor]);
 
   const frame = {
     title: templates[session.templateId].name,
@@ -248,6 +257,7 @@ export function Runner({ session, logs, last }: RunnerProps) {
         nextStep={upcoming}
         nextTotalSets={upcoming ? total(upcoming.planIndex) : 0}
         onContinue={() => advance()}
+        afterSet={steps[cursor - 1]?.kind === 'set'}
       />
     );
   }

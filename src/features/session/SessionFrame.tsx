@@ -49,8 +49,11 @@ export function SessionFrame({
           Avbryt
         </button>
       </header>
-      <div className="mt-1">
+      <div className="mt-1 flex items-center gap-3">
         <Tally items={tally.items} label={tally.label} size={32} tone="edge" />
+        <span className="text-base text-ink-soft" aria-hidden="true">
+          set kvar
+        </span>
       </div>
       <div className="flex flex-1 flex-col gap-4 pt-4 pb-4">{children}</div>
       <div className="sticky bottom-0 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
