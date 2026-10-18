@@ -43,9 +43,9 @@ export function sideLetter(side: 'right' | 'left' | 'both'): string {
 
 /** Reason codes from the rules, as short Swedish lines. */
 export const REASON_TEXT: Partial<Record<ReasonCode, string>> = {
-  first_time: 'Första gången: börja i nedre delen av intervallet.',
+  first_time: 'Första gången: startnivå.',
   week1_bodyweight: 'Första veckan: kroppsvikt.',
-  start_load: 'Startvikt från vecka 2.',
+  start_load: 'Från vecka 2: startvikt.',
 };
 
 export function reasonText(code: ReasonCode): string {

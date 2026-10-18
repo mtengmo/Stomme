@@ -82,7 +82,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
           );
         })}
       </ol>
-      <div className="sticky bottom-[5.25rem] mt-auto">
+      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto bg-paper px-5 py-3">
         {active ? (
           <Button onClick={start}>Fortsätt passet</Button>
         ) : (

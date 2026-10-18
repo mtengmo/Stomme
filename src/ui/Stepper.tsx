@@ -47,7 +47,7 @@ export function Stepper({
         <div className="flex min-w-0 flex-1 flex-col items-center">
           <p
             className={`count m-0 text-center leading-none ${
-              size === 'lg' ? 'text-7xl' : 'text-5xl'
+              size === 'lg' ? 'text-7xl' : 'text-4xl'
             }`}
             aria-live="polite"
           >

@@ -121,7 +121,9 @@ try {
       for (const scenario of ['done', 'partial'] as const) {
         await page.evaluate(seed, scenario);
         await page.reload();
-        await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+        await page
+          .getByRole('link', { name: /Starta pass|Fortsätt passet/ })
+          .waitFor();
         await page.screenshot({
           path: `${OUT}/${size.name}-${scheme}-week-${scenario}.png`,
         });

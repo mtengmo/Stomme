@@ -65,7 +65,7 @@ export function RestScreen({
       }
     >
       <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
-      <div className="relative mx-auto grid size-72 place-items-center">
+      <div className="relative mx-auto grid size-60 place-items-center">
         <svg
           viewBox="0 0 280 280"
           className="absolute inset-0 size-full -rotate-90"
@@ -92,7 +92,7 @@ export function RestScreen({
           />
         </svg>
         <p
-          className="count m-0 text-[6.5rem] leading-none"
+          className="count m-0 text-[6rem] leading-none"
           role="timer"
           aria-label={`${timer.seconds} sekunder kvar`}
         >
