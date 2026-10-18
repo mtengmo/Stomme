@@ -1,0 +1,50 @@
+import { describe, expect, it } from 'vitest';
+import { exerciseList, exercises } from './exercises';
+import { templates } from './templates';
+
+describe('exercise seed', () => {
+  it('has 11 exercises with unique ids', () => {
+    expect(exerciseList).toHaveLength(11);
+    expect(new Set(exerciseList.map((e) => e.id)).size).toBe(11);
+  });
+
+  it.each(exerciseList)(
+    '$id has valid ladder, indices, range and tips',
+    (e) => {
+      for (let i = 1; i < e.loadLadder.length; i++) {
+        expect(e.loadLadder[i]?.kg).toBeGreaterThanOrEqual(
+          e.loadLadder[i - 1]?.kg ?? 0,
+        );
+      }
+      expect(e.startLoadIndex).toBeGreaterThanOrEqual(0);
+      expect(e.startLoadIndex).toBeLessThan(e.loadLadder.length);
+      expect(e.week1LoadIndex).toBeGreaterThanOrEqual(0);
+      expect(e.week1LoadIndex).toBeLessThan(e.loadLadder.length);
+      expect(e.range.start).toBeLessThanOrEqual(e.range.max);
+      expect(e.tips).toHaveLength(3);
+    },
+  );
+});
+
+describe('templates', () => {
+  it('resolve to known non-optional exercises', () => {
+    for (const t of Object.values(templates)) {
+      expect(t.items).toHaveLength(5);
+      for (const item of t.items) {
+        const ex = exercises[item.exerciseId];
+        expect(ex).toBeDefined();
+        expect(ex.optional).toBeUndefined();
+      }
+    }
+  });
+
+  it('uses 3 sets for the carry and 60 s rest everywhere', () => {
+    const carry = templates.B.items.find(
+      (i) => i.exerciseId === 'suitcase-carry',
+    );
+    expect(carry?.sets).toBe(3);
+    for (const t of Object.values(templates)) {
+      for (const i of t.items) expect(i.restSec).toBe(60);
+    }
+  });
+});
