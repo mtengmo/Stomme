@@ -154,9 +154,13 @@ try {
       await page.getByRole('button', { name: 'Starta pass' }).click();
       await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
       await shot(page, 'pain-picker-empty');
-      await page.getByRole('radio', { name: '4', exact: true }).check({ force: true });
+      await page
+        .getByRole('radio', { name: '4', exact: true })
+        .check({ force: true });
       await shot(page, 'pain-picker');
-      await page.getByRole('radio', { name: '1', exact: true }).check({ force: true });
+      await page
+        .getByRole('radio', { name: '1', exact: true })
+        .check({ force: true });
       await page.getByRole('switch', { name: 'Skarp smärta' }).click();
       await shot(page, 'pain-picker-flag');
       await page.getByRole('button', { name: 'Spara' }).click();
