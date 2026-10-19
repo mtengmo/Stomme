@@ -232,16 +232,19 @@ function ExerciseSets({
           </span>
         ) : null}
       </h3>
-      <ol className="m-0 flex list-none flex-col gap-1 p-0">
+      <ol className="m-0 flex list-none flex-col gap-3 p-0">
         {setNumbers.map((n) => {
           const row = logs
             .filter((l) => l.setNumber === n)
             .sort((a, b) => a.side.localeCompare(b.side));
           const first = row[0];
           return (
-            <li key={n} className="flex items-baseline gap-3 text-base">
-              <span className="w-12 shrink-0 text-ink-soft">Set {n}</span>
-              <span className="flex flex-wrap gap-x-4">
+            <li key={n} className="flex flex-col text-base">
+              <span className="text-ink-soft">
+                Set {n}
+                {first ? ` · ${kgText(first.weightKg)}` : ''}
+              </span>
+              <span className="flex flex-wrap gap-x-5">
                 {row.map((l) => (
                   <span key={l.id}>
                     <span className="count text-2xl">
@@ -250,11 +253,6 @@ function ExerciseSets({
                     {SIDE[l.side] ? ` ${SIDE[l.side]}` : ''}
                   </span>
                 ))}
-                {first ? (
-                  <span className="text-ink-soft">
-                    {kgText(first.weightKg)}
-                  </span>
-                ) : null}
               </span>
             </li>
           );

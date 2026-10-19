@@ -7,7 +7,7 @@ import { linearScale, niceTicks } from './scales';
 const W = 320;
 const H = 224;
 const LEFT = 36;
-const RIGHT = 296;
+const RIGHT = 228;
 const TOP = 24;
 const BASE = 184;
 
@@ -126,9 +126,9 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
           className="fill-upcoming"
         />
         <text
-          x={RIGHT + 4}
-          y={y(0) - 8}
-          textAnchor="end"
+          x={RIGHT + 14}
+          y={(y(0) + y(3)) / 2 + 5}
+          textAnchor="start"
           fontSize={16}
           className="fill-upcoming-ink font-bold"
         >
@@ -155,15 +155,6 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
               {t}
             </text>
           </g>
-        ))}
-        {TIMINGS.map((t) => (
-          <polyline
-            key={t}
-            fill="none"
-            className={TONE[t].stroke}
-            strokeWidth={1.5}
-            points={series[t].map((p) => `${px(t, p)},${y(p.score)}`).join(' ')}
-          />
         ))}
         {TIMINGS.flatMap((t) =>
           series[t].map((p) => (
