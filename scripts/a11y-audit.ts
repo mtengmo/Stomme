@@ -1,0 +1,254 @@
+/**
+ * Structural a11y audit over every screen (DEV server, SYNTHETIC data):
+ * targets under 48 px, text under 16 px, unnamed controls, focus ring on Tab,
+ * reduced-motion (animations/transitions), dialog keyboard (Escape, focus trap).
+ * Usage: npx tsx scripts/a11y-audit.ts
+ */
+import { spawn } from 'node:child_process';
+import { chromium, type Page } from '@playwright/test';
+
+const PORT = 5293;
+async function up(url: string) {
+  for (let i = 0; i < 60; i++) {
+    try {
+      if ((await fetch(url)).ok) return;
+    } catch {}
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error('no server');
+}
+
+const srv = spawn('npx', ['vite', '--port', String(PORT), '--strictPort'], {
+  shell: true,
+  stdio: 'ignore',
+});
+const findings: string[] = [];
+let screens = 0;
+
+async function audit(page: Page, name: string) {
+  screens++;
+  const res = await page.evaluate(() => {
+    const out: string[] = [];
+    const label = (el: Element) =>
+      `${el.tagName.toLowerCase()}${el.getAttribute('role') ? `[${el.getAttribute('role')}]` : ''} "${(
+        el.getAttribute('aria-label') ||
+        (el as HTMLElement).innerText ||
+        ''
+      )
+        .trim()
+        .slice(0, 30)}"`;
+    const visible = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      const s = getComputedStyle(el);
+      return (
+        r.width > 1 &&
+        r.height > 1 &&
+        s.visibility !== 'hidden' &&
+        s.display !== 'none'
+      );
+    };
+    const sel =
+      'a[href],button,input:not([type=hidden]),select,textarea,[role=radio],[role=switch],[role=button],summary';
+    for (const el of document.querySelectorAll(sel)) {
+      if (!visible(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 47.5 || r.height < 47.5) {
+        // radios/switches are often visually-hidden inputs inside a labelled 48px row
+        const host = el.closest('label') ?? el;
+        const hr = host.getBoundingClientRect();
+        if (hr.width >= 47.5 && hr.height >= 47.5) continue;
+        out.push(
+          `target ${Math.round(r.width)}x${Math.round(r.height)} ${label(el)}`,
+        );
+      }
+      const name =
+        el.getAttribute('aria-label') ||
+        el.getAttribute('aria-labelledby') ||
+        (el as HTMLElement).innerText?.trim() ||
+        el.closest('label')?.textContent?.trim();
+      if (!name) out.push(`unnamed control ${label(el)}`);
+    }
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+    );
+    const seen = new Set<Element>();
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const el = n.parentElement;
+      if (!el || seen.has(el) || !n.textContent?.trim() || !visible(el))
+        continue;
+      seen.add(el);
+      if (el.closest('svg')) continue;
+      const fs = Number.parseFloat(getComputedStyle(el).fontSize);
+      if (fs < 15.99)
+        out.push(`text ${fs}px "${n.textContent.trim().slice(0, 30)}"`);
+    }
+    return out;
+  });
+  for (const r of res) findings.push(`${name}: ${r}`);
+
+  // keyboard focus ring on the first tab stops
+  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press('Tab');
+    const ring = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body) return null;
+      const s = getComputedStyle(el);
+      return {
+        t: `${el.tagName.toLowerCase()} "${((el as HTMLElement).innerText || el.getAttribute('aria-label') || '').trim().slice(0, 25)}"`,
+        ok: s.outlineStyle !== 'none' && Number.parseFloat(s.outlineWidth) >= 2,
+        // visually hidden inputs delegate the ring to their label
+        hidden: el.getBoundingClientRect().width < 2,
+      };
+    });
+    if (ring && !ring.ok && !ring.hidden)
+      findings.push(`${name}: no focus ring on ${ring.t}`);
+  }
+}
+
+async function theme(scheme: 'light' | 'dark') {
+  const browser = await chromium.launch();
+  const ctx = await browser.newContext({
+    viewport: { width: 360, height: 800 },
+    colorScheme: scheme,
+    reducedMotion: 'reduce',
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript('window.__name = (f) => f');
+  const base = `http://localhost:${PORT}`;
+  const tag = (s: string) => `${scheme} ${s}`;
+  await page.goto(base);
+  await page.getByRole('heading', { name: /Välkommen/ }).waitFor();
+  await audit(page, tag('onboarding'));
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.goto(`${base}/#/dev/demo`);
+  await page
+    .getByRole('button', { name: 'Fyll med syntetisk testdata' })
+    .click();
+  await page.getByText(/Fyllde med/).waitFor();
+  for (const [name, hash, wait] of [
+    ['week', '#/', /Vecka/],
+    ['history', '#/historik', /Historik/],
+    ['settings', '#/installningar', /Inställningar/],
+    ['exercise card', '#/ovning/step-up', /Step/i],
+  ] as const) {
+    await page.goto(`${base}/${hash}`);
+    await page.getByRole('heading', { name: wait }).first().waitFor();
+    await page.waitForTimeout(300);
+    await audit(page, tag(name));
+  }
+  await page.goto(`${base}/#/historik`);
+  await page.getByRole('link', { name: /Pass/ }).first().click();
+  await page.getByRole('heading', { name: /Pass [AB]/, level: 1 }).waitFor();
+  await audit(page, tag('session detail'));
+  await page.getByRole('button', { name: 'Radera passet' }).click();
+  await audit(page, tag('session detail delete confirm'));
+
+  // settings confirmations
+  await page.goto(`${base}/#/installningar`);
+  await page.getByRole('button', { name: 'Radera all data' }).click();
+  await audit(page, tag('delete confirm'));
+  await page.keyboard.press('Escape');
+  await page.getByRole('heading', { name: 'Inställningar' }).waitFor();
+
+  // fresh session flow: preview, pain, set, rest, effort, pain after, summary
+  await page.goto(`${base}/#/pass/A`);
+  await page.getByRole('heading', { name: 'Pass A' }).waitFor();
+  await audit(page, tag('pass preview'));
+  await page.getByRole('button', { name: 'Starta pass' }).click();
+  await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
+  await audit(page, tag('pain screen'));
+  await page.getByRole('radio', { name: /^0(,|$)/ }).check({ force: true });
+  await page.getByRole('button', { name: 'Spara' }).click();
+  await page.locator('[data-step]').waitFor();
+  await audit(page, tag('session set'));
+  // exercise sheet: open, Escape closes, focus returns, focus trapped
+  await page.getByRole('button', { name: 'Hur gör man?' }).click();
+  await page.getByRole('dialog').waitFor();
+  await audit(page, tag('exercise sheet'));
+  const trapped = await page.evaluate(async () => {
+    const dlg = document.querySelector('[role=dialog]');
+    for (let i = 0; i < 25; i++) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+    }
+    return !!dlg;
+  });
+  for (let i = 0; i < 25; i++) {
+    await page.keyboard.press('Tab');
+    const inside = await page.evaluate(
+      () => !!document.activeElement?.closest('[role=dialog]'),
+    );
+    if (!inside) {
+      findings.push(
+        `${tag('exercise sheet')}: focus escaped the dialog after ${i + 1} Tab presses`,
+      );
+      break;
+    }
+  }
+  void trapped;
+  await page.keyboard.press('Escape');
+  if ((await page.getByRole('dialog').count()) > 0) {
+    findings.push(`${tag('exercise sheet')}: Escape does not close the dialog`);
+  }
+  await page.getByRole('button', { name: 'Klar set' }).click();
+  await page.getByRole('button', { name: 'Hoppa över vila' }).waitFor();
+  await audit(page, tag('rest'));
+  await page.getByRole('button', { name: 'Hoppa över vila' }).click();
+  // finish quickly: loop primary actions until the effort / summary screens
+  const seen = new Set<string>();
+  for (let g = 0; g < 80; g++) {
+    const a = page
+      .getByRole('button', {
+        name: /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara)$/,
+      })
+      .first();
+    await a.waitFor();
+    const n = (await a.innerText()).trim();
+    if (n === 'Lagom' && !seen.has('effort')) {
+      seen.add('effort');
+      await audit(page, tag('effort'));
+    }
+    if (n === 'Spara' && !seen.has('after')) {
+      seen.add('after');
+      await audit(page, tag('pain after'));
+      await page.getByRole('radio', { name: /^0(,|$)/ }).check({ force: true });
+    }
+    if (n === 'Avsluta pass') {
+      await audit(page, tag('summary'));
+      await a.click();
+      break;
+    }
+    const before = await page
+      .locator('[data-step]')
+      .getAttribute('data-step')
+      .catch(() => null);
+    await a.click();
+    await page.waitForTimeout(80);
+    void before;
+  }
+  // stop screen
+  await page.goto(`${base}/#/stopp/x`);
+  await page.waitForTimeout(300);
+  await audit(page, tag('stop screen'));
+  // reduced motion: no running animations/long transitions on week view
+  await page.goto(`${base}/#/`);
+  await page.waitForTimeout(500);
+  const anims = await page.evaluate(() => document.getAnimations().length);
+  if (anims > 0)
+    findings.push(
+      `${tag('week')}: ${anims} running animation(s) under reduced motion`,
+    );
+  await browser.close();
+}
+
+try {
+  await up(`http://localhost:${PORT}`);
+  await theme('light');
+  await theme('dark');
+} finally {
+  srv.kill();
+}
+const unique = [...new Set(findings)];
+console.log(`${screens} screen audits (360x800, light+dark)`);
+console.log(unique.length ? unique.join('\n') : 'No findings');

@@ -41,6 +41,7 @@ const GENERIC_IMPORT_ERROR = 'Filen kunde inte läsas. Inget har ändrats.';
 
 function megabytes(bytes: number): string {
   const mb = bytes / (1024 * 1024);
+  if (mb >= 1024) return `${(mb / 1024).toFixed(1)} GB`;
   return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} MB`;
 }
 
@@ -193,8 +194,8 @@ export function Settings() {
         </h1>
         <p className="m-0 text-xl">
           Filen innehåller {c.sessions.length} pass, {c.setLogs.length} set och{' '}
-          {c.painLogs.length} smärtvärden, sparad{' '}
-          {formatShortDate(toLocalDate(new Date(c.exportedAt)))}.
+          {c.painLogs.length} smärtvärden. Filen skapades{' '}
+          {formatShortDate(toLocalDate(new Date(c.exportedAt)))}
         </p>
         <p className="m-0 text-xl">
           All data i appen ersätts. Först sparas en säkerhetskopia av det du har

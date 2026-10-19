@@ -9,7 +9,7 @@ colors:
   edge-grey: "#66766f"
   upcoming-fill: "#dde6e2"
   upcoming-ink: "#3d484b"
-  red-pencil: "#c22f27"
+  red-pencil: "#b52a23"
   blue-ink: "#2b4fa0"
   today-amber: "#f0b13a"
   today-amber-ink: "#23292b"
@@ -244,6 +244,9 @@ Seven 44 px squares with 2 px outlines (edge grey) holding day abbreviation and 
 ### Navigation
 Fixed bottom bar, paper fill, 3 px graphite top rule, three equal tabs (Vecka, Historik, Inställningar), each 64 px tall with a 24 px icon above a 16 px label. Active: bold graphite text and a 4 px graphite (ink) underline, since red means done only; inactive: graphite-soft with transparent underline. Current page is flagged with `aria-current`.
 
+### Settings blocks
+Settings is plain ruled paper, not cards: each section opens with a 3 px graphite rule and a 1.875rem condensed heading, with text and full-width secondary buttons below. Confirmations (replace data, delete all) take over the screen with a heading, one plain sentence, a safe secondary button first (Behåll min data) and the destructive action as the heavier primary ink button; never red. Status lines pair an icon with bold text. Update and backup-reminder banners are the info banner (blue outline) with a bold sentence and a 48 px action.
+
 ### Inputs / Fields
 Not yet built. Focus treatment is global: 3 px blue outline, 3 px offset, 4 px radius.
 
@@ -268,4 +271,8 @@ Not yet built. Focus treatment is global: 3 px blue outline, 3 px offset, 4 px r
 
 ## Not canonized
 
-Recorded here as build facts, not rules for future surfaces: the "Nästa pass" blue text label above the lead card's count is an incidental state marker, not a kicker pattern to repeat; routes for session, history and settings are stubs and have no visual system yet.
+Recorded here as build facts, not rules for future surfaces: the "Nästa pass" blue text label above the lead card's count is an incidental state marker, not a kicker pattern to repeat .
+
+## Contrast (computed)
+
+`npx tsx scripts/contrast.ts` reads the tokens in `src/styles/index.css` and checks every text and UI pair in both themes (4.5:1 text, 3:1 UI). Light red pencil was darkened from #c22f27 to #b52a23 so red text also holds 4.5:1 over a printed grid line. See `docs/a11y-audit.md`.

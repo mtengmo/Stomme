@@ -221,7 +221,10 @@ function ExerciseSets({
   return (
     <div className="flex flex-col gap-2 rounded-md border-2 border-edge bg-paper p-4">
       <h3 className="m-0 flex flex-wrap items-baseline justify-between gap-x-3 text-xl font-bold">
-        <Link href={`/ovning/${exerciseId}`} className="text-ink">
+        <Link
+          href={`/ovning/${exerciseId}`}
+          className="inline-flex min-h-12 items-center text-ink underline decoration-2 underline-offset-4"
+        >
           {ex.name}
         </Link>
         {effort ? (

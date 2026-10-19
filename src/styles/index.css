@@ -15,7 +15,7 @@
   --line: #d6e2dc;
   --ink: #23292b;
   --ink-soft: #4a5659;
-  --red: #c22f27;
+  --red: #b52a23;
   --blue: #2b4fa0;
   --amber: #f0b13a;
   --amber-ink: #23292b;
@@ -123,5 +123,19 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   .tick-new {
     animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  button:active,
+  a:active {
+    transform: none !important;
   }
 }

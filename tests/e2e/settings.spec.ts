@@ -87,3 +87,25 @@ test('no update banner appears during a session', async ({ page }) => {
   await expect(page.locator('[data-step]')).toBeVisible();
   await expect(page.getByText('Ny version finns')).toHaveCount(0);
 });
+
+test('the exercise sheet traps focus and closes with Escape', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.getByRole('button', { name: 'Starta pass' }).click();
+  await answerPain(page, 0);
+  await page.getByRole('button', { name: 'Hur gör man?' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press('Tab');
+    expect(
+      await page.evaluate(
+        () => !!document.activeElement?.closest('[role=dialog]'),
+      ),
+    ).toBe(true);
+  }
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
