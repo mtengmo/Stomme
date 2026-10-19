@@ -144,7 +144,9 @@ export function StopScreen({
       <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
         <div className="flex flex-1 flex-col gap-4 pt-10">
           <Icon name="stop" size={64} />
-          <h1 className="m-0 text-6xl leading-none font-extrabold">
+          <h1
+            className={`m-0 leading-none font-extrabold break-words ${dayAfter || afterSession ? 'text-5xl' : 'text-6xl'}`}
+          >
             {dayAfter
               ? PAIN_COPY.stopTitleDayAfter
               : afterSession
