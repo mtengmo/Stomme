@@ -38,7 +38,10 @@ try {
       const tag = `m3-${s.name}-${scheme}`;
       await page.goto(`${base}/#/dev/figurer`);
       await page.waitForTimeout(400);
-      await page.screenshot({ path: `${OUT}/${tag}-figurer.png`, fullPage: true });
+      await page.screenshot({
+        path: `${OUT}/${tag}-figurer.png`,
+        fullPage: true,
+      });
       await page.goto(`${base}/#/ovning/step-up`);
       await page.waitForTimeout(300);
       await page.screenshot({ path: `${OUT}/${tag}-card.png`, fullPage: true });

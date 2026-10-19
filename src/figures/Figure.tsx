@@ -53,7 +53,7 @@ export function FigureFrame({
   const leg = (k: Pt, a: Pt, t: Pt) => line([p.hip, k, a, t]);
   return (
     <svg
-      viewBox="0 0 200 200"
+      viewBox="14 20 164 168"
       role="img"
       aria-hidden="true"
       className="block h-auto w-full"
@@ -81,8 +81,8 @@ export function FigureFrame({
           ))
         : null}
       <text
-        x="14"
-        y="30"
+        x="20"
+        y="58"
         fontSize="28"
         fontWeight="800"
         fill="var(--blue)"
