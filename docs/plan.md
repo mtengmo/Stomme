@@ -316,3 +316,11 @@ Magnus's answers 2026-10-18: Q1 keep it generic (no special carry rule; use the 
 10. Pain warn holds only knee-loaded exercises; core and carry progress normally.
 11. Calf raise (start = max = 12): moves to 10 kg step once 3x12 is easy.
 12. Repo visibility: public (free Pages); no personal data in the app repo.
+
+### Decisions recorded after the M4 safety review (2026-10-19; defaults, Magnus to confirm)
+13. **No-history pain hold (changes 5.2 rule 2):** a knee-loaded exercise with no finished history and any pain on record (last session or today's 'before' not ok) starts at the week-1 load with template sets, reason pain_hold or pain_stop_hold, and 'Fråga fysioterapeuten' on stop. It counts all pain on record (not only since a last session), so one old warn keeps a never-done knee exercise at the week-1 load until it has been done once.
+14. **Pain mid-session:** the abort confirm has 'Avbryt på grund av knäet', which aborts with reason pain_stop (logs kept, stop banner, day-after prompt, next plan held with 'Fråga fysioterapeuten'). Plain 'Avbryt passet' stays reason user.
+15. **'Before' reading is one-shot:** it cannot be re-entered or overwritten once taken or once any set is logged; the reading and its consequence (abort or replan) are written in one transaction, and the session screen re-checks a stored 'before' reading on load.
+16. **Day-after window:** a day-after reading is only accepted 1-2 calendar days after the session (as shouldPromptDayAfter), and a day-after red flag shows the stop banner but does not abort the completed session.
+17. **Import note (M6):** the importer must reject or flag an in-progress session with sets but no 'before' reading.
+18. **Open for Magnus:** whether a set may be added (added_set) after a 'Tungt' session (the plan's rule order allows it); whether carry and bird dog (not knee-loaded) may progress after a stop; and the wall-sit offer lost when the warn screen is reloaded.

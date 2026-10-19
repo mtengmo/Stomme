@@ -76,6 +76,7 @@ describe('"Hur gör man?" sheet', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Starta pass' }),
     );
+    await answerPain(user, 0);
     await screen.findByText('Set 1 av 2');
     const opener = screen.getByRole('button', { name: 'Hur gör man?' });
 
