@@ -1,15 +1,11 @@
 import { useState } from 'react';
-import {
-  AMOUNT_LABEL,
-  sideLabel,
-  sideLetter,
-  UNIT_WORD,
-} from '../../content/copy';
+import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
 import type { Exercise } from '../../domain/types';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
+import { ExerciseSheet } from '../exercise/ExerciseCard';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
@@ -40,6 +36,7 @@ export function SetScreen({
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
   const hold = useCountdown();
+  const [cardOpen, setCardOpen] = useState(false);
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
@@ -69,13 +66,11 @@ export function SetScreen({
         </>
       }
     >
-      <div className="flex items-start gap-4">
-        <FigureSlot letter={sideLetter(step.side)} />
+      <h1 className="m-0 text-3xl leading-tight font-bold">{exercise.name}</h1>
+      <div className="flex items-center gap-4">
+        <FigureSlot exerciseId={exercise.id} side={step.side} />
         <div className="min-w-0">
-          <h1 className="m-0 text-3xl leading-tight font-bold">
-            {exercise.name}
-          </h1>
-          <p className="m-0 mt-1 text-xl font-bold">
+          <p className="m-0 text-xl font-bold">
             Set {step.setNumber} av {totalSets}
             {side ? (
               <>
@@ -85,8 +80,18 @@ export function SetScreen({
             ) : null}
           </p>
           {cue ? <p className="m-0 text-base text-ink-soft">{cue}</p> : null}
+          <button
+            type="button"
+            onClick={() => setCardOpen(true)}
+            className="-ml-2 min-h-12 px-2 text-base font-bold underline decoration-2 underline-offset-4"
+          >
+            Hur gör man?
+          </button>
         </div>
       </div>
+      {cardOpen ? (
+        <ExerciseSheet exercise={exercise} onClose={() => setCardOpen(false)} />
+      ) : null}
 
       <div className="mt-auto flex flex-col gap-4">
         <Stepper
