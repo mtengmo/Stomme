@@ -16,7 +16,12 @@ export function BarChart({ weeks }: { weeks: WeekVolume[] }) {
   const x = bandScale(n, [4, W - 4], 0.25);
   const y = linearScale([0, max], [BASE, TOP]);
   const lastFour = weeks.slice(-4).reduce((sum, w) => sum + w.sets, 0);
-  const summary = `Senaste 4 veckorna: ${lastFour} set. Blå stapel är veckan som pågår.`;
+  const running = weeks[n - 1];
+  const summary = `Senaste 4 veckorna: ${lastFour} set. ${
+    running && running.sets > 0
+      ? 'Blå stapel är veckan som pågår.'
+      : 'Veckan som pågår har inga set än.'
+  }`;
 
   return (
     <ChartShell
@@ -71,6 +76,26 @@ export function BarChart({ weeks }: { weeks: WeekVolume[] }) {
                     className="count fill-ink"
                   >
                     {w.sets}
+                  </text>
+                </>
+              ) : null}
+              {w.sets === 0 ? (
+                <>
+                  <rect
+                    x={x(i)}
+                    y={BASE - 3}
+                    width={x.bandwidth}
+                    height={3}
+                    className={current ? 'fill-blue' : 'fill-ink'}
+                  />
+                  <text
+                    x={x.center(i)}
+                    y={BASE - 10}
+                    textAnchor="middle"
+                    fontSize={18}
+                    className={`count ${current ? 'fill-blue' : 'fill-ink-soft'}`}
+                  >
+                    0
                   </text>
                 </>
               ) : null}

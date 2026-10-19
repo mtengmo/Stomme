@@ -7,20 +7,22 @@ import { linearScale, niceTicks } from './scales';
 const W = 320;
 const H = 224;
 const LEFT = 36;
-const RIGHT = 228;
+const RIGHT = 304;
 const TOP = 24;
 const BASE = 184;
 
 type Timing = PainLog['timing'];
 
 const TIMINGS: Timing[] = ['before', 'after', 'dayAfter'];
+/** dayAfter first so the diamonds sit behind the other two. */
+const DRAW_ORDER: Timing[] = ['dayAfter', 'before', 'after'];
 const LABEL: Record<Timing, string> = {
   before: 'Före',
   after: 'Efter',
   dayAfter: 'Dagen efter',
 };
 /** Horizontal nudge so same-day points do not hide each other. */
-const NUDGE: Record<Timing, number> = { before: -6, after: 6, dayAfter: 0 };
+const NUDGE: Record<Timing, number> = { before: -8, after: 8, dayAfter: 0 };
 const TONE: Record<Timing, { fill: string; stroke: string }> = {
   before: { fill: 'fill-paper', stroke: 'stroke-ink' },
   after: { fill: 'fill-blue', stroke: 'stroke-blue' },
@@ -125,15 +127,6 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
           height={y(0) - y(3)}
           className="fill-upcoming"
         />
-        <text
-          x={RIGHT + 14}
-          y={(y(0) + y(3)) / 2 + 5}
-          textAnchor="start"
-          fontSize={16}
-          className="fill-upcoming-ink font-bold"
-        >
-          Okej-zon
-        </text>
         {yTicks.map((t) => (
           <g key={t}>
             <line
@@ -156,7 +149,7 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
             </text>
           </g>
         ))}
-        {TIMINGS.flatMap((t) =>
+        {DRAW_ORDER.flatMap((t) =>
           series[t].map((p) => (
             <Marker
               key={`${t}-${p.sessionId}`}
@@ -190,6 +183,19 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
             {LABEL[t]}
           </li>
         ))}
+        <li className="flex items-center gap-2">
+          <svg width={20} height={20} viewBox="0 0 20 20" aria-hidden="true">
+            <rect
+              x={1}
+              y={4}
+              width={18}
+              height={12}
+              className="fill-upcoming stroke-edge"
+              strokeWidth={1}
+            />
+          </svg>
+          Okej-zon 0–3
+        </li>
       </ul>
     </ChartShell>
   );

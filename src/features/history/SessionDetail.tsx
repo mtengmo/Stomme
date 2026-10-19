@@ -130,7 +130,7 @@ export function SessionDetail({ id }: { id: string }) {
       </section>
 
       <section className="flex flex-col gap-3" aria-label="Smärta">
-        <h2 className="m-0 text-3xl font-bold">Smärta i knäet</h2>
+        <h2 className="m-0 text-3xl font-bold">Smärta i högerknäet</h2>
         {pain.length === 0 ? (
           <p className="m-0 text-base text-ink-soft">
             Ingen smärta antecknad för det här passet.
@@ -193,9 +193,7 @@ export function SessionDetail({ id }: { id: string }) {
             <Button variant="secondary" onClick={() => setConfirming(false)}>
               Behåll passet
             </Button>
-            <Button variant="secondary" onClick={remove}>
-              Ja, radera passet
-            </Button>
+            <Button onClick={remove}>Ja, radera passet</Button>
           </>
         ) : (
           <Button variant="secondary" onClick={() => setConfirming(true)}>

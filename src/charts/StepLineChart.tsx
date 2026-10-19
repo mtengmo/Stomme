@@ -44,7 +44,11 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
   const n = pts.length;
   const last = pts[n - 1];
 
-  const ticks = niceTicks(0, Math.max(...pts.map((p) => p.weightKg), 0), 4);
+  const ticks = niceTicks(
+    0,
+    Math.max(...pts.map((p) => p.weightKg), 0) * 1.35,
+    4,
+  );
   const y = linearScale([ticks.min, ticks.max], [BASE, TOP]);
   const x = (i: number) =>
     n === 1 ? (LEFT + RIGHT) / 2 : LEFT + ((RIGHT - LEFT) * i) / (n - 1);
@@ -57,12 +61,15 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
 
   const unit = UNIT_WORD[ex.unit];
   const summary = last
-    ? `${chipName(id)}: senast ${kgText(last.weightKg)}, ${last.amount} ${unit} (${n} pass). Siffran vid punkten är antal ${unit}.`
+    ? `${chipName(id)}: senast ${kgText(last.weightKg)}, ${last.amount} ${unit} (${n} pass). Siffran vid punkten är antal ${unit.replace(/\.$/, '')}.`
     : 'Inget loggat än.';
 
   const chips = (
-    <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
-      <legend className="sr-only">Välj övning</legend>
+    <div
+      role="group"
+      aria-label="Välj övning"
+      className="-mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-2"
+    >
       {exerciseIds.map((e) => {
         const on = e === id;
         return (
@@ -71,7 +78,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
             type="button"
             aria-pressed={on}
             onClick={() => setPicked(e)}
-            className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${
+            className={`min-h-12 shrink-0 snap-start whitespace-nowrap rounded-sm border-2 px-3 text-base font-bold ${
               on
                 ? 'border-ink bg-ink text-paper'
                 : 'border-edge bg-paper text-ink'
@@ -81,7 +88,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
           </button>
         );
       })}
-    </fieldset>
+    </div>
   );
 
   return (

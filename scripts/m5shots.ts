@@ -74,6 +74,13 @@ try {
         path: `${OUT}/${tag}-detail.png`,
         fullPage: true,
       });
+      await page.getByRole('button', { name: 'Radera passet' }).click();
+      await page.getByRole('button', { name: 'Ja, radera passet' }).waitFor();
+      await page.waitForTimeout(200);
+      await page.screenshot({
+        path: `${OUT}/${tag}-confirm.png`,
+        fullPage: true,
+      });
       await ctx.close();
     }
   }
