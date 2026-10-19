@@ -16,10 +16,13 @@ export interface LastResult {
   /** Set logs of this exercise from the last session. */
   logs: SetLog[];
   feedback?: { effort?: Effort; skipped?: boolean };
-  /** Worst pain status of the last session. */
+  /**
+   * Worst pain since this exercise's last session, including day-after
+   * readings. Build it with worstPainSince / sessionPainStatus from pain.ts.
+   */
   sessionPain: PainStatus;
   /** Programme week of the last session; enables the week 1 -> 2 switch. */
-  programWeek?: number;
+  programWeek: number;
 }
 
 export interface Suggestion {
@@ -36,6 +39,11 @@ export function setsForWeek(templateSets: number, programWeek: number): number {
   return programWeek >= 3
     ? Math.max(templateSets, SETS_FROM_WEEK_3)
     : templateSets;
+}
+
+const PAIN_RANK: Record<PainStatus, number> = { ok: 0, warn: 1, stop: 2 };
+function worse(a: PainStatus, b: PainStatus): PainStatus {
+  return PAIN_RANK[b] > PAIN_RANK[a] ? b : a;
 }
 
 function make(
@@ -57,19 +65,25 @@ function make(
 }
 
 /** The load the user actually used last time (their choice is the base). */
-function loggedLoadIndex(last: LastResult): number {
+function loggedLoadIndex(last: LastResult, logs: readonly SetLog[]): number {
   let latest: SetLog | undefined;
-  for (const l of last.logs) {
+  for (const l of logs) {
     if (!latest || l.loggedAt >= latest.loggedAt) latest = l;
   }
   return latest ? latest.loadIndex : last.plan.loadIndex;
 }
 
 /** Every planned set logged (both sides if per side) and at or above target. */
-function allSetsReachedTarget(ex: Exercise, last: LastResult): boolean {
+function allSetsReachedTarget(
+  ex: Exercise,
+  last: LastResult,
+  logs: readonly SetLog[],
+  baseLoad: number,
+): boolean {
   const { sets, target } = last.plan;
+  if (logs.some((l) => l.loadIndex !== baseLoad)) return false;
   for (let n = 1; n <= sets; n++) {
-    const forSet = last.logs.filter((l) => l.setNumber === n);
+    const forSet = logs.filter((l) => l.setNumber === n);
     if (forSet.length === 0) return false;
     if (ex.perSide) {
       const right = forSet.some((l) => l.side === 'right');
@@ -86,8 +100,11 @@ export function suggestNext(
   templateSets: number,
   programWeek: number,
   last?: LastResult,
+  /** Today's 'before' status; worst of this and last.sessionPain feeds the knee gate. */
+  currentPain: PainStatus = 'ok',
 ): Suggestion {
-  const kneeStop = ex.kneeLoaded && last?.sessionPain === 'stop';
+  const pain = worse(last?.sessionPain ?? 'ok', currentPain);
+  const kneeStop = ex.kneeLoaded && pain === 'stop';
 
   // 1. Programme week 1 is fixed.
   if (programWeek <= 1) {
@@ -112,12 +129,13 @@ export function suggestNext(
     return make(ex, weekSets, ex.range.start, ex.startLoadIndex, 'first_time');
   }
 
-  const baseLoad = loggedLoadIndex(last);
+  const logs = last.logs.filter((l) => l.exerciseId === ex.id);
+  const baseLoad = loggedLoadIndex(last, logs);
   const { sets, target } = last.plan;
 
   // 3. Pain gate: repeat the last plan, never lower the load.
-  if (ex.kneeLoaded && last.sessionPain !== 'ok') {
-    const stop = last.sessionPain === 'stop';
+  if (ex.kneeLoaded && pain !== 'ok') {
+    const stop = pain === 'stop';
     return make(
       ex,
       sets,
@@ -130,7 +148,14 @@ export function suggestNext(
 
   // 4. Leaving week 1: switch to the start load.
   if (last.programWeek === 1) {
-    return make(ex, weekSets, ex.range.start, ex.startLoadIndex, 'start_load');
+    // Sets stay; an added set follows next time. Never lowers the load.
+    return make(
+      ex,
+      sets,
+      ex.range.start,
+      Math.max(ex.startLoadIndex, baseLoad),
+      'start_load',
+    );
   }
 
   // 5. A new set, nothing else changes.
@@ -139,7 +164,10 @@ export function suggestNext(
   }
 
   // 6-7. Holds.
-  if (last.feedback?.skipped || !allSetsReachedTarget(ex, last)) {
+  if (
+    last.feedback?.skipped ||
+    !allSetsReachedTarget(ex, last, logs, baseLoad)
+  ) {
     return make(ex, sets, target, baseLoad, 'hold_incomplete');
   }
   if (last.feedback?.effort === 'hard') {

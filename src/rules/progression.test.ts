@@ -28,6 +28,7 @@ interface Opts {
   left?: number[];
   loggedLoad?: number;
   noLogs?: boolean;
+  logsAs?: ExerciseId;
 }
 
 function last(id: ExerciseId, o: Opts): LastResult {
@@ -48,7 +49,7 @@ function last(id: ExerciseId, o: Opts): LastResult {
         logs.push({
           id: `${id}-${n}-${side}`,
           sessionId: 's',
-          exerciseId: id,
+          exerciseId: o.logsAs ?? id,
           setNumber: n,
           side,
           amount,
@@ -61,7 +62,7 @@ function last(id: ExerciseId, o: Opts): LastResult {
   }
   return {
     plan: {
-      exerciseId: id,
+      exerciseId: o.logsAs ?? id,
       sets: o.sets,
       target: o.target,
       loadIndex: o.load,
@@ -477,7 +478,7 @@ describe('invariants', () => {
         effort: pick(r, efforts),
         skipped: r() < 0.1,
         pain: pick(r, pains),
-        week: 2,
+        week: pick(r, [1, 2, 2, 3]),
         amounts,
         loggedLoad:
           r() < 0.3 ? Math.floor(r() * ex.loadLadder.length) : undefined,
@@ -493,9 +494,11 @@ describe('invariants', () => {
         s.target !== target,
         s.loadIndex !== base,
       ].filter(Boolean).length;
-      // next_load is a single load step: the amount resets with it.
-      const allowed = s.reason === 'next_load' ? 2 : 1;
+      // next_load/start_load are one load step: the amount resets with it.
+      const allowed =
+        s.reason === 'next_load' || s.reason === 'start_load' ? 2 : 1;
       expect(changed, `${id} ${s.reason}`).toBeLessThanOrEqual(allowed);
+      if (s.reason === 'start_load') expect(s.sets).toBe(sets);
       if (s.reason === 'next_load') {
         expect(s.sets).toBe(sets);
         expect(s.target).toBe(ex.range.start);
@@ -536,6 +539,136 @@ describe('malformed content', () => {
       loadIndex: 9,
       weightKg: 0,
       reason: 'first_time',
+    });
+  });
+});
+
+describe('review fixes', () => {
+  it('last session week 1 with warn/stop, now week 3: pain gate holds', () => {
+    for (const pain of ['warn', 'stop'] as const) {
+      const l = last('split-squat', {
+        sets: 2,
+        target: 8,
+        load: 0,
+        week: 1,
+        pain,
+      });
+      const s = next('split-squat', 2, 3, l);
+      expectS(
+        s,
+        2,
+        8,
+        0,
+        pain === 'stop' ? 'pain_stop_hold' : 'pain_hold',
+        pain === 'stop',
+      );
+    }
+  });
+  it('skipped with complete logs still holds', () => {
+    const l = last('step-up', { sets: 2, target: 8, load: 1, skipped: true });
+    expectS(next('step-up', 2, 2, l), 2, 8, 1, 'hold_incomplete');
+  });
+  it('start_load in week 3 keeps sets (added set comes next time)', () => {
+    const l = last('step-up', { sets: 2, target: 10, load: 0, week: 1 });
+    expectS(next('step-up', 2, 3, l), 2, 8, 1, 'start_load');
+  });
+  it('start_load never lowers a heavier logged load', () => {
+    const l = last('step-up', {
+      sets: 2,
+      target: 8,
+      load: 0,
+      week: 1,
+      loggedLoad: 2,
+    });
+    expectS(next('step-up', 2, 2, l), 2, 8, 2, 'start_load');
+  });
+  it('mixed loads in the logs hold instead of progressing', () => {
+    const l = last('goblet-chair-squat', { sets: 2, target: 10, load: 1 });
+    (l.logs[0] as SetLog).loadIndex = 0;
+    (l.logs[0] as SetLog).loggedAt = '2026-01-01T00:00:00Z';
+    expectS(next('goblet-chair-squat', 2, 2, l), 2, 10, 1, 'hold_incomplete');
+  });
+  it('logs of another exercise are ignored', () => {
+    const l = last('step-up', {
+      sets: 2,
+      target: 8,
+      load: 1,
+      logsAs: 'bird-dog',
+    });
+    expectS(next('step-up', 2, 2, l), 2, 8, 1, 'hold_incomplete');
+  });
+
+  describe('currentPain (today before reading)', () => {
+    const goblet = exercises['goblet-chair-squat'];
+    const base = () =>
+      last('goblet-chair-squat', {
+        sets: 3,
+        target: 12,
+        load: 1,
+        effort: 'easy',
+      });
+    it('warn blocks next_load, increase, added_set and start_load', () => {
+      expect(suggestNext(goblet, 2, 2, base(), 'warn')).toMatchObject({
+        loadIndex: 1,
+        reason: 'pain_hold',
+      });
+      const sets2 = last('goblet-chair-squat', {
+        sets: 2,
+        target: 10,
+        load: 1,
+      });
+      expect(suggestNext(goblet, 2, 3, sets2, 'warn')).toMatchObject({
+        sets: 2,
+        reason: 'pain_hold',
+      });
+      expect(suggestNext(goblet, 2, 2, sets2, 'warn')).toMatchObject({
+        target: 10,
+        reason: 'pain_hold',
+      });
+      const w1 = last('goblet-chair-squat', {
+        sets: 2,
+        target: 10,
+        load: 0,
+        week: 1,
+      });
+      expect(suggestNext(goblet, 2, 2, w1, 'warn')).toMatchObject({
+        loadIndex: 0,
+        reason: 'pain_hold',
+      });
+    });
+    it('stop flags the physio', () => {
+      expectS(
+        suggestNext(goblet, 2, 2, base(), 'stop'),
+        3,
+        12,
+        1,
+        'pain_stop_hold',
+        true,
+      );
+    });
+    it('does not affect core exercises or an ok reading', () => {
+      const d = last('dead-bug', { sets: 2, target: 8, load: 0 });
+      expect(suggestNext(exercises['dead-bug'], 2, 2, d, 'warn').reason).toBe(
+        'increase_amount',
+      );
+      expect(suggestNext(goblet, 2, 2, base(), 'ok').reason).toBe('next_load');
+    });
+    it('the worse of last and current wins', () => {
+      const l = last('split-squat', {
+        sets: 2,
+        target: 8,
+        load: 1,
+        pain: 'stop',
+      });
+      expect(
+        suggestNext(exercises['split-squat'], 2, 2, l, 'warn').reason,
+      ).toBe('pain_stop_hold');
+    });
+    it('week 1 with a current stop flags the physio', () => {
+      expect(
+        suggestNext(exercises['split-squat'], 2, 1, undefined, 'stop')
+          .seePhysio,
+      ).toBe(true);
     });
   });
 });
