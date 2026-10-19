@@ -10,7 +10,6 @@ import {
   parseBackup,
 } from '../../db/backup';
 import { getDb } from '../../db/db';
-import { getMeta } from '../../db/repo';
 import { deleteAllData } from '../../db/wipe';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
@@ -19,6 +18,7 @@ import { type StorageStatus, storageStatus } from '../../lib/storage';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
+import { readBackupMeta } from '../week/BackupReminder';
 import { useUpdate } from './updateContext';
 
 type View =
@@ -83,8 +83,7 @@ export function Settings() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const lastExportAt = useLiveQuery(async () => {
-    const m = await getMeta<{ lastExportAt?: string }>(getDb(), 'backup');
-    return m?.lastExportAt ?? null;
+    return (await readBackupMeta()).lastExportAt ?? null;
   }, []);
 
   // Move focus to the screen's heading whenever the view changes.

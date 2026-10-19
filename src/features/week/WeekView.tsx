@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'wouter';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
-import { getMeta, listSessions } from '../../db/repo';
+import { listSessions } from '../../db/repo';
 import type { Session, TemplateId } from '../../domain/types';
 import { formatShortDate, formatWeekday, toLocalDate } from '../../lib/dates';
 import { shouldRemindBackup } from '../../lib/storage';
@@ -13,13 +13,14 @@ import { PencilTick } from '../../ui/PencilTick';
 import { Tally, type TallyItem } from '../../ui/Tally';
 import { careState } from '../pain/careState';
 import { DayAfterNotices, StopBanner } from '../pain/PainNotices';
-import { type BackupMeta, BackupReminder } from './BackupReminder';
+import { BackupReminder, readBackupMeta } from './BackupReminder';
 import {
   isoWeekNumber,
   type PassState,
   passStates,
   STATE_LABEL,
 } from './passState';
+import { StaleSession } from './StaleSession';
 
 const DAY_NAMES = ['mån', 'tis', 'ons', 'tors', 'fre', 'lör', 'sön'];
 const IDS: TemplateId[] = ['A', 'B'];
@@ -80,7 +81,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const painLogs = useLiveQuery(() => getDb().painLogs.toArray(), []);
   const backupMeta = useLiveQuery(
     async () => ({
-      value: await getMeta<BackupMeta>(getDb(), 'backup'),
+      value: await readBackupMeta(),
     }),
     [],
   );
@@ -116,6 +117,9 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
       now,
     });
   const active = sessions.find((s) => s.status === 'in_progress');
+  const stale = sessions.find(
+    (s) => s.status === 'in_progress' && s.date < today,
+  );
   const doneDates = new Set(summary.completed.map((s) => s.date));
   const first = summary.days[0] ?? today;
   const last = summary.days[6] ?? today;
@@ -146,6 +150,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
 
       {care.stopBanner ? <StopBanner /> : null}
       <DayAfterNotices care={care} today={today} />
+      {stale ? <StaleSession session={stale} /> : null}
 
       <ol
         className="m-0 flex list-none justify-between p-0"

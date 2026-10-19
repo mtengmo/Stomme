@@ -314,7 +314,7 @@ describe('M6 review fixes', () => {
     await userEvent.click(
       screen.getByRole('button', { name: 'Exportera först' }),
     );
-    expect(shareMock).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(shareMock).toHaveBeenCalledTimes(1));
     expect(await screen.findByRole('status')).toBeTruthy();
   });
 

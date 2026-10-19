@@ -73,7 +73,10 @@ export function ExerciseCardBody({
 
 /** #/ovning/:id */
 export function ExerciseCardPage({ id }: { id: string }) {
-  const exercise = (exercises as Record<string, Exercise | undefined>)[id];
+  // hasOwn: ids like "constructor" or "toString" must not resolve to prototype members.
+  const exercise = Object.hasOwn(exercises, id)
+    ? (exercises as Record<string, Exercise>)[id]
+    : undefined;
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-3 pb-28">
       <button

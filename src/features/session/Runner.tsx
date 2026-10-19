@@ -61,7 +61,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [snack, setSnack] = useState<Snack | null>(null);
   const [confirmAbort, setConfirmAbort] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [abortError, setAbortError] = useState(false);
+  const [error, setError] = useState(false);
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -87,13 +87,28 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     setCursor(resumeIndex(steps, l, fresh?.feedback ?? {}));
   };
 
-  const runUndo = async () => {
-    const s = snack;
-    setSnack(null);
-    if (!s) return;
-    await s.undo();
-    await resync();
+  /** One write at a time; a failure shows a Swedish alert instead of a dead screen. */
+  const run = async (fn: () => Promise<void>) => {
+    if (busy) return;
+    setBusy(true);
+    setError(false);
+    try {
+      await fn();
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
   };
+
+  const runUndo = () =>
+    run(async () => {
+      const s = snack;
+      setSnack(null);
+      if (!s) return;
+      await s.undo();
+      await resync();
+    });
 
   const step = steps[cursor];
   const total = (planIndex: number) => session.plan[planIndex]?.sets ?? 0;
@@ -133,41 +148,49 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     clock: formatClock(seconds),
     tally,
     onAbort: () => setConfirmAbort(true),
-    snack: snack ? (
-      <Snackbar
-        key={snack.key}
-        message={snack.message}
-        onUndo={runUndo}
-        onExpire={expire}
-      />
-    ) : undefined,
+    snack:
+      snack || error ? (
+        <>
+          {error ? (
+            <p
+              role="alert"
+              className="m-0 border-t-[3px] border-ink bg-paper px-5 py-2 text-base font-bold text-ink"
+            >
+              {PAIN_COPY.error}
+            </p>
+          ) : null}
+          {snack ? (
+            <Snackbar
+              key={snack.key}
+              message={snack.message}
+              onUndo={runUndo}
+              onExpire={expire}
+            />
+          ) : null}
+        </>
+      ) : undefined,
   };
 
   const advance = (feedback = session.feedback) =>
     setCursor(nextIndex(steps, cursor, feedback));
 
-  const finish = async () => {
-    await finishSession(getDb(), session.id, new Date());
-    navigate('/');
-  };
+  const finish = () =>
+    run(async () => {
+      await finishSession(getDb(), session.id, new Date());
+      navigate('/');
+    });
 
-  const abort = async () => {
-    await abortSession(getDb(), session.id, new Date(), 'user');
-    navigate('/');
-  };
+  const abort = () =>
+    run(async () => {
+      await abortSession(getDb(), session.id, new Date(), 'user');
+      navigate('/');
+    });
 
-  const abortForKnee = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
+  const abortForKnee = () =>
+    run(async () => {
       await abortSession(getDb(), session.id, new Date(), 'pain_stop');
       navigate(`/stopp/${session.id}`);
-    } catch {
-      setAbortError(true);
-    } finally {
-      setBusy(false);
-    }
-  };
+    });
 
   if (confirmAbort) {
     return (
@@ -182,10 +205,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           <Button onClick={() => setConfirmAbort(false)}>
             Fortsätt passet
           </Button>
-          <Button variant="secondary" onClick={abort}>
+          <Button variant="secondary" disabled={busy} onClick={abort}>
             Avbryt passet
           </Button>
-          {abortError ? (
+          {error ? (
             <p role="alert" className="m-0 text-center text-base font-bold">
               {PAIN_COPY.error}
             </p>
@@ -233,21 +256,23 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         initialAmount={prior?.amount ?? plan?.target ?? ex.range.start}
         initialLoadIndex={prior?.loadIndex ?? plan?.loadIndex ?? 0}
         busy={busy}
-        onSkip={async () => {
-          const db = getDb();
-          await setFeedback(db, session.id, step.exerciseId, { skipped: true });
-          advance({
-            ...session.feedback,
-            [step.exerciseId]: { skipped: true },
-          });
-          showSnack(`Hoppade över ${ex.name}`, () =>
-            setFeedback(db, session.id, step.exerciseId, { skipped: false }),
-          );
-        }}
-        onDone={async (amount, loadIndex) => {
-          if (busy) return;
-          setBusy(true);
-          try {
+        onSkip={() =>
+          run(async () => {
+            const db = getDb();
+            await setFeedback(db, session.id, step.exerciseId, {
+              skipped: true,
+            });
+            advance({
+              ...session.feedback,
+              [step.exerciseId]: { skipped: true },
+            });
+            showSnack(`Hoppade över ${ex.name}`, () =>
+              setFeedback(db, session.id, step.exerciseId, { skipped: false }),
+            );
+          })
+        }
+        onDone={(amount, loadIndex) =>
+          run(async () => {
             const db = getDb();
             await logSet(
               db,
@@ -266,10 +291,8 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
             showSnack(`Set ${step.setNumber} loggat`, async () => {
               await undoLastSet(db, session.id);
             });
-          } finally {
-            setBusy(false);
-          }
-        }}
+          })
+        }
       />
     );
   }
@@ -296,11 +319,13 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       key={cursor}
       frame={frame}
       exercise={ex}
-      onPick={async (effort: Effort) => {
-        await setFeedback(getDb(), session.id, step.exerciseId, { effort });
-        setSnack(null);
-        advance({ ...session.feedback, [step.exerciseId]: { effort } });
-      }}
+      onPick={(effort: Effort) =>
+        run(async () => {
+          await setFeedback(getDb(), session.id, step.exerciseId, { effort });
+          setSnack(null);
+          advance({ ...session.feedback, [step.exerciseId]: { effort } });
+        })
+      }
     />
   );
 }

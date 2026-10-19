@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Redirect, useLocation } from 'wouter';
+import { PAIN_COPY } from '../../content/copy';
 import { getDb } from '../../db/db';
 import {
   abortSession,
@@ -11,7 +12,7 @@ import {
 import type { PainLog, Session, SetLog } from '../../domain/types';
 import { useElapsed } from '../../lib/useElapsed';
 import { assessReading } from '../../rules/pain';
-import { buttonClass } from '../../ui/Button';
+import { Button, buttonClass } from '../../ui/Button';
 import { Runner } from './Runner';
 import { Summary } from './Summary';
 
@@ -45,20 +46,53 @@ function Open({
   const handled = useRef(false);
   const stopped = status === 'stop';
   const replan = status === 'warn' && logs.length === 0;
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: attempt re-triggers the effect on retry
   useEffect(() => {
     if (handled.current || (!stopped && !replan)) return;
     handled.current = true;
     void (async () => {
       const db = getDb();
-      if (stopped) {
-        await abortSession(db, session.id, new Date(), 'pain_stop');
-        navigate(`/stopp/${session.id}`);
-      } else {
-        await replanSession(db, session.id);
+      try {
+        if (stopped) {
+          await abortSession(db, session.id, new Date(), 'pain_stop');
+          navigate(`/stopp/${session.id}`);
+        } else {
+          await replanSession(db, session.id);
+        }
+      } catch {
+        // Let the user retry instead of leaving a blank screen.
+        handled.current = false;
+        setFailed(true);
       }
     })();
-  }, [stopped, replan, session.id, navigate]);
+  }, [stopped, replan, session.id, navigate, attempt]);
+
+  if (failed && (stopped || replan)) {
+    return (
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 px-5 pt-10">
+        <h1 className="m-0 text-5xl leading-none font-extrabold">
+          Något gick fel
+        </h1>
+        <p role="alert" className="m-0 text-xl font-bold">
+          {PAIN_COPY.error}
+        </p>
+        <Button
+          onClick={() => {
+            setFailed(false);
+            setAttempt((n) => n + 1);
+          }}
+        >
+          Försök igen
+        </Button>
+        <Link href="/" className={buttonClass('secondary')}>
+          Till veckan
+        </Link>
+      </div>
+    );
+  }
 
   if (stopped) return null;
   return (

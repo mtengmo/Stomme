@@ -12,10 +12,26 @@ export interface BackupMeta {
 
 export const SNOOZE_DAYS = 7;
 
+const validInstant = (v: unknown): v is string =>
+  typeof v === 'string' && !Number.isNaN(Date.parse(v));
+
+/** Reads the 'backup' meta defensively: bad values are dropped, never thrown on. */
+export async function readBackupMeta(): Promise<BackupMeta> {
+  const raw = await getMeta<Record<string, unknown>>(getDb(), 'backup');
+  return {
+    lastExportAt: validInstant(raw?.lastExportAt)
+      ? raw.lastExportAt
+      : undefined,
+    snoozedUntil: validInstant(raw?.snoozedUntil)
+      ? raw.snoozedUntil
+      : undefined,
+  };
+}
+
 /** Keeps meta 'backup' fields other than the one being changed. */
 export async function snoozeBackupReminder(now: Date): Promise<void> {
   const db = getDb();
-  const current = (await getMeta<BackupMeta>(db, 'backup')) ?? {};
+  const current = await readBackupMeta();
   const until = new Date(now.getTime() + SNOOZE_DAYS * 24 * 3600 * 1000);
   await setMeta(db, 'backup', {
     ...current,
