@@ -155,7 +155,7 @@ The system is built for a phone held at arm's length on the floor: heavy 3 px gr
 **Key Characteristics:**
 - Squared paper background (24 px grid, 1 px lines) in both themes.
 - Thick graphite outlines (3 px) instead of shadows; hierarchy by size and outline weight.
-- Red is spent only on completion (pencil ticks, done chip, active-tab underline, stop-list dashes, warning banner).
+- Red is spent only on completion (pencil ticks, done chip, stop-list dashes, warning banner).
 - Condensed heavy numerals for headings and counts; plain platform sans for everything else.
 - Flat, no elevation; one authored motion (a tick drawing on).
 
@@ -164,7 +164,7 @@ The system is built for a phone held at arm's length on the floor: heavy 3 px gr
 Cool green-grey paper, graphite and chalk text, with two pen colours (red pencil, blue ink) and one highlighter (amber). Light values are the `:root` set; dark values swap under `prefers-color-scheme: dark` and are named with the `-dark` suffix.
 
 ### Primary
-- **Red Pencil** (`red-pencil`; dark: `red-pencil-dark`): completion only. Pencil tick fill, the "Klar" chip outline and text, active-tab underline, the warning banner border and icon, the short dashes in the onboarding stop list.
+- **Red Pencil** (`red-pencil`; dark: `red-pencil-dark`): completion only. Pencil tick fill, the "Klar" chip outline and text, the warning banner border and icon, the short dashes in the onboarding stop list.
 - **Blue Ink** (`blue-ink`; dark: `blue-ink-dark`): the working side. Focus ring (3 px), text selection, caret, the "Nästa pass" marker, info banner border, rule lines in the onboarding stop list.
 
 ### Secondary
@@ -242,7 +242,7 @@ A row of set circles per pass: one circle per exercise, 3 px outline (graphite o
 Seven 44 px squares with 2 px outlines (edge grey) holding day abbreviation and count-style number; today is amber with a graphite outline; a completed day carries a pencil tick offset at its top-right corner.
 
 ### Navigation
-Fixed bottom bar, paper fill, 3 px graphite top rule, three equal tabs (Vecka, Historik, Inställningar), each 64 px tall with a 24 px icon above a 16 px label. Active: bold graphite text and a 4 px red underline; inactive: graphite-soft with transparent underline. Current page is flagged with `aria-current`.
+Fixed bottom bar, paper fill, 3 px graphite top rule, three equal tabs (Vecka, Historik, Inställningar), each 64 px tall with a 24 px icon above a 16 px label. Active: bold graphite text and a 4 px graphite (ink) underline, since red means done only; inactive: graphite-soft with transparent underline. Current page is flagged with `aria-current`.
 
 ### Inputs / Fields
 Not yet built. Focus treatment is global: 3 px blue outline, 3 px offset, 4 px radius.

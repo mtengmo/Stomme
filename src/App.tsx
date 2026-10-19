@@ -1,15 +1,23 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { lazy, Suspense } from 'react';
 import { Route, Router, Switch, useLocation } from 'wouter';
 import { useHashLocation } from 'wouter/use-hash-location';
 import { getDb } from './db/db';
 import { ExerciseCardPage } from './features/exercise/ExerciseCard';
 import { FigureDev } from './features/exercise/FigureDev';
+import { History } from './features/history/History';
+import { SessionDetail } from './features/history/SessionDetail';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
-import { HistoryStub, SettingsStub } from './features/stubs/Stubs';
+import { SettingsStub } from './features/stubs/Stubs';
 import { WeekView } from './features/week/WeekView';
 import { BottomNav } from './ui/BottomNav';
+
+// DEV-only synthetic data helper; absent from the production bundle.
+const DemoSeed = import.meta.env.DEV
+  ? lazy(() => import('./dev/DemoSeed'))
+  : null;
 
 export function App() {
   // undefined while loading, then true/false.
@@ -54,7 +62,19 @@ function Shell() {
           {import.meta.env.DEV ? (
             <Route path="/dev/figurer">{() => <FigureDev />}</Route>
           ) : null}
-          <Route path="/historik" component={HistoryStub} />
+          {DemoSeed ? (
+            <Route path="/dev/demo">
+              {() => (
+                <Suspense fallback={null}>
+                  <DemoSeed />
+                </Suspense>
+              )}
+            </Route>
+          ) : null}
+          <Route path="/historik">{() => <History />}</Route>
+          <Route path="/historik/:id">
+            {(params) => <SessionDetail id={params.id} />}
+          </Route>
           <Route path="/installningar" component={SettingsStub} />
           <Route>{() => <WeekView />}</Route>
         </Switch>

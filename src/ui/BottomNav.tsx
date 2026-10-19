@@ -7,6 +7,13 @@ const tabs: { href: string; label: string; icon: IconName }[] = [
   { href: '/installningar', label: 'Inställningar', icon: 'settings' },
 ];
 
+/** Exact match for the root tab; sub-routes (/historik/:id) keep their tab active. */
+export function isTabActive(href: string, location: string): boolean {
+  return href === '/'
+    ? location === '/'
+    : location === href || location.startsWith(`${href}/`);
+}
+
 export function BottomNav() {
   const [location] = useLocation();
   return (
@@ -16,7 +23,7 @@ export function BottomNav() {
     >
       <ul className="m-0 mx-auto flex max-w-md list-none p-0">
         {tabs.map((t) => {
-          const active = location === t.href;
+          const active = isTabActive(t.href, location);
           return (
             <li key={t.href} className="flex-1">
               <Link
@@ -24,7 +31,7 @@ export function BottomNav() {
                 aria-current={active ? 'page' : undefined}
                 className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline ${
                   active
-                    ? 'border-red font-bold text-ink'
+                    ? 'border-ink font-bold text-ink'
                     : 'border-transparent text-ink-soft'
                 }`}
               >
