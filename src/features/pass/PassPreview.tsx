@@ -1,20 +1,28 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { prescriptionText, reasonText } from '../../content/copy';
+import { resultLine, SEE_PHYSIO, suggestionReason } from '../../content/copy';
 import { exercises } from '../../content/exercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
-import { getActiveSession, getMeta, startSession } from '../../db/repo';
+import {
+  getActiveSession,
+  getMeta,
+  planningData,
+  startSession,
+} from '../../db/repo';
 import type { TemplateId } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
-import { interimPlan } from '../../rules/prescription';
+import { buildPlan } from '../../rules/nextPlan';
+import { assessReading } from '../../rules/pain';
 import { programWeek } from '../../rules/schedule';
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
+import { careState } from '../pain/careState';
+import { StopBanner } from '../pain/PainNotices';
 
-/** #/pass/:id: today's prescription for the pass, then start (or continue). */
+/** #/pass/:id: today's suggestion for the pass, then start (or continue). */
 export function PassPreview({ id }: { id: TemplateId }) {
   const [, navigate] = useLocation();
   const [starting, setStarting] = useState(false);
@@ -23,6 +31,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
     return {
       active: (await getActiveSession(db)) ?? null,
       program: (await getMeta<{ startDate: string }>(db, 'program')) ?? null,
+      planning: await planningData(db),
     };
   }, []);
   if (data === undefined) return null;
@@ -30,11 +39,34 @@ export function PassPreview({ id }: { id: TemplateId }) {
   const template = templates[id];
   const today = toLocalDate(new Date());
   const week = data.program ? programWeek(data.program.startDate, today) : 1;
-  const plan = interimPlan(template, week);
   const active = data.active;
-  const lead =
-    plan.find((p) => p.reason !== 'first_time')?.reason ?? 'first_time';
-  const headline = reasonText(lead);
+  const before = active
+    ? data.planning.painLogs.find(
+        (p) => p.sessionId === active.id && p.timing === 'before',
+      )
+    : undefined;
+  const computed = buildPlan(
+    template,
+    week,
+    data.planning,
+    before ? assessReading(before).status : 'ok',
+    active?.id,
+  );
+  // An active session shows its stored snapshot, not a recompute.
+  const snapshot = active?.templateId === id ? active.plan : undefined;
+  const items = computed.map((i) => ({
+    ...i,
+    plan: snapshot?.find((p) => p.exerciseId === i.plan.exerciseId) ?? i.plan,
+  }));
+  const care = careState(data.planning.sessions, data.planning.painLogs, today);
+  // The physio line once, as a banner: not per row, and not when a row's
+  // reason text or the stop banner already says it.
+  const physioOnce =
+    items.some((i) => i.suggestion.seePhysio) &&
+    !care.stopBanner &&
+    !items.some((i) =>
+      suggestionReason(i.suggestion, week).includes(SEE_PHYSIO),
+    );
   const other = active && active.templateId !== id;
 
   const start = async () => {
@@ -44,7 +76,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
     }
     setStarting(true);
     const s = await startSession(getDb(), id, new Date());
-    navigate(`/session/${s.id}`);
+    navigate(`/smarta/${s.id}/before`);
   };
 
   return (
@@ -61,31 +93,46 @@ export function PassPreview({ id }: { id: TemplateId }) {
           {template.name}
         </h1>
         <p className="m-0 mt-2 text-base text-ink-soft">
-          Vecka {week} · {plan.reduce((n, p) => n + p.sets, 0)} set
+          Vecka {week} · {items.reduce((n, i) => n + i.plan.sets, 0)} set
         </p>
-        <p className="m-0 mt-1 text-base text-ink-soft">{headline}</p>
       </header>
+      {care.stopBanner ? <StopBanner /> : null}
+      {physioOnce ? <Banner tone="care">{SEE_PHYSIO}.</Banner> : null}
       {other ? (
         <Banner>
           Du har {templates[active.templateId].name} igång. Fortsätt det först.
         </Banner>
       ) : null}
       <ol className="m-0 flex list-none flex-col p-0">
-        {plan.map((p) => {
+        {items.map(({ plan: p, suggestion, last }) => {
           const ex = exercises[p.exerciseId];
           return (
             <li key={p.exerciseId} className="border-b-2 border-edge py-3">
               <Link
                 href={`/ovning/${ex.id}`}
-                className="block min-h-12 text-ink no-underline"
+                className="-my-1 block min-h-12 py-3.5 text-ink no-underline"
               >
                 <span className="block text-lg leading-tight font-bold underline decoration-2 underline-offset-4">
                   {ex.name}
                 </span>
-                <span className="count mt-1 block text-2xl">
-                  {prescriptionText(p, ex)}
-                </span>
               </Link>
+              {last ? (
+                <p className="m-0 mt-1 grid grid-cols-[7rem_1fr] items-baseline gap-2 text-base text-ink-soft">
+                  <span>Förra gången</span>
+                  <span className="count text-xl">
+                    {resultLine(ex, last.sets, last.amount, last.loadIndex)}
+                  </span>
+                </p>
+              ) : null}
+              <p className="m-0 mt-1 grid grid-cols-[7rem_1fr] items-baseline gap-2 text-base font-bold">
+                <span>Idag</span>
+                <span className="count text-2xl">
+                  {resultLine(ex, p.sets, p.target, p.loadIndex)}
+                </span>
+              </p>
+              <p className="m-0 mt-1 text-base text-ink-soft">
+                {suggestionReason(suggestion, week)}
+              </p>
             </li>
           );
         })}

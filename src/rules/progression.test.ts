@@ -672,3 +672,30 @@ describe('review fixes', () => {
     });
   });
 });
+
+describe('knee-loaded exercise with no history and pain (S3)', () => {
+  const goblet = exercises['goblet-chair-squat'];
+  it('warn holds at the week-1 load and template sets', () => {
+    const s = suggestNext(goblet, 2, 3, undefined, 'warn');
+    expectS(s, 2, goblet.range.start, goblet.week1LoadIndex, 'pain_hold');
+  });
+  it('stop holds the same and asks for the physio', () => {
+    const s = suggestNext(goblet, 2, 3, undefined, 'stop');
+    expectS(
+      s,
+      2,
+      goblet.range.start,
+      goblet.week1LoadIndex,
+      'pain_stop_hold',
+      true,
+    );
+  });
+  it('a non-knee exercise still gets the normal first-time plan', () => {
+    const s = suggestNext(exercises['dead-bug'], 2, 3, undefined, 'stop');
+    expect(s.reason).toBe('first_time');
+    expect(s.seePhysio).toBe(false);
+  });
+  it('no pain keeps the start load', () => {
+    expectS(suggestNext(goblet, 2, 3), 3, 10, 1, 'first_time');
+  });
+});

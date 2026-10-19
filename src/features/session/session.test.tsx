@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '../../App';
 import { getDb } from '../../db/db';
 import { getActiveSession, setMeta } from '../../db/repo';
+import { answerPain } from '../pain/testHelpers';
 
 beforeEach(async () => {
   window.location.hash = '#/';
@@ -27,6 +28,7 @@ describe('session flow', () => {
       screen.getAllByText('Första veckan: kroppsvikt.').length,
     ).toBeGreaterThan(0);
     await user.click(screen.getByRole('button', { name: 'Starta pass' }));
+    await answerPain(user, 0);
 
     // session mode: no bottom navigation, set screen with one primary action
     expect(await screen.findByText('Set 1 av 2')).toBeTruthy();
@@ -58,6 +60,7 @@ describe('session flow', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Starta pass' }),
     );
+    await answerPain(user, 0);
     await user.click(await screen.findByRole('button', { name: 'Klar set' }));
     unmount();
 
@@ -76,6 +79,7 @@ describe('session flow', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Starta pass' }),
     );
+    await answerPain(user, 0);
     await user.click(await screen.findByRole('button', { name: 'Klar set' }));
     await screen.findByText('Set 1 loggat');
     await user.click(screen.getByRole('button', { name: 'Avbryt' }));

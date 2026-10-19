@@ -10,6 +10,8 @@ import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { PencilTick } from '../../ui/PencilTick';
 import { Tally, type TallyItem } from '../../ui/Tally';
+import { careState } from '../pain/careState';
+import { DayAfterNotices, StopBanner } from '../pain/PainNotices';
 import {
   isoWeekNumber,
   type PassState,
@@ -73,13 +75,16 @@ function StateChip({ state }: { state: PassState }) {
 export function WeekView({ now: nowProp }: { now?: Date }) {
   const sessions = useLiveQuery(() => listSessions(getDb()), []);
   const logs = useLiveQuery(() => getDb().setLogs.toArray(), []);
-  if (sessions === undefined || logs === undefined) return null;
+  const painLogs = useLiveQuery(() => getDb().painLogs.toArray(), []);
+  if (sessions === undefined || logs === undefined || painLogs === undefined)
+    return null;
 
   const now = nowProp ?? new Date();
   const today = toLocalDate(now);
   const summary = weekSummary(sessions, today);
   const { states, next } = passStates(sessions, today);
   const rest = restText(sessions, now);
+  const care = careState(sessions, painLogs, today);
   const active = sessions.find((s) => s.status === 'in_progress');
   const doneDates = new Set(summary.completed.map((s) => s.date));
   const first = summary.days[0] ?? today;
@@ -108,6 +113,9 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
           {formatShortDate(first)} – {formatShortDate(last)}
         </p>
       </header>
+
+      {care.stopBanner ? <StopBanner /> : null}
+      <DayAfterNotices care={care} today={today} />
 
       <ol
         className="m-0 flex list-none justify-between p-0"
@@ -192,7 +200,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         })}
       </ul>
 
-      <div className="sticky bottom-[5.25rem] mt-auto flex flex-col gap-2">
+      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
         {active ? (
           <Link

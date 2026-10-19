@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'wouter';
+import { Redirect, useLocation } from 'wouter';
+import { PAIN_COPY } from '../../content/copy';
 import { exercises } from '../../content/exercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
@@ -33,8 +34,8 @@ import { Summary } from './Summary';
 interface RunnerProps {
   session: Session;
   logs: SetLog[];
-  /** Latest logged set per exercise before this session, for prefill. */
-  last: Partial<Record<ExerciseId, SetLog>>;
+  /** The 'after' pain reading is in; until then the end of the plan leads to it. */
+  hasAfter: boolean;
 }
 
 interface Snack {
@@ -48,7 +49,7 @@ function sidesOf(id: ExerciseId): number {
 }
 
 /** The session state machine: one cursor over the steps derived from the plan. */
-export function Runner({ session, logs, last }: RunnerProps) {
+export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [, navigate] = useLocation();
   const steps = useMemo(
     () => buildSteps(session.plan, (id) => exercises[id]),
@@ -60,6 +61,7 @@ export function Runner({ session, logs, last }: RunnerProps) {
   const [snack, setSnack] = useState<Snack | null>(null);
   const [confirmAbort, setConfirmAbort] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [abortError, setAbortError] = useState(false);
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -154,6 +156,19 @@ export function Runner({ session, logs, last }: RunnerProps) {
     navigate('/');
   };
 
+  const abortForKnee = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await abortSession(getDb(), session.id, new Date(), 'pain_stop');
+      navigate(`/stopp/${session.id}`);
+    } catch {
+      setAbortError(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   if (confirmAbort) {
     return (
       <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
@@ -170,9 +185,21 @@ export function Runner({ session, logs, last }: RunnerProps) {
           <Button variant="secondary" onClick={abort}>
             Avbryt passet
           </Button>
+          {abortError ? (
+            <p role="alert" className="m-0 text-center text-base font-bold">
+              {PAIN_COPY.error}
+            </p>
+          ) : null}
+          <Button variant="secondary" disabled={busy} onClick={abortForKnee}>
+            {PAIN_COPY.stopAbortKnee}
+          </Button>
         </div>
       </div>
     );
+  }
+
+  if (!step && !hasAfter) {
+    return <Redirect to={`/smarta/${session.id}/after`} />;
   }
 
   if (!step) {
@@ -194,7 +221,8 @@ export function Runner({ session, logs, last }: RunnerProps) {
       .filter((l) => l.exerciseId === step.exerciseId)
       .sort((a, b) => a.loggedAt.localeCompare(b.loggedAt))
       .at(-1);
-    const prior = mine ?? last[step.exerciseId];
+    // The suggestion in the plan is the prefill; what the user logs becomes the base.
+    const prior = mine;
     return (
       <SetScreen
         key={cursor}
