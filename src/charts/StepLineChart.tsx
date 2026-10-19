@@ -44,11 +44,11 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
   const n = pts.length;
   const last = pts[n - 1];
 
-  const ticks = niceTicks(
-    0,
-    Math.max(...pts.map((p) => p.weightKg), 0) * 1.35,
-    4,
-  );
+  const maxKg = Math.max(...pts.map((p) => p.weightKg), 0);
+  const base = niceTicks(0, maxKg, 5);
+  // Keep the top label off the last gridline: add a step when the max is close to it.
+  const ticks =
+    maxKg > base.max * 0.9 ? niceTicks(0, base.max + base.step, 5) : base;
   const y = linearScale([ticks.min, ticks.max], [BASE, TOP]);
   const x = (i: number) =>
     n === 1 ? (LEFT + RIGHT) / 2 : LEFT + ((RIGHT - LEFT) * i) / (n - 1);

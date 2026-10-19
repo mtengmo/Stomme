@@ -2,31 +2,27 @@ import type { PainLog } from '../domain/types';
 import { daysBetween, formatShortDate } from '../lib/dates';
 import { type PainPoint, painSeries } from '../rules/stats';
 import { ChartShell } from './ChartShell';
-import { linearScale, niceTicks } from './scales';
+import { linearScale } from './scales';
 
 const W = 320;
-const H = 224;
+const LANE_STEP = 100;
+const LANE_PLOT = 56;
+const H = LANE_STEP * 3 + 24;
 const LEFT = 36;
 const RIGHT = 304;
-const TOP = 24;
-const BASE = 184;
 
 type Timing = PainLog['timing'];
 
 const TIMINGS: Timing[] = ['before', 'after', 'dayAfter'];
-/** dayAfter first so the diamonds sit behind the other two. */
-const DRAW_ORDER: Timing[] = ['dayAfter', 'before', 'after'];
 const LABEL: Record<Timing, string> = {
   before: 'Före',
   after: 'Efter',
   dayAfter: 'Dagen efter',
 };
-/** Horizontal nudge so same-day points do not hide each other. */
-const NUDGE: Record<Timing, number> = { before: -8, after: 8, dayAfter: 0 };
 const TONE: Record<Timing, { fill: string; stroke: string }> = {
   before: { fill: 'fill-paper', stroke: 'stroke-ink' },
   after: { fill: 'fill-blue', stroke: 'stroke-blue' },
-  dayAfter: { fill: 'fill-edge', stroke: 'stroke-edge' },
+  dayAfter: { fill: 'fill-edge', stroke: 'stroke-ink-soft' },
 };
 
 /** The marker shape is the primary signal; colour only backs it up. */
@@ -78,11 +74,8 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
   const lastDate = dates[dates.length - 1];
   if (!first || !lastDate) return null;
   const span = Math.max(1, daysBetween(first, lastDate));
-  const y = linearScale([0, 10], [BASE, TOP]);
   const x = linearScale([0, span], [LEFT + 10, RIGHT - 10]);
-  const px = (t: Timing, p: PainPoint) =>
-    x(daysBetween(first, p.date)) + NUDGE[t];
-  const yTicks = niceTicks(0, 10, 6).ticks;
+  const px = (p: PainPoint) => x(daysBetween(first, p.date));
 
   const summary = `Senast: före ${latest(series.before)}, efter ${latest(series.after)}, dagen efter ${latest(series.dayAfter)}. Okej-zonen är 0 till 3.`;
 
@@ -120,52 +113,73 @@ export function PainChart({ painLogs }: { painLogs: readonly PainLog[] }) {
         aria-label={`Punktdiagram, smärta 0 till 10 över tid. ${summary}`}
         className="block"
       >
-        <rect
-          x={LEFT}
-          y={y(3)}
-          width={RIGHT - LEFT + 8}
-          height={y(0) - y(3)}
-          className="fill-upcoming"
-        />
-        {yTicks.map((t) => (
-          <g key={t}>
-            <line
-              x1={LEFT}
-              x2={RIGHT + 8}
-              y1={y(t)}
-              y2={y(t)}
-              className="stroke-edge"
-              strokeWidth={1}
-              strokeDasharray="2 4"
-            />
-            <text
-              x={LEFT - 8}
-              y={y(t) + 5}
-              textAnchor="end"
-              fontSize={16}
-              className="count fill-ink-soft"
-            >
-              {t}
-            </text>
-          </g>
-        ))}
-        {DRAW_ORDER.flatMap((t) =>
-          series[t].map((p) => (
-            <Marker
-              key={`${t}-${p.sessionId}`}
-              timing={t}
-              cx={px(t, p)}
-              cy={y(p.score)}
-            />
-          )),
-        )}
-        <text x={LEFT} y={H - 6} fontSize={16} className="fill-ink-soft">
+        {TIMINGS.map((t, i) => {
+          const top = i * LANE_STEP + 30;
+          const y = linearScale([0, 10], [top + LANE_PLOT, top]);
+          return (
+            <g key={t}>
+              <text
+                x={0}
+                y={top - 6}
+                fontSize={16}
+                className="font-bold fill-ink"
+              >
+                {LABEL[t]}
+              </text>
+              <rect
+                x={LEFT}
+                y={y(3)}
+                width={RIGHT - LEFT + 8}
+                height={y(0) - y(3)}
+                className="fill-upcoming"
+              />
+              <line
+                x1={LEFT}
+                x2={RIGHT + 8}
+                y1={y(0)}
+                y2={y(0)}
+                className="stroke-edge"
+                strokeWidth={1}
+              />
+              {[0, 10].map((v) => (
+                <text
+                  key={v}
+                  x={LEFT - 8}
+                  y={y(v) + 5}
+                  textAnchor="end"
+                  fontSize={16}
+                  className="count fill-ink-soft"
+                >
+                  {v}
+                </text>
+              ))}
+              <polyline
+                fill="none"
+                className={TONE[t].stroke}
+                strokeWidth={1.5}
+                points={series[t]
+                  .map((p) => `${px(p)},${y(p.score)}`)
+                  .join(' ')}
+              />
+              {series[t].map((p) => (
+                <Marker
+                  key={p.sessionId}
+                  timing={t}
+                  cx={px(p)}
+                  cy={y(p.score)}
+                  size={4}
+                />
+              ))}
+            </g>
+          );
+        })}
+        <text x={LEFT} y={H - 4} fontSize={16} className="fill-ink-soft">
           {formatShortDate(first)}
         </text>
         {span > 1 ? (
           <text
             x={RIGHT + 4}
-            y={H - 6}
+            y={H - 4}
             textAnchor="end"
             fontSize={16}
             className="fill-ink-soft"
