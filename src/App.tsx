@@ -12,7 +12,7 @@ import { isTiming, PainScreen, StopScreen } from './features/pain/PainScreen';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
 import { Settings } from './features/settings/Settings';
-import { UpdateContext } from './features/settings/updateContext';
+import { UpdateContext, useUpdate } from './features/settings/updateContext';
 import { WeekView } from './features/week/WeekView';
 import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
@@ -24,6 +24,9 @@ const DemoSeed = import.meta.env.DEV
   : null;
 
 export function App() {
+  // Mounted once for the whole app (also during onboarding) so the service
+  // worker registers on first load; the shell decides where the banner shows.
+  const update = useAppUpdate();
   // undefined while loading, then true/false.
   const accepted = useLiveQuery(
     async () => (await getDb().meta.get('onboarding')) !== undefined,
@@ -34,9 +37,11 @@ export function App() {
   if (!accepted) return <Onboarding />;
 
   return (
-    <Router hook={useHashLocation}>
-      <Shell />
-    </Router>
+    <UpdateContext.Provider value={update}>
+      <Router hook={useHashLocation}>
+        <Shell />
+      </Router>
+    </UpdateContext.Provider>
   );
 }
 
@@ -46,7 +51,8 @@ function Shell() {
     location.startsWith('/session/') ||
     location.startsWith('/smarta/') ||
     location.startsWith('/stopp/');
-  const update = useAppUpdate(inSession);
+  const { needRefresh, updateNow } = useUpdate();
+  const showBanner = needRefresh && !inSession;
   // The banner shows on the calm screens only, never on session routes or
   // cards that can be opened mid-session.
   const calm =
@@ -54,14 +60,14 @@ function Shell() {
     location.startsWith('/historik') ||
     location === '/installningar';
   return (
-    <UpdateContext.Provider value={update}>
-      {update.showBanner && calm ? (
+    <>
+      {showBanner && calm ? (
         <div className="mx-auto max-w-md px-5 pt-3">
           <Banner>
             <p className="m-0 font-bold">Ny version finns</p>
             <button
               type="button"
-              onClick={() => void update.updateNow()}
+              onClick={() => void updateNow()}
               className="mt-2 min-h-12 rounded-md border-[3px] border-ink bg-paper px-5 text-base font-bold text-ink"
             >
               Uppdatera
@@ -121,7 +127,7 @@ function Shell() {
         </Switch>
       </main>
       {inSession ? null : <BottomNav />}
-    </UpdateContext.Provider>
+    </>
   );
 }
 
