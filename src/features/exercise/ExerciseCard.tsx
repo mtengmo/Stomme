@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
+import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
 import type { Exercise, ExerciseId } from '../../domain/types';
 import { Figure, usePrefersReducedMotion } from '../../figures/Figure';
@@ -35,6 +36,9 @@ export function ExerciseCardBody({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="m-0 text-4xl leading-tight font-bold">{exercise.name}</h1>
+      <p className="m-0 text-base text-ink-soft">
+        Övning {exerciseReferences[exercise.id]}
+      </p>
       <MuscleFocus exerciseId={exercise.id} />
       <fieldset className="m-0 flex gap-2 border-0 p-0">
         <legend className="sr-only">Visning</legend>

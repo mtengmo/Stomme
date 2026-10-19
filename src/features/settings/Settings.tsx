@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'wouter';
 import {
   BackupError,
   type BackupFile,
@@ -15,7 +16,7 @@ import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
 import { shareOrDownload } from '../../lib/share';
 import { type StorageStatus, storageStatus } from '../../lib/storage';
-import { Button } from '../../ui/Button';
+import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { readBackupMeta } from '../week/BackupReminder';
@@ -361,6 +362,15 @@ export function Settings() {
       <StorageSection />
       <InstallSection />
       <VersionSection />
+      <Section id="set-exercises" title="Övningar">
+        <p className={note}>
+          Granska namn, referensnummer, muskelområden och rörelsens lägen för
+          alla övningar.
+        </p>
+        <Link href="/granska" className={buttonClass('secondary')}>
+          Granska alla övningar
+        </Link>
+      </Section>
 
       <Section id="set-about" title="Om och säkerhet">
         <DisclaimerText className="m-0 text-base" />

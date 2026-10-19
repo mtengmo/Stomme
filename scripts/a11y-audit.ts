@@ -165,6 +165,13 @@ async function theme(scheme: 'light' | 'dark') {
   await audit(page, tag('muscle movement overlay'));
   await page.getByRole('button', { name: 'Muskler', exact: true }).click();
   await audit(page, tag('front and back muscle map'));
+  await page.goto(`${base}/#/granska?ovning=E03`);
+  await page.getByRole('heading', { name: /^E03 ·/ }).waitFor();
+  await audit(page, tag('numbered exercise review'));
+  await page
+    .getByRole('button', { name: 'Visa muskelmarkeringar', exact: true })
+    .click();
+  await audit(page, tag('exercise review muscle frames'));
   await page.goto(`${base}/#/historik`);
   await page.getByRole('link', { name: /Pass/ }).first().click();
   await page.getByRole('heading', { name: /Pass [AB]/, level: 1 }).waitFor();

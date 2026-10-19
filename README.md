@@ -28,6 +28,10 @@ for the full build plan and `docs/spec.md` for the specification.
 
 Requires Node 24 and npm. Install with `npm ci`.
 
+## Exercise review
+
+Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All eleven exercises have fixed references E01–E11, independent of workout order. The read-only view includes names, IDs, muscles, instructions and static start/mid/end frames for each side, plus links to the normal animated exercise cards. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
+
 ## Deployment
 
 Deployed by `.github/workflows/deploy.yml` to GitHub Pages at `https://stomme.tengmo.com`.

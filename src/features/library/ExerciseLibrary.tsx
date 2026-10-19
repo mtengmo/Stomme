@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
+import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList } from '../../content/exercises';
 import {
   exerciseMuscles,
@@ -47,7 +48,8 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         <Icon name="back" className="shrink-0 rotate-180" />
       </Link>
       <p className="m-0 mt-2 text-base">
-        Tränar främst: {primaryMuscleLabel(exercise.id)}
+        {exerciseReferences[exercise.id]} · Tränar främst:{' '}
+        {primaryMuscleLabel(exercise.id)}
       </p>
       <p className="m-0 mt-1 text-base text-ink-soft">
         Utrustning: {equipment(exercise)}
@@ -135,6 +137,12 @@ export function ExerciseLibrary() {
           Ben, höft och bål för löpning. Här finns programmets alla övningar.
         </p>
       </header>
+      <Link
+        href="/granska"
+        className="flex min-h-12 items-center self-start text-base font-bold underline decoration-2 underline-offset-4"
+      >
+        Granska alla övningar
+      </Link>
       <fieldset
         className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0"
         aria-label="Filtrera på muskelgrupp"

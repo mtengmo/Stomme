@@ -31,6 +31,11 @@ const ExerciseLibrary = lazy(() =>
     default: m.ExerciseLibrary,
   })),
 );
+const ExerciseReview = lazy(() =>
+  import('./features/exercise/ExerciseReview').then((m) => ({
+    default: m.ExerciseReview,
+  })),
+);
 
 // DEV-only synthetic data helper; absent from the production bundle.
 const DemoSeed = import.meta.env.DEV
@@ -137,6 +142,7 @@ function Shell() {
                 )}
               </Route>
             ) : null}
+            <Route path="/granska">{() => <ExerciseReview />}</Route>
             <Route path="/historik">{() => <History />}</Route>
             <Route path="/historik/:id">
               {(params) => <SessionDetail id={params.id} />}

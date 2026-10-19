@@ -53,3 +53,9 @@ Captured the final pain-stop, week warning, stale-session and error-boundary scr
 The audit now additionally covers the filtered exercise library, muscle-overlay movement view, front/back map and inline exercise choices in both themes: 46 screen audits, no findings. Contrast checks pass with the existing tokens. Each run reserves its own server port and closes its browsers on failure, avoiding accidental checks against another worktree's server.
 
 Production browser checks also verify filter/Back restoration, invalid filters, choices surviving detail inspection/pain replanning/reload, reduced motion, real animation pause/resume, and the optional sixth exercise fitting inside a 360 px week card. All 18 browser tests pass. The front/back region diagrams have matching text labels and solid/patterned distinctions; the maps explain broad training focus, not precise activation.
+
+## Numbered exercise review (2026-10-19)
+
+The read-only `#/granska` page adds fixed E01–E11 references, a desktop catalogue/mobile picker, previous/next navigation, stable per-exercise links and both-side start/mid/end frames. References also appear in the library and exercise cards. This metadata does not change stored workout IDs or backup schemas.
+
+All 50 screen audits report no findings, including the review page and its muscle-frame mode in both themes. Mobile-dark and desktop-light browser checks cover all eleven references, direct links, Back/reload restoration, narrow layout and offline review. All 20 production browser tests and 415 unit tests pass; type/lint check and production build pass with the existing CSS warnings. The review route is loaded on demand; initial JavaScript remains about 136.7 KB gzipped. Impeccable's detector reports no findings on the changed surfaces.
