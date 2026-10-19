@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Stomme</title>
+  <rect width="512" height="512" fill="#eef3f0"/>
+  <g stroke="#d6e2dc" stroke-width="4">
+    <path d="M128 0V512M256 0V512M384 0V512M0 128H512M0 256H512M0 384H512"/>
+  </g>
+  <!-- stomme: a frame open at the top right, inside the 80% safe circle -->
+  <path d="M345 170H170V342H342V262" fill="none" stroke="#23292b" stroke-width="40" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- one red pencil tick -->
+  <path d="M222 262L270 308L388 182" fill="none" stroke="#c22f27" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
