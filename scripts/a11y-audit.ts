@@ -5,11 +5,25 @@
  * Usage: npx tsx scripts/a11y-audit.ts
  */
 import { spawn } from 'node:child_process';
-import { chromium, type Page } from '@playwright/test';
+import { createServer } from 'node:net';
+import { type Browser, chromium, type Page } from '@playwright/test';
 
-const PORT = 5293;
+// Each run owns its server; a stale worktree server must not pass an audit.
+const reservation = createServer();
+await new Promise<void>((resolve, reject) => {
+  reservation.once('error', reject);
+  reservation.listen(0, resolve);
+});
+const address = reservation.address();
+if (!address || typeof address === 'string') throw new Error('No audit port');
+const PORT = address.port;
+await new Promise<void>((resolve, reject) =>
+  reservation.close((error) => (error ? reject(error) : resolve())),
+);
 async function up(url: string) {
   for (let i = 0; i < 60; i++) {
+    if (srv.exitCode !== null)
+      throw new Error(`Audit server exited: ${srv.exitCode}`);
     try {
       if ((await fetch(url)).ok) return;
     } catch {}
@@ -26,6 +40,7 @@ const srv = spawn(
   },
 );
 const findings: string[] = [];
+const browsers = new Set<Browser>();
 let screens = 0;
 
 async function audit(page: Page, name: string) {
@@ -112,6 +127,7 @@ async function audit(page: Page, name: string) {
 
 async function theme(scheme: 'light' | 'dark') {
   const browser = await chromium.launch();
+  browsers.add(browser);
   const ctx = await browser.newContext({
     viewport: { width: 360, height: 800 },
     colorScheme: scheme,
@@ -141,6 +157,14 @@ async function theme(scheme: 'light' | 'dark') {
     await page.waitForTimeout(300);
     await audit(page, tag(name));
   }
+  await page.goto(`${base}/#/ovningar?muskel=core`);
+  await page.getByRole('heading', { name: 'Övningar', exact: true }).waitFor();
+  await audit(page, tag('filtered exercise library'));
+  await page.goto(`${base}/#/ovning/dead-bug`);
+  await page.getByRole('heading', { name: 'Dead bug', exact: true }).waitFor();
+  await audit(page, tag('muscle movement overlay'));
+  await page.getByRole('button', { name: 'Muskler', exact: true }).click();
+  await audit(page, tag('front and back muscle map'));
   await page.goto(`${base}/#/historik`);
   await page.getByRole('link', { name: /Pass/ }).first().click();
   await page.getByRole('heading', { name: /Pass [AB]/, level: 1 }).waitFor();
@@ -159,6 +183,14 @@ async function theme(scheme: 'light' | 'dark') {
   await page.goto(`${base}/#/pass/A`);
   await page.getByRole('heading', { name: 'Pass A' }).waitFor();
   await audit(page, tag('pass preview'));
+  await page
+    .getByRole('button', { name: 'Byt övning', exact: true })
+    .first()
+    .click();
+  await audit(page, tag('exercise choices'));
+  await page
+    .getByRole('button', { name: 'Stäng övningsval', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
   await audit(page, tag('pain screen'));
@@ -279,6 +311,7 @@ async function theme(scheme: 'light' | 'dark') {
   await p2.getByRole('heading', { name: 'Något gick fel' }).waitFor();
   await audit(p2, tag('error boundary'));
   await browser.close();
+  browsers.delete(browser);
 }
 
 try {
@@ -286,6 +319,7 @@ try {
   await theme('light');
   await theme('dark');
 } finally {
+  await Promise.all([...browsers].map((browser) => browser.close()));
   srv.kill();
 }
 const unique = [...new Set(findings)];

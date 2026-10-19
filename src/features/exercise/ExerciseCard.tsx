@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { exercises } from '../../content/exercises';
 import type { Exercise, ExerciseId } from '../../domain/types';
-import { Figure } from '../../figures/Figure';
+import { Figure, usePrefersReducedMotion } from '../../figures/Figure';
+import { MuscleFocus, MuscleMap } from '../../figures/MuscleMap';
 import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 
@@ -10,6 +11,12 @@ const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
   'split-squat': 'Fråga fysioterapeuten hur djupt du ska gå ner.',
 };
+
+const MUSCLE_OVERLAY_EXERCISES = new Set<ExerciseId>([
+  'goblet-chair-squat',
+  'single-leg-rdl',
+  'dead-bug',
+]);
 
 /** The card content: name, muscles, figure, tips, mistake, easier variant. */
 export function ExerciseCardBody({
@@ -19,31 +26,98 @@ export function ExerciseCardBody({
   exercise: Exercise;
   side?: 'right' | 'left';
 }) {
+  const [view, setView] = useState<'movement' | 'muscles'>('movement');
+  const [paused, setPaused] = useState(false);
+  const [overlay, setOverlay] = useState(true);
+  const reducedMotion = usePrefersReducedMotion();
   const working = exercise.perSide ? side : null;
   const physio = ASK_PHYSIO[exercise.id];
   return (
     <div className="flex flex-col gap-4">
       <h1 className="m-0 text-4xl leading-tight font-bold">{exercise.name}</h1>
-      <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {exercise.muscles.map((m) => (
-          <li
-            key={m}
-            className="rounded-md border-2 border-edge px-3 py-1 text-base font-bold"
-          >
-            {m}
-          </li>
-        ))}
-      </ul>
-      <div className="border-[3px] border-edge rounded-md p-2">
-        <Figure exerciseId={exercise.id} working={working} />
-      </div>
+      <MuscleFocus exerciseId={exercise.id} />
+      <fieldset className="m-0 flex gap-2 border-0 p-0">
+        <legend className="sr-only">Visning</legend>
+        <button
+          type="button"
+          aria-pressed={view === 'movement'}
+          onClick={() => setView('movement')}
+          className={`min-h-12 flex-1 rounded-md border-[3px] px-3 text-base font-bold ${view === 'movement' ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
+        >
+          Rörelse
+        </button>
+        <button
+          type="button"
+          aria-pressed={view === 'muscles'}
+          onClick={() => setView('muscles')}
+          className={`min-h-12 flex-1 rounded-md border-[3px] px-3 text-base font-bold ${view === 'muscles' ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
+        >
+          Muskler
+        </button>
+      </fieldset>
+      {view === 'movement' ? (
+        <>
+          <div className="border-[3px] border-edge rounded-md p-2">
+            <Figure
+              exerciseId={exercise.id}
+              working={working}
+              paused={paused || reducedMotion}
+              showMuscles={overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)}
+            />
+          </div>
+          {!reducedMotion ? (
+            <button
+              type="button"
+              aria-pressed={paused}
+              onClick={() => setPaused((value) => !value)}
+              className="min-h-12 self-start rounded-md border-[3px] border-edge px-4 text-base font-bold"
+            >
+              {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
+            </button>
+          ) : (
+            <p className="m-0 text-base text-ink-soft">
+              Rörelsen visas stilla med start- och slutläge eftersom du har valt
+              minskad rörelse.
+            </p>
+          )}
+          {MUSCLE_OVERLAY_EXERCISES.has(exercise.id) ? (
+            <>
+              <button
+                type="button"
+                aria-pressed={overlay}
+                onClick={() => setOverlay((value) => !value)}
+                className="min-h-12 self-start rounded-md border-[3px] border-edge px-4 text-base font-bold"
+              >
+                {overlay
+                  ? 'Dölj muskler i rörelsen'
+                  : 'Visa muskler i rörelsen'}
+              </button>
+              <p className="m-0 text-base text-ink-soft">
+                H/V visar arbetande sida. Markeringarna visar ungefärliga
+                muskelområden; heldragen yta tränar främst och streckad yta
+                hjälper till.
+              </p>
+            </>
+          ) : (
+            <p className="m-0 text-base text-ink-soft">
+              Se ungefärliga muskelområden under Muskler.
+            </p>
+          )}
+        </>
+      ) : (
+        <div className="border-[3px] border-edge rounded-md p-3">
+          <MuscleMap exerciseId={exercise.id} />
+        </div>
+      )}
       {working ? (
         <p className="m-0 text-base text-ink-soft">
           <span className="font-bold text-blue">
             {working === 'right' ? 'H' : 'V'}
           </span>{' '}
-          och blå linje = {working === 'right' ? 'höger' : 'vänster'} sida
-          arbetar.
+          {working === 'right' ? 'höger' : 'vänster'} sida arbetar.
+          {view === 'movement' && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
+            ? ' Markeringarna visar ungefärliga muskelområden.'
+            : ''}
         </p>
       ) : null}
       <section>

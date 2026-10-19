@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
+import { selectedTemplate, snapshotTemplate } from '../content/alternatives';
 import { exercises } from '../content/exercises';
-import { templates } from '../content/templates';
 import type {
   ExerciseFeedback,
   ExerciseId,
@@ -88,7 +88,9 @@ export async function startSession(
   db: StommeDB,
   templateId: TemplateId,
   now: Date,
+  selection?: readonly ExerciseId[],
 ): Promise<Session> {
+  const template = selectedTemplate(templateId, selection);
   return db.transaction(
     'rw',
     [db.sessions, db.meta, db.setLogs, db.painLogs],
@@ -108,7 +110,7 @@ export async function startSession(
         startedAt: now.toISOString(),
         status: 'in_progress',
         programWeek: week,
-        plan: buildPlan(templates[templateId], week, data).map((i) => i.plan),
+        plan: buildPlan(template, week, data).map((i) => i.plan),
         feedback: {},
       };
       await db.sessions.add(session);
@@ -375,7 +377,7 @@ export async function replanSession(
       );
       const data = await planningData(db);
       const plan = buildPlan(
-        templates[s.templateId],
+        snapshotTemplate(s),
         s.programWeek,
         data,
         before ? assessReading(before).status : 'ok',

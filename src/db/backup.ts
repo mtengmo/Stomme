@@ -158,7 +158,14 @@ const sessionSchema = z.strictObject({
   status: z.enum(['in_progress', 'completed', 'aborted']),
   abortReason: z.enum(['pain_stop', 'user']).optional(),
   programWeek: z.number().int().min(1).max(1000),
-  plan: z.array(plannedExercise).max(30),
+  plan: z
+    .array(plannedExercise)
+    .max(30)
+    .refine(
+      (items) =>
+        new Set(items.map((item) => item.exerciseId)).size === items.length,
+      { message: 'Duplicate exercise in session plan' },
+    ),
   feedback: z.partialRecord(exerciseIdSchema, effortFeedback),
   note: z.string().max(5000).optional(),
 });

@@ -10,6 +10,8 @@ export default defineConfig({
     },
   },
   test: {
+    // Bound jsdom concurrency so large developer machines do not exhaust test resources.
+    maxWorkers: 4,
     environment: 'node',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],

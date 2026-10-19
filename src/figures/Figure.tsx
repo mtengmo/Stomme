@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ExerciseId } from '../domain/types';
 import { cycleProgress, lerpPt, type Pt } from './lerp';
+import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
 import { FloorLine, Held, PropShape } from './props';
 
@@ -42,15 +43,17 @@ export function FigureFrame({
   exerciseId,
   pose,
   working = 'right',
+  showMuscles = false,
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
   /** null: two-sided exercise, no marker and no accent colour. */
   working?: Working | null;
+  showMuscles?: boolean;
 }) {
   const spec = figures[exerciseId];
   const p = pose;
-  const accent = working ? 'var(--blue)' : 'var(--ink)';
+  const accent = working && !showMuscles ? 'var(--blue)' : 'var(--ink)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
     working === 'left' ? 'translate(192 0) scale(-1 1)' : undefined;
@@ -69,6 +72,9 @@ export function FigureFrame({
           <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
         ))}
         <FloorLine />
+        {showMuscles ? (
+          <MuscleOverlay exerciseId={exerciseId} pose={p} />
+        ) : null}
         <g stroke="var(--edge)" {...limb}>
           <path d={arm(p.eL, p.hL)} />
           <path d={leg(p.kL, p.aL, p.tL)} />
@@ -108,27 +114,34 @@ export function Figure({
   exerciseId,
   working = 'right',
   stillOnly = false,
+  paused = false,
+  showMuscles = false,
 }: {
   exerciseId: ExerciseId;
   working?: Working | null;
   /** Show only the start frame (small slots under reduced motion). */
   stillOnly?: boolean;
+  paused?: boolean;
+  /** Segment-attached anatomy hint, available for the reviewed prototypes. */
+  showMuscles?: boolean;
 }) {
   const reduced = usePrefersReducedMotion();
   const spec = figures[exerciseId];
   const [t, setT] = useState(0);
+  const elapsedMs = useRef(0);
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || paused) return;
     let raf = 0;
-    const t0 = performance.now();
+    const t0 = performance.now() - elapsedMs.current;
     const tick = (now: number) => {
-      setT(cycleProgress(now - t0));
+      elapsedMs.current = now - t0;
+      setT(cycleProgress(elapsedMs.current));
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced]);
+  }, [reduced, paused]);
 
   if (reduced && !stillOnly) {
     return (
@@ -144,6 +157,7 @@ export function Figure({
               exerciseId={exerciseId}
               pose={pose}
               working={working}
+              showMuscles={showMuscles}
             />
             <figcaption className="text-center text-base font-bold">
               {label}
@@ -158,6 +172,7 @@ export function Figure({
       exerciseId={exerciseId}
       pose={reduced ? spec.start : lerpPose(spec.start, spec.end, t)}
       working={working}
+      showMuscles={showMuscles}
     />
   );
 }

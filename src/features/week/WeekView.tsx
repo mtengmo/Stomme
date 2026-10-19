@@ -10,7 +10,7 @@ import { restStatus, weekSummary } from '../../rules/schedule';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { PencilTick } from '../../ui/PencilTick';
-import { Tally, type TallyItem } from '../../ui/Tally';
+import { Tally } from '../../ui/Tally';
 import { careState } from '../pain/careState';
 import { DayAfterNotices, StopBanner } from '../pain/PainNotices';
 import { BackupReminder, readBackupMeta } from './BackupReminder';
@@ -21,27 +21,14 @@ import {
   STATE_LABEL,
 } from './passState';
 import { StaleSession } from './StaleSession';
+import { weekTally } from './weekTally';
 
 const DAY_NAMES = ['mån', 'tis', 'ons', 'tors', 'fre', 'lör', 'sön'];
 const IDS: TemplateId[] = ['A', 'B'];
-
-function setTotal(id: TemplateId): number {
-  return templates[id].items.reduce((n, i) => n + i.sets, 0);
-}
-
-/** One tally item per exercise; sets done come from the pass's in-progress session logs. */
-function tallyItems(
-  id: TemplateId,
-  complete: boolean,
-  doneByExercise: Map<string, number>,
-): TallyItem[] {
-  return templates[id].items.map((it) => ({
-    id: it.exerciseId,
-    remaining: complete
-      ? 0
-      : Math.max(0, it.sets - (doneByExercise.get(it.exerciseId) ?? 0)),
-  }));
-}
+const PASS_PURPOSE: Record<TemplateId, string> = {
+  A: 'Knäböj, steg och höftfällning · bål',
+  B: 'Utfall, bäckenlyft och vader · bål',
+};
 
 function restText(sessions: Session[], now: Date): string | null {
   const { ok, earliestNext } = restStatus(sessions, now);
@@ -61,16 +48,30 @@ const chipStyle: Record<PassState, string> = {
   upcoming: 'bg-upcoming text-upcoming-ink',
 };
 
-function StateChip({ state }: { state: PassState }) {
+function StateChip({
+  state,
+  active = false,
+}: {
+  state: PassState;
+  active?: boolean;
+}) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${chipStyle[state]}`}
+      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-blue text-blue' : chipStyle[state]}`}
     >
       <Icon
-        name={state === 'done' ? 'check' : state === 'today' ? 'sun' : 'clock'}
+        name={
+          active
+            ? 'clock'
+            : state === 'done'
+              ? 'check'
+              : state === 'today'
+                ? 'sun'
+                : 'clock'
+        }
         size={18}
       />
-      {STATE_LABEL[state]}
+      {active ? 'Pågår' : STATE_LABEL[state]}
     </span>
   );
 }
@@ -124,19 +125,6 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const first = summary.days[0] ?? today;
   const last = summary.days[6] ?? today;
 
-  const doneFor = (id: TemplateId): Map<string, number> => {
-    const open = sessions.find(
-      (s) => s.status === 'in_progress' && s.templateId === id,
-    );
-    const m = new Map<string, number>();
-    if (!open) return m;
-    for (const l of logs) {
-      if (l.sessionId === open.id)
-        m.set(l.exerciseId, (m.get(l.exerciseId) ?? 0) + 1);
-    }
-    return m;
-  };
-
   return (
     <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-5 px-5 pt-5 pb-28">
       <header>
@@ -146,6 +134,16 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         <p className="m-0 mt-2 text-base text-ink-soft">
           {formatShortDate(first)} – {formatShortDate(last)}
         </p>
+        <p className="m-0 mt-3 text-base text-ink-soft">
+          Två styrkepass för ben, höft och bål som stöd till löpningen.
+        </p>
+        <Link
+          href="/ovningar"
+          className="mt-1 inline-flex min-h-12 items-center gap-2 text-base font-bold underline decoration-2 underline-offset-4"
+        >
+          Övningar
+          <Icon name="back" size={20} className="rotate-180" />
+        </Link>
       </header>
 
       {care.stopBanner ? <StopBanner /> : null}
@@ -189,11 +187,16 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
       <ul className="m-0 flex list-none flex-col gap-4 p-0">
         {IDS.map((id) => {
           const state = states[id];
-          const total = setTotal(id);
-          const items = tallyItems(id, state === 'done', doneFor(id));
-          const left = items.reduce((n, i) => n + i.remaining, 0);
-          const done = total - left;
-          const lead = id === next && state !== 'done';
+          const open = sessions.find(
+            (s) => s.templateId === id && s.status === 'in_progress',
+          );
+          const snapshot =
+            open ??
+            summary.completed
+              .filter((s) => s.templateId === id)
+              .sort((a, b) => b.startedAt.localeCompare(a.startedAt))[0];
+          const { total, done, items } = weekTally(id, snapshot, logs);
+          const lead = open !== undefined || (id === next && state !== 'done');
           const label = `${templates[id].name}: ${done} av ${total} set klara`;
           return (
             <li
@@ -216,8 +219,9 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
                     </p>
                   ) : null}
                 </div>
-                <StateChip state={state} />
+                <StateChip state={state} active={open !== undefined} />
               </div>
+              <p className="m-0 text-base text-ink-soft">{PASS_PURPOSE[id]}</p>
               {lead ? (
                 <p className="count m-0 mt-auto text-7xl leading-none">
                   {done}

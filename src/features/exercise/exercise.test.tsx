@@ -62,7 +62,12 @@ describe('"Hur gör man?" sheet', () => {
 
     await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getAllByRole('listitem').length).toBeGreaterThan(3);
+    expect(
+      within(dialog).getByRole('heading', { name: 'Så gör du' }),
+    ).toBeTruthy();
+    expect(
+      within(dialog).getByRole('heading', { name: 'Tränar främst' }),
+    ).toBeTruthy();
     expect(document.activeElement).toBe(dialog);
     await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());

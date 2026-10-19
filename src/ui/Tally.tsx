@@ -42,7 +42,7 @@ export function Tally({ items, label, size = 48, tone = 'ink' }: TallyProps) {
       role="img"
       aria-label={label}
       data-done={doneNow}
-      className="flex gap-1.5"
+      className="flex flex-wrap gap-1.5"
     >
       {items.map((item, idx) => (
         <span

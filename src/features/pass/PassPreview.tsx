@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { exerciseChoices, selectedTemplate } from '../../content/alternatives';
 import {
   PAIN_COPY,
   resultLine,
@@ -8,6 +9,7 @@ import {
   suggestionReason,
 } from '../../content/copy';
 import { exercises } from '../../content/exercises';
+import { primaryMuscleLabel } from '../../content/muscles';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import {
@@ -16,7 +18,7 @@ import {
   programStartDate,
   startSession,
 } from '../../db/repo';
-import type { TemplateId } from '../../domain/types';
+import type { ExerciseId, TemplateId } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
 import { buildPlan } from '../../rules/nextPlan';
 import { assessReading } from '../../rules/pain';
@@ -26,12 +28,17 @@ import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { careState } from '../pain/careState';
 import { StopBanner } from '../pain/PainNotices';
+import { readChoiceDraft, writeChoiceDraft } from './selectionDraft';
 
 /** #/pass/:id: today's suggestion for the pass, then start (or continue). */
 export function PassPreview({ id }: { id: TemplateId }) {
   const [, navigate] = useLocation();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selections, setSelections] = useState<
+    Partial<Record<TemplateId, ExerciseId[]>>
+  >(() => ({ A: readChoiceDraft('A'), B: readChoiceDraft('B') }));
+  const [editingSlot, setEditingSlot] = useState<number | null>(null);
   const data = useLiveQuery(async () => {
     const db = getDb();
     return {
@@ -44,26 +51,58 @@ export function PassPreview({ id }: { id: TemplateId }) {
 
   const template = templates[id];
   const today = toLocalDate(new Date());
-  const week = data.program ? programWeek(data.program, today) : 1;
   const active = data.active;
+  const week =
+    active?.templateId === id
+      ? active.programWeek
+      : data.program
+        ? programWeek(data.program, today)
+        : 1;
+  const selected =
+    selections[id] ?? template.items.map((item) => item.exerciseId);
+  const adapted = selected.some(
+    (exerciseId, slot) => exerciseId !== template.items[slot]?.exerciseId,
+  );
+  const snapshot = active?.templateId === id ? active.plan : undefined;
   const before = active
     ? data.planning.painLogs.find(
         (p) => p.sessionId === active.id && p.timing === 'before',
       )
     : undefined;
   const computed = buildPlan(
-    template,
+    snapshot
+      ? {
+          ...template,
+          items: snapshot.map((item) => ({
+            exerciseId: item.exerciseId,
+            sets: item.sets,
+            restSec: item.restSec,
+          })),
+        }
+      : selectedTemplate(id, selected),
     week,
     data.planning,
     before ? assessReading(before).status : 'ok',
     active?.id,
   );
   // An active session shows its stored snapshot, not a recompute.
-  const snapshot = active?.templateId === id ? active.plan : undefined;
-  const items = computed.map((i) => ({
-    ...i,
-    plan: snapshot?.find((p) => p.exerciseId === i.plan.exerciseId) ?? i.plan,
-  }));
+  const items = computed.map((item, slot) => {
+    const stored = snapshot?.[slot];
+    return stored
+      ? {
+          ...item,
+          plan: stored,
+          suggestion: {
+            ...item.suggestion,
+            reason: stored.reason,
+            seePhysio:
+              stored.reason === 'pain_stop_hold' ||
+              (stored.reason === 'week1_bodyweight' &&
+                item.suggestion.seePhysio),
+          },
+        }
+      : item;
+  });
   const care = careState(data.planning.sessions, data.planning.painLogs, today);
   // The physio line once, as a banner: not per row, and not when a row's
   // reason text or the stop banner already says it.
@@ -84,7 +123,8 @@ export function PassPreview({ id }: { id: TemplateId }) {
     setStarting(true);
     setError(null);
     try {
-      const s = await startSession(getDb(), id, new Date());
+      const s = await startSession(getDb(), id, new Date(), selected);
+      writeChoiceDraft(id);
       navigate(`/smarta/${s.id}/before`);
     } catch {
       setError(PAIN_COPY.error);
@@ -109,6 +149,12 @@ export function PassPreview({ id }: { id: TemplateId }) {
           Vecka {week} · {items.reduce((n, i) => n + i.plan.sets, 0)} set
         </p>
       </header>
+      <Link
+        href="/ovningar"
+        className="flex min-h-12 items-center self-start text-base font-bold text-ink underline decoration-2 underline-offset-4"
+      >
+        Se alla övningar
+      </Link>
       {care.stopBanner ? <StopBanner /> : null}
       {physioOnce ? <Banner tone="care">{SEE_PHYSIO}.</Banner> : null}
       {other ? (
@@ -116,11 +162,37 @@ export function PassPreview({ id }: { id: TemplateId }) {
           Du har {templates[active.templateId].name} igång. Fortsätt det först.
         </Banner>
       ) : null}
+      {!active ? (
+        <div>
+          <p className="m-0 text-base text-ink-soft">
+            Du kan byta vissa övningar innan du startar. Smärtfrågorna gäller
+            oavsett ditt val.
+          </p>
+          {adapted ? (
+            <button
+              type="button"
+              disabled={starting}
+              className="min-h-12 text-base font-bold underline decoration-2 underline-offset-4 disabled:opacity-50"
+              onClick={() => {
+                setSelections((current) => ({ ...current, [id]: undefined }));
+                writeChoiceDraft(id);
+                setEditingSlot(null);
+              }}
+            >
+              Återställ passet
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <ol className="m-0 flex list-none flex-col p-0">
-        {items.map(({ plan: p, suggestion, last }) => {
+        {items.map(({ plan: p, suggestion, last }, slot) => {
           const ex = exercises[p.exerciseId];
+          const choices = exerciseChoices(id, slot);
           return (
-            <li key={p.exerciseId} className="border-b-2 border-edge py-3">
+            <li
+              key={snapshot ? p.exerciseId : template.items[slot]?.exerciseId}
+              className="border-b-2 border-edge py-3"
+            >
               <Link
                 href={`/ovning/${ex.id}`}
                 className="-my-1 block min-h-12 py-3.5 text-ink no-underline"
@@ -129,6 +201,9 @@ export function PassPreview({ id }: { id: TemplateId }) {
                   {ex.name}
                 </span>
               </Link>
+              <p className="m-0 text-base text-ink-soft">
+                Tränar främst: {primaryMuscleLabel(ex.id)}
+              </p>
               {last ? (
                 <p className="m-0 mt-1 grid grid-cols-[7rem_1fr] items-baseline gap-2 text-base text-ink-soft">
                   <span>Förra gången</span>
@@ -146,6 +221,68 @@ export function PassPreview({ id }: { id: TemplateId }) {
               <p className="m-0 mt-1 text-base text-ink-soft">
                 {suggestionReason(suggestion, week)}
               </p>
+              {!active && choices.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    disabled={starting}
+                    aria-expanded={editingSlot === slot}
+                    aria-controls={`exercise-choice-${id}-${slot}`}
+                    className="min-h-12 text-base font-bold underline decoration-2 underline-offset-4 disabled:opacity-50"
+                    onClick={() =>
+                      setEditingSlot(editingSlot === slot ? null : slot)
+                    }
+                  >
+                    {editingSlot === slot ? 'Stäng övningsval' : 'Byt övning'}
+                  </button>
+                  {editingSlot === slot ? (
+                    <div id={`exercise-choice-${id}-${slot}`}>
+                      <label
+                        htmlFor={`exercise-select-${id}-${slot}`}
+                        className="mb-2 block text-base font-bold"
+                      >
+                        Övning i moment {slot + 1}
+                      </label>
+                      <select
+                        id={`exercise-select-${id}-${slot}`}
+                        disabled={starting}
+                        value={p.exerciseId}
+                        className="min-h-12 w-full rounded-sm border-2 border-ink bg-paper px-3 text-base text-ink"
+                        onChange={(event) => {
+                          const next = [...selected];
+                          next[slot] = event.target.value as ExerciseId;
+                          selectedTemplate(id, next);
+                          writeChoiceDraft(id, next);
+                          setSelections((current) => ({
+                            ...current,
+                            [id]: next,
+                          }));
+                        }}
+                      >
+                        {choices.map((choice) => {
+                          const used =
+                            choice.exerciseId !== p.exerciseId &&
+                            selected.includes(choice.exerciseId);
+                          return (
+                            <option
+                              key={choice.exerciseId}
+                              value={choice.exerciseId}
+                              disabled={used}
+                            >
+                              {exercises[choice.exerciseId].name}
+                              {used ? ' – finns redan i passet' : ''}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                  ) : null}
+                </>
+              ) : !active ? (
+                <p className="m-0 mt-2 text-base text-ink-soft">
+                  Inget byte i det här passet.
+                </p>
+              ) : null}
             </li>
           );
         })}

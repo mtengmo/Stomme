@@ -24,6 +24,7 @@ for the full build plan and `docs/spec.md` for the specification.
 | `npm run e2e` | Build and run the production Playwright browser tests |
 | `npm run audit:a11y` | Check contrast and audit mobile screens in light and dark themes |
 | `npm run shots` | Build and capture mobile screenshots in light and dark themes |
+| `npm run shots:muscles` | Capture muscle-library, exercise-choice and anatomy review screens |
 
 Requires Node 24 and npm. Install with `npm ci`.
 

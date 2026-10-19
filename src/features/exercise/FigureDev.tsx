@@ -1,8 +1,8 @@
 import { exerciseList } from '../../content/exercises';
-import { FigureFrame } from '../../figures/Figure';
+import { FigureFrame, lerpPose } from '../../figures/Figure';
 import { figures } from '../../figures/poses';
 
-/** DEV only: every start/end pose, right then left, static, for review. */
+/** DEV only: every start/mid/end pose, right then left, static, for review. */
 export function FigureDev() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-3 pb-28">
@@ -16,18 +16,35 @@ export function FigureDev() {
             <h2 className="m-0 text-lg font-bold">{ex.name}</h2>
             <div className="grid grid-cols-2 gap-2">
               {sides.flatMap((w) =>
-                (['start', 'end'] as const).map((k) => (
+                (['start', 'middle', 'end'] as const).map((k) => (
                   <div
                     key={`${w}-${k}`}
                     className="rounded-md border-2 border-edge p-1"
                   >
                     <FigureFrame
                       exerciseId={ex.id}
-                      pose={figures[ex.id][k]}
+                      pose={
+                        k === 'middle'
+                          ? lerpPose(
+                              figures[ex.id].start,
+                              figures[ex.id].end,
+                              0.5,
+                            )
+                          : figures[ex.id][k]
+                      }
                       working={w}
+                      showMuscles={[
+                        'goblet-chair-squat',
+                        'single-leg-rdl',
+                        'dead-bug',
+                      ].includes(ex.id)}
                     />
                     <p className="m-0 text-center text-base">
-                      {k === 'start' ? 'Start' : 'Slut'}
+                      {k === 'start'
+                        ? 'Start'
+                        : k === 'middle'
+                          ? 'Mitt'
+                          : 'Slut'}
                     </p>
                   </div>
                 )),

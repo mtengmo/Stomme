@@ -47,3 +47,9 @@ Updated the session walk to expect the summary immediately after saving the afte
 On Node 24: all contrast pairs pass and all 38 screen audits report no findings. All 391 unit tests and 14 production Playwright tests pass; type-check, lint check (with existing reduced-motion CSS warnings), and production build pass. Initial JavaScript is approximately 131 KB gzipped including the service-worker registration helper, below the 150 KB target.
 
 Captured the final pain-stop, week warning, stale-session and error-boundary screens at 360×800 and 412×915 in both themes. Visual spot checks found no clipping or unreadable controls. Physical Android/TalkBack testing remains a manual check.
+
+## Muscle guidance feature (2026-10-19)
+
+The audit now additionally covers the filtered exercise library, muscle-overlay movement view, front/back map and inline exercise choices in both themes: 46 screen audits, no findings. Contrast checks pass with the existing tokens. Each run reserves its own server port and closes its browsers on failure, avoiding accidental checks against another worktree's server.
+
+Production browser checks also verify filter/Back restoration, invalid filters, choices surviving detail inspection/pain replanning/reload, reduced motion, real animation pause/resume, and the optional sixth exercise fitting inside a 360 px week card. All 18 browser tests pass. The front/back region diagrams have matching text labels and solid/patterned distinctions; the maps explain broad training focus, not precise activation.

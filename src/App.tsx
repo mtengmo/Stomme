@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { lazy, Suspense } from 'react';
 import { Route, Router, Switch, useLocation } from 'wouter';
-import { useHashLocation } from 'wouter/use-hash-location';
 import { getDb } from './db/db';
 import { ExerciseCardPage } from './features/exercise/ExerciseCard';
 import { FigureDev } from './features/exercise/FigureDev';
@@ -12,6 +11,7 @@ import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
 import { UpdateContext, useUpdate } from './features/settings/updateContext';
 import { WeekView } from './features/week/WeekView';
+import { useAppHashLocation } from './lib/hashLocation';
 import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
 import { BottomNav } from './ui/BottomNav';
@@ -24,6 +24,11 @@ const History = lazy(() =>
 const Settings = lazy(() =>
   import('./features/settings/Settings').then((m) => ({
     default: m.Settings,
+  })),
+);
+const ExerciseLibrary = lazy(() =>
+  import('./features/library/ExerciseLibrary').then((m) => ({
+    default: m.ExerciseLibrary,
   })),
 );
 
@@ -47,7 +52,7 @@ export function App() {
 
   return (
     <UpdateContext.Provider value={update}>
-      <Router hook={useHashLocation}>
+      <Router hook={useAppHashLocation}>
         <Shell />
       </Router>
     </UpdateContext.Provider>
@@ -119,6 +124,7 @@ function Shell() {
             <Route path="/ovning/:id">
               {(params) => <ExerciseCardPage id={params.id} />}
             </Route>
+            <Route path="/ovningar">{() => <ExerciseLibrary />}</Route>
             {import.meta.env.DEV ? (
               <Route path="/dev/figurer">{() => <FigureDev />}</Route>
             ) : null}

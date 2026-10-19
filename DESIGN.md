@@ -276,3 +276,14 @@ Recorded here as build facts, not rules for future surfaces: the "Nästa pass" b
 ## Contrast (computed)
 
 `npx tsx scripts/contrast.ts` reads the tokens in `src/styles/index.css` and checks every text and UI pair in both themes (4.5:1 text, 3:1 UI). Light red pencil was darkened from #c22f27 to #b52a23 so red text also holds 4.5:1 over a printed grid line. See `docs/a11y-audit.md`.
+
+
+## Muscle guidance and exercise choice
+
+Exercise discovery and details keep the notebook surfaces, outlined controls and Swedish copy. The library uses wrapping, labelled filters with a check and pressed state. Primary matches and supporting matches have separate text headings. A/B preview changes use an inline native select, with duplicate choices disabled, an explicit reset and the existing bottom action.
+
+Blue ink identifies selected controls, the H/V side marker and anatomy regions. The meaning is explained in each context: movement mode can highlight the working side; anatomy overlay mode keeps limb strokes neutral and marks broad training regions. Primary regions are solid, supporting regions hatched; both have text labels. Red retains its existing completion/stop meaning. Maps have front/back labels and muscle links large enough to tap.
+
+Looping exercise demonstrations can be paused and resumed. Reduced motion uses static start/end frames and the same muscle map. Detailed anatomy appears in exercise details and the session's help sheet; compact set figures keep their existing movement/side behaviour.
+
+Week tallies follow the stored session roster, count both sides as one set, and wrap when the optional sixth exercise is present. Active workouts show “Pågår” even after the same pass was completed earlier in the week.

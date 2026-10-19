@@ -80,6 +80,42 @@ describe('week view', () => {
       screen.getByRole('link', { name: 'Starta pass' }).getAttribute('href'),
     ).toBe('/pass/B');
   });
+
+  it('shows the active adapted roster after both weekly passes are already complete', async () => {
+    for (const templateId of ['A', 'B'] as const) {
+      await createSession(getDb(), {
+        templateId,
+        date: '2026-10-13',
+        startedAt: `2026-10-13T0${templateId === 'A' ? 8 : 9}:00:00Z`,
+        status: 'completed',
+        programWeek: 1,
+        plan: [],
+        feedback: {},
+      });
+    }
+    await createSession(getDb(), {
+      templateId: 'A',
+      date: '2026-10-14',
+      startedAt: '2026-10-14T10:00:00Z',
+      status: 'in_progress',
+      programWeek: 3,
+      feedback: {},
+      plan: ['split-squat', 'wall-sit'].map((exerciseId) => ({
+        exerciseId: exerciseId as 'split-squat' | 'wall-sit',
+        sets: 3,
+        target: 8,
+        loadIndex: 0,
+        weightKg: 0,
+        restSec: 60,
+        reason: 'first_time' as const,
+      })),
+    });
+    render(<WeekView now={NOW} />);
+    expect(await screen.findByText('Pågår')).toBeTruthy();
+    expect(
+      screen.getByRole('img', { name: 'Pass A: 0 av 6 set klara' }),
+    ).toBeTruthy();
+  });
 });
 
 describe('isoWeekNumber', () => {
