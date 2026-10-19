@@ -21,7 +21,9 @@ for the full build plan and `docs/spec.md` for the specification.
 | `npm run preview` | Serve the production build locally |
 | `npm run check` | Biome lint/format check and `tsc --noEmit` |
 | `npm test` | Run the Vitest test suite once |
-| `npm run shots` | Placeholder; screenshot script arrives in a later milestone |
+| `npm run e2e` | Build and run the production Playwright browser tests |
+| `npm run audit:a11y` | Check contrast and audit mobile screens in light and dark themes |
+| `npm run shots` | Build and capture mobile screenshots in light and dark themes |
 
 Requires Node 24 and npm. Install with `npm ci`.
 

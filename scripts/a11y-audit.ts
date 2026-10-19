@@ -18,10 +18,13 @@ async function up(url: string) {
   throw new Error('no server');
 }
 
-const srv = spawn('npx', ['vite', '--port', String(PORT), '--strictPort'], {
-  shell: true,
-  stdio: 'ignore',
-});
+const srv = spawn(
+  process.execPath,
+  ['node_modules/vite/bin/vite.js', '--port', String(PORT), '--strictPort'],
+  {
+    stdio: 'ignore',
+  },
+);
 const findings: string[] = [];
 let screens = 0;
 
@@ -167,13 +170,6 @@ async function theme(scheme: 'light' | 'dark') {
   await page.getByRole('button', { name: 'Hur gör man?' }).click();
   await page.getByRole('dialog').waitFor();
   await audit(page, tag('exercise sheet'));
-  const trapped = await page.evaluate(async () => {
-    const dlg = document.querySelector('[role=dialog]');
-    for (let i = 0; i < 25; i++) {
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
-    }
-    return !!dlg;
-  });
   for (let i = 0; i < 25; i++) {
     await page.keyboard.press('Tab');
     const inside = await page.evaluate(
@@ -186,7 +182,6 @@ async function theme(scheme: 'light' | 'dark') {
       break;
     }
   }
-  void trapped;
   await page.keyboard.press('Escape');
   if ((await page.getByRole('dialog').count()) > 0) {
     findings.push(`${tag('exercise sheet')}: Escape does not close the dialog`);
@@ -197,10 +192,11 @@ async function theme(scheme: 'light' | 'dark') {
   await page.getByRole('button', { name: 'Hoppa över vila' }).click();
   // finish quickly: loop primary actions until the effort / summary screens
   const seen = new Set<string>();
+  let completed = false;
   for (let g = 0; g < 80; g++) {
     const a = page
       .getByRole('button', {
-        name: /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara)$/,
+        name: /^(Klar set|Hoppa över vila|Lagom|Spara)$/,
       })
       .first();
     await a.waitFor();
@@ -214,19 +210,50 @@ async function theme(scheme: 'light' | 'dark') {
       await audit(page, tag('pain after'));
       await page.getByRole('radio', { name: /^0(,|$)/ }).check({ force: true });
     }
-    if (n === 'Avsluta pass') {
-      await audit(page, tag('summary'));
+    if (n === 'Spara') {
       await a.click();
+      // Saving the 'after' reading finishes the session and shows the summary.
+      const home = page.getByRole('link', { name: 'Till veckan' });
+      await home.waitFor();
+      await audit(page, tag('summary'));
+      await home.click();
+      completed = true;
       break;
     }
-    const before = await page
-      .locator('[data-step]')
-      .getAttribute('data-step')
-      .catch(() => null);
     await a.click();
     await page.waitForTimeout(80);
-    void before;
   }
+  if (!completed)
+    throw new Error(`${scheme}: session did not reach its summary`);
+  // stale open session on the week view
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const open = indexedDB.open('stomme');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result;
+          const tx = db.transaction('sessions', 'readwrite');
+          const d = new Date(Date.now() - 3 * 86400000);
+          const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          tx.objectStore('sessions').put({
+            id: 'stale-1',
+            templateId: 'B',
+            date,
+            startedAt: d.toISOString(),
+            status: 'in_progress',
+            programWeek: 1,
+            plan: [],
+            feedback: {},
+          });
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+  );
+  await page.reload();
+  await page.getByText(/är inte avslutat/).waitFor();
+  await audit(page, tag('stale session'));
   // stop screen
   await page.goto(`${base}/#/stopp/x`);
   await page.waitForTimeout(300);
@@ -239,6 +266,18 @@ async function theme(scheme: 'light' | 'dark') {
     findings.push(
       `${tag('week')}: ${anims} running animation(s) under reduced motion`,
     );
+  // error boundary: make the History route throw on render
+  const p2 = await ctx.newPage();
+  await p2.addInitScript('window.__name = (f) => f');
+  await p2.route('**/features/history/History.tsx*', (r) =>
+    r.fulfill({
+      contentType: 'text/javascript',
+      body: "export function History(){ throw new Error('demo'); }",
+    }),
+  );
+  await p2.goto(`${base}/#/historik`);
+  await p2.getByRole('heading', { name: 'Något gick fel' }).waitFor();
+  await audit(p2, tag('error boundary'));
   await browser.close();
 }
 
@@ -252,3 +291,4 @@ try {
 const unique = [...new Set(findings)];
 console.log(`${screens} screen audits (360x800, light+dark)`);
 console.log(unique.length ? unique.join('\n') : 'No findings');
+if (unique.length) process.exitCode = 1;

@@ -1,11 +1,12 @@
 # Accessibility and dark theme audit (M6.7)
 
-Scope: onboarding, week, pass preview, pain screens (before, after, stop), session set, rest, effort, summary, exercise card and sheet, history, session detail, settings (main, import confirm, delete confirm). Light and dark, 360x800. Data was synthetic; no personal data is recorded here.
+Scope: onboarding, week, pass preview, pain screens (before, after, stop), session set, rest, effort, summary, exercise card and sheet, history, session detail, settings (main and delete confirm), stale session actions, and the root error screen. Light and dark, 360x800. Data was synthetic; no personal data is recorded here. The import confirmation flow is covered separately by Playwright.
 
 Re-run:
 
 - `npx tsx scripts/contrast.ts` computes contrast numerically from the tokens in `src/styles/index.css` (exit code 1 on failure).
-- `npx tsx scripts/a11y-audit.ts` drives the dev server through all screens in both themes and reports targets under 48 px, text under 16 px, unnamed controls, missing focus rings on the first Tab stops, running animations under reduced motion, and dialog keyboard behaviour (34 screen audits).
+- `npx tsx scripts/a11y-audit.ts` drives the dev server through all screens in both themes and reports targets under 48 px, text under 16 px, unnamed controls, missing focus rings on the first Tab stops, running animations under reduced motion, and dialog keyboard behaviour (38 screen audits). Findings produce a failing exit code.
+- `npm run audit:a11y` runs both checks.
 
 ## Results
 
@@ -38,3 +39,11 @@ Re-run:
 ## Re-run (2026-10-19, after the review fixes)
 
 `scripts/contrast.ts`: all pairs pass in light and dark. `scripts/a11y-audit.ts`: 34 screen audits, no findings (targets, text size, names, focus rings, reduced motion, dialog keyboard).
+
+## Final merged release verification (2026-10-19)
+
+Updated the session walk to expect the summary immediately after saving the after-pain reading. Added stale-session and error-boundary checks, an explicit failure if the walk never reaches the summary, and a failing exit code for findings. Vite is launched directly with the current Node executable so cleanup terminates the server without a shell intermediary.
+
+On Node 24: all contrast pairs pass and all 38 screen audits report no findings. All 391 unit tests and 14 production Playwright tests pass; type-check, lint check (with existing reduced-motion CSS warnings), and production build pass. Initial JavaScript is approximately 131 KB gzipped including the service-worker registration helper, below the 150 KB target.
+
+Captured the final pain-stop, week warning, stale-session and error-boundary screens at 360×800 and 412×915 in both themes. Visual spot checks found no clipping or unreadable controls. Physical Android/TalkBack testing remains a manual check.
