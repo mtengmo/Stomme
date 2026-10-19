@@ -28,7 +28,7 @@ export function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-const W = 5;
+const W = 6;
 const line = (pts: Pt[]) => `M${pts.map((p) => p.join(' ')).join('L')}`;
 const limb = {
   fill: 'none',
@@ -69,7 +69,7 @@ export function FigureFrame({
       </g>
       <g stroke="var(--ink)" {...limb}>
         <path d={line([p.neck, p.hip])} />
-        <circle cx={p.head[0]} cy={p.head[1]} r="8" fill="var(--paper)" />
+        <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
       </g>
       <g stroke="var(--blue)" {...limb}>
         <path d={arm(p.eR, p.hR)} />
