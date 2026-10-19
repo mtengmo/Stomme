@@ -17,6 +17,7 @@ import { WeekView } from './features/week/WeekView';
 import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
 import { BottomNav } from './ui/BottomNav';
+import { Button } from './ui/Button';
 
 // DEV-only synthetic data helper; absent from the production bundle.
 const DemoSeed = import.meta.env.DEV
@@ -65,13 +66,16 @@ function Shell() {
         <div className="mx-auto max-w-md px-5 pt-3">
           <Banner>
             <p className="m-0 font-bold">Ny version finns</p>
-            <button
-              type="button"
+            <p className="m-0 text-ink-soft">
+              Appen laddas om. Din data påverkas inte.
+            </p>
+            <Button
+              variant="secondary"
+              className="mt-2"
               onClick={() => void updateNow()}
-              className="mt-2 min-h-12 rounded-md border-[3px] border-ink bg-paper px-5 text-base font-bold text-ink"
             >
               Uppdatera
-            </button>
+            </Button>
           </Banner>
         </div>
       ) : null}

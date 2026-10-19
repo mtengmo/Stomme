@@ -155,7 +155,7 @@ The system is built for a phone held at arm's length on the floor: heavy 3 px gr
 **Key Characteristics:**
 - Squared paper background (24 px grid, 1 px lines) in both themes.
 - Thick graphite outlines (3 px) instead of shadows; hierarchy by size and outline weight.
-- Red is spent only on completion (pencil ticks, done chip, stop-list dashes, warning banner).
+- Red is spent only on completion (pencil ticks, done chip, stop-list dashes).
 - Condensed heavy numerals for headings and counts; plain platform sans for everything else.
 - Flat, no elevation; one authored motion (a tick drawing on).
 
@@ -164,7 +164,7 @@ The system is built for a phone held at arm's length on the floor: heavy 3 px gr
 Cool green-grey paper, graphite and chalk text, with two pen colours (red pencil, blue ink) and one highlighter (amber). Light values are the `:root` set; dark values swap under `prefers-color-scheme: dark` and are named with the `-dark` suffix.
 
 ### Primary
-- **Red Pencil** (`red-pencil`; dark: `red-pencil-dark`): completion only. Pencil tick fill, the "Klar" chip outline and text, the warning banner border and icon, the short dashes in the onboarding stop list.
+- **Red Pencil** (`red-pencil`; dark: `red-pencil-dark`): completion only. Pencil tick fill, the "Klar" chip outline and text, the short dashes in the onboarding stop list.
 - **Blue Ink** (`blue-ink`; dark: `blue-ink-dark`): the working side. Focus ring (3 px), text selection, caret, the "Nästa pass" marker, info banner border, rule lines in the onboarding stop list.
 
 ### Secondary
@@ -233,7 +233,7 @@ Squared like graph paper: 6 px corners on buttons, cards and banners; 4 px on ch
 
 ### Cards / Containers
 - **Pass card:** paper fill, 6 px corners, 3 px outline. Lead: graphite outline, 20 px padding, 4rem-class title, "Nästa pass" in blue ink, large count. Receding: edge-grey outline, 16 px padding.
-- **Banner:** paper fill, 2 px outline (blue info, red warn), icon plus text, 16 px padding.
+- **Banner:** paper fill, 2 px outline (blue info, ink warn), icon plus text, 16 px padding.
 
 ### Tally (signature)
 A row of set circles per pass: one circle per exercise, 3 px outline (graphite on the lead card, edge-grey otherwise), 48 px lead and 36 px receding, 6 px gap. A circle shows the sets left as a condensed digit; when finished it holds a red pencil tick. A newly completed set draws its tick on (480 ms, clip-path wipe, `cubic-bezier(0.16, 1, 0.3, 1)`); under reduced motion it appears without animation. Exposed to assistive tech as one image with a text label.
@@ -255,7 +255,7 @@ Not yet built. Focus treatment is global: 3 px blue outline, 3 px offset, 4 px r
 ### Do:
 - **Do** keep the 24 px squared grid on the body in light and dark.
 - **Do** use 3 px outlines for primary containers and the graphite or edge-grey pair to separate lead from receding.
-- **Do** use red pencil only for done, stop and warning, and blue ink for focus, selection, next and info.
+- **Do** use red pencil only for done, and blue ink for focus, selection, next and info.
 - **Do** pair every state colour with an icon and a Swedish word.
 - **Do** keep text at 1rem or larger and primary targets at 56-64 px.
 - **Do** use `.count` (Barlow Condensed 800, tabular) for any number that is a quantity.

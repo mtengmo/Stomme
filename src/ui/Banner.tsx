@@ -17,13 +17,13 @@ export function Banner({ tone = 'info', children }: BannerProps) {
         care
           ? 'border-[3px] border-ink font-bold'
           : warn
-            ? 'border-2 border-red'
+            ? 'border-2 border-ink'
             : 'border-2 border-blue'
       }`}
     >
       <Icon
         name={warn || care ? 'warning' : 'info'}
-        className={`mt-0.5 shrink-0 ${care ? 'text-ink' : warn ? 'text-red' : 'text-blue'}`}
+        className={`mt-0.5 shrink-0 ${care || warn ? 'text-ink' : 'text-blue'}`}
       />
       <div>{children}</div>
     </div>

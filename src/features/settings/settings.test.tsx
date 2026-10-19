@@ -164,7 +164,7 @@ describe('Settings', () => {
     // Nothing is deleted before the second step.
     expect(await getDb().sessions.count()).toBe(1);
     await userEvent.click(
-      screen.getByRole('button', { name: 'Behåll min data' }),
+      screen.getByRole('button', { name: 'Behåll mina data' }),
     );
     expect(await getDb().sessions.count()).toBe(1);
     await userEvent.click(
@@ -228,5 +228,123 @@ describe('backup reminder', () => {
     render(<WeekView now={NOW} />);
     await screen.findByRole('heading', { name: /Vecka/ });
     expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
+  });
+});
+
+describe('M6 review fixes', () => {
+  const NOW = new Date(2026, 9, 14, 12, 0);
+  const done = (i: number) =>
+    createSession(getDb(), {
+      templateId: 'A',
+      date: `2026-10-0${i}`,
+      startedAt: `2026-10-0${i}T08:00:00.000Z`,
+      finishedAt: `2026-10-0${i}T08:30:00.000Z`,
+      status: 'completed',
+      programWeek: 1,
+      plan: [],
+      feedback: {},
+    });
+
+  it('reminder shows the reason, can be snoozed, and stays hidden', async () => {
+    for (let i = 1; i <= 4; i++) await done(i);
+    await setMeta(getDb(), 'backup', {
+      lastExportAt: '2026-09-01T10:00:00.000Z',
+    });
+    render(<WeekView now={NOW} />);
+    expect(
+      await screen.findByText(/Senaste kopian: .*, 4 pass sedan/),
+    ).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: 'Senare' }));
+    await waitFor(() =>
+      expect(screen.queryByText(/säkerhetskopierade/)).toBeNull(),
+    );
+    cleanup();
+    render(<WeekView now={new Date(2026, 9, 20, 12, 0)} />);
+    await screen.findByRole('heading', { name: /Vecka/ });
+    expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
+    cleanup();
+    render(<WeekView now={new Date(2026, 9, 22, 12, 0)} />);
+    expect(await screen.findByText(/säkerhetskopierade/)).toBeTruthy();
+  });
+
+  it('says "Aldrig säkerhetskopierat" without an export', async () => {
+    for (let i = 1; i <= 4; i++) await done(i);
+    render(<WeekView now={NOW} />);
+    expect(await screen.findByText('Aldrig säkerhetskopierat')).toBeTruthy();
+  });
+
+  it('a pain stop notice outranks the reminder', async () => {
+    for (let i = 1; i <= 4; i++) await done(i);
+    await createSession(getDb(), {
+      templateId: 'B',
+      date: '2026-10-13',
+      startedAt: '2026-10-13T08:00:00.000Z',
+      status: 'aborted',
+      abortReason: 'pain_stop',
+      programWeek: 1,
+      plan: [],
+      feedback: {},
+    });
+    render(<WeekView now={NOW} />);
+    await screen.findByRole('heading', { name: /Vecka/ });
+    expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
+  });
+
+  it('Back from the delete confirmation returns to settings', async () => {
+    render(<App />);
+    window.location.hash = '#/installningar';
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Radera all data' }),
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Radera allt?' }),
+    ).toBeTruthy();
+    window.history.back();
+    expect(
+      await screen.findByRole('heading', { name: 'Inställningar' }),
+    ).toBeTruthy();
+    expect(window.location.hash).toBe('#/installningar');
+  });
+
+  it('delete confirm offers Exportera först', async () => {
+    render(<Settings />);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Radera all data' }),
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Exportera först' }),
+    );
+    expect(shareMock).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('status')).toBeTruthy();
+  });
+
+  it('import confirm shows current and file counts and the share note', async () => {
+    const text = await backupWithOneSession();
+    render(<Settings />);
+    await userEvent.upload(
+      screen.getByLabelText('Välj säkerhetskopia att importera'),
+      file(text),
+    );
+    expect(await screen.findByText(/Du har nu 1 pass, 0 set/)).toBeTruthy();
+    expect(screen.getByText(/Du får välja var den sparas/)).toBeTruthy();
+  });
+
+  it('import errors say what to do and that nothing changed', async () => {
+    render(<Settings />);
+    await userEvent.upload(
+      screen.getByLabelText('Välj säkerhetskopia att importera'),
+      file('{"schemaVersion":99}'),
+    );
+    const t = (await screen.findByRole('alert')).textContent ?? '';
+    expect(t).toMatch(/Uppdatera appen och försök igen/);
+    expect(t).toMatch(/Inget har ändrats/);
+  });
+
+  it('hides the Version update block while the shell banner shows', async () => {
+    sw.need = true;
+    render(<App />);
+    window.location.hash = '#/installningar';
+    await screen.findByText('Appen laddas om. Din data påverkas inte.');
+    expect(screen.queryByRole('heading', { name: 'Version' })).toBeNull();
   });
 });

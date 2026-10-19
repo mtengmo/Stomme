@@ -7,13 +7,13 @@ import type { Session, TemplateId } from '../../domain/types';
 import { formatShortDate, formatWeekday, toLocalDate } from '../../lib/dates';
 import { shouldRemindBackup } from '../../lib/storage';
 import { restStatus, weekSummary } from '../../rules/schedule';
-import { Banner } from '../../ui/Banner';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { PencilTick } from '../../ui/PencilTick';
 import { Tally, type TallyItem } from '../../ui/Tally';
 import { careState } from '../pain/careState';
 import { DayAfterNotices, StopBanner } from '../pain/PainNotices';
+import { type BackupMeta, BackupReminder } from './BackupReminder';
 import {
   isoWeekNumber,
   type PassState,
@@ -80,7 +80,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const painLogs = useLiveQuery(() => getDb().painLogs.toArray(), []);
   const backupMeta = useLiveQuery(
     async () => ({
-      value: await getMeta<{ lastExportAt?: string }>(getDb(), 'backup'),
+      value: await getMeta<BackupMeta>(getDb(), 'backup'),
     }),
     [],
   );
@@ -97,14 +97,24 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const summary = weekSummary(sessions, today);
   const { states, next } = passStates(sessions, today);
   const rest = restText(sessions, now);
-  const remindBackup = shouldRemindBackup({
-    lastExportAt: backupMeta.value?.lastExportAt,
-    completedSessionTimes: sessions
-      .filter((s) => s.status === 'completed')
-      .map((s) => s.startedAt),
-    now,
-  });
   const care = careState(sessions, painLogs, today);
+  const completedTimes = sessions
+    .filter((s) => s.status === 'completed')
+    .map((s) => s.startedAt);
+  const snoozed =
+    backupMeta.value?.snoozedUntil !== undefined &&
+    now.toISOString() < backupMeta.value.snoozedUntil;
+  // Pain notices outrank the backup reminder.
+  const remindBackup =
+    !snoozed &&
+    !care.stopBanner &&
+    !care.dayAfterWorse &&
+    !care.dayAfterDue &&
+    shouldRemindBackup({
+      lastExportAt: backupMeta.value?.lastExportAt,
+      completedSessionTimes: completedTimes,
+      now,
+    });
   const active = sessions.find((s) => s.status === 'in_progress');
   const doneDates = new Set(summary.completed.map((s) => s.date));
   const first = summary.days[0] ?? today;
@@ -136,19 +146,6 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
 
       {care.stopBanner ? <StopBanner /> : null}
       <DayAfterNotices care={care} today={today} />
-      {remindBackup ? (
-        <Banner>
-          <p className="m-0 font-bold">
-            Det var ett tag sedan du säkerhetskopierade
-          </p>
-          <Link
-            href="/installningar"
-            className="mt-1 inline-flex min-h-12 items-center font-bold text-blue underline underline-offset-4"
-          >
-            Öppna inställningar
-          </Link>
-        </Banner>
-      ) : null}
 
       <ol
         className="m-0 flex list-none justify-between p-0"
@@ -232,6 +229,14 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
           );
         })}
       </ul>
+
+      {remindBackup ? (
+        <BackupReminder
+          meta={backupMeta.value}
+          completedTimes={completedTimes}
+          now={now}
+        />
+      ) : null}
 
       <div className="sticky bottom-[4.2rem] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}

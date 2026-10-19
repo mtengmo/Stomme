@@ -109,3 +109,17 @@ test('the exercise sheet traps focus and closes with Escape', async ({
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
+
+test('Android Back from a confirmation returns to settings', async ({
+  page,
+}) => {
+  await toSettings(page);
+  await page.getByRole('button', { name: 'Radera all data' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Radera allt?' }),
+  ).toBeVisible();
+  await page.goBack();
+  await expect(
+    page.getByRole('heading', { name: 'Inställningar' }),
+  ).toBeVisible();
+});

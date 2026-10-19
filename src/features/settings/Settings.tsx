@@ -23,18 +23,23 @@ import { useUpdate } from './updateContext';
 
 type View =
   | { name: 'main' }
-  | { name: 'confirmImport'; text: string; backup: BackupFile }
+  | {
+      name: 'confirmImport';
+      text: string;
+      backup: BackupFile;
+      current: { sessions: number; setLogs: number };
+    }
   | { name: 'confirmDelete' };
 
 export const IMPORT_ERRORS: Record<BackupError['code'], string> = {
   too_large:
-    'Filen är för stor (högst 5 MB). Välj en säkerhetskopia från Stomme.',
+    'Filen är för stor (högst 5 MB). Välj en säkerhetskopia som Stomme har skapat. Inget har ändrats.',
   not_json:
-    'Filen kunde inte läsas som en säkerhetskopia. Välj en .json-fil som Stomme har skapat.',
+    'Filen kunde inte läsas som en säkerhetskopia. Välj en .json-fil som Stomme har skapat. Inget har ändrats.',
   schema_version:
-    'Filen kommer från en annan version av Stomme och kan inte läsas här.',
+    'Filen kommer från en annan version av Stomme. Uppdatera appen och försök igen. Inget har ändrats.',
   invalid:
-    'Filens innehåll stämmer inte med en säkerhetskopia från Stomme. Inget har ändrats.',
+    'Filens innehåll stämmer inte med en säkerhetskopia från Stomme. Välj en säkerhetskopia som Stomme har skapat. Inget har ändrats.',
 };
 
 const GENERIC_IMPORT_ERROR = 'Filen kunde inte läsas. Inget har ändrats.';
@@ -88,11 +93,29 @@ export function Settings() {
     heading.current?.focus();
   }, [view.name]);
 
+  // Confirmation views are history entries: Android Back (popstate) returns
+  // to the main view, exactly like "Behåll min data".
+  useEffect(() => {
+    const onPop = () => setView({ name: 'main' });
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const openConfirm = (next: View) => {
+    window.history.pushState({ settingsConfirm: true }, '');
+    setView(next);
+  };
+  // Leaves a confirmation through history so the pushed entry is consumed.
+  const leave = () => {
+    if (view.name === 'main') return;
+    window.history.back();
+  };
+
   // Escape leaves a confirmation without changing anything.
   useEffect(() => {
     if (view.name === 'main') return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !busy) setView({ name: 'main' });
+      if (e.key === 'Escape' && !busy) window.history.back();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -128,7 +151,16 @@ export function Settings() {
       }
       const text = await file.text();
       const backup = parseBackup(text);
-      setView({ name: 'confirmImport', text, backup });
+      const db = getDb();
+      openConfirm({
+        name: 'confirmImport',
+        text,
+        backup,
+        current: {
+          sessions: await db.sessions.count(),
+          setLogs: await db.setLogs.count(),
+        },
+      });
     } catch (e) {
       setError(
         e instanceof BackupError ? IMPORT_ERRORS[e.code] : GENERIC_IMPORT_ERROR,
@@ -152,12 +184,12 @@ export function Settings() {
           }
         },
       });
-      setView({ name: 'main' });
+      leave();
       setStatus(
         `Importerat: ${counts.sessions} pass, ${counts.setLogs} set och ${counts.painLogs} smärtvärden. Din tidigare data sparades först som en säkerhetskopia.`,
       );
     } catch (e) {
-      setView({ name: 'main' });
+      leave();
       setError(
         e instanceof BackupError
           ? IMPORT_ERRORS[e.code]
@@ -176,7 +208,7 @@ export function Settings() {
       window.location.hash = '#/';
       await deleteAllData(getDb());
     } catch {
-      setView({ name: 'main' });
+      leave();
       setError('Det gick inte att radera datan. Försök igen.');
       setBusy(false);
     }
@@ -195,18 +227,21 @@ export function Settings() {
         <p className="m-0 text-xl">
           Filen innehåller {c.sessions.length} pass, {c.setLogs.length} set och{' '}
           {c.painLogs.length} smärtvärden. Filen skapades{' '}
-          {formatShortDate(toLocalDate(new Date(c.exportedAt)))}
+          {formatShortDate(toLocalDate(new Date(c.exportedAt))).replace(
+            ' ',
+            '\u00a0',
+          )}
         </p>
         <p className="m-0 text-xl">
-          All data i appen ersätts. Först sparas en säkerhetskopia av det du har
-          nu, så att du kan gå tillbaka.
+          Du har nu {view.current.sessions} pass, {view.current.setLogs} set.
+          All data i appen ersätts.
+        </p>
+        <p className="m-0 text-xl">
+          Först öppnas en delnings- eller nedladdningsruta med en säkerhetskopia
+          av det du har nu. Du får välja var den sparas.
         </p>
         <div className="flex flex-col gap-3">
-          <Button
-            variant="secondary"
-            disabled={busy}
-            onClick={() => setView({ name: 'main' })}
-          >
+          <Button variant="secondary" disabled={busy} onClick={leave}>
             Behåll min data
           </Button>
           <Button
@@ -230,17 +265,36 @@ export function Settings() {
           Alla pass, set och smärtvärden tas bort från den här telefonen och
           appen börjar om från början. Det går inte att ångra.
         </p>
-        <p className="m-0 text-xl">
-          Vill du ha en kopia? Gå tillbaka och välj Exportera först.
-        </p>
+        <p className="m-0 text-xl">Vill du ha en kopia? Exportera först.</p>
         <div className="flex flex-col gap-3">
+          <Button variant="secondary" disabled={busy} onClick={leave}>
+            Behåll mina data
+          </Button>
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={() => setView({ name: 'main' })}
+            onClick={() => void onExport()}
           >
-            Behåll min data
+            Exportera först
           </Button>
+          {status ? (
+            <p
+              role="status"
+              className="m-0 flex items-start gap-2 text-base font-bold"
+            >
+              <Icon name="check" className="mt-0.5 shrink-0" />
+              {status}
+            </p>
+          ) : null}
+          {error ? (
+            <p
+              role="alert"
+              className="m-0 flex items-start gap-2 text-base font-bold"
+            >
+              <Icon name="warning" className="mt-0.5 shrink-0" />
+              {error}
+            </p>
+          ) : null}
           <Button disabled={busy} onClick={() => void onConfirmDelete()}>
             Radera all data nu
           </Button>
@@ -324,7 +378,11 @@ export function Settings() {
         <Button
           variant="secondary"
           disabled={busy}
-          onClick={() => setView({ name: 'confirmDelete' })}
+          onClick={() => {
+            setStatus(null);
+            setError(null);
+            openConfirm({ name: 'confirmDelete' });
+          }}
         >
           Radera all data
         </Button>
@@ -365,7 +423,7 @@ function StorageSection() {
           {s.quotaBytes ? ` av ${megabytes(s.quotaBytes)}` : ''}.
         </p>
       ) : null}
-      <p className={note}>
+      <p className="m-0 text-base">
         Din data finns bara på den här telefonen, så en säkerhetskopia är det
         enda skyddet om webbläsaren rensar den eller telefonen byts.
       </p>
@@ -398,6 +456,8 @@ function InstallSection() {
 
 function VersionSection() {
   const { needRefresh, updateNow } = useUpdate();
+  // The shell banner already offers the update on this screen.
+  if (needRefresh) return null;
   return (
     <Section id="set-version" title="Version">
       {needRefresh ? (
