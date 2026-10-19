@@ -251,9 +251,9 @@ describe('pass preview suggestions', () => {
       (await screen.findAllByText('Knäet gav stopp. Fråga fysioterapeuten.'))
         .length,
     ).toBeGreaterThan(0);
-    expect(screen.getAllByText('Fråga fysioterapeuten').length).toBeGreaterThan(
-      0,
-    );
+    // no per-row triangle line: the banner and the reason text already say it
+    expect(screen.queryByText('Fråga fysioterapeuten')).toBeNull();
+    expect(screen.queryByText('Fråga fysioterapeuten.')).toBeNull();
   });
 });
 
@@ -367,6 +367,7 @@ describe('safety gates', () => {
       await screen.findByRole('heading', { name: 'Avbryt passet.' }),
     ).toBeTruthy();
     expect((await getDb().sessions.get(s.id))?.abortReason).toBe('pain_stop');
+    expect(screen.queryByRole('button', { name: 'Klar set' })).toBeNull();
   });
 
   it('a stored warn before reading replans when no sets are logged', async () => {

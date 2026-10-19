@@ -174,6 +174,19 @@ try {
       await shot(page, 'banner-preview');
       await page.context().close();
 
+      // Abort confirm with its three buttons.
+      page = await fresh(browser, url, size, scheme);
+      await openPreview(page);
+      await page.getByRole('button', { name: 'Starta pass' }).click();
+      await answerPain(page, 0);
+      await page.getByRole('button', { name: 'Klar set' }).waitFor();
+      await page.getByRole('button', { name: 'Avbryt', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Avbryt på grund av knäet' })
+        .waitFor();
+      await shot(page, 'abort-confirm');
+      await page.context().close();
+
       // Warn screen with the wall sit offer.
       page = await fresh(browser, url, size, scheme);
       await openPreview(page);

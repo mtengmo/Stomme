@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ExerciseId } from '../domain/types';
 import { StommeDB } from './db';
 import {
@@ -94,6 +94,44 @@ describe('recordPainReading', () => {
     });
     expect(await db.setLogs.count()).toBe(1);
     expect(await listPainLogsBySession(db, s.id)).toHaveLength(1);
+  });
+
+  it('is atomic: a failing abort after the write leaves no reading behind', async () => {
+    const s = await startSession(db, 'A', W1);
+    const spy = vi
+      .spyOn(db.sessions, 'update')
+      .mockRejectedValue(new Error('boom'));
+    await expect(
+      recordPainReading(
+        db,
+        {
+          sessionId: s.id,
+          timing: 'after',
+          score: 1,
+          redFlags: { ...none, sharp: true },
+        },
+        W1,
+      ),
+    ).rejects.toThrow('boom');
+    spy.mockRestore();
+    expect(await listPainLogsBySession(db, s.id)).toHaveLength(0);
+    expect((await db.sessions.get(s.id))?.status).toBe('in_progress');
+  });
+
+  it('is atomic: a failing replan after the write leaves no before reading', async () => {
+    const s = await startSession(db, 'A', W1);
+    const spy = vi
+      .spyOn(db.sessions, 'update')
+      .mockRejectedValue(new Error('boom'));
+    await expect(
+      recordPainReading(
+        db,
+        { sessionId: s.id, timing: 'before', score: 5, redFlags: none },
+        W1,
+      ),
+    ).rejects.toThrow('boom');
+    spy.mockRestore();
+    expect(await listPainLogsBySession(db, s.id)).toHaveLength(0);
   });
 
   it('is atomic: a failure leaves no reading behind', async () => {

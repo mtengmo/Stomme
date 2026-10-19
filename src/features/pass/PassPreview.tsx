@@ -58,8 +58,16 @@ export function PassPreview({ id }: { id: TemplateId }) {
     ...i,
     plan: snapshot?.find((p) => p.exerciseId === i.plan.exerciseId) ?? i.plan,
   }));
-  const other = active && active.templateId !== id;
   const care = careState(data.planning.sessions, data.planning.painLogs, today);
+  // The physio line once, as a banner: not per row, and not when a row's
+  // reason text or the stop banner already says it.
+  const physioOnce =
+    items.some((i) => i.suggestion.seePhysio) &&
+    !care.stopBanner &&
+    !items.some((i) =>
+      suggestionReason(i.suggestion, week).includes(SEE_PHYSIO),
+    );
+  const other = active && active.templateId !== id;
 
   const start = async () => {
     if (active) {
@@ -89,6 +97,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
         </p>
       </header>
       {care.stopBanner ? <StopBanner /> : null}
+      {physioOnce ? <Banner tone="care">{SEE_PHYSIO}.</Banner> : null}
       {other ? (
         <Banner>
           Du har {templates[active.templateId].name} igång. Fortsätt det först.
@@ -124,12 +133,6 @@ export function PassPreview({ id }: { id: TemplateId }) {
               <p className="m-0 mt-1 text-base text-ink-soft">
                 {suggestionReason(suggestion, week)}
               </p>
-              {suggestion.seePhysio ? (
-                <p className="m-0 mt-1 flex items-center gap-2 text-base font-bold">
-                  <Icon name="warning" size={20} />
-                  {SEE_PHYSIO}
-                </p>
-              ) : null}
             </li>
           );
         })}

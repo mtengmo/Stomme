@@ -61,6 +61,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [snack, setSnack] = useState<Snack | null>(null);
   const [confirmAbort, setConfirmAbort] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [abortError, setAbortError] = useState(false);
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -156,8 +157,16 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   };
 
   const abortForKnee = async () => {
-    await abortSession(getDb(), session.id, new Date(), 'pain_stop');
-    navigate(`/stopp/${session.id}`);
+    if (busy) return;
+    setBusy(true);
+    try {
+      await abortSession(getDb(), session.id, new Date(), 'pain_stop');
+      navigate(`/stopp/${session.id}`);
+    } catch {
+      setAbortError(true);
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (confirmAbort) {
@@ -176,7 +185,12 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           <Button variant="secondary" onClick={abort}>
             Avbryt passet
           </Button>
-          <Button variant="secondary" onClick={abortForKnee}>
+          {abortError ? (
+            <p role="alert" className="m-0 text-center text-base font-bold">
+              {PAIN_COPY.error}
+            </p>
+          ) : null}
+          <Button variant="secondary" disabled={busy} onClick={abortForKnee}>
             {PAIN_COPY.stopAbortKnee}
           </Button>
         </div>
