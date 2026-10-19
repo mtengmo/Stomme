@@ -203,7 +203,7 @@ describe('day after and banner', () => {
     const user = userEvent.setup();
     await seedSession(5, 'aborted', 'pain_stop');
     const text =
-      'Senast stoppade du pga knäet. Fråga fysioterapeuten innan nästa pass.';
+      'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.';
     render(<App />);
     expect(await screen.findByText(text)).toBeTruthy();
     await user.click(screen.getByRole('link', { name: 'Starta pass' }));
@@ -248,10 +248,221 @@ describe('pass preview suggestions', () => {
     window.location.hash = '#/pass/A';
     render(<App />);
     expect(
-      await screen.findByText('Du stoppade sist. Samma igen.'),
-    ).toBeTruthy();
+      (await screen.findAllByText('Knäet gav stopp. Fråga fysioterapeuten.'))
+        .length,
+    ).toBeGreaterThan(0);
     expect(screen.getAllByText('Fråga fysioterapeuten').length).toBeGreaterThan(
       0,
     );
+  });
+});
+
+async function openSession(opts: { before?: number; skipAll?: boolean } = {}) {
+  const s = await startSession(getDb(), 'A', new Date());
+  if (opts.before !== undefined) {
+    await addPainLog(
+      getDb(),
+      { sessionId: s.id, timing: 'before', score: opts.before, redFlags: none },
+      new Date(),
+    );
+  }
+  if (opts.skipAll) {
+    await getDb().sessions.update(s.id, {
+      feedback: Object.fromEntries(
+        s.plan.map((p) => [p.exerciseId, { skipped: true }]),
+      ),
+    });
+  }
+  return s;
+}
+
+describe('safety gates', () => {
+  it('opening the session directly without a before reading goes to the pain screen', async () => {
+    const s = await openSession();
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    expect(
+      await screen.findByRole('heading', { name: /Hur känns högra knäet nu/ }),
+    ).toBeTruthy();
+  });
+
+  it('the before screen cannot be re-entered once a reading exists', async () => {
+    const s = await openSession({ before: 2 });
+    window.location.hash = `#/smarta/${s.id}/before`;
+    render(<App />);
+    expect(
+      await screen.findByRole('button', { name: 'Klar set' }),
+    ).toBeTruthy();
+    expect(await listPainLogsBySession(getDb(), s.id)).toHaveLength(1);
+  });
+
+  it('the before screen cannot be re-entered once a set is logged', async () => {
+    const s = await openSession();
+    await getDb().setLogs.add({
+      id: 'x',
+      sessionId: s.id,
+      exerciseId: 'goblet-chair-squat',
+      setNumber: 1,
+      side: 'both',
+      amount: 10,
+      loadIndex: 0,
+      weightKg: 0,
+      loggedAt: new Date().toISOString(),
+    });
+    window.location.hash = `#/smarta/${s.id}/before`;
+    render(<App />);
+    expect(
+      await screen.findByRole('button', { name: 'Klar set' }),
+    ).toBeTruthy();
+    expect(await listPainLogsBySession(getDb(), s.id)).toHaveLength(0);
+  });
+
+  it('a knee problem mid-session aborts with pain_stop and shows the stop screen', async () => {
+    const user = userEvent.setup();
+    const s = await openSession({ before: 1 });
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Avbryt' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Avbryt på grund av knäet' }),
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Avbryt passet.' }),
+    ).toBeTruthy();
+    expect(await getDb().sessions.get(s.id)).toMatchObject({
+      status: 'aborted',
+      abortReason: 'pain_stop',
+    });
+  });
+
+  it('plain Avbryt keeps reason user', async () => {
+    const user = userEvent.setup();
+    const s = await openSession({ before: 1 });
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Avbryt' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Avbryt passet' }),
+    );
+    await waitFor(async () =>
+      expect((await getDb().sessions.get(s.id))?.abortReason).toBe('user'),
+    );
+  });
+
+  it('a stored before red flag is enforced on load', async () => {
+    const s = await startSession(getDb(), 'A', new Date());
+    await addPainLog(
+      getDb(),
+      {
+        sessionId: s.id,
+        timing: 'before',
+        score: 1,
+        redFlags: { ...none, sharp: true },
+      },
+      new Date(),
+    );
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    expect(
+      await screen.findByRole('heading', { name: 'Avbryt passet.' }),
+    ).toBeTruthy();
+    expect((await getDb().sessions.get(s.id))?.abortReason).toBe('pain_stop');
+  });
+
+  it('a stored warn before reading replans when no sets are logged', async () => {
+    const s = await openSession({ before: 6 });
+    await getDb().sessions.update(s.id, { plan: [] });
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    await waitFor(async () =>
+      expect(
+        ((await getDb().sessions.get(s.id))?.plan ?? []).length,
+      ).toBeGreaterThan(0),
+    );
+  });
+
+  it('an after red flag aborts with pain_stop and the banner follows', async () => {
+    const user = userEvent.setup();
+    const s = await openSession({ before: 1, skipAll: true });
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    await answerPain(user, 2, ['Svullnad']);
+    expect(
+      await screen.findByRole('heading', { name: 'Avbryt passet.' }),
+    ).toBeTruthy();
+    expect(await getDb().sessions.get(s.id)).toMatchObject({
+      status: 'aborted',
+      abortReason: 'pain_stop',
+    });
+    await user.click(screen.getByRole('button', { name: 'Till veckan' }));
+    expect(
+      await screen.findByText(/Senast stoppade du på grund av knäet/),
+    ).toBeTruthy();
+  });
+
+  it('an after warn continues to the summary with Gå vidare', async () => {
+    const user = userEvent.setup();
+    const s = await openSession({ before: 1, skipAll: true });
+    window.location.hash = `#/session/${s.id}`;
+    render(<App />);
+    await answerPain(user, 5);
+    expect(
+      await screen.findByRole('heading', { name: 'Smärtan är över 3.' }),
+    ).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Gå vidare' }));
+    expect(
+      await screen.findByRole('button', { name: 'Avsluta pass' }),
+    ).toBeTruthy();
+  });
+
+  it('a day-after red flag shows the stop screen, keeps the session and holds the next plan', async () => {
+    const user = userEvent.setup();
+    await setMeta(getDb(), 'program', {
+      startDate: addDays(toLocalDate(new Date()), -7),
+    });
+    const s = await seedSession(1, 'completed');
+    window.location.hash = `#/smarta/${s.id}/dayAfter`;
+    render(<App />);
+    await answerPain(user, 1, ['Knät låser sig']);
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Fråga fysioterapeuten innan nästa pass.',
+      }),
+    ).toBeTruthy();
+    expect((await getDb().sessions.get(s.id))?.status).toBe('completed');
+    await user.click(screen.getByRole('button', { name: 'Till veckan' }));
+    expect(
+      await screen.findByText(/Senast stoppade du på grund av knäet/),
+    ).toBeTruthy();
+    cleanup();
+    window.location.hash = '#/pass/A';
+    render(<App />);
+    expect(
+      (await screen.findAllByText('Knäet gav stopp. Fråga fysioterapeuten.'))
+        .length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('a day-after reading outside the window is refused', async () => {
+    const s = await seedSession(4, 'completed');
+    window.location.hash = `#/smarta/${s.id}/dayAfter`;
+    render(<App />);
+    expect(await screen.findByRole('heading', { name: /Vecka/ })).toBeTruthy();
+  });
+
+  it('above threshold only: the day-after screen does not claim worse than after', async () => {
+    const user = userEvent.setup();
+    const s = await seedSession(1, 'completed');
+    await addPainLog(
+      getDb(),
+      { sessionId: s.id, timing: 'after', score: 6, redFlags: none },
+      new Date(),
+    );
+    window.location.hash = `#/smarta/${s.id}/dayAfter`;
+    render(<App />);
+    await answerPain(user, 5);
+    expect(
+      await screen.findByRole('heading', { name: 'Smärtan är över 3.' }),
+    ).toBeTruthy();
   });
 });

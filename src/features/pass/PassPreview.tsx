@@ -45,13 +45,19 @@ export function PassPreview({ id }: { id: TemplateId }) {
         (p) => p.sessionId === active.id && p.timing === 'before',
       )
     : undefined;
-  const items = buildPlan(
+  const computed = buildPlan(
     template,
     week,
     data.planning,
     before ? assessReading(before).status : 'ok',
     active?.id,
   );
+  // An active session shows its stored snapshot, not a recompute.
+  const snapshot = active?.templateId === id ? active.plan : undefined;
+  const items = computed.map((i) => ({
+    ...i,
+    plan: snapshot?.find((p) => p.exerciseId === i.plan.exerciseId) ?? i.plan,
+  }));
   const other = active && active.templateId !== id;
   const care = careState(data.planning.sessions, data.planning.painLogs, today);
 
@@ -95,22 +101,22 @@ export function PassPreview({ id }: { id: TemplateId }) {
             <li key={p.exerciseId} className="border-b-2 border-edge py-3">
               <Link
                 href={`/ovning/${ex.id}`}
-                className="block min-h-12 text-ink no-underline"
+                className="-my-1 block min-h-12 py-3.5 text-ink no-underline"
               >
                 <span className="block text-lg leading-tight font-bold underline decoration-2 underline-offset-4">
                   {ex.name}
                 </span>
               </Link>
               {last ? (
-                <p className="m-0 mt-1 flex items-baseline gap-2 text-base text-ink-soft">
-                  <span className="w-28 shrink-0">Förra gången</span>
+                <p className="m-0 mt-1 grid grid-cols-[7rem_1fr] items-baseline gap-2 text-base text-ink-soft">
+                  <span>Förra gången</span>
                   <span className="count text-xl">
                     {resultLine(ex, last.sets, last.amount, last.loadIndex)}
                   </span>
                 </p>
               ) : null}
-              <p className="m-0 mt-1 flex items-baseline gap-2 text-base font-bold">
-                <span className="w-28 shrink-0">Idag</span>
+              <p className="m-0 mt-1 grid grid-cols-[7rem_1fr] items-baseline gap-2 text-base font-bold">
+                <span>Idag</span>
                 <span className="count text-2xl">
                   {resultLine(ex, p.sets, p.target, p.loadIndex)}
                 </span>

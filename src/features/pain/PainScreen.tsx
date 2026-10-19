@@ -4,17 +4,13 @@ import { PAIN_COPY } from '../../content/copy';
 import { getDb } from '../../db/db';
 import {
   abortSession,
-  addPainLog,
   addWallSit,
   listPainLogsBySession,
-  replanSession,
+  recordPainReading,
 } from '../../db/repo';
-import type { PainLog, PainStatus, Session } from '../../domain/types';
-import {
-  assessReading,
-  dayAfterReference,
-  isValidScore,
-} from '../../rules/pain';
+import type { PainLog, PainReason, Session } from '../../domain/types';
+import { toLocalDate } from '../../lib/dates';
+import { isValidScore, shouldPromptDayAfter } from '../../rules/pain';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 
@@ -129,8 +125,52 @@ function Toggle({
 
 type Outcome =
   | { kind: 'stop' }
-  | { kind: 'warn'; wallSit: boolean }
+  | { kind: 'warn'; wallSit: boolean; reasons: PainReason[] }
   | undefined;
+
+/** Stop screen: an ink field with paper text (no red), clearly unlike the warn screen. */
+export function StopScreen({
+  dayAfter = false,
+  onHome,
+}: {
+  dayAfter?: boolean;
+  onHome(): void;
+}) {
+  return (
+    <div className="min-h-dvh bg-ink text-paper">
+      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
+        <div className="flex flex-1 flex-col gap-4 pt-10">
+          <Icon name="stop" size={64} />
+          <h1 className="m-0 text-6xl leading-none font-extrabold">
+            {dayAfter ? PAIN_COPY.stopTitleDayAfter : PAIN_COPY.stopTitle}
+          </h1>
+          {dayAfter ? null : (
+            <>
+              <p className="m-0 text-2xl font-bold">{PAIN_COPY.stopBody}</p>
+              <p className="m-0 text-xl">Det du hunnit logga sparas.</p>
+            </>
+          )}
+        </div>
+        <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-paper bg-ink px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={onHome}
+            className="flex min-h-16 w-full items-center justify-center rounded-md bg-paper px-6 text-xl font-bold text-ink active:scale-[0.98]"
+          >
+            {PAIN_COPY.stopDone}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface Loaded {
+  session: Session | null;
+  hasBefore: boolean;
+  anySets: boolean;
+  dayAfterDue: boolean;
+}
 
 /** #/smarta/:sessionId/:timing: one pain reading, then ok / warn / stop. */
 export function PainScreen({
@@ -142,94 +182,121 @@ export function PainScreen({
 }) {
   const [, navigate] = useLocation();
   // Loaded once: a stop aborts the session and the result must stay on screen.
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [loaded, setLoaded] = useState<Loaded | undefined>(undefined);
   const [score, setScore] = useState<number | null>(null);
   const [flags, setFlags] = useState<Flags>(NO_FLAGS);
   const [outcome, setOutcome] = useState<Outcome>(undefined);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    void getDb()
-      .sessions.get(sessionId)
-      .then((s) => {
-        if (!cancelled) setSession(s ?? null);
-      });
+    void (async () => {
+      const db = getDb();
+      const session = (await db.sessions.get(sessionId)) ?? null;
+      const readings = await listPainLogsBySession(db, sessionId);
+      const sets = await db.setLogs
+        .where('sessionId')
+        .equals(sessionId)
+        .count();
+      const all = await db.sessions.toArray();
+      const due = session
+        ? shouldPromptDayAfter(session, readings, toLocalDate(new Date()), all)
+        : false;
+      if (!cancelled) {
+        setLoaded({
+          session,
+          hasBefore: readings.some((r) => r.timing === 'before'),
+          anySets: sets > 0,
+          dayAfterDue: due,
+        });
+      }
+    })();
     return () => {
       cancelled = true;
     };
   }, [sessionId]);
 
-  if (session === undefined) return null;
+  if (loaded === undefined) return null;
+  const { session } = loaded;
   const live = session?.status === 'in_progress';
-  if (!session || (timing !== 'dayAfter' && !live)) {
-    return <Redirect to={session ? `/session/${sessionId}` : '/'} />;
+  if (!session) return <Redirect to="/" />;
+  // 'before' is one-shot: Android back from the session must not re-enter it.
+  if (
+    timing === 'before' &&
+    (!live || loaded.hasBefore || loaded.anySets) &&
+    outcome === undefined
+  ) {
+    return <Redirect to={`/session/${sessionId}`} />;
+  }
+  if (timing === 'after' && !live && outcome === undefined) {
+    return <Redirect to={`/session/${sessionId}`} />;
+  }
+  if (timing === 'dayAfter' && !loaded.dayAfterDue && outcome === undefined) {
+    return <Redirect to="/" />;
   }
 
   const valid = isValidScore(score);
 
-  const save = async () => {
-    if (!isValidScore(score) || busy) return;
+  /** Runs an action once at a time; shows a Swedish error instead of failing silently. */
+  const run = async (fn: () => Promise<void>) => {
+    if (busy) return;
     setBusy(true);
+    setError(false);
     try {
-      const db = getDb();
-      const now = new Date();
-      await addPainLog(db, { sessionId, timing, score, redFlags: flags }, now);
-      const readings = await listPainLogsBySession(db, sessionId);
-      const mine = readings.find((r) => r.timing === timing);
-      const status: PainStatus = mine
-        ? assessReading(
-            mine,
-            timing === 'dayAfter' ? dayAfterReference(readings) : undefined,
-          ).status
-        : 'warn';
-      if (status === 'stop') {
-        if (live) await abortSession(db, sessionId, now, 'pain_stop');
-        setOutcome({ kind: 'stop' });
-        return;
-      }
-      if (timing === 'before') await replanSession(db, sessionId);
-      if (status === 'warn') {
-        setOutcome({ kind: 'warn', wallSit: false });
-        return;
-      }
-      navigate(timing === 'dayAfter' ? '/' : `/session/${sessionId}`);
+      await fn();
+    } catch {
+      setError(true);
     } finally {
       setBusy(false);
     }
   };
 
+  const save = () =>
+    run(async () => {
+      if (!isValidScore(score)) return;
+      const result = await recordPainReading(
+        getDb(),
+        { sessionId, timing, score, redFlags: flags },
+        new Date(),
+      );
+      if (result.status === 'stop') {
+        setOutcome({ kind: 'stop' });
+      } else if (result.status === 'warn') {
+        setOutcome({ kind: 'warn', wallSit: false, reasons: result.reasons });
+      } else {
+        navigate(timing === 'dayAfter' ? '/' : `/session/${sessionId}`);
+      }
+    });
+
   if (outcome?.kind === 'stop') {
-    const dayAfter = timing === 'dayAfter';
     return (
-      <Shell>
-        <div className="flex flex-1 flex-col gap-4 pt-10">
-          <Icon name="stop" size={56} />
-          <h1 className="m-0 text-6xl leading-none font-extrabold">
-            {dayAfter ? PAIN_COPY.stopTitleDayAfter : PAIN_COPY.stopTitle}
-          </h1>
-          <p className="m-0 text-2xl font-bold">{PAIN_COPY.stopBody}</p>
-          {dayAfter ? null : (
-            <p className="m-0 text-xl">Det du hunnit logga sparas.</p>
-          )}
-        </div>
-        <Actions>
-          <Button onClick={() => navigate('/')}>{PAIN_COPY.stopDone}</Button>
-        </Actions>
-      </Shell>
+      <StopScreen
+        dayAfter={timing === 'dayAfter'}
+        onHome={() => navigate('/')}
+      />
     );
   }
+
+  const errorLine = error ? (
+    <p role="alert" className="m-0 text-center text-base font-bold">
+      {PAIN_COPY.error}
+    </p>
+  ) : null;
 
   if (outcome?.kind === 'warn') {
     const dayAfter = timing === 'dayAfter';
     const before = timing === 'before';
     const wallSit = outcome.wallSit;
+    const worse = outcome.reasons.includes('worse_than_previous_day');
     return (
       <Shell>
         <div className="flex flex-1 flex-col gap-4 pt-10">
           <Icon name="warning" size={56} />
           <h1 className="m-0 text-6xl leading-none font-extrabold">
-            {dayAfter ? PAIN_COPY.warnTitleDayAfter : PAIN_COPY.warnTitle}
+            {dayAfter && worse
+              ? PAIN_COPY.warnTitleDayAfter
+              : PAIN_COPY.warnTitle}
           </h1>
           <p className="m-0 text-2xl font-bold">{PAIN_COPY.warnBody}</p>
           {before ? (
@@ -237,29 +304,36 @@ export function PainScreen({
               size="text-lg"
               label={PAIN_COPY.wallSit}
               on={wallSit}
-              onToggle={() => setOutcome({ kind: 'warn', wallSit: !wallSit })}
+              onToggle={() => setOutcome({ ...outcome, wallSit: !wallSit })}
             />
           ) : null}
         </div>
         <Actions>
+          {errorLine}
           {before ? (
             <>
               <Button
-                onClick={async () => {
-                  if (wallSit) await addWallSit(getDb(), sessionId);
-                  navigate(`/session/${sessionId}`);
-                }}
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    await abortSession(getDb(), sessionId, new Date(), 'user');
+                    navigate('/');
+                  })
+                }
               >
-                {PAIN_COPY.warnContinue}
+                {PAIN_COPY.warnEnd}
               </Button>
               <Button
                 variant="secondary"
-                onClick={async () => {
-                  await abortSession(getDb(), sessionId, new Date(), 'user');
-                  navigate('/');
-                }}
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    if (wallSit) await addWallSit(getDb(), sessionId);
+                    navigate(`/session/${sessionId}`);
+                  })
+                }
               >
-                {PAIN_COPY.warnEnd}
+                {PAIN_COPY.warnContinue}
               </Button>
             </>
           ) : (
@@ -296,6 +370,7 @@ export function PainScreen({
         </fieldset>
       </div>
       <Actions>
+        {errorLine}
         {valid ? null : (
           <p className="m-0 text-center text-base text-ink-soft">
             {PAIN_COPY.pickFirst}

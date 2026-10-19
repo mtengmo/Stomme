@@ -5,7 +5,7 @@ import { getDb } from './db/db';
 import { ExerciseCardPage } from './features/exercise/ExerciseCard';
 import { FigureDev } from './features/exercise/FigureDev';
 import { Onboarding } from './features/onboarding/Onboarding';
-import { isTiming, PainScreen } from './features/pain/PainScreen';
+import { isTiming, PainScreen, StopScreen } from './features/pain/PainScreen';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
 import { HistoryStub, SettingsStub } from './features/stubs/Stubs';
@@ -32,7 +32,9 @@ export function App() {
 function Shell() {
   const [location] = useLocation();
   const inSession =
-    location.startsWith('/session/') || location.startsWith('/smarta/');
+    location.startsWith('/session/') ||
+    location.startsWith('/smarta/') ||
+    location.startsWith('/stopp/');
   return (
     <>
       <main>
@@ -62,6 +64,7 @@ function Shell() {
               )
             }
           </Route>
+          <Route path="/stopp/:sessionId">{() => <StopRoute />}</Route>
           <Route path="/ovning/:id">
             {(params) => <ExerciseCardPage id={params.id} />}
           </Route>
@@ -76,4 +79,9 @@ function Shell() {
       {inSession ? null : <BottomNav />}
     </>
   );
+}
+
+function StopRoute() {
+  const [, navigate] = useLocation();
+  return <StopScreen onHome={() => navigate('/')} />;
 }

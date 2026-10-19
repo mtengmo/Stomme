@@ -54,8 +54,8 @@ export const REASON_TEXT: Record<ReasonCode, string> = {
   hold_not_easy_at_max: 'Toppnivån kändes inte lätt. Samma igen.',
   hold_waiting_for_3_sets: 'Tre set först, sedan tyngre vikt.',
   max_level: 'Högsta nivån. Behåll.',
-  pain_hold: 'Knäet var över gränsen sedan sist. Samma igen.',
-  pain_stop_hold: 'Du stoppade sist. Samma igen.',
+  pain_hold: 'Knäet har känts av. Samma igen.',
+  pain_stop_hold: 'Knäet gav stopp. Fråga fysioterapeuten.',
 };
 
 export const SEE_PHYSIO = 'Fråga fysioterapeuten';
@@ -124,7 +124,8 @@ export const PAIN_COPY = {
   save: 'Spara',
   pickFirst: 'Välj ett värde först',
   stopTitle: 'Avbryt passet.',
-  stopTitleDayAfter: 'Vänta med nästa pass.',
+  stopTitleDayAfter: 'Fråga fysioterapeuten innan nästa pass.',
+  stopAbortKnee: 'Avbryt på grund av knäet',
   stopBody: 'Fråga fysioterapeuten.',
   stopDone: 'Till veckan',
   warnTitle: 'Smärtan är över 3.',
@@ -136,10 +137,12 @@ export const PAIN_COPY = {
   warnBackHome: 'Till veckan',
   wallSit: 'Lägg till väggsittning sist (3 × 30 s, valfri)',
   banner:
-    'Senast stoppade du pga knäet. Fråga fysioterapeuten innan nästa pass.',
+    'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.',
   dayAfterCardTitle: 'Hur känns knäet idag?',
   dayAfterAnswer: 'Svara',
   dayAfterWarn: 'Knäet var värre dagen efter. Fråga fysioterapeuten.',
+  dayAfterWarnHigh: 'Knäet kändes av dagen efter. Fråga fysioterapeuten.',
+  error: 'Något gick fel. Försök igen.',
 } as const;
 
 /** "2 × 10 reps · Kroppsvikt". */

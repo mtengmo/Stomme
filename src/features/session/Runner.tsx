@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Redirect, useLocation } from 'wouter';
+import { PAIN_COPY } from '../../content/copy';
 import { exercises } from '../../content/exercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
@@ -154,6 +155,11 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     navigate('/');
   };
 
+  const abortForKnee = async () => {
+    await abortSession(getDb(), session.id, new Date(), 'pain_stop');
+    navigate(`/stopp/${session.id}`);
+  };
+
   if (confirmAbort) {
     return (
       <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
@@ -169,6 +175,9 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           </Button>
           <Button variant="secondary" onClick={abort}>
             Avbryt passet
+          </Button>
+          <Button variant="secondary" onClick={abortForKnee}>
+            {PAIN_COPY.stopAbortKnee}
           </Button>
         </div>
       </div>

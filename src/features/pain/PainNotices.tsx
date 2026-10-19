@@ -23,8 +23,12 @@ export function DayAfterNotices({
   const due = care.dayAfterDue;
   return (
     <>
-      {care.dayAfterWorse ? (
-        <Banner tone="care">{PAIN_COPY.dayAfterWarn}</Banner>
+      {care.dayAfterWorse && !care.stopBanner ? (
+        <Banner tone="care">
+          {care.dayAfterHigherThanAfter
+            ? PAIN_COPY.dayAfterWarn
+            : PAIN_COPY.dayAfterWarnHigh}
+        </Banner>
       ) : null}
       {due ? (
         <section

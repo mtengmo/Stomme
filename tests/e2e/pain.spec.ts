@@ -37,7 +37,7 @@ test('a red flag stops the pass and shows the banner afterwards', async ({
   await page.getByRole('button', { name: 'Till veckan' }).click();
   await expect(
     page.getByText(
-      'Senast stoppade du pga knäet. Fråga fysioterapeuten innan nästa pass.',
+      'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.',
     ),
   ).toBeVisible();
 });
