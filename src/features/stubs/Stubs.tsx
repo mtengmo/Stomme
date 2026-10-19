@@ -12,7 +12,3 @@ function Stub({ title, children }: { title: string; children?: string }) {
 export function HistoryStub() {
   return <Stub title="Historik" />;
 }
-
-export function SettingsStub() {
-  return <Stub title="Inställningar" />;
-}

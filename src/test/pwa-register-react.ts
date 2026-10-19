@@ -1,4 +1,9 @@
-// Vitest alias target for the virtual module; tests replace it with vi.mock.
-export function useRegisterSW(): never {
-  throw new Error('virtual:pwa-register/react is mocked in tests');
+// Vitest alias target for the virtual module: inert "no update" state.
+// Tests that need a waiting update replace it with vi.mock.
+export function useRegisterSW() {
+  return {
+    needRefresh: [false, () => {}] as const,
+    offlineReady: [false, () => {}] as const,
+    updateServiceWorker: async () => {},
+  };
 }

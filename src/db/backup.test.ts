@@ -223,7 +223,9 @@ describe('backup', () => {
     const b = await valid();
     const bad = {
       ...b,
-      sessions: [session('s2', { status: 'in_progress', finishedAt: undefined })],
+      sessions: [
+        session('s2', { status: 'in_progress', finishedAt: undefined }),
+      ],
       setLogs: [setLog('l9', 's2')],
       painLogs: [],
     };

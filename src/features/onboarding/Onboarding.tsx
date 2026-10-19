@@ -8,7 +8,27 @@ export async function acceptOnboarding(): Promise<void> {
   });
 }
 
-const STOP = ['skarp smärta', 'svullnad', 'att knät låser sig'];
+export const STOP = ['skarp smärta', 'svullnad', 'att knät låser sig'];
+
+/** Disclaimer paragraphs, shared with the settings screen. */
+export function DisclaimerText({
+  className = 'm-0 text-xl',
+}: {
+  className?: string;
+}) {
+  return (
+    <>
+      <p className={className}>
+        Stomme är ett träningsstöd, inte sjukvård. Appen ger inga medicinska råd
+        och ersätter inte en fysioterapeut.
+      </p>
+      <p className={className}>
+        Visa programmet för en fysioterapeut innan du börjar, särskilt{' '}
+        <strong>step-up</strong> och <strong>split squat</strong>.
+      </p>
+    </>
+  );
+}
 
 export function Onboarding() {
   return (
@@ -16,14 +36,7 @@ export function Onboarding() {
       <h1 className="m-0 text-6xl leading-[0.95] font-extrabold text-balance">
         Välkommen till Stomme
       </h1>
-      <p className="m-0 text-xl">
-        Stomme är ett träningsstöd, inte sjukvård. Appen ger inga medicinska råd
-        och ersätter inte en fysioterapeut.
-      </p>
-      <p className="m-0 text-xl">
-        Visa programmet för en fysioterapeut innan du börjar, särskilt{' '}
-        <strong>step-up</strong> och <strong>split squat</strong>.
-      </p>
+      <DisclaimerText />
       <section
         aria-labelledby="stop-heading"
         className="border-2 border-edge bg-paper"
