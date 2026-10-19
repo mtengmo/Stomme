@@ -9,6 +9,8 @@ export type IconName =
   | 'settings'
   | 'info'
   | 'warning'
+  | 'stop'
+  | 'bell'
   | 'minus'
   | 'plus'
   | 'back';
@@ -53,6 +55,18 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 11v5M12 8v.01" />
+    </>
+  ),
+  stop: (
+    <>
+      <path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z" />
+      <path d="M8 12h8" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z" />
+      <path d="M10 21h4" />
     </>
   ),
   warning: (
