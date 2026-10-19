@@ -115,7 +115,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
       </header>
 
       {care.stopBanner ? <StopBanner /> : null}
-      <DayAfterNotices care={care} />
+      <DayAfterNotices care={care} today={today} />
 
       <ol
         className="m-0 flex list-none justify-between p-0"

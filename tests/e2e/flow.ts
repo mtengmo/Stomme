@@ -2,15 +2,38 @@ import { expect, type Page } from '@playwright/test';
 
 export type Stage =
   | 'preview'
+  | 'pain'
   | 'set-first'
   | 'set-side'
   | 'set-timed'
   | 'set-after-skip'
   | 'rest'
   | 'effort'
+  | 'pain-after'
   | 'summary';
 
-const ACTION = /^(Klar set|Hoppa över vila|Lagom|Avsluta pass)$/;
+const ACTION = /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara)$/;
+
+/** Fills the pain picker (score, optional red flags) and saves. */
+export async function answerPain(
+  page: Page,
+  score: number,
+  flags: string[] = [],
+): Promise<void> {
+  await page
+    .getByRole('radio', { name: new RegExp(`^${score}(,|$)`) })
+    .check({ force: true });
+  for (const f of flags) await page.getByRole('switch', { name: f }).click();
+  await page.getByRole('button', { name: 'Spara' }).click();
+}
+
+/** Onboarding, then the preview of Pass A (nothing started yet). */
+export async function openPreview(page: Page): Promise<void> {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
+}
 
 /**
  * Plays Pass A from a clean database: onboarding, preview, then only the
@@ -27,6 +50,9 @@ export async function playPassA(
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
   await onStage('preview');
   await page.getByRole('button', { name: 'Starta pass' }).click();
+  await expect(page.getByRole('heading', { name: /Hur känns/ })).toBeVisible();
+  await onStage('pain');
+  await answerPain(page, 0);
   await expect(page.locator('[data-step]')).toBeVisible();
 
   const seen = new Set<Stage>();
@@ -41,6 +67,12 @@ export async function playPassA(
     const action = page.getByRole('button', { name: ACTION }).first();
     await action.waitFor();
     const name = (await action.innerText()).trim();
+
+    if (name === 'Spara') {
+      await once('pain-after');
+      await answerPain(page, 0);
+      continue;
+    }
 
     if (name === 'Avsluta pass') {
       await once('summary');
@@ -86,6 +118,7 @@ export async function skipFirstExercise(
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.getByRole('link', { name: 'Starta pass' }).click();
   await page.getByRole('button', { name: 'Starta pass' }).click();
+  await answerPain(page, 0);
   const frame = page.locator('[data-step]');
   const before = await frame.getAttribute('data-step');
   await page.getByRole('button', { name: 'Hoppa över övningen' }).click();

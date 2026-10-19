@@ -1,7 +1,7 @@
 import { Link } from 'wouter';
 import { PAIN_COPY } from '../../content/copy';
 import { templates } from '../../content/templates';
-import { formatWeekday } from '../../lib/dates';
+import { daysBetween } from '../../lib/dates';
 import { Banner } from '../../ui/Banner';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
@@ -13,7 +13,13 @@ export function StopBanner() {
 }
 
 /** Week view: ask for the day-after reading, or show that it was worse. */
-export function DayAfterNotices({ care }: { care: CareState }) {
+export function DayAfterNotices({
+  care,
+  today,
+}: {
+  care: CareState;
+  today: string;
+}) {
   const due = care.dayAfterDue;
   return (
     <>
@@ -32,7 +38,8 @@ export function DayAfterNotices({ care }: { care: CareState }) {
                 {PAIN_COPY.dayAfterCardTitle}
               </h2>
               <p className="m-0 mt-1 text-base text-ink-soft">
-                {templates[due.templateId].name} {formatWeekday(due.date)}
+                {templates[due.templateId].name}{' '}
+                {daysBetween(due.date, today) === 1 ? 'i går' : 'i förrgår'}
               </p>
             </div>
           </div>

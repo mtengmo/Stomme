@@ -134,7 +134,7 @@ export const PAIN_COPY = {
   warnEnd: 'Avsluta',
   warnAfterContinue: 'Gå vidare',
   warnBackHome: 'Till veckan',
-  wallSit: 'Lägg till väggsittning sist (3 × 30 s, valfri)',
+  wallSit: 'Lägg till väggsittning sist (3 × 30 s, valfri)',
   banner:
     'Senast stoppade du pga knäet. Fråga fysioterapeuten innan nästa pass.',
   dayAfterCardTitle: 'Hur känns knäet idag?',
