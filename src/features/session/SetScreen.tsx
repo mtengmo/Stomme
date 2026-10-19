@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
+import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
@@ -20,7 +21,6 @@ interface SetScreenProps {
   onDone(amount: number, loadIndex: number): void;
   onSkip(): void;
 }
-
 /** One set: name, side, big steppers prefilled, and a single "Klar set". */
 export function SetScreen({
   frame,
@@ -35,19 +35,36 @@ export function SetScreen({
 }: SetScreenProps) {
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
-  const hold = useCountdown();
+  const [holdDone, setHoldDone] = useState(false);
+  const hold = useCountdown(() => setHoldDone(true));
   const [cardOpen, setCardOpen] = useState(false);
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
-
+  const presentation = loadPresentation(exercise, loadIndex);
+  const nextCue =
+    step.side === 'right'
+      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila. Tryck Klar set när höger är klar.`
+      : step.setNumber < totalSets
+        ? 'Sedan: vila före nästa set. Tryck Klar set när du är klar.'
+        : 'Sedan: ange hur övningen kändes. Tryck Klar set när du är klar.';
+  const quantity =
+    unit === 'seconds'
+      ? 'hela hålltiden'
+      : unit === 'meters'
+        ? 'hela sträckan'
+        : 'hela antalet';
   const cue =
-    step.side === 'right' && step.setNumber === 1
-      ? 'Börja med höger.'
-      : unit === 'reps'
-        ? 'Sänk på 3 sekunder.'
-        : '';
-
+    step.side === 'left'
+      ? `Byt nu till vänster. Samma ${unit === 'seconds' ? 'hålltid' : unit === 'meters' ? 'sträcka' : 'antal'} på denna sida.`
+      : step.side === 'right'
+        ? `Börja med höger. Gör ${quantity} på denna sida.`
+        : `Gör ${quantity} med båda sidor samtidigt.`;
+  const changeAmount = (value: number) => {
+    hold.stop();
+    setHoldDone(false);
+    setAmount(value);
+  };
   return (
     <SessionFrame
       {...frame}
@@ -68,7 +85,11 @@ export function SetScreen({
     >
       <h1 className="m-0 text-3xl leading-tight font-bold">{exercise.name}</h1>
       <div className="flex items-center gap-4">
-        <FigureSlot exerciseId={exercise.id} side={step.side} />
+        <FigureSlot
+          exerciseId={exercise.id}
+          side={step.side}
+          loadIndex={loadIndex}
+        />
         <div className="min-w-0">
           <p className="m-0 text-xl font-bold">
             Set {step.setNumber} av {totalSets}
@@ -93,20 +114,25 @@ export function SetScreen({
         <ExerciseSheet
           exercise={exercise}
           side={step.side === 'left' ? 'left' : 'right'}
+          loadIndex={loadIndex}
           onClose={() => setCardOpen(false)}
         />
       ) : null}
-
+      <p className="m-0 text-base font-bold" aria-live="polite">
+        {nextCue}
+      </p>
+      <p className="m-0 text-base text-ink-soft" aria-live="polite">
+        {presentation.cue}
+      </p>
       <div className="mt-auto flex flex-col gap-4">
         <Stepper
           label={AMOUNT_LABEL[unit]}
           value={String(amount)}
           unit={UNIT_WORD[unit]}
-          onDec={() => setAmount(Math.max(range.step, amount - range.step))}
-          onInc={() => setAmount(amount + range.step)}
+          onDec={() => changeAmount(Math.max(range.step, amount - range.step))}
+          onInc={() => changeAmount(amount + range.step)}
           decDisabled={amount <= range.step}
         />
-
         {loadLadder.length > 1 && load ? (
           <Stepper
             size={load.kg === 0 ? 'sm' : 'md'}
@@ -126,17 +152,51 @@ export function SetScreen({
             {load.kg === 0 ? 'Kroppsvikt' : load.label}
           </p>
         ) : null}
-
         {unit === 'seconds' ? (
-          <Button
-            variant="secondary"
-            onClick={() => (hold.running ? hold.stop() : hold.start(amount))}
-          >
-            {hold.running
-              ? `Håll: ${hold.seconds} s · Stoppa`
-              : `Starta nedräkning (${amount} s)`}
-          </Button>
-        ) : null}
+          <section aria-label="Hålltid" className="flex flex-col gap-2">
+            <p className="m-0 text-base">
+              Håll positionen i {amount} sekunder
+              {exercise.perSide ? ' på denna sida' : ''}. Starta när du är på
+              plats.
+            </p>
+            {hold.running ? (
+              <p
+                role="timer"
+                aria-label={`${hold.seconds} sekunder hålltid kvar`}
+                className="count m-0 text-5xl"
+              >
+                {hold.seconds} s kvar
+              </p>
+            ) : null}
+            <p role="status" className="m-0 text-base font-bold">
+              {holdDone
+                ? 'Hålltiden är klar. Tryck Klar set för att fortsätta.'
+                : hold.running
+                  ? 'Håll positionen. Detta är din träningstid.'
+                  : 'Timern är ett stöd. Setet sparas med Klar set.'}
+            </p>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setHoldDone(false);
+                if (hold.running) hold.stop();
+                else hold.start(amount);
+              }}
+            >
+              {hold.running
+                ? 'Avbryt hålltid'
+                : holdDone
+                  ? `Starta om hålltid (${amount} s)`
+                  : `Starta hålltid (${amount} s)`}
+            </Button>
+          </section>
+        ) : (
+          <p className="m-0 text-base text-ink-soft">
+            {unit === 'reps'
+              ? 'Räkna repetitionerna själv. Tryck Klar set när hela antalet är gjort.'
+              : 'Gå den angivna sträckan och tryck Klar set.'}
+          </p>
+        )}
       </div>
     </SessionFrame>
   );

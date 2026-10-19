@@ -25,19 +25,23 @@ beforeEach(async () => {
 afterEach(() => cleanup());
 
 describe('ExerciseCardBody', () => {
-  it('shows name, three tips, mistake and easier variant', () => {
+  it('shows instructions in their own reader view', async () => {
+    const user = userEvent.setup();
     const ex = exercises['dead-bug'];
     render(<ExerciseCardBody exercise={ex} />);
     expect(screen.getByRole('heading', { name: ex.name })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Så gör du' }));
     for (const t of ex.tips) expect(screen.getByText(t)).toBeTruthy();
     expect(screen.getByText('Vanligt fel')).toBeTruthy();
     expect(screen.getByText('Enklare variant')).toBeTruthy();
     expect(screen.queryByText(/Fråga fysioterapeuten/)).toBeNull();
   });
 
-  it('has the physio footnote only for step-up and split squat', () => {
+  it('has the physio footnote only for step-up and split squat', async () => {
+    const user = userEvent.setup();
     for (const id of ['step-up', 'split-squat'] as const) {
       const { unmount } = render(<ExerciseCardBody exercise={exercises[id]} />);
+      await user.click(screen.getByRole('button', { name: 'Så gör du' }));
       expect(screen.getByText(/Fråga fysioterapeuten/)).toBeTruthy();
       unmount();
     }
@@ -63,11 +67,9 @@ describe('"Hur gör man?" sheet', () => {
     await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
     const dialog = screen.getByRole('dialog');
     expect(
-      within(dialog).getByRole('heading', { name: 'Så gör du' }),
+      within(dialog).getByRole('button', { name: 'Så gör du' }),
     ).toBeTruthy();
-    expect(
-      within(dialog).getByRole('heading', { name: 'Tränar främst' }),
-    ).toBeTruthy();
+    expect(within(dialog).getByText(/^Tränar främst:/)).toBeTruthy();
     expect(document.activeElement).toBe(dialog);
     await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());

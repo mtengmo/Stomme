@@ -33,7 +33,9 @@ test('the app works offline after one load', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   await page.getByRole('button', { name: 'Klar set' }).click();
-  await expect(page.getByRole('status')).toContainText('Set 1 loggat');
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Set 1 loggat' }),
+  ).toContainText('Set 1 loggat');
 });
 
 test('skipping an exercise moves on and shows it as skipped in the tally', async ({

@@ -287,7 +287,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
           );
         })}
       </ol>
-      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
         {error ? (
           <p role="alert" className="m-0 text-base font-bold">
             {error}

@@ -32,12 +32,17 @@ Requires Node 24 and npm. Install with `npm ci`.
 
 Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All eleven exercises have fixed references E01–E11, independent of workout order. The read-only view includes names, IDs, muscles, instructions and static start/mid/end frames for each side, plus links to the normal animated exercise cards. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
 
+The reader keeps navigation visible and scrolls its content internally. Choose Rörelse, Muskler or Så gör du; review one large pose using Start/Mitt/Slut and switch sides as needed. Selecting a weight changes the equipment diagram and handling instructions. Session help uses the weight currently selected in that set.
+
+Workout screens distinguish holding time from rest time and explain when to switch sides. A countdown never logs a set or starts the next set automatically; use Klar set / Nästa set to continue.
+
 ## Deployment
 
 Deployed by `.github/workflows/deploy.yml` to GitHub Pages at `https://stomme.tengmo.com`.
 
 - Pushes and pull requests run check, test and build.
 - Pushes to `main` also upload the build and deploy it to Pages.
+- Settings shows `major.minor.<Git commit count>` and the short commit hash. Each new commit advances the build version automatically; full Git history is required in CI. Uncommitted local builds carry a `-dev` suffix.
 - `VITE_BASE` sets the base path. It defaults to `/`. Set `VITE_BASE=/Stomme/` only if the
   `github.io` URL is needed before the custom domain works.
 - Do not add a `CNAME` file. With a GitHub Actions deploy it is ignored; the custom domain is

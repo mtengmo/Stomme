@@ -163,13 +163,16 @@ async function theme(scheme: 'light' | 'dark') {
   await page.goto(`${base}/#/ovning/dead-bug`);
   await page.getByRole('heading', { name: 'Dead bug', exact: true }).waitFor();
   await audit(page, tag('muscle movement overlay'));
+  await page.getByRole('button', { name: 'Så gör du', exact: true }).click();
+  await audit(page, tag('exercise instructions'));
+  await page.getByRole('button', { name: 'Rörelse', exact: true }).click();
   await page.getByRole('button', { name: 'Muskler', exact: true }).click();
   await audit(page, tag('front and back muscle map'));
   await page.goto(`${base}/#/granska?ovning=E03`);
   await page.getByRole('heading', { name: /^E03 ·/ }).waitFor();
   await audit(page, tag('numbered exercise review'));
   await page
-    .getByRole('button', { name: 'Visa muskelmarkeringar', exact: true })
+    .getByRole('button', { name: 'Dölj muskler i rörelsen', exact: true })
     .click();
   await audit(page, tag('exercise review muscle frames'));
   await page.goto(`${base}/#/historik`);

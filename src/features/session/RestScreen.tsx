@@ -10,7 +10,6 @@ import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
 const RADIUS = 124;
 const CIRC = 2 * Math.PI * RADIUS;
-
 interface RestScreenProps {
   frame: Omit<SessionFrameProps, 'children' | 'actions'>;
   restSec: number;
@@ -21,7 +20,6 @@ interface RestScreenProps {
   /** True when the rest follows a set (not an effort answer): draws the tick. */
   afterSet: boolean;
 }
-
 /** Huge countdown on timestamps, +15 s, skip; "Nästa" tells what comes after. */
 export function RestScreen({
   frame,
@@ -35,18 +33,14 @@ export function RestScreen({
   const total = useRef(restSec);
   const timer = useCountdown();
   const { start } = timer;
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: start once per rest screen
   useEffect(() => {
     total.current = restSec;
     start(restSec);
-  }, []);
-
+  }, [restSec, start]);
   const over = !timer.running;
   const fraction = over ? 0 : Math.min(1, timer.seconds / total.current);
   const side =
     nextExercise && nextStep ? sideLabel(nextExercise, nextStep.side) : '';
-
   return (
     <SessionFrame
       {...frame}
@@ -106,6 +100,11 @@ export function RestScreen({
           {over ? 'Nu' : formatClock(timer.seconds)}
         </p>
       </div>
+      <p role="status" className="m-0 text-base">
+        {over
+          ? 'Vilan är klar. Tryck Nästa set när du är redo.'
+          : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}
+      </p>
       {nextExercise && nextStep ? (
         <div>
           <p className="m-0 text-2xl leading-tight font-bold">

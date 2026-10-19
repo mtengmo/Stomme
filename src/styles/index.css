@@ -23,6 +23,7 @@
   --upcoming: #dde6e2;
   --upcoming-ink: #3d484b;
   --grid: 24px;
+  --app-nav-height: calc(67px + env(safe-area-inset-bottom));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -138,4 +139,35 @@ h2 {
   a:active {
     transform: none !important;
   }
+}
+
+/* Readers own their scroll area; the page and close controls stay still. */
+.exercise-stage {
+  height: clamp(200px, 34dvh, 360px);
+}
+.exercise-stage svg {
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+.exercise-stage > div {
+  height: 100%;
+}
+.exercise-stage figure {
+  min-height: 0;
+}
+.exercise-stage figure svg {
+  flex: 1;
+}
+
+.exercise-stage .grid figure {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.exercise-stage figcaption {
+  flex-shrink: 0;
+}
+.review-stage {
+  height: clamp(170px, 24dvh, 260px);
 }

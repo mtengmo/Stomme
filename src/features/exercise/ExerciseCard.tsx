@@ -2,153 +2,289 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
+import { loadPresentation } from '../../content/loadPresentation';
+import { primaryMuscleLabel } from '../../content/muscles';
+import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
-import { Figure, usePrefersReducedMotion } from '../../figures/Figure';
+import {
+  Figure,
+  FigureFrame,
+  lerpPose,
+  usePrefersReducedMotion,
+} from '../../figures/Figure';
 import { MuscleFocus, MuscleMap } from '../../figures/MuscleMap';
-import { Button, buttonClass } from '../../ui/Button';
+import { figures } from '../../figures/poses';
+import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
   'split-squat': 'Fråga fysioterapeuten hur djupt du ska gå ner.',
 };
-
 const MUSCLE_OVERLAY_EXERCISES = new Set<ExerciseId>([
   'goblet-chair-squat',
   'single-leg-rdl',
   'dead-bug',
 ]);
-
-/** The card content: name, muscles, figure, tips, mistake, easier variant. */
+/** Bounded reader: controls stay in place; each view scrolls independently. */
 export function ExerciseCardBody({
   exercise,
   side = 'right',
+  loadIndex,
+  review = false,
 }: {
   exercise: Exercise;
   side?: 'right' | 'left';
+  loadIndex?: number;
+  review?: boolean;
 }) {
-  const [view, setView] = useState<'movement' | 'muscles'>('movement');
+  const [view, setView] = useState<'movement' | 'muscles' | 'instructions'>(
+    'movement',
+  );
+  const [selectedLoad, setSelectedLoad] = useState(
+    loadIndex ?? exercise.week1LoadIndex,
+  );
+  const [workingSide, setWorkingSide] = useState(side);
+  const [frame, setFrame] = useState(0);
   const [paused, setPaused] = useState(false);
   const [overlay, setOverlay] = useState(true);
   const reducedMotion = usePrefersReducedMotion();
-  const working = exercise.perSide ? side : null;
+  const working = exercise.perSide ? workingSide : null;
   const physio = ASK_PHYSIO[exercise.id];
-  return (
-    <div className="flex flex-col gap-4">
-      <h1 className="m-0 text-4xl leading-tight font-bold">{exercise.name}</h1>
-      <p className="m-0 text-base text-ink-soft">
-        Övning {exerciseReferences[exercise.id]}
-      </p>
-      <MuscleFocus exerciseId={exercise.id} />
-      <fieldset className="m-0 flex gap-2 border-0 p-0">
-        <legend className="sr-only">Visning</legend>
-        <button
-          type="button"
-          aria-pressed={view === 'movement'}
-          onClick={() => setView('movement')}
-          className={`min-h-12 flex-1 rounded-md border-[3px] px-3 text-base font-bold ${view === 'movement' ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
-        >
-          Rörelse
-        </button>
-        <button
-          type="button"
-          aria-pressed={view === 'muscles'}
-          onClick={() => setView('muscles')}
-          className={`min-h-12 flex-1 rounded-md border-[3px] px-3 text-base font-bold ${view === 'muscles' ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
-        >
-          Muskler
-        </button>
-      </fieldset>
-      {view === 'movement' ? (
-        <>
-          <div className="border-[3px] border-edge rounded-md p-2">
-            <Figure
-              exerciseId={exercise.id}
-              working={working}
-              paused={paused || reducedMotion}
-              showMuscles={overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)}
-            />
-          </div>
-          {!reducedMotion ? (
-            <button
-              type="button"
-              aria-pressed={paused}
-              onClick={() => setPaused((value) => !value)}
-              className="min-h-12 self-start rounded-md border-[3px] border-edge px-4 text-base font-bold"
-            >
-              {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
-            </button>
-          ) : (
-            <p className="m-0 text-base text-ink-soft">
-              Rörelsen visas stilla med start- och slutläge eftersom du har valt
-              minskad rörelse.
-            </p>
-          )}
-          {MUSCLE_OVERLAY_EXERCISES.has(exercise.id) ? (
-            <>
-              <button
-                type="button"
-                aria-pressed={overlay}
-                onClick={() => setOverlay((value) => !value)}
-                className="min-h-12 self-start rounded-md border-[3px] border-edge px-4 text-base font-bold"
-              >
-                {overlay
-                  ? 'Dölj muskler i rörelsen'
-                  : 'Visa muskler i rörelsen'}
-              </button>
-              <p className="m-0 text-base text-ink-soft">
-                H/V visar arbetande sida. Markeringarna visar ungefärliga
-                muskelområden; heldragen yta tränar främst och streckad yta
-                hjälper till.
-              </p>
-            </>
-          ) : (
-            <p className="m-0 text-base text-ink-soft">
-              Se ungefärliga muskelområden under Muskler.
-            </p>
-          )}
-        </>
+  const presentation = loadPresentation(exercise, loadIndex ?? selectedLoad);
+  const spec = figures[exercise.id];
+  const equipmentControls = (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+      {loadIndex === undefined && exercise.loadLadder.length > 1 ? (
+        <label className="flex min-h-12 flex-wrap items-center gap-2 text-base font-bold">
+          Vikt
+          <select
+            value={selectedLoad}
+            onChange={(event) => setSelectedLoad(Number(event.target.value))}
+            className="min-h-12 max-w-full rounded-sm border-2 border-edge bg-paper px-2 text-base text-ink"
+          >
+            {exercise.loadLadder.map((load, index) => (
+              <option key={load.kg} value={index}>
+                {load.label}
+              </option>
+            ))}
+          </select>
+        </label>
       ) : (
-        <div className="border-[3px] border-edge rounded-md p-3">
-          <MuscleMap exerciseId={exercise.id} />
-        </div>
+        <p className="m-0 text-base font-bold">{presentation.load.label}</p>
       )}
-      {working ? (
-        <p className="m-0 text-base text-ink-soft">
-          <span className="font-bold text-blue">
-            {working === 'right' ? 'H' : 'V'}
-          </span>{' '}
-          {working === 'right' ? 'höger' : 'vänster'} sida arbetar.
-          {view === 'movement' && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
-            ? ' Markeringarna visar ungefärliga muskelområden.'
-            : ''}
-        </p>
-      ) : null}
-      <section>
-        <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
-        <ol className="m-0 mt-2 flex list-decimal flex-col gap-2 pl-6 text-xl">
-          {exercise.tips.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ol>
-      </section>
-      <section>
-        <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
-        <p className="m-0 mt-1 text-xl">{exercise.commonMistake}</p>
-      </section>
-      <section>
-        <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
-        <p className="m-0 mt-1 text-xl">{exercise.easierVariant}</p>
-      </section>
-      {physio ? (
-        <p className="m-0 border-t-2 border-edge pt-3 text-base text-ink-soft">
-          {physio}
-        </p>
+      {exercise.perSide ? (
+        <button
+          type="button"
+          onClick={() =>
+            setWorkingSide((value) => (value === 'right' ? 'left' : 'right'))
+          }
+          className="min-h-12 text-base font-bold underline"
+        >
+          {workingSide === 'right' ? 'Höger' : 'Vänster'} sida · Byt sida
+        </button>
       ) : null}
     </div>
   );
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <header className="shrink-0">
+        <h1 className="m-0 text-3xl leading-tight font-bold">
+          {review ? `${exerciseReferences[exercise.id]} · ` : ''}
+          {exercise.name}
+        </h1>
+        {!review ? (
+          <p className="m-0 text-base text-ink-soft">
+            Övning {exerciseReferences[exercise.id]}
+          </p>
+        ) : null}
+        <p className="m-0 text-base">
+          Tränar främst: {primaryMuscleLabel(exercise.id)}
+        </p>
+      </header>
+      <fieldset className="m-0 flex shrink-0 gap-2 border-0 p-0">
+        <legend className="sr-only">Visning</legend>
+        {(
+          [
+            ['movement', 'Rörelse'],
+            ['muscles', 'Muskler'],
+            ['instructions', 'Så gör du'],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            type="button"
+            key={id}
+            aria-pressed={view === id}
+            onClick={() => setView(id)}
+            className={`min-h-12 min-w-0 flex-1 rounded-md border-2 px-2 text-base font-bold ${view === id ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </fieldset>
+      <section
+        key={view}
+        aria-label={
+          view === 'movement'
+            ? 'Rörelsens lägen'
+            : view === 'muscles'
+              ? 'Muskelområden'
+              : 'Instruktioner'
+        }
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable scroll region for keyboard readers
+        tabIndex={0}
+        className="guide-panel min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-3"
+      >
+        {view === 'movement' ? (
+          <div className="flex flex-col gap-3">
+            {!review ? equipmentControls : null}
+            {review ? (
+              <fieldset
+                className="m-0 flex gap-2 border-0 p-0"
+                aria-label="Välj rörelseläge"
+              >
+                {['Start', 'Mitt', 'Slut'].map((label, index) => (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-pressed={frame === index}
+                    onClick={() => setFrame(index)}
+                    className={`min-h-12 flex-1 border-2 border-edge text-base font-bold ${frame === index ? 'bg-ink text-paper' : ''}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </fieldset>
+            ) : null}
+            <div
+              className={`exercise-stage rounded-md border-2 border-edge p-2 ${review ? 'review-stage' : ''}`}
+            >
+              {review ? (
+                <figure className="m-0 flex h-full flex-col">
+                  <FigureFrame
+                    exerciseId={exercise.id}
+                    pose={lerpPose(spec.start, spec.end, frame / 2)}
+                    working={working}
+                    equipment={presentation.equipment}
+                    showMuscles={
+                      overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
+                    }
+                  />
+                  <figcaption className="text-center text-base font-bold">
+                    {['Start', 'Mitt', 'Slut'][frame]}
+                  </figcaption>
+                </figure>
+              ) : (
+                <Figure
+                  exerciseId={exercise.id}
+                  working={working}
+                  equipment={presentation.equipment}
+                  paused={paused || reducedMotion}
+                  showMuscles={
+                    overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
+                  }
+                />
+              )}
+            </div>
+            {review ? equipmentControls : null}
+            {!review && !reducedMotion ? (
+              <button
+                type="button"
+                aria-pressed={paused}
+                onClick={() => setPaused((value) => !value)}
+                className="min-h-12 self-start px-2 text-base font-bold underline"
+              >
+                {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
+              </button>
+            ) : !review ? (
+              <p className="m-0 text-base text-ink-soft">
+                Start och slut visas stilla med minskad rörelse.
+              </p>
+            ) : null}
+            <p className="m-0 text-base font-bold">{presentation.cue}</p>
+            {working ? (
+              <p className="m-0 text-base text-ink-soft">
+                {working === 'right'
+                  ? 'H: höger sida arbetar.'
+                  : 'V: vänster sida arbetar.'}
+              </p>
+            ) : null}
+            {MUSCLE_OVERLAY_EXERCISES.has(exercise.id) ? (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={overlay}
+                  onClick={() => setOverlay((value) => !value)}
+                  className="min-h-12 self-start px-2 text-base font-bold underline"
+                >
+                  {overlay
+                    ? 'Dölj muskler i rörelsen'
+                    : 'Visa muskler i rörelsen'}
+                </button>
+                <p className="m-0 text-base text-ink-soft">
+                  Ungefärliga muskelområden: heldragen yta tränar främst,
+                  streckad yta hjälper till.
+                </p>
+              </>
+            ) : (
+              <p className="m-0 text-base text-ink-soft">
+                Se muskelområden under Muskler.
+              </p>
+            )}
+            <p className="m-0 text-base text-ink-soft">
+              Animationen visar tekniken. Följ antalet eller hålltiden i passet.
+            </p>
+          </div>
+        ) : view === 'muscles' ? (
+          <>
+            <MuscleFocus exerciseId={exercise.id} />
+            <MuscleMap exerciseId={exercise.id} />
+          </>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {review ? (
+              <p className="m-0 break-words text-base text-ink-soft">
+                ID: {exercise.id} ·{' '}
+                {Object.values(templates)
+                  .filter((template) =>
+                    template.items.some(
+                      (item) => item.exerciseId === exercise.id,
+                    ),
+                  )
+                  .map((template) => template.name)
+                  .join(' / ') || 'Valfri övning'}
+              </p>
+            ) : null}
+            <section>
+              <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
+              <p className="my-2 text-base font-bold">
+                {presentation.load.label} · {presentation.cue}
+              </p>
+              <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
+                {presentation.tips.map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ol>
+            </section>
+            <section>
+              <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
+              <p className="m-0 mt-1 text-lg">{exercise.commonMistake}</p>
+            </section>
+            <section>
+              <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
+              <p className="m-0 mt-1 text-lg">{exercise.easierVariant}</p>
+            </section>
+            {physio ? (
+              <p className="m-0 border-t-2 border-edge pt-3 text-base text-ink-soft">
+                {physio}
+              </p>
+            ) : null}
+          </div>
+        )}
+      </section>
+    </div>
+  );
 }
-
 /** #/ovning/:id */
 export function ExerciseCardPage({ id }: { id: string }) {
   // hasOwn: ids like "constructor" or "toString" must not resolve to prototype members.
@@ -156,7 +292,7 @@ export function ExerciseCardPage({ id }: { id: string }) {
     ? (exercises as Record<string, Exercise>)[id]
     : undefined;
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-3 pb-28">
+    <div className="mx-auto flex h-[calc(100dvh-var(--app-nav-height))] max-w-2xl flex-col gap-3 overflow-hidden px-5 pt-2 pb-3">
       <button
         type="button"
         onClick={() => window.history.back()}
@@ -178,7 +314,6 @@ export function ExerciseCardPage({ id }: { id: string }) {
     </div>
   );
 }
-
 /**
  * Full-screen overlay over the session; closing keeps all session state.
  * Opening pushes a history entry so the back gesture closes the sheet.
@@ -187,17 +322,20 @@ export function ExerciseSheet({
   exercise,
   side = 'right',
   onClose,
+  loadIndex,
 }: {
   exercise: Exercise;
   side?: 'right' | 'left';
+  loadIndex?: number;
   onClose(): void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
-
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     ref.current?.focus();
     window.history.pushState({ sheet: true }, '');
     const onPop = () => closeRef.current();
@@ -214,7 +352,7 @@ export function ExerciseSheet({
       if (e.key !== 'Tab') return;
       const items = [
         ...root.querySelectorAll<HTMLElement>(
-          'a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])',
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
         ),
       ];
       const first = items[0];
@@ -236,13 +374,12 @@ export function ExerciseSheet({
     return () => {
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('popstate', onPop);
+      document.body.style.overflow = oldOverflow;
       previous?.focus?.();
     };
   }, []);
-
   // Closing goes through history so the pushed entry is consumed.
   const close = () => window.history.back();
-
   return (
     <div
       ref={ref}
@@ -250,10 +387,10 @@ export function ExerciseSheet({
       aria-modal="true"
       aria-label={exercise.name}
       tabIndex={-1}
-      className="fixed inset-0 z-50 overflow-y-auto bg-paper outline-none"
+      className="fixed inset-0 z-50 flex h-dvh flex-col overflow-hidden bg-paper outline-none"
     >
       <div className="sticky top-0 z-10 border-b-[3px] border-ink bg-paper">
-        <div className="mx-auto flex max-w-md justify-end px-5 py-1">
+        <div className="mx-auto flex max-w-2xl justify-end px-5 py-1">
           <button
             type="button"
             onClick={close}
@@ -263,9 +400,12 @@ export function ExerciseSheet({
           </button>
         </div>
       </div>
-      <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-4 pb-8">
-        <ExerciseCardBody exercise={exercise} side={side} />
-        <Button onClick={close}>Tillbaka till passet</Button>
+      <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <ExerciseCardBody
+          exercise={exercise}
+          side={side}
+          loadIndex={loadIndex}
+        />
       </div>
     </div>
   );

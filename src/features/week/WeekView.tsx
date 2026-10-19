@@ -247,7 +247,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         />
       ) : null}
 
-      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
         {active ? (
           <Link

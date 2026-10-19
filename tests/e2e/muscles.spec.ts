@@ -94,9 +94,7 @@ test('muscle highlights have a text alternative and respect reduced motion', asy
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/ovning/dead-bug');
-  await expect(
-    page.getByRole('heading', { name: 'Tränar främst', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText(/^Tränar främst:/)).toBeVisible();
   await expect(page.getByText('Start', { exact: true })).toBeVisible();
   await expect(page.getByText('Slut', { exact: true })).toBeVisible();
   await expect(

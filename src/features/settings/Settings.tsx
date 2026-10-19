@@ -16,6 +16,7 @@ import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
 import { shareOrDownload } from '../../lib/share';
 import { type StorageStatus, storageStatus } from '../../lib/storage';
+import { APP_COMMIT, APP_VERSION } from '../../lib/version';
 import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
@@ -477,7 +478,10 @@ function VersionSection() {
           </Button>
         </>
       ) : (
-        <p className={note}>Du har den senaste versionen.</p>
+        <>
+          <p className="m-0 text-base font-bold">Version {APP_VERSION}</p>
+          <p className={note}>Bygge {APP_COMMIT}</p>
+        </>
       )}
     </Section>
   );

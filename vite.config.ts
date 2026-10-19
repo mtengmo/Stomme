@@ -2,6 +2,10 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import packageInfo from './package.json' with { type: 'json' };
+import { buildVersion } from './scripts/buildVersion';
+
+const build = buildVersion(packageInfo.version);
 
 /** Content-Security-Policy for the production build only (dev needs inline HMR scripts). */
 const CSP =
@@ -9,6 +13,10 @@ const CSP =
 
 export default defineConfig({
   base: process.env.VITE_BASE ?? '/',
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(build.version),
+    'import.meta.env.VITE_APP_COMMIT': JSON.stringify(build.commit),
+  },
   plugins: [
     react(),
     {

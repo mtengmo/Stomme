@@ -5,6 +5,8 @@ import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
 import { FloorLine, Held, PropShape } from './props';
 
+export type Equipment = 'dumbbell' | 'kettlebell' | null;
+
 export type Working = 'right' | 'left';
 
 export function lerpPose(a: Pose, b: Pose, t: number): Pose {
@@ -44,15 +46,51 @@ export function FigureFrame({
   pose,
   working = 'right',
   showMuscles = false,
+  equipment,
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
   /** null: two-sided exercise, no marker and no accent colour. */
   working?: Working | null;
   showMuscles?: boolean;
+  equipment?: Equipment;
 }) {
   const spec = figures[exerciseId];
-  const p = pose;
+  let p = pose;
+  // With external load, hands carry it rather than resting on the support.
+  if (
+    equipment &&
+    (exerciseId === 'split-squat' || exerciseId === 'single-leg-calf-raise')
+  ) {
+    p = {
+      ...pose,
+      eR: [pose.neck[0] + 6, pose.neck[1] + 20],
+      hR: [pose.hip[0] + 10, pose.hip[1] + 8],
+    };
+    if (exerciseId === 'split-squat')
+      p = {
+        ...p,
+        eL: [pose.neck[0] - 8, pose.neck[1] + 20],
+        hL: [pose.hip[0] - 12, pose.hip[1] + 8],
+      };
+  }
+  if (equipment && exerciseId === 'single-leg-hip-thrust') {
+    p = {
+      ...p,
+      hR: [p.hip[0] + 5, p.hip[1] - 5],
+      hL: [p.hip[0] - 5, p.hip[1] - 5],
+    };
+  }
+  const heldKind = equipment === undefined ? spec.held?.kind : equipment;
+  const anchors: Pt[] =
+    exerciseId === 'single-leg-hip-thrust'
+      ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
+      : (
+          spec.held?.hands ??
+          (exerciseId === 'split-squat'
+            ? (['hR', 'hL'] as const)
+            : (['hR'] as const))
+        ).map((hand) => p[hand]);
   const accent = working && !showMuscles ? 'var(--blue)' : 'var(--ink)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
@@ -87,11 +125,17 @@ export function FigureFrame({
           <path d={arm(p.eR, p.hR)} />
           <path d={leg(p.kR, p.aR, p.tR)} />
         </g>
-        {spec.held
-          ? spec.held.hands.map((h) => (
-              <Held key={h} kind={spec.held?.kind ?? 'dumbbell'} at={p[h]} />
-            ))
-          : null}
+        {heldKind ? (
+          <g data-equipment={heldKind}>
+            {anchors.map((at) => (
+              <Held
+                key={at === p.hL ? 'left' : 'right'}
+                kind={heldKind}
+                at={at}
+              />
+            ))}
+          </g>
+        ) : null}
       </g>
       {working ? (
         <text
@@ -116,6 +160,7 @@ export function Figure({
   stillOnly = false,
   paused = false,
   showMuscles = false,
+  equipment,
 }: {
   exerciseId: ExerciseId;
   working?: Working | null;
@@ -124,6 +169,7 @@ export function Figure({
   paused?: boolean;
   /** Segment-attached anatomy hint, available for the reviewed prototypes. */
   showMuscles?: boolean;
+  equipment?: Equipment;
 }) {
   const reduced = usePrefersReducedMotion();
   const spec = figures[exerciseId];
@@ -157,6 +203,7 @@ export function Figure({
               exerciseId={exerciseId}
               pose={pose}
               working={working}
+              equipment={equipment}
               showMuscles={showMuscles}
             />
             <figcaption className="text-center text-base font-bold">
@@ -172,6 +219,7 @@ export function Figure({
       exerciseId={exerciseId}
       pose={reduced ? spec.start : lerpPose(spec.start, spec.end, t)}
       working={working}
+      equipment={equipment}
       showMuscles={showMuscles}
     />
   );

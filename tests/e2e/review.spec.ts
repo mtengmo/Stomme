@@ -55,7 +55,9 @@ for (const mode of [
       page.getByRole('heading', { name: /^E03 · Enbens rumänskt marklyft$/ }),
     ).toBeVisible();
     const poses = page.getByRole('region', { name: 'Rörelsens lägen' });
-    await expect(poses.getByRole('figure')).toHaveCount(6);
+    await expect(poses.getByRole('figure')).toHaveCount(1);
+    await poses.getByRole('button', { name: 'Mitt', exact: true }).click();
+    await expect(poses.getByRole('figure')).toContainText('Mitt');
     await page.screenshot({
       path: test.info().outputPath('review.png'),
       fullPage: true,
