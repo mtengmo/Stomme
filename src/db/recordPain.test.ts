@@ -63,7 +63,7 @@ async function weekOneDone() {
 }
 
 describe('recordPainReading', () => {
-  it('a red flag aborts the open session with pain_stop in one go and keeps logs', async () => {
+  it('an after red flag completes the session (not aborted) and keeps logs', async () => {
     const s = await startSession(db, 'A', W1);
     await logSet(
       db,
@@ -88,10 +88,9 @@ describe('recordPainReading', () => {
       W1,
     );
     expect(r.status).toBe('stop');
-    expect(await db.sessions.get(s.id)).toMatchObject({
-      status: 'aborted',
-      abortReason: 'pain_stop',
-    });
+    const stored = await db.sessions.get(s.id);
+    expect(stored?.status).toBe('completed');
+    expect(stored?.abortReason).toBeUndefined();
     expect(await db.setLogs.count()).toBe(1);
     expect(await listPainLogsBySession(db, s.id)).toHaveLength(1);
   });

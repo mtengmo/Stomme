@@ -99,9 +99,11 @@ describe('pain picker', () => {
       await screen.findByRole('heading', { name: /efter passet/ }),
     ).toBeTruthy();
     await answerPain(user, 2);
+    // Saving the 'after' reading finishes the session: summary with a way home.
     expect(
-      await screen.findByRole('button', { name: 'Avsluta pass' }),
+      await screen.findByRole('link', { name: 'Till veckan' }),
     ).toBeTruthy();
+    expect((await getDb().sessions.get(s.id))?.status).toBe('completed');
   });
 });
 
@@ -382,19 +384,20 @@ describe('safety gates', () => {
     );
   });
 
-  it('an after red flag aborts with pain_stop and the banner follows', async () => {
+  it('an after red flag keeps the session completed and the banner follows', async () => {
     const user = userEvent.setup();
     const s = await openSession({ before: 1, skipAll: true });
     window.location.hash = `#/session/${s.id}`;
     render(<App />);
     await answerPain(user, 2, ['Svullnad']);
     expect(
-      await screen.findByRole('heading', { name: 'Avbryt passet.' }),
+      await screen.findByRole('heading', {
+        name: 'Passet är klart. Fråga fysioterapeuten innan nästa pass.',
+      }),
     ).toBeTruthy();
-    expect(await getDb().sessions.get(s.id)).toMatchObject({
-      status: 'aborted',
-      abortReason: 'pain_stop',
-    });
+    const stored = await getDb().sessions.get(s.id);
+    expect(stored?.status).toBe('completed');
+    expect(stored?.abortReason).toBeUndefined();
     await user.click(screen.getByRole('button', { name: 'Till veckan' }));
     expect(
       await screen.findByText(/Senast stoppade du på grund av knäet/),
@@ -412,7 +415,7 @@ describe('safety gates', () => {
     ).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Gå vidare' }));
     expect(
-      await screen.findByRole('button', { name: 'Avsluta pass' }),
+      await screen.findByRole('link', { name: 'Till veckan' }),
     ).toBeTruthy();
   });
 

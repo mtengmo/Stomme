@@ -71,7 +71,12 @@ export async function playPassA(
     if (name === 'Spara') {
       await once('pain-after');
       await answerPain(page, 0);
-      continue;
+      // Saving the 'after' reading finishes the session and shows the summary.
+      const home = page.getByRole('link', { name: 'Till veckan' });
+      await home.waitFor();
+      await once('summary');
+      await home.click();
+      break;
     }
 
     if (name === 'Avsluta pass') {

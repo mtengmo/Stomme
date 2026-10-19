@@ -131,9 +131,12 @@ type Outcome =
 /** Stop screen: an ink field with paper text (no red), clearly unlike the warn screen. */
 export function StopScreen({
   dayAfter = false,
+  afterSession = false,
   onHome,
 }: {
   dayAfter?: boolean;
+  /** Red flag in the 'after' reading: the session is already complete. */
+  afterSession?: boolean;
   onHome(): void;
 }) {
   return (
@@ -142,9 +145,13 @@ export function StopScreen({
         <div className="flex flex-1 flex-col gap-4 pt-10">
           <Icon name="stop" size={64} />
           <h1 className="m-0 text-6xl leading-none font-extrabold">
-            {dayAfter ? PAIN_COPY.stopTitleDayAfter : PAIN_COPY.stopTitle}
+            {dayAfter
+              ? PAIN_COPY.stopTitleDayAfter
+              : afterSession
+                ? PAIN_COPY.stopTitleAfter
+                : PAIN_COPY.stopTitle}
           </h1>
-          {dayAfter ? null : (
+          {dayAfter || afterSession ? null : (
             <>
               <p className="m-0 text-2xl font-bold">{PAIN_COPY.stopBody}</p>
               <p className="m-0 text-xl">Det du hunnit logga sparas.</p>
@@ -273,6 +280,7 @@ export function PainScreen({
     return (
       <StopScreen
         dayAfter={timing === 'dayAfter'}
+        afterSession={timing === 'after'}
         onHome={() => navigate('/')}
       />
     );

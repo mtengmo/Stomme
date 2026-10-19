@@ -1,14 +1,19 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { resultLine, SEE_PHYSIO, suggestionReason } from '../../content/copy';
+import {
+  PAIN_COPY,
+  resultLine,
+  SEE_PHYSIO,
+  suggestionReason,
+} from '../../content/copy';
 import { exercises } from '../../content/exercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import {
   getActiveSession,
-  getMeta,
   planningData,
+  programStartDate,
   startSession,
 } from '../../db/repo';
 import type { TemplateId } from '../../domain/types';
@@ -26,11 +31,12 @@ import { StopBanner } from '../pain/PainNotices';
 export function PassPreview({ id }: { id: TemplateId }) {
   const [, navigate] = useLocation();
   const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const data = useLiveQuery(async () => {
     const db = getDb();
     return {
       active: (await getActiveSession(db)) ?? null,
-      program: (await getMeta<{ startDate: string }>(db, 'program')) ?? null,
+      program: await programStartDate(db),
       planning: await planningData(db),
     };
   }, []);
@@ -38,7 +44,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
 
   const template = templates[id];
   const today = toLocalDate(new Date());
-  const week = data.program ? programWeek(data.program.startDate, today) : 1;
+  const week = data.program ? programWeek(data.program, today) : 1;
   const active = data.active;
   const before = active
     ? data.planning.painLogs.find(
@@ -74,9 +80,16 @@ export function PassPreview({ id }: { id: TemplateId }) {
       navigate(`/session/${active.id}`);
       return;
     }
+    if (starting) return;
     setStarting(true);
-    const s = await startSession(getDb(), id, new Date());
-    navigate(`/smarta/${s.id}/before`);
+    setError(null);
+    try {
+      const s = await startSession(getDb(), id, new Date());
+      navigate(`/smarta/${s.id}/before`);
+    } catch {
+      setError(PAIN_COPY.error);
+      setStarting(false);
+    }
   };
 
   return (
@@ -137,7 +150,12 @@ export function PassPreview({ id }: { id: TemplateId }) {
           );
         })}
       </ol>
-      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[4.2rem] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+        {error ? (
+          <p role="alert" className="m-0 text-base font-bold">
+            {error}
+          </p>
+        ) : null}
         {active ? (
           <Button onClick={start}>Fortsätt passet</Button>
         ) : (

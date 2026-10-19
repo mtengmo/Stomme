@@ -21,7 +21,7 @@ test('pain before -> session -> pain after with ok', async ({ page }) => {
     page.getByRole('heading', { name: /efter passet/ }),
   ).toBeVisible();
   await answerPain(page, 2);
-  await page.getByRole('button', { name: 'Avsluta pass' }).click();
+  await page.getByRole('link', { name: 'Till veckan' }).click();
   await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
 });
 

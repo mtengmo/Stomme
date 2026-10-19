@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: crafted JSON mutations
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { exercises } from '../content/exercises';
@@ -234,5 +235,82 @@ describe('backup', () => {
     });
     const ok = { ...bad, painLogs: [painLog('p9', 's2')] };
     await expect(importAll(db, text(ok))).resolves.toBeDefined();
+  });
+
+  describe('crafted files', () => {
+    const reject = async (mutate: (b: Record<string, any>) => void) => {
+      const b = JSON.parse(text(await valid()));
+      mutate(b);
+      await expect(importAll(db, JSON.stringify(b))).rejects.toMatchObject({
+        code: 'invalid',
+      });
+    };
+    it.each([
+      [
+        'program.startDate is a number',
+        (b: any) => (b.meta = [{ key: 'program', value: { startDate: 5 } }]),
+      ],
+      [
+        'program.startDate is not a real date',
+        (b: any) =>
+          (b.meta = [{ key: 'program', value: { startDate: '2026-13-45' } }]),
+      ],
+      [
+        'backup.lastExportAt is garbage',
+        (b: any) =>
+          (b.meta = [{ key: 'backup', value: { lastExportAt: 'garbage' } }]),
+      ],
+      [
+        'onboarding.acceptedAt has an offset',
+        (b: any) =>
+          (b.meta = [
+            {
+              key: 'onboarding',
+              value: { acceptedAt: '2026-10-01T00:00:00+02:00' },
+            },
+          ]),
+      ],
+      [
+        'plan.sets is 100000',
+        (b: any) => (b.sessions[0].plan[0].sets = 100000),
+      ],
+      ['plan.target is 601', (b: any) => (b.sessions[0].plan[0].target = 601)],
+      [
+        'plan.reason is unknown',
+        (b: any) => (b.sessions[0].plan[0].reason = 'free text'),
+      ],
+      [
+        'session.date is not real',
+        (b: any) => (b.sessions[0].date = '2026-02-30'),
+      ],
+      [
+        'startedAt has an offset',
+        (b: any) => (b.sessions[0].startedAt = '2026-10-19T08:00:00+02:00'),
+      ],
+      [
+        'loggedAt has an offset',
+        (b: any) => (b.setLogs[0].loggedAt = '2026-10-19T08:00:00+02:00'),
+      ],
+    ])('rejects when %s', async (_n, m) => {
+      await reject(m);
+    });
+    it('accepts valid meta shapes', async () => {
+      const b = JSON.parse(text(await valid()));
+      b.meta = [
+        { key: 'program', value: { startDate: '2026-10-12' } },
+        {
+          key: 'onboarding',
+          value: { acceptedAt: '2026-10-01T00:00:00.000Z' },
+        },
+        {
+          key: 'backup',
+          value: {
+            lastExportAt: '2026-10-02T00:00:00.000Z',
+            snoozedUntil: '2026-10-09T00:00:00.000Z',
+          },
+        },
+      ];
+      await expect(importAll(db, JSON.stringify(b))).resolves.toBeDefined();
+    });
   });
 });

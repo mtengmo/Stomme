@@ -4,10 +4,11 @@ import type {
   ExerciseId,
   MetaEntry,
   PainLog,
+  ReasonCode,
   Session,
   SetLog,
 } from '../domain/types';
-import { toLocalDate } from '../lib/dates';
+import { isRealDate, toLocalDate } from '../lib/dates';
 import { type ShareResult, shareOrDownload } from '../lib/share';
 import type { StommeDB } from './db';
 import { setMeta } from './repo';
@@ -100,8 +101,25 @@ const exerciseIds = exerciseList.map((e) => e.id) as [
 ];
 const exerciseIdSchema = z.enum(exerciseIds);
 const id = z.string().min(1).max(100);
-const localDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-const instant = z.iso.datetime({ offset: true });
+const localDate = z.string().refine(isRealDate, { message: 'not a real date' });
+/** UTC instants only (trailing Z), as toISOString writes them. */
+const instant = z.iso.datetime();
+
+const reasonCodes = [
+  'first_time',
+  'week1_bodyweight',
+  'start_load',
+  'added_set',
+  'increase_amount',
+  'next_load',
+  'hold_incomplete',
+  'hold_hard',
+  'hold_not_easy_at_max',
+  'hold_waiting_for_3_sets',
+  'max_level',
+  'pain_hold',
+  'pain_stop_hold',
+] as const satisfies readonly ReasonCode[];
 const count = z.number().int().min(0).max(100_000);
 
 function loadIndexFor(exerciseId: ExerciseId) {
@@ -113,12 +131,12 @@ function loadIndexFor(exerciseId: ExerciseId) {
 const plannedExercise = z
   .strictObject({
     exerciseId: exerciseIdSchema,
-    sets: count,
-    target: z.number().min(0).max(100_000),
+    sets: z.number().int().min(0).max(20),
+    target: z.number().min(0).max(600),
     loadIndex: count,
     weightKg: z.number().min(0).max(1000),
     restSec: count,
-    reason: z.string().min(1).max(40),
+    reason: z.enum(reasonCodes),
   })
   .superRefine((p, ctx) => {
     if (!loadIndexFor(p.exerciseId).safeParse(p.loadIndex).success) {
@@ -180,10 +198,23 @@ const painLogSchema = z.strictObject({
   createdAt: instant,
 });
 
-const metaSchema = z.strictObject({
-  key: z.enum(['program', 'onboarding', 'backup']),
-  value: z.json(),
-});
+const metaSchema = z.discriminatedUnion('key', [
+  z.strictObject({
+    key: z.literal('program'),
+    value: z.strictObject({ startDate: localDate }),
+  }),
+  z.strictObject({
+    key: z.literal('onboarding'),
+    value: z.strictObject({ acceptedAt: instant }),
+  }),
+  z.strictObject({
+    key: z.literal('backup'),
+    value: z.strictObject({
+      lastExportAt: instant.optional(),
+      snoozedUntil: instant.optional(),
+    }),
+  }),
+]);
 
 const backupSchema = z.strictObject({
   schemaVersion: z.literal(BACKUP_SCHEMA_VERSION),

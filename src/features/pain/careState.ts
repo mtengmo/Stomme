@@ -36,8 +36,14 @@ export function careState(
     return d ? assessReading(d, dayAfterReference(own)) : undefined;
   };
   const latestDay = latest ? dayAfterOf(latest) : undefined;
+  // A red flag in the 'after' reading keeps the session completed but still
+  // holds the next plan, so it shows the stop banner like the other stops.
+  const after = latest
+    ? logsOf(latest).find((p) => p.timing === 'after')
+    : undefined;
   const stopBanner =
     (latest?.status === 'aborted' && latest.abortReason === 'pain_stop') ||
+    (after !== undefined && assessReading(after).status === 'stop') ||
     latestDay?.status === 'stop';
   const dayAfterDue = sorted.find((s) =>
     shouldPromptDayAfter(s, logsOf(s), today, sessions),

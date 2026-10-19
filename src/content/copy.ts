@@ -125,6 +125,7 @@ export const PAIN_COPY = {
   pickFirst: 'Välj ett värde först',
   stopTitle: 'Avbryt passet.',
   stopTitleDayAfter: 'Fråga fysioterapeuten innan nästa pass.',
+  stopTitleAfter: 'Passet är klart. Fråga fysioterapeuten innan nästa pass.',
   stopAbortKnee: 'Avbryt på grund av knäet',
   stopBody: 'Fråga fysioterapeuten.',
   stopDone: 'Till veckan',

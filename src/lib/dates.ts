@@ -6,6 +6,20 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+/** True for YYYY-MM-DD strings that are real calendar dates (not 2026-13-45). */
+export function isRealDate(date: unknown): date is string {
+  if (typeof date !== 'string') return false;
+  const m = DATE_RE.exec(date);
+  if (!m) return false;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const t = new Date(Date.UTC(y, mo - 1, d));
+  return (
+    t.getUTCFullYear() === y &&
+    t.getUTCMonth() === mo - 1 &&
+    t.getUTCDate() === d
+  );
+}
+
 /** Local date of an instant, as YYYY-MM-DD. */
 export function toLocalDate(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;

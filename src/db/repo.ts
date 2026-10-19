@@ -10,7 +10,7 @@ import type {
   SetLog,
   TemplateId,
 } from '../domain/types';
-import { toLocalDate } from '../lib/dates';
+import { isRealDate, toLocalDate } from '../lib/dates';
 import { requestPersistence } from '../lib/storage';
 import type { PlanningData } from '../rules/nextPlan';
 import { buildPlan, wallSitPlan } from '../rules/nextPlan';
@@ -96,9 +96,9 @@ export async function startSession(
       const active = await getActiveSession(db);
       if (active) return active;
       const today = toLocalDate(now);
-      const program = await getMeta<{ startDate: string }>(db, 'program');
-      const startDate = program?.startDate ?? today;
-      if (!program) await setMeta(db, 'program', { startDate });
+      const known = await programStartDate(db);
+      const startDate = known ?? today;
+      if (!known) await setMeta(db, 'program', { startDate });
       const week = programWeek(startDate, today);
       const data = await planningData(db);
       const session: Session = {
@@ -115,6 +115,20 @@ export async function startSession(
       return session;
     },
   );
+}
+
+/**
+ * The programme start date, defensively: a valid stored date wins; if the
+ * meta is missing or bad but sessions exist, the earliest session date, so
+ * the programme week never silently drops back to 1. Null on a fresh install.
+ */
+export async function programStartDate(db: StommeDB): Promise<string | null> {
+  const program = await getMeta<{ startDate?: unknown }>(db, 'program');
+  if (isRealDate(program?.startDate)) return program.startDate;
+  const dates = (await db.sessions.toArray())
+    .map((s) => s.date)
+    .filter(isRealDate);
+  return dates.length > 0 ? dates.reduce((a, b) => (a < b ? a : b)) : null;
 }
 
 /** Everything the progression rules read, in one go. */
@@ -224,20 +238,41 @@ export async function setFeedback(
   });
 }
 
+/**
+ * Completes an open session. A session left open from an earlier day is
+ * stamped with its last logged activity (not 
+ow), so durations stay honest.
+ */
 export async function finishSession(
   db: StommeDB,
   sessionId: string,
   now: Date,
 ): Promise<void> {
-  await db.transaction('rw', db.sessions, async () => {
-    await requireOpen(db, sessionId);
-    await db.sessions.update(sessionId, {
-      status: 'completed',
-      finishedAt: now.toISOString(),
-    });
+  await db.transaction('rw', [db.sessions, db.setLogs], async () => {
+    await completeOpenSession(db, sessionId, now);
   });
   // Best effort, outside the transaction: ask the browser to keep our data.
   void requestPersistence();
+}
+
+async function completeOpenSession(
+  db: StommeDB,
+  sessionId: string,
+  now: Date,
+): Promise<void> {
+  const s = await requireOpen(db, sessionId);
+  let finishedAt = now.toISOString();
+  if (s.date < toLocalDate(now)) {
+    const logs = await db.setLogs
+      .where('sessionId')
+      .equals(sessionId)
+      .toArray();
+    finishedAt = logs.reduce(
+      (latest, l) => (l.loggedAt > latest ? l.loggedAt : latest),
+      s.startedAt,
+    );
+  }
+  await db.sessions.update(sessionId, { status: 'completed', finishedAt });
 }
 
 /** Ends a session early; logged sets are kept. */
@@ -409,7 +444,13 @@ export async function recordPainReading(
         mine ?? { ...input, score: Number.NaN },
         input.timing === 'dayAfter' ? dayAfterReference(readings) : undefined,
       );
-      if (result.status === 'stop' && s.status === 'in_progress') {
+      if (input.timing === 'after' && s.status === 'in_progress') {
+        // The session is over: an 'after' reading finishes it. A red flag here
+        // keeps it completed (like the day-after case); the stop banner and the
+        // held next plan come from the reading itself.
+        await completeOpenSession(db, s.id, now);
+        void requestPersistence();
+      } else if (result.status === 'stop' && s.status === 'in_progress') {
         await abortSession(db, s.id, now, 'pain_stop');
       } else if (input.timing === 'before') {
         await replanSession(db, s.id);
