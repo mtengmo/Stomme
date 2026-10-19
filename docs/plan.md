@@ -165,7 +165,7 @@ suggestNext(ex, templateSets, programWeek, last?)
 ```
 Algorithm in order; never change more than one variable (sets, amount, load) per step:
 1. programWeek 1: `week1LoadIndex`, `range.start`, template sets (`first_time`/`week1_bodyweight`).
-2. No `last`: week-appropriate load (start load from week 2), `range.start`, `setsForWeek` (`first_time`).
+2. No `last`: week-appropriate load (start load from week 2), `range.start`, `setsForWeek` (`first_time`). Exception (section 12, item 13): a knee-loaded exercise with any pain on record uses the week-1 load and template sets with `pain_hold`/`pain_stop_hold`.
 3. Pain gate, only if `kneeLoaded`: `stop` -> repeat last plan, `pain_stop_hold`, `seePhysio=true`; `warn` -> repeat last plan, `pain_hold`. Also blocks week-based set increase. Never lowers load automatically.
 4. Last session week 1 and now week 2+: switch to start load, reset to `range.start` (`start_load`).
 5. `setsForWeek` > last sets: add set, keep amount/load (`added_set`).
