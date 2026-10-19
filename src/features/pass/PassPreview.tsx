@@ -75,10 +75,17 @@ export function PassPreview({ id }: { id: TemplateId }) {
           const ex = exercises[p.exerciseId];
           return (
             <li key={p.exerciseId} className="border-b-2 border-edge py-3">
-              <p className="m-0 text-lg leading-tight font-bold">{ex.name}</p>
-              <p className="count m-0 mt-1 text-2xl text-ink">
-                {prescriptionText(p, ex)}
-              </p>
+              <Link
+                href={`/ovning/${ex.id}`}
+                className="block min-h-12 text-ink no-underline"
+              >
+                <span className="block text-lg leading-tight font-bold underline decoration-2 underline-offset-4">
+                  {ex.name}
+                </span>
+                <span className="count mt-1 block text-2xl">
+                  {prescriptionText(p, ex)}
+                </span>
+              </Link>
             </li>
           );
         })}

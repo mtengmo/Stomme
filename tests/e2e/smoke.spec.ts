@@ -41,3 +41,17 @@ test('skipping an exercise moves on and shows it as skipped in the tally', async
   await skipFirstExercise(page, async () => {});
   await expect(page.getByRole('img', { name: /set klara/ })).toBeVisible();
 });
+
+test('the exercise sheet opens and closes without losing the set screen', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.getByRole('button', { name: 'Starta pass' }).click();
+  await page.getByRole('button', { name: 'Hur gör man?' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button', { name: 'Stäng' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
+});

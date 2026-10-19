@@ -2,14 +2,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Route, Router, Switch, useLocation } from 'wouter';
 import { useHashLocation } from 'wouter/use-hash-location';
 import { getDb } from './db/db';
+import { ExerciseCardPage } from './features/exercise/ExerciseCard';
+import { FigureDev } from './features/exercise/FigureDev';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
-import {
-  ExerciseStub,
-  HistoryStub,
-  SettingsStub,
-} from './features/stubs/Stubs';
+import { HistoryStub, SettingsStub } from './features/stubs/Stubs';
 import { WeekView } from './features/week/WeekView';
 import { BottomNav } from './ui/BottomNav';
 
@@ -50,7 +48,12 @@ function Shell() {
           <Route path="/session/:id">
             {(params) => <SessionScreen id={params.id} />}
           </Route>
-          <Route path="/ovning/:id" component={ExerciseStub} />
+          <Route path="/ovning/:id">
+            {(params) => <ExerciseCardPage id={params.id} />}
+          </Route>
+          {import.meta.env.DEV ? (
+            <Route path="/dev/figurer">{() => <FigureDev />}</Route>
+          ) : null}
           <Route path="/historik" component={HistoryStub} />
           <Route path="/installningar" component={SettingsStub} />
           <Route>{() => <WeekView />}</Route>

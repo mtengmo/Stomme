@@ -1,0 +1,62 @@
+// @vitest-environment jsdom
+import 'fake-indexeddb/auto';
+import { cleanup, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { App } from '../../App';
+import { exercises } from '../../content/exercises';
+import { getDb } from '../../db/db';
+import { setMeta } from '../../db/repo';
+import { ExerciseCardBody } from './ExerciseCard';
+
+beforeEach(async () => {
+  window.location.hash = '#/';
+  await getDb().delete();
+  await getDb().open();
+  await setMeta(getDb(), 'onboarding', { acceptedAt: '2026-10-01T00:00:00Z' });
+});
+afterEach(() => cleanup());
+
+describe('ExerciseCardBody', () => {
+  it('shows name, three tips, mistake and easier variant', () => {
+    const ex = exercises['dead-bug'];
+    render(<ExerciseCardBody exercise={ex} />);
+    expect(screen.getByRole('heading', { name: ex.name })).toBeTruthy();
+    for (const t of ex.tips) expect(screen.getByText(t)).toBeTruthy();
+    expect(screen.getByText('Vanligt fel')).toBeTruthy();
+    expect(screen.getByText('Enklare variant')).toBeTruthy();
+    expect(screen.queryByText(/Fråga fysioterapeuten/)).toBeNull();
+  });
+
+  it('has the physio footnote only for step-up and split squat', () => {
+    for (const id of ['step-up', 'split-squat'] as const) {
+      const { unmount } = render(<ExerciseCardBody exercise={exercises[id]} />);
+      expect(screen.getByText(/Fråga fysioterapeuten/)).toBeTruthy();
+      unmount();
+    }
+    render(<ExerciseCardBody exercise={exercises['wall-sit']} />);
+    expect(screen.queryByText(/Fråga fysioterapeuten/)).toBeNull();
+  });
+});
+
+describe('"Hur gör man?" sheet', () => {
+  it('keeps the stepper value when opened and closed', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/pass/A';
+    render(<App />);
+    await user.click(
+      await screen.findByRole('button', { name: 'Starta pass' }),
+    );
+    await screen.findByText('Set 1 av 2');
+    await user.click(screen.getByRole('button', { name: 'Öka antal' }));
+    const before = screen.getByText('11');
+    expect(before).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getAllByRole('listitem').length).toBeGreaterThan(3);
+    await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByText('11')).toBeTruthy();
+  });
+});

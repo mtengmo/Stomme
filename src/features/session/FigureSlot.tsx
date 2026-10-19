@@ -1,13 +1,21 @@
-/** Placeholder for the exercise figure (M3). Shows the working-side letter. */
-export function FigureSlot({ letter }: { letter: string }) {
+import type { ExerciseId } from '../../domain/types';
+import { Figure } from '../../figures/Figure';
+
+/** The animated exercise figure; left sets mirror the working side to V. */
+export function FigureSlot({
+  exerciseId,
+  side,
+}: {
+  exerciseId: ExerciseId;
+  side: 'right' | 'left' | 'both';
+}) {
   return (
-    <div
-      aria-hidden="true"
-      className="grid size-20 shrink-0 place-items-center rounded-md border-[3px] border-edge"
-    >
-      {letter ? (
-        <span className="count text-5xl leading-none text-blue">{letter}</span>
-      ) : null}
+    <div className="size-32 shrink-0">
+      <Figure
+        exerciseId={exerciseId}
+        working={side === 'left' ? 'left' : 'right'}
+        stillOnly
+      />
     </div>
   );
 }
