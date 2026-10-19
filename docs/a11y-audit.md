@@ -33,4 +33,8 @@ Re-run:
 - The amber "today" fill against paper is 1.69:1 in light. It is never the only signal: today also has a 2 px ink outline (13:1), bold text and `aria-current="date"`, and the week card chip adds the sun icon and the word Idag.
 - Day squares (44 px) and tally circles are not interactive, so the 48 px target rule does not apply to them.
 - Screen reader behaviour (TalkBack) was reviewed through roles and names only, not on a device.
-- The `warn` tone of `Banner` still uses a red outline; it is not used by the M6 screens. Under the "red means done" rule this should be revisited when it is next used.
+- Resolved: the `warn` tone of `Banner` is now an ink outline and ink icon (no red), so red means done only.
+
+## Re-run (2026-10-19, after the review fixes)
+
+`scripts/contrast.ts`: all pairs pass in light and dark. `scripts/a11y-audit.ts`: 34 screen audits, no findings (targets, text size, names, focus rings, reduced motion, dialog keyboard).
