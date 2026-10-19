@@ -5,19 +5,27 @@ import { useHashLocation } from 'wouter/use-hash-location';
 import { getDb } from './db/db';
 import { ExerciseCardPage } from './features/exercise/ExerciseCard';
 import { FigureDev } from './features/exercise/FigureDev';
-import { History } from './features/history/History';
 import { SessionDetail } from './features/history/SessionDetail';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { isTiming, PainScreen, StopScreen } from './features/pain/PainScreen';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
-import { Settings } from './features/settings/Settings';
 import { UpdateContext, useUpdate } from './features/settings/updateContext';
 import { WeekView } from './features/week/WeekView';
 import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
 import { BottomNav } from './ui/BottomNav';
 import { Button } from './ui/Button';
+
+// Heavier routes load on demand to keep the first load small.
+const History = lazy(() =>
+  import('./features/history/History').then((m) => ({ default: m.History })),
+);
+const Settings = lazy(() =>
+  import('./features/settings/Settings').then((m) => ({
+    default: m.Settings,
+  })),
+);
 
 // DEV-only synthetic data helper; absent from the production bundle.
 const DemoSeed = import.meta.env.DEV
@@ -80,55 +88,57 @@ function Shell() {
         </div>
       ) : null}
       <main>
-        <Switch>
-          <Route path="/">{() => <WeekView />}</Route>
-          <Route path="/pass/:id">
-            {(params) =>
-              params.id === 'A' || params.id === 'B' ? (
-                <PassPreview id={params.id} />
-              ) : (
-                <UnknownPass />
-              )
-            }
-          </Route>
-          <Route path="/session/:id">
-            {(params) => <SessionScreen id={params.id} />}
-          </Route>
-          <Route path="/smarta/:sessionId/:timing">
-            {(params) =>
-              isTiming(params.timing) ? (
-                <PainScreen
-                  sessionId={params.sessionId}
-                  timing={params.timing}
-                />
-              ) : (
-                <UnknownPass />
-              )
-            }
-          </Route>
-          <Route path="/stopp/:sessionId">{() => <StopRoute />}</Route>
-          <Route path="/ovning/:id">
-            {(params) => <ExerciseCardPage id={params.id} />}
-          </Route>
-          {import.meta.env.DEV ? (
-            <Route path="/dev/figurer">{() => <FigureDev />}</Route>
-          ) : null}
-          {DemoSeed ? (
-            <Route path="/dev/demo">
-              {() => (
-                <Suspense fallback={null}>
-                  <DemoSeed />
-                </Suspense>
-              )}
+        <Suspense fallback={null}>
+          <Switch>
+            <Route path="/">{() => <WeekView />}</Route>
+            <Route path="/pass/:id">
+              {(params) =>
+                params.id === 'A' || params.id === 'B' ? (
+                  <PassPreview id={params.id} />
+                ) : (
+                  <UnknownPass />
+                )
+              }
             </Route>
-          ) : null}
-          <Route path="/historik">{() => <History />}</Route>
-          <Route path="/historik/:id">
-            {(params) => <SessionDetail id={params.id} />}
-          </Route>
-          <Route path="/installningar">{() => <Settings />}</Route>
-          <Route>{() => <WeekView />}</Route>
-        </Switch>
+            <Route path="/session/:id">
+              {(params) => <SessionScreen id={params.id} />}
+            </Route>
+            <Route path="/smarta/:sessionId/:timing">
+              {(params) =>
+                isTiming(params.timing) ? (
+                  <PainScreen
+                    sessionId={params.sessionId}
+                    timing={params.timing}
+                  />
+                ) : (
+                  <UnknownPass />
+                )
+              }
+            </Route>
+            <Route path="/stopp/:sessionId">{() => <StopRoute />}</Route>
+            <Route path="/ovning/:id">
+              {(params) => <ExerciseCardPage id={params.id} />}
+            </Route>
+            {import.meta.env.DEV ? (
+              <Route path="/dev/figurer">{() => <FigureDev />}</Route>
+            ) : null}
+            {DemoSeed ? (
+              <Route path="/dev/demo">
+                {() => (
+                  <Suspense fallback={null}>
+                    <DemoSeed />
+                  </Suspense>
+                )}
+              </Route>
+            ) : null}
+            <Route path="/historik">{() => <History />}</Route>
+            <Route path="/historik/:id">
+              {(params) => <SessionDetail id={params.id} />}
+            </Route>
+            <Route path="/installningar">{() => <Settings />}</Route>
+            <Route>{() => <WeekView />}</Route>
+          </Switch>
+        </Suspense>
       </main>
       {inSession ? null : <BottomNav />}
     </>

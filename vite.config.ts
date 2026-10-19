@@ -3,10 +3,24 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+/** Content-Security-Policy for the production build only (dev needs inline HMR scripts). */
+const CSP =
+  "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'";
+
 export default defineConfig({
   base: process.env.VITE_BASE ?? '/',
   plugins: [
     react(),
+    {
+      name: 'stomme-csp',
+      transformIndexHtml(html, ctx) {
+        if (ctx.server) return html;
+        return html.replace(
+          '<title>',
+          `<meta http-equiv="Content-Security-Policy" content="${CSP}" />\n    <title>`,
+        );
+      },
+    },
     tailwindcss(),
     // Offline basics (M2.7): precache the build and serve index.html for
     // navigations. Manifest (M6.1); updates wait for the M6 prompt.
