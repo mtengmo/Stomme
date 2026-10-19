@@ -77,10 +77,11 @@ try {
       await page.getByRole('button', { name: 'Radera passet' }).click();
       await page.getByRole('button', { name: 'Ja, radera passet' }).waitFor();
       await page.waitForTimeout(200);
-      await page.screenshot({
-        path: `${OUT}/${tag}-confirm.png`,
-        fullPage: true,
-      });
+      await page
+        .getByRole('button', { name: 'Behåll passet' })
+        .evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await page.waitForTimeout(150);
+      await page.screenshot({ path: `${OUT}/${tag}-confirm.png` });
       await ctx.close();
     }
   }

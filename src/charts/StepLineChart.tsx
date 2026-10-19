@@ -65,7 +65,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
     : 'Inget loggat än.';
 
   const chips = (
-    <fieldset className="m-0 -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-2 border-0">
+    <fieldset className="m-0 min-w-0 -mx-5 flex snap-x gap-2 overflow-x-auto px-5 pb-2 border-0">
       <legend className="sr-only">Välj övning</legend>
       {exerciseIds.map((e) => {
         const on = e === id;
