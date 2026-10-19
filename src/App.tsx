@@ -5,6 +5,7 @@ import { getDb } from './db/db';
 import { ExerciseCardPage } from './features/exercise/ExerciseCard';
 import { FigureDev } from './features/exercise/FigureDev';
 import { Onboarding } from './features/onboarding/Onboarding';
+import { isTiming, PainScreen } from './features/pain/PainScreen';
 import { PassPreview, UnknownPass } from './features/pass/PassPreview';
 import { SessionScreen } from './features/session/SessionScreen';
 import { HistoryStub, SettingsStub } from './features/stubs/Stubs';
@@ -30,7 +31,8 @@ export function App() {
 
 function Shell() {
   const [location] = useLocation();
-  const inSession = location.startsWith('/session/');
+  const inSession =
+    location.startsWith('/session/') || location.startsWith('/smarta/');
   return (
     <>
       <main>
@@ -47,6 +49,18 @@ function Shell() {
           </Route>
           <Route path="/session/:id">
             {(params) => <SessionScreen id={params.id} />}
+          </Route>
+          <Route path="/smarta/:sessionId/:timing">
+            {(params) =>
+              isTiming(params.timing) ? (
+                <PainScreen
+                  sessionId={params.sessionId}
+                  timing={params.timing}
+                />
+              ) : (
+                <UnknownPass />
+              )
+            }
           </Route>
           <Route path="/ovning/:id">
             {(params) => <ExerciseCardPage id={params.id} />}

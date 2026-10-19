@@ -7,6 +7,7 @@ import { App } from '../../App';
 import { exercises } from '../../content/exercises';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
+import { answerPain } from '../pain/testHelpers';
 import { ExerciseCardBody } from './ExerciseCard';
 
 beforeEach(async () => {
@@ -47,6 +48,7 @@ describe('"Hur gör man?" sheet', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Starta pass' }),
     );
+    await answerPain(user, 0);
     await screen.findByText('Set 1 av 2');
     await user.click(screen.getByRole('button', { name: 'Öka antal' }));
     const before = screen.getByText('11');

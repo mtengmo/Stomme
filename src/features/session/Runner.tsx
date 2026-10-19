@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'wouter';
+import { Redirect, useLocation } from 'wouter';
 import { exercises } from '../../content/exercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
@@ -33,8 +33,8 @@ import { Summary } from './Summary';
 interface RunnerProps {
   session: Session;
   logs: SetLog[];
-  /** Latest logged set per exercise before this session, for prefill. */
-  last: Partial<Record<ExerciseId, SetLog>>;
+  /** The 'after' pain reading is in; until then the end of the plan leads to it. */
+  hasAfter: boolean;
 }
 
 interface Snack {
@@ -48,7 +48,7 @@ function sidesOf(id: ExerciseId): number {
 }
 
 /** The session state machine: one cursor over the steps derived from the plan. */
-export function Runner({ session, logs, last }: RunnerProps) {
+export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [, navigate] = useLocation();
   const steps = useMemo(
     () => buildSteps(session.plan, (id) => exercises[id]),
@@ -175,6 +175,10 @@ export function Runner({ session, logs, last }: RunnerProps) {
     );
   }
 
+  if (!step && !hasAfter) {
+    return <Redirect to={`/smarta/${session.id}/after`} />;
+  }
+
   if (!step) {
     return (
       <Summary
@@ -194,7 +198,8 @@ export function Runner({ session, logs, last }: RunnerProps) {
       .filter((l) => l.exerciseId === step.exerciseId)
       .sort((a, b) => a.loggedAt.localeCompare(b.loggedAt))
       .at(-1);
-    const prior = mine ?? last[step.exerciseId];
+    // The suggestion in the plan is the prefill; what the user logs becomes the base.
+    const prior = mine;
     return (
       <SetScreen
         key={cursor}
