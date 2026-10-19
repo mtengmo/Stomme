@@ -90,7 +90,11 @@ export function SetScreen({
         </div>
       </div>
       {cardOpen ? (
-        <ExerciseSheet exercise={exercise} onClose={() => setCardOpen(false)} />
+        <ExerciseSheet
+          exercise={exercise}
+          side={step.side === 'left' ? 'left' : 'right'}
+          onClose={() => setCardOpen(false)}
+        />
       ) : null}
 
       <div className="mt-auto flex flex-col gap-4">

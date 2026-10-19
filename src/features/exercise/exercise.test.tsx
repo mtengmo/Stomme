@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '../../App';
@@ -55,8 +61,38 @@ describe('"Hur gör man?" sheet', () => {
     await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getAllByRole('listitem').length).toBeGreaterThan(3);
+    expect(document.activeElement).toBe(dialog);
     await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
-    expect(screen.queryByRole('dialog')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByText('11')).toBeTruthy();
+  });
+
+  it('closes on Escape and on the back gesture, restoring focus', async () => {
+    const user = userEvent.setup();
+    window.location.hash = '#/pass/A';
+    render(<App />);
+    await user.click(
+      await screen.findByRole('button', { name: 'Starta pass' }),
+    );
+    await screen.findByText('Set 1 av 2');
+    const opener = screen.getByRole('button', { name: 'Hur gör man?' });
+
+    await user.click(opener);
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(document.activeElement).toBe(opener);
+
+    await user.click(opener);
+    window.history.back();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByText('Set 1 av 2')).toBeTruthy();
+  });
+
+  it('has no side marker or legend for two-sided exercises', () => {
+    render(<ExerciseCardBody exercise={exercises['wall-sit']} />);
+    expect(screen.queryByText(/och blå linje/)).toBeNull();
+    cleanup();
+    render(<ExerciseCardBody exercise={exercises['step-up']} side="left" />);
+    expect(screen.getByText(/vänster sida arbetar/)).toBeTruthy();
   });
 });

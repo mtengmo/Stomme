@@ -13,7 +13,7 @@ export function FigureSlot({
     <div className="size-32 shrink-0">
       <Figure
         exerciseId={exerciseId}
-        working={side === 'left' ? 'left' : 'right'}
+        working={side === 'both' ? null : side}
         stillOnly
       />
     </div>
