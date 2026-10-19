@@ -16,7 +16,8 @@ export function BottomNav() {
     >
       <ul className="m-0 mx-auto flex max-w-md list-none p-0">
         {tabs.map((t) => {
-          const active = location === t.href;
+          const active =
+            location === t.href || (t.href !== '/' && location.startsWith(`/`));
           return (
             <li key={t.href} className="flex-1">
               <Link
