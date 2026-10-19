@@ -12,7 +12,12 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["vite/client", "vite-plugin-pwa/client", "node"]
+    "types": [
+      "vite/client",
+      "vite-plugin-pwa/client",
+      "vite-plugin-pwa/react",
+      "node"
+    ]
   },
   "include": [
     "src",
