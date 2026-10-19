@@ -33,7 +33,7 @@ const list: Exercise[] = [
     name: 'Step-up (20–30 cm)',
     muscles: ['Framsida lår', 'Säte'],
     tips: [
-      'Höger ben jobbar hela vägen upp, sänk långsamt',
+      'Det arbetande benet jobbar hela vägen upp, sänk långsamt',
       'Hela foten på steget',
       'Skjut inte ifrån med det nedre benet',
     ],
@@ -114,7 +114,7 @@ const list: Exercise[] = [
     muscles: ['Framsida lår', 'Säte'],
     tips: [
       'Kort steg, bakre knäet mot golvet med kontroll',
-      'Höger fot fram först',
+      'Det arbetande benet står fram först',
       'Upprätt överkropp, ta stöd i vägg/stol',
     ],
     commonMistake: 'Främre knäet faller inåt eller hälen lyfter.',

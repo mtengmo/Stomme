@@ -37,6 +37,7 @@ try {
       await page.getByRole('button', { name: /Jag förstår/ }).click();
       const tag = `m3-${s.name}-${scheme}`;
       await page.goto(`${base}/#/dev/figurer`);
+      await page.addStyleTag({ content: 'nav{display:none!important}' });
       await page.waitForTimeout(400);
       await page.screenshot({
         path: `${OUT}/${tag}-figurer.png`,
@@ -44,11 +45,23 @@ try {
       });
       await page.goto(`${base}/#/ovning/step-up`);
       await page.waitForTimeout(300);
-      await page.screenshot({ path: `${OUT}/${tag}-card.png`, fullPage: true });
+      await page.screenshot({
+        path: `${OUT}/${tag}-card.png`,
+        fullPage: false,
+      });
       await page.goto(`${base}/#/pass/A`);
       await page.getByRole('button', { name: 'Starta pass' }).click();
       await page.waitForTimeout(500);
       await page.screenshot({ path: `${OUT}/${tag}-set.png` });
+      for (let i = 0; i < 30; i++) {
+        if (await page.getByText(/Vänster/).count()) break;
+        const next = page.getByRole('button', {
+          name: /^(Klar set|Hoppa över vila|Lagom)$/,
+        });
+        await next.first().click();
+        await page.waitForTimeout(150);
+      }
+      await page.screenshot({ path: `${OUT}/${tag}-left-set.png` });
       await page.getByRole('button', { name: 'Hur gör man?' }).click();
       await page.waitForTimeout(300);
       await page.screenshot({ path: `${OUT}/${tag}-sheet.png` });

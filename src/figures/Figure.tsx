@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ExerciseId } from '../domain/types';
 import { cycleProgress, lerpPt, type Pt } from './lerp';
-import { figures, POSE_KEYS, type Pose, swapSides } from './poses';
+import { figures, POSE_KEYS, type Pose } from './poses';
 import { FloorLine, Held, PropShape } from './props';
 
 export type Working = 'right' | 'left';
@@ -45,10 +45,15 @@ export function FigureFrame({
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
-  working?: Working;
+  /** null: two-sided exercise, no marker and no accent colour. */
+  working?: Working | null;
 }) {
   const spec = figures[exerciseId];
-  const p = working === 'right' ? pose : swapSides(pose);
+  const p = pose;
+  const accent = working ? 'var(--blue)' : 'var(--ink)';
+  // Left sets mirror the whole scene so the working limb keeps its geometry.
+  const mirror =
+    working === 'left' ? 'translate(192 0) scale(-1 1)' : undefined;
   const arm = (e: Pt, h: Pt) => line([p.neck, e, h]);
   const leg = (k: Pt, a: Pt, t: Pt) => line([p.hip, k, a, t]);
   return (
@@ -59,37 +64,41 @@ export function FigureFrame({
       className="block h-auto w-full"
     >
       <title>{exerciseId}</title>
-      {spec.props.map((pr) => (
-        <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
-      ))}
-      <FloorLine />
-      <g stroke="var(--edge)" {...limb}>
-        <path d={arm(p.eL, p.hL)} />
-        <path d={leg(p.kL, p.aL, p.tL)} />
+      <g transform={mirror}>
+        {spec.props.map((pr) => (
+          <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
+        ))}
+        <FloorLine />
+        <g stroke="var(--edge)" {...limb}>
+          <path d={arm(p.eL, p.hL)} />
+          <path d={leg(p.kL, p.aL, p.tL)} />
+        </g>
+        <g stroke="var(--ink)" {...limb}>
+          <path d={line([p.neck, p.hip])} />
+          <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
+        </g>
+        <g stroke={accent} {...limb}>
+          <path d={arm(p.eR, p.hR)} />
+          <path d={leg(p.kR, p.aR, p.tR)} />
+        </g>
+        {spec.held
+          ? spec.held.hands.map((h) => (
+              <Held key={h} kind={spec.held?.kind ?? 'dumbbell'} at={p[h]} />
+            ))
+          : null}
       </g>
-      <g stroke="var(--ink)" {...limb}>
-        <path d={line([p.neck, p.hip])} />
-        <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
-      </g>
-      <g stroke="var(--blue)" {...limb}>
-        <path d={arm(p.eR, p.hR)} />
-        <path d={leg(p.kR, p.aR, p.tR)} />
-      </g>
-      {spec.held
-        ? spec.held.hands.map((h) => (
-            <Held key={h} kind={spec.held?.kind ?? 'dumbbell'} at={p[h]} />
-          ))
-        : null}
-      <text
-        x="20"
-        y="58"
-        fontSize="28"
-        fontWeight="800"
-        fill="var(--blue)"
-        fontFamily="system-ui, sans-serif"
-      >
-        {working === 'right' ? 'H' : 'V'}
-      </text>
+      {working ? (
+        <text
+          x="20"
+          y="58"
+          fontSize="28"
+          fontWeight="800"
+          fill="var(--blue)"
+          fontFamily="system-ui, sans-serif"
+        >
+          {working === 'right' ? 'H' : 'V'}
+        </text>
+      ) : null}
     </svg>
   );
 }
@@ -101,7 +110,7 @@ export function Figure({
   stillOnly = false,
 }: {
   exerciseId: ExerciseId;
-  working?: Working;
+  working?: Working | null;
   /** Show only the start frame (small slots under reduced motion). */
   stillOnly?: boolean;
 }) {
