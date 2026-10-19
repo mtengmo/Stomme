@@ -14,13 +14,14 @@ export interface PainAssessment {
 
 const RANK: Record<PainStatus, number> = { ok: 0, warn: 1, stop: 2 };
 
-export function isValidScore(n: number): boolean {
-  return Number.isInteger(n) && n >= 0 && n <= 10;
+export function isValidScore(n: unknown): n is number {
+  return typeof n === 'number' && Number.isInteger(n) && n >= 0 && n <= 10;
 }
 
 /**
  * Any red flag stops; a score above 3 warns; a score higher than the
- * reference reading warns. Every applicable reason is reported.
+ * reference reading warns (day-after readings only). An invalid score warns
+ * (never ok). Every applicable reason is reported.
  */
 export function assessReading(
   r: PainReading,
@@ -29,8 +30,9 @@ export function assessReading(
   const reasons: PainReason[] = [];
   const redFlag = r.redFlags.sharp || r.redFlags.swelling || r.redFlags.locking;
   if (redFlag) reasons.push('red_flag');
+  if (!isValidScore(r.score)) reasons.push('invalid_score');
   if (r.score > PAIN_OK_MAX) reasons.push('above_threshold');
-  if (reference && r.score > reference.score) {
+  if (r.timing === 'dayAfter' && reference && r.score > reference.score) {
     reasons.push('worse_than_previous_day');
   }
   let status: PainStatus = 'ok';
@@ -72,6 +74,47 @@ export function dayAfterReference(
 }
 
 /**
+ * Pain status of one session including its day-after reading: the worst of
+ * assessSession and the latest dayAfter reading compared with the session's
+ * 'after' (fallback 'before') reading. LastResult.sessionPain must come from
+ * this (or worstPainSince), so that day-after 3 after 'after' 2 gives 'warn'.
+ */
+export function sessionPainStatus(
+  readings: readonly PainReading[],
+): PainStatus {
+  const base = assessSession(readings).status;
+  const dayAfter = latest(readings.filter((r) => r.timing === 'dayAfter'));
+  if (!dayAfter) return base;
+  const a = assessReading(dayAfter, dayAfterReference(readings));
+  return RANK[a.status] > RANK[base] ? a.status : base;
+}
+
+/**
+ * Worst pain status over every session dated on or after `sinceDate` (the
+ * date of the exercise's last session), using each session's own readings
+ * (matched on sessionId) including day-after. A session aborted for pain
+ * always counts as 'stop', even without readings.
+ */
+export function worstPainSince(
+  sessions: readonly Session[],
+  painLogs: readonly PainReading[],
+  sinceDate: string,
+): PainStatus {
+  let worst: PainStatus = 'ok';
+  for (const s of sessions) {
+    if (s.date < sinceDate) continue;
+    let status = sessionPainStatus(
+      painLogs.filter((p) => p.sessionId === s.id),
+    );
+    if (s.status === 'aborted' && s.abortReason === 'pain_stop') {
+      status = 'stop';
+    }
+    if (RANK[status] > RANK[worst]) worst = status;
+  }
+  return worst;
+}
+
+/**
  * Whether to ask for a day-after reading for `session` on local date `today`.
  * The session counts from its local start date (`session.date`). Prompt when
  * it was completed or stopped for pain, is 1-2 calendar days old, has no
@@ -97,6 +140,8 @@ export function shouldPromptDayAfter(
   );
   if (logged) return false;
   return !sessions.some(
-    (s) => s.id !== session.id && s.startedAt > session.startedAt,
+    (s) =>
+      s.id !== session.id &&
+      Date.parse(s.startedAt) > Date.parse(session.startedAt),
   );
 }

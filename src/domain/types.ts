@@ -140,4 +140,5 @@ export type PainStatus = 'ok' | 'warn' | 'stop';
 export type PainReason =
   | 'red_flag'
   | 'above_threshold'
-  | 'worse_than_previous_day';
+  | 'worse_than_previous_day'
+  | 'invalid_score';

@@ -6,7 +6,9 @@ import {
   dayAfterReference,
   isValidScore,
   type PainReading,
+  sessionPainStatus,
   shouldPromptDayAfter,
+  worstPainSince,
 } from './pain';
 
 const none = { sharp: false, swelling: false, locking: false };
@@ -196,5 +198,150 @@ describe('shouldPromptDayAfter', () => {
     });
     expect(shouldPromptDayAfter(eve, [], '2026-10-26')).toBe(true);
     expect(shouldPromptDayAfter(eve, [], '2026-10-28')).toBe(false);
+  });
+});
+
+describe('invalid scores and timing', () => {
+  it.each([Number.NaN, -1, 11, 2.5, undefined])('%s warns, never ok', (n) => {
+    const a = assessReading(rd(n as number));
+    expect(a.status).toBe('warn');
+    expect(a.reasons).toContain('invalid_score');
+  });
+  it('a red flag with an invalid score still stops', () => {
+    const a = assessReading(rd(-1, 'before', { ...none, sharp: true }));
+    expect(a.status).toBe('stop');
+  });
+  it('worse-than-reference applies to dayAfter only', () => {
+    expect(assessReading(rd(3, 'after'), rd(2, 'before')).status).toBe('ok');
+    expect(assessReading(rd(3, 'before'), rd(2, 'before')).status).toBe('ok');
+  });
+  it('assessSession order does not matter: [stop, warn]', () => {
+    const stop = rd(0, 'before', { ...none, locking: true });
+    expect(assessSession([stop, rd(5, 'after')]).status).toBe('stop');
+  });
+  it('isValidScore rejects non-numbers', () => {
+    expect(isValidScore('3')).toBe(false);
+  });
+});
+
+describe('sessionPainStatus', () => {
+  it('empty is ok', () => {
+    expect(sessionPainStatus([])).toBe('ok');
+  });
+  it('day-after 3 after an after of 2 is warn', () => {
+    expect(
+      sessionPainStatus([rd(1, 'before'), rd(2, 'after'), rd(3, 'dayAfter')]),
+    ).toBe('warn');
+  });
+  it('day-after 2 vs before 1 (no after) is warn', () => {
+    expect(sessionPainStatus([rd(1, 'before'), rd(2, 'dayAfter')])).toBe(
+      'warn',
+    );
+  });
+  it('day-after not worse stays ok', () => {
+    expect(sessionPainStatus([rd(2, 'after'), rd(2, 'dayAfter')])).toBe('ok');
+  });
+  it('day-after with no reference uses the threshold only', () => {
+    expect(sessionPainStatus([rd(3, 'dayAfter')])).toBe('ok');
+    expect(sessionPainStatus([rd(4, 'dayAfter')])).toBe('warn');
+  });
+  it('base stop is kept when day-after is milder', () => {
+    const stop = rd(0, 'after', { ...none, sharp: true });
+    expect(sessionPainStatus([stop, rd(0, 'dayAfter')])).toBe('stop');
+  });
+  it('base warn is kept when day-after is ok', () => {
+    expect(sessionPainStatus([rd(5, 'after'), rd(5, 'dayAfter')])).toBe('warn');
+  });
+});
+
+describe('worstPainSince', () => {
+  const mk = (over: Partial<Session>): Session => ({
+    id: 'x',
+    templateId: 'A',
+    date: '2026-10-10',
+    startedAt: '2026-10-10T10:00:00+02:00',
+    status: 'completed',
+    programWeek: 2,
+    plan: [],
+    feedback: {},
+    ...over,
+  });
+  const A = mk({ id: 'a', date: '2026-10-10' });
+  const B = mk({ id: 'b', templateId: 'B', date: '2026-10-12' });
+  const A2 = mk({ id: 'a2', date: '2026-10-14' });
+
+  it('no sessions is ok', () => {
+    expect(worstPainSince([], [], '2026-10-01')).toBe('ok');
+  });
+  it('A/B alternation: pain in B counts for an exercise last done in A', () => {
+    const logs = [rd(5, 'after', none, { sessionId: 'b' })];
+    expect(worstPainSince([A, B, A2], logs, '2026-10-10')).toBe('warn');
+  });
+  it('sessions before sinceDate are ignored', () => {
+    const logs = [rd(5, 'after', none, { sessionId: 'a' })];
+    expect(worstPainSince([A, B], logs, '2026-10-11')).toBe('ok');
+  });
+  it('the last session itself counts, including its day-after', () => {
+    const logs = [
+      rd(2, 'after', none, { sessionId: 'a' }),
+      rd(3, 'dayAfter', none, { sessionId: 'a' }),
+    ];
+    expect(worstPainSince([A], logs, '2026-10-10')).toBe('warn');
+  });
+  it('an aborted pain_stop session counts as stop without readings', () => {
+    const stopped = mk({
+      id: 's',
+      date: '2026-10-12',
+      status: 'aborted',
+      abortReason: 'pain_stop',
+    });
+    expect(worstPainSince([A, stopped], [], '2026-10-10')).toBe('stop');
+  });
+  it('a user abort does not count by itself; stop beats warn', () => {
+    const quit = mk({ id: 'q', status: 'aborted', abortReason: 'user' });
+    expect(worstPainSince([quit], [], '2026-10-01')).toBe('ok');
+    const logs = [
+      rd(5, 'after', none, { sessionId: 'a' }),
+      rd(0, 'after', { ...none, swelling: true }, { sessionId: 'b' }),
+    ];
+    expect(worstPainSince([A, B], logs, '2026-10-01')).toBe('stop');
+  });
+});
+
+describe('shouldPromptDayAfter extras', () => {
+  const base: Session = {
+    id: 's1',
+    templateId: 'A',
+    date: '2026-10-17',
+    startedAt: '2026-10-17T10:00:00+02:00',
+    status: 'completed',
+    programWeek: 2,
+    plan: [],
+    feedback: {},
+  };
+  it('an after reading does not suppress the prompt', () => {
+    const after = rd(2, 'after', none, { sessionId: 's1' });
+    expect(shouldPromptDayAfter(base, [after], '2026-10-18')).toBe(true);
+  });
+  it('an older session does not suppress the prompt', () => {
+    const older = {
+      ...base,
+      id: 's0',
+      date: '2026-10-15',
+      startedAt: '2026-10-15T10:00:00+02:00',
+    };
+    expect(shouldPromptDayAfter(base, [], '2026-10-18', [older, base])).toBe(
+      true,
+    );
+  });
+  it('compares instants, not strings, across offsets', () => {
+    const later = {
+      ...base,
+      id: 's2',
+      startedAt: '2026-10-17T09:00:00+00:00',
+    };
+    expect(shouldPromptDayAfter(base, [], '2026-10-18', [base, later])).toBe(
+      false,
+    );
   });
 });
