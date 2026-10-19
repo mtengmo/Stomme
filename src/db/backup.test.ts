@@ -218,4 +218,19 @@ describe('backup', () => {
     await importAll(db, serializeBackup(b));
     expect((await db.sessions.get('s1'))?.note).toBe(note);
   });
+
+  it('rejects an in-progress session with sets but no before-pain reading', async () => {
+    const b = await valid();
+    const bad = {
+      ...b,
+      sessions: [session('s2', { status: 'in_progress', finishedAt: undefined })],
+      setLogs: [setLog('l9', 's2')],
+      painLogs: [],
+    };
+    await expect(importAll(db, text(bad))).rejects.toMatchObject({
+      code: 'invalid',
+    });
+    const ok = { ...bad, painLogs: [painLog('p9', 's2')] };
+    await expect(importAll(db, text(ok))).resolves.toBeDefined();
+  });
 });

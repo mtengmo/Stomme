@@ -237,6 +237,26 @@ export function parseBackup(text: string): BackupFile {
   ) {
     throw new BackupError('invalid', 'Duplicate ids or dangling references');
   }
+  // An in-progress session with logged sets must have its 'before' pain
+  // reading (the pain gate runs before the first set); otherwise resuming it
+  // would skip the safety check.
+  const withBefore = new Set(
+    b.painLogs.filter((p) => p.timing === 'before').map((p) => p.sessionId),
+  );
+  const setSessions = new Set(b.setLogs.map((l) => l.sessionId));
+  if (
+    b.sessions.some(
+      (s) =>
+        s.status === 'in_progress' &&
+        setSessions.has(s.id) &&
+        !withBefore.has(s.id),
+    )
+  ) {
+    throw new BackupError(
+      'invalid',
+      'In-progress session has sets but no pain reading before the session',
+    );
+  }
   return b;
 }
 
