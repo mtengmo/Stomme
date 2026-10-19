@@ -29,6 +29,11 @@ export interface PlannedItem {
   last?: LastSummary;
 }
 
+const RANK: Record<PainStatus, number> = { ok: 0, warn: 1, stop: 2 };
+function worsePain(a: PainStatus, b: PainStatus): PainStatus {
+  return RANK[b] > RANK[a] ? b : a;
+}
+
 /** The newest finished (or aborted) session in which the exercise was done or skipped. */
 function lastSessionOf(
   id: ExerciseId,
@@ -92,13 +97,19 @@ export function buildPlan(
         };
       }
     }
-    const suggestion = suggestNext(
-      ex,
-      item.sets,
-      programWeek,
-      last,
-      currentPain,
-    );
+    // Without history there is no LastResult to carry past pain, so any pain
+    // on record (day-after readings and pain_stop aborts included) counts today.
+    const pain = last
+      ? currentPain
+      : worsePain(
+          currentPain,
+          worstPainSince(
+            data.sessions.filter((s) => s.id !== excludeSessionId),
+            data.painLogs,
+            '',
+          ),
+        );
+    const suggestion = suggestNext(ex, item.sets, programWeek, last, pain);
     const plan: PlannedExercise = {
       exerciseId: ex.id,
       sets: suggestion.sets,

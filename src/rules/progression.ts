@@ -124,8 +124,20 @@ export function suggestNext(
 
   const weekSets = setsForWeek(templateSets, programWeek);
 
-  // 2. Nothing to build on.
+  // 2. Nothing to build on. With pain on a knee-loaded exercise stay
+  // conservative: the week-1 load and the template sets, never the start load.
   if (!last) {
+    if (ex.kneeLoaded && pain !== 'ok') {
+      const stop = pain === 'stop';
+      return make(
+        ex,
+        templateSets,
+        ex.range.start,
+        ex.week1LoadIndex,
+        stop ? 'pain_stop_hold' : 'pain_hold',
+        stop,
+      );
+    }
     return make(ex, weekSets, ex.range.start, ex.startLoadIndex, 'first_time');
   }
 

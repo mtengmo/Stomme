@@ -13,7 +13,13 @@ import type {
 import { toLocalDate } from '../lib/dates';
 import type { PlanningData } from '../rules/nextPlan';
 import { buildPlan, wallSitPlan } from '../rules/nextPlan';
-import { assessReading, isValidScore } from '../rules/pain';
+import {
+  assessReading,
+  dayAfterReference,
+  isValidScore,
+  type PainAssessment,
+  shouldPromptDayAfter,
+} from '../rules/pain';
 import { programWeek } from '../rules/schedule';
 import type { StommeDB } from './db';
 
@@ -337,7 +343,8 @@ export async function replanSession(
         before ? assessReading(before).status : 'ok',
         sessionId,
       ).map((i) => i.plan);
-      await db.sessions.update(sessionId, { plan });
+      const extras = s.plan.filter((p) => p.exerciseId === 'wall-sit');
+      await db.sessions.update(sessionId, { plan: [...plan, ...extras] });
     },
   );
 }
@@ -354,4 +361,57 @@ export async function addWallSit(
       plan: [...s.plan, wallSitPlan(s.plan[0]?.restSec)],
     });
   });
+}
+
+/**
+ * Writes one pain reading and its consequence in ONE transaction: a red flag
+ * aborts an open session with pain_stop (logs kept); a 'before' reading that
+ * is not a stop replans the session. 'before' is one-shot (rejected when a
+ * 'before' reading or any set already exists) and a 'dayAfter' reading must be
+ * inside the shouldPromptDayAfter window.
+ */
+export async function recordPainReading(
+  db: StommeDB,
+  input: NewPainLog,
+  now: Date,
+): Promise<PainAssessment> {
+  if (!isValidScore(input.score)) {
+    throw new Error(`Invalid pain score ${String(input.score)}`);
+  }
+  return db.transaction(
+    'rw',
+    [db.sessions, db.setLogs, db.painLogs],
+    async () => {
+      const s = await db.sessions.get(input.sessionId);
+      if (!s) throw new Error(`Unknown session ${input.sessionId}`);
+      const existing = await listPainLogsBySession(db, s.id);
+      if (input.timing === 'dayAfter') {
+        const all = await db.sessions.toArray();
+        if (!shouldPromptDayAfter(s, existing, toLocalDate(now), all)) {
+          throw new Error('Day-after reading is not due');
+        }
+      } else if (s.status !== 'in_progress') {
+        throw new Error('Session is not in progress');
+      }
+      if (input.timing === 'before') {
+        const logged = await db.setLogs.where('sessionId').equals(s.id).count();
+        if (logged > 0 || existing.some((p) => p.timing === 'before')) {
+          throw new Error('The before reading is already taken');
+        }
+      }
+      await addPainLog(db, input, now);
+      const readings = await listPainLogsBySession(db, s.id);
+      const mine = readings.find((r) => r.timing === input.timing);
+      const result = assessReading(
+        mine ?? { ...input, score: Number.NaN },
+        input.timing === 'dayAfter' ? dayAfterReference(readings) : undefined,
+      );
+      if (result.status === 'stop' && s.status === 'in_progress') {
+        await abortSession(db, s.id, now, 'pain_stop');
+      } else if (input.timing === 'before') {
+        await replanSession(db, s.id);
+      }
+      return result;
+    },
+  );
 }

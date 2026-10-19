@@ -163,4 +163,32 @@ describe('buildPlan', () => {
     };
     expect(first(buildPlan(templates.A, 2, data))?.last).toBeUndefined();
   });
+
+  it('a skipped exercise counts as the last session and holds', () => {
+    const data: PlanningData = {
+      sessions: [
+        session({
+          id: 's1',
+          date: '2026-10-12',
+          programWeek: 2,
+          feedback: { 'goblet-chair-squat': { skipped: true } },
+        }),
+      ],
+      setLogs: [],
+      painLogs: [],
+    };
+    const p = first(buildPlan(templates.A, 2, data));
+    expect(p?.last).toBeUndefined();
+    expect(p?.suggestion.reason).toBe('hold_incomplete');
+  });
+
+  it('no history and a stop today holds the knee exercise with seePhysio (S3)', () => {
+    const p = first(buildPlan(templates.A, 3, empty, 'stop'));
+    expect(p?.suggestion).toMatchObject({
+      reason: 'pain_stop_hold',
+      seePhysio: true,
+      sets: 2,
+    });
+    expect(p?.plan.loadIndex).toBe(0);
+  });
 });
