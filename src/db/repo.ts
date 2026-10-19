@@ -10,6 +10,7 @@ import type {
   TemplateId,
 } from '../domain/types';
 import { toLocalDate } from '../lib/dates';
+import { requestPersistence } from '../lib/storage';
 import { interimPlan } from '../rules/prescription';
 import { programWeek } from '../rules/schedule';
 import type { StommeDB } from './db';
@@ -211,6 +212,8 @@ export async function finishSession(
       finishedAt: now.toISOString(),
     });
   });
+  // Best effort, outside the transaction: ask the browser to keep our data.
+  void requestPersistence();
 }
 
 /** Ends a session early; logged sets are kept. */
