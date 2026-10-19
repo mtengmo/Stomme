@@ -6,3 +6,4 @@ screenshots/
 .impeccable/questions/
 .impeccable/mocks/
 test-results/
+coverage/
