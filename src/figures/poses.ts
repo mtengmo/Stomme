@@ -461,7 +461,7 @@ export const figures: Record<ExerciseId, FigureSpec> = {
   },
   'bird-dog': {
     start: pose(
-      [54, 124],
+      [54, 126],
       [62, 138],
       [108, 138],
       [
@@ -480,7 +480,7 @@ export const figures: Record<ExerciseId, FigureSpec> = {
       ],
     ),
     end: pose(
-      [54, 124],
+      [54, 126],
       [62, 138],
       [108, 138],
       [
