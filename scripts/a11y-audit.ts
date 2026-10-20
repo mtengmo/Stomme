@@ -247,7 +247,7 @@ async function theme(scheme: 'light' | 'dark') {
     if (n === 'Spara') {
       await a.click();
       // Saving the 'after' reading finishes the session and shows the summary.
-      const home = page.getByRole('link', { name: 'Till veckan' });
+      const home = page.getByRole('link', { name: 'Till träningen' });
       await home.waitFor();
       await audit(page, tag('summary'));
       await home.click();

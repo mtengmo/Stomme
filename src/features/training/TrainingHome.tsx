@@ -157,7 +157,7 @@ export function TrainingSetup({
           </label>
           <p className="m-0 text-base">
             {rehabFocus === 'knee'
-              ? 'Du får ett färdigt, redigerbart pass för allmän knäträning. Det anpassas till din utrustning och valda sida.'
+              ? 'Du får ett färdigt, redigerbart startpass för allmän knäträning. Övningsurval och startdos bygger på AAOS-programmet. Passet anpassas till din utrustning och valda sida.'
               : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
           </p>
         </>

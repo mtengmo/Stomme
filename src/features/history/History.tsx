@@ -92,7 +92,7 @@ export function History() {
           fort du har kört det.
         </p>
         <Link href="/" className={buttonClass('secondary')}>
-          Till veckan
+          Till träningen
         </Link>
       </div>
     );

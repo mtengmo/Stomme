@@ -94,7 +94,7 @@ export function Summary({
             <Button onClick={onFinish}>Avsluta pass</Button>
           ) : (
             <Link href="/" className={buttonClass('primary')}>
-              Till veckan
+              Till träningen
             </Link>
           )}
         </div>

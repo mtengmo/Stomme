@@ -41,6 +41,10 @@ export function Onboarding() {
         Färdiga pass för styrka, löpning och knäträning. Välj ett fokus så
         hjälper vi dig att komma igång.
       </p>
+      <p className="m-0 text-base">
+        Ett set är en omgång. 3 × 10 betyder tre omgångar med tio repetitioner.
+        Per sida betyder att du gör antalet för varje vald sida.
+      </p>
       <p className="m-0 text-base text-ink-soft">
         Stomme är ett träningsstöd. Vid skada eller efter operation: stäm av
         övningarna med din fysioterapeut.

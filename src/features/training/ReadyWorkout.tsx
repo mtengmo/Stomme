@@ -69,9 +69,10 @@ export function ReadyWorkout({
             Om knäpasset
           </summary>
           <p className="m-0 text-base">
-            Stommes urval ur AAOS allmänna knäprogram. Vid skada eller efter
+            Stomme har valt övningar och startdos ur AAOS allmänna knäprogram.
+            Granska och ändra doseringen före start. Vid skada eller efter
             operation: stäm av övningar och dosering med vården. Setvilan är
-            appens justerbara standard. Ingen automatisk ökning.
+            appens justerbara standard. Passet ökar inte automatiskt.
           </p>
           <a
             href={kneeRehabSource}

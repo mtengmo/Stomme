@@ -131,9 +131,9 @@ export function Settings() {
       const r = await exportAndShare(getDb());
       setStatus(
         r === 'shared'
-          ? 'Delad. Spara filen på ett ställe utanför telefonen, till exempel i din e-post eller molnlagring.'
+          ? 'Delad. Spara filen utanför appen, till exempel i din e-post eller molnlagring.'
           : r === 'downloaded'
-            ? 'Filen laddades ner. Flytta den till ett ställe utanför telefonen.'
+            ? 'Filen laddades ner. Spara den utanför appen.'
             : 'Avbrutet. Ingen säkerhetskopia sparades.',
       );
     } catch {
@@ -264,7 +264,7 @@ export function Settings() {
           Radera allt?
         </h1>
         <p className="m-0 text-xl">
-          Alla pass, set och smärtvärden tas bort från den här telefonen och
+          Alla pass, set och smärtvärden tas bort från den här webbläsaren och
           appen börjar om från början. Det går inte att ångra.
         </p>
         <p className="m-0 text-xl">Vill du ha en kopia? Exportera först.</p>
@@ -387,7 +387,7 @@ export function Settings() {
 
       <Section id="set-delete" title="Radera all data">
         <p className={note}>
-          Tar bort allt som är sparat i appen på den här telefonen.
+          Tar bort allt som är sparat i appen i den här webbläsaren.
         </p>
         <Button
           variant="secondary"
@@ -438,8 +438,8 @@ function StorageSection() {
         </p>
       ) : null}
       <p className="m-0 text-base">
-        Din data finns bara på den här telefonen, så en säkerhetskopia är det
-        enda skyddet om webbläsaren rensar den eller telefonen byts.
+        Din data finns bara i den här webbläsaren. En säkerhetskopia skyddar om
+        webbläsaren rensar den eller om du byter webbläsare eller enhet.
       </p>
     </Section>
   );

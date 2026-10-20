@@ -90,8 +90,8 @@ export function ExerciseSymptoms({
     >
       <h2 className="m-0 text-2xl font-bold">Besvär under övningen</h2>
       <p className="m-0 text-base">
-        Ansträngning och smärta sparas var för sig. Rapporten ger ingen
-        automatisk ökning nästa gång.
+        Ansträngning och besvär sparas var för sig. Anpassa själv eller avstå
+        från övningen och följ råden från din vårdgivare.
       </p>
       <SymptomFields value={symptom} onChange={setSymptom} />
       {error ? (
@@ -256,7 +256,7 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
               onChange={(event) => setAcknowledged(event.target.checked)}
               className="size-6 shrink-0"
             />
-            Jag har tagit ställning och vill fortsätta med ett anpassat pass.
+            Jag har tagit ställning och vill fortsätta.
           </label>
         </>
       ) : null}

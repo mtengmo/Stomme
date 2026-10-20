@@ -52,7 +52,7 @@ try {
       await page.getByRole('button', { name: 'Spara' }).click();
       await page.getByRole('heading', { name: /Passet är klart/ }).waitFor();
       await page.screenshot({ path: `${OUT}/${tag}-after-stop.png` });
-      await page.getByRole('button', { name: 'Till veckan' }).click();
+      await page.getByRole('button', { name: 'Till träningen' }).click();
       await page.getByText(/Senast stoppade du/).waitFor();
       await page.screenshot({ path: `${OUT}/${tag}-after-stop-week.png` });
 

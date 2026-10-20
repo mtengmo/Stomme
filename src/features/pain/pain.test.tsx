@@ -101,7 +101,7 @@ describe('pain picker', () => {
     await answerPain(user, 2);
     // Saving the 'after' reading finishes the session: summary with a way home.
     expect(
-      await screen.findByRole('link', { name: 'Till veckan' }),
+      await screen.findByRole('link', { name: 'Till träningen' }),
     ).toBeTruthy();
     expect((await getDb().sessions.get(s.id))?.status).toBe('completed');
   });
@@ -185,7 +185,7 @@ describe('day after and banner', () => {
         name: 'Knäet är värre än efter passet.',
       }),
     ).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: 'Till veckan' }));
+    await user.click(screen.getByRole('button', { name: 'Till träningen' }));
     expect(await screen.findByText(/Knäet var värre dagen efter/)).toBeTruthy();
     expect(
       screen.queryByRole('heading', { name: 'Hur känns knäet idag?' }),
@@ -242,7 +242,7 @@ describe('pass preview suggestions', () => {
     expect(screen.getAllByText('2×10 · 10 kg').length).toBe(1);
     expect(screen.getAllByText('Idag').length).toBe(5);
     expect(
-      screen.getByText('Du klarade alla set. Lite fler denna gång.'),
+      screen.getByText('Du klarade alla set. Mängden ökar lite denna gång.'),
     ).toBeTruthy();
     unmount();
 
@@ -398,7 +398,7 @@ describe('safety gates', () => {
     const stored = await getDb().sessions.get(s.id);
     expect(stored?.status).toBe('completed');
     expect(stored?.abortReason).toBeUndefined();
-    await user.click(screen.getByRole('button', { name: 'Till veckan' }));
+    await user.click(screen.getByRole('button', { name: 'Till träningen' }));
     expect(
       await screen.findByText(/Senast stoppade du på grund av knäet/),
     ).toBeTruthy();
@@ -415,7 +415,7 @@ describe('safety gates', () => {
     ).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Gå vidare' }));
     expect(
-      await screen.findByRole('link', { name: 'Till veckan' }),
+      await screen.findByRole('link', { name: 'Till träningen' }),
     ).toBeTruthy();
   });
 
@@ -434,7 +434,7 @@ describe('safety gates', () => {
       }),
     ).toBeTruthy();
     expect((await getDb().sessions.get(s.id))?.status).toBe('completed');
-    await user.click(screen.getByRole('button', { name: 'Till veckan' }));
+    await user.click(screen.getByRole('button', { name: 'Till träningen' }));
     expect(
       await screen.findByText(/Senast stoppade du på grund av knäet/),
     ).toBeTruthy();

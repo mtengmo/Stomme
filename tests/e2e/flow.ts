@@ -72,7 +72,7 @@ export async function playPassA(
       await once('pain-after');
       await answerPain(page, 0);
       // Saving the 'after' reading finishes the session and shows the summary.
-      const home = page.getByRole('link', { name: 'Till veckan' });
+      const home = page.getByRole('link', { name: 'Till träningen' });
       await home.waitFor();
       await once('summary');
       await home.click();

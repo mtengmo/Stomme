@@ -166,7 +166,7 @@ try {
       await page.getByRole('button', { name: 'Spara' }).click();
       await page.getByRole('heading', { name: 'Avbryt passet.' }).waitFor();
       await shot(page, 'pain-stop');
-      await page.getByRole('button', { name: 'Till veckan' }).click();
+      await page.getByRole('button', { name: 'Till träningen' }).click();
       await page.getByText(/Senast stoppade du/).waitFor();
       await shot(page, 'banner-week');
       await page.getByRole('link', { name: 'Starta pass' }).click();
@@ -215,7 +215,7 @@ try {
         .getByRole('heading', { name: 'Knäet är värre än efter passet.' })
         .waitFor();
       await shot(page, 'dayafter-warn');
-      await page.getByRole('button', { name: 'Till veckan' }).click();
+      await page.getByRole('button', { name: 'Till träningen' }).click();
       await page.getByText(/Knäet var värre dagen efter/).waitFor();
       await shot(page, 'dayafter-warn-card');
       await page.context().close();

@@ -157,8 +157,13 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
   ],
   'single-leg-rdl': [
     ['bodyweight', 1, [0], 'Låt armarna följa kroppen utan extra vikt.'],
-    ['dumbbell', 1, [1], 'Håll hanteln nära stödbenet.'],
-    ['kettlebell', 1, [2], 'Håll kettlebellen nära stödbenet.'],
+    ['dumbbell', 1, [1], 'Håll hanteln i samma sidas hand som stödbenet.'],
+    [
+      'kettlebell',
+      1,
+      [2],
+      'Håll kettlebellen i samma sidas hand som stödbenet.',
+    ],
   ],
   'dead-bug': [['bodyweight', 1, [0], 'Arbeta utan extra vikt.']],
   'side-plank': [['bodyweight', 1, [0], 'Stöd på underarm och fötter.']],
@@ -185,8 +190,20 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'Utan extra vikt, övre ryggen på det låga stödet.',
       'step',
     ],
-    ['dumbbell', 1, [1], 'Håll hanteln stadigt på höften.', 'step'],
-    ['kettlebell', 1, [2], 'Håll kettlebellen stadigt på höften.', 'step'],
+    [
+      'dumbbell',
+      1,
+      [1],
+      'Ha övre ryggen mot ett lågt stöd och håll hanteln stadigt på höften.',
+      'step',
+    ],
+    [
+      'kettlebell',
+      1,
+      [2],
+      'Ha övre ryggen mot ett lågt stöd och håll kettlebellen stadigt på höften.',
+      'step',
+    ],
   ],
   'single-leg-calf-raise': [
     ['bodyweight', 1, [0], 'Ta stöd mot väggen med händerna.', 'support'],
@@ -426,7 +443,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
   ],
   'kettlebell-press': [
     'technical',
-    'Ensidig last över huvudet och korrekt rackposition.',
+    'Ensidig last över huvudet och kontroll med vikten nära axeln.',
   ],
   'band-leg-press': [
     'practiced',
@@ -460,7 +477,16 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
           'Fitness Matters, January/February 2010: Kettlebell Shoulder Press',
         publisher: 'American Council on Exercise',
         url: 'https://www.acefitness.org/cp/pdfs/FitnessMatters/Jan10.pdf',
-        note: 'Neutral handled, rackposition och strikt press. Ingen clean eller benhjälp ingår i appens variant.',
+        note: 'Handleden hålls rak med vikten nära axeln inför en press utan benhjälp. Appens variant börjar med vikten vid axeln.',
+      },
+    ];
+  if (id === 'single-leg-rdl')
+    return [
+      {
+        title: 'Single-arm, single-leg Romanian deadlift',
+        publisher: 'American Council on Exercise',
+        url: `${aceUrl}127/single-arm-single-leg-romanian-dead-lift/`,
+        note: 'Källan visar vikt i motsatt hand mot stödbenet. Appens animation och instruktion visar vikten i samma sidas hand; detta är en egen variant.',
       },
     ];
   if (id === 'shoulder-press')
@@ -537,7 +563,7 @@ export const exerciseMetadata = Object.fromEntries(
             ? 'basic'
             : technicalLevel,
         technicalReason,
-        setup: exercise.tips[0],
+        setup: cue,
         cue,
         easierOption: exercise.easierVariant,
         defaultLoadIndex: loadIndices[0] ?? 0,

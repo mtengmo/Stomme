@@ -49,7 +49,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await expect(page.locator('[data-step]')).toBeVisible();
   await page.getByRole('button', { name: 'Klar set', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Hur kändes det?' }),
+    page.getByRole('heading', { name: 'Hur ansträngande var övningen?' }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Lagom', exact: true }).click();
 
@@ -195,7 +195,7 @@ test('rehab uses explicitly entered dose and selected left side through reload',
   await expect(page.getByText(/Sedan: byt till vänster/)).toHaveCount(0);
   await page.getByRole('button', { name: 'Klar set', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Hur kändes det?' }),
+    page.getByRole('heading', { name: 'Hur ansträngande var övningen?' }),
   ).toBeVisible();
 });
 

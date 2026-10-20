@@ -31,10 +31,13 @@ export function EffortScreen({ frame, exercise, onPick }: EffortScreenProps) {
       <p className="m-0 text-lg font-bold text-ink-soft">{exercise.name}</p>
       <div className="flex items-center justify-between gap-3">
         <h1 className="m-0 text-5xl leading-none font-extrabold">
-          Hur kändes det?
+          Hur ansträngande var övningen?
         </h1>
         <PencilTick size={88} animate variant={2} className="shrink-0" />
       </div>
+      <p className="m-0 text-base text-ink-soft">
+        Bedöm ansträngningen, inte smärtan. Rapportera besvär separat.
+      </p>
     </SessionFrame>
   );
 }

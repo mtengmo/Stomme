@@ -268,14 +268,6 @@ export function ExerciseCardBody({
               {!presentation.tips.includes(presentation.cue) ? (
                 <p className="my-2 text-base font-bold">{presentation.cue}</p>
               ) : null}
-              {metadata.holdSeconds ? (
-                <p className="my-2 text-base">
-                  Håll varje repetition i {metadata.holdSeconds} sekunder.
-                  {metadata.relaxSeconds
-                    ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
-                    : ''}
-                </p>
-              ) : null}
               <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
                 {presentation.tips.map((tip) => (
                   <li key={tip}>{tip}</li>
@@ -343,8 +335,9 @@ export function ExerciseCardBody({
                       .join(', ')}
                   </p>
                   <p className="m-0">
-                    Teknisk nivå: {technicalLevelLabels[variant.technicalLevel]}
-                    . {variant.technicalReason}
+                    Teknisk svårighetsgrad:{' '}
+                    {technicalLevelLabels[variant.technicalLevel]}.{' '}
+                    {variant.technicalReason}
                   </p>
                   {!presentation.tips.includes(variant.setup) ? (
                     <p className="m-0">{variant.setup}</p>
@@ -416,7 +409,7 @@ export function ExerciseCardPage({ id }: { id: string }) {
         <>
           <h1 className="m-0 text-4xl font-bold">Övningen finns inte</h1>
           <Link href="/" className={buttonClass('primary')}>
-            Till veckan
+            Till träningen
           </Link>
         </>
       )}

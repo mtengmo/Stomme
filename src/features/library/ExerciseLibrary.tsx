@@ -61,6 +61,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         Utrustning: {equipment(exercise)}
       </p>
       <p className="m-0 mt-1 text-base text-ink-soft">
+        Teknisk svårighetsgrad:{' '}
         {[
           ...new Set(
             exerciseMetadata[exercise.id].variants.map(
@@ -208,7 +209,7 @@ export function ExerciseLibrary() {
         className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
       >
         <Icon name="back" />
-        Till veckan
+        Till träningen
       </Link>
       <header>
         <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
@@ -277,7 +278,7 @@ export function ExerciseLibrary() {
             </select>
           </label>
           <label className="flex flex-col gap-2 text-base font-bold">
-            Teknisk nivå
+            Teknisk svårighetsgrad
             <select
               value={filters.level}
               onChange={(event) => changeFilter('niva', event.target.value)}

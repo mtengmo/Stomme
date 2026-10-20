@@ -14,13 +14,10 @@ export function loadPresentation(
   );
   const cue = variant.cue;
   const tips = [...exercise.tips];
-  if (exercise.id === 'goblet-chair-squat') tips[1] = cue;
-  if (exercise.id === 'single-leg-rdl' && !equipment) tips[2] = cue;
-  if (exercise.id === 'split-squat' && equipment)
-    tips[2] = 'Upprätt överkropp. Välj kroppsvikt om du behöver handstöd.';
-  if (exercise.id === 'goblet-squat' && !equipment)
-    tips[0] =
-      'Stå stadigt med hela fötterna i golvet och armarna framför kroppen.';
+  if (exercise.id === 'goblet-chair-squat' && equipment)
+    tips[0] = `Ställ en stadig stol bakom dig och stå med fötterna ungefär höftbrett. ${cue}`;
+  if (exercise.id === 'goblet-squat' && equipment)
+    tips[0] = `Stå med fötterna ungefär axelbrett och hela fötterna i golvet. ${cue}`;
   return {
     load: exercise.loadLadder[index] ?? load,
     equipment,

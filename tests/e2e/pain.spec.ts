@@ -27,7 +27,7 @@ test('pain before -> session -> pain after with ok', async ({ page }) => {
     page.getByRole('heading', { name: /efter passet/ }),
   ).toBeVisible();
   await answerPain(page, 2);
-  await page.getByRole('link', { name: 'Till veckan' }).click();
+  await page.getByRole('link', { name: 'Till träningen' }).click();
   await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
 });
 
@@ -40,7 +40,7 @@ test('a red flag stops the pass and shows the banner afterwards', async ({
     page.getByRole('heading', { name: 'Avbryt passet.' }),
   ).toBeVisible();
   await expect(page.getByText('Fråga fysioterapeuten.')).toBeVisible();
-  await page.getByRole('button', { name: 'Till veckan' }).click();
+  await page.getByRole('button', { name: 'Till träningen' }).click();
   await expect(
     page.getByText(
       'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.',

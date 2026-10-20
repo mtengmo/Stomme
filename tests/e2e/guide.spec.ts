@@ -23,8 +23,8 @@ for (const viewport of [
     await page.getByText('Hur gör man?', { exact: true }).click();
     const technique = page.getByRole('region', { name: 'Teknik', exact: true });
     await expect(
-      technique.getByText('Håll hanteln med båda händerna nära bröstet.', {
-        exact: true,
+      technique.getByRole('listitem').filter({
+        hasText: 'Håll hanteln med båda händerna nära bröstet.',
       }),
     ).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);

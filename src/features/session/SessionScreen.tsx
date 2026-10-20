@@ -88,7 +88,7 @@ function Open({
           Försök igen
         </Button>
         <Link href="/" className={buttonClass('secondary')}>
-          Till veckan
+          Till träningen
         </Link>
       </div>
     );
@@ -123,7 +123,7 @@ export function SessionScreen({ id }: { id: string }) {
           Passet finns inte
         </h1>
         <Link href="/" className={buttonClass('primary')}>
-          Till veckan
+          Till träningen
         </Link>
       </div>
     );

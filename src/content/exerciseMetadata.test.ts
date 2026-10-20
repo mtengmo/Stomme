@@ -91,4 +91,39 @@ describe('expanded library integrity', () => {
       { type: 'band', count: 1 },
     ]);
   });
+  it('keeps hold and recovery timing within every displayed repetition sequence', () => {
+    for (const exercise of exerciseList) {
+      const metadata = exerciseMetadata[exercise.id];
+      if (!metadata.holdSeconds) continue;
+      for (const variant of metadata.variants) {
+        const tips = loadPresentation(
+          exercise,
+          variant.defaultLoadIndex,
+          variant.id,
+        ).tips.join(' ');
+        expect(tips).toContain(`${metadata.holdSeconds} sekunder`);
+        if (metadata.relaxSeconds)
+          expect(tips).toContain(`${metadata.relaxSeconds} sekunder`);
+        expect(tips).toContain('repetition');
+      }
+    }
+  });
+  it('preserves movement and return steps across equipment variants', () => {
+    for (const exercise of exerciseList) {
+      for (const variant of exerciseMetadata[exercise.id].variants) {
+        expect(
+          loadPresentation(
+            exercise,
+            variant.defaultLoadIndex,
+            variant.id,
+          ).tips.slice(1),
+        ).toEqual(exercise.tips.slice(1));
+      }
+    }
+    expect(
+      exerciseMetadata['goblet-squat'].variants.find(
+        (variant) => variant.id === 'bodyweight',
+      )?.setup,
+    ).not.toMatch(/hantel|kettlebell|vikt nära bröstet/i);
+  });
 });

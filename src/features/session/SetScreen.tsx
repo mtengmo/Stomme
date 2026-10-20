@@ -60,7 +60,7 @@ export function SetScreen({
       ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila.`
       : step.setNumber < totalSets
         ? 'Sedan: vila före nästa set.'
-        : 'Sedan: ange hur övningen kändes.';
+        : 'Sedan: bedöm hur ansträngande övningen var.';
   const metadata = exerciseMetadata[exercise.id];
   const weightLabel =
     weightKg !== undefined
@@ -316,8 +316,11 @@ export function SetScreen({
             <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
             <p className="m-0 text-base">{exercise.easierVariant}</p>
             <p className="m-0 text-base text-ink-soft">
-              Animationen visar tekniken. Räkna repetitionerna själv. Setet
-              sparas med Klar set.
+              {unit === 'reps'
+                ? 'Animationen visar tekniken. Räkna repetitionerna själv och tryck Klar set när du är klar.'
+                : unit === 'seconds'
+                  ? 'Animationen visar tekniken. Starta hålltiden när du är på plats. Sluta hålla vid 0:00 och tryck Klar set för att spara.'
+                  : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>
             {['step-up', 'split-squat'].includes(exercise.id) ? (
               <p className="m-0 text-base">
