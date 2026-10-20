@@ -3,13 +3,17 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import {
   equipmentChoices,
+  experienceLabels,
   isTrainingPreferences,
   programmeNames,
   trainingName,
 } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
-import { saveTrainingPreferences } from '../../db/training';
+import {
+  canReplaceTrainingPreparation,
+  saveTrainingPreferences,
+} from '../../db/training';
 import type {
   EquipmentChoice,
   ProgramId,
@@ -106,7 +110,7 @@ export function TrainingSetup({
             </label>
           ))}
       </fieldset>
-      {programId === 'general' ? (
+      {programId !== 'rehab' ? (
         <label className="flex flex-col gap-2 text-lg font-bold">
           Hur van är du vid styrketräning?
           <select
@@ -209,7 +213,12 @@ export function TrainingHome() {
       listSessions(getDb()),
       getMeta(getDb(), 'program'),
     ]);
-    return { preferences, sessions, legacyProgramme };
+    const active = sessions.find((session) => session.status === 'in_progress');
+    const preparationId =
+      active && (await canReplaceTrainingPreparation(getDb(), active))
+        ? active.id
+        : undefined;
+    return { preferences, sessions, legacyProgramme, preparationId };
   }, []);
   const [editing, setEditing] = useState(false);
   if (!data) return null;
@@ -219,6 +228,8 @@ export function TrainingHome() {
   const active = data.sessions.find(
     (session) => session.status === 'in_progress',
   );
+  const prepared = !!active && active.id === data.preparationId;
+  const locked = !!active && !prepared;
   const due = data.sessions.filter((session) =>
     trainingDayAfterDue(session, toLocalDate(new Date())),
   );
@@ -250,13 +261,14 @@ export function TrainingHome() {
     preferences?.programId === 'rehab' || lastCompleted?.templateId !== 'A'
       ? 'A'
       : 'B';
+  const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
     return (
       <>
         <div className="mx-auto max-w-md px-5 pt-3">
           <button
             type="button"
-            disabled={!!active}
+            disabled={locked}
             onClick={() => setEditing(true)}
             className="min-h-12 text-base font-bold underline disabled:opacity-50"
           >
@@ -270,7 +282,11 @@ export function TrainingHome() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
       <h1 className="m-0 text-5xl font-extrabold">
-        {active ? 'Fortsätt ditt pass' : 'Nästa pass'}
+        {prepared
+          ? 'Förbered ditt pass'
+          : active
+            ? 'Fortsätt ditt pass'
+            : 'Nästa pass'}
       </h1>
       <p className="m-0 text-lg font-bold">
         {trainingName(preferences)}
@@ -278,11 +294,20 @@ export function TrainingHome() {
           ? ` · Pass ${nextId}`
           : ''}
       </p>
+      {preferences.programId !== 'rehab' ? (
+        <p className="m-0 -mt-3 text-base text-ink-soft">
+          Träningsvana: {experienceLabels[preferences.experience]}
+        </p>
+      ) : null}
       <Link
         href={active ? `/session/${active.id}` : `/traning/${nextId}`}
         className={buttonClass('primary')}
       >
-        {active ? 'Fortsätt passet' : 'Visa nästa pass'}
+        {prepared
+          ? 'Fortsätt förberedelsen'
+          : active
+            ? 'Fortsätt passet'
+            : 'Visa nästa pass'}
       </Link>
       {due.map((session) => (
         <Link
@@ -300,22 +325,22 @@ export function TrainingHome() {
         <div className="flex flex-col gap-2">
           <button
             type="button"
-            disabled={!!active}
+            disabled={locked}
             onClick={() => setEditing(true)}
             className="min-h-12 self-start text-base font-bold underline disabled:opacity-50"
           >
             Byt inriktning eller utrustning
           </button>
-          {active ? (
+          {locked ? (
             <p className="m-0 text-base text-ink-soft">
               Avsluta eller avbryt passet innan du byter inriktning.
             </p>
           ) : preferences.programId !== 'rehab' ? (
             <Link
-              href={`/traning/${nextId === 'A' ? 'B' : 'A'}`}
+              href={`/traning/${alternateId}`}
               className="flex min-h-12 items-center text-base underline"
             >
-              Visa pass {nextId === 'A' ? 'B' : 'A'} i stället
+              Visa pass {alternateId} i stället
             </Link>
           ) : null}
           <Link

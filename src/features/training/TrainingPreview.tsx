@@ -12,7 +12,11 @@ import {
   kneeRehabExercises,
   kneeRehabSource,
 } from '../../content/kneeRehab';
-import { isTrainingPreferences, trainingName } from '../../content/programmes';
+import {
+  experienceLabels,
+  isTrainingPreferences,
+  trainingName,
+} from '../../content/programmes';
 import {
   type CustomWorkout,
   readCustomWorkouts,
@@ -20,6 +24,7 @@ import {
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import {
+  canReplaceTrainingPreparation,
   saveRehabPlan,
   startTrainingSession,
   validateTrainingPlan,
@@ -148,6 +153,7 @@ function PreviewEditor({
 
   savedPlans,
   customWorkout,
+  preparationId,
 }: {
   preferences: TrainingPreferences;
 
@@ -159,6 +165,7 @@ function PreviewEditor({
 
   savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>;
   customWorkout?: CustomWorkout;
+  preparationId?: string;
 }) {
   const [, navigate] = useLocation();
 
@@ -189,6 +196,13 @@ function PreviewEditor({
       /* A damaged draft never replaces the saved session. */
     }
 
+    const prepared = sessions.find(
+      (session) =>
+        session.id === preparationId &&
+        session.templateId === id &&
+        session.customWorkoutId === customWorkout?.id,
+    );
+    if (prepared) return structuredClone(prepared.plan);
     if (
       customWorkout?.plan &&
       validateTrainingPlan(customWorkout.plan) &&
@@ -274,7 +288,10 @@ function PreviewEditor({
 
   const [addId, setAddId] = useState<ExerciseId | ''>('');
 
-  const active = sessions.find((session) => session.status === 'in_progress');
+  const active = sessions.find(
+    (session) =>
+      session.status === 'in_progress' && session.id !== preparationId,
+  );
 
   const change = (index: number, patch: Partial<PlannedExercise>) =>
     updatePlan((current) =>
@@ -301,6 +318,11 @@ function PreviewEditor({
         <p className="m-0 mt-2 text-lg font-bold">
           {trainingName(preferences)}
         </p>
+        {preferences.programId !== 'rehab' ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Träningsvana: {experienceLabels[preferences.experience]}
+          </p>
+        ) : null}
         {customWorkout ? (
           <p className="m-0 mt-2 text-base text-ink-soft">
             Dina valda övningar. Passet använder din träningsinriktning,
@@ -901,24 +923,29 @@ function PreviewEditor({
 
 export function TrainingPreview({ id }: { id: string }) {
   const workoutId = new URLSearchParams(useHashSearch()).get('workout');
-  const data = useLiveQuery(
-    async () => ({
+  const data = useLiveQuery(async () => {
+    const sessions = await listSessions(getDb());
+    const active = sessions.find((session) => session.status === 'in_progress');
+    const preparationId =
+      active && (await canReplaceTrainingPreparation(getDb(), active))
+        ? active.id
+        : undefined;
+    return {
       preferences: await getMeta(getDb(), 'training'),
       customWorkouts: readCustomWorkouts(
         await getMeta(getDb(), 'customWorkouts'),
       ),
 
-      sessions: await listSessions(getDb()),
+      sessions,
 
       logs: await getDb().setLogs.toArray(),
+      preparationId,
 
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
         | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
         | undefined,
-    }),
-
-    [],
-  );
+    };
+  }, []);
 
   if (!data) return null;
 
@@ -949,6 +976,7 @@ export function TrainingPreview({ id }: { id: string }) {
     <PreviewEditor
       key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}`}
       customWorkout={customWorkout}
+      preparationId={data.preparationId}
       preferences={data.preferences}
       id={id}
       sessions={data.sessions}

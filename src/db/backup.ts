@@ -178,6 +178,7 @@ const sessionSchema = z
     customWorkoutId: z.string().min(1).max(100).optional(),
     customWorkoutName: z.string().min(1).max(60).optional(),
     programId: z.enum(['general', 'running', 'rehab']).optional(),
+    experience: z.enum(['new', 'some', 'regular']).optional(),
     policyVersion: z.literal(1).optional(),
     rehabFocus: z.enum(['custom', 'knee']).optional(),
     checkins: z

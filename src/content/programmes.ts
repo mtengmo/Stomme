@@ -4,6 +4,15 @@ import type {
   TrainingPreferences,
 } from '../domain/types';
 
+export const experienceLabels: Record<
+  TrainingPreferences['experience'],
+  string
+> = {
+  new: 'Ny eller på väg tillbaka',
+  some: 'Viss vana',
+  regular: 'Tränar regelbundet',
+};
+
 export const programmeNames: Record<ProgramId, string> = {
   general: 'Allmän styrka',
 

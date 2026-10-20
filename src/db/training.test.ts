@@ -13,6 +13,7 @@ import { exportAll, importAll, parseBackup, serializeBackup } from './backup';
 import { StommeDB } from './db';
 import { logSet, setFeedback } from './repo';
 import {
+  canReplaceTrainingPreparation,
   recordTrainingCheckin,
   saveRehabPlan,
   saveTrainingPreferences,
@@ -64,6 +65,126 @@ afterEach(async () => {
 });
 
 describe('programme persistence and safety boundaries', () => {
+  it('allows changing preferences during preparation without recording an aborted workout', async () => {
+    await saveTrainingPreferences(db, preferences);
+    const prepared = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    expect(await canReplaceTrainingPreparation(db, prepared)).toBe(true);
+    await saveTrainingPreferences(db, {
+      ...preferences,
+      programId: 'running',
+      experience: 'regular',
+    });
+    expect(await db.sessions.count()).toBe(0);
+    expect((await db.meta.get('training'))?.value).toMatchObject({
+      programId: 'running',
+      experience: 'regular',
+    });
+  });
+  it('restores the prepared plan if saving new preferences fails', async () => {
+    await saveTrainingPreferences(db, preferences);
+    const prepared = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    vi.spyOn(db.meta, 'put').mockRejectedValueOnce(new Error('Storage full'));
+    await expect(
+      saveTrainingPreferences(db, { ...preferences, programId: 'running' }),
+    ).rejects.toThrow('Storage full');
+    expect(await db.sessions.get(prepared.id)).toEqual(prepared);
+    expect((await db.meta.get('training'))?.value).toEqual(preferences);
+  });
+  it('replaces an unstarted A with B and snapshots experience; the clock starts with the answers', async () => {
+    const prepared = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    const replacement = await startTrainingSession(
+      db,
+      preferences,
+      'B',
+      [{ ...plan, target: 9 }],
+      now,
+    );
+    expect(await db.sessions.get(prepared.id)).toBeUndefined();
+    expect(await db.sessions.count()).toBe(1);
+    expect(replacement).toMatchObject({
+      templateId: 'B',
+      experience: 'some',
+      plan: [{ ...plan, target: 9 }],
+    });
+    const actualStart = '2026-10-21T00:15:00.000Z';
+    await recordTrainingCheckin(db, replacement.id, 'before', {
+      ...before,
+      recordedAt: actualStart,
+    });
+    expect((await db.sessions.get(replacement.id))?.startedAt).toBe(
+      actualStart,
+    );
+    expect((await db.sessions.get(replacement.id))?.date).toBe('2026-10-21');
+  });
+  it.each(['answers', 'sets', 'pain', 'feedback', 'legacy', 'note'] as const)(
+    'keeps %s when changing preferences is requested',
+    async (kind) => {
+      const prepared = await startTrainingSession(
+        db,
+        preferences,
+        'A',
+        [plan],
+        now,
+      );
+      if (kind === 'answers')
+        await recordTrainingCheckin(db, prepared.id, 'before', before);
+      if (kind === 'sets')
+        await db.setLogs.put({
+          id: 'set',
+          sessionId: prepared.id,
+          exerciseId: plan.exerciseId,
+          setNumber: 1,
+          side: 'left',
+          amount: 8,
+          loadIndex: 1,
+          weightKg: 7.5,
+          loggedAt: now.toISOString(),
+        });
+      if (kind === 'pain')
+        await db.painLogs.put({
+          id: 'pain',
+          sessionId: prepared.id,
+          date: prepared.date,
+          timing: 'before',
+          score: 2,
+          location: 'right_knee',
+          redFlags: { sharp: false, swelling: false, locking: false },
+          createdAt: now.toISOString(),
+        });
+      if (kind === 'feedback')
+        await db.sessions.update(prepared.id, {
+          feedback: { [plan.exerciseId]: { skipped: true } },
+        });
+      if (kind === 'legacy')
+        await db.sessions.update(prepared.id, { programId: undefined });
+      if (kind === 'note')
+        await db.sessions.update(prepared.id, { note: 'Min anteckning' });
+      const snapshot = await db.sessions.get(prepared.id);
+      await expect(
+        saveTrainingPreferences(db, { ...preferences, programId: 'running' }),
+      ).rejects.toThrow(/pågående/);
+      expect(await db.sessions.get(prepared.id)).toEqual(snapshot);
+    },
+  );
+
   it('opens a real version1 database without rewriting legacy pain, effort or active plan', async () => {
     const old = new Dexie(db.name);
     old.version(1).stores({
@@ -213,6 +334,8 @@ describe('programme persistence and safety boundaries', () => {
       [plan],
       now,
     );
+    await recordTrainingCheckin(db, active.id, 'before', before);
+    const started = await db.sessions.get(active.id);
     const changed = { ...preferences, programId: 'rehab' as const };
     await expect(saveTrainingPreferences(db, changed)).rejects.toThrow(
       /pågående/,
@@ -224,7 +347,7 @@ describe('programme persistence and safety boundaries', () => {
       [{ ...plan, target: 12 }],
       now,
     );
-    expect(resumed).toEqual(active);
+    expect(resumed).toEqual(started);
     expect((await db.meta.get('training'))?.value).toEqual(preferences);
     expect(await db.sessions.count()).toBe(1);
   });
@@ -418,6 +541,7 @@ describe('saved knee rehabilitation programmes', () => {
       knee: [kneePlan],
     });
     expect((await db.sessions.get(session.id))?.rehabFocus).toBe('knee');
+    await recordTrainingCheckin(db, session.id, 'before', before);
     await expect(saveRehabPlan(db, 'knee', [kneePlan])).rejects.toThrow(
       /pågående/,
     );

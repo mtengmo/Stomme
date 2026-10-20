@@ -1,8 +1,13 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, Redirect, useLocation } from 'wouter';
-import { trainingName } from '../../content/programmes';
+import {
+  experienceLabels,
+  isTrainingPreferences,
+  trainingName,
+} from '../../content/programmes';
 import { getDb } from '../../db/db';
+import { getMeta } from '../../db/repo';
 import { recordTrainingCheckin } from '../../db/training';
 import type { SymptomReport, TrainingCheckin } from '../../domain/types';
 import { Button, buttonClass } from '../../ui/Button';
@@ -128,7 +133,10 @@ export function ExerciseSymptoms({
 
 export function Checkin({ id, timing }: { id: string; timing: string }) {
   const data = useLiveQuery(
-    async () => ({ session: await getDb().sessions.get(id) }),
+    async () => ({
+      session: await getDb().sessions.get(id),
+      preferences: await getMeta(getDb(), 'training'),
+    }),
     [id],
   );
   const [, navigate] = useLocation();
@@ -156,6 +164,13 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
       </div>
     );
   const session = data.session;
+  const experience =
+    session.experience ??
+    (session.status === 'in_progress' &&
+    isTrainingPreferences(data.preferences) &&
+    data.preferences.programId === session.programId
+      ? data.preferences.experience
+      : undefined);
   const period = timing as 'before' | 'after' | 'dayAfter';
   if (session.checkins?.[period])
     return <Redirect to={timing === 'before' ? `/session/${id}` : '/'} />;
@@ -189,8 +204,29 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
               ? 'Hur kändes passet?'
               : 'Hur känns det dagen efter?'}
         </h1>
-        <p className="m-0 mt-2 text-lg font-bold">{trainingName(session)}</p>
+        <p className="m-0 mt-2 text-lg font-bold">
+          {session.customWorkoutName ? `${session.customWorkoutName} · ` : ''}
+          {trainingName(session)} · Pass {session.templateId}
+        </p>
+        {experience && session.programId !== 'rehab' ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Träningsvana: {experienceLabels[experience]}
+          </p>
+        ) : null}
       </header>
+      {period === 'before' ? (
+        <div className="flex flex-col gap-1">
+          <Link
+            href={`/traning/${session.templateId}${session.customWorkoutId ? `?workout=${session.customWorkoutId}` : ''}`}
+            className="flex min-h-12 items-center self-start text-base font-bold underline"
+          >
+            Ändra passet
+          </Link>
+          <p className="m-0 text-base text-ink-soft">
+            Passet startar när du sparar svaren.
+          </p>
+        </div>
+      ) : null}
       <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
         <legend className="mb-2 text-lg font-bold">
           {timing === 'before' ? 'Dagsform' : 'Helhetskänsla'}

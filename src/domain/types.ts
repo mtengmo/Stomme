@@ -159,6 +159,8 @@ export interface Session {
   customWorkoutName?: string;
   /** Absent on original knee/running sessions. */
   programId?: ProgramId;
+  /** Experience selected when this workout was prepared. */
+  experience?: TrainingPreferences['experience'];
   policyVersion?: number;
   rehabFocus?: 'custom' | 'knee';
   checkins?: Partial<Record<'before' | 'after' | 'dayAfter', TrainingCheckin>>;

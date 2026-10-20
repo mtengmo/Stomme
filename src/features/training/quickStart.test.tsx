@@ -68,6 +68,13 @@ it('preserves a returning user’s active session and makes resuming the primary
     programWeek: 1,
     plan: [],
     feedback: {},
+    checkins: {
+      before: {
+        recordedAt: '2026-10-20T08:00:00Z',
+        feeling: 'ready',
+        symptoms: null,
+      },
+    },
   });
   const user = userEvent.setup();
   render(<App />);
@@ -90,4 +97,27 @@ it('preserves a returning user’s active session and makes resuming the primary
     status: 'in_progress',
     programId: 'running',
   });
+});
+
+it('returns from the before-workout questions to an editable prepared workout', async () => {
+  await setMeta(getDb(), 'training', {
+    programId: 'running',
+    equipment: ['bodyweight'],
+    experience: 'some',
+  });
+  window.location.hash = '#/traning/A';
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Börja passet' }));
+  await screen.findByRole('heading', { name: 'Hur känns kroppen?' });
+  expect(screen.getByText('Träningsvana: Viss vana')).toBeTruthy();
+  await user.click(screen.getByRole('link', { name: 'Ändra passet' }));
+  await user.click(
+    await screen.findByRole('button', { name: 'Anpassa passet' }),
+  );
+  expect(
+    screen.getAllByLabelText('Set', { exact: true }).length,
+  ).toBeGreaterThan(0);
+  expect(screen.queryByText('Du har redan ett pågående pass.')).toBeNull();
+  expect(await getDb().sessions.count()).toBe(1);
 });

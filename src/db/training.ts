@@ -22,6 +22,26 @@ import type { StommeDB } from './db';
 
 import { getActiveSession } from './repo';
 
+/** A preparation contains no recorded exercise, symptoms or answers to discard. */
+export async function canReplaceTrainingPreparation(
+  db: StommeDB,
+  session: Session,
+): Promise<boolean> {
+  if (
+    !session.programId ||
+    session.status !== 'in_progress' ||
+    Object.values(session.checkins ?? {}).some(Boolean) ||
+    Object.keys(session.feedback ?? {}).length ||
+    session.note?.trim()
+  )
+    return false;
+  const [sets, pain] = await Promise.all([
+    db.setLogs.where('sessionId').equals(session.id).count(),
+    db.painLogs.where('sessionId').equals(session.id).count(),
+  ]);
+  return sets === 0 && pain === 0;
+}
+
 export async function saveTrainingPreferences(
   db: StommeDB,
 
@@ -34,14 +54,22 @@ export async function saveTrainingPreferences(
   )
     throw new Error('Invalid training preferences');
 
-  await db.transaction('rw', db.sessions, db.meta, async () => {
-    if (await getActiveSession(db))
-      throw new Error(
-        'Avsluta det pågående passet innan du byter träningsinriktning.',
-      );
+  await db.transaction(
+    'rw',
+    [db.sessions, db.meta, db.setLogs, db.painLogs],
+    async () => {
+      const active = await getActiveSession(db);
+      if (active) {
+        if (!(await canReplaceTrainingPreparation(db, active)))
+          throw new Error(
+            'Avsluta det pågående passet innan du byter träningsinriktning.',
+          );
+        await db.sessions.delete(active.id);
+      }
 
-    await db.meta.put({ key: 'training', value: preferences });
-  });
+      await db.meta.put({ key: 'training', value: preferences });
+    },
+  );
 }
 
 export function validateTrainingPlan(plan: PlannedExercise[]): boolean {
@@ -125,49 +153,56 @@ export async function startTrainingSession(
   )
     throw new Error('Kontrollera övningar, antal, vikt och sidor.');
 
-  return db.transaction('rw', db.sessions, async () => {
-    const active = await getActiveSession(db);
+  return db.transaction(
+    'rw',
+    [db.sessions, db.setLogs, db.painLogs],
+    async () => {
+      const active = await getActiveSession(db);
+      if (active) {
+        if (!(await canReplaceTrainingPreparation(db, active))) return active;
+        await db.sessions.delete(active.id);
+      }
 
-    if (active) return active;
+      const session: Session = {
+        id: crypto.randomUUID(),
 
-    const session: Session = {
-      id: crypto.randomUUID(),
+        templateId,
+        ...(customWorkout
+          ? {
+              customWorkoutId: customWorkout.id,
+              customWorkoutName: customWorkout.name,
+            }
+          : {}),
 
-      templateId,
-      ...(customWorkout
-        ? {
-            customWorkoutId: customWorkout.id,
-            customWorkoutName: customWorkout.name,
-          }
-        : {}),
+        programId: preferences.programId,
+        experience: preferences.experience,
 
-      programId: preferences.programId,
+        policyVersion: 1,
 
-      policyVersion: 1,
+        ...(preferences.programId === 'rehab'
+          ? { rehabFocus: preferences.rehabFocus ?? 'custom' }
+          : {}),
 
-      ...(preferences.programId === 'rehab'
-        ? { rehabFocus: preferences.rehabFocus ?? 'custom' }
-        : {}),
+        checkins: {},
 
-      checkins: {},
+        date: toLocalDate(now),
 
-      date: toLocalDate(now),
+        startedAt: now.toISOString(),
 
-      startedAt: now.toISOString(),
+        status: 'in_progress',
 
-      status: 'in_progress',
+        programWeek: 1,
 
-      programWeek: 1,
+        plan,
 
-      plan,
+        feedback: {},
+      };
 
-      feedback: {},
-    };
+      await db.sessions.add(session);
 
-    await db.sessions.add(session);
-
-    return session;
-  });
+      return session;
+    },
+  );
 }
 
 export async function recordTrainingCheckin(
@@ -207,6 +242,12 @@ export async function recordTrainingCheckin(
 
     await db.sessions.update(id, {
       checkins: { ...session.checkins, [timing]: check },
+      ...(timing === 'before'
+        ? {
+            startedAt: check.recordedAt,
+            date: toLocalDate(new Date(check.recordedAt)),
+          }
+        : {}),
 
       ...(timing === 'after'
         ? { status: 'completed' as const, finishedAt: check.recordedAt }
@@ -227,39 +268,44 @@ export async function saveRehabPlan(
       'Kontrollera övningar, antal, vikt och sidor innan du sparar.',
     );
 
-  await db.transaction('rw', db.sessions, db.meta, async () => {
-    if (await getActiveSession(db))
-      throw new Error(
-        'Avsluta det pågående passet innan du ändrar programmet.',
-      );
-
-    const preferences = (await db.meta.get('training'))?.value;
-    if (
-      !isTrainingPreferences(preferences) ||
-      preferences.programId !== 'rehab' ||
-      (preferences.rehabFocus ?? 'custom') !== focus ||
-      plan.some((p) => {
-        const variant = exerciseMetadata[p.exerciseId].variants.find(
-          (v) => v.id === p.variantId,
+  await db.transaction(
+    'rw',
+    [db.sessions, db.meta, db.setLogs, db.painLogs],
+    async () => {
+      const active = await getActiveSession(db);
+      if (active && !(await canReplaceTrainingPreparation(db, active)))
+        throw new Error(
+          'Avsluta det pågående passet innan du ändrar programmet.',
         );
-        return (
-          !variant ||
-          !equipmentFits(variant.equipment, preferences.equipment) ||
-          (focus === 'knee' &&
-            !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
-        );
-      })
-    )
-      throw new Error(
-        'Kontrollera rehabinriktning och tillgänglig utrustning.',
-      );
-    const previous = (await db.meta.get('rehabPlans'))?.value as
-      | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
-      | undefined;
 
-    await db.meta.put({
-      key: 'rehabPlans',
-      value: { ...previous, [focus]: structuredClone(plan) },
-    });
-  });
+      const preferences = (await db.meta.get('training'))?.value;
+      if (
+        !isTrainingPreferences(preferences) ||
+        preferences.programId !== 'rehab' ||
+        (preferences.rehabFocus ?? 'custom') !== focus ||
+        plan.some((p) => {
+          const variant = exerciseMetadata[p.exerciseId].variants.find(
+            (v) => v.id === p.variantId,
+          );
+          return (
+            !variant ||
+            !equipmentFits(variant.equipment, preferences.equipment) ||
+            (focus === 'knee' &&
+              !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
+          );
+        })
+      )
+        throw new Error(
+          'Kontrollera rehabinriktning och tillgänglig utrustning.',
+        );
+      const previous = (await db.meta.get('rehabPlans'))?.value as
+        | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
+        | undefined;
+
+      await db.meta.put({
+        key: 'rehabPlans',
+        value: { ...previous, [focus]: structuredClone(plan) },
+      });
+    },
+  );
 }

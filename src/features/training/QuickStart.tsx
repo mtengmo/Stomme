@@ -173,7 +173,7 @@ export function QuickStart() {
                     </label>
                   ))
                 : null}
-              {goal === 'general' ? (
+              {goal === 'general' || goal === 'running' ? (
                 <label className="flex flex-col gap-2 text-base font-bold">
                   Träningsvana
                   <select
