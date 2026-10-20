@@ -7,6 +7,40 @@ import { FigureFrame, movementPose } from './Figure';
 import { figures } from './poses';
 
 describe('catalogue equipment and contacts', () => {
+  it.each(exerciseList)(
+    '$id colours both sides blue for bilateral demonstrations',
+    (exercise) => {
+      const markup = renderToStaticMarkup(
+        <FigureFrame
+          exerciseId={exercise.id}
+          pose={movementPose(exercise.id, 0.5)}
+          working={null}
+        />,
+      );
+      expect(markup).toContain('data-body-side="far" stroke="var(--blue)"');
+      expect(markup).toContain('data-body-side="near" stroke="var(--blue)"');
+      expect(markup).not.toContain('<text');
+    },
+  );
+  it('keeps unilateral limbs distinct and equipment separate from the blue body', () => {
+    for (const equipment of ['dumbbell', 'kettlebell', 'band'] as const) {
+      const markup = renderToStaticMarkup(
+        <FigureFrame
+          exerciseId="dumbbell-rdl"
+          pose={movementPose('dumbbell-rdl', 0.5)}
+          working="left"
+          equipment={equipment}
+        />,
+      );
+      expect(markup).toContain('data-body-side="far" stroke="var(--edge)"');
+      expect(markup).toContain('data-body-side="near" stroke="var(--blue)"');
+      expect(markup.split(`data-equipment="${equipment}"`)[1]).toContain(
+        'stroke="var(--equipment)"',
+      );
+      expect(markup).toContain('translate(192 0) scale(-1 1)');
+    }
+  });
+
   it('keeps the kettlebell Romanian deadlift above the floor at the bottom', () => {
     const markup = renderToStaticMarkup(
       <FigureFrame

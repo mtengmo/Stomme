@@ -67,7 +67,7 @@ export function Held({
     return (
       <g
         {...PROP}
-        stroke="var(--ink)"
+        stroke="var(--equipment)"
         strokeWidth={4}
         transform={vertical ? `rotate(90 ${x} ${y})` : undefined}
       >
@@ -78,7 +78,7 @@ export function Held({
     );
   }
   return (
-    <g {...PROP} stroke="var(--ink)" strokeWidth={4}>
+    <g {...PROP} stroke="var(--equipment)" strokeWidth={4}>
       <path d={`M${x - 5} ${y + 2}A5 6 0 0 1 ${x + 5} ${y + 2}`} />
       <circle cx={x} cy={y + 12} r="9" fill="var(--paper)" />
     </g>

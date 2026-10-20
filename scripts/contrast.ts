@@ -55,6 +55,8 @@ const pairs: [string, string, number, string][] = [
   ['edge', 'line', 3, 'outlines over a grid line (UI)'],
   ['ink', 'paper', 3, 'heavy outlines and tick (UI)'],
   ['blue', 'paper', 3, 'focus ring (UI)'],
+  ['equipment', 'paper', 3, 'exercise equipment outlines'],
+  ['equipment', 'line', 3, 'exercise equipment over a grid line'],
   ['red', 'paper', 3, 'pencil tick (UI)'],
 ];
 

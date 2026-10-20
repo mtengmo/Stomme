@@ -52,6 +52,7 @@ export function ExerciseCardBody({
   const [paused, setPaused] = useState(false);
   const [overlay, setOverlay] = useState(true);
   const reducedMotion = usePrefersReducedMotion();
+  const overlayActive = overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id);
   const working = exercise.perSide ? workingSide : null;
   const physio = ASK_PHYSIO[exercise.id];
   const selectedLoadIndex = loadIndex ?? selectedLoad;
@@ -167,9 +168,7 @@ export function ExerciseCardBody({
                 working={working}
                 equipment={presentation.equipment}
                 paused={paused || reducedMotion}
-                showMuscles={
-                  overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
-                }
+                showMuscles={overlayActive}
               />
             </div>
             {review ? equipmentControls : null}
@@ -187,11 +186,18 @@ export function ExerciseCardBody({
                 Rörelsen visas stilla med minskad rörelse.
               </p>
             )}
-            {working ? (
+            {working || !overlayActive || equipment ? (
               <p className="m-0 text-base text-ink-soft">
-                {working === 'right'
-                  ? 'H: höger sida arbetar.'
-                  : 'V: vänster sida arbetar.'}
+                {working
+                  ? working === 'right'
+                    ? 'H: höger sida arbetar.'
+                    : 'V: vänster sida arbetar.'
+                  : !overlayActive
+                    ? 'Blått: båda sidor arbetar.'
+                    : ''}
+                {equipment
+                  ? ` Orange: ${equipment === 'dumbbell' ? 'hantel' : equipment === 'kettlebell' ? 'kettlebell' : 'gummiband'}.`
+                  : ''}
               </p>
             ) : null}
           </section>

@@ -52,7 +52,7 @@ const limb = {
   strokeLinejoin: 'round',
 } as const;
 
-/** One frame. The working side is blue and carries a letter marker. */
+/** Working limbs are blue; one-sided exercises also carry an H/V marker. */
 export function FigureFrame({
   exerciseId,
   pose,
@@ -62,7 +62,7 @@ export function FigureFrame({
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
-  /** null: two-sided exercise, no marker and no accent colour. */
+  /** null: both sides work in blue, without an H/V marker. */
   working?: Working | null;
   showMuscles?: boolean;
   equipment?: Equipment;
@@ -139,7 +139,9 @@ export function FigureFrame({
       eL: [p.neck[0] + 19, p.neck[1] + 10],
       hL: [p.neck[0] + 41, p.neck[1] + 12],
     };
-  const accent = working && !showMuscles ? 'var(--blue)' : 'var(--ink)';
+  const accent = !showMuscles ? 'var(--blue)' : 'var(--ink)';
+  const farSide =
+    working === null && !showMuscles ? 'var(--blue)' : 'var(--edge)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
     working === 'left' ? 'translate(192 0) scale(-1 1)' : undefined;
@@ -161,7 +163,7 @@ export function FigureFrame({
         {showMuscles ? (
           <MuscleOverlay exerciseId={exerciseId} pose={p} />
         ) : null}
-        <g stroke="var(--edge)" {...limb}>
+        <g data-body-side="far" stroke={farSide} {...limb}>
           <path d={arm(p.eL, p.hL)} />
           <path d={leg(p.kL, p.aL, p.tL)} />
         </g>
@@ -169,7 +171,7 @@ export function FigureFrame({
           <path d={line([p.neck, p.hip])} />
           <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
         </g>
-        <g stroke={accent} {...limb}>
+        <g data-body-side="near" stroke={accent} {...limb}>
           <path d={arm(p.eR, p.hR)} />
           <path d={leg(p.kR, p.aR, p.tR)} />
         </g>
@@ -178,8 +180,9 @@ export function FigureFrame({
             data-equipment="band"
             d={`M${p.hR.join(' ')}L${p.aR[0] + 2} ${p.aR[1] - 2}L${p.hL.join(' ')}`}
             fill="none"
-            stroke="var(--blue)"
+            stroke="var(--equipment)"
             strokeWidth="3"
+            strokeDasharray="5 3"
           />
         ) : heldKind ? (
           <g data-equipment={heldKind}>
