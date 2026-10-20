@@ -1,6 +1,7 @@
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 import { Button } from '../../ui/Button';
+import { PrivacyNotice } from '../privacy/PrivacyNotice';
 
 export async function acceptOnboarding(): Promise<void> {
   await setMeta(getDb(), 'onboarding', {
@@ -47,6 +48,12 @@ export function Onboarding() {
       <p className="m-0 text-lg font-bold">
         Avbryt vid skarp smärta, svullnad eller om knät låser sig.
       </p>
+      <details>
+        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+          Integritet – dina uppgifter
+        </summary>
+        <PrivacyNotice />
+      </details>
       <div className="mt-auto pt-2">
         <Button onClick={() => void acceptOnboarding()}>
           Jag förstår, fortsätt

@@ -20,6 +20,7 @@ import { APP_COMMIT, APP_VERSION } from '../../lib/version';
 import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
+import { PrivacyNotice } from '../privacy/PrivacyNotice';
 import { readBackupMeta } from '../week/BackupReminder';
 import { useUpdate } from './updateContext';
 
@@ -360,6 +361,9 @@ export function Settings() {
         ) : null}
       </Section>
 
+      <Section id="set-privacy" title="Integritet">
+        <PrivacyNotice />
+      </Section>
       <StorageSection />
       <InstallSection />
       <VersionSection />
