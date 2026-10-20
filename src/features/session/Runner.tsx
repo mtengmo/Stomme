@@ -65,6 +65,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [timedExercise, setTimedExercise] = useState<ExerciseId | null>(null);
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -98,6 +99,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     try {
       await fn();
     } catch {
+      setTimedExercise(null);
       setError(true);
     } finally {
       setBusy(false);
@@ -106,6 +108,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
 
   const runUndo = () =>
     run(async () => {
+      setTimedExercise(null);
       const s = snack;
       setSnack(null);
       if (!s) return;
@@ -152,7 +155,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     stepId: cursor,
     clock: formatClock(seconds),
     tally,
-    onAbort: () => setConfirmAbort(true),
+    onAbort: () => {
+      setTimedExercise(null);
+      setConfirmAbort(true);
+    },
     snack:
       snack || error ? (
         <>
@@ -296,13 +302,21 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         }
         variantId={prior?.variantId ?? plan?.variantId}
         singleSide={plan?.sides?.length === 1}
+        autoStartTimer={timedExercise === ex.id}
+        onStartTimer={() => setTimedExercise(ex.id)}
         onReportSymptoms={
-          session.programId ? () => setReporting(true) : undefined
+          session.programId
+            ? () => {
+                setTimedExercise(null);
+                setReporting(true);
+              }
+            : undefined
         }
         symptomReported={!!session.feedback[step.exerciseId]?.symptoms}
         busy={busy}
         onSkip={() =>
           run(async () => {
+            setTimedExercise(null);
             const db = getDb();
             await setFeedback(db, session.id, step.exerciseId, {
               skipped: true,
@@ -355,6 +369,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         nextTotalSets={upcoming ? total(upcoming.planIndex) : 0}
         onContinue={() => advance()}
         afterSet={steps[cursor - 1]?.kind === 'set'}
+        autoContinue={
+          timedExercise === step.exerciseId &&
+          upcoming?.exerciseId === step.exerciseId
+        }
       />
     );
   }
@@ -367,6 +385,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       exercise={ex}
       onPick={(effort: Effort) =>
         run(async () => {
+          setTimedExercise(null);
           await setFeedback(getDb(), session.id, step.exerciseId, { effort });
           setSnack(null);
           advance({ ...session.feedback, [step.exerciseId]: { effort } });

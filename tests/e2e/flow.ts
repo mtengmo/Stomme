@@ -12,7 +12,8 @@ export type Stage =
   | 'pain-after'
   | 'summary';
 
-const ACTION = /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara)$/;
+const ACTION =
+  /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara|Starta – 5 s förberedelse)$/;
 
 /** Fills the pain picker (score, optional red flags) and saves. */
 export async function answerPain(
@@ -67,6 +68,34 @@ export async function playPassA(
     const action = page.getByRole('button', { name: ACTION }).first();
     await action.waitFor();
     const name = (await action.innerText()).trim();
+
+    if (name.startsWith('Starta –')) {
+      await once('set-timed');
+      await page.clock.install();
+      await action.click();
+      // Pass A ends with two right/left pairs of 20-second side planks.
+      for (let set = 0; set < 2; set++) {
+        for (const side of ['Höger sida', 'Vänster sida']) {
+          await expect(page.getByText(side, { exact: true })).toBeVisible();
+          await expect(page.getByRole('timer')).toHaveText('0:05');
+          await page.clock.fastForward(5_000);
+          await expect(page.getByRole('timer')).toHaveText('0:20');
+          await page.clock.fastForward(20_000);
+          sets += 1;
+        }
+        if (set === 0) {
+          await expect(
+            page.getByRole('heading', { name: 'Vila', exact: true }),
+          ).toBeVisible();
+          await page.clock.fastForward(60_000);
+        }
+      }
+      await expect(
+        page.getByRole('button', { name: 'Lagom', exact: true }),
+      ).toBeVisible();
+      await page.clock.resume();
+      continue;
+    }
 
     if (name === 'Spara') {
       await once('pain-after');

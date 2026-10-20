@@ -5,7 +5,7 @@ import { loadPresentation } from '../../content/loadPresentation';
 import { exerciseMuscles, muscleGroups } from '../../content/muscles';
 import type { Exercise } from '../../domain/types';
 import { formatClock } from '../../lib/format';
-import { useCountdown } from '../../lib/useCountdown';
+import { useTimedHold } from '../../lib/useTimedHold';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
@@ -22,6 +22,8 @@ interface SetScreenProps {
   initialWeightKg?: number;
   variantId?: string;
   singleSide?: boolean;
+  autoStartTimer?: boolean;
+  onStartTimer?(): void;
   onReportSymptoms?(): void;
   symptomReported?: boolean;
   busy: boolean;
@@ -39,6 +41,8 @@ export function SetScreen({
   initialWeightKg,
   variantId,
   singleSide,
+  autoStartTimer = false,
+  onStartTimer,
   onReportSymptoms,
   symptomReported,
   busy,
@@ -48,16 +52,31 @@ export function SetScreen({
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
   const [weightKg, setWeightKg] = useState(initialWeightKg);
-  const [holdDone, setHoldDone] = useState(false);
-  const [stoppedSeconds, setStoppedSeconds] = useState<number | null>(null);
-  const hold = useCountdown(() => setHoldDone(true));
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
   const presentation = loadPresentation(exercise, loadIndex, variantId);
+  const invalidWeight =
+    weightKg !== undefined &&
+    (!Number.isFinite(weightKg) ||
+      weightKg < 0 ||
+      weightKg > 500 ||
+      (presentation.equipment === 'dumbbell' ||
+      presentation.equipment === 'kettlebell'
+        ? weightKg <= 0
+        : weightKg !== 0));
+  const hold = useTimedHold({
+    seconds: amount,
+    side,
+    autoStart: unit === 'seconds' && autoStartTimer,
+    onDone: () => {
+      if (!busy && !invalidWeight) onDone(amount, loadIndex, weightKg);
+    },
+  });
+  const timerActive = hold.phase === 'prepare' || hold.phase === 'hold';
   const nextCue =
     step.side === 'right' && !singleSide
-      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila.`
+      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}${unit === 'seconds' ? '. Du får 5 sekunder att byta.' : ', utan vila.'}`
       : step.setNumber < totalSets
         ? 'Sedan: vila före nästa set.'
         : 'Sedan: bedöm hur ansträngande övningen var.';
@@ -69,36 +88,37 @@ export function SetScreen({
         ? 'Kroppsvikt'
         : load?.label;
   const changeAmount = (value: number) => {
-    hold.stop();
-    setHoldDone(false);
-    setStoppedSeconds(null);
+    hold.reset();
     setAmount(value);
   };
-  const remaining = hold.running
-    ? hold.seconds
-    : holdDone
-      ? 0
-      : (stoppedSeconds ?? amount);
+  const remaining = hold.phase === 'idle' ? amount : hold.remaining;
   return (
     <SessionFrame
       {...frame}
       actions={
         <div className="session-set-actions flex items-center gap-3">
           <Button
-            disabled={
-              busy ||
-              (weightKg !== undefined &&
-                (!Number.isFinite(weightKg) ||
-                  weightKg < 0 ||
-                  weightKg > 500 ||
-                  (presentation.equipment === 'dumbbell' ||
-                  presentation.equipment === 'kettlebell'
-                    ? weightKg <= 0
-                    : weightKg !== 0)))
-            }
-            onClick={() => onDone(amount, loadIndex, weightKg)}
+            disabled={busy || invalidWeight}
+            onClick={() => {
+              if (unit !== 'seconds' || hold.phase === 'done')
+                onDone(amount, loadIndex, weightKg);
+              else if (timerActive) hold.pause();
+              else if (hold.phase === 'paused') hold.resume();
+              else {
+                onStartTimer?.();
+                hold.start();
+              }
+            }}
           >
-            Klar set
+            {unit !== 'seconds'
+              ? 'Klar set'
+              : timerActive
+                ? 'Pausa timer'
+                : hold.phase === 'paused'
+                  ? 'Fortsätt timer'
+                  : hold.phase === 'done'
+                    ? 'Spara set igen'
+                    : 'Starta – 5 s förberedelse'}
           </Button>
           <button
             type="button"
@@ -132,55 +152,37 @@ export function SetScreen({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="m-0 text-base font-bold">
-                Hålltid{side ? ` · ${side}` : ''}
+                {hold.phase === 'prepare'
+                  ? 'Gör dig redo'
+                  : hold.phase === 'paused'
+                    ? 'Pausad'
+                    : 'Hålltid'}
+                {side ? ` · ${side}` : ''}
               </p>
               <p
                 role="timer"
-                aria-label={`${remaining} sekunder hålltid kvar`}
+                aria-label={`${remaining} sekunder ${hold.phase === 'prepare' ? 'förberedelse ' : hold.phase === 'paused' ? '' : 'hålltid '}kvar`}
                 className="count m-0 text-[clamp(4.5rem,24vw,6rem)] leading-none"
               >
                 {formatClock(remaining)}
               </p>
             </div>
-            <button
-              type="button"
-              className="min-h-14 w-28 rounded-md border-2 border-current px-2 text-base font-bold"
-              onClick={() => {
-                setHoldDone(false);
-                if (hold.running) {
-                  setStoppedSeconds(hold.seconds);
-                  hold.stop();
-                } else {
-                  hold.start(stoppedSeconds ?? amount);
-                  setStoppedSeconds(null);
-                }
-              }}
-            >
-              {hold.running
-                ? 'Stoppa timer'
-                : stoppedSeconds !== null
-                  ? 'Fortsätt timer'
-                  : holdDone
-                    ? `Starta om hålltid (${amount} s)`
-                    : `Starta hålltid (${amount} s)`}
-            </button>
           </div>
           <p role="status" className="m-0 text-base font-bold">
-            {holdDone
-              ? 'Hålltiden är klar. Sluta hålla och tryck Klar set.'
-              : hold.running
-                ? 'Håll tills timern når 0:00.'
-                : stoppedSeconds !== null
-                  ? 'Timern är stoppad. Fortsätt när du är redo.'
-                  : 'Starta när du är på plats. Timern stannar vid 0:00.'}
+            {hold.phase === 'done'
+              ? 'Hålltiden är klar. Släpp positionen. Setet sparas automatiskt.'
+              : hold.phase === 'hold'
+                ? 'Håll tills signalen. Setet sparas och nästa steg börjar automatiskt.'
+                : hold.phase === 'prepare'
+                  ? `Ta position${side ? ` · ${side}` : ''}. Hålltiden börjar automatiskt.`
+                  : hold.phase === 'paused'
+                    ? 'Timern är pausad. Fortsätt när du är redo.'
+                    : '5 s förberedelse. Sedan automatiska sidbyten och vila. Ljud om möjligt.'}
           </p>
-          {stoppedSeconds !== null ? (
+          {hold.phase === 'paused' ? (
             <button
               type="button"
-              onClick={() => {
-                setStoppedSeconds(null);
-                setHoldDone(false);
-              }}
+              onClick={hold.reset}
               className="min-h-12 text-base font-bold underline"
             >
               Nollställ till {amount} sekunder
@@ -320,7 +322,7 @@ export function SetScreen({
               {unit === 'reps'
                 ? 'Animationen visar tekniken. Räkna repetitionerna själv och tryck Klar set när du är klar.'
                 : unit === 'seconds'
-                  ? 'Animationen visar tekniken. Starta hålltiden när du är på plats. Sluta hålla vid 0:00 och tryck Klar set för att spara.'
+                  ? 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
                   : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>
             {['step-up', 'split-squat'].includes(exercise.id) ? (

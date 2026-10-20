@@ -230,11 +230,18 @@ async function theme(scheme: 'light' | 'dark') {
   for (let g = 0; g < 80; g++) {
     const a = page
       .getByRole('button', {
-        name: /^(Klar set|Hoppa över vila|Lagom|Spara)$/,
+        name: /^(Klar set|Hoppa över vila|Lagom|Spara|Starta – 5 s förberedelse)$/,
       })
       .first();
     await a.waitFor();
     const n = (await a.innerText()).trim();
+    if (n.startsWith('Starta –')) {
+      await audit(page, tag('timed hold'));
+      await page
+        .getByRole('button', { name: 'Hoppa över övningen', exact: true })
+        .click();
+      continue;
+    }
     if (n === 'Lagom' && !seen.has('effort')) {
       seen.add('effort');
       await audit(page, tag('effort'));

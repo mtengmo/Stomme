@@ -107,22 +107,24 @@ for (const width of [360, 390, 1280]) {
       page.getByRole('heading', { name: 'Sidoplanka', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText(/Sedan: byt till vänster sida, utan vila/),
+      page.getByText(/Sedan: byt till vänster sida. Du får 5 sekunder/),
     ).toBeVisible();
     const frame = page.locator('[data-step]');
     const step = await frame.getAttribute('data-step');
     await page.clock.install();
-    const start = page.getByRole('button', { name: /^Starta hålltid/ });
+    const start = page.getByRole('button', { name: /^Starta –/ });
     await expect(start).toBeInViewport({ ratio: 1 });
     await expect(page.getByRole('region', { name: 'Rörelsen' })).toBeInViewport(
       { ratio: 1 },
     );
     await start.click();
+    await expect(page.getByRole('timer')).toHaveText('0:05');
+    await page.clock.fastForward(5_000);
     await expect(page.getByRole('timer')).toHaveText('0:20');
     await expect(page.getByRole('timer')).toBeInViewport({ ratio: 1 });
     await page.clock.fastForward(5_000);
     await page
-      .getByRole('button', { name: 'Stoppa timer', exact: true })
+      .getByRole('button', { name: 'Pausa timer', exact: true })
       .click();
     await expect(page.getByRole('timer')).toHaveText('0:15');
     await page.clock.fastForward(10_000);
@@ -131,25 +133,84 @@ for (const width of [360, 390, 1280]) {
     await page
       .getByRole('button', { name: 'Fortsätt timer', exact: true })
       .click();
-    await page.clock.fastForward(16_000);
-    await expect(
-      page.getByRole('status').filter({ hasText: 'Hålltiden är klar' }),
-    ).toBeVisible();
-    await expect(frame).toHaveAttribute('data-step', step ?? '');
-    await page.screenshot({
-      path: test.info().outputPath('hold-complete.png'),
-    });
-    await page.getByRole('button', { name: 'Klar set', exact: true }).click();
+    await page.clock.fastForward(15_000);
     await expect(page.getByText('Vänster sida', { exact: true })).toBeVisible();
+    await expect(page.getByRole('timer')).toHaveText('0:05');
+    await page.clock.fastForward(5_000);
     await expect(page.getByRole('timer')).toHaveText('0:20');
-    await page.getByRole('button', { name: 'Klar set', exact: true }).click();
+    await page.screenshot({
+      path: test.info().outputPath('hands-free-hold.png'),
+    });
+    await page.clock.fastForward(20_000);
     await expect(
       page.getByRole('heading', { name: 'Vila', exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole('timer')).toBeInViewport({ ratio: 1 });
-    await page.clock.fastForward(120_000);
+    await expect(page.getByRole('timer')).toHaveText('1:00');
+    await page.getByRole('button', { name: 'Pausa vila', exact: true }).click();
+    await page.clock.fastForward(10_000);
+    await expect(page.getByRole('timer')).toHaveText('1:00');
+    await page
+      .getByRole('button', { name: 'Fortsätt vila', exact: true })
+      .click();
+    await page.clock.fastForward(60_000);
+    await expect(page.getByText('Höger sida', { exact: true })).toBeVisible();
+    await expect(page.getByRole('timer')).toHaveText('0:05');
+    await page.clock.fastForward(5_000);
+    await expect(page.getByRole('timer')).toHaveText('0:20');
+    await page.clock.fastForward(20_000);
+    await expect(page.getByText('Vänster sida', { exact: true })).toBeVisible();
+    await expect(page.getByRole('timer')).toHaveText('0:05');
+    await page.clock.fastForward(5_000);
+    await expect(page.getByRole('timer')).toHaveText('0:20');
+    await page.clock.fastForward(20_000);
     await expect(
-      page.getByText(/Vilan är klar. Tryck Nästa set/),
+      page.getByRole('heading', { name: 'Hur ansträngande var övningen?' }),
     ).toBeVisible();
+    const logged = await page.evaluate(
+      () =>
+        new Promise<Array<{ side: string; setNumber: number; amount: number }>>(
+          (resolve, reject) => {
+            const open = indexedDB.open('stomme');
+            open.onerror = () => reject(open.error);
+            open.onsuccess = () => {
+              const db = open.result;
+              const read = db
+                .transaction('setLogs')
+                .objectStore('setLogs')
+                .getAll();
+              read.onerror = () => {
+                db.close();
+                reject(read.error);
+              };
+              read.onsuccess = () => {
+                const rows = read.result as Array<{
+                  exerciseId: string;
+                  side: string;
+                  setNumber: number;
+                  amount: number;
+                  loggedAt: string;
+                }>;
+                resolve(
+                  rows
+                    .filter((row) => row.exerciseId === 'side-plank')
+                    .sort((a, b) => a.loggedAt.localeCompare(b.loggedAt))
+                    .map(({ side, setNumber, amount }) => ({
+                      side,
+                      setNumber,
+                      amount,
+                    })),
+                );
+                db.close();
+              };
+            };
+          },
+        ),
+    );
+    expect(logged).toEqual([
+      { side: 'right', setNumber: 1, amount: 20 },
+      { side: 'left', setNumber: 1, amount: 20 },
+      { side: 'right', setNumber: 2, amount: 20 },
+      { side: 'left', setNumber: 2, amount: 20 },
+    ]);
   });
 }

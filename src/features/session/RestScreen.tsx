@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { sideLabel } from '../../content/copy';
 import type { Exercise } from '../../domain/types';
 import { formatClock } from '../../lib/format';
+import { stopTimerVoice, timerVoice } from '../../lib/timerVoice';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
@@ -19,6 +20,7 @@ interface RestScreenProps {
   onContinue(): void;
   /** True when the rest follows a set (not an effort answer): draws the tick. */
   afterSet: boolean;
+  autoContinue?: boolean;
 }
 /** Huge countdown on timestamps, +15 s, skip; "Nästa" tells what comes after. */
 export function RestScreen({
@@ -29,14 +31,36 @@ export function RestScreen({
   nextTotalSets,
   onContinue,
   afterSet,
+  autoContinue = false,
 }: RestScreenProps) {
   const total = useRef(restSec);
-  const timer = useCountdown();
+  const [paused, setPaused] = useState(false);
+  const savedSeconds = useRef(restSec);
+  const timer = useCountdown(() => {
+    if (autoContinue && !document.hidden) onContinue();
+  });
   const { start } = timer;
   useEffect(() => {
     total.current = restSec;
     start(restSec);
-  }, [restSec, start]);
+    if (autoContinue) timerVoice(`Vila. ${restSec} sekunder.`);
+  }, [restSec, start, autoContinue]);
+  const pause = () => {
+    if (paused || !timer.running) return;
+    savedSeconds.current = timer.seconds;
+    timer.stop();
+    stopTimerVoice();
+    setPaused(true);
+  };
+  const pauseRef = useRef(pause);
+  pauseRef.current = pause;
+  useEffect(() => {
+    const hide = () => {
+      if (document.hidden && autoContinue) pauseRef.current();
+    };
+    document.addEventListener('visibilitychange', hide, true);
+    return () => document.removeEventListener('visibilitychange', hide, true);
+  }, [autoContinue]);
   const over = !timer.running;
   const fraction = over ? 0 : Math.min(1, timer.seconds / total.current);
   const side =
@@ -46,6 +70,19 @@ export function RestScreen({
       {...frame}
       actions={
         <>
+          {autoContinue ? (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                if (paused) {
+                  setPaused(false);
+                  start(savedSeconds.current);
+                } else pause();
+              }}
+            >
+              {paused ? 'Fortsätt vila' : 'Pausa vila'}
+            </Button>
+          ) : null}
           <Button
             variant="secondary"
             disabled={over}
@@ -95,15 +132,23 @@ export function RestScreen({
         <p
           className="count m-0 text-[6rem] leading-none"
           role="timer"
-          aria-label={`${timer.seconds} sekunder kvar`}
+          aria-label={`${paused ? savedSeconds.current : timer.seconds} sekunder kvar`}
         >
-          {over ? 'Nu' : formatClock(timer.seconds)}
+          {paused
+            ? formatClock(savedSeconds.current)
+            : over
+              ? 'Nu'
+              : formatClock(timer.seconds)}
         </p>
       </div>
       <p role="status" className="m-0 text-base">
-        {over
-          ? 'Vilan är klar. Tryck Nästa set när du är redo.'
-          : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}
+        {paused
+          ? 'Vilan är pausad. Fortsätt när du är redo.'
+          : autoContinue
+            ? 'Nästa hållning börjar automatiskt efter vilan och 5 sekunders förberedelse.'
+            : over
+              ? 'Vilan är klar. Tryck Nästa set när du är redo.'
+              : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}
       </p>
       {nextExercise && nextStep ? (
         <div>
