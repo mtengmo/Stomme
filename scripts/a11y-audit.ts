@@ -390,6 +390,62 @@ async function theme(scheme: 'light' | 'dark') {
     .getByRole('heading', { name: 'Pass A klart', exact: true })
     .waitFor();
   await audit(training, tag('general training summary'));
+  await training.goto(`${base}/#/historik`);
+  await training
+    .getByRole('heading', { name: 'Historik', exact: true })
+    .waitFor();
+  await audit(training, tag('new history overview and trends'));
+  await training
+    .getByRole('region', { name: 'Alla pass' })
+    .getByRole('link')
+    .first()
+    .click();
+  await training
+    .getByRole('heading', { name: 'Känsla och besvär', exact: true })
+    .waitFor();
+  await audit(training, tag('new session history answers'));
+  await training
+    .getByRole('link', { name: 'Jämför tidigare pass' })
+    .first()
+    .click();
+  await training
+    .getByRole('combobox', { name: 'Utrustning', exact: true })
+    .waitFor();
+  await audit(training, tag('equipment and side exercise comparison'));
+  await training.goto(`${base}/#/`);
+  await training
+    .getByRole('button', { name: 'Byt träningsinriktning' })
+    .click();
+  await training
+    .getByRole('radio', { name: 'Mitt rehabprogram', exact: true })
+    .check();
+  await training
+    .getByRole('combobox', { name: 'Rehabinriktning', exact: true })
+    .selectOption('knee');
+  await audit(training, tag('knee rehabilitation setup'));
+  await training
+    .getByRole('button', { name: 'Spara träningsinriktning' })
+    .click();
+  await training.getByRole('link', { name: 'Planera mitt rehabpass' }).click();
+  await training
+    .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
+    .click();
+  await audit(training, tag('AAOS exercise selection'));
+  await training
+    .getByRole('button', { name: 'Lägg till E31', exact: true })
+    .click();
+  await training
+    .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
+    .click();
+  await training.getByLabel('Set', { exact: true }).fill('1');
+  await training.getByLabel('Repetitioner per sida', { exact: true }).fill('3');
+  await training
+    .getByRole('checkbox', { name: /Jag har kontrollerat/ })
+    .check();
+  await training
+    .getByRole('button', { name: 'Spara rehabprogram', exact: true })
+    .click();
+  await audit(training, tag('saved knee programme editor'));
   await trainingContext.close();
   await browser.close();
   browsers.delete(browser);

@@ -21,6 +21,11 @@ const SessionScreen = lazy(() =>
     default: m.SessionScreen,
   })),
 );
+const ExerciseHistory = lazy(() =>
+  import('./features/history/ExerciseHistory').then((m) => ({
+    default: m.ExerciseHistory,
+  })),
+);
 const SessionDetail = lazy(() =>
   import('./features/history/SessionDetail').then((m) => ({
     default: m.SessionDetail,
@@ -206,6 +211,9 @@ function Shell() {
             ) : null}
             <Route path="/granska">{() => <ExerciseReview />}</Route>
             <Route path="/historik">{() => <History />}</Route>
+            <Route path="/historik/ovning/:id">
+              {(params) => <ExerciseHistory key={params.id} id={params.id} />}
+            </Route>
             <Route path="/historik/:id">
               {(params) => <SessionDetail id={params.id} />}
             </Route>

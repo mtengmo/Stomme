@@ -166,3 +166,89 @@ test('rehab uses explicitly entered dose and selected left side through reload',
     page.getByRole('heading', { name: 'Hur kändes det?' }),
   ).toBeVisible();
 });
+
+test('knee rehab saves a reusable AAOS selection and connects actual sets to history', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page
+    .getByRole('radio', { name: 'Mitt rehabprogram', exact: true })
+    .check();
+  await page
+    .getByRole('combobox', { name: 'Rehabinriktning', exact: true })
+    .selectOption('knee');
+  await page
+    .getByRole('combobox', {
+      name: 'Vilket knä eller vilken sida?',
+      exact: true,
+    })
+    .selectOption('left');
+  await page.getByRole('button', { name: 'Spara träningsinriktning' }).click();
+  await page.getByRole('link', { name: 'Planera mitt rehabpass' }).click();
+  await page
+    .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Lägg till E38', exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole('button', { name: 'Lägg till E31', exact: true })
+    .click();
+  await page
+    .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
+    .click();
+  await expect(page.getByLabel('Set', { exact: true })).toHaveValue('');
+  await expect(
+    page.getByRole('combobox', { name: 'Arbetande sida', exact: true }),
+  ).toHaveValue('left');
+  await page.getByLabel('Set', { exact: true }).fill('1');
+  await page.getByLabel('Repetitioner per sida', { exact: true }).fill('3');
+  await page.getByRole('checkbox', { name: /Jag har kontrollerat/ }).check();
+  await page
+    .getByRole('button', { name: 'Spara rehabprogram', exact: true })
+    .click();
+  await expect(page.getByRole('status')).toContainText(
+    'Rehabprogrammet är sparat',
+  );
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload();
+  await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
+  await expect(
+    page.getByLabel('Repetitioner per sida', { exact: true }),
+  ).toHaveValue('3');
+  await page.getByRole('checkbox', { name: /Jag har kontrollerat/ }).check();
+  await page.getByRole('button', { name: 'Starta pass', exact: true }).click();
+  await page.getByRole('radio', { name: 'Redo att träna' }).check();
+  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
+  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await page.getByRole('button', { name: 'Klar set', exact: true }).click();
+  await page.getByRole('button', { name: 'Lätt', exact: true }).click();
+  await page.getByRole('radio', { name: 'Bra', exact: true }).check();
+  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
+  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await page.getByRole('heading', { name: /Pass A klart/ }).waitFor();
+  await page.goto('/#/historik');
+  await page
+    .getByRole('combobox', { name: 'Träningsinriktning', exact: true })
+    .selectOption('knee');
+  await expect(page.getByRole('status')).toHaveText('1 pass visas');
+  await page
+    .getByRole('region', { name: 'Alla pass' })
+    .getByRole('link')
+    .first()
+    .click();
+  await expect(
+    page.getByRole('region', { name: 'Känsla och besvär' }),
+  ).toContainText('Svar saknas');
+  await expect(page.getByText('3 rep.', { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Smärta i högerknäet' }),
+  ).toHaveCount(0);
+  await page.getByRole('link', { name: 'Jämför tidigare pass' }).click();
+  await expect(
+    page.getByRole('combobox', { name: 'Arbetande sida', exact: true }),
+  ).toHaveValue('left');
+  await expect(page.getByText(/Set 1: 3 rep/)).toBeVisible();
+});

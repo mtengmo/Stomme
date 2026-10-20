@@ -14,6 +14,7 @@ import { StommeDB } from './db';
 import { logSet, setFeedback } from './repo';
 import {
   recordTrainingCheckin,
+  saveRehabPlan,
   saveTrainingPreferences,
   startTrainingSession,
 } from './training';
@@ -379,5 +380,76 @@ describe('programme persistence and safety boundaries', () => {
       await expect(importAll(db, serializeBackup(backup))).rejects.toThrow();
       expect(await exportAll(db, now)).toEqual(valid);
     }
+  });
+});
+
+describe('saved knee rehabilitation programmes', () => {
+  const knee: TrainingPreferences = {
+    programId: 'rehab',
+    experience: 'new',
+    equipment: ['bodyweight'],
+    rehabFocus: 'knee',
+    rehabSide: 'left',
+  };
+  const kneePlan: PlannedExercise = {
+    exerciseId: 'straight-leg-raise',
+    sets: 2,
+    target: 3,
+    loadIndex: 0,
+    weightKg: 0,
+    restSec: 30,
+    variantId: 'bodyweight',
+    sides: ['left'],
+    reason: 'first_time',
+  };
+  it('saves a reusable plan without a session, round-trips backup and snapshots the focus', async () => {
+    await saveTrainingPreferences(db, knee);
+    await saveRehabPlan(db, 'knee', [kneePlan]);
+    expect(await db.sessions.count()).toBe(0);
+    expect((await db.meta.get('rehabPlans'))?.value).toEqual({
+      knee: [kneePlan],
+    });
+    const session = await startTrainingSession(db, knee, 'A', [kneePlan], now);
+    expect(session.rehabFocus).toBe('knee');
+    const backup = parseBackup(serializeBackup(await exportAll(db, now)));
+    await importAll(db, serializeBackup(backup), { now });
+    expect((await db.meta.get('training'))?.value).toEqual(knee);
+    expect((await db.meta.get('rehabPlans'))?.value).toEqual({
+      knee: [kneePlan],
+    });
+    expect((await db.sessions.get(session.id))?.rehabFocus).toBe('knee');
+    await expect(saveRehabPlan(db, 'knee', [kneePlan])).rejects.toThrow(
+      /pågående/,
+    );
+  });
+  it('rejects incomplete dose, wrong collection and unavailable equipment', async () => {
+    await saveTrainingPreferences(db, knee);
+    await expect(
+      saveRehabPlan(db, 'knee', [{ ...kneePlan, target: 0 }]),
+    ).rejects.toThrow();
+    await expect(saveRehabPlan(db, 'knee', [plan])).rejects.toThrow();
+    await expect(
+      startTrainingSession(db, knee, 'A', [plan], now),
+    ).rejects.toThrow();
+    await saveTrainingPreferences(db, { ...knee, rehabFocus: 'custom' });
+    await expect(saveRehabPlan(db, 'custom', [plan])).rejects.toThrow(
+      /utrustning/,
+    );
+    expect(await db.meta.get('rehabPlans')).toBeUndefined();
+  });
+  it('keeps custom and knee plans independent and rejects damaged saved backup plans', async () => {
+    await saveTrainingPreferences(db, knee);
+    await saveRehabPlan(db, 'knee', [kneePlan]);
+    await saveTrainingPreferences(db, { ...knee, rehabFocus: 'custom' });
+    await saveRehabPlan(db, 'custom', [{ ...kneePlan, target: 5 }]);
+    expect((await db.meta.get('rehabPlans'))?.value).toEqual({
+      knee: [kneePlan],
+      custom: [{ ...kneePlan, target: 5 }],
+    });
+    const backup = await exportAll(db, now);
+    const stored = backup.meta.find((m) => m.key === 'rehabPlans');
+    if (!stored) throw new Error('Missing saved plan');
+    stored.value = { knee: [{ ...kneePlan, sets: 0 }] };
+    expect(() => parseBackup(serializeBackup(backup))).toThrow();
   });
 });

@@ -71,3 +71,9 @@ Deployed by `.github/workflows/deploy.yml` to GitHub Pages at `https://stomme.te
 
 Browser storage is per origin. Data entered on `github.io` does not appear on
 `stomme.tengmo.com`, so use the app for real data only on the final domain.
+
+### Knee rehabilitation and history
+
+Choose **Mitt rehabprogram → Knärehab – välj från AAOS** to select from the 12 attributed knee-conditioning exercises. Choose working sides, enter an agreed dose and explicitly save the reusable programme without starting a workout. Knee and custom rehab selections are saved separately, included in JSON backup, and never automatically progressed. AAOS recommends selecting exercises with a doctor or physiotherapist; the collection is not a personalised prescription.
+
+History lists sessions before charts and filters by programme, status and period. It shows complete planned sets (all selected sides required), partial sessions and missing symptom answers. Session details separate readiness, effort and symptoms, and retain the actual equipment, weight, amount and side of every logged set. Exercise comparisons filter by equipment and side rather than combining equal weights from different implements. Four-week frequency and recent before/after/next-day reports remain descriptive; missing answers are not zero symptoms. Legacy right-knee charts remain separate from new check-ins.

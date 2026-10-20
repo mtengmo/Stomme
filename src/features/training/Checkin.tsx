@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, Redirect, useLocation } from 'wouter';
-import { programmeNames } from '../../content/programmes';
+import { trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { recordTrainingCheckin } from '../../db/training';
 import type { SymptomReport, TrainingCheckin } from '../../domain/types';
@@ -194,9 +194,7 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
               ? 'Hur kändes passet?'
               : 'Hur känns det dagen efter?'}
         </h1>
-        <p className="m-0 mt-2 text-lg font-bold">
-          {programmeNames[session.programId ?? 'general']}
-        </p>
+        <p className="m-0 mt-2 text-lg font-bold">{trainingName(session)}</p>
       </header>
       <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
         <legend className="mb-2 text-lg font-bold">

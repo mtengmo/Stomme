@@ -86,6 +86,8 @@ export interface TrainingPreferences {
   programId: ProgramId;
   equipment: EquipmentChoice[];
   experience: 'new' | 'some' | 'regular';
+  rehabFocus?: 'custom' | 'knee';
+  rehabSide?: 'right' | 'left' | 'both';
 }
 export interface SymptomReport {
   area: string;
@@ -154,6 +156,7 @@ export interface Session {
   /** Absent on original knee/running sessions. */
   programId?: ProgramId;
   policyVersion?: number;
+  rehabFocus?: 'custom' | 'knee';
   checkins?: Partial<Record<'before' | 'after' | 'dayAfter', TrainingCheckin>>;
   /** Local date, YYYY-MM-DD. */
   date: string;
@@ -196,7 +199,7 @@ export interface PainLog {
 }
 
 export interface MetaEntry {
-  key: 'program' | 'onboarding' | 'backup' | 'training';
+  key: 'program' | 'onboarding' | 'backup' | 'training' | 'rehabPlans';
   value: unknown;
 }
 

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
+import { kneeRehabExercises } from '../content/kneeRehab';
 import type {
   ExerciseId,
   MetaEntry,
@@ -176,6 +177,7 @@ const sessionSchema = z
     templateId: z.enum(['A', 'B']),
     programId: z.enum(['general', 'running', 'rehab']).optional(),
     policyVersion: z.literal(1).optional(),
+    rehabFocus: z.enum(['custom', 'knee']).optional(),
     checkins: z
       .strictObject({
         before: checkin.optional(),
@@ -201,6 +203,21 @@ const sessionSchema = z
     note: z.string().max(5000).optional(),
   })
   .superRefine((session, ctx) => {
+    if (session.rehabFocus && session.programId !== 'rehab')
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Rehab focus requires rehab programme',
+      });
+    if (
+      session.rehabFocus === 'knee' &&
+      session.plan.some(
+        (p) => !kneeRehabExercises.some((ex) => ex.id === p.exerciseId),
+      )
+    )
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Unknown knee collection exercise',
+      });
     if (!session.programId) return;
     if (session.policyVersion !== 1 || !validateTrainingPlan(session.plan))
       ctx.addIssue({
@@ -255,12 +272,32 @@ const painLogSchema = z.strictObject({
   createdAt: instant,
 });
 
+const savedRehabPlan = z
+  .array(plannedExercise)
+  .min(1)
+  .max(12)
+  .refine(validateTrainingPlan);
 const metaSchema = z.discriminatedUnion('key', [
+  z.strictObject({
+    key: z.literal('rehabPlans'),
+    value: z.strictObject({
+      custom: savedRehabPlan.optional(),
+      knee: savedRehabPlan
+        .refine((plan) =>
+          plan.every((p) =>
+            kneeRehabExercises.some((ex) => ex.id === p.exerciseId),
+          ),
+        )
+        .optional(),
+    }),
+  }),
   z.strictObject({
     key: z.literal('training'),
     value: z.strictObject({
       programId: z.enum(['general', 'running', 'rehab']),
       experience: z.enum(['new', 'some', 'regular']),
+      rehabFocus: z.enum(['custom', 'knee']).optional(),
+      rehabSide: z.enum(['right', 'left', 'both']).optional(),
       equipment: z
         .array(
           z.enum([

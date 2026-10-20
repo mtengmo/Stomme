@@ -6,6 +6,7 @@ import {
   equipmentChoices,
   isTrainingPreferences,
   programmeNames,
+  trainingName,
 } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
@@ -43,6 +44,12 @@ export function TrainingSetup({
   const [experience, setExperience] = useState<
     TrainingPreferences['experience']
   >(current?.experience ?? 'new');
+  const [rehabFocus, setRehabFocus] = useState<'custom' | 'knee'>(
+    current?.rehabFocus ?? 'custom',
+  );
+  const [rehabSide, setRehabSide] = useState<'right' | 'left' | 'both'>(
+    current?.rehabSide ?? 'both',
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   return (
@@ -118,10 +125,40 @@ export function TrainingSetup({
         </label>
       ) : null}
       {programId === 'rehab' ? (
-        <p className="m-0 text-base">
-          Välj sedan övningar, sida och dosering som du kommit överens om med
-          din fysioterapeut. Inriktningen skapar ingen behandling åt dig.
-        </p>
+        <>
+          <label className="flex flex-col gap-2 text-lg font-bold">
+            Rehabinriktning
+            <select
+              className={inputClass}
+              value={rehabFocus}
+              onChange={(e) =>
+                setRehabFocus(e.target.value as 'custom' | 'knee')
+              }
+            >
+              <option value="custom">Mitt eget rehabprogram</option>
+              <option value="knee">Knärehab – välj från AAOS</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-2 text-lg font-bold">
+            Vilket knä eller vilken sida?
+            <select
+              className={inputClass}
+              value={rehabSide}
+              onChange={(e) =>
+                setRehabSide(e.target.value as 'right' | 'left' | 'both')
+              }
+            >
+              <option value="both">Höger och vänster</option>
+              <option value="right">Höger</option>
+              <option value="left">Vänster</option>
+            </select>
+          </label>
+          <p className="m-0 text-base">
+            Välj sedan övningar, sida och dosering som du kommit överens om med
+            din fysioterapeut. AAOS-samlingen är ett urval att välja från, inte
+            en personlig ordination.
+          </p>
+        </>
       ) : null}
       {error ? (
         <p role="alert" className="m-0 text-base font-bold">
@@ -138,6 +175,7 @@ export function TrainingSetup({
               programId,
               equipment: [...new Set(['bodyweight' as const, ...equipment])],
               experience,
+              ...(programId === 'rehab' ? { rehabFocus, rehabSide } : {}),
             });
             onSaved();
           } catch (err) {
@@ -195,7 +233,7 @@ export function TrainingHome() {
           <>
             <p className="m-0 text-xl font-bold">
               {preferences
-                ? programmeNames[preferences.programId]
+                ? trainingName(preferences)
                 : 'Knä och löpning · nuvarande program'}
             </p>
             <button
@@ -220,8 +258,7 @@ export function TrainingHome() {
             href={`/kansla/${session.id}/dayAfter`}
             className={buttonClass('secondary')}
           >
-            Hur känns det dagen efter{' '}
-            {programmeNames[session.programId ?? 'general']}?
+            Hur känns det dagen efter {trainingName(session)}?
           </Link>
         ))}
       </div>

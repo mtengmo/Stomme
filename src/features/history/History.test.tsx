@@ -7,6 +7,7 @@ import { App } from '../../App';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 import { buildDemoData } from '../../dev/demoData';
+import type { Session, SetLog } from '../../domain/types';
 
 beforeEach(async () => {
   window.location.hash = '#/historik';
@@ -89,4 +90,97 @@ describe('history screen', () => {
       await getDb().painLogs.where('sessionId').equals(target.id).count(),
     ).toBe(0);
   });
+});
+
+it('shows new check-ins separately from effort and compares only the selected equipment and side', async () => {
+  const session: Session = {
+    id: 'new',
+    templateId: 'A',
+    programId: 'general',
+    date: '2026-10-20',
+    startedAt: '2026-10-20T08:00:00Z',
+    status: 'completed',
+    programWeek: 1,
+    plan: [
+      {
+        exerciseId: 'supported-row',
+        sets: 1,
+        target: 8,
+        loadIndex: 0,
+        weightKg: 10,
+        restSec: 60,
+        reason: 'first_time',
+        sides: ['left'],
+      },
+    ],
+    feedback: {
+      'supported-row': {
+        effort: 'easy',
+        symptoms: { area: 'Axel', side: 'left', score: 2 },
+      },
+    },
+    checkins: {
+      before: {
+        feeling: 'ready',
+        symptoms: null,
+        recordedAt: '2026-10-20T08:00:00Z',
+      },
+    },
+  };
+  const log: SetLog = {
+    id: 'new-log',
+    sessionId: 'new',
+    exerciseId: 'supported-row',
+    side: 'left',
+    setNumber: 1,
+    amount: 8,
+    weightKg: 10,
+    loadIndex: 0,
+    variantId: 'dumbbell',
+    loggedAt: session.startedAt,
+  };
+  await getDb().sessions.bulkAdd([session, { ...session, id: 'other' }]);
+  await getDb().setLogs.bulkAdd([
+    log,
+    {
+      ...log,
+      id: 'kb',
+      sessionId: 'other',
+      variantId: 'kettlebell',
+      amount: 17,
+    },
+    { ...log, id: 'right', side: 'right', amount: 19 },
+  ]);
+  window.location.hash = '#/historik/new';
+  render(<App />);
+  const answers = await screen.findByRole('region', {
+    name: 'Känsla och besvär',
+  });
+  expect(
+    within(answers).getByText(/Redo att träna · Inga besvär/),
+  ).toBeTruthy();
+  expect(within(answers).getByText(/Axel · vänster · 2\/10/)).toBeTruthy();
+  expect(within(answers).getAllByText('Svar saknas').length).toBe(2);
+  expect(
+    screen.queryByRole('heading', { name: 'Smärta i högerknäet' }),
+  ).toBeNull();
+  await userEvent.click(
+    screen.getByRole('link', { name: 'Jämför tidigare pass' }),
+  );
+  await userEvent.selectOptions(
+    await screen.findByRole('combobox', { name: 'Utrustning' }),
+    'dumbbell',
+  );
+  await userEvent.selectOptions(
+    screen.getByRole('combobox', { name: 'Arbetande sida' }),
+    'left',
+  );
+  expect(screen.getByText(/Set 1: 8 rep/)).toBeTruthy();
+  expect(screen.queryByText(/Set 1: 17 rep/)).toBeNull();
+  expect(screen.queryByText(/Set 1: 19 rep/)).toBeNull();
+  await userEvent.selectOptions(
+    screen.getByRole('combobox', { name: 'Utrustning' }),
+    'kettlebell',
+  );
+  expect(screen.getByText(/Set 1: 17 rep/)).toBeTruthy();
 });
