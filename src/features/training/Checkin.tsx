@@ -6,6 +6,7 @@ import { getDb } from '../../db/db';
 import { recordTrainingCheckin } from '../../db/training';
 import type { SymptomReport, TrainingCheckin } from '../../domain/types';
 import { Button, buttonClass } from '../../ui/Button';
+import { ScorePicker } from '../../ui/ScorePicker';
 import { inputClass } from './TrainingHome';
 
 export function SymptomFields({
@@ -57,19 +58,13 @@ export function SymptomFields({
           <option value="both">Båda</option>
         </select>
       </label>
-      <label className="flex flex-col gap-1 text-base font-bold">
-        Besvärens intensitet (0–10)
-        <input
-          type="number"
-          min="0"
-          max="10"
-          value={value.score}
-          onChange={(event) =>
-            onChange({ ...value, score: Number(event.target.value) })
-          }
-          className={inputClass}
-        />
-      </label>
+      <ScorePicker
+        value={value.score}
+        onChange={(score) => onChange({ ...value, score })}
+        label="Besvärens intensitet (0–10)"
+        low="Inga besvär"
+        high="Värsta tänkbara"
+      />
     </div>
   );
 }

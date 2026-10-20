@@ -113,6 +113,10 @@ test('running direction uses body-wide check-ins and keeps effort separate from 
   await page
     .getByRole('combobox', { name: 'Sida', exact: true })
     .selectOption('left');
+  await page
+    .getByRole('group', { name: 'Besvärens intensitet (0–10)', exact: true })
+    .getByText('2', { exact: true })
+    .click();
   await page.getByRole('button', { name: 'Spara besvär', exact: true }).click();
   await page.getByRole('button', { name: 'Klar set', exact: true }).click();
   await page.getByRole('button', { name: 'Lätt', exact: true }).click();
@@ -141,7 +145,11 @@ test('running direction uses body-wide check-ins and keeps effort separate from 
         feedback: expect.objectContaining({
           'goblet-chair-squat': expect.objectContaining({
             effort: 'easy',
-            symptoms: expect.objectContaining({ area: 'Axel', side: 'left' }),
+            symptoms: expect.objectContaining({
+              area: 'Axel',
+              side: 'left',
+              score: 2,
+            }),
           }),
         }),
       }),

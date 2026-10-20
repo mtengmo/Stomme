@@ -13,6 +13,7 @@ import { toLocalDate } from '../../lib/dates';
 import { isValidScore, shouldPromptDayAfter } from '../../rules/pain';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
+import { ScorePicker as ScoreScale } from '../../ui/ScorePicker';
 
 export type PainTiming = PainLog['timing'];
 
@@ -50,46 +51,14 @@ function ScorePicker({
   onChange(n: number): void;
 }) {
   return (
-    <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
-      <legend className="sr-only">{PAIN_COPY.scoreLabel}</legend>
-      <p className="m-0 text-base font-bold text-ink-soft">
-        0 · {PAIN_COPY.anchorLow}
-      </p>
-      <div className="grid grid-cols-6 gap-1.5">
-        {Array.from({ length: 11 }, (_, n) => n).map((n) => {
-          const on = value === n;
-          return (
-            <label key={n} className="block cursor-pointer">
-              <input
-                type="radio"
-                name="pain-score"
-                value={n}
-                checked={on}
-                onChange={() => onChange(n)}
-                aria-label={
-                  n === 0
-                    ? `0, ${PAIN_COPY.anchorLow.toLowerCase()}`
-                    : n === 10
-                      ? `10, ${PAIN_COPY.anchorHigh.toLowerCase()}`
-                      : String(n)
-                }
-                className="peer sr-only"
-              />
-              <span
-                className={`count grid h-14 min-w-12 place-items-center rounded-md border-[3px] border-ink text-3xl transition-transform duration-150 ease-out peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-[3px] peer-focus-visible:outline-blue active:scale-[0.96] ${
-                  on ? 'bg-ink text-paper' : 'bg-paper text-ink'
-                }`}
-              >
-                {n}
-              </span>
-            </label>
-          );
-        })}
-      </div>
-      <p className="m-0 text-right text-base font-bold text-ink-soft">
-        10 · {PAIN_COPY.anchorHigh}
-      </p>
-    </fieldset>
+    <ScoreScale
+      value={value}
+      onChange={onChange}
+      label={PAIN_COPY.scoreLabel}
+      low={PAIN_COPY.anchorLow}
+      high={PAIN_COPY.anchorHigh}
+      showLabel={false}
+    />
   );
 }
 
