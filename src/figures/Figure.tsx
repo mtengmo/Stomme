@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ExerciseId } from '../domain/types';
-import { hamstringCurlPose, kettlebellFloorPressPose } from './additionalPoses';
+import {
+  hamstringCurlPose,
+  kettlebellFloorPressPose,
+  seatedKneeExtensionPose,
+} from './additionalPoses';
 import { cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
@@ -18,6 +22,7 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
+  if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
     return kettlebellFloorPressPose(t);
   const spec = figures[exerciseId];
@@ -265,13 +270,16 @@ export function Figure({
       setT(
         spec.motion === 'ballistic'
           ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-          : cycleProgress(elapsedMs.current),
+          : cycleProgress(
+              elapsedMs.current,
+              exerciseId === 'seated-knee-extension' ? 5000 : undefined,
+            ),
       );
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, paused, spec.motion]);
+  }, [reduced, paused, spec.motion, exerciseId]);
 
   if (reduced && !stillOnly) {
     return (

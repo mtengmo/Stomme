@@ -25,6 +25,15 @@ describe('lerp', () => {
 });
 
 describe('cycleProgress', () => {
+  it('can hold a seated knee extension for five seconds before lowering', () => {
+    const endAt = HOLD_MS + TWEEN_MS;
+    expect(cycleProgress(endAt - TWEEN_MS / 2, 5000)).toBeCloseTo(0.5);
+    expect(cycleProgress(endAt, 5000)).toBe(1);
+    expect(cycleProgress(endAt + 4999, 5000)).toBe(1);
+    expect(cycleProgress(endAt + 5000 + TWEEN_MS / 2, 5000)).toBeCloseTo(0.5);
+    expect(cycleProgress(HOLD_MS + 2 * TWEEN_MS + 5000, 5000)).toBe(0);
+  });
+
   it('holds at start, tweens, holds at end, tweens back', () => {
     expect(cycleProgress(0)).toBe(0);
     expect(cycleProgress(HOLD_MS - 1)).toBe(0);

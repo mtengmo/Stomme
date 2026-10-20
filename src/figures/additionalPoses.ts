@@ -241,6 +241,42 @@ export function hamstringCurlPose(progress: number): Pose {
     tR: rotate(supportedStand.tR),
   };
 }
+const seatedKneeExtensionStart = p(
+  [85, 76],
+  [84, 90],
+  [83, 133],
+  [
+    [88, 111],
+    [103, 133],
+    [78, 111],
+    [95, 133],
+  ],
+  [
+    [115, 135],
+    [115, 174],
+    [126, 177],
+    [107, 133],
+    [106, 174],
+    [117, 177],
+  ],
+);
+/** Extend at a fixed knee, with the shin and foot rotating as one rigid segment. */
+export function seatedKneeExtensionPose(progress: number): Pose {
+  const base = seatedKneeExtensionStart;
+  const knee = base.kR;
+  const thighAngle = Math.atan2(knee[1] - base.hip[1], knee[0] - base.hip[0]);
+  const shinAngle = Math.atan2(base.aR[1] - knee[1], base.aR[0] - knee[0]);
+  const angle = Math.min(1, Math.max(0, progress)) * (thighAngle - shinAngle);
+  const rotate = ([x, y]: P): P => {
+    const dx = x - knee[0];
+    const dy = y - knee[1];
+    return [
+      knee[0] + dx * Math.cos(angle) - dy * Math.sin(angle),
+      knee[1] + dx * Math.sin(angle) + dy * Math.cos(angle),
+    ];
+  };
+  return { ...base, aR: rotate(base.aR), tR: rotate(base.tR) };
+}
 const prone = p(
   [37, 165],
   [51, 170],
@@ -600,44 +636,8 @@ export const additionalFigures = {
     props: wall,
   },
   'seated-knee-extension': {
-    start: p(
-      [85, 76],
-      [84, 90],
-      [83, 133],
-      [
-        [88, 111],
-        [103, 133],
-        [78, 111],
-        [95, 133],
-      ],
-      [
-        [115, 135],
-        [115, 174],
-        [126, 177],
-        [107, 133],
-        [106, 174],
-        [117, 177],
-      ],
-    ),
-    end: p(
-      [85, 76],
-      [84, 90],
-      [83, 133],
-      [
-        [88, 111],
-        [103, 133],
-        [78, 111],
-        [95, 133],
-      ],
-      [
-        [115, 135],
-        [151, 135],
-        [153, 125],
-        [107, 133],
-        [106, 174],
-        [117, 177],
-      ],
-    ),
+    start: seatedKneeExtensionPose(0),
+    end: seatedKneeExtensionPose(1),
     props: [{ type: 'chair', x: 66, y: 139, w: 47 }],
   },
   'straight-leg-raise': {

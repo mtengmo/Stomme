@@ -7,6 +7,51 @@ import { FigureFrame, movementPose } from './Figure';
 import { figures } from './poses';
 
 describe('catalogue equipment and contacts', () => {
+  it('extends the seated knee without shortening the shin, bending the foot or moving the chair-supported body', () => {
+    const start = movementPose('seated-knee-extension', 0);
+    const length = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+    for (const t of [0, 0.125, 0.25, 0.5, 0.75, 0.875, 1]) {
+      const pose = movementPose('seated-knee-extension', t);
+      for (const point of [
+        'head',
+        'neck',
+        'hip',
+        'eR',
+        'hR',
+        'eL',
+        'hL',
+        'kR',
+        'kL',
+        'aL',
+        'tL',
+      ] as const)
+        expect(pose[point]).toEqual(start[point]);
+      expect(length(pose.kR, pose.aR)).toBeCloseTo(
+        length(start.kR, start.aR),
+        8,
+      );
+      expect(length(pose.aR, pose.tR)).toBeCloseTo(
+        length(start.aR, start.tR),
+        8,
+      );
+      expect(length(pose.kR, pose.tR)).toBeCloseTo(
+        length(start.kR, start.tR),
+        8,
+      );
+    }
+    const end = movementPose('seated-knee-extension', 1);
+    expect(end.aR[0]).toBeGreaterThan(end.kR[0]);
+    expect(end.aR[1]).toBeLessThan(start.aR[1]);
+    const thighAngle = Math.atan2(
+      end.kR[1] - end.hip[1],
+      end.kR[0] - end.hip[0],
+    );
+    const shinAngle = Math.atan2(end.aR[1] - end.kR[1], end.aR[0] - end.kR[0]);
+    expect(shinAngle).toBeCloseTo(thighAngle, 8);
+    expect(end).toEqual(figures['seated-knee-extension'].end);
+  });
+
   it.each(exerciseList)(
     '$id colours both sides blue for bilateral demonstrations',
     (exercise) => {
