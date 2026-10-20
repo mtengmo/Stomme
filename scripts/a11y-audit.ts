@@ -212,26 +212,14 @@ async function theme(scheme: 'light' | 'dark') {
   await page.getByRole('button', { name: 'Spara' }).click();
   await page.locator('[data-step]').waitFor();
   await audit(page, tag('session set'));
-  // exercise sheet: open, Escape closes, focus returns, focus trapped
-  await page.getByRole('button', { name: 'Hur gör man?' }).click();
-  await page.getByRole('dialog').waitFor();
-  await audit(page, tag('exercise sheet'));
-  for (let i = 0; i < 25; i++) {
-    await page.keyboard.press('Tab');
-    const inside = await page.evaluate(
-      () => !!document.activeElement?.closest('[role=dialog]'),
-    );
-    if (!inside) {
-      findings.push(
-        `${tag('exercise sheet')}: focus escaped the dialog after ${i + 1} Tab presses`,
-      );
-      break;
-    }
-  }
-  await page.keyboard.press('Escape');
-  if ((await page.getByRole('dialog').count()) > 0) {
-    findings.push(`${tag('exercise sheet')}: Escape does not close the dialog`);
-  }
+  // Inline technique leaves workout context visible, without a modal focus trap.
+  const help = page.getByText('Hur gör man?', { exact: true });
+  await help.focus();
+  await page.keyboard.press('Enter');
+  await page.getByRole('region', { name: 'Teknik', exact: true }).waitFor();
+  await audit(page, tag('inline technique'));
+  await help.focus();
+  await page.keyboard.press('Enter');
   await page.getByRole('button', { name: 'Klar set' }).click();
   await page.getByRole('button', { name: 'Hoppa över vila' }).waitFor();
   await audit(page, tag('rest'));

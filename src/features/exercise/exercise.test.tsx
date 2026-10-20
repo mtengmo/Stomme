@@ -1,12 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import {
-  cleanup,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '../../App';
@@ -81,8 +75,8 @@ describe('ExerciseCardBody', () => {
   });
 });
 
-describe('"Hur gör man?" sheet', () => {
-  it('keeps the stepper value when opened and closed', async () => {
+describe('inline workout technique', () => {
+  it('keeps the edited amount while technique opens and closes', async () => {
     const user = userEvent.setup();
     window.location.hash = '#/pass/A';
     render(<App />);
@@ -91,47 +85,16 @@ describe('"Hur gör man?" sheet', () => {
     );
     await answerPain(user, 0);
     await screen.findByText('Set 1 av 2');
+    await user.click(screen.getByText('Ändra set', { exact: true }));
     await user.click(screen.getByRole('button', { name: 'Öka antal' }));
-    const before = screen.getByText('11');
-    expect(before).toBeTruthy();
-
-    await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
-    const dialog = screen.getByRole('dialog');
-    expect(
-      within(dialog).getByRole('heading', { name: 'Så gör du' }),
-    ).toBeTruthy();
-    expect(
-      within(dialog).getByRole('heading', { name: 'Tränar främst' }),
-    ).toBeTruthy();
-    expect(
-      within(dialog).getByRole('heading', { name: 'Hjälper till' }),
-    ).toBeTruthy();
-    expect(document.activeElement).toBe(dialog);
-    await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expect(screen.getByText('11')).toBeTruthy();
-  });
-
-  it('closes on Escape and on the back gesture, restoring focus', async () => {
-    const user = userEvent.setup();
-    window.location.hash = '#/pass/A';
-    render(<App />);
-    await user.click(
-      await screen.findByRole('button', { name: 'Starta pass' }),
-    );
-    await answerPain(user, 0);
-    await screen.findByText('Set 1 av 2');
-    const opener = screen.getByRole('button', { name: 'Hur gör man?' });
-
-    await user.click(opener);
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expect(document.activeElement).toBe(opener);
-
-    await user.click(opener);
-    window.history.back();
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expect(screen.getByText('Set 1 av 2')).toBeTruthy();
+    await user.click(screen.getByText('Ändra set', { exact: true }));
+    const help = screen.getByText('Hur gör man?', { exact: true });
+    await user.click(help);
+    expect(screen.getByRole('region', { name: 'Teknik' })).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('region', { name: 'Rörelsen' })).toBeTruthy();
+    await user.click(help);
+    expect(screen.getByText(/11 rep/)).toBeTruthy();
   });
 
   it('has no side marker or legend for two-sided exercises', () => {

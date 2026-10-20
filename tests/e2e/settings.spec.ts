@@ -88,7 +88,7 @@ test('no update banner appears during a session', async ({ page }) => {
   await expect(page.getByText('Ny version finns')).toHaveCount(0);
 });
 
-test('the exercise sheet traps focus and closes with Escape', async ({
+test('workout help is keyboard accessible without trapping focus', async ({
   page,
 }) => {
   await page.goto('/');
@@ -96,18 +96,17 @@ test('the exercise sheet traps focus and closes with Escape', async ({
   await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
-  await page.getByRole('button', { name: 'Hur gör man?' }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  for (let i = 0; i < 12; i++) {
-    await page.keyboard.press('Tab');
-    expect(
-      await page.evaluate(
-        () => !!document.activeElement?.closest('[role=dialog]'),
-      ),
-    ).toBe(true);
-  }
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog')).toHaveCount(0);
+  const help = page.getByText('Hur gör man?', { exact: true });
+  await help.focus();
+  await page.keyboard.press('Enter');
+  await expect(
+    page.getByRole('region', { name: 'Teknik', exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(
+    page.getByRole('region', { name: 'Teknik', exact: true }),
+  ).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
 });
 
 test('Android Back from a confirmation returns to settings', async ({

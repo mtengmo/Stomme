@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
+import { exerciseMuscles, muscleGroups } from '../../content/muscles';
 import type { Exercise } from '../../domain/types';
+import { formatClock } from '../../lib/format';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
-import { ExerciseSheet } from '../exercise/ExerciseCard';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
@@ -49,31 +50,23 @@ export function SetScreen({
   const [weightKg, setWeightKg] = useState(initialWeightKg);
   const [holdDone, setHoldDone] = useState(false);
   const hold = useCountdown(() => setHoldDone(true));
-  const [cardOpen, setCardOpen] = useState(false);
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
   const presentation = loadPresentation(exercise, loadIndex, variantId);
   const nextCue =
     step.side === 'right' && !singleSide
-      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila. Tryck Klar set när höger är klar.`
+      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila.`
       : step.setNumber < totalSets
-        ? 'Sedan: vila före nästa set. Tryck Klar set när du är klar.'
-        : 'Sedan: ange hur övningen kändes. Tryck Klar set när du är klar.';
-  const quantity =
-    unit === 'seconds'
-      ? 'hela hålltiden'
-      : unit === 'meters'
-        ? 'hela sträckan'
-        : 'hela antalet';
-  const cue =
-    step.side === 'left'
-      ? singleSide
-        ? `Vänster sida arbetar. Gör ${quantity} på denna sida.`
-        : `Byt nu till vänster. Samma ${unit === 'seconds' ? 'hålltid' : unit === 'meters' ? 'sträcka' : 'antal'} på denna sida.`
-      : step.side === 'right'
-        ? `Börja med höger. Gör ${quantity} på denna sida.`
-        : `Gör ${quantity} med båda sidor samtidigt.`;
+        ? 'Sedan: vila före nästa set.'
+        : 'Sedan: ange hur övningen kändes.';
+  const metadata = exerciseMetadata[exercise.id];
+  const weightLabel =
+    weightKg !== undefined
+      ? `${weightKg} kg totalt`
+      : load?.kg === 0
+        ? 'Kroppsvikt'
+        : load?.label;
   const changeAmount = (value: number) => {
     hold.stop();
     setHoldDone(false);
@@ -83,7 +76,7 @@ export function SetScreen({
     <SessionFrame
       {...frame}
       actions={
-        <>
+        <div className="session-set-actions flex items-center gap-3">
           <Button
             disabled={
               busy ||
@@ -103,147 +96,50 @@ export function SetScreen({
           <button
             type="button"
             onClick={onSkip}
-            className="min-h-12 text-base font-bold text-ink-soft underline decoration-2 underline-offset-4"
+            className="min-h-16 w-24 shrink-0 text-base font-bold text-ink-soft underline decoration-2 underline-offset-4"
           >
             Hoppa över övningen
           </button>
-        </>
+        </div>
       }
     >
-      <h1 className="m-0 text-3xl leading-tight font-bold">{exercise.name}</h1>
-      <div className="flex items-center gap-4">
-        <FigureSlot
-          exerciseId={exercise.id}
-          side={step.side}
-          loadIndex={loadIndex}
-          variantId={variantId}
-        />
-        <div className="min-w-0">
-          <p className="m-0 text-xl font-bold">
-            Set {step.setNumber} av {totalSets}
-            {side ? (
-              <>
-                {' · '}
-                <span className="text-blue">{side}</span>
-              </>
-            ) : null}
-          </p>
-          {cue ? <p className="m-0 text-base text-ink-soft">{cue}</p> : null}
-          <button
-            type="button"
-            onClick={() => setCardOpen(true)}
-            className="-ml-2 min-h-12 px-2 text-base font-bold underline decoration-2 underline-offset-4"
-          >
-            Hur gör man?
-          </button>
-        </div>
-      </div>
-      {cardOpen ? (
-        <ExerciseSheet
-          exercise={exercise}
-          side={step.side === 'left' ? 'left' : 'right'}
-          loadIndex={loadIndex}
-          variantId={variantId}
-          weightKg={weightKg}
-          onClose={() => setCardOpen(false)}
-        />
-      ) : null}
-      {onReportSymptoms ? (
-        <button
-          type="button"
-          onClick={onReportSymptoms}
-          className="min-h-12 self-start px-2 text-base font-bold underline"
-        >
-          {symptomReported
-            ? 'Besvär sparade · ändra rapport'
-            : 'Rapportera smärta eller besvär'}
-        </button>
-      ) : null}
-      {exerciseMetadata[exercise.id].holdSeconds ? (
-        <p className="m-0 text-base font-bold">
-          Håll varje repetition i {exerciseMetadata[exercise.id].holdSeconds}{' '}
-          sekunder.
-          {exerciseMetadata[exercise.id].relaxSeconds
-            ? ` Slappna av i ${exerciseMetadata[exercise.id].relaxSeconds} sekunder mellan repetitionerna.`
-            : ''}{' '}
-          Räkna sedan nästa repetition.
+      <div>
+        <h1 className="m-0 break-words text-3xl leading-tight font-bold">
+          {exercise.name}
+        </h1>
+        <p className="m-0 text-lg font-bold">
+          Set {step.setNumber} av {totalSets}
+          {side ? (
+            <>
+              {' '}
+              · <span className="text-blue">{side}</span>
+            </>
+          ) : null}
         </p>
-      ) : null}
-      <p className="m-0 text-base font-bold" aria-live="polite">
-        {nextCue}
-      </p>
-      <p className="m-0 text-base text-ink-soft" aria-live="polite">
-        {presentation.cue}
-      </p>
-      <div className="mt-auto flex flex-col gap-4">
-        <Stepper
-          label={AMOUNT_LABEL[unit]}
-          value={String(amount)}
-          unit={UNIT_WORD[unit]}
-          onDec={() => changeAmount(Math.max(range.step, amount - range.step))}
-          onInc={() => changeAmount(amount + range.step)}
-          decDisabled={amount <= range.step}
-        />
-        {weightKg !== undefined ? (
-          <label className="flex flex-col gap-2 text-lg font-bold">
-            Total vikt (kg)
-            <input
-              type="number"
-              min="0"
-              max="500"
-              step="0.5"
-              value={weightKg}
-              onChange={(event) => setWeightKg(Number(event.target.value))}
-              className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-xl text-ink"
-            />
-            <span className="text-base font-normal text-ink-soft">
-              {presentation.variant.label} · samma redskap som i passplanen
-            </span>
-          </label>
-        ) : loadLadder.length > 1 && load ? (
-          <Stepper
-            size={load.kg === 0 ? 'sm' : 'md'}
-            label="Vikt"
-            value={load.kg === 0 ? 'Kroppsvikt' : `${load.kg} kg`}
-            note={load.kg === 0 ? undefined : load.label}
-            onDec={() => setLoadIndex(Math.max(0, loadIndex - 1))}
-            onInc={() =>
-              setLoadIndex(Math.min(loadLadder.length - 1, loadIndex + 1))
-            }
-            decDisabled={loadIndex <= 0}
-            incDisabled={loadIndex >= loadLadder.length - 1}
-          />
-        ) : load ? (
-          <p className="m-0 text-xl">
-            <span className="font-bold">Vikt: </span>
-            {load.kg === 0 ? 'Kroppsvikt' : load.label}
-          </p>
-        ) : null}
-        {unit === 'seconds' ? (
-          <section aria-label="Hålltid" className="flex flex-col gap-2">
-            <p className="m-0 text-base">
-              Håll positionen i {amount} sekunder
-              {exercise.perSide ? ' på denna sida' : ''}. Starta när du är på
-              plats.
-            </p>
-            {hold.running ? (
+      </div>
+      {unit === 'seconds' ? (
+        <section
+          aria-label="Hålltid"
+          className="rounded-md bg-blue px-4 py-2 text-paper"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="m-0 text-base font-bold">
+                Hålltid{side ? ` · ${side}` : ''}
+              </p>
               <p
                 role="timer"
-                aria-label={`${hold.seconds} sekunder hålltid kvar`}
-                className="count m-0 text-5xl"
+                aria-label={`${hold.running ? hold.seconds : holdDone ? 0 : amount} sekunder hålltid kvar`}
+                className="count m-0 text-[5rem] leading-none"
               >
-                {hold.seconds} s kvar
+                {formatClock(
+                  hold.running ? hold.seconds : holdDone ? 0 : amount,
+                )}
               </p>
-            ) : null}
-            <p role="status" className="m-0 text-base font-bold">
-              {holdDone
-                ? 'Hålltiden är klar. Tryck Klar set för att fortsätta.'
-                : hold.running
-                  ? 'Håll positionen. Detta är din träningstid.'
-                  : 'Timern är ett stöd. Setet sparas med Klar set.'}
-            </p>
-            <Button
-              variant="secondary"
+            </div>
+            <button
+              type="button"
+              className="min-h-12 max-w-36 rounded-md border-2 border-current px-3 text-base font-bold"
               onClick={() => {
                 setHoldDone(false);
                 if (hold.running) hold.stop();
@@ -255,16 +151,166 @@ export function SetScreen({
                 : holdDone
                   ? `Starta om hålltid (${amount} s)`
                   : `Starta hålltid (${amount} s)`}
-            </Button>
-          </section>
-        ) : (
-          <p className="m-0 text-base text-ink-soft">
-            {unit === 'reps'
-              ? 'Räkna repetitionerna själv. Tryck Klar set när hela antalet är gjort.'
-              : 'Gå den angivna sträckan och tryck Klar set.'}
+            </button>
+          </div>
+          <p role="status" className="m-0 text-base font-bold">
+            {holdDone
+              ? 'Hålltiden är klar. Tryck Klar set.'
+              : hold.running
+                ? 'Håll positionen.'
+                : 'Starta när du är på plats.'}
           </p>
-        )}
+        </section>
+      ) : (
+        <p className="m-0 text-xl font-bold">
+          {amount} {UNIT_WORD[unit]}
+          {exercise.perSide ? ' på denna sida' : ''}
+          {weightLabel ? (
+            <span className="font-normal"> · {weightLabel}</span>
+          ) : null}
+        </p>
+      )}
+      <FigureSlot
+        exerciseId={exercise.id}
+        side={step.side}
+        loadIndex={loadIndex}
+        variantId={variantId}
+      />
+      <div>
+        <p className="m-0 text-base font-bold">{presentation.cue}</p>
+        {metadata.holdSeconds ? (
+          <p className="m-0 text-base">
+            Håll varje repetition i {metadata.holdSeconds} sekunder.
+            {metadata.relaxSeconds
+              ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
+              : ''}
+          </p>
+        ) : null}
+        <p className="m-0 text-base text-ink-soft" aria-live="polite">
+          {nextCue}
+        </p>
       </div>
+      <section
+        className="session-extras"
+        aria-label="Inställningar och teknik"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard access to bounded scrolling details
+        tabIndex={0}
+      >
+        <details name="workout-options">
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold underline">
+            Ändra set
+          </summary>
+          <section
+            className="session-extra-scroll flex flex-col gap-4"
+            aria-label="Ändra antal och vikt"
+          >
+            <Stepper
+              label={AMOUNT_LABEL[unit]}
+              value={String(amount)}
+              unit={UNIT_WORD[unit]}
+              onDec={() =>
+                changeAmount(Math.max(range.step, amount - range.step))
+              }
+              onInc={() => changeAmount(amount + range.step)}
+              decDisabled={amount <= range.step}
+            />
+            {weightKg !== undefined ? (
+              <label className="flex flex-col gap-2 text-lg font-bold">
+                Total vikt (kg)
+                <input
+                  type="number"
+                  min="0"
+                  max="500"
+                  step="0.5"
+                  value={weightKg}
+                  onChange={(event) => setWeightKg(Number(event.target.value))}
+                  className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-xl text-ink"
+                />
+                <span className="text-base font-normal text-ink-soft">
+                  {presentation.variant.label} · samma redskap som i passplanen
+                </span>
+              </label>
+            ) : loadLadder.length > 1 && load ? (
+              <Stepper
+                size={load.kg === 0 ? 'sm' : 'md'}
+                label="Vikt"
+                value={load.kg === 0 ? 'Kroppsvikt' : `${load.kg} kg`}
+                note={load.kg === 0 ? undefined : load.label}
+                onDec={() => setLoadIndex(Math.max(0, loadIndex - 1))}
+                onInc={() =>
+                  setLoadIndex(Math.min(loadLadder.length - 1, loadIndex + 1))
+                }
+                decDisabled={loadIndex <= 0}
+                incDisabled={loadIndex >= loadLadder.length - 1}
+              />
+            ) : load ? (
+              <p className="m-0 text-xl">
+                <span className="font-bold">Vikt: </span>
+                {load.kg === 0 ? 'Kroppsvikt' : load.label}
+              </p>
+            ) : null}
+          </section>
+        </details>
+        <details name="workout-options">
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold underline">
+            Hur gör man?
+          </summary>
+          <section
+            className="session-extra-scroll flex flex-col gap-3"
+            aria-label="Teknik"
+          >
+            <p className="m-0 text-base font-bold">
+              {weightLabel}
+              {presentation.variant.label !== weightLabel
+                ? ` · ${presentation.variant.label}`
+                : ''}
+            </p>
+            <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
+            <ol className="m-0 list-decimal space-y-2 pl-6 text-base">
+              {presentation.tips.map((tip) => (
+                <li key={tip}>{tip}</li>
+              ))}
+            </ol>
+            <h3 className="m-0 text-base font-bold">Tränar främst</h3>
+            <p className="m-0 text-base">
+              {exerciseMuscles[exercise.id].primary
+                .map((id) => muscleGroups[id].label)
+                .join(', ')}
+            </p>
+            <h3 className="m-0 text-base font-bold">Hjälper till</h3>
+            <p className="m-0 text-base">
+              {exerciseMuscles[exercise.id].secondary
+                .map((id) => muscleGroups[id].label)
+                .join(', ') || 'Inga särskilda muskelgrupper.'}
+            </p>
+            <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
+            <p className="m-0 text-base">{exercise.commonMistake}</p>
+            <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
+            <p className="m-0 text-base">{exercise.easierVariant}</p>
+            <p className="m-0 text-base text-ink-soft">
+              Animationen visar tekniken. Räkna repetitionerna själv. Setet
+              sparas med Klar set.
+            </p>
+            {['step-up', 'split-squat'].includes(exercise.id) ? (
+              <p className="m-0 text-base">
+                Fråga fysioterapeuten vilken höjd eller vilket rörelseomfång som
+                passar dig.
+              </p>
+            ) : null}
+          </section>
+        </details>
+      </section>
+      {onReportSymptoms ? (
+        <button
+          type="button"
+          onClick={onReportSymptoms}
+          className="min-h-12 self-start text-base font-bold underline"
+        >
+          {symptomReported
+            ? 'Besvär sparade · ändra rapport'
+            : 'Rapportera smärta eller besvär'}
+        </button>
+      ) : null}
     </SessionFrame>
   );
 }

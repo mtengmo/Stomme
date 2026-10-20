@@ -30,10 +30,10 @@ export function SessionFrame({
   return (
     <div
       data-step={stepId}
-      className="mx-auto flex min-h-dvh max-w-md flex-col px-5"
+      className="session-frame mx-auto flex h-dvh max-w-md flex-col px-5"
     >
-      <header className="flex items-center justify-between gap-3 pt-3">
-        <p className="m-0 flex items-center gap-2 text-lg font-bold">
+      <header className="flex shrink-0 items-center justify-between gap-3 pt-1">
+        <p className="m-0 flex min-w-0 flex-wrap items-center gap-x-2 text-base font-bold">
           {title}
           <span className="flex items-center gap-1 font-normal text-ink-soft">
             <Icon name="clock" size={20} />
@@ -49,16 +49,18 @@ export function SessionFrame({
           Avbryt
         </button>
       </header>
-      <div className="mt-1 flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
         <Tally items={tally.items} label={tally.label} size={32} tone="edge" />
         <span className="text-base text-ink-soft" aria-hidden="true">
           set kvar
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-4 pt-4 pb-4">{children}</div>
-      <div className="sticky bottom-0 -mx-5 flex flex-col">
+      <div className="session-content flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto py-2">
+        {children}
+      </div>
+      <div className="-mx-5 flex shrink-0 flex-col">
         {snack}
-        <div className="flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-col gap-1 border-t-[3px] border-ink bg-paper px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {actions}
         </div>
       </div>

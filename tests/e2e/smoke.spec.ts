@@ -46,7 +46,7 @@ test('skipping an exercise moves on and shows it as skipped in the tally', async
   await expect(page.getByRole('img', { name: /set klara/ })).toBeVisible();
 });
 
-test('the exercise sheet opens and closes without losing the set screen', async ({
+test('inline technique opens and closes without losing the set screen', async ({
   page,
 }) => {
   await page.goto('/');
@@ -54,9 +54,11 @@ test('the exercise sheet opens and closes without losing the set screen', async 
   await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
-  await page.getByRole('button', { name: 'Hur gör man?' }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.getByRole('button', { name: 'Stäng' }).click();
+  await page.getByText('Hur gör man?', { exact: true }).click();
+  await expect(
+    page.getByRole('region', { name: 'Teknik', exact: true }),
+  ).toBeVisible();
+  await page.getByText('Hur gör man?', { exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
 });

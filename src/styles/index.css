@@ -166,6 +166,10 @@ h2 {
 .exercise-stage figure {
   min-height: 0;
 }
+.session-movement svg {
+  height: 100%;
+  width: 100%;
+}
 .exercise-stage figure svg {
   flex: 1;
 }
@@ -207,5 +211,63 @@ h2 {
 
   .review-stage {
     height: 150px;
+  }
+}
+
+/* Workout essentials occupy the viewport; the footer has its own reserved row. */
+.session-content {
+  scrollbar-gutter: stable;
+}
+.session-content > * {
+  flex-shrink: 0;
+}
+.session-movement {
+  height: clamp(9rem, 23dvh, 13rem);
+}
+.session-movement > div {
+  height: 100%;
+}
+
+.session-extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
+  align-content: start;
+  flex: 1 1 3rem;
+  min-height: 3rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.session-extras details[open] {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+.session-extra-scroll {
+  padding: 0.25rem 0.25rem 0.75rem;
+}
+@media (max-height: 600px) {
+  .session-movement {
+    height: 8rem;
+  }
+  .session-extras {
+    flex: none;
+    overflow: visible;
+  }
+}
+
+.session-frame {
+  container-type: inline-size;
+}
+.session-content {
+  overflow-wrap: anywhere;
+}
+/* Text zoom and narrow screens retain readable actions through reflow. */
+@container (max-width: 18rem) {
+  .session-set-actions {
+    flex-direction: column;
+  }
+  .session-set-actions > button {
+    width: 100%;
+    padding-inline: 0.5rem;
   }
 }
