@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
-import { exerciseMuscles, muscleGroups } from '../../content/muscles';
 import type { Exercise } from '../../domain/types';
 import { formatClock } from '../../lib/format';
 import { useTimedHold } from '../../lib/useTimedHold';
@@ -10,6 +9,7 @@ import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
+import { ExerciseMuscles } from '../exercise/ExerciseMuscles';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
@@ -297,6 +297,7 @@ export function SetScreen({
                 ? ` · ${presentation.variant.label}`
                 : ''}
             </p>
+            <ExerciseMuscles exerciseId={exercise.id} />
             <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
             <ExerciseDifficulty
               exerciseId={exercise.id}
@@ -308,18 +309,6 @@ export function SetScreen({
                 <li key={tip}>{tip}</li>
               ))}
             </ol>
-            <h3 className="m-0 text-base font-bold">Tränar främst</h3>
-            <p className="m-0 text-base">
-              {exerciseMuscles[exercise.id].primary
-                .map((id) => muscleGroups[id].label)
-                .join(', ')}
-            </p>
-            <h3 className="m-0 text-base font-bold">Hjälper till</h3>
-            <p className="m-0 text-base">
-              {exerciseMuscles[exercise.id].secondary
-                .map((id) => muscleGroups[id].label)
-                .join(', ') || 'Inga särskilda muskelgrupper.'}
-            </p>
             <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
             <p className="m-0 text-base">{exercise.commonMistake}</p>
             <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>

@@ -8,7 +8,6 @@ import {
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
-import { exerciseMuscles, muscleGroups } from '../../content/muscles';
 import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
 import type { Equipment } from '../../figures/Figure';
@@ -18,10 +17,10 @@ import {
   movementPose,
   usePrefersReducedMotion,
 } from '../../figures/Figure';
-import { MuscleMap } from '../../figures/MuscleMap';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { ExerciseDifficulty } from './ExerciseDifficulty';
+import { ExerciseMuscles } from './ExerciseMuscles';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
@@ -243,26 +242,7 @@ export function ExerciseCardBody({
               variantId={variant.id}
               loadIndex={selectedLoadIndex}
             />
-            <section aria-label="Muskelgrupper" className="flex flex-col gap-1">
-              <div>
-                <h3 className="m-0 inline text-base font-bold">
-                  Tränar främst
-                </h3>
-                <p className="m-0 text-base">
-                  {exerciseMuscles[exercise.id].primary
-                    .map((id) => muscleGroups[id].label)
-                    .join(', ')}
-                </p>
-              </div>
-              <div>
-                <h3 className="m-0 inline text-base font-bold">Hjälper till</h3>
-                <p className="m-0 text-base">
-                  {exerciseMuscles[exercise.id].secondary
-                    .map((id) => muscleGroups[id].label)
-                    .join(', ') || 'Inga särskilda muskelgrupper.'}
-                </p>
-              </div>
-            </section>
+            <ExerciseMuscles exerciseId={exercise.id} />
 
             <section aria-labelledby="exercise-instructions-heading">
               <h2
@@ -316,14 +296,6 @@ export function ExerciseCardBody({
               Animationen visar rörelsen i förenklat tempo. Följ antalet och
               hålltiderna i texten och passet.
             </p>
-            <details className="border-t-2 border-edge pt-3">
-              <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
-                Visa muskelkarta
-              </summary>
-              <div className="pt-3">
-                <MuscleMap exerciseId={exercise.id} />
-              </div>
-            </details>
             <details className="border-t-2 border-edge pt-3">
               <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
                 Utrustning, nivå och källor

@@ -37,6 +37,23 @@ for (const viewport of [
         .getByRole('region', { name: 'Inställningar och teknik' })
         .evaluate((el) => el.scrollHeight <= el.clientHeight + 1),
     ).toBe(true);
+    const muscles = technique.getByRole('region', {
+      name: 'Muskelgrupper',
+      exact: true,
+    });
+    await expect(muscles).toContainText('Framsida lår, Säte');
+    await expect(muscles).toContainText('Bål');
+    await muscles.getByText('Visa muskelkarta', { exact: true }).click();
+    await expect(
+      muscles.getByRole('region', { name: 'Muskler', exact: true }),
+    ).toBeVisible();
+    await muscles.screenshot({
+      path: test.info().outputPath('muscles-in-howto.png'),
+    });
+    await muscles.getByText('Visa muskelkarta', { exact: true }).click();
+    await expect(
+      technique.getByRole('heading', { name: 'Så gör du', exact: true }),
+    ).toBeVisible();
     const easier = technique.getByRole('heading', { name: 'Enklare variant' });
     await easier.scrollIntoViewIfNeeded();
     await expect(easier).toBeInViewport({ ratio: 1 });
