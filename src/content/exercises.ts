@@ -36,7 +36,7 @@ const list: Exercise[] = [
     tips: [
       'Stå framför ett stadigt steg. Sätt hela den valda foten på steget; den andra foten står på golvet.',
       'Pressa genom foten på steget och res dig upp. Låt det fria benet följa med utan att skjuta ifrån från golvet.',
-      'Sänk den fria foten till golvet och kliv sedan ned med den valda foten. Upp och ned är en repetition.',
+      'Sänk den fria foten lugnt till golvet och behåll den valda foten på steget. Upp och ned är en repetition. Kliv ned när du är klar med sidan.',
     ],
     commonMistake: 'Knäet faller inåt eller du studsar ifrån med bakre foten.',
     easierVariant: 'Lägre steg (10–15 cm) utan hantlar, håll i väggen.',

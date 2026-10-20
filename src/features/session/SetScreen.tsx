@@ -216,7 +216,8 @@ export function SetScreen({
             Håll varje repetition i {metadata.holdSeconds} sekunder.
             {metadata.relaxSeconds
               ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
-              : ''}
+              : ''}{' '}
+            Följ tiderna i texten. Animationen visar rörelsen i förenklat tempo.
           </p>
         ) : null}
         <p className="m-0 text-base text-ink-soft" aria-live="polite">

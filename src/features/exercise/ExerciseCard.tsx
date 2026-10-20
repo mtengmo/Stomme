@@ -307,7 +307,8 @@ export function ExerciseCardBody({
               </>
             ) : null}
             <p className="m-0 text-base text-ink-soft">
-              Animationen visar tekniken. Följ antalet eller hålltiden i passet.
+              Animationen visar rörelsen i förenklat tempo. Följ antalet och
+              hålltiderna i texten och passet.
             </p>
             <details className="border-t-2 border-edge pt-3">
               <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
