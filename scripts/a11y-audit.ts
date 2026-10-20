@@ -431,9 +431,10 @@ async function theme(scheme: 'light' | 'dark') {
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();
   await audit(training, tag('AAOS exercise selection'));
-  await training
-    .getByRole('button', { name: 'Lägg till E31', exact: true })
-    .click();
+  const removeKnee = training
+    .getByRole('button', { name: /^Ta bort / })
+    .filter({ hasNotText: 'Rakt benlyft' });
+  while (await removeKnee.count()) await removeKnee.first().click();
   await training
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();

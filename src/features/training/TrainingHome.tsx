@@ -136,7 +136,9 @@ export function TrainingSetup({
               }
             >
               <option value="custom">Mitt eget rehabprogram</option>
-              <option value="knee">Knärehab – välj från AAOS</option>
+              <option value="knee">
+                Allmän knäträning – färdigt AAOS-baserat pass
+              </option>
             </select>
           </label>
           <label className="flex flex-col gap-2 text-lg font-bold">
@@ -154,9 +156,9 @@ export function TrainingSetup({
             </select>
           </label>
           <p className="m-0 text-base">
-            Välj sedan övningar, sida och dosering som du kommit överens om med
-            din fysioterapeut. AAOS-samlingen är ett urval att välja från, inte
-            en personlig ordination.
+            {rehabFocus === 'knee'
+              ? 'Du får ett färdigt, redigerbart pass för allmän knäträning. Det anpassas till din utrustning och valda sida.'
+              : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
           </p>
         </>
       ) : null}
@@ -269,7 +271,9 @@ export function TrainingHome() {
           <h1 className="m-0 text-5xl font-extrabold">Din träning</h1>
           <p className="m-0 text-lg">
             {preferences.programId === 'rehab'
-              ? 'Bygg ditt överenskomna pass. Ingen automatisk ökning.'
+              ? preferences.rehabFocus === 'knee'
+                ? 'Öppna ditt färdiga knäpass och anpassa före start. Ingen automatisk ökning.'
+                : 'Bygg ditt överenskomna pass. Ingen automatisk ökning.'
               : 'Välj ett pass. Kontrollera övningar, antal och vikt före start.'}
           </p>
           {active ? (

@@ -7,7 +7,11 @@ import { Link, useLocation } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 
 import { exerciseList, exercises } from '../../content/exercises';
-import { kneeRehabExercises } from '../../content/kneeRehab';
+import {
+  kneeConditioningPlan,
+  kneeRehabExercises,
+  kneeRehabSource,
+} from '../../content/kneeRehab';
 import { isTrainingPreferences, trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
@@ -113,9 +117,8 @@ function defaultPlan(
       prior?.plan.map((plan) => ({
         ...plan,
 
-        explanation:
-          'Din senast sparade rehabdosering. Kontrollera mot din överenskommelse.',
-      })) ?? []
+        explanation: 'Din senast använda dosering. Kontrollera före start.',
+      })) ?? (focus === 'knee' ? kneeConditioningPlan(preferences) : [])
     );
   }
 
@@ -253,9 +256,57 @@ function PreviewEditor({
         <>
           <p className="m-0 text-base">
             {preferences.programId === 'rehab'
-              ? 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'
+              ? preferences.rehabFocus === 'knee'
+                ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
+                : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'
               : 'Startförslaget matchar din utrustning. Anpassa efter din vana; vikten anges totalt för alla redskap.'}
           </p>
+
+          {preferences.programId === 'rehab' &&
+          preferences.rehabFocus === 'knee' ? (
+            <section
+              aria-label="Färdigt knäpass"
+              className="flex flex-col gap-3"
+            >
+              <p className="m-0 text-base">
+                Värm upp 5–10 minuter med promenad eller lugn cykling. Förslaget
+                är Stommes urval ur AAOS knäprogram. Vid skada eller efter
+                operation behöver övningsvalet stämmas av med vården. Avbryt en
+                övning som gör ont.
+              </p>
+              <p className="m-0 text-base text-ink-soft">
+                {kneeConditioningPlan(preferences).length} av 6 övningar passar
+                din utrustning. Vikten börjar på noll; 60 sekunders setvila är
+                appens justerbara standard. Ingen automatisk ökning.
+              </p>
+              <a
+                href={kneeRehabSource}
+                target="_blank"
+                rel="noreferrer"
+                className="flex min-h-12 items-center text-base font-bold underline"
+              >
+                Läs AAOS vägledning
+              </a>
+              <details>
+                <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                  Återställ till färdigt knäpass
+                </summary>
+                <p className="m-0 text-base">
+                  Ersätter övningarna i förhandsvisningen. Ditt sparade program
+                  ändras först när du sparar igen.
+                </p>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    updatePlan(kneeConditioningPlan(preferences));
+                    setAddId('');
+                  }}
+                >
+                  Använd färdigt knäpass
+                </Button>
+              </details>
+            </section>
+          ) : null}
 
           {preferences.programId !== 'rehab' &&
           !compatible.some((exercise) => exercise.id === 'floor-press') ? (
@@ -556,8 +607,9 @@ function PreviewEditor({
                 onChange={(event) => setConfirmed(event.target.checked)}
                 className="size-6 shrink-0"
               />
-              Jag har kontrollerat övningar, sida och dosering mot mitt
-              överenskomna rehabprogram.
+              {preferences.rehabFocus === 'knee'
+                ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
+                : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
             </label>
           ) : null}
 

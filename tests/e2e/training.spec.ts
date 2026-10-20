@@ -193,13 +193,18 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await expect(
     page.getByRole('button', { name: 'Lägg till E38', exact: true }),
   ).toBeDisabled();
-  await page
-    .getByRole('button', { name: 'Lägg till E31', exact: true })
-    .click();
+  await expect(
+    page.getByRole('button', { name: 'E31 tillagd', exact: true }),
+  ).toBeDisabled();
   await page
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();
-  await expect(page.getByLabel('Set', { exact: true })).toHaveValue('');
+  await expect(page.getByRole('button', { name: /^Ta bort / })).toHaveCount(6);
+  const remove = page
+    .getByRole('button', { name: /^Ta bort / })
+    .filter({ hasNotText: 'Rakt benlyft' });
+  while (await remove.count()) await remove.first().click();
+  await expect(page.getByLabel('Set', { exact: true })).toHaveValue('3');
   await expect(
     page.getByRole('combobox', { name: 'Arbetande sida', exact: true }),
   ).toHaveValue('left');
