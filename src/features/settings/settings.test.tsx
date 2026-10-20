@@ -21,6 +21,7 @@ import { App } from '../../App';
 import { exportAll, serializeBackup } from '../../db/backup';
 import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
+import { initInstall } from '../../lib/install';
 import { WeekView } from '../week/WeekView';
 import { Settings } from './Settings';
 
@@ -53,6 +54,35 @@ async function backupWithOneSession(): Promise<string> {
 }
 
 describe('Settings', () => {
+  it('explains manual mobile installation when a native prompt is unavailable', async () => {
+    render(<Settings />);
+    await userEvent.click(screen.getByText('Så installerar du på mobilen'));
+    expect(screen.getByText('iPhone och iPad:')).toBeTruthy();
+    expect(screen.getByText('Android:')).toBeTruthy();
+  });
+
+  it('offers manual recovery if the browser install prompt fails', async () => {
+    const stop = initInstall();
+    const event = new Event('beforeinstallprompt', { cancelable: true });
+    Object.assign(event, {
+      prompt: vi.fn().mockRejectedValue(new Error('Browser refused prompt')),
+    });
+    window.dispatchEvent(event);
+    try {
+      render(<Settings />);
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Installera appen' }),
+      );
+      expect((await screen.findByRole('alert')).textContent).toContain(
+        'Använd instruktionerna nedan',
+      );
+      expect(screen.getByText('Så installerar du på mobilen')).toBeTruthy();
+    } finally {
+      cleanup();
+      stop();
+    }
+  });
+
   it('shows every section', async () => {
     render(<Settings />);
     for (const name of [

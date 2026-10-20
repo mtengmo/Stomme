@@ -447,23 +447,72 @@ function StorageSection() {
 
 function InstallSection() {
   const { canInstall, installed, prompt } = useInstall();
+  const [installError, setInstallError] = useState('');
+  const install = async () => {
+    setInstallError('');
+    try {
+      const result = await prompt();
+      if (result === 'unavailable')
+        setInstallError('Använd webbläsarens meny för att lägga till appen.');
+    } catch {
+      setInstallError(
+        'Installationen kunde inte öppnas. Använd instruktionerna nedan.',
+      );
+    }
+  };
   return (
     <Section id="set-install" title="Installera">
+      <div className="flex items-center gap-3">
+        <img
+          src={`${import.meta.env.BASE_URL}pwa-192x192.png`}
+          width="64"
+          height="64"
+          alt=""
+          className="size-16 shrink-0 rounded-xl"
+        />
+        <p className="m-0 text-base">
+          Stomme på hemskärmen. Öppna som en egen app och träna offline när
+          appen har laddats en gång med internet.
+        </p>
+      </div>
       {installed ? (
         <p className="m-0 flex items-start gap-2 text-base font-bold">
           <Icon name="check" className="mt-0.5 shrink-0" />
           Installerad
         </p>
       ) : canInstall ? (
-        <Button variant="secondary" onClick={() => void prompt()}>
+        <Button variant="secondary" onClick={() => void install()}>
           Installera appen
         </Button>
-      ) : (
-        <p className={note}>
-          Öppna webbläsarens meny (tre punkter uppe till höger i Chrome på
-          Android) och välj Lägg till på startskärmen.
+      ) : null}
+      {installError ? (
+        <p role="alert" className={note}>
+          {installError}
         </p>
-      )}
+      ) : null}
+      {!installed ? (
+        <details>
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold underline">
+            Så installerar du på mobilen
+          </summary>
+          <div className="flex flex-col gap-3 text-base">
+            <p className="m-0">
+              <strong>iPhone och iPad:</strong> Öppna Stomme i Safari. Välj Dela
+              → Lägg till på hemskärmen. Aktivera Öppna som webbapp om valet
+              visas och tryck Lägg till.
+            </p>
+            <p className="m-0">
+              <strong>Android:</strong> Öppna Stomme i Chrome. Välj menyn med
+              tre punkter → Lägg till på startskärmen → Installera. Menynamnen
+              kan variera mellan webbläsare.
+            </p>
+            <p className="m-0">
+              Öppna sedan Stomme från den nya ikonen. Säkerhetskopiera dina pass
+              före byte av webbläsare eller enhet.
+            </p>
+          </div>
+        </details>
+      ) : null}
     </Section>
   );
 }

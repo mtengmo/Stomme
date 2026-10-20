@@ -29,7 +29,22 @@ test('manifest is served, icons resolve, service worker registers', async ({
     const r = await request.get(`/${icon.src}`);
     expect(r.ok()).toBe(true);
     expect(r.headers()['content-type']).toContain('image/png');
+    const body = await r.body();
+    const [width, height] = icon.sizes.split('x').map(Number);
+    expect(body.readUInt32BE(16)).toBe(width);
+    expect(body.readUInt32BE(20)).toBe(height);
   }
+  await expect(
+    page.locator('meta[name="apple-mobile-web-app-capable"]'),
+  ).toHaveAttribute('content', 'yes');
+  const appleIcon = await page
+    .locator('link[rel="apple-touch-icon"]')
+    .getAttribute('href');
+  const appleResponse = await request.get(appleIcon as string);
+  expect(appleResponse.ok()).toBe(true);
+  const appleBody = await appleResponse.body();
+  expect(appleBody.readUInt32BE(16)).toBe(180);
+  expect(appleBody.readUInt32BE(20)).toBe(180);
   await expect(page.locator('meta[name="theme-color"]')).toHaveCount(2);
   const scope = await page.evaluate(async () => {
     const reg = await navigator.serviceWorker.ready;
