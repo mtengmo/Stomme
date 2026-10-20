@@ -40,6 +40,8 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'quadriceps-stretch': 'E36',
   'hamstring-stretch': 'E37',
   'band-leg-press': 'E38',
+  'kettlebell-floor-press': 'E39',
+  'kettlebell-rack-carry': 'E40',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

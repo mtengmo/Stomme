@@ -36,7 +36,9 @@ export type ExerciseId =
   | 'calf-stretch'
   | 'quadriceps-stretch'
   | 'hamstring-stretch'
-  | 'band-leg-press';
+  | 'band-leg-press'
+  | 'kettlebell-floor-press'
+  | 'kettlebell-rack-carry';
 
 export type Unit = 'reps' | 'seconds' | 'meters';
 export type SideKind = 'ben' | 'sida' | 'hand';

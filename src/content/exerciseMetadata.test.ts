@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E38 references and original load indices', () => {
+  it('preserves permanent E01–E40 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 38 },
+        { length: 40 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -20,6 +20,26 @@ describe('expanded library integrity', () => {
     expect(
       exercises['suitcase-carry'].loadLadder.map((load) => load.kg),
     ).toEqual([10, 16]);
+    for (const id of [
+      'dumbbell-rdl',
+      'reverse-lunge',
+      'forward-lunge',
+    ] as const) {
+      expect(
+        exerciseMetadata[id].variants.find((v) => v.id === 'dumbbell')
+          ?.loadIndices,
+      ).toEqual(id === 'dumbbell-rdl' ? [0, 1] : [1]);
+      expect(
+        exercises[id].loadLadder.slice(0, 2).map((load) => load.kg),
+      ).toEqual(id === 'dumbbell-rdl' ? [4, 8] : [0, 4]);
+      const kettlebell = exerciseMetadata[id].variants.find(
+        (v) => v.id === 'kettlebell',
+      );
+      expect(kettlebell?.equipment).toEqual([{ type: 'kettlebell', count: 1 }]);
+      expect(
+        exercises[id].loadLadder[kettlebell?.loadIndices.at(-1) ?? -1]?.kg,
+      ).toBe(16);
+    }
   });
   it.each(exerciseList)(
     '$id has complete variants, attribution, anatomy and bounded poses',

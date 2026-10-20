@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ExerciseId } from '../domain/types';
-import { hamstringCurlPose } from './additionalPoses';
+import { hamstringCurlPose, kettlebellFloorPressPose } from './additionalPoses';
 import { cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
@@ -18,6 +18,8 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
+  if (exerciseId === 'kettlebell-floor-press')
+    return kettlebellFloorPressPose(t);
   const spec = figures[exerciseId];
   if (!spec.middle) return lerpPose(spec.start, spec.end, t);
   return t < 0.5
@@ -95,8 +97,33 @@ export function FigureFrame({
     };
   }
   const heldKind = equipment === undefined ? spec.held?.kind : equipment;
-  const anchors: Pt[] =
-    exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
+  const twoHandedBell =
+    heldKind === 'kettlebell' &&
+    ['dumbbell-rdl', 'reverse-lunge', 'forward-lunge'].includes(exerciseId);
+  if (twoHandedBell) {
+    if (exerciseId === 'dumbbell-rdl') {
+      // The bell hangs below the hands: leave room above the floor at the bottom.
+      p = lerpPose(spec.start, p, 0.8);
+      const hands: Pt = [(p.hR[0] + p.hL[0]) / 2, (p.hR[1] + p.hL[1]) / 2];
+      const elbow: Pt = [
+        (p.neck[0] + hands[0]) / 2,
+        (p.neck[1] + hands[1]) / 2,
+      ];
+      p = { ...p, eR: elbow, eL: elbow, hR: hands, hL: hands };
+    } else {
+      const hands: Pt = [p.neck[0] + 13, p.neck[1] + 9];
+      p = {
+        ...p,
+        eR: [p.neck[0] + 12, p.neck[1] + 26],
+        eL: [p.neck[0] + 6, p.neck[1] + 24],
+        hR: hands,
+        hL: hands,
+      };
+    }
+  }
+  const anchors: Pt[] = twoHandedBell
+    ? [p.hR]
+    : exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
       ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
       : (
           spec.held?.hands ??

@@ -39,7 +39,7 @@ afterEach(cleanup);
 describe('exercise library', () => {
   it('shows all exercises, equipment, template links and optional status', () => {
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('38 övningar');
+    expect(screen.getByRole('status').textContent).toBe('40 övningar');
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
@@ -105,7 +105,7 @@ describe('exercise library', () => {
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     window.history.back();
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('38 övningar'),
+      expect(screen.getByRole('status').textContent).toBe('40 övningar'),
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -115,7 +115,7 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('38 övningar');
+    expect(screen.getByRole('status').textContent).toBe('40 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
 });

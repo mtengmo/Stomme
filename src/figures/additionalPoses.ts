@@ -129,6 +129,23 @@ const floorBase = p(
     [147, 177],
   ],
 );
+
+/** One-arm floor press: upper arm rotates while the forearm stays upright. */
+export function kettlebellFloorPressPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const angle = Math.asin(4 / 26) * (1 - t) - (Math.PI / 2) * t;
+  const elbow: P = [
+    floorBase.neck[0] + 26 * Math.cos(angle),
+    floorBase.neck[1] + 26 * Math.sin(angle),
+  ];
+  return {
+    ...floorBase,
+    eR: elbow,
+    hR: [elbow[0], elbow[1] - 26],
+    eL: [78, 174],
+    hL: [98, 174],
+  };
+}
 const shoulderStart = p(
   [99, 69],
   [98, 83],
@@ -265,6 +282,38 @@ const sideLying = p(
 
 /** Individually authored start/mid/end geometry; no fallback motion for new IDs. */
 export const additionalFigures = {
+  'kettlebell-floor-press': {
+    start: kettlebellFloorPressPose(0),
+    end: kettlebellFloorPressPose(1),
+    props: mat,
+    held: oneBell,
+  },
+  'kettlebell-rack-carry': {
+    start: {
+      ...stand,
+      eR: [115, 102],
+      hR: [111, 78],
+      kR: [111, 149],
+      aR: [120, 174],
+      tR: [132, 177],
+      kL: [84, 148],
+      aL: [77, 174],
+      tL: [89, 177],
+    },
+    end: {
+      ...stand,
+      eR: [115, 102],
+      hR: [111, 78],
+      kR: [88, 148],
+      aR: [79, 174],
+      tR: [91, 177],
+      kL: [110, 149],
+      aL: [119, 174],
+      tL: [131, 177],
+    },
+    props: [],
+    held: oneBell,
+  },
   'goblet-squat': {
     start: gobletStart,
     end: squatBottom,

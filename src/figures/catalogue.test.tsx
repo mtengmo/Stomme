@@ -7,6 +7,37 @@ import { FigureFrame, movementPose } from './Figure';
 import { figures } from './poses';
 
 describe('catalogue equipment and contacts', () => {
+  it('keeps the kettlebell Romanian deadlift above the floor at the bottom', () => {
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="dumbbell-rdl"
+        pose={movementPose('dumbbell-rdl', 1)}
+        equipment="kettlebell"
+        working={null}
+      />,
+    );
+    const bell = markup.split('data-equipment="kettlebell"')[1] ?? '';
+    const centerY = /cy="([\d.]+)"/.exec(bell)?.[1];
+    expect(centerY).toBeDefined();
+    expect(Number(centerY) + 11).toBeLessThan(178);
+  });
+  it('keeps the one-arm floor press supported, upright at the forearm and constant in limb length', () => {
+    const start = movementPose('kettlebell-floor-press', 0);
+    const length = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      const p = movementPose('kettlebell-floor-press', t);
+      expect(p.hip).toEqual(start.hip);
+      expect(p.aR).toEqual(start.aR);
+      expect(p.hL).toEqual(start.hL);
+      expect(p.hR[0]).toBeCloseTo(p.eR[0], 8);
+      expect(length(p.neck, p.eR)).toBeCloseTo(26, 8);
+      expect(length(p.eR, p.hR)).toBeCloseTo(26, 8);
+    }
+    expect(figures['kettlebell-rack-carry'].start.hR).toEqual(
+      figures['kettlebell-rack-carry'].end.hR,
+    );
+  });
   it('curls around a fixed knee without shrinking the shin or turning the toes upward', () => {
     const start = movementPose('hamstring-curl', 0);
     const distance = (a: readonly number[], b: readonly number[]) =>

@@ -241,6 +241,12 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
   ],
   'dumbbell-rdl': [
     ['dumbbell', 2, [0, 1], 'Håll en hantel i varje hand framför benen.'],
+    [
+      'kettlebell',
+      1,
+      [2, 3],
+      'Håll samma kettlebell med båda händerna framför låren.',
+    ],
   ],
   'supported-row': [
     [
@@ -316,6 +322,12 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       [1],
       'En hantel i varje hand; det valda benet stannar fram.',
     ],
+    [
+      'kettlebell',
+      1,
+      [2, 3, 4],
+      'Håll en kettlebell med båda händerna nära bröstet. Det valda benet stannar fram.',
+    ],
   ],
   'forward-lunge': [
     ['bodyweight', 1, [0], 'Utan extra vikt; kliv fram med det valda benet.'],
@@ -324,6 +336,12 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       2,
       [1],
       'En hantel i varje hand; kliv fram med det valda benet.',
+    ],
+    [
+      'kettlebell',
+      1,
+      [2, 3, 4],
+      'Håll en kettlebell med båda händerna nära bröstet. Kliv fram med det valda benet.',
     ],
   ],
   'kettlebell-swing': [
@@ -401,6 +419,22 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'Ett helt gummiband runt hålfoten med en ände i varje hand.',
     ],
   ],
+  'kettlebell-floor-press': [
+    [
+      'kettlebell',
+      1,
+      [0, 1, 2],
+      'En kettlebell i vald hand; den fria handen hjälper till vid start och avslut.',
+    ],
+  ],
+  'kettlebell-rack-carry': [
+    [
+      'kettlebell',
+      1,
+      [0, 1, 2],
+      'En kettlebell vid den valda sidans axel, med armbågen nära kroppen.',
+    ],
+  ],
 };
 
 const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
@@ -463,7 +497,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Höftfällning och golvstart behöver samordnas.',
   ],
-  'dumbbell-rdl': ['practiced', 'Höftfällning med två vikter och lång rygg.'],
+  'dumbbell-rdl': [
+    'practiced',
+    'Höftfällning med vikten nära benen och kontrollerad rygg.',
+  ],
   'supported-row': ['practiced', 'Håll överkroppen stilla medan armen drar.'],
   'floor-press': [
     'practiced',
@@ -493,16 +530,42 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Bandets läge och motstånd kontrolleras under hela rörelsen.',
   ],
+  'kettlebell-floor-press': [
+    'practiced',
+    'Ensidig press och kontrollerad förflyttning av vikten till och från golvet.',
+  ],
+  'kettlebell-rack-carry': [
+    'practiced',
+    'Håll axelposition och upprätt bål medan du går med ensidig last.',
+  ],
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'kettlebell-floor-press')
+    return [
+      {
+        title: 'Angles and Arches—Using the Floor to Strengthen Your Press',
+        publisher: 'StrongFirst · Piers Kwan',
+        url: 'https://www.strongfirst.com/using-the-floor-to-strengthen-your-press/',
+        note: 'Enarms golvpress och start med rullning mot vikten. Appen visar böjda knän utan höftlyft; vikter och dos är justerbara appförslag.',
+      },
+    ];
+  if (id === 'kettlebell-rack-carry')
+    return [
+      {
+        title: 'Two Important Carries for the Clinician · Front Rack',
+        publisher: 'StrongFirst · Travis Jewett',
+        url: 'https://www.strongfirst.com/two-important-carries-clinician/',
+        note: 'Gång med en kettlebell i axelposition. Appens sträcka och vikter är egna förslag; ingen individuell rehabiliteringsrekommendation.',
+      },
+    ];
   if (id === 'dumbbell-rdl')
     return [
       {
         title: 'Dumbbell Romanian Deadlift',
         publisher: 'National Academy of Sports Medicine',
         url: 'https://www.nasm.org/resource-center/exercise-library/dumbbell-romanian-deadlift',
-        note: 'Höftfällning med två hantlar. Appens startvikter och dos är egna, justerbara förslag.',
+        note: 'Höftfällning med två hantlar. Appen har även en variant med en kettlebell i båda händerna. Startvikter och dos är justerbara appförslag.',
       },
     ];
   if (id === 'reverse-lunge')
@@ -511,7 +574,26 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
         title: 'Reverse Lunge',
         publisher: 'Catalyst Athletics',
         url: 'https://www.catalystathletics.com/exercise/735/Reverse-Lunge/',
-        note: 'Steg bakåt och kontrollerad sänkning; här visas kroppsvikt eller två hantlar.',
+        note: 'Steg bakåt och kontrollerad sänkning; appen visar kroppsvikt, två hantlar eller en kettlebell vid bröstet.',
+      },
+      {
+        title:
+          'Fitness Matters, January/February 2010 · Kettlebell Walking Lunge',
+        publisher: 'American Council on Exercise',
+        url: 'https://contentcdn.eacefitness.com/cp/pdfs/FitnessMatters/Jan10.pdf',
+        page: 10,
+        note: 'Källan visar framåtriktade gångutfall med vikten vid bröstet. Appens bakåtutfall är en separat variant med samma grepp.',
+      },
+    ];
+  if (id === 'forward-lunge')
+    return [
+      {
+        title:
+          'Fitness Matters, January/February 2010 · Kettlebell Walking Lunge',
+        publisher: 'American Council on Exercise',
+        url: 'https://contentcdn.eacefitness.com/cp/pdfs/FitnessMatters/Jan10.pdf',
+        page: 10,
+        note: 'Källan visar gångutfall med en kettlebell vid bröstet. Appen återgår till start efter varje framåtutfall och erbjuder även kroppsvikt eller hantlar.',
       },
     ];
   if (id === 'kettlebell-press')

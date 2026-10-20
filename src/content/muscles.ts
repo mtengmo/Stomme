@@ -208,6 +208,16 @@ export const exerciseMuscles: Record<
     secondary: ['core'],
     qualities: [],
   },
+  'kettlebell-floor-press': {
+    primary: ['chest'],
+    secondary: ['triceps', 'shoulders', 'core'],
+    qualities: [],
+  },
+  'kettlebell-rack-carry': {
+    primary: ['core'],
+    secondary: ['shoulders', 'back', 'forearms'],
+    qualities: ['grip'],
+  },
 };
 
 export function primaryMuscleLabel(exerciseId: ExerciseId): string {

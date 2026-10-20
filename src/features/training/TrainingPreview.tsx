@@ -350,11 +350,15 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId !== 'rehab' &&
-              !compatible.some((exercise) => exercise.id === 'floor-press') ? (
+              (!compatible.some((exercise) =>
+                ['floor-press', 'kettlebell-floor-press'].includes(exercise.id),
+              ) ||
+                !compatible.some(
+                  (exercise) => exercise.id === 'supported-row',
+                )) ? (
                 <p className="m-0 text-base text-ink-soft">
-                  Med den valda utrustningen saknas vissa press- och
-                  dragövningar. Lägg till utrustning under Byt
-                  träningsinriktning för fler val.
+                  Fler redskap ger fler press- och dragövningar. Välj bland
+                  tillgängliga övningar nedan.
                 </p>
               ) : null}
 

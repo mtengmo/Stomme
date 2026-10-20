@@ -33,13 +33,18 @@ function entry(
     perSide,
     ...(perSide
       ? {
-          sideKind: [
-            'supported-row',
-            'triceps-kickback',
-            'kettlebell-press',
-          ].includes(id)
-            ? ('sida' as const)
-            : ('ben' as const),
+          sideKind:
+            id === 'kettlebell-rack-carry'
+              ? ('hand' as const)
+              : [
+                    'supported-row',
+                    'triceps-kickback',
+                    'kettlebell-press',
+                    'kettlebell-floor-press',
+                    'kettlebell-rack-carry',
+                  ].includes(id)
+                ? ('sida' as const)
+                : ('ben' as const),
         }
       : {}),
     range:
@@ -84,16 +89,16 @@ export const additionalExercises: Exercise[] = [
   ),
   entry(
     'dumbbell-rdl',
-    'Rumänskt marklyft med hantlar',
+    'Rumänskt marklyft',
     ['Baksida lår', 'Säte', 'Rygg'],
     [
-      'Stå med en hantel i varje hand framför låren och lätt böjda knän.',
-      'För höften bakåt. Låt hantlarna följa benen nedåt medan ryggen behåller sin form.',
+      'Stå höftbrett med vikten framför låren och lätt böjda knän. Greppa enligt den valda varianten.',
+      'För höften bakåt. Låt vikten följa benen nedåt medan ryggen behåller sin form.',
       'Pressa genom fötterna och räta upp höften till stående. Ned och upp är en repetition.',
     ],
     'Du gör en djup knäböj eller rundar ryggen för att nå golvet.',
-    'Välj lättare hantlar och för höften kortare bakåt.',
-    [pair(2), pair(4)],
+    'Välj lättare vikt och för höften kortare bakåt.',
+    [pair(2), pair(4), single(8, 'kettlebell'), single(16, 'kettlebell')],
   ),
   entry(
     'supported-row',
@@ -227,7 +232,13 @@ export const additionalExercises: Exercise[] = [
     ],
     'Du kliver på en smal linje eller tappar främre knäets riktning.',
     'Välj kroppsvikt och ett kortare, grundare utfall.',
-    [bw, pair(2)],
+    [
+      bw,
+      pair(2),
+      single(4, 'kettlebell'),
+      single(8, 'kettlebell'),
+      single(16, 'kettlebell'),
+    ],
     true,
   ),
   entry(
@@ -241,7 +252,13 @@ export const additionalExercises: Exercise[] = [
     ],
     'Du faller framåt eller slår ned foten utan att bromsa.',
     'Välj kroppsvikt och ett grundare utfall.',
-    [bw, pair(2)],
+    [
+      bw,
+      pair(2),
+      single(4, 'kettlebell'),
+      single(8, 'kettlebell'),
+      single(16, 'kettlebell'),
+    ],
     true,
   ),
   entry(
@@ -426,5 +443,42 @@ export const additionalExercises: Exercise[] = [
     'Välj ett lättare band och kortare rörelse.',
     [{ kg: 0, label: 'Gummiband · motstånd utan kg-angivelse' }],
     true,
+  ),
+  entry(
+    'kettlebell-floor-press',
+    'Enarms golvpress med kettlebell',
+    ['Bröst', 'Triceps', 'Axlar'],
+    [
+      'Ligg på sidan på golvet med kettlebellen framför bröstet. Greppa med vald hand och stöd med den andra. Rulla över på rygg med vikten nära bröstet, böjda knän och fötterna i golvet.',
+      'Håll handleden rak och överarmen mot golvet nära kroppen. Pressa vikten upp över axeln tills armen är rak; håll höfter och axlar stilla.',
+      'Sänk tills överarmen vilar mjukt på golvet. Upp och ned är en repetition. Avsluta genom att ta stöd med fria handen, rulla mot vikten och sätta ned den.',
+    ],
+    'Kroppen vrids, handleden viks eller armbågen slår i golvet.',
+    'Välj en lättare kettlebell och öva att komma i och ur startläget först.',
+    [
+      single(4, 'kettlebell'),
+      single(8, 'kettlebell'),
+      single(16, 'kettlebell'),
+    ],
+    true,
+  ),
+  entry(
+    'kettlebell-rack-carry',
+    'Gång med kettlebell vid axeln',
+    ['Bål', 'Axlar', 'Rygg'],
+    [
+      'Ta upp kettlebellen med båda händerna och placera den i vald hand vid axeln. Håll handleden rak och armbågen nära kroppen; vikten vilar mot underarmen.',
+      'Gå med korta, lugna steg och upprätt överkropp. Håll vikten stilla vid axeln och andas under hela sträckan.',
+      'Räkna hela sträckan, även efter en lugn vändning. Stanna, ta hjälp av fria handen och sätt ned vikten kontrollerat. Gå angiven sträcka på varje vald sida.',
+    ],
+    'Du lutar åt sidan, svankar eller håller andan.',
+    'Välj en lättare kettlebell eller kortare sträcka. Öva först att hålla vikten stilla vid axeln.',
+    [
+      single(4, 'kettlebell'),
+      single(8, 'kettlebell'),
+      single(16, 'kettlebell'),
+    ],
+    true,
+    'meters',
   ),
 ];
