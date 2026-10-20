@@ -4,6 +4,9 @@ import type { AppUpdate } from '../../lib/update';
 const none: AppUpdate = {
   needRefresh: false,
   showBanner: false,
+  status: 'idle',
+  reloadPending: false,
+  checkForUpdate: async () => {},
   updateNow: async () => {},
 };
 

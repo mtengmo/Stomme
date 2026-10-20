@@ -150,7 +150,7 @@ describe('backup', () => {
 
   it('rejects wrong schemaVersion', async () => {
     const b = await valid();
-    for (const v of [0, 2, '1']) {
+    for (const v of [0, 3, '1']) {
       await expect(
         importAll(db, text({ ...b, schemaVersion: v })),
       ).rejects.toMatchObject({

@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import { EFFORT_LABEL, UNIT_WORD } from '../../content/copy';
 import { exercises } from '../../content/exercises';
+import { programmeNames } from '../../content/programmes';
 import { templates } from '../../content/templates';
 import type { Session, SetLog } from '../../domain/types';
 import { formatMinutes } from '../../lib/format';
@@ -41,6 +42,11 @@ export function Summary({
           {formatMinutes(seconds)} · {setsDone}/{planned} set
         </p>
         <ul className="m-0 flex list-none flex-col p-0">
+          {session.programId ? (
+            <li className="pb-3 text-lg font-bold">
+              {programmeNames[session.programId]}
+            </li>
+          ) : null}
           {session.plan.map((p, i) => {
             const ex = exercises[p.exerciseId];
             const fb = session.feedback[p.exerciseId];

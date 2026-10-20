@@ -1,5 +1,6 @@
 import Dexie from 'dexie';
 import { selectedTemplate, snapshotTemplate } from '../content/alternatives';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
 import type {
   ExerciseFeedback,
@@ -66,6 +67,7 @@ export interface NewSetLog {
   side: SetLog['side'];
   amount: number;
   loadIndex: number;
+  weightKg?: number;
 }
 
 /** The in-progress session, if any (newest if there are several). */
@@ -128,6 +130,7 @@ export async function programStartDate(db: StommeDB): Promise<string | null> {
   const program = await getMeta<{ startDate?: unknown }>(db, 'program');
   if (isRealDate(program?.startDate)) return program.startDate;
   const dates = (await db.sessions.toArray())
+    .filter((s) => !s.programId)
     .map((s) => s.date)
     .filter(isRealDate);
   return dates.length > 0 ? dates.reduce((a, b) => (a < b ? a : b)) : null;
@@ -158,7 +161,50 @@ export async function logSet(
   now: Date,
 ): Promise<SetLog> {
   return db.transaction('rw', db.sessions, db.setLogs, async () => {
-    await requireOpen(db, sessionId);
+    const session = await requireOpen(db, sessionId);
+    if (session.programId) {
+      if (!session.checkins?.before)
+        throw new Error('Svara på frågorna före passet först.');
+      const planned = session.plan.find(
+        (p) => p.exerciseId === input.exerciseId,
+      );
+      const variant =
+        planned &&
+        exerciseMetadata[input.exerciseId].variants.find(
+          (item) => item.id === planned.variantId,
+        );
+      const external = variant?.equipment.some(
+        (item) => item.type === 'dumbbell' || item.type === 'kettlebell',
+      );
+      const weight = input.weightKg ?? planned?.weightKg;
+      const sides =
+        planned?.sides ??
+        (exercises[input.exerciseId].perSide ? ['right', 'left'] : ['both']);
+      if (
+        !planned ||
+        !variant?.loadIndices.includes(input.loadIndex) ||
+        !sides.includes(input.side) ||
+        !Number.isInteger(input.setNumber) ||
+        input.setNumber < 1 ||
+        input.setNumber > planned.sets ||
+        !Number.isFinite(input.amount) ||
+        input.amount < 0 ||
+        input.amount > 600 ||
+        typeof weight !== 'number' ||
+        !Number.isFinite(weight) ||
+        weight < 0 ||
+        weight > 500 ||
+        (external ? weight <= 0 : weight !== 0)
+      )
+        throw new Error('Kontrollera vikt, antal och arbetande sida.');
+    }
+    if (
+      input.weightKg !== undefined &&
+      (!Number.isFinite(input.weightKg) ||
+        input.weightKg < 0 ||
+        input.weightKg > 500)
+    )
+      throw new Error('Invalid weight');
     const existing = await db.setLogs
       .where('sessionId')
       .equals(sessionId)
@@ -175,7 +221,20 @@ export async function logSet(
       id: crypto.randomUUID(),
       sessionId,
       ...input,
-      weightKg: ladder[input.loadIndex]?.kg ?? 0,
+      weightKg: session.programId
+        ? (input.weightKg ??
+          session.plan.find((p) => p.exerciseId === input.exerciseId)
+            ?.weightKg ??
+          ladder[input.loadIndex]?.kg ??
+          0)
+        : (ladder[input.loadIndex]?.kg ?? 0),
+      ...(session.plan.find((p) => p.exerciseId === input.exerciseId)?.variantId
+        ? {
+            variantId: session.plan.find(
+              (p) => p.exerciseId === input.exerciseId,
+            )?.variantId,
+          }
+        : {}),
       loggedAt: now.toISOString(),
     };
     await db.setLogs.add(log);

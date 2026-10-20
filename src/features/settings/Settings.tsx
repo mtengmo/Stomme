@@ -465,24 +465,54 @@ function InstallSection() {
 }
 
 function VersionSection() {
-  const { needRefresh, updateNow } = useUpdate();
-  // The shell banner already offers the update on this screen.
-  if (needRefresh) return null;
+  const { needRefresh, status, reloadPending, updateNow, checkForUpdate } =
+    useUpdate();
+  const message = {
+    idle: 'Sök efter en ny version när du har internet.',
+    checking: 'Söker efter uppdatering …',
+    installing: 'Hämtar uppdatering … Du kan fortsätta använda appen.',
+    ready: reloadPending
+      ? 'Uppdateringen är klar. Ladda om när det passar.'
+      : 'Ny version är klar att använda.',
+    current: 'Ingen ny uppdatering hittades vid kontrollen.',
+    offline: 'Du är offline. Sök igen när du har internet.',
+    failed: 'Uppdateringen kunde inte kontrolleras. Försök igen.',
+    unsupported:
+      'Den här webbläsaren kan inte söka efter appuppdateringar. Öppna appen igen för att hämta en ny version.',
+    applying: 'Öppnar den nya versionen …',
+  }[status];
   return (
     <Section id="set-version" title="Version">
+      <p className="m-0 text-base font-bold">Version {APP_VERSION}</p>
+      <p className={note}>Bygge {APP_COMMIT}</p>
+      <p aria-live="polite" className="m-0 flex items-start gap-2 text-base">
+        <Icon
+          name={status === 'failed' ? 'warning' : 'info'}
+          className="mt-0.5 shrink-0"
+        />
+        {message}
+      </p>
+      <Button
+        variant="secondary"
+        disabled={
+          status === 'checking' ||
+          status === 'installing' ||
+          status === 'applying' ||
+          status === 'unsupported'
+        }
+        onClick={() => void checkForUpdate()}
+      >
+        Sök efter uppdatering
+      </Button>
       {needRefresh ? (
-        <>
-          <p className="m-0 text-base font-bold">Ny version finns.</p>
-          <Button variant="secondary" onClick={() => void updateNow()}>
-            Uppdatera
-          </Button>
-        </>
-      ) : (
-        <>
-          <p className="m-0 text-base font-bold">Version {APP_VERSION}</p>
-          <p className={note}>Bygge {APP_COMMIT}</p>
-        </>
-      )}
+        <Button
+          variant="secondary"
+          disabled={status === 'applying'}
+          onClick={() => void updateNow()}
+        >
+          Uppdatera nu
+        </Button>
+      ) : null}
     </Section>
   );
 }

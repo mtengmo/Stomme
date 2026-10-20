@@ -2,15 +2,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { lazy, Suspense } from 'react';
 import { Route, Router, Switch, useLocation } from 'wouter';
 import { getDb } from './db/db';
-import { ExerciseCardPage } from './features/exercise/ExerciseCard';
-import { FigureDev } from './features/exercise/FigureDev';
-import { SessionDetail } from './features/history/SessionDetail';
 import { Onboarding } from './features/onboarding/Onboarding';
-import { isTiming, PainScreen, StopScreen } from './features/pain/PainScreen';
-import { PassPreview, UnknownPass } from './features/pass/PassPreview';
-import { SessionScreen } from './features/session/SessionScreen';
 import { UpdateContext, useUpdate } from './features/settings/updateContext';
-import { WeekView } from './features/week/WeekView';
 import { useAppHashLocation } from './lib/hashLocation';
 import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
@@ -18,6 +11,46 @@ import { BottomNav } from './ui/BottomNav';
 import { Button } from './ui/Button';
 
 // Heavier routes load on demand to keep the first load small.
+const ExerciseCardPage = lazy(() =>
+  import('./features/exercise/ExerciseCard').then((m) => ({
+    default: m.ExerciseCardPage,
+  })),
+);
+const SessionScreen = lazy(() =>
+  import('./features/session/SessionScreen').then((m) => ({
+    default: m.SessionScreen,
+  })),
+);
+const SessionDetail = lazy(() =>
+  import('./features/history/SessionDetail').then((m) => ({
+    default: m.SessionDetail,
+  })),
+);
+const PassPreview = lazy(() =>
+  import('./features/pass/PassPreview').then((m) => ({
+    default: m.PassPreview,
+  })),
+);
+const UnknownPass = lazy(() =>
+  import('./features/pass/PassPreview').then((m) => ({
+    default: m.UnknownPass,
+  })),
+);
+const PainScreen = lazy(() =>
+  import('./features/pain/PainScreen').then((m) => ({ default: m.PainScreen })),
+);
+const StopScreen = lazy(() =>
+  import('./features/pain/PainScreen').then((m) => ({ default: m.StopScreen })),
+);
+const FigureDev = import.meta.env.DEV
+  ? lazy(() =>
+      import('./features/exercise/FigureDev').then((m) => ({
+        default: m.FigureDev,
+      })),
+    )
+  : null;
+const isTiming = (value: string): value is 'before' | 'after' | 'dayAfter' =>
+  ['before', 'after', 'dayAfter'].includes(value);
 const History = lazy(() =>
   import('./features/history/History').then((m) => ({ default: m.History })),
 );
@@ -38,6 +71,20 @@ const ExerciseReview = lazy(() =>
 );
 
 // DEV-only synthetic data helper; absent from the production bundle.
+const TrainingHome = lazy(() =>
+  import('./features/training/TrainingHome').then((m) => ({
+    default: m.TrainingHome,
+  })),
+);
+const TrainingPreview = lazy(() =>
+  import('./features/training/TrainingPreview').then((m) => ({
+    default: m.TrainingPreview,
+  })),
+);
+const Checkin = lazy(() =>
+  import('./features/training/Checkin').then((m) => ({ default: m.Checkin })),
+);
+
 const DemoSeed = import.meta.env.DEV
   ? lazy(() => import('./dev/DemoSeed'))
   : null;
@@ -69,27 +116,30 @@ function Shell() {
   const inSession =
     location.startsWith('/session/') ||
     location.startsWith('/smarta/') ||
+    location.startsWith('/kansla/') ||
+    location.startsWith('/traning/') ||
     location.startsWith('/stopp/');
-  const { needRefresh, updateNow } = useUpdate();
-  const showBanner = needRefresh && !inSession;
-  // The banner shows on the calm screens only, never on session routes or
-  // cards that can be opened mid-session.
-  const calm =
-    location === '/' ||
-    location.startsWith('/historik') ||
-    location === '/installningar';
+  const { needRefresh, status, reloadPending, updateNow } = useUpdate();
+  const showBanner =
+    needRefresh &&
+    !inSession &&
+    !location.startsWith('/ovning/') &&
+    location !== '/granska';
   return (
     <>
-      {showBanner && calm ? (
+      {showBanner ? (
         <div className="mx-auto max-w-md px-5 pt-3">
           <Banner>
             <p className="m-0 font-bold">Ny version finns</p>
             <p className="m-0 text-ink-soft">
-              Appen laddas om. Din data påverkas inte.
+              {reloadPending
+                ? 'Uppdateringen är klar. Ladda om när det passar.'
+                : 'Appen laddas om. Sparade pass finns kvar.'}
             </p>
             <Button
               variant="secondary"
               className="mt-2"
+              disabled={status === 'applying'}
               onClick={() => void updateNow()}
             >
               Uppdatera
@@ -100,7 +150,19 @@ function Shell() {
       <main>
         <Suspense fallback={null}>
           <Switch>
-            <Route path="/">{() => <WeekView />}</Route>
+            <Route path="/">{() => <TrainingHome />}</Route>
+            <Route path="/traning/:id">
+              {(params) => <TrainingPreview id={params.id} />}
+            </Route>
+            <Route path="/kansla/:id/:timing">
+              {(params) => (
+                <Checkin
+                  key={`${params.id}-${params.timing}`}
+                  id={params.id}
+                  timing={params.timing}
+                />
+              )}
+            </Route>
             <Route path="/pass/:id">
               {(params) =>
                 params.id === 'A' || params.id === 'B' ? (
@@ -130,7 +192,7 @@ function Shell() {
               {(params) => <ExerciseCardPage id={params.id} />}
             </Route>
             <Route path="/ovningar">{() => <ExerciseLibrary />}</Route>
-            {import.meta.env.DEV ? (
+            {FigureDev ? (
               <Route path="/dev/figurer">{() => <FigureDev />}</Route>
             ) : null}
             {DemoSeed ? (
@@ -148,7 +210,7 @@ function Shell() {
               {(params) => <SessionDetail id={params.id} />}
             </Route>
             <Route path="/installningar">{() => <Settings />}</Route>
-            <Route>{() => <WeekView />}</Route>
+            <Route>{() => <TrainingHome />}</Route>
           </Switch>
         </Suspense>
       </main>

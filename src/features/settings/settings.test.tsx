@@ -340,11 +340,16 @@ describe('M6 review fixes', () => {
     expect(t).toMatch(/Inget har ändrats/);
   });
 
-  it('hides the Version update block while the shell banner shows', async () => {
+  it('keeps version, build and manual update check visible with a pending update', async () => {
     sw.need = true;
     render(<App />);
     window.location.hash = '#/installningar';
-    await screen.findByText('Appen laddas om. Din data påverkas inte.');
-    expect(screen.queryByRole('heading', { name: 'Version' })).toBeNull();
+    await screen.findByText('Appen laddas om. Sparade pass finns kvar.');
+    expect(screen.getByRole('heading', { name: 'Version' })).toBeTruthy();
+    expect(screen.getByText(/^Version /)).toBeTruthy();
+    expect(screen.getByText(/^Bygge /)).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Sök efter uppdatering' }),
+    ).toBeTruthy();
   });
 });

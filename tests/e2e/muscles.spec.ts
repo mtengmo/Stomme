@@ -11,14 +11,14 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.getByRole('link', { name: 'Övningar', exact: true }).click();
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
-  await expect(page.getByRole('status')).toHaveText('1 övning för vader');
+  await expect(page.getByRole('status')).toHaveText('2 övningar för vader');
   await page
     .getByRole('link', { name: 'Enbens tåhävning', exact: true })
     .click();
   await expect(
     page.getByRole('heading', { name: 'Enbens tåhävning', exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Muskler', exact: true }).click();
+  await page.getByText('Visa muskelkarta', { exact: true }).click();
   await expect(page.getByRole('img', { name: 'Kropp bakifrån' })).toBeVisible();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
@@ -27,7 +27,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
-  await expect(page.getByRole('status')).toHaveText('11 övningar');
+  await expect(page.getByRole('status')).toHaveText('38 övningar');
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,
   );
@@ -94,17 +94,18 @@ test('muscle highlights have a text alternative and respect reduced motion', asy
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/ovning/dead-bug');
-  await expect(page.getByText(/^Tränar främst:/)).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Tränar främst' }),
+  ).toBeVisible();
   await expect(page.getByText('Start', { exact: true })).toBeVisible();
   await expect(page.getByText('Slut', { exact: true })).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Pausa rörelsen' }),
   ).toHaveCount(0);
-  await page.getByRole('button', { name: 'Muskler', exact: true }).click();
+  await page.getByText('Visa muskelkarta', { exact: true }).click();
   await expect(
     page.getByRole('img', { name: 'Kropp framifrån' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Rörelse', exact: true }).click();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   const movingFigure = page
     .locator('svg')

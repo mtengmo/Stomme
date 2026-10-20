@@ -115,7 +115,7 @@ describe('controlled exercise choices', () => {
     await replanSession(db, session.id);
     expect((await getActiveSession(db))?.plan).toEqual(active?.plan);
     const backup = await exportAll(db, now);
-    expect(backup.schemaVersion).toBe(1);
+    expect(backup.schemaVersion).toBe(2);
     await importAll(db, serializeBackup(backup));
     expect((await getActiveSession(db))?.plan).toEqual(active?.plan);
   });

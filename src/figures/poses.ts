@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { additionalFigures } from './additionalPoses';
 import type { Pt } from './lerp';
 
 /**
@@ -48,6 +49,8 @@ export type Prop =
 export interface FigureSpec {
   start: Pose;
   end: Pose;
+  middle?: Pose;
+  motion?: 'controlled' | 'ballistic' | 'hold';
   props: Prop[];
   held?: { kind: 'dumbbell' | 'kettlebell'; hands: ('hR' | 'hL')[] };
 }
@@ -86,6 +89,7 @@ function pose(
 }
 
 export const figures: Record<ExerciseId, FigureSpec> = {
+  ...additionalFigures,
   'goblet-chair-squat': {
     start: pose(
       [97, 92],

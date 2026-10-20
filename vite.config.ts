@@ -39,7 +39,8 @@ export default defineConfig({
       manifest: {
         name: 'Stomme',
         short_name: 'Stomme',
-        description: 'Styrkepass för knät, lokalt och offline.',
+        description:
+          'Styrketräning, löpstyrka och ditt rehabprogram, lokalt och offline.',
         lang: 'sv',
         id: '/',
         start_url: '/',

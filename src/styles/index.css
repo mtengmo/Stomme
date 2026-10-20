@@ -141,9 +141,19 @@ h2 {
   }
 }
 
-/* Readers own their scroll area; the page and close controls stay still. */
+/* Exercise help is one bounded reader; only this document scrolls. */
+.exercise-guide-scroll {
+  scrollbar-color: var(--edge) transparent;
+  scrollbar-width: thin;
+}
+
+.exercise-guide-layout {
+  max-width: 70rem;
+  margin-inline: auto;
+}
+
 .exercise-stage {
-  height: clamp(200px, 34dvh, 360px);
+  height: clamp(180px, 25dvh, 250px);
 }
 .exercise-stage svg {
   height: 100%;
@@ -169,5 +179,33 @@ h2 {
   flex-shrink: 0;
 }
 .review-stage {
-  height: clamp(170px, 24dvh, 260px);
+  height: clamp(160px, 23dvh, 230px);
+}
+
+@media (min-width: 900px) {
+  .exercise-guide-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .exercise-guide-movement {
+    position: sticky;
+    top: 0;
+  }
+
+  .exercise-stage {
+    height: clamp(230px, 34dvh, 360px);
+  }
+}
+
+@media (max-height: 520px) {
+  .exercise-stage {
+    height: 160px;
+  }
+
+  .review-stage {
+    height: 150px;
+  }
 }

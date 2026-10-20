@@ -56,14 +56,21 @@ export function PropShape({ prop }: { prop: Prop }) {
 export function Held({
   kind,
   at,
+  vertical = false,
 }: {
   kind: 'dumbbell' | 'kettlebell';
   at: readonly [number, number];
+  vertical?: boolean;
 }) {
   const [x, y] = at;
   if (kind === 'dumbbell') {
     return (
-      <g {...PROP} stroke="var(--ink)" strokeWidth={4}>
+      <g
+        {...PROP}
+        stroke="var(--ink)"
+        strokeWidth={4}
+        transform={vertical ? `rotate(90 ${x} ${y})` : undefined}
+      >
         <path
           d={`M${x - 8} ${y}H${x + 8}M${x - 8} ${y - 5}V${y + 5}M${x + 8} ${y - 5}V${y + 5}`}
         />

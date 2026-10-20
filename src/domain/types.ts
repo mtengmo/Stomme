@@ -9,7 +9,34 @@ export type ExerciseId =
   | 'single-leg-calf-raise'
   | 'suitcase-carry'
   | 'bird-dog'
-  | 'wall-sit';
+  | 'wall-sit'
+  | 'goblet-squat'
+  | 'kettlebell-deadlift'
+  | 'dumbbell-rdl'
+  | 'supported-row'
+  | 'floor-press'
+  | 'shoulder-press'
+  | 'farmer-carry'
+  | 'biceps-curl'
+  | 'hammer-curl'
+  | 'lateral-raise'
+  | 'triceps-kickback'
+  | 'glute-bridge'
+  | 'reverse-lunge'
+  | 'forward-lunge'
+  | 'kettlebell-swing'
+  | 'kettlebell-press'
+  | 'half-squat'
+  | 'hamstring-curl'
+  | 'seated-knee-extension'
+  | 'straight-leg-raise'
+  | 'prone-leg-raise'
+  | 'side-lying-hip-abduction'
+  | 'side-lying-hip-adduction'
+  | 'calf-stretch'
+  | 'quadriceps-stretch'
+  | 'hamstring-stretch'
+  | 'band-leg-press';
 
 export type Unit = 'reps' | 'seconds' | 'meters';
 export type SideKind = 'ben' | 'sida' | 'hand';
@@ -43,6 +70,33 @@ export interface Exercise {
 }
 
 export type TemplateId = 'A' | 'B';
+
+export type ProgramId = 'general' | 'running' | 'rehab';
+export type EquipmentChoice =
+  | 'bodyweight'
+  | 'dumbbell-1'
+  | 'dumbbell-2'
+  | 'kettlebell-1'
+  | 'kettlebell-2'
+  | 'chair'
+  | 'support'
+  | 'step'
+  | 'band';
+export interface TrainingPreferences {
+  programId: ProgramId;
+  equipment: EquipmentChoice[];
+  experience: 'new' | 'some' | 'regular';
+}
+export interface SymptomReport {
+  area: string;
+  side: 'right' | 'left' | 'both' | 'unspecified';
+  score: number;
+}
+export interface TrainingCheckin {
+  recordedAt: string;
+  feeling: 'ready' | 'tired' | 'good' | 'mixed' | 'difficult';
+  symptoms: SymptomReport | null;
+}
 
 export interface TemplateItem {
   exerciseId: ExerciseId;
@@ -82,16 +136,25 @@ export interface PlannedExercise {
   weightKg: number;
   restSec: number;
   reason: ReasonCode;
+  /** Explicit sides for clinician-selected/custom plans; absent preserves legacy behaviour. */
+  sides?: ('right' | 'left' | 'both')[];
+  variantId?: string;
+  explanation?: string;
 }
 
 export interface ExerciseFeedback {
   effort?: Effort;
   skipped?: boolean;
+  symptoms?: SymptomReport | null;
 }
 
 export interface Session {
   id: string;
   templateId: TemplateId;
+  /** Absent on original knee/running sessions. */
+  programId?: ProgramId;
+  policyVersion?: number;
+  checkins?: Partial<Record<'before' | 'after' | 'dayAfter', TrainingCheckin>>;
   /** Local date, YYYY-MM-DD. */
   date: string;
   /** ISO-8601 instant. */
@@ -116,6 +179,7 @@ export interface SetLog {
   amount: number;
   loadIndex: number;
   weightKg: number;
+  variantId?: string;
   loggedAt: string;
 }
 
@@ -132,7 +196,7 @@ export interface PainLog {
 }
 
 export interface MetaEntry {
-  key: 'program' | 'onboarding' | 'backup';
+  key: 'program' | 'onboarding' | 'backup' | 'training';
   value: unknown;
 }
 

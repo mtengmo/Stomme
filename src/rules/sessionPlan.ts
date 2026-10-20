@@ -37,9 +37,8 @@ export function buildSteps(
 ): Step[] {
   const steps: Step[] = [];
   plan.forEach((p, planIndex) => {
-    const sides: SetSide[] = catalog(p.exerciseId).perSide
-      ? ['right', 'left']
-      : ['both'];
+    const sides: SetSide[] =
+      p.sides ?? (catalog(p.exerciseId).perSide ? ['right', 'left'] : ['both']);
     for (let setNumber = 1; setNumber <= p.sets; setNumber++) {
       for (const side of sides) {
         steps.push({

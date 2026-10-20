@@ -29,12 +29,12 @@ for (const mode of [
       page.getByRole('heading', { name: 'Granska övningar', exact: true }),
     ).toBeVisible();
     const codes = Array.from(
-      { length: 11 },
+      { length: 38 },
       (_, i) => `E${String(i + 1).padStart(2, '0')}`,
     );
     if (mode.viewport.width < 1024) {
       const picker = page.getByLabel('Välj övning att granska');
-      await expect(picker.getByRole('option')).toHaveCount(11);
+      await expect(picker.getByRole('option')).toHaveCount(38);
       for (const code of codes)
         await expect(
           picker.getByRole('option', { name: new RegExp(`^${code} · `) }),
@@ -54,9 +54,18 @@ for (const mode of [
     await expect(
       page.getByRole('heading', { name: /^E03 · Enbens rumänskt marklyft$/ }),
     ).toBeVisible();
-    const poses = page.getByRole('region', { name: 'Rörelsens lägen' });
+    const poses = page.getByRole('region', { name: 'Rörelsen' });
     await expect(poses.getByRole('figure')).toHaveCount(1);
-    await poses.getByRole('button', { name: 'Mitt', exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Så gör du' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Tränar främst' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Hjälper till' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Mitt', exact: true }).click();
     await expect(poses.getByRole('figure')).toContainText('Mitt');
     await page.screenshot({
       path: test.info().outputPath('review.png'),
@@ -65,15 +74,6 @@ for (const mode of [
     await page.getByRole('link', { name: 'Nästa', exact: true }).click();
     await expect(page).toHaveURL(/#\/granska\?ovning=E04$/);
     await page.goBack();
-    await expect(page).toHaveURL(/#\/granska\?ovning=E03$/);
-    await page
-      .getByRole('link', {
-        name: 'Öppna övningskort och animation',
-        exact: true,
-      })
-      .click();
-    await expect(page.getByText('Övning E03', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
     await expect(page).toHaveURL(/#\/granska\?ovning=E03$/);
     await page.reload();
     await expect(page.getByRole('heading', { name: /^E03 ·/ })).toBeVisible();

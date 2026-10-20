@@ -129,6 +129,17 @@ export function SessionScreen({ id }: { id: string }) {
     );
   }
   if (!open) return <Finished id={id} />;
+  if (session.s.programId) {
+    if (!session.s.checkins?.before)
+      return <Redirect to={`/kansla/${id}/before`} />;
+    return (
+      <Runner
+        session={session.s}
+        logs={logs}
+        hasAfter={!!session.s.checkins?.after}
+      />
+    );
+  }
   // The 'before' reading gates the session; 'after' gates the summary.
   if (!pain.some((p) => p.timing === 'before') && logs.length === 0) {
     return <Redirect to={`/smarta/${id}/before`} />;

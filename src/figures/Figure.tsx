@@ -5,7 +5,7 @@ import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
 import { FloorLine, Held, PropShape } from './props';
 
-export type Equipment = 'dumbbell' | 'kettlebell' | null;
+export type Equipment = 'dumbbell' | 'kettlebell' | 'band' | null;
 
 export type Working = 'right' | 'left';
 
@@ -13,6 +13,14 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
   const out = { ...a };
   for (const k of POSE_KEYS) out[k] = lerpPt(a[k], b[k], t);
   return out;
+}
+
+export function movementPose(exerciseId: ExerciseId, t: number): Pose {
+  const spec = figures[exerciseId];
+  if (!spec.middle) return lerpPose(spec.start, spec.end, t);
+  return t < 0.5
+    ? lerpPose(spec.start, spec.middle, t * 2)
+    : lerpPose(spec.middle, spec.end, (t - 0.5) * 2);
 }
 
 export function usePrefersReducedMotion(): boolean {
@@ -74,7 +82,10 @@ export function FigureFrame({
         hL: [pose.hip[0] - 12, pose.hip[1] + 8],
       };
   }
-  if (equipment && exerciseId === 'single-leg-hip-thrust') {
+  if (
+    equipment &&
+    (exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge')
+  ) {
     p = {
       ...p,
       hR: [p.hip[0] + 5, p.hip[1] - 5],
@@ -83,7 +94,7 @@ export function FigureFrame({
   }
   const heldKind = equipment === undefined ? spec.held?.kind : equipment;
   const anchors: Pt[] =
-    exerciseId === 'single-leg-hip-thrust'
+    exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
       ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
       : (
           spec.held?.hands ??
@@ -91,6 +102,14 @@ export function FigureFrame({
             ? (['hR', 'hL'] as const)
             : (['hR'] as const))
         ).map((hand) => p[hand]);
+  if (equipment === null && exerciseId === 'goblet-squat')
+    p = {
+      ...p,
+      eR: [p.neck[0] + 21, p.neck[1] + 7],
+      hR: [p.neck[0] + 43, p.neck[1] + 9],
+      eL: [p.neck[0] + 19, p.neck[1] + 10],
+      hL: [p.neck[0] + 41, p.neck[1] + 12],
+    };
   const accent = working && !showMuscles ? 'var(--blue)' : 'var(--ink)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
@@ -125,13 +144,22 @@ export function FigureFrame({
           <path d={arm(p.eR, p.hR)} />
           <path d={leg(p.kR, p.aR, p.tR)} />
         </g>
-        {heldKind ? (
+        {heldKind === 'band' ? (
+          <path
+            data-equipment="band"
+            d={`M${p.hR.join(' ')}L${p.aR[0] + 2} ${p.aR[1] - 2}L${p.hL.join(' ')}`}
+            fill="none"
+            stroke="var(--blue)"
+            strokeWidth="3"
+          />
+        ) : heldKind ? (
           <g data-equipment={heldKind}>
             {anchors.map((at) => (
               <Held
-                key={at === p.hL ? 'left' : 'right'}
+                key={at.join(',')}
                 kind={heldKind}
                 at={at}
+                vertical={exerciseId === 'hammer-curl'}
               />
             ))}
           </g>
@@ -182,12 +210,16 @@ export function Figure({
     const t0 = performance.now() - elapsedMs.current;
     const tick = (now: number) => {
       elapsedMs.current = now - t0;
-      setT(cycleProgress(elapsedMs.current));
+      setT(
+        spec.motion === 'ballistic'
+          ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
+          : cycleProgress(elapsedMs.current),
+      );
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, paused]);
+  }, [reduced, paused, spec.motion]);
 
   if (reduced && !stillOnly) {
     return (
@@ -217,7 +249,13 @@ export function Figure({
   return (
     <FigureFrame
       exerciseId={exerciseId}
-      pose={reduced ? spec.start : lerpPose(spec.start, spec.end, t)}
+      pose={
+        reduced
+          ? spec.start
+          : spec.motion === 'hold'
+            ? spec.end
+            : movementPose(exerciseId, t)
+      }
       working={working}
       equipment={equipment}
       showMuscles={showMuscles}

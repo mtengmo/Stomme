@@ -39,7 +39,7 @@ afterEach(cleanup);
 describe('exercise library', () => {
   it('shows all exercises, equipment, template links and optional status', () => {
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('11 övningar');
+    expect(screen.getByRole('status').textContent).toBe('38 övningar');
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
@@ -53,14 +53,19 @@ describe('exercise library', () => {
       screen.getAllByRole('link', { name: 'Ingår i Pass B' }),
     ).toHaveLength(5);
     expect(screen.getByText('Valfri övning')).toBeTruthy();
-    expect(screen.getByText('Utrustning: Vägg · Kroppsvikt')).toBeTruthy();
+    const wallSit = screen
+      .getByRole('link', { name: 'Väggsittning' })
+      .closest('li');
+    expect(wallSit?.textContent).toContain(
+      'Utrustning: Kroppsvikt + stabilt stöd',
+    );
   });
 
   it('separates primary and supporting matches from a directly opened URL', () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=hamstrings');
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe(
-      '2 övningar för baksida lår',
+      '13 övningar för baksida lår',
     );
     const primary = screen.getByRole('region', { name: 'Tränar främst' });
     const supporting = screen.getByRole('region', { name: 'Hjälper till' });
@@ -83,7 +88,7 @@ describe('exercise library', () => {
     await user.click(screen.getByRole('button', { name: 'Vader' }));
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     expect(window.location.search).toBe('');
-    expect(screen.getByRole('status').textContent).toBe('1 övning för vader');
+    expect(screen.getByRole('status').textContent).toBe('2 övningar för vader');
     await user.click(
       screen.getByRole('link', {
         name: exercises['single-leg-calf-raise'].name,
@@ -93,12 +98,14 @@ describe('exercise library', () => {
       screen.getByRole('button', { name: 'Tillbaka från övning' }),
     );
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('1 övning för vader'),
+      expect(screen.getByRole('status').textContent).toBe(
+        '2 övningar för vader',
+      ),
     );
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     window.history.back();
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('11 övningar'),
+      expect(screen.getByRole('status').textContent).toBe('38 övningar'),
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -108,7 +115,7 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('11 övningar');
+    expect(screen.getByRole('status').textContent).toBe('38 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
 });

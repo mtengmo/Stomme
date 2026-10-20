@@ -1,8 +1,8 @@
 # Stomme
 
-A small, offline-first personal strength programme for knee rehabilitation, built as a
-installable PWA (Android Chrome first). The UI is in Swedish; code, identifiers and comments
-are in English.
+A small, offline-first strength app for general training, running support and individually
+selected rehab workouts, built as an installable PWA (Android Chrome first). The UI is in
+Swedish; code, identifiers and comments are in English.
 
 The app is not medical advice. Stop on sharp pain, swelling or locking, and show the
 programme to a physiotherapist.
@@ -21,6 +21,7 @@ for the full build plan and `docs/spec.md` for the specification.
 | `npm run preview` | Serve the production build locally |
 | `npm run check` | Biome lint/format check and `tsc --noEmit` |
 | `npm test` | Run the Vitest test suite once |
+| `npm run test:upgrade` | Test real production service-worker upgrades, offline retry, old clients and two tabs |
 | `npm run e2e` | Build and run the production Playwright browser tests |
 | `npm run audit:a11y` | Check contrast and audit mobile screens in light and dark themes |
 | `npm run shots` | Build and capture mobile screenshots in light and dark themes |
@@ -30,11 +31,21 @@ Requires Node 24 and npm. Install with `npm ci`.
 
 ## Exercise review
 
-Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All eleven exercises have fixed references E01–E11, independent of workout order. The read-only view includes names, IDs, muscles, instructions and static start/mid/end frames for each side, plus links to the normal animated exercise cards. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
+Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All 38 exercises have fixed references E01–E38, independent of workout order. The read-only view includes names, IDs, muscles, instructions, source attribution and static start/mid/end frames for each side. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
 
-The reader keeps navigation visible and scrolls its content internally. Choose Rörelse, Muskler or Så gör du; review one large pose using Start/Mitt/Slut and switch sides as needed. Selecting a weight changes the equipment diagram and handling instructions. Session help uses the weight currently selected in that set.
+The reader combines movement, muscle information and instructions in one internally scrolling view. Review one large pose using Start/Mitt/Slut and switch sides as needed. Selecting a weight changes the equipment diagram and handling instructions. Session help uses the variant and actual total weight currently selected in that set.
 
 Workout screens distinguish holding time from rest time and explain when to switch sides. A countdown never logs a set or starts the next set automatically; use Klar set / Nästa set to continue.
+
+## Training directions and feedback
+
+First-use setup offers Allmän styrka, Styrka för löpning and Mitt rehabprogram, equipment and training experience. Existing users keep their original programme until they choose another direction. New programme sessions store their identity, selected variant, side and actual weight; rehab exercises and dosage are explicitly chosen by the user rather than generated as a treatment plan.
+
+Readiness, exercise effort and symptoms are separate answers. Report symptoms with body area/side, including during an exercise. General/running suggestions use only that direction's completed history; symptoms block automatic increases and rehab never progresses automatically. Conditional next-day questions appear inside the app. See the policy in [the implementation plan](docs/general-strength-plan.md).
+
+The library combines purpose, muscle, equipment and technical-level filters, supports name/reference search and links to the AAOS-derived knee collection. Source content and differences are documented in [the source review](docs/exercise-source-review.md). Historical sessions and schema-1 backups remain supported; new exports use schema 2.
+
+Settings always shows the installed version/commit and offers Sök efter uppdatering. Update checks run on registration, foreground return, reconnect and periodically while visible/online. Applying an update requires consent and defers reload during active workout/input routes, including when another tab accepts an update. See [update recovery](docs/update-recovery.md) for an old client that has not yet received this mechanism.
 
 ## Deployment
 

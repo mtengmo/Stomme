@@ -15,7 +15,7 @@ const catalogue = [...exerciseList].sort((a, b) =>
   exerciseReferences[a.id].localeCompare(exerciseReferences[b.id]),
 );
 
-/** Read-only review with one large pose, fixed navigation and a bounded reader. */
+/** Read-only review with exercise navigation and the unified bounded guide. */
 
 export function ExerciseReview() {
   const [, navigate] = useLocation();
@@ -122,12 +122,6 @@ export function ExerciseReview() {
             )}
           </nav>
           <ExerciseCardBody key={exercise.id} exercise={exercise} review />
-          <Link
-            href={`/ovning/${exercise.id}`}
-            className="flex min-h-12 shrink-0 items-center text-base font-bold underline"
-          >
-            Öppna övningskort och animation
-          </Link>
         </div>
       </div>
     </div>

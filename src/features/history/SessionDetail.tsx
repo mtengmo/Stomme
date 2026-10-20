@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { exercises } from '../../content/exercises';
+import { programmeNames } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { deleteSession } from '../../db/history';
 import type { ExerciseId, PainLog, SetLog } from '../../domain/types';
@@ -102,6 +103,11 @@ export function SessionDetail({ id }: { id: string }) {
         <h1 className="m-0 text-5xl font-extrabold">
           Pass {session.templateId}
         </h1>
+        {session.programId ? (
+          <p className="m-0 text-lg font-bold">
+            {programmeNames[session.programId]}
+          </p>
+        ) : null}
         <p className="m-0 text-xl">
           {formatLongDate(session.date)}
           {duration ? ` · ${duration}` : ''}

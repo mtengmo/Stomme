@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Redirect, useLocation } from 'wouter';
 import { PAIN_COPY } from '../../content/copy';
 import { exercises } from '../../content/exercises';
+import { programmeNames } from '../../content/programmes';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import {
@@ -26,6 +27,7 @@ import {
 import { Button } from '../../ui/Button';
 import { Snackbar } from '../../ui/Snackbar';
 import type { TallyItem } from '../../ui/Tally';
+import { ExerciseSymptoms } from '../training/Checkin';
 import { EffortScreen } from './EffortScreen';
 import { RestScreen } from './RestScreen';
 import { SetScreen } from './SetScreen';
@@ -62,6 +64,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [confirmAbort, setConfirmAbort] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -133,7 +136,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         const count = logs.filter(
           (l) => l.exerciseId === p.exerciseId && l.setNumber === n,
         ).length;
-        if (count >= sidesOf(p.exerciseId)) complete += 1;
+        if (count >= (p.sides?.length ?? sidesOf(p.exerciseId))) complete += 1;
       }
       items.push({ id: p.exerciseId, remaining: p.sets - complete, active });
       done += complete;
@@ -143,7 +146,9 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   }, [session.plan, session.feedback, logs, steps, cursor]);
 
   const frame = {
-    title: templates[session.templateId].name,
+    title: session.programId
+      ? `${programmeNames[session.programId]} · ${session.templateId}`
+      : templates[session.templateId].name,
     stepId: cursor,
     clock: formatClock(seconds),
     tally,
@@ -222,7 +227,15 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   }
 
   if (!step && !hasAfter) {
-    return <Redirect to={`/smarta/${session.id}/after`} />;
+    return (
+      <Redirect
+        to={
+          session.programId
+            ? `/kansla/${session.id}/after`
+            : `/smarta/${session.id}/after`
+        }
+      />
+    );
   }
 
   if (!step) {
@@ -246,6 +259,29 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       .at(-1);
     // The suggestion in the plan is the prefill; what the user logs becomes the base.
     const prior = mine;
+    if (reporting && session.programId)
+      return (
+        <div className="mx-auto flex max-w-md flex-col gap-4 px-5 py-6">
+          <ExerciseSymptoms
+            onCancel={() => setReporting(false)}
+            onSave={async (symptoms) => {
+              await setFeedback(getDb(), session.id, step.exerciseId, {
+                symptoms,
+              });
+              setReporting(false);
+            }}
+          />
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setReporting(false);
+              setConfirmAbort(true);
+            }}
+          >
+            Avbryt passet
+          </Button>
+        </div>
+      );
     return (
       <SetScreen
         key={cursor}
@@ -255,6 +291,15 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         totalSets={total(step.planIndex)}
         initialAmount={prior?.amount ?? plan?.target ?? ex.range.start}
         initialLoadIndex={prior?.loadIndex ?? plan?.loadIndex ?? 0}
+        initialWeightKg={
+          session.programId ? (prior?.weightKg ?? plan?.weightKg) : undefined
+        }
+        variantId={prior?.variantId ?? plan?.variantId}
+        singleSide={plan?.sides?.length === 1}
+        onReportSymptoms={
+          session.programId ? () => setReporting(true) : undefined
+        }
+        symptomReported={!!session.feedback[step.exerciseId]?.symptoms}
         busy={busy}
         onSkip={() =>
           run(async () => {
@@ -271,7 +316,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
             );
           })
         }
-        onDone={(amount, loadIndex) =>
+        onDone={(amount, loadIndex, weightKg) =>
           run(async () => {
             const db = getDb();
             await logSet(
@@ -283,6 +328,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
                 side: step.side,
                 amount,
                 loadIndex,
+                weightKg,
               },
               new Date(),
             );

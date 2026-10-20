@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import type {
   ExerciseId,
@@ -10,11 +11,13 @@ import type {
 } from '../domain/types';
 import { isRealDate, toLocalDate } from '../lib/dates';
 import { type ShareResult, shareOrDownload } from '../lib/share';
+import { validateCheckin } from '../rules/training';
 import type { StommeDB } from './db';
 import { setMeta } from './repo';
+import { validateTrainingPlan } from './training';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
-export const BACKUP_SCHEMA_VERSION = 1;
+export const BACKUP_SCHEMA_VERSION = 2;
 /** Import size limit (risk R12). */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -137,6 +140,13 @@ const plannedExercise = z
     weightKg: z.number().min(0).max(1000),
     restSec: count,
     reason: z.enum(reasonCodes),
+    sides: z
+      .array(z.enum(['right', 'left', 'both']))
+      .min(1)
+      .max(2)
+      .optional(),
+    variantId: z.string().min(1).max(100).optional(),
+    explanation: z.string().max(1000).optional(),
   })
   .superRefine((p, ctx) => {
     if (!loadIndexFor(p.exerciseId).safeParse(p.loadIndex).success) {
@@ -144,31 +154,70 @@ const plannedExercise = z
     }
   });
 
+const symptom = z.strictObject({
+  area: z.string().trim().min(1).max(100),
+  side: z.enum(['right', 'left', 'both', 'unspecified']),
+  score: z.number().int().min(0).max(10),
+});
+const checkin = z.strictObject({
+  recordedAt: instant,
+  feeling: z.enum(['ready', 'tired', 'good', 'mixed', 'difficult']),
+  symptoms: symptom.nullable(),
+});
 const effortFeedback = z.strictObject({
   effort: z.enum(['easy', 'ok', 'hard']).optional(),
   skipped: z.boolean().optional(),
+  symptoms: symptom.nullable().optional(),
 });
 
-const sessionSchema = z.strictObject({
-  id,
-  templateId: z.enum(['A', 'B']),
-  date: localDate,
-  startedAt: instant,
-  finishedAt: instant.optional(),
-  status: z.enum(['in_progress', 'completed', 'aborted']),
-  abortReason: z.enum(['pain_stop', 'user']).optional(),
-  programWeek: z.number().int().min(1).max(1000),
-  plan: z
-    .array(plannedExercise)
-    .max(30)
-    .refine(
-      (items) =>
-        new Set(items.map((item) => item.exerciseId)).size === items.length,
-      { message: 'Duplicate exercise in session plan' },
-    ),
-  feedback: z.partialRecord(exerciseIdSchema, effortFeedback),
-  note: z.string().max(5000).optional(),
-});
+const sessionSchema = z
+  .strictObject({
+    id,
+    templateId: z.enum(['A', 'B']),
+    programId: z.enum(['general', 'running', 'rehab']).optional(),
+    policyVersion: z.literal(1).optional(),
+    checkins: z
+      .strictObject({
+        before: checkin.optional(),
+        after: checkin.optional(),
+        dayAfter: checkin.optional(),
+      })
+      .optional(),
+    date: localDate,
+    startedAt: instant,
+    finishedAt: instant.optional(),
+    status: z.enum(['in_progress', 'completed', 'aborted']),
+    abortReason: z.enum(['pain_stop', 'user']).optional(),
+    programWeek: z.number().int().min(1).max(1000),
+    plan: z
+      .array(plannedExercise)
+      .max(30)
+      .refine(
+        (items) =>
+          new Set(items.map((item) => item.exerciseId)).size === items.length,
+        { message: 'Duplicate exercise in session plan' },
+      ),
+    feedback: z.partialRecord(exerciseIdSchema, effortFeedback),
+    note: z.string().max(5000).optional(),
+  })
+  .superRefine((session, ctx) => {
+    if (!session.programId) return;
+    if (session.policyVersion !== 1 || !validateTrainingPlan(session.plan))
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Invalid programme policy or exercise plan',
+      });
+    for (const timing of ['before', 'after', 'dayAfter'] as const) {
+      const check = session.checkins?.[timing];
+      if (check && !validateCheckin(check, timing))
+        ctx.addIssue({ code: 'custom', message: 'Invalid check-in timing' });
+    }
+    if (
+      (session.checkins?.after || session.checkins?.dayAfter) &&
+      !session.checkins.before
+    )
+      ctx.addIssue({ code: 'custom', message: 'Missing before check-in' });
+  });
 
 const setLogSchema = z
   .strictObject({
@@ -180,6 +229,7 @@ const setLogSchema = z
     amount: z.number().min(0).max(100_000),
     loadIndex: count,
     weightKg: z.number().min(0).max(1000),
+    variantId: z.string().min(1).max(100).optional(),
     loggedAt: instant,
   })
   .superRefine((l, ctx) => {
@@ -207,6 +257,28 @@ const painLogSchema = z.strictObject({
 
 const metaSchema = z.discriminatedUnion('key', [
   z.strictObject({
+    key: z.literal('training'),
+    value: z.strictObject({
+      programId: z.enum(['general', 'running', 'rehab']),
+      experience: z.enum(['new', 'some', 'regular']),
+      equipment: z
+        .array(
+          z.enum([
+            'bodyweight',
+            'dumbbell-1',
+            'dumbbell-2',
+            'kettlebell-1',
+            'kettlebell-2',
+            'chair',
+            'support',
+            'step',
+            'band',
+          ]),
+        )
+        .max(9),
+    }),
+  }),
+  z.strictObject({
     key: z.literal('program'),
     value: z.strictObject({ startDate: localDate }),
   }),
@@ -224,7 +296,7 @@ const metaSchema = z.discriminatedUnion('key', [
 ]);
 
 const backupSchema = z.strictObject({
-  schemaVersion: z.literal(BACKUP_SCHEMA_VERSION),
+  schemaVersion: z.union([z.literal(1), z.literal(BACKUP_SCHEMA_VERSION)]),
   exportedAt: instant,
   sessions: z.array(sessionSchema),
   setLogs: z.array(setLogSchema),
@@ -251,7 +323,8 @@ export function parseBackup(text: string): BackupFile {
     typeof raw === 'object' &&
     raw !== null &&
     'schemaVersion' in raw &&
-    raw.schemaVersion !== BACKUP_SCHEMA_VERSION
+    raw.schemaVersion !== BACKUP_SCHEMA_VERSION &&
+    raw.schemaVersion !== 1
   ) {
     throw new BackupError(
       'schema_version',
@@ -263,6 +336,8 @@ export function parseBackup(text: string): BackupFile {
     throw new BackupError('invalid', 'Backup content is not valid');
   }
   const b = parsed.data as BackupFile;
+  // v1 is an additive migration: absent programme fields preserve the legacy policy.
+  b.schemaVersion = BACKUP_SCHEMA_VERSION;
   const sessionIds = new Set(b.sessions.map((s) => s.id));
   const metaKeys = new Set(b.meta.map((m) => m.key));
   if (
@@ -282,12 +357,49 @@ export function parseBackup(text: string): BackupFile {
     b.painLogs.filter((p) => p.timing === 'before').map((p) => p.sessionId),
   );
   const setSessions = new Set(b.setLogs.map((l) => l.sessionId));
+  const sessionsById = new Map(
+    b.sessions.map((session) => [session.id, session]),
+  );
+  for (const log of b.setLogs) {
+    const session = sessionsById.get(log.sessionId);
+    if (!session?.programId) continue;
+    const plan = session.plan.find(
+      (item) => item.exerciseId === log.exerciseId,
+    );
+    const variant =
+      plan &&
+      exerciseMetadata[log.exerciseId].variants.find(
+        (item) => item.id === plan.variantId,
+      );
+    const sides =
+      plan?.sides ??
+      (exercises[log.exerciseId].perSide ? ['right', 'left'] : ['both']);
+    const external = variant?.equipment.some(
+      (item) => item.type === 'dumbbell' || item.type === 'kettlebell',
+    );
+    if (
+      !plan ||
+      !variant ||
+      !session.checkins?.before ||
+      log.variantId !== variant.id ||
+      !variant.loadIndices.includes(log.loadIndex) ||
+      !sides.includes(log.side) ||
+      log.setNumber > plan.sets ||
+      log.amount > 600 ||
+      log.weightKg > 500 ||
+      (external ? log.weightKg <= 0 : log.weightKg !== 0)
+    )
+      throw new BackupError(
+        'invalid',
+        'Programme set does not match its saved plan',
+      );
+  }
   if (
     b.sessions.some(
       (s) =>
         s.status === 'in_progress' &&
         setSessions.has(s.id) &&
-        !withBefore.has(s.id),
+        (s.programId ? !s.checkins?.before : !withBefore.has(s.id)),
     )
   ) {
     throw new BackupError(

@@ -56,6 +56,9 @@ async function audit(page: Page, name: string) {
         .trim()
         .slice(0, 30)}"`;
     const visible = (el: Element) => {
+      const closed = el.closest('details:not([open])');
+      if (closed && el !== closed.querySelector(':scope > summary'))
+        return false;
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
       return (
@@ -163,10 +166,11 @@ async function theme(scheme: 'light' | 'dark') {
   await page.goto(`${base}/#/ovning/dead-bug`);
   await page.getByRole('heading', { name: 'Dead bug', exact: true }).waitFor();
   await audit(page, tag('muscle movement overlay'));
-  await page.getByRole('button', { name: 'Så gör du', exact: true }).click();
-  await audit(page, tag('exercise instructions'));
-  await page.getByRole('button', { name: 'Rörelse', exact: true }).click();
-  await page.getByRole('button', { name: 'Muskler', exact: true }).click();
+  await page.getByRole('heading', { name: 'Så gör du', exact: true }).waitFor();
+  await page.getByRole('heading', { name: 'Tränar främst' }).waitFor();
+  await page.getByRole('heading', { name: 'Hjälper till' }).waitFor();
+  await audit(page, tag('unified exercise guide'));
+  await page.locator('summary').filter({ hasText: 'Visa muskelkarta' }).click();
   await audit(page, tag('front and back muscle map'));
   await page.goto(`${base}/#/granska?ovning=E03`);
   await page.getByRole('heading', { name: /^E03 ·/ }).waitFor();
@@ -320,6 +324,73 @@ async function theme(scheme: 'light' | 'dark') {
   await p2.goto(`${base}/#/historik`);
   await p2.getByRole('heading', { name: 'Något gick fel' }).waitFor();
   await audit(p2, tag('error boundary'));
+  // A separate fresh profile covers the programme flows without changing the
+  // legacy synthetic sessions used above.
+  const trainingContext = await browser.newContext({
+    viewport: { width: 360, height: 800 },
+    colorScheme: scheme,
+    reducedMotion: 'reduce',
+  });
+  const training = await trainingContext.newPage();
+  await training.addInitScript('window.__name = (f) => f');
+  await training.goto(base);
+  await training.getByRole('button', { name: /Jag förstår/ }).click();
+  await training.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();
+  await audit(training, tag('training setup'));
+  await training
+    .getByRole('radio', { name: 'Allmän styrka', exact: true })
+    .check();
+  await training
+    .getByRole('button', { name: 'Spara träningsinriktning' })
+    .click();
+  await training.getByRole('link', { name: 'Planera pass A' }).waitFor();
+  await audit(training, tag('training overview'));
+  await training.getByRole('link', { name: 'Planera pass A' }).click();
+  await training
+    .getByRole('heading', { name: 'Pass A', exact: true })
+    .waitFor();
+  await audit(training, tag('general training preview'));
+  while (
+    (await training.getByRole('button', { name: /^Ta bort / }).count()) > 1
+  )
+    await training
+      .getByRole('button', { name: /^Ta bort / })
+      .last()
+      .click();
+  await training.getByLabel('Set', { exact: true }).fill('1');
+  await training
+    .getByRole('button', { name: 'Starta pass', exact: true })
+    .click();
+  await training.getByRole('heading', { name: 'Hur känns kroppen?' }).waitFor();
+  await audit(training, tag('training readiness check'));
+  await training.getByRole('radio', { name: 'Redo att träna' }).check();
+  await training
+    .getByRole('radio', { name: 'Ja, jag vill ange besvär' })
+    .check();
+  await audit(training, tag('training symptom fields'));
+  await training.getByRole('radio', { name: 'Nej, inga besvär' }).check();
+  await training.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await training
+    .getByRole('button', { name: 'Rapportera smärta eller besvär' })
+    .waitFor();
+  await audit(training, tag('general training set'));
+  await training
+    .getByRole('button', { name: 'Rapportera smärta eller besvär' })
+    .click();
+  await audit(training, tag('exercise symptom report'));
+  await training.getByRole('button', { name: 'Avbryt rapport' }).click();
+  await training.getByRole('button', { name: 'Klar set', exact: true }).click();
+  await training.getByRole('button', { name: 'Lagom', exact: true }).click();
+  await training.getByRole('heading', { name: 'Hur kändes passet?' }).waitFor();
+  await audit(training, tag('training after check'));
+  await training.getByRole('radio', { name: 'Bra', exact: true }).check();
+  await training.getByRole('radio', { name: 'Nej, inga besvär' }).check();
+  await training.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await training
+    .getByRole('heading', { name: 'Pass A klart', exact: true })
+    .waitFor();
+  await audit(training, tag('general training summary'));
+  await trainingContext.close();
   await browser.close();
   browsers.delete(browser);
 }

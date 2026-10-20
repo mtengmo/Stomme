@@ -47,6 +47,7 @@ function lastSessionOf(
     .filter(
       (s) =>
         s.id !== excludeSessionId &&
+        !s.programId &&
         s.status !== 'in_progress' &&
         s.plan.some((p) => p.exerciseId === id) &&
         (withLogs.has(s.id) || s.feedback[id]?.skipped === true),
@@ -82,7 +83,9 @@ export function buildPlan(
         logs,
         feedback: lastSession.feedback[ex.id],
         sessionPain: worstPainSince(
-          data.sessions.filter((s) => s.id !== excludeSessionId),
+          data.sessions.filter(
+            (s) => s.id !== excludeSessionId && !s.programId,
+          ),
           data.painLogs,
           lastSession.date,
         ),

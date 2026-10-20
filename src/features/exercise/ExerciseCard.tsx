@@ -1,19 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
+import {
+  equipmentLabels,
+  exerciseMetadata,
+  technicalLevelLabels,
+} from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
-import { primaryMuscleLabel } from '../../content/muscles';
+import { exerciseMuscles, muscleGroups } from '../../content/muscles';
 import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
+import type { Equipment } from '../../figures/Figure';
 import {
   Figure,
   FigureFrame,
-  lerpPose,
+  movementPose,
   usePrefersReducedMotion,
 } from '../../figures/Figure';
-import { MuscleFocus, MuscleMap } from '../../figures/MuscleMap';
-import { figures } from '../../figures/poses';
+import { MuscleMap } from '../../figures/MuscleMap';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 
@@ -26,21 +31,25 @@ const MUSCLE_OVERLAY_EXERCISES = new Set<ExerciseId>([
   'single-leg-rdl',
   'dead-bug',
 ]);
-/** Bounded reader: controls stay in place; each view scrolls independently. */
+
+/** One bounded reader that keeps movement, muscle focus and coaching together. */
 export function ExerciseCardBody({
   exercise,
   side = 'right',
   loadIndex,
+  variantId,
+  weightKg,
   review = false,
+  showTitle = true,
 }: {
   exercise: Exercise;
   side?: 'right' | 'left';
   loadIndex?: number;
+  variantId?: string;
+  weightKg?: number;
   review?: boolean;
+  showTitle?: boolean;
 }) {
-  const [view, setView] = useState<'movement' | 'muscles' | 'instructions'>(
-    'movement',
-  );
   const [selectedLoad, setSelectedLoad] = useState(
     loadIndex ?? exercise.week1LoadIndex,
   );
@@ -51,11 +60,45 @@ export function ExerciseCardBody({
   const reducedMotion = usePrefersReducedMotion();
   const working = exercise.perSide ? workingSide : null;
   const physio = ASK_PHYSIO[exercise.id];
-  const presentation = loadPresentation(exercise, loadIndex ?? selectedLoad);
-  const spec = figures[exercise.id];
+  const selectedLoadIndex = loadIndex ?? selectedLoad;
+  const basePresentation = loadPresentation(
+    exercise,
+    selectedLoadIndex,
+    variantId,
+  );
+  const metadata = exerciseMetadata[exercise.id];
+  const variant = basePresentation.variant;
+  const selectedTool = variant.equipment.find(({ type }) =>
+    ['dumbbell', 'kettlebell', 'band'].includes(type),
+  )?.type;
+  const equipment: Equipment =
+    selectedTool === 'dumbbell' ||
+    selectedTool === 'kettlebell' ||
+    selectedTool === 'band'
+      ? selectedTool
+      : null;
+  const cue = basePresentation.cue;
+  const loadLabel =
+    equipment === 'band'
+      ? 'Gummiband · valt motstånd'
+      : weightKg === undefined
+        ? basePresentation.load.label
+        : weightKg === 0
+          ? equipment === null
+            ? 'Kroppsvikt'
+            : '0 kg totalt'
+          : `${new Intl.NumberFormat('sv-SE', { maximumFractionDigits: 1 }).format(weightKg)} kg totalt`;
+  const presentation = {
+    ...basePresentation,
+    equipment,
+    cue,
+    load: { ...basePresentation.load, label: loadLabel },
+  };
   const equipmentControls = (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-      {loadIndex === undefined && exercise.loadLadder.length > 1 ? (
+      {loadIndex === undefined &&
+      weightKg === undefined &&
+      exercise.loadLadder.length > 1 ? (
         <label className="flex min-h-12 flex-wrap items-center gap-2 text-base font-bold">
           Vikt
           <select
@@ -73,6 +116,11 @@ export function ExerciseCardBody({
       ) : (
         <p className="m-0 text-base font-bold">{presentation.load.label}</p>
       )}
+      {variant.label ? (
+        <p className="m-0 text-base" data-testid="selected-exercise-variant">
+          Variant: {variant.label}
+        </p>
+      ) : null}
       {exercise.perSide ? (
         <button
           type="button"
@@ -86,57 +134,35 @@ export function ExerciseCardBody({
       ) : null}
     </div>
   );
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="shrink-0">
-        <h1 className="m-0 text-3xl leading-tight font-bold">
-          {review ? `${exerciseReferences[exercise.id]} · ` : ''}
-          {exercise.name}
-        </h1>
-        {!review ? (
-          <p className="m-0 text-base text-ink-soft">
-            Övning {exerciseReferences[exercise.id]}
-          </p>
-        ) : null}
-        <p className="m-0 text-base">
-          Tränar främst: {primaryMuscleLabel(exercise.id)}
-        </p>
-      </header>
-      <fieldset className="m-0 flex shrink-0 gap-2 border-0 p-0">
-        <legend className="sr-only">Visning</legend>
-        {(
-          [
-            ['movement', 'Rörelse'],
-            ['muscles', 'Muskler'],
-            ['instructions', 'Så gör du'],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            type="button"
-            key={id}
-            aria-pressed={view === id}
-            onClick={() => setView(id)}
-            className={`min-h-12 min-w-0 flex-1 rounded-md border-2 px-2 text-base font-bold ${view === id ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </fieldset>
+    <div className="exercise-guide flex min-h-0 min-w-0 flex-1 flex-col">
+      {showTitle ? (
+        <header className="shrink-0 pb-2">
+          <h1 className="m-0 text-3xl leading-tight font-bold">
+            {review ? `${exerciseReferences[exercise.id]} · ` : ''}
+            {exercise.name}
+          </h1>
+          {!review ? (
+            <p className="m-0 text-base text-ink-soft">
+              Övning {exerciseReferences[exercise.id]}
+            </p>
+          ) : null}
+        </header>
+      ) : null}
+
       <section
-        key={view}
-        aria-label={
-          view === 'movement'
-            ? 'Rörelsens lägen'
-            : view === 'muscles'
-              ? 'Muskelområden'
-              : 'Instruktioner'
-        }
+        aria-label="Övningsguide"
         // biome-ignore lint/a11y/noNoninteractiveTabindex: focusable scroll region for keyboard readers
         tabIndex={0}
-        className="guide-panel min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-3"
+        className="exercise-guide-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-3"
+        data-testid="exercise-guide-scroll"
       >
-        {view === 'movement' ? (
-          <div className="flex flex-col gap-3">
+        <div className="exercise-guide-layout flex flex-col gap-4">
+          <section
+            className="exercise-guide-movement flex min-w-0 flex-col gap-3"
+            aria-label="Rörelsen"
+          >
             {!review ? equipmentControls : null}
             {review ? (
               <fieldset
@@ -163,7 +189,7 @@ export function ExerciseCardBody({
                 <figure className="m-0 flex h-full flex-col">
                   <FigureFrame
                     exerciseId={exercise.id}
-                    pose={lerpPose(spec.start, spec.end, frame / 2)}
+                    pose={movementPose(exercise.id, frame / 2)}
                     working={working}
                     equipment={presentation.equipment}
                     showMuscles={
@@ -197,16 +223,77 @@ export function ExerciseCardBody({
                 {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
               </button>
             ) : !review ? (
-              <p className="m-0 text-base text-ink-soft">
-                Start och slut visas stilla med minskad rörelse.
+              <p className="sr-only">
+                Rörelsen visas stilla med minskad rörelse.
               </p>
             ) : null}
-            <p className="m-0 text-base font-bold">{presentation.cue}</p>
             {working ? (
               <p className="m-0 text-base text-ink-soft">
                 {working === 'right'
                   ? 'H: höger sida arbetar.'
                   : 'V: vänster sida arbetar.'}
+              </p>
+            ) : null}
+          </section>
+
+          <div className="exercise-guide-notes flex min-w-0 flex-col gap-4">
+            <section aria-label="Muskelgrupper" className="flex flex-col gap-1">
+              <div>
+                <h3 className="m-0 inline text-base font-bold">
+                  Tränar främst
+                </h3>
+                <p className="m-0 text-base">
+                  {exerciseMuscles[exercise.id].primary
+                    .map((id) => muscleGroups[id].label)
+                    .join(', ')}
+                </p>
+              </div>
+              <div>
+                <h3 className="m-0 inline text-base font-bold">Hjälper till</h3>
+                <p className="m-0 text-base">
+                  {exerciseMuscles[exercise.id].secondary
+                    .map((id) => muscleGroups[id].label)
+                    .join(', ') || 'Inga särskilda muskelgrupper.'}
+                </p>
+              </div>
+            </section>
+
+            <section aria-labelledby="exercise-instructions-heading">
+              <h2
+                id="exercise-instructions-heading"
+                className="m-0 text-2xl font-bold"
+              >
+                Så gör du
+              </h2>
+              {!presentation.tips.includes(presentation.cue) ? (
+                <p className="my-2 text-base font-bold">{presentation.cue}</p>
+              ) : null}
+              {metadata.holdSeconds ? (
+                <p className="my-2 text-base">
+                  Håll varje repetition i {metadata.holdSeconds} sekunder.
+                  {metadata.relaxSeconds
+                    ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
+                    : ''}
+                </p>
+              ) : null}
+              <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
+                {presentation.tips.map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ol>
+            </section>
+
+            <section>
+              <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
+              <p className="m-0 mt-1 text-lg">{exercise.commonMistake}</p>
+            </section>
+            <section>
+              <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
+              <p className="m-0 mt-1 text-lg">{exercise.easierVariant}</p>
+            </section>
+            {physio ? (
+              <p className="m-0 border-t-2 border-edge pt-3 text-base text-ink-soft">
+                {physio}
               </p>
             ) : null}
             {MUSCLE_OVERLAY_EXERCISES.has(exercise.id) ? (
@@ -226,24 +313,69 @@ export function ExerciseCardBody({
                   streckad yta hjälper till.
                 </p>
               </>
-            ) : (
-              <p className="m-0 text-base text-ink-soft">
-                Se muskelområden under Muskler.
-              </p>
-            )}
+            ) : null}
             <p className="m-0 text-base text-ink-soft">
               Animationen visar tekniken. Följ antalet eller hålltiden i passet.
             </p>
-          </div>
-        ) : view === 'muscles' ? (
-          <>
-            <MuscleFocus exerciseId={exercise.id} />
-            <MuscleMap exerciseId={exercise.id} />
-          </>
-        ) : (
-          <div className="flex flex-col gap-4">
+            <details className="border-t-2 border-edge pt-3">
+              <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
+                Visa muskelkarta
+              </summary>
+              <div className="pt-3">
+                <MuscleMap exerciseId={exercise.id} />
+              </div>
+            </details>
+            <details className="border-t-2 border-edge pt-3">
+              <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
+                Utrustning, nivå och källor
+              </summary>
+              <div className="flex flex-col gap-3 pt-3 text-base">
+                <section>
+                  <h3 className="m-0 text-lg font-bold">Vald variant</h3>
+                  <p className="m-0">{variant.label}</p>
+                  <p className="m-0">
+                    Utrustning:{' '}
+                    {variant.equipment
+                      .map(
+                        ({ type, count }) =>
+                          `${count} × ${equipmentLabels[type]}`,
+                      )
+                      .join(', ')}
+                  </p>
+                  <p className="m-0">
+                    Teknisk nivå: {technicalLevelLabels[variant.technicalLevel]}
+                    . {variant.technicalReason}
+                  </p>
+                  {!presentation.tips.includes(variant.setup) ? (
+                    <p className="m-0">{variant.setup}</p>
+                  ) : null}
+                  <p className="m-0">
+                    Lättare alternativ: {variant.easierOption}
+                  </p>
+                </section>
+                <section>
+                  <h3 className="m-0 text-lg font-bold">Källor</h3>
+                  <ul className="m-0 flex list-disc flex-col gap-2 pl-6">
+                    {metadata.sources.map((source) => (
+                      <li key={`${source.url}-${source.title}`}>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex min-h-12 items-center font-bold underline"
+                        >
+                          {source.publisher}: {source.title}
+                          {source.page ? ` · sida ${source.page}` : ''}
+                        </a>
+                        <p className="m-0">{source.note}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </div>
+            </details>
             {review ? (
-              <p className="m-0 break-words text-base text-ink-soft">
+              <p className="m-0 break-words border-t-2 border-edge pt-3 text-base text-ink-soft">
                 ID: {exercise.id} ·{' '}
                 {Object.values(templates)
                   .filter((template) =>
@@ -255,36 +387,13 @@ export function ExerciseCardBody({
                   .join(' / ') || 'Valfri övning'}
               </p>
             ) : null}
-            <section>
-              <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
-              <p className="my-2 text-base font-bold">
-                {presentation.load.label} · {presentation.cue}
-              </p>
-              <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
-                {presentation.tips.map((tip) => (
-                  <li key={tip}>{tip}</li>
-                ))}
-              </ol>
-            </section>
-            <section>
-              <h2 className="m-0 text-2xl font-bold">Vanligt fel</h2>
-              <p className="m-0 mt-1 text-lg">{exercise.commonMistake}</p>
-            </section>
-            <section>
-              <h2 className="m-0 text-2xl font-bold">Enklare variant</h2>
-              <p className="m-0 mt-1 text-lg">{exercise.easierVariant}</p>
-            </section>
-            {physio ? (
-              <p className="m-0 border-t-2 border-edge pt-3 text-base text-ink-soft">
-                {physio}
-              </p>
-            ) : null}
           </div>
-        )}
+        </div>
       </section>
     </div>
   );
 }
+
 /** #/ovning/:id */
 export function ExerciseCardPage({ id }: { id: string }) {
   // hasOwn: ids like "constructor" or "toString" must not resolve to prototype members.
@@ -292,7 +401,7 @@ export function ExerciseCardPage({ id }: { id: string }) {
     ? (exercises as Record<string, Exercise>)[id]
     : undefined;
   return (
-    <div className="mx-auto flex h-[calc(100dvh-var(--app-nav-height))] max-w-2xl flex-col gap-3 overflow-hidden px-5 pt-2 pb-3">
+    <div className="mx-auto flex h-[calc(100dvh-var(--app-nav-height))] max-w-6xl flex-col gap-3 overflow-hidden px-5 pt-2 pb-3">
       <button
         type="button"
         onClick={() => window.history.back()}
@@ -314,19 +423,21 @@ export function ExerciseCardPage({ id }: { id: string }) {
     </div>
   );
 }
-/**
- * Full-screen overlay over the session; closing keeps all session state.
- * Opening pushes a history entry so the back gesture closes the sheet.
- */
+
+/** Full-screen overlay over the session; closing keeps all session state. */
 export function ExerciseSheet({
   exercise,
   side = 'right',
   onClose,
   loadIndex,
+  variantId,
+  weightKg,
 }: {
   exercise: Exercise;
   side?: 'right' | 'left';
   loadIndex?: number;
+  variantId?: string;
+  weightKg?: number;
   onClose(): void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -335,13 +446,12 @@ export function ExerciseSheet({
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const oldOverflow = document.body.style.overflow;
+    const oldScrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
     ref.current?.focus();
     window.history.pushState({ sheet: true }, '');
     const onPop = () => closeRef.current();
     window.addEventListener('popstate', onPop);
-    // Modal keyboard behaviour even if focus has left the sheet: Escape
-    // closes, Tab cycles inside it.
     const onKey = (e: KeyboardEvent) => {
       const root = ref.current;
       if (!root) return;
@@ -352,9 +462,16 @@ export function ExerciseSheet({
       if (e.key !== 'Tab') return;
       const items = [
         ...root.querySelectorAll<HTMLElement>(
-          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),summary,[tabindex]:not([tabindex="-1"])',
         ),
-      ];
+      ].filter((item) => {
+        const closed = item.closest('details:not([open])');
+        return (
+          (!closed || item === closed.querySelector(':scope > summary')) &&
+          item.getClientRects().length > 0 &&
+          getComputedStyle(item).visibility !== 'hidden'
+        );
+      });
       const first = items[0];
       const last = items[items.length - 1];
       if (!first || !last) return;
@@ -375,10 +492,10 @@ export function ExerciseSheet({
       document.removeEventListener('keydown', onKey);
       window.removeEventListener('popstate', onPop);
       document.body.style.overflow = oldOverflow;
+      if (window.scrollY !== oldScrollY) window.scrollTo(0, oldScrollY);
       previous?.focus?.();
     };
   }, []);
-  // Closing goes through history so the pushed entry is consumed.
   const close = () => window.history.back();
   return (
     <div
@@ -389,22 +506,33 @@ export function ExerciseSheet({
       tabIndex={-1}
       className="fixed inset-0 z-50 flex h-dvh flex-col overflow-hidden bg-paper outline-none"
     >
-      <div className="sticky top-0 z-10 border-b-[3px] border-ink bg-paper">
-        <div className="mx-auto flex max-w-2xl justify-end px-5 py-1">
+      <header className="z-10 shrink-0 border-b-[3px] border-ink bg-paper">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-1">
+          <div className="min-w-0">
+            <h1 className="m-0 break-words text-lg leading-tight font-bold sm:text-2xl">
+              {exercise.name}
+            </h1>
+            <p className="m-0 text-base text-ink-soft">
+              Övning {exerciseReferences[exercise.id]}
+            </p>
+          </div>
           <button
             type="button"
             onClick={close}
-            className="min-h-12 px-2 text-base font-bold underline decoration-2 underline-offset-4"
+            className="min-h-12 shrink-0 px-2 text-base font-bold underline decoration-2 underline-offset-4"
           >
             Stäng
           </button>
         </div>
-      </div>
-      <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col gap-3 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      </header>
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <ExerciseCardBody
           exercise={exercise}
           side={side}
           loadIndex={loadIndex}
+          variantId={variantId}
+          weightKg={weightKg}
+          showTitle={false}
         />
       </div>
     </div>

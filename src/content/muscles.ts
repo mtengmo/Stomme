@@ -7,7 +7,13 @@ export type MuscleGroupId =
   | 'calves'
   | 'core'
   | 'hip-abductors'
-  | 'back';
+  | 'back'
+  | 'chest'
+  | 'shoulders'
+  | 'biceps'
+  | 'triceps'
+  | 'forearms'
+  | 'hip-adductors';
 
 export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
   quads: { label: 'Framsida lår' },
@@ -17,11 +23,18 @@ export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
   core: { label: 'Bål' },
   'hip-abductors': { label: 'Sidan av höften' },
   back: { label: 'Rygg' },
+  chest: { label: 'Bröst' },
+  shoulders: { label: 'Axlar' },
+  biceps: { label: 'Biceps' },
+  triceps: { label: 'Triceps' },
+  forearms: { label: 'Underarmar' },
+  'hip-adductors': { label: 'Insida lår' },
 };
 
 export const trainingQualities = {
   balance: { label: 'Balans' },
   grip: { label: 'Grepp' },
+  power: { label: 'Explosivitet' },
 };
 
 /** Display guidance only; independent of persisted exercise and pain rules. */
@@ -30,7 +43,7 @@ export const exerciseMuscles: Record<
   {
     primary: MuscleGroupId[];
     secondary: MuscleGroupId[];
-    qualities: ('balance' | 'grip')[];
+    qualities: ('balance' | 'grip' | 'power')[];
   }
 > = {
   'goblet-chair-squat': {
@@ -80,6 +93,121 @@ export const exerciseMuscles: Record<
     qualities: [],
   },
   'wall-sit': { primary: ['quads'], secondary: [], qualities: [] },
+  'goblet-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core'],
+    qualities: [],
+  },
+  'kettlebell-deadlift': {
+    primary: ['glutes', 'hamstrings'],
+    secondary: ['back', 'core', 'forearms'],
+    qualities: ['grip'],
+  },
+  'dumbbell-rdl': {
+    primary: ['hamstrings', 'glutes'],
+    secondary: ['back', 'core'],
+    qualities: ['grip'],
+  },
+  'supported-row': {
+    primary: ['back'],
+    secondary: ['biceps', 'shoulders', 'forearms'],
+    qualities: ['grip'],
+  },
+  'floor-press': {
+    primary: ['chest'],
+    secondary: ['triceps', 'shoulders'],
+    qualities: [],
+  },
+  'shoulder-press': {
+    primary: ['shoulders'],
+    secondary: ['triceps', 'core'],
+    qualities: [],
+  },
+  'farmer-carry': {
+    primary: ['forearms', 'core'],
+    secondary: ['shoulders', 'back'],
+    qualities: ['grip'],
+  },
+  'biceps-curl': {
+    primary: ['biceps'],
+    secondary: ['forearms'],
+    qualities: [],
+  },
+  'hammer-curl': {
+    primary: ['biceps', 'forearms'],
+    secondary: [],
+    qualities: [],
+  },
+  'lateral-raise': { primary: ['shoulders'], secondary: [], qualities: [] },
+  'triceps-kickback': {
+    primary: ['triceps'],
+    secondary: ['shoulders'],
+    qualities: [],
+  },
+  'glute-bridge': {
+    primary: ['glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: [],
+  },
+  'reverse-lunge': {
+    primary: ['quads', 'glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: ['balance'],
+  },
+  'forward-lunge': {
+    primary: ['quads', 'glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: ['balance'],
+  },
+  'kettlebell-swing': {
+    primary: ['glutes', 'hamstrings'],
+    secondary: ['core', 'back', 'forearms'],
+    qualities: ['grip', 'power'],
+  },
+  'kettlebell-press': {
+    primary: ['shoulders'],
+    secondary: ['triceps', 'core'],
+    qualities: [],
+  },
+  'half-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['hamstrings'],
+    qualities: [],
+  },
+  'hamstring-curl': { primary: ['hamstrings'], secondary: [], qualities: [] },
+  'seated-knee-extension': { primary: ['quads'], secondary: [], qualities: [] },
+  'straight-leg-raise': {
+    primary: ['quads'],
+    secondary: ['core'],
+    qualities: [],
+  },
+  'prone-leg-raise': {
+    primary: ['glutes', 'hamstrings'],
+    secondary: [],
+    qualities: [],
+  },
+  'side-lying-hip-abduction': {
+    primary: ['hip-abductors', 'glutes'],
+    secondary: [],
+    qualities: [],
+  },
+  'side-lying-hip-adduction': {
+    primary: ['hip-adductors'],
+    secondary: [],
+    qualities: [],
+  },
+  'calf-stretch': { primary: ['calves'], secondary: [], qualities: [] },
+  'quadriceps-stretch': { primary: ['quads'], secondary: [], qualities: [] },
+  'hamstring-stretch': {
+    primary: ['hamstrings'],
+    secondary: [],
+    qualities: [],
+  },
+  'band-leg-press': {
+    primary: ['quads', 'hamstrings'],
+    secondary: ['core'],
+    qualities: [],
+  },
 };
 
 export function primaryMuscleLabel(exerciseId: ExerciseId): string {

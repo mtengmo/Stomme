@@ -22,19 +22,28 @@ for (const viewport of [
     await expect(
       dialog.getByText('10 kg hantel mot bröstet', { exact: true }),
     ).toBeVisible();
-    await dialog
-      .getByRole('button', { name: 'Så gör du', exact: true })
-      .click();
     await expect(
-      dialog.getByText('Håll hanteln med båda händerna tätt mot bröstet.', {
+      dialog.getByRole('heading', { name: 'Så gör du' }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByText('Håll hanteln med båda händerna nära bröstet.', {
         exact: true,
       }),
     ).toBeVisible();
+    await expect(
+      dialog.getByRole('heading', { name: 'Tränar främst' }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('heading', { name: 'Hjälper till' }),
+    ).toBeVisible();
     await page.screenshot({ path: test.info().outputPath('instructions.png') });
     const before = await page.evaluate(() => window.scrollY);
-    await dialog.getByRole('region', { name: 'Instruktioner' }).hover();
+    await dialog.getByTestId('exercise-guide-scroll').hover();
     await page.mouse.wheel(0, 2000);
     expect(await page.evaluate(() => window.scrollY)).toBe(before);
+    await expect(
+      dialog.getByRole('heading', { name: 'Enklare variant' }),
+    ).toBeVisible();
     await expect(
       dialog.getByRole('button', { name: 'Stäng' }),
     ).toBeInViewport();
@@ -45,6 +54,55 @@ for (const viewport of [
     await expect(page.locator('[data-equipment="kettlebell"]')).toHaveCount(1);
     await page.getByRole('button', { name: 'Hur gör man?' }).click();
     await page.screenshot({ path: test.info().outputPath('movement.png') });
+  });
+}
+
+for (const mode of [
+  {
+    name: 'short landscape',
+    viewport: { width: 800, height: 480 },
+    fontScale: 1,
+  },
+  { name: '200% text', viewport: { width: 360, height: 800 }, fontScale: 2 },
+]) {
+  test(`the guide scrolls as one bounded reader (${mode.name})`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(mode.viewport);
+    await openPreview(page);
+    await page
+      .getByRole('button', { name: 'Starta pass', exact: true })
+      .click();
+    await answerPain(page, 0);
+    await page.getByRole('button', { name: 'Hur gör man?' }).click();
+    const dialog = page.getByRole('dialog');
+    if (mode.fontScale > 1) {
+      await page.evaluate((scale) => {
+        document.documentElement.style.fontSize = `${scale * 100}%`;
+      }, mode.fontScale);
+    }
+    const scrollArea = dialog.getByTestId('exercise-guide-scroll');
+    const before = await page.evaluate(() => window.scrollY);
+    await scrollArea.hover();
+    await page.mouse.wheel(0, 1600);
+    await expect
+      .poll(() => scrollArea.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(before);
+    expect(
+      await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+    ).toBe(true);
+    await expect(
+      dialog.getByRole('heading', { name: 'Vanligt fel' }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('heading', { name: 'Enklare variant' }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'Stäng' }),
+    ).toBeInViewport();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
   });
 }
 

@@ -1,4 +1,5 @@
 import type { Exercise, ExerciseId, Load } from '../domain/types';
+import { additionalExercises } from './additionalExercises';
 
 const BW: Load = { kg: 0, label: 'Kroppsvikt' };
 const L = (kg: number, label: string): Load => ({ kg, label });
@@ -234,8 +235,11 @@ const list: Exercise[] = [
   },
 ];
 
-export const exerciseList: readonly Exercise[] = list;
+export const exerciseList: readonly Exercise[] = [
+  ...list,
+  ...additionalExercises,
+];
 
 export const exercises = Object.fromEntries(
-  list.map((e) => [e.id, e]),
+  exerciseList.map((e) => [e.id, e]),
 ) as Record<ExerciseId, Exercise>;

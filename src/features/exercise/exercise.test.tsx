@@ -25,28 +25,59 @@ beforeEach(async () => {
 afterEach(() => cleanup());
 
 describe('ExerciseCardBody', () => {
-  it('shows instructions in their own reader view', async () => {
-    const user = userEvent.setup();
+  it('shows movement, muscles, and all instructions in one reader', () => {
     const ex = exercises['dead-bug'];
     render(<ExerciseCardBody exercise={ex} />);
     expect(screen.getByRole('heading', { name: ex.name })).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: 'Så gör du' }));
-    for (const t of ex.tips) expect(screen.getByText(t)).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Rörelsen' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Tränar främst' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Hjälper till' })).toBeTruthy();
+    expect(screen.getByText('Bål')).toBeTruthy();
+    expect(screen.getByText('Inga särskilda muskelgrupper.')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Så gör du' })).toBeTruthy();
+    for (const t of ex.tips)
+      expect(screen.getAllByText(t).length).toBeGreaterThan(0);
     expect(screen.getByText('Vanligt fel')).toBeTruthy();
     expect(screen.getByText('Enklare variant')).toBeTruthy();
+    expect(screen.getByText('Visa muskelkarta')).toBeTruthy();
+    expect(screen.getByText('Visa muskelkarta').closest('details')?.open).toBe(
+      false,
+    );
     expect(screen.queryByText(/Fråga fysioterapeuten/)).toBeNull();
   });
 
-  it('has the physio footnote only for step-up and split squat', async () => {
-    const user = userEvent.setup();
+  it('has the physio footnote only for step-up and split squat', () => {
     for (const id of ['step-up', 'split-squat'] as const) {
       const { unmount } = render(<ExerciseCardBody exercise={exercises[id]} />);
-      await user.click(screen.getByRole('button', { name: 'Så gör du' }));
       expect(screen.getByText(/Fråga fysioterapeuten/)).toBeTruthy();
       unmount();
     }
     render(<ExerciseCardBody exercise={exercises['wall-sit']} />);
     expect(screen.queryByText(/Fråga fysioterapeuten/)).toBeNull();
+  });
+
+  it('reflects the session weight and variant and exposes attributed sources', async () => {
+    const user = userEvent.setup();
+    render(
+      <ExerciseCardBody
+        exercise={exercises['goblet-chair-squat']}
+        loadIndex={1}
+        variantId="dumbbell"
+        weightKg={12}
+      />,
+    );
+    expect(screen.getByText('12 kg totalt')).toBeTruthy();
+    expect(screen.getByTestId('selected-exercise-variant').textContent).toMatch(
+      /Variant:.*hantel/i,
+    );
+    expect(
+      screen.getAllByText('Håll hanteln med båda händerna nära bröstet.')
+        .length,
+    ).toBeGreaterThan(0);
+    await user.click(screen.getByText('Utrustning, nivå och källor'));
+    expect(
+      screen.getByRole('link', { name: /American Council on Exercise/ }),
+    ).toBeTruthy();
   });
 });
 
@@ -67,9 +98,14 @@ describe('"Hur gör man?" sheet', () => {
     await user.click(screen.getByRole('button', { name: 'Hur gör man?' }));
     const dialog = screen.getByRole('dialog');
     expect(
-      within(dialog).getByRole('button', { name: 'Så gör du' }),
+      within(dialog).getByRole('heading', { name: 'Så gör du' }),
     ).toBeTruthy();
-    expect(within(dialog).getByText(/^Tränar främst:/)).toBeTruthy();
+    expect(
+      within(dialog).getByRole('heading', { name: 'Tränar främst' }),
+    ).toBeTruthy();
+    expect(
+      within(dialog).getByRole('heading', { name: 'Hjälper till' }),
+    ).toBeTruthy();
     expect(document.activeElement).toBe(dialog);
     await user.click(within(dialog).getByRole('button', { name: 'Stäng' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());

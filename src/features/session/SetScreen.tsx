@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
+import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { useCountdown } from '../../lib/useCountdown';
@@ -17,8 +18,13 @@ interface SetScreenProps {
   totalSets: number;
   initialAmount: number;
   initialLoadIndex: number;
+  initialWeightKg?: number;
+  variantId?: string;
+  singleSide?: boolean;
+  onReportSymptoms?(): void;
+  symptomReported?: boolean;
   busy: boolean;
-  onDone(amount: number, loadIndex: number): void;
+  onDone(amount: number, loadIndex: number, weightKg?: number): void;
   onSkip(): void;
 }
 /** One set: name, side, big steppers prefilled, and a single "Klar set". */
@@ -29,21 +35,27 @@ export function SetScreen({
   totalSets,
   initialAmount,
   initialLoadIndex,
+  initialWeightKg,
+  variantId,
+  singleSide,
+  onReportSymptoms,
+  symptomReported,
   busy,
   onDone,
   onSkip,
 }: SetScreenProps) {
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
+  const [weightKg, setWeightKg] = useState(initialWeightKg);
   const [holdDone, setHoldDone] = useState(false);
   const hold = useCountdown(() => setHoldDone(true));
   const [cardOpen, setCardOpen] = useState(false);
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
-  const presentation = loadPresentation(exercise, loadIndex);
+  const presentation = loadPresentation(exercise, loadIndex, variantId);
   const nextCue =
-    step.side === 'right'
+    step.side === 'right' && !singleSide
       ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}, utan vila. Tryck Klar set när höger är klar.`
       : step.setNumber < totalSets
         ? 'Sedan: vila före nästa set. Tryck Klar set när du är klar.'
@@ -56,7 +68,9 @@ export function SetScreen({
         : 'hela antalet';
   const cue =
     step.side === 'left'
-      ? `Byt nu till vänster. Samma ${unit === 'seconds' ? 'hålltid' : unit === 'meters' ? 'sträcka' : 'antal'} på denna sida.`
+      ? singleSide
+        ? `Vänster sida arbetar. Gör ${quantity} på denna sida.`
+        : `Byt nu till vänster. Samma ${unit === 'seconds' ? 'hålltid' : unit === 'meters' ? 'sträcka' : 'antal'} på denna sida.`
       : step.side === 'right'
         ? `Börja med höger. Gör ${quantity} på denna sida.`
         : `Gör ${quantity} med båda sidor samtidigt.`;
@@ -70,7 +84,20 @@ export function SetScreen({
       {...frame}
       actions={
         <>
-          <Button disabled={busy} onClick={() => onDone(amount, loadIndex)}>
+          <Button
+            disabled={
+              busy ||
+              (weightKg !== undefined &&
+                (!Number.isFinite(weightKg) ||
+                  weightKg < 0 ||
+                  weightKg > 500 ||
+                  (presentation.equipment === 'dumbbell' ||
+                  presentation.equipment === 'kettlebell'
+                    ? weightKg <= 0
+                    : weightKg !== 0)))
+            }
+            onClick={() => onDone(amount, loadIndex, weightKg)}
+          >
             Klar set
           </Button>
           <button
@@ -89,6 +116,7 @@ export function SetScreen({
           exerciseId={exercise.id}
           side={step.side}
           loadIndex={loadIndex}
+          variantId={variantId}
         />
         <div className="min-w-0">
           <p className="m-0 text-xl font-bold">
@@ -115,8 +143,31 @@ export function SetScreen({
           exercise={exercise}
           side={step.side === 'left' ? 'left' : 'right'}
           loadIndex={loadIndex}
+          variantId={variantId}
+          weightKg={weightKg}
           onClose={() => setCardOpen(false)}
         />
+      ) : null}
+      {onReportSymptoms ? (
+        <button
+          type="button"
+          onClick={onReportSymptoms}
+          className="min-h-12 self-start px-2 text-base font-bold underline"
+        >
+          {symptomReported
+            ? 'Besvär sparade · ändra rapport'
+            : 'Rapportera smärta eller besvär'}
+        </button>
+      ) : null}
+      {exerciseMetadata[exercise.id].holdSeconds ? (
+        <p className="m-0 text-base font-bold">
+          Håll varje repetition i {exerciseMetadata[exercise.id].holdSeconds}{' '}
+          sekunder.
+          {exerciseMetadata[exercise.id].relaxSeconds
+            ? ` Slappna av i ${exerciseMetadata[exercise.id].relaxSeconds} sekunder mellan repetitionerna.`
+            : ''}{' '}
+          Räkna sedan nästa repetition.
+        </p>
       ) : null}
       <p className="m-0 text-base font-bold" aria-live="polite">
         {nextCue}
@@ -133,7 +184,23 @@ export function SetScreen({
           onInc={() => changeAmount(amount + range.step)}
           decDisabled={amount <= range.step}
         />
-        {loadLadder.length > 1 && load ? (
+        {weightKg !== undefined ? (
+          <label className="flex flex-col gap-2 text-lg font-bold">
+            Total vikt (kg)
+            <input
+              type="number"
+              min="0"
+              max="500"
+              step="0.5"
+              value={weightKg}
+              onChange={(event) => setWeightKg(Number(event.target.value))}
+              className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-xl text-ink"
+            />
+            <span className="text-base font-normal text-ink-soft">
+              {presentation.variant.label} · samma redskap som i passplanen
+            </span>
+          </label>
+        ) : loadLadder.length > 1 && load ? (
           <Stepper
             size={load.kg === 0 ? 'sm' : 'md'}
             label="Vikt"

@@ -17,6 +17,14 @@ export class StommeDB extends Dexie {
       painLogs: 'id, sessionId, date, [sessionId+timing]',
       meta: 'key',
     });
+    // Additive programme/check-in fields live in existing records. Legacy records
+    // deliberately retain absent programId and their original knee policy.
+    this.version(2).stores({
+      sessions: 'id, date, status, templateId',
+      setLogs: 'id, sessionId, [exerciseId+loggedAt]',
+      painLogs: 'id, sessionId, date, [sessionId+timing]',
+      meta: 'key',
+    });
   }
 }
 

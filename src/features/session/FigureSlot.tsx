@@ -8,16 +8,21 @@ export function FigureSlot({
   exerciseId,
   side,
   loadIndex,
+  variantId,
 }: {
   exerciseId: ExerciseId;
   side: 'right' | 'left' | 'both';
   loadIndex: number;
+  variantId?: string;
 }) {
   return (
     <div className="size-32 shrink-0">
       <Figure
         exerciseId={exerciseId}
-        equipment={loadPresentation(exercises[exerciseId], loadIndex).equipment}
+        equipment={
+          loadPresentation(exercises[exerciseId], loadIndex, variantId)
+            .equipment
+        }
         working={side === 'both' ? null : side}
         stillOnly
       />

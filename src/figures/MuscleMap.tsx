@@ -17,6 +17,12 @@ const ids: MuscleGroupId[] = [
   'core',
   'hip-abductors',
   'back',
+  'chest',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'forearms',
+  'hip-adductors',
 ];
 
 const BODY_OUTLINE =
@@ -50,6 +56,45 @@ const shapes: Record<MuscleGroupId, { side: 'front' | 'back'; d: string }[]> = {
     },
   ],
   back: [{ side: 'back', d: 'M49 53 Q60 50 71 53 L73 82 Q60 86 47 82 Z' }],
+  chest: [{ side: 'front', d: 'M46 39 Q60 34 74 39 L73 56 Q60 61 47 56 Z' }],
+  shoulders: [
+    {
+      side: 'front',
+      d: 'M43 34 Q48 34 49 42 L43 53 L37 49 Z M77 34 Q72 34 71 42 L77 53 L83 49 Z',
+    },
+    {
+      side: 'back',
+      d: 'M43 34 Q48 34 49 42 L43 53 L37 49 Z M77 34 Q72 34 71 42 L77 53 L83 49 Z',
+    },
+  ],
+  biceps: [
+    {
+      side: 'front',
+      d: 'M37 50 L44 52 L41 65 L36 63 Z M76 52 L83 50 L84 63 L79 65 Z',
+    },
+  ],
+  triceps: [
+    {
+      side: 'back',
+      d: 'M37 50 L44 52 L41 65 L36 63 Z M76 52 L83 50 L84 63 L79 65 Z',
+    },
+  ],
+  forearms: [
+    {
+      side: 'front',
+      d: 'M36 64 L41 66 L44 82 L39 83 Z M79 66 L84 64 L81 83 L76 82 Z',
+    },
+    {
+      side: 'back',
+      d: 'M36 64 L41 66 L44 82 L39 83 Z M79 66 L84 64 L81 83 L76 82 Z',
+    },
+  ],
+  'hip-adductors': [
+    {
+      side: 'front',
+      d: 'M53 103 L59 107 L57 130 L52 129 Z M61 107 L67 103 L68 129 L63 130 Z',
+    },
+  ],
 };
 
 function rolesFor(exerciseId: ExerciseId) {
@@ -200,7 +245,12 @@ export function MuscleFocus({ exerciseId }: { exerciseId: ExerciseId }) {
       <GroupLinks label="Tränar främst" ids={mapping.primary} />
       {mapping.secondary.length > 0 ? (
         <GroupLinks label="Hjälper till" ids={mapping.secondary} />
-      ) : null}
+      ) : (
+        <div className="flex flex-col gap-1">
+          <h2 className="m-0 text-base font-bold">Hjälper till</h2>
+          <p className="m-0 text-base">Inga särskilda muskelgrupper.</p>
+        </div>
+      )}
       {qualities.length > 0 ? (
         <p className="m-0 text-base">
           <strong>Tränar också:</strong>{' '}

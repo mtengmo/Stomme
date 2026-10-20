@@ -1,0 +1,45 @@
+# Exercise content review, 2026-10-20
+
+The library contains E01–E38. E01–E11 keep their permanent IDs, references and load-ladder order. Source review concerns movement descriptions and educational anatomy, not clinical approval or a personal prescription. Technical levels and purpose rationales are editorial classifications. The Swedish instructions and skeleton poses are original work; source illustrations are not reproduced.
+
+## AAOS source-to-content matrix
+
+Page numbers below count the PDF cover as page 1. The document itself has inconsistent printed exercise-page numbers. Source: [AAOS Knee Conditioning Program](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf). It calls for selecting exercises with a doctor or physical therapist and discussing exercise pain with them. Stomme's previous pain thresholds are separate app policy. The library does not copy the source's sets, repetitions, frequency, duration of treatment or weight progression into an individual's programme.
+
+| Ref / source movement | Swedish entry and movement review | Equipment / working side | Muscles | Source page / differences |
+|---|---|---|---|---|
+| E08 / Calf Raises | Enbens tåhävning: supported rise onto forefoot, controlled heel lowering | Wall/support; chosen leg | Calves | [p. 5](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=5). Reuses existing ID and history. Existing handheld-weight option remains a separate app variant. |
+| E28 / Half Squats | Halv knäböj: shallow hip/knee bend, chest lifted, feet grounded | Bodyweight and support; both legs | Quads, glutes; hamstrings | [p. 4](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=4). Distinct from sitting onto a chair and free goblet squat. Hand weights not offered here. |
+| E29 / Hamstring Curls | Stående lårcurl: bend knee while thighs remain aligned | Bodyweight and support; chosen leg | Hamstrings | [p. 4](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=4). No ankle-weight variant. |
+| E30 / Leg Extensions | Sittande knästräckning: straighten knee without kicking, lower foot | Stable chair, bodyweight; chosen leg | Quads | [p. 5](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=5). No ankle-weight or machine variant. |
+| E31 / Straight-Leg Raises | Rakt benlyft: forearms support torso, free foot grounded, straight working leg lifts modestly | Bodyweight; chosen leg | Quads; core | [p. 6](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=6). Preserves source's supported upper body; no ankle weights. |
+| E32 / Straight-Leg Raises (Prone) | Rakt benlyft på mage: forehead on arms, pelvis grounded during small straight-leg lift | Bodyweight; chosen leg | Glutes, hamstrings | [p. 6](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=6). No ankle weights. |
+| E33 / Hip Abduction | Sidliggande benlyft utåt: upper leg lifts with pelvis still, lower knee bent | Bodyweight; chosen leg is upper leg | Hip abductors, glutes | [p. 7](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=7). No ankle weights. |
+| E34 / Hip Adduction | Sidliggande benlyft inåt: lower straight leg lifts, other foot crossed in front, hand supports torso | Bodyweight; chosen leg is lower leg | Hip adductors | [p. 7](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=7). Separate anatomy and pose from abduction; no ankle weights. |
+| E35 / Heel Cord Stretch | Vadstretch mot vägg: straight rear knee and grounded heel while hip moves forward | Wall/support; chosen leg is rear leg | Calves | [p. 2](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=2). Mobility; hold rather than repetitions. |
+| E36 / Standing Quadriceps Stretch | Stående lårstretch: supported stance and gentle ankle hold without arching back | Wall/support; chosen leg bends | Quads | [p. 2](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=2). Mobility; no towel variant is offered. |
+| E37 / Supine Hamstring Stretch | Liggande stretch av baksida lår: hold thigh from behind, gently straighten knee | Bodyweight; chosen leg raised | Hamstrings | [p. 3](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=3). Mobility; hands avoid pulling on knee joint. Optional source towel is not offered as a separate variant. |
+| E38 / Leg Presses | Benpress med gummiband: one band around arch, ends held, knee bends and leg extends against band | One resistance band; chosen foot | Quads, hamstrings; core | [p. 8](https://orthoinfo.aaos.org/globalassets/pdfs/2017-rehab_knee.pdf#page=8). Band is explicit equipment, no handheld/ankle weights. Resistance has no fabricated kg value. |
+
+The source pauses inside repetitions are stored separately as `holdSeconds` (five seconds, two for band press) and `relaxSeconds` where applicable. Mobility uses a duration unit. These are movement guidance, not an automatic session dose. A clinician-selected programme must explicitly choose side(s), repetitions/hold duration, sets and rest. Library `choose-side` does not mean universal right-then-left treatment.
+
+## General strength movement basis
+
+| References | Primary source reviewed | Adaptation / visual requirement |
+|---|---|---|
+| E12, E13, E26 | [ACE kettlebell introduction](https://www.acefitness.org/resources/pros/expert-articles/5269/how-to-get-started-with-kettlebells/); [ACE goblet squat](https://www.acefitness.org/resources/everyone/exercise-library/362/goblet-squat/); [ACE swing technique](https://www.acefitness.org/continuing-education/certified/january-2025/8788/the-ace-do-it-better-series-the-two-handed-kettlebell-swing/) | Goblet has BW/one DB/one KB; deadlift one KB floor start; swing uses a hip hinge, own midpoint and fast timing without a universal slow-lowering cue. |
+| E14 | [NASM dumbbell Romanian deadlift](https://www.nasm.org/resource-center/exercise-library/dumbbell-romanian-deadlift) | Two DBs; softly bent knees and hip hinge. |
+| E15 | [ACE single-arm row](https://www.acefitness.org/resources/everyone/exercise-library/126/single-arm-row/) | App uses a standing split stance with hand support rather than knee on bench. DB/KB variants share pulling mechanics. |
+| E16 | [ACE chest press](https://www.acefitness.org/resources/everyone/exercise-library/19/chest-press/) | App changes bench to floor, limiting descent when upper arms reach floor. Two DBs, feet grounded. |
+| E17 | [ACE standing shoulder press](https://www.acefitness.org/resources/everyone/exercise-library/71/standing-shoulder-press/) | Source uses barbell; app uses two independently controlled DBs. Strict standing press. |
+| E18 | [ACE farmer carry](https://www.acefitness.org/resources/everyone/exercise-library/359/farmer-s-carry/) | Two DBs or two KBs, explicit count. |
+| E19, E20 | [ACE biceps curl](https://www.acefitness.org/resources/everyone/exercise-library/44/seated-biceps-curl/); [ACE hammer curl](https://www.acefitness.org/resources/everyone/exercise-library/10/hammer-curl/) | Biceps curl shown standing rather than seated. Hammer grip shown with vertical implements; two DBs throughout. |
+| E21 | [ACE lateral raise](https://www.acefitness.org/resources/everyone/exercise-library/26/lateral-raise/) | Two DBs; distinct outward arm arc at or below shoulder height. |
+| E22 | [ACE triceps kickback](https://www.acefitness.org/resources/everyone/exercise-library/55/triceps-kickback/) | Stable external hand support instead of source thigh support. Working upper arm remains still while elbow extends. |
+| E23 | [ACE glute bridge](https://www.acefitness.org/resources/everyone/exercise-library/49/glute-bridge/) | Both feet and upper back on floor. Optional DB is securely held across hip; no bench is implied. |
+| E24, E25 | [Catalyst Athletics reverse lunge](https://www.catalystathletics.com/exercise/735/Reverse-Lunge/); [ACE forward lunge](https://www.acefitness.org/resources/everyone/exercise-library/94/forward-lunge/) | Bodyweight or two DBs. Independently authored stepping midpoints distinguish direction and working leg. |
+| E27 | [ACE Fitness Matters, January/February 2010](https://www.acefitness.org/cp/pdfs/FitnessMatters/Jan10.pdf) | One KB, neutral wrist/rack and strict press. Setup starts from rack; clean is not demonstrated or required. |
+
+All additions have original start/end poses; stepping and swing add authored midpoints. Both sides use scene mirroring with the working limb marked. Static frames preserve equipment for reduced motion. No new movement muscle overlays are claimed as reviewed; text muscle focus and the full body map remain available. Body map areas are approximate educational locations.
+
+Initial weights and 8–12 repetition ranges in the library are configurable app defaults, not copied source programmes. Existing ladders remain ordered and unchanged. Lighter implement settings, bodyweight where supported, smaller controlled range, and explicitly linked easier movements are the available simplifications; textual notes never silently substitute a logged movement.
