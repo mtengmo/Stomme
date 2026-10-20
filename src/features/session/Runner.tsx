@@ -149,9 +149,11 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   }, [session.plan, session.feedback, logs, steps, cursor]);
 
   const frame = {
-    title: session.programId
-      ? `${programmeNames[session.programId]} · ${session.templateId}`
-      : templates[session.templateId].name,
+    title:
+      session.customWorkoutName ??
+      (session.programId
+        ? `${programmeNames[session.programId]} · ${session.templateId}`
+        : templates[session.templateId].name),
     stepId: cursor,
     clock: formatClock(seconds),
     tally,

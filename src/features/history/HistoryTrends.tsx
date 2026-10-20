@@ -83,7 +83,8 @@ export function HistoryTrends({
                 href={`/historik/${session.id}`}
                 className="flex min-h-12 items-center font-bold underline"
               >
-                {formatShortDate(session.date)} · Pass {session.templateId}
+                {formatShortDate(session.date)} ·{' '}
+                {session.customWorkoutName ?? `Pass ${session.templateId}`}
               </Link>
               <p className="m-0">
                 Före: {symptomText(session.checkins?.before?.symptoms)}

@@ -156,7 +156,8 @@ export function ExerciseHistory({ id }: { id: string }) {
                   href={`/historik/${session.id}`}
                   className="flex min-h-12 items-center text-xl font-bold underline"
                 >
-                  {formatShortDate(session.date)} · Pass {session.templateId}
+                  {formatShortDate(session.date)} ·{' '}
+                  {session.customWorkoutName ?? `Pass ${session.templateId}`}
                 </Link>
                 <p className="m-0 text-base text-ink-soft">
                   {trainingName(session)}

@@ -36,7 +36,7 @@ export function Summary({
         <h1 className="m-0 text-6xl leading-none font-extrabold">
           {aborted
             ? 'Passet avbröts'
-            : `${templates[session.templateId].name} klart`}
+            : `${session.customWorkoutName ?? templates[session.templateId].name} klart`}
         </h1>
         <p className="count m-0 text-4xl text-ink">
           {formatMinutes(seconds)} · {setsDone}/{planned} set

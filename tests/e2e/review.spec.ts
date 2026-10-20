@@ -53,7 +53,7 @@ for (const mode of [
       page.getByRole('heading', { name: /^E03 · Enbens rumänskt marklyft$/ }),
     ).toBeVisible();
     const poses = page.getByRole('region', { name: 'Rörelsen' });
-    await expect(poses.getByRole('figure')).toHaveCount(1);
+    await expect(poses.locator('svg')).toHaveCount(1);
     await expect(
       page.getByRole('heading', { name: 'Så gör du' }),
     ).toBeVisible();
@@ -63,8 +63,16 @@ for (const mode of [
     await expect(
       page.getByRole('heading', { name: 'Hjälper till' }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Mitt', exact: true }).click();
-    await expect(poses.getByRole('figure')).toContainText('Mitt');
+    await expect(
+      page.getByRole('group', { name: 'Välj rörelseläge' }),
+    ).toHaveCount(0);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page
+      .getByRole('button', { name: 'Pausa rörelsen', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: 'Spela rörelsen' }),
+    ).toBeVisible();
     await page.screenshot({
       path: test.info().outputPath('review.png'),
       fullPage: true,

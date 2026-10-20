@@ -175,6 +175,8 @@ const sessionSchema = z
   .strictObject({
     id,
     templateId: z.enum(['A', 'B']),
+    customWorkoutId: z.string().min(1).max(100).optional(),
+    customWorkoutName: z.string().min(1).max(60).optional(),
     programId: z.enum(['general', 'running', 'rehab']).optional(),
     policyVersion: z.literal(1).optional(),
     rehabFocus: z.enum(['custom', 'knee']).optional(),
@@ -278,6 +280,25 @@ const savedRehabPlan = z
   .max(12)
   .refine(validateTrainingPlan);
 const metaSchema = z.discriminatedUnion('key', [
+  z.strictObject({
+    key: z.literal('customWorkouts'),
+    value: z
+      .array(
+        z.strictObject({
+          id: z.string().min(1).max(100),
+          name: z.string().trim().min(1).max(60),
+          plan: savedRehabPlan.optional(),
+          exerciseIds: z
+            .array(
+              z.enum(Object.keys(exercises) as [ExerciseId, ...ExerciseId[]]),
+            )
+            .min(1)
+            .max(12)
+            .refine((ids) => new Set(ids).size === ids.length),
+        }),
+      )
+      .max(30),
+  }),
   z.strictObject({
     key: z.literal('rehabPlans'),
     value: z.strictObject({

@@ -11,12 +11,7 @@ import { loadPresentation } from '../../content/loadPresentation';
 import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
 import type { Equipment } from '../../figures/Figure';
-import {
-  Figure,
-  FigureFrame,
-  movementPose,
-  usePrefersReducedMotion,
-} from '../../figures/Figure';
+import { Figure, usePrefersReducedMotion } from '../../figures/Figure';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { ExerciseDifficulty } from './ExerciseDifficulty';
@@ -54,7 +49,6 @@ export function ExerciseCardBody({
     loadIndex ?? exercise.week1LoadIndex,
   );
   const [workingSide, setWorkingSide] = useState(side);
-  const [frame, setFrame] = useState(0);
   const [paused, setPaused] = useState(false);
   const [overlay, setOverlay] = useState(true);
   const reducedMotion = usePrefersReducedMotion();
@@ -164,56 +158,22 @@ export function ExerciseCardBody({
             aria-label="Rörelsen"
           >
             {!review ? equipmentControls : null}
-            {review ? (
-              <fieldset
-                className="m-0 flex gap-2 border-0 p-0"
-                aria-label="Välj rörelseläge"
-              >
-                {['Start', 'Mitt', 'Slut'].map((label, index) => (
-                  <button
-                    key={label}
-                    type="button"
-                    aria-pressed={frame === index}
-                    onClick={() => setFrame(index)}
-                    className={`min-h-12 flex-1 border-2 border-edge text-base font-bold ${frame === index ? 'bg-ink text-paper' : ''}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </fieldset>
-            ) : null}
             <div
               className={`exercise-stage rounded-md border-2 border-edge p-2 ${review ? 'review-stage' : ''}`}
             >
-              {review ? (
-                <figure className="m-0 flex h-full flex-col">
-                  <FigureFrame
-                    exerciseId={exercise.id}
-                    pose={movementPose(exercise.id, frame / 2)}
-                    working={working}
-                    equipment={presentation.equipment}
-                    showMuscles={
-                      overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
-                    }
-                  />
-                  <figcaption className="text-center text-base font-bold">
-                    {['Start', 'Mitt', 'Slut'][frame]}
-                  </figcaption>
-                </figure>
-              ) : (
-                <Figure
-                  exerciseId={exercise.id}
-                  working={working}
-                  equipment={presentation.equipment}
-                  paused={paused || reducedMotion}
-                  showMuscles={
-                    overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
-                  }
-                />
-              )}
+              <Figure
+                exerciseId={exercise.id}
+                stillOnly={review}
+                working={working}
+                equipment={presentation.equipment}
+                paused={paused || reducedMotion}
+                showMuscles={
+                  overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id)
+                }
+              />
             </div>
             {review ? equipmentControls : null}
-            {!review && !reducedMotion ? (
+            {!reducedMotion ? (
               <button
                 type="button"
                 aria-pressed={paused}
@@ -222,11 +182,11 @@ export function ExerciseCardBody({
               >
                 {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
               </button>
-            ) : !review ? (
+            ) : (
               <p className="sr-only">
                 Rörelsen visas stilla med minskad rörelse.
               </p>
-            ) : null}
+            )}
             {working ? (
               <p className="m-0 text-base text-ink-soft">
                 {working === 'right'

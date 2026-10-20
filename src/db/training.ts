@@ -103,6 +103,7 @@ export async function startTrainingSession(
   plan: PlannedExercise[],
 
   now = new Date(),
+  customWorkout?: { id: string; name: string },
 ): Promise<Session> {
   if (
     !isTrainingPreferences(preferences) ||
@@ -133,6 +134,12 @@ export async function startTrainingSession(
       id: crypto.randomUUID(),
 
       templateId,
+      ...(customWorkout
+        ? {
+            customWorkoutId: customWorkout.id,
+            customWorkoutName: customWorkout.name,
+          }
+        : {}),
 
       programId: preferences.programId,
 

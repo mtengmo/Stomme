@@ -104,7 +104,7 @@ export function SessionDetail({ id }: { id: string }) {
       <BackLink />
       <header className="flex flex-col gap-2">
         <h1 className="m-0 text-5xl font-extrabold">
-          Pass {session.templateId}
+          {session.customWorkoutName ?? `Pass ${session.templateId}`}
         </h1>
         {session.programId ? (
           <p className="m-0 text-lg font-bold">{trainingName(session)}</p>

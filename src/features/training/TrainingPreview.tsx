@@ -13,6 +13,10 @@ import {
   kneeRehabSource,
 } from '../../content/kneeRehab';
 import { isTrainingPreferences, trainingName } from '../../content/programmes';
+import {
+  type CustomWorkout,
+  readCustomWorkouts,
+} from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import {
@@ -28,6 +32,7 @@ import type {
   TemplateId,
   TrainingPreferences,
 } from '../../domain/types';
+import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
@@ -142,6 +147,7 @@ function PreviewEditor({
   logs,
 
   savedPlans,
+  customWorkout,
 }: {
   preferences: TrainingPreferences;
 
@@ -152,10 +158,11 @@ function PreviewEditor({
   logs: SetLog[];
 
   savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>;
+  customWorkout?: CustomWorkout;
 }) {
   const [, navigate] = useLocation();
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
 
   const [plan, setPlan] = useState(() => {
     try {
@@ -182,6 +189,17 @@ function PreviewEditor({
       /* A damaged draft never replaces the saved session. */
     }
 
+    if (
+      customWorkout?.plan &&
+      validateTrainingPlan(customWorkout.plan) &&
+      customWorkout.plan.map((item) => item.exerciseId).join() ===
+        customWorkout.exerciseIds.join()
+    )
+      return structuredClone(customWorkout.plan);
+    if (customWorkout)
+      return customWorkout.exerciseIds.map((exerciseId) =>
+        basePlan(exerciseId, preferences),
+      );
     return defaultPlan(preferences, id, sessions, logs, savedPlans);
   });
 
@@ -196,6 +214,7 @@ function PreviewEditor({
   const [confirmed, setConfirmed] = useState(false);
   const [editing, setEditing] = useState(() => {
     if (
+      customWorkout ||
       !validateTrainingPlan(plan) ||
       (preferences.programId === 'rehab' && preferences.rehabFocus !== 'knee')
     )
@@ -215,6 +234,16 @@ function PreviewEditor({
   }, [draftKey, editing]);
   const ready =
     validateTrainingPlan(plan) &&
+    !(
+      preferences.programId === 'rehab' &&
+      preferences.rehabFocus === 'knee' &&
+      plan.some(
+        (item) =>
+          !kneeRehabExercises.some(
+            (exercise) => exercise.id === item.exerciseId,
+          ),
+      )
+    ) &&
     plan.every((item) => {
       const variant = exerciseMetadata[item.exerciseId].variants.find(
         (v) => v.id === item.variantId,
@@ -262,13 +291,31 @@ function PreviewEditor({
       </Link>
 
       <header>
-        <h1 className="m-0 text-5xl font-extrabold">
-          {preferences.programId === 'rehab' ? 'Mitt rehabpass' : `Pass ${id}`}
+        <h1 className="m-0 break-words text-5xl font-extrabold">
+          {customWorkout?.name ??
+            (preferences.programId === 'rehab'
+              ? 'Mitt rehabpass'
+              : `Pass ${id}`)}
         </h1>
 
         <p className="m-0 mt-2 text-lg font-bold">
           {trainingName(preferences)}
         </p>
+        {customWorkout ? (
+          <p className="m-0 mt-2 text-base text-ink-soft">
+            Dina valda övningar. Passet använder din träningsinriktning,
+            utrustning och frågorna om hur du mår.
+          </p>
+        ) : null}
+        {customWorkout && !ready ? (
+          <p className="m-0 mt-2 text-base">
+            Kontrollera din utrustning och träningsinriktning på{' '}
+            <Link href="/" className="font-bold underline">
+              träningssidan
+            </Link>
+            . Knärehab använder bara övningar i AAOS-samlingen.
+          </p>
+        ) : null}
       </header>
 
       {active ? (
@@ -688,7 +735,68 @@ function PreviewEditor({
             </label>
           ) : null}
 
-          {editing && preferences.programId === 'rehab' ? (
+          {editing && customWorkout ? (
+            <>
+              <Button
+                variant="secondary"
+                disabled={
+                  busy ||
+                  !ready ||
+                  (preferences.programId === 'rehab' && !confirmed)
+                }
+                onClick={async () => {
+                  setBusy(true);
+                  setError('');
+                  try {
+                    await getDb().transaction('rw', getDb().meta, async () => {
+                      const current = readCustomWorkouts(
+                        (await getDb().meta.get('customWorkouts'))?.value,
+                      );
+                      if (
+                        !current.some(
+                          (workout) => workout.id === customWorkout.id,
+                        )
+                      )
+                        throw new Error('Passet finns inte kvar.');
+                      await getDb().meta.put({
+                        key: 'customWorkouts',
+                        value: current.map((workout) =>
+                          workout.id === customWorkout.id
+                            ? {
+                                ...workout,
+                                exerciseIds: plan.map(
+                                  (item) => item.exerciseId,
+                                ),
+                                plan,
+                              }
+                            : workout,
+                        ),
+                      });
+                    });
+                    setSaved(true);
+                  } catch {
+                    setError('Kunde inte spara passet. Försök igen.');
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Spara ändringar i eget pass
+              </Button>
+              <p className="m-0 text-base text-ink-soft">
+                {saved
+                  ? 'Ändringarna är sparade.'
+                  : 'Spara för att återanvända övningar, antal, vikt och vila.'}
+              </p>
+              <Link
+                href="/ovningar"
+                className="flex min-h-12 items-center font-bold underline"
+              >
+                Till mina egna pass
+              </Link>
+            </>
+          ) : null}
+          {editing && !customWorkout && preferences.programId === 'rehab' ? (
             <>
               <Button
                 variant="secondary"
@@ -758,6 +866,8 @@ function PreviewEditor({
                       id,
 
                       plan,
+                      new Date(),
+                      customWorkout,
                     );
 
                     try {
@@ -790,9 +900,13 @@ function PreviewEditor({
 }
 
 export function TrainingPreview({ id }: { id: string }) {
+  const workoutId = new URLSearchParams(useHashSearch()).get('workout');
   const data = useLiveQuery(
     async () => ({
       preferences: await getMeta(getDb(), 'training'),
+      customWorkouts: readCustomWorkouts(
+        await getMeta(getDb(), 'customWorkouts'),
+      ),
 
       sessions: await listSessions(getDb()),
 
@@ -819,9 +933,22 @@ export function TrainingPreview({ id }: { id: string }) {
       </div>
     );
 
+  const customWorkout = data.customWorkouts.find(
+    (workout) => workout.id === workoutId,
+  );
+  if (workoutId && !customWorkout)
+    return (
+      <div className="mx-auto max-w-md px-5 py-8">
+        <h1 className="text-4xl font-bold">Passet finns inte kvar</h1>
+        <Link href="/ovningar" className={buttonClass('primary')}>
+          Till egna pass
+        </Link>
+      </div>
+    );
   return (
     <PreviewEditor
-      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}`}
+      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}`}
+      customWorkout={customWorkout}
       preferences={data.preferences}
       id={id}
       sessions={data.sessions}

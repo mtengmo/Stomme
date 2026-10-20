@@ -155,6 +155,8 @@ export interface ExerciseFeedback {
 export interface Session {
   id: string;
   templateId: TemplateId;
+  customWorkoutId?: string;
+  customWorkoutName?: string;
   /** Absent on original knee/running sessions. */
   programId?: ProgramId;
   policyVersion?: number;
@@ -201,7 +203,13 @@ export interface PainLog {
 }
 
 export interface MetaEntry {
-  key: 'program' | 'onboarding' | 'backup' | 'training' | 'rehabPlans';
+  key:
+    | 'program'
+    | 'onboarding'
+    | 'backup'
+    | 'training'
+    | 'rehabPlans'
+    | 'customWorkouts';
   value: unknown;
 }
 

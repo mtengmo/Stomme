@@ -31,6 +31,7 @@ import {
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
+import { ExerciseChoice, WorkoutBuilder } from './WorkoutBuilder';
 
 function equipment(exercise: Exercise): string {
   return exerciseMetadata[exercise.id].variants
@@ -43,49 +44,52 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
     template.items.some((item) => item.exerciseId === exercise.id),
   );
   return (
-    <li className="border-t-2 border-edge py-4">
-      <Link
-        href={`/ovning/${exercise.id}`}
-        className="flex min-h-12 items-center justify-between gap-3 text-ink underline decoration-2 underline-offset-4"
-      >
-        <h3 className="m-0 font-sans text-xl leading-snug font-bold">
-          {exercise.name}
-        </h3>
-        <Icon name="back" className="shrink-0 rotate-180" />
-      </Link>
-      <p className="m-0 mt-2 text-base">
-        {exerciseReferences[exercise.id]} · Tränar främst:{' '}
-        {primaryMuscleLabel(exercise.id)}
-      </p>
-      <p className="m-0 mt-1 text-base text-ink-soft">
-        Utrustning: {equipment(exercise)}
-      </p>
-      <p className="m-0 mt-1 text-base text-ink-soft">
-        Teknisk svårighetsgrad:{' '}
-        {[
-          ...new Set(
-            exerciseMetadata[exercise.id].variants.map(
-              (variant) => technicalLevelLabels[variant.technicalLevel],
-            ),
-          ),
-        ].join(' / ')}{' '}
-        ·{' '}
-        {exerciseMetadata[exercise.id].kind === 'mobility'
-          ? 'Rörlighet'
-          : 'Styrka'}
-      </p>
-      {exercise.optional ? (
-        <p className="m-0 mt-2 text-base font-bold">Valfri övning</p>
-      ) : null}
-      {membership.map((template) => (
+    <li className="grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-4 border-t-2 border-edge py-4">
+      <ExerciseChoice exercise={exercise} />
+      <div className="min-w-0">
         <Link
-          key={template.id}
-          href={`/pass/${template.id}`}
-          className="inline-flex min-h-12 items-center text-base font-bold underline decoration-2 underline-offset-4"
+          href={`/ovning/${exercise.id}`}
+          className="flex min-h-12 items-center justify-between gap-3 text-ink underline decoration-2 underline-offset-4"
         >
-          Ingår i {template.name}
+          <h3 className="m-0 font-sans text-xl leading-snug font-bold">
+            {exercise.name}
+          </h3>
+          <Icon name="back" className="shrink-0 rotate-180" />
         </Link>
-      ))}
+        <p className="m-0 mt-2 text-base">
+          {exerciseReferences[exercise.id]} · Tränar främst:{' '}
+          {primaryMuscleLabel(exercise.id)}
+        </p>
+        <p className="m-0 mt-1 text-base text-ink-soft">
+          Utrustning: {equipment(exercise)}
+        </p>
+        <p className="m-0 mt-1 text-base text-ink-soft">
+          Teknisk svårighetsgrad:{' '}
+          {[
+            ...new Set(
+              exerciseMetadata[exercise.id].variants.map(
+                (variant) => technicalLevelLabels[variant.technicalLevel],
+              ),
+            ),
+          ].join(' / ')}{' '}
+          ·{' '}
+          {exerciseMetadata[exercise.id].kind === 'mobility'
+            ? 'Rörlighet'
+            : 'Styrka'}
+        </p>
+        {exercise.optional ? (
+          <p className="m-0 mt-2 text-base font-bold">Valfri övning</p>
+        ) : null}
+        {membership.map((template) => (
+          <Link
+            key={template.id}
+            href={`/pass/${template.id}`}
+            className="inline-flex min-h-12 items-center text-base font-bold underline decoration-2 underline-offset-4"
+          >
+            Ingår i {template.name}
+          </Link>
+        ))}
+      </div>
     </li>
   );
 }
@@ -333,16 +337,18 @@ export function ExerciseLibrary() {
           alternativ.
         </p>
       ) : null}
-      <ResultList
-        title={selected ? 'Tränar främst' : 'Alla övningar'}
-        items={primary}
-        id="primary-results"
-      />
-      <ResultList
-        title="Hjälper till"
-        items={secondary}
-        id="secondary-results"
-      />
+      <WorkoutBuilder>
+        <ResultList
+          title={selected ? 'Tränar främst' : 'Alla övningar'}
+          items={primary}
+          id="primary-results"
+        />
+        <ResultList
+          title="Hjälper till"
+          items={secondary}
+          id="secondary-results"
+        />
+      </WorkoutBuilder>
     </div>
   );
 }

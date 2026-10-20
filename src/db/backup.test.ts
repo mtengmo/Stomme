@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: crafted JSON mutations
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
 import type { PainLog, Session, SetLog } from '../domain/types';
 import {
@@ -100,6 +101,47 @@ async function snapshot() {
 }
 
 describe('backup', () => {
+  it('round trips named custom selections and session names', async () => {
+    const variant = exerciseMetadata['dead-bug'].variants[0];
+    if (!variant) throw new Error('Missing dead bug variant');
+    const loadIndex = variant.defaultLoadIndex;
+    const custom = [
+      {
+        id: 'own-1',
+        name: 'Mitt pass',
+        exerciseIds: ['dead-bug'],
+        plan: [
+          {
+            exerciseId: 'dead-bug',
+            sets: 2,
+            target: 8,
+            loadIndex,
+            variantId: variant.id,
+            weightKg: exercises['dead-bug'].loadLadder[loadIndex]?.kg ?? 0,
+            restSec: 45,
+            reason: 'first_time',
+            sides: ['right', 'left'],
+          },
+        ],
+      },
+    ];
+    await db.meta.put({ key: 'customWorkouts', value: custom });
+    await db.sessions.add(
+      session('own-session', {
+        customWorkoutId: 'own-1',
+        customWorkoutName: 'Mitt pass',
+      }),
+    );
+    const backup = await exportAll(db);
+    await db.meta.clear();
+    await db.sessions.clear();
+    await importAll(db, serializeBackup(backup));
+    expect((await db.meta.get('customWorkouts'))?.value).toEqual(custom);
+    expect((await db.sessions.get('own-session'))?.customWorkoutName).toBe(
+      'Mitt pass',
+    );
+  });
+
   it('names the file by local date', () => {
     expect(backupFileName(new Date(2026, 9, 5, 23, 30))).toBe(
       'stomme-backup-2026-10-05.json',

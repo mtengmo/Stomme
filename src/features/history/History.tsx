@@ -241,7 +241,7 @@ export function History() {
                     >
                       <span className="flex flex-col">
                         <span className="count text-3xl leading-none">
-                          Pass {s.templateId}
+                          {s.customWorkoutName ?? `Pass ${s.templateId}`}
                         </span>
                         <span className="mt-1 text-base font-bold">
                           {trainingName(s)}

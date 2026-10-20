@@ -5,6 +5,8 @@ for (const width of [360, 1280]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.clock.install();
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await page.goto('/#/ovningar?redskap=kettlebell');
@@ -24,8 +26,8 @@ for (const width of [360, 1280]) {
       await page
         .getByRole('combobox', { name: 'Vikt', exact: true })
         .selectOption(load);
-      for (const frame of ['Start', 'Mitt', 'Slut']) {
-        await page.getByRole('button', { name: frame, exact: true }).click();
+      for (let sample = 0; sample < 3; sample++) {
+        await page.clock.runFor(500);
         await expect(page.locator('[data-equipment="kettlebell"]')).toHaveCount(
           1,
         );
