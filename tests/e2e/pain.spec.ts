@@ -15,7 +15,13 @@ test('pain before -> session -> pain after with ok', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
   // skip every exercise: the end of the plan leads to the after reading
   for (let i = 0; i < 5; i++) {
+    const previous = await page
+      .getByRole('heading', { level: 1 })
+      .textContent();
     await page.getByRole('button', { name: 'Hoppa över övningen' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).not.toHaveText(
+      previous ?? '',
+    );
   }
   await expect(
     page.getByRole('heading', { name: /efter passet/ }),

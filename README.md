@@ -79,3 +79,9 @@ Choose **Mitt rehabprogram → Allmän knäträning – färdigt AAOS-baserat pa
 History lists sessions before charts and filters by programme, status and period. It shows complete planned sets (all selected sides required), partial sessions and missing symptom answers. Session details separate readiness, effort and symptoms, and retain the actual equipment, weight, amount and side of every logged set. Exercise comparisons filter by equipment and side rather than combining equal weights from different implements. Four-week frequency and recent before/after/next-day reports remain descriptive; missing answers are not zero symptoms. Legacy right-knee charts remain separate from new check-ins.
 
 The general knee option now starts with six equipment-compatible exercises and editable AAOS-based doses. Existing saved plans and drafts take priority; **Återställ till färdigt knäpass** loads the template explicitly. New custom rehab plans still begin empty.
+
+### Getting started
+
+New users choose **Bli starkare**, **Styrka för löpning** or **Träna knäna**, confirm the equipment they want to use, and receive a compact workout. No equipment is preselected; bodyweight is the fallback. Counts appear only when weights are selected. Experience, extra equipment and working side are under **Fler inställningar**. Custom rehab remains available through **Jag har ett eget rehabprogram**.
+
+**Anpassa passet** opens the full exercise editor; the default view shows exercise names, amounts, equipment and working sides with one **Börja passet** action. Readiness and symptom questions still precede exercise. Returning users see the next A/B session (based on completed sessions in their programme) or resume their active workout. Profile changes are under **Ändra**. Existing legacy sessions keep the original week view.

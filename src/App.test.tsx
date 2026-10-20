@@ -31,7 +31,10 @@ describe('onboarding gating', () => {
     ).toBeTruthy();
     expect(screen.queryByRole('navigation')).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: /Jag förstår/ }));
-    expect(await screen.findByRole('navigation')).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
+    ).toBeTruthy();
+    expect(screen.queryByRole('navigation')).toBeNull();
     const stored = await getMeta<{ acceptedAt: string }>(getDb(), 'onboarding');
     expect(stored?.acceptedAt).toBeTruthy();
   });
@@ -39,11 +42,12 @@ describe('onboarding gating', () => {
   it('skips onboarding once accepted', async () => {
     await accept();
     render(<App />);
-    expect(await screen.findByRole('navigation')).toBeTruthy();
-    expect(screen.queryByText(/Välkommen till Stomme/)).toBeNull();
     expect(
-      screen.getByRole('link', { name: 'Vecka' }).getAttribute('aria-current'),
-    ).toBe('page');
+      await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
+    ).toBeTruthy();
+    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.queryByText(/Välkommen till Stomme/)).toBeNull();
+    expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
   });
 });
 

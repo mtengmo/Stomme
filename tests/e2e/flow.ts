@@ -31,7 +31,7 @@ export async function answerPain(
 export async function openPreview(page: Page): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
 }
 
@@ -46,7 +46,7 @@ export async function playPassA(
 ): Promise<{ sets: number }> {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
   await onStage('preview');
   await page.getByRole('button', { name: 'Starta pass' }).click();
@@ -121,7 +121,7 @@ export async function skipFirstExercise(
 ): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   const frame = page.locator('[data-step]');

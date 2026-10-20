@@ -338,18 +338,20 @@ async function theme(scheme: 'light' | 'dark') {
   await training.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();
   await audit(training, tag('training setup'));
   await training
-    .getByRole('radio', { name: 'Allmän styrka', exact: true })
-    .check();
-  await training
-    .getByRole('button', { name: 'Spara träningsinriktning' })
+    .getByRole('button', { name: 'Bli starkare', exact: true })
     .click();
-  await training.getByRole('link', { name: 'Planera pass A' }).waitFor();
-  await audit(training, tag('training overview'));
-  await training.getByRole('link', { name: 'Planera pass A' }).click();
+  await audit(training, tag('quick equipment selection'));
+  await training
+    .getByRole('button', { name: 'Visa mitt pass', exact: true })
+    .click();
   await training
     .getByRole('heading', { name: 'Pass A', exact: true })
     .waitFor();
-  await audit(training, tag('general training preview'));
+  await audit(training, tag('ready workout overview'));
+  await training
+    .getByRole('button', { name: 'Anpassa passet', exact: true })
+    .click();
+  await audit(training, tag('optional workout editor'));
   while (
     (await training.getByRole('button', { name: /^Ta bort / }).count()) > 1
   )
@@ -359,7 +361,7 @@ async function theme(scheme: 'light' | 'dark') {
       .click();
   await training.getByLabel('Set', { exact: true }).fill('1');
   await training
-    .getByRole('button', { name: 'Starta pass', exact: true })
+    .getByRole('button', { name: 'Börja passet', exact: true })
     .click();
   await training.getByRole('heading', { name: 'Hur känns kroppen?' }).waitFor();
   await audit(training, tag('training readiness check'));
@@ -413,8 +415,12 @@ async function theme(scheme: 'light' | 'dark') {
     .waitFor();
   await audit(training, tag('equipment and side exercise comparison'));
   await training.goto(`${base}/#/`);
+  await training.getByText('Ändra', { exact: true }).click();
   await training
-    .getByRole('button', { name: 'Byt träningsinriktning' })
+    .getByRole('button', {
+      name: 'Byt inriktning eller utrustning',
+      exact: true,
+    })
     .click();
   await training
     .getByRole('radio', { name: 'Mitt rehabprogram', exact: true })
@@ -426,7 +432,13 @@ async function theme(scheme: 'light' | 'dark') {
   await training
     .getByRole('button', { name: 'Spara träningsinriktning' })
     .click();
-  await training.getByRole('link', { name: 'Planera mitt rehabpass' }).click();
+  await training
+    .getByRole('link', { name: 'Visa nästa pass', exact: true })
+    .click();
+  await audit(training, tag('ready knee workout'));
+  await training
+    .getByRole('button', { name: 'Anpassa passet', exact: true })
+    .click();
   await training
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();

@@ -19,9 +19,7 @@ for (const mode of [
     await page.emulateMedia({ colorScheme: mode.colorScheme });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page
-      .getByRole('link', { name: 'Inställningar', exact: true })
-      .click();
+    await page.goto('/#/installningar');
     await page
       .getByRole('link', { name: 'Granska alla övningar', exact: true })
       .click();

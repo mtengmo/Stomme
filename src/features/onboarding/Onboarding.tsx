@@ -36,29 +36,17 @@ export function Onboarding() {
       <h1 className="m-0 text-6xl leading-[0.95] font-extrabold text-balance">
         Välkommen till Stomme
       </h1>
-      <DisclaimerText />
-      <section
-        aria-labelledby="stop-heading"
-        className="border-2 border-edge bg-paper"
-      >
-        <h2
-          id="stop-heading"
-          className="m-0 border-b border-blue px-4 py-3 text-3xl leading-none font-bold"
-        >
-          Avbryt direkt vid
-        </h2>
-        <ul className="m-0 list-none p-0">
-          {STOP.map((t) => (
-            <li
-              key={t}
-              className="flex min-h-12 items-center gap-3 border-b border-blue px-4 text-xl last:border-b-0"
-            >
-              <span aria-hidden="true" className="h-0.5 w-4 shrink-0 bg-red" />
-              {t}
-            </li>
-          ))}
-        </ul>
-      </section>
+      <p className="m-0 text-xl">
+        Färdiga pass för styrka, löpning och knäträning. Välj ett fokus så
+        hjälper vi dig att komma igång.
+      </p>
+      <p className="m-0 text-base text-ink-soft">
+        Stomme är ett träningsstöd. Vid skada eller efter operation: stäm av
+        övningarna med din fysioterapeut.
+      </p>
+      <p className="m-0 text-lg font-bold">
+        Avbryt vid skarp smärta, svullnad eller om knät låser sig.
+      </p>
       <div className="mt-auto pt-2">
         <Button onClick={() => void acceptOnboarding()}>
           Jag förstår, fortsätt

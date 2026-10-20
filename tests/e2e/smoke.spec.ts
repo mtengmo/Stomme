@@ -20,7 +20,8 @@ test('Pass A can be completed with only the primary action on each screen', asyn
 test('the app works offline after one load', async ({ page, context }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+  await page.goto('/#/pass/A');
+  await page.getByRole('button', { name: 'Starta pass' }).waitFor();
   // wait for the service worker to take control, then cut the network
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -29,7 +30,7 @@ test('the app works offline after one load', async ({ page, context }) => {
   await page.evaluate(() => navigator.serviceWorker.controller !== null);
   await context.setOffline(true);
   await page.reload();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   await page.getByRole('button', { name: 'Klar set' }).click();
@@ -50,7 +51,7 @@ test('the exercise sheet opens and closes without losing the set screen', async 
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   await page.getByRole('button', { name: 'Hur gör man?' }).click();

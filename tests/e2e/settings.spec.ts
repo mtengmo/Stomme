@@ -6,7 +6,7 @@ test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
 async function toSettings(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Inställningar' }).click();
+  await page.goto('/#/installningar');
   await expect(
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
@@ -81,7 +81,7 @@ test('delete all data needs two steps and returns to onboarding', async ({
 test('no update banner appears during a session', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   await expect(page.locator('[data-step]')).toBeVisible();
@@ -93,7 +93,7 @@ test('the exercise sheet traps focus and closes with Escape', async ({
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Starta pass' }).click();
+  await page.goto('/#/pass/A');
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
   await page.getByRole('button', { name: 'Hur gör man?' }).click();

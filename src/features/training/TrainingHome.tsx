@@ -2,7 +2,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link } from 'wouter';
 import {
-  defaultEquipment,
   equipmentChoices,
   isTrainingPreferences,
   programmeNames,
@@ -20,6 +19,7 @@ import { toLocalDate } from '../../lib/dates';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
 import { WeekView } from '../week/WeekView';
+import { QuickStart } from './QuickStart';
 
 const inputClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
@@ -39,7 +39,7 @@ export function TrainingSetup({
     current?.programId ?? 'general',
   );
   const [equipment, setEquipment] = useState<EquipmentChoice[]>(
-    current?.equipment ?? defaultEquipment,
+    current?.equipment ?? ['bodyweight'],
   );
   const [experience, setExperience] = useState<
     TrainingPreferences['experience']
@@ -203,13 +203,14 @@ export function TrainingSetup({
 }
 
 export function TrainingHome() {
-  const data = useLiveQuery(
-    async () => ({
-      preferences: await getMeta(getDb(), 'training'),
-      sessions: await listSessions(getDb()),
-    }),
-    [],
-  );
+  const data = useLiveQuery(async () => {
+    const [preferences, sessions, legacyProgramme] = await Promise.all([
+      getMeta(getDb(), 'training'),
+      listSessions(getDb()),
+      getMeta(getDb(), 'program'),
+    ]);
+    return { preferences, sessions, legacyProgramme };
+  }, []);
   const [editing, setEditing] = useState(false);
   if (!data) return null;
   const preferences = isTrainingPreferences(data.preferences)
@@ -221,106 +222,130 @@ export function TrainingHome() {
   const due = data.sessions.filter((session) =>
     trainingDayAfterDue(session, toLocalDate(new Date())),
   );
-  const legacy = !preferences;
-  return (
-    <>
-      <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-5">
-        {editing || (legacy && data.sessions.length === 0) ? (
-          <TrainingSetup
-            current={preferences}
-            onSaved={() => setEditing(false)}
-            onCancel={preferences ? () => setEditing(false) : undefined}
-          />
-        ) : (
-          <>
-            <p className="m-0 text-xl font-bold">
-              {preferences
-                ? trainingName(preferences)
-                : 'Knä och löpning · nuvarande program'}
-            </p>
-            <button
-              type="button"
-              disabled={!!active}
-              onClick={() => setEditing(true)}
-              className="min-h-12 self-start text-base font-bold underline disabled:opacity-50"
-            >
-              Byt träningsinriktning
-            </button>
-            {active ? (
-              <p className="m-0 text-base text-ink-soft">
-                Avsluta eller avbryt det pågående passet innan du byter
-                inriktning.
-              </p>
-            ) : null}
-          </>
-        )}
-        {due.map((session) => (
-          <Link
-            key={session.id}
-            href={`/kansla/${session.id}/dayAfter`}
-            className={buttonClass('secondary')}
-          >
-            Hur känns det dagen efter {trainingName(session)}?
-          </Link>
-        ))}
+  const legacy =
+    !preferences && (data.sessions.length > 0 || !!data.legacyProgramme);
+  if (!preferences && !legacy && !editing) return <QuickStart />;
+  if (editing)
+    return (
+      <div className="mx-auto max-w-md px-5 pt-5 pb-28">
+        <TrainingSetup
+          current={preferences}
+          onSaved={() => setEditing(false)}
+          onCancel={() => setEditing(false)}
+        />
       </div>
-      {legacy ? (
-        <WeekView />
-      ) : (
-        <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-5 pb-28">
-          <h1 className="m-0 text-5xl font-extrabold">Din träning</h1>
-          <p className="m-0 text-lg">
-            {preferences.programId === 'rehab'
-              ? preferences.rehabFocus === 'knee'
-                ? 'Öppna ditt färdiga knäpass och anpassa före start. Ingen automatisk ökning.'
-                : 'Bygg ditt överenskomna pass. Ingen automatisk ökning.'
-              : 'Välj ett pass. Kontrollera övningar, antal och vikt före start.'}
-          </p>
-          {active ? (
-            <Link
-              href={`/session/${active.id}`}
-              className={buttonClass('primary')}
-            >
-              Fortsätt passet
-            </Link>
-          ) : (
-            (preferences.programId === 'rehab' ? ['A'] : ['A', 'B']).map(
-              (id) => (
-                <Link
-                  key={id}
-                  href={`/traning/${id}`}
-                  className={buttonClass('primary')}
-                >
-                  {preferences.programId === 'rehab'
-                    ? 'Planera mitt rehabpass'
-                    : `Planera pass ${id}`}
-                </Link>
-              ),
-            )
-          )}
-          <Link href="/ovningar" className={buttonClass('secondary')}>
-            Övningar
-          </Link>
-          <h2 className="m-0 mt-3 text-2xl font-bold">Senaste pass</h2>
-          {data.sessions
-            .filter(
-              (session) =>
-                session.programId === preferences.programId &&
-                session.status !== 'in_progress',
-            )
-            .slice(0, 3)
-            .map((session) => (
-              <Link
-                key={session.id}
-                href={`/historik/${session.id}`}
-                className="flex min-h-12 items-center border-b-2 border-edge text-lg underline"
-              >
-                {session.date} · Pass {session.templateId} ·{' '}
-                {session.status === 'completed' ? 'klart' : 'avbrutet'}
-              </Link>
-            ))}
+    );
+  const recent = data.sessions.filter(
+    (session) =>
+      session.programId === preferences?.programId &&
+      (session.programId !== 'rehab' ||
+        (session.rehabFocus ?? 'custom') ===
+          (preferences?.rehabFocus ?? 'custom')) &&
+      session.status !== 'in_progress',
+  );
+  const lastCompleted = recent.find(
+    (session) => session.status === 'completed',
+  );
+  const nextId =
+    preferences?.programId === 'rehab' || lastCompleted?.templateId !== 'A'
+      ? 'A'
+      : 'B';
+  if (legacy)
+    return (
+      <>
+        <div className="mx-auto max-w-md px-5 pt-3">
+          <button
+            type="button"
+            disabled={!!active}
+            onClick={() => setEditing(true)}
+            className="min-h-12 text-base font-bold underline disabled:opacity-50"
+          >
+            Ändra träningsinriktning
+          </button>
         </div>
-      )}
-    </>
+        <WeekView />
+      </>
+    );
+  if (!preferences) return null;
+  return (
+    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
+      <h1 className="m-0 text-5xl font-extrabold">
+        {active ? 'Fortsätt ditt pass' : 'Nästa pass'}
+      </h1>
+      <p className="m-0 text-lg font-bold">
+        {trainingName(preferences)}
+        {!active && preferences.programId !== 'rehab'
+          ? ` · Pass ${nextId}`
+          : ''}
+      </p>
+      <Link
+        href={active ? `/session/${active.id}` : `/traning/${nextId}`}
+        className={buttonClass('primary')}
+      >
+        {active ? 'Fortsätt passet' : 'Visa nästa pass'}
+      </Link>
+      {due.map((session) => (
+        <Link
+          key={session.id}
+          href={`/kansla/${session.id}/dayAfter`}
+          className={buttonClass('secondary')}
+        >
+          Hur känns det dagen efter {trainingName(session)}?
+        </Link>
+      ))}
+      <details>
+        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+          Ändra
+        </summary>
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            disabled={!!active}
+            onClick={() => setEditing(true)}
+            className="min-h-12 self-start text-base font-bold underline disabled:opacity-50"
+          >
+            Byt inriktning eller utrustning
+          </button>
+          {active ? (
+            <p className="m-0 text-base text-ink-soft">
+              Avsluta eller avbryt passet innan du byter inriktning.
+            </p>
+          ) : preferences.programId !== 'rehab' ? (
+            <Link
+              href={`/traning/${nextId === 'A' ? 'B' : 'A'}`}
+              className="flex min-h-12 items-center text-base underline"
+            >
+              Visa pass {nextId === 'A' ? 'B' : 'A'} i stället
+            </Link>
+          ) : null}
+          <Link
+            href="/ovningar"
+            className="flex min-h-12 items-center text-base underline"
+          >
+            Bläddra bland övningar
+          </Link>
+        </div>
+      </details>
+      {recent.length ? (
+        <section
+          aria-labelledby="recent-training"
+          className="flex flex-col gap-2 border-t-2 border-edge pt-5"
+        >
+          <h2 id="recent-training" className="m-0 text-2xl font-bold">
+            Senaste pass
+          </h2>
+          {recent.slice(0, 3).map((session) => (
+            <Link
+              key={session.id}
+              href={`/historik/${session.id}`}
+              className="flex min-h-12 items-center border-b-2 border-edge text-base underline"
+            >
+              {session.date} · Pass {session.templateId} ·{' '}
+              {session.status === 'completed' ? 'klart' : 'avbrutet'}
+            </Link>
+          ))}
+        </section>
+      ) : null}
+    </div>
   );
 }

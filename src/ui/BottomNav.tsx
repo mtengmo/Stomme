@@ -1,8 +1,10 @@
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useLocation } from 'wouter';
+import { getDb } from '../db/db';
 import { Icon, type IconName } from './Icon';
 
 const tabs: { href: string; label: string; icon: IconName }[] = [
-  { href: '/', label: 'Vecka', icon: 'week' },
+  { href: '/', label: 'Träning', icon: 'week' },
   { href: '/historik', label: 'Historik', icon: 'history' },
   { href: '/installningar', label: 'Inställningar', icon: 'settings' },
 ];
@@ -16,6 +18,15 @@ export function isTabActive(href: string, location: string): boolean {
 
 export function BottomNav() {
   const [location] = useLocation();
+  const started = useLiveQuery(async () => {
+    if (location !== '/') return true;
+    const [meta, count] = await Promise.all([
+      getDb().meta.bulkGet(['training', 'program']),
+      getDb().sessions.count(),
+    ]);
+    return meta.some(Boolean) || count > 0;
+  }, [location]);
+  if (location === '/' && !started) return null;
   return (
     <nav
       aria-label="Huvudmeny"

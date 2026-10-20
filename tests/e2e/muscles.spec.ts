@@ -8,7 +8,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('link', { name: 'Övningar', exact: true }).click();
+  await page.goto('/#/ovningar');
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
   await expect(page.getByRole('status')).toHaveText('2 övningar för vader');

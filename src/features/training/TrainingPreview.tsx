@@ -32,8 +32,8 @@ import { equipmentFits } from '../../rules/equipment';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
-
 import { KneeCollection } from './KneeCollection';
+import { ReadyWorkout } from './ReadyWorkout';
 import { inputClass } from './TrainingHome';
 
 function available(preferences: TrainingPreferences) {
@@ -193,6 +193,35 @@ function PreviewEditor({
   }, [draftKey, plan]);
 
   const [confirmed, setConfirmed] = useState(false);
+  const [editing, setEditing] = useState(() => {
+    if (
+      !validateTrainingPlan(plan) ||
+      (preferences.programId === 'rehab' && preferences.rehabFocus !== 'knee')
+    )
+      return true;
+    try {
+      return sessionStorage.getItem(`${draftKey}.editing`) === 'true';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`${draftKey}.editing`, String(editing));
+    } catch {
+      /* Editing remains available without storage. */
+    }
+  }, [draftKey, editing]);
+  const ready =
+    validateTrainingPlan(plan) &&
+    plan.every((item) => {
+      const variant = exerciseMetadata[item.exerciseId].variants.find(
+        (v) => v.id === item.variantId,
+      );
+      return (
+        !!variant && equipmentFits(variant.equipment, preferences.equipment)
+      );
+    });
 
   const [busy, setBusy] = useState(false);
 
@@ -254,351 +283,383 @@ function PreviewEditor({
         </>
       ) : (
         <>
-          <p className="m-0 text-base">
-            {preferences.programId === 'rehab'
-              ? preferences.rehabFocus === 'knee'
-                ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
-                : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'
-              : 'Startförslaget matchar din utrustning. Anpassa efter din vana; vikten anges totalt för alla redskap.'}
-          </p>
-
-          {preferences.programId === 'rehab' &&
-          preferences.rehabFocus === 'knee' ? (
-            <section
-              aria-label="Färdigt knäpass"
-              className="flex flex-col gap-3"
-            >
+          <button
+            type="button"
+            onClick={() => setEditing((value) => !value)}
+            className="min-h-12 self-start text-base font-bold underline"
+            aria-expanded={editing}
+          >
+            {editing ? 'Visa passöversikt' : 'Anpassa passet'}
+          </button>
+          {editing ? (
+            <>
               <p className="m-0 text-base">
-                Värm upp 5–10 minuter med promenad eller lugn cykling. Förslaget
-                är Stommes urval ur AAOS knäprogram. Vid skada eller efter
-                operation behöver övningsvalet stämmas av med vården. Avbryt en
-                övning som gör ont.
+                {preferences.programId === 'rehab'
+                  ? preferences.rehabFocus === 'knee'
+                    ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
+                    : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'
+                  : 'Startförslaget matchar din utrustning. Anpassa efter din vana; vikten anges totalt för alla redskap.'}
               </p>
-              <p className="m-0 text-base text-ink-soft">
-                {kneeConditioningPlan(preferences).length} av 6 övningar passar
-                din utrustning. Vikten börjar på noll; 60 sekunders setvila är
-                appens justerbara standard. Ingen automatisk ökning.
-              </p>
-              <a
-                href={kneeRehabSource}
-                target="_blank"
-                rel="noreferrer"
-                className="flex min-h-12 items-center text-base font-bold underline"
-              >
-                Läs AAOS vägledning
-              </a>
-              <details>
-                <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                  Återställ till färdigt knäpass
-                </summary>
-                <p className="m-0 text-base">
-                  Ersätter övningarna i förhandsvisningen. Ditt sparade program
-                  ändras först när du sparar igen.
-                </p>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    updatePlan(kneeConditioningPlan(preferences));
-                    setAddId('');
-                  }}
+
+              {preferences.programId === 'rehab' &&
+              preferences.rehabFocus === 'knee' ? (
+                <section
+                  aria-label="Färdigt knäpass"
+                  className="flex flex-col gap-3"
                 >
-                  Använd färdigt knäpass
-                </Button>
-              </details>
-            </section>
-          ) : null}
-
-          {preferences.programId !== 'rehab' &&
-          !compatible.some((exercise) => exercise.id === 'floor-press') ? (
-            <p className="m-0 text-base text-ink-soft">
-              Med den valda utrustningen saknas vissa press- och dragövningar.
-              Lägg till utrustning under Byt träningsinriktning för fler val.
-            </p>
-          ) : null}
-
-          {preferences.programId === 'rehab' &&
-          preferences.rehabFocus === 'knee' ? (
-            <details className="border-y-2 border-edge py-2">
-              <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
-                Välj övningar från AAOS · 12 övningar
-              </summary>
-              <KneeCollection
-                preferences={preferences}
-                plan={plan}
-                onAdd={(exerciseId) => {
-                  updatePlan((current) => [
-                    ...current,
-                    basePlan(exerciseId, preferences),
-                  ]);
-                  setAddId('');
-                }}
-              />
-            </details>
-          ) : null}
-          <h2 className="m-0 text-3xl font-bold">Övningar i passet</h2>
-
-          {plan.length === 0 ? (
-            <p className="m-0 text-base">
-              Inga övningar valda ännu. Lägg till övningar nedan.
-            </p>
-          ) : null}
-
-          <ol className="m-0 list-none p-0">
-            {plan.map((item, index) => {
-              const exercise = exercises[item.exerciseId];
-
-              return (
-                <li
-                  key={exercise.id}
-                  className="flex flex-col gap-3 border-t-2 border-edge py-5"
-                >
-                  <Link
-                    href={`/ovning/${exercise.id}`}
-                    className="flex min-h-12 items-center text-xl font-bold underline"
-                  >
-                    {exercise.name}
-                  </Link>
-
-                  <p className="m-0 text-base text-ink-soft">
-                    {item.explanation ??
-                      (preferences.programId === 'rehab'
-                        ? 'Ange din överenskomna dosering.'
-                        : 'Startförslag. Anpassa före start.')}
+                  <p className="m-0 text-base">
+                    Värm upp 5–10 minuter med promenad eller lugn cykling.
+                    Förslaget är Stommes urval ur AAOS knäprogram. Vid skada
+                    eller efter operation behöver övningsvalet stämmas av med
+                    vården. Avbryt en övning som gör ont.
                   </p>
-
-                  {!exerciseMetadata[exercise.id].variants.some(
-                    (variant) =>
-                      variant.id === item.variantId &&
-                      equipmentFits(variant.equipment, preferences.equipment),
-                  ) ? (
-                    <p role="alert" className="m-0 text-base font-bold">
-                      Den tidigare utrustningen är inte tillgänglig. Välj en
-                      variant nedan eller ta bort övningen.
+                  <p className="m-0 text-base text-ink-soft">
+                    {kneeConditioningPlan(preferences).length} av 6 övningar
+                    passar din utrustning. Vikten börjar på noll; 60 sekunders
+                    setvila är appens justerbara standard. Ingen automatisk
+                    ökning.
+                  </p>
+                  <a
+                    href={kneeRehabSource}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex min-h-12 items-center text-base font-bold underline"
+                  >
+                    Läs AAOS vägledning
+                  </a>
+                  <details>
+                    <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                      Återställ till färdigt knäpass
+                    </summary>
+                    <p className="m-0 text-base">
+                      Ersätter övningarna i förhandsvisningen. Ditt sparade
+                      program ändras först när du sparar igen.
                     </p>
-                  ) : null}
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="flex flex-col gap-1 text-base font-bold">
-                      Set
-                      <input
-                        type="number"
-                        min="1"
-                        max="10"
-                        value={item.sets || ''}
-                        onChange={(event) =>
-                          change(index, { sets: Number(event.target.value) })
-                        }
-                        className={inputClass}
-                      />
-                    </label>
-
-                    <label className="flex flex-col gap-1 text-base font-bold">
-                      {exercise.unit === 'seconds'
-                        ? 'Sekunder'
-                        : exercise.unit === 'meters'
-                          ? 'Meter'
-                          : 'Repetitioner'}
-
-                      {exercise.perSide ? ' per sida' : ''}
-
-                      <input
-                        type="number"
-                        min="1"
-                        max="600"
-                        value={item.target || ''}
-                        onChange={(event) =>
-                          change(index, { target: Number(event.target.value) })
-                        }
-                        className={inputClass}
-                      />
-                    </label>
-
-                    <label className="flex flex-col gap-1 text-base font-bold">
-                      Total vikt (kg)
-                      <input
-                        type="number"
-                        min="0"
-                        max="500"
-                        step="0.5"
-                        disabled={
-                          !exerciseMetadata[exercise.id].variants
-
-                            .find((variant) => variant.id === item.variantId)
-
-                            ?.equipment.some(
-                              (required) =>
-                                required.type === 'dumbbell' ||
-                                required.type === 'kettlebell',
-                            )
-                        }
-                        value={item.weightKg}
-                        onChange={(event) =>
-                          change(index, {
-                            weightKg: Number(event.target.value),
-                          })
-                        }
-                        className={inputClass}
-                      />
-                    </label>
-
-                    <label className="flex flex-col gap-1 text-base font-bold">
-                      Vila (sekunder)
-                      <input
-                        type="number"
-                        min="0"
-                        max="600"
-                        value={item.restSec}
-                        onChange={(event) =>
-                          change(index, { restSec: Number(event.target.value) })
-                        }
-                        className={inputClass}
-                      />
-                    </label>
-                  </div>
-
-                  <label className="flex flex-col gap-1 text-base font-bold">
-                    Utrustningsvariant
-                    <select
-                      value={item.variantId ?? ''}
-                      onChange={(event) => {
-                        const variant = exerciseMetadata[
-                          exercise.id
-                        ].variants.find(
-                          (value) => value.id === event.target.value,
-                        );
-
-                        if (variant)
-                          change(index, {
-                            variantId: variant.id,
-
-                            loadIndex: variant.defaultLoadIndex,
-
-                            weightKg:
-                              exercise.loadLadder[variant.defaultLoadIndex]
-                                ?.kg ?? 0,
-                          });
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        updatePlan(kneeConditioningPlan(preferences));
+                        setAddId('');
                       }}
-                      className={inputClass}
                     >
+                      Använd färdigt knäpass
+                    </Button>
+                  </details>
+                </section>
+              ) : null}
+
+              {preferences.programId !== 'rehab' &&
+              !compatible.some((exercise) => exercise.id === 'floor-press') ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Med den valda utrustningen saknas vissa press- och
+                  dragövningar. Lägg till utrustning under Byt
+                  träningsinriktning för fler val.
+                </p>
+              ) : null}
+
+              {preferences.programId === 'rehab' &&
+              preferences.rehabFocus === 'knee' ? (
+                <details className="border-y-2 border-edge py-2">
+                  <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
+                    Välj övningar från AAOS · 12 övningar
+                  </summary>
+                  <KneeCollection
+                    preferences={preferences}
+                    plan={plan}
+                    onAdd={(exerciseId) => {
+                      updatePlan((current) => [
+                        ...current,
+                        basePlan(exerciseId, preferences),
+                      ]);
+                      setAddId('');
+                    }}
+                  />
+                </details>
+              ) : null}
+              <h2 className="m-0 text-3xl font-bold">Övningar i passet</h2>
+
+              {plan.length === 0 ? (
+                <p className="m-0 text-base">
+                  Inga övningar valda ännu. Lägg till övningar nedan.
+                </p>
+              ) : null}
+
+              <ol className="m-0 list-none p-0">
+                {plan.map((item, index) => {
+                  const exercise = exercises[item.exerciseId];
+
+                  return (
+                    <li
+                      key={exercise.id}
+                      className="flex flex-col gap-3 border-t-2 border-edge py-5"
+                    >
+                      <Link
+                        href={`/ovning/${exercise.id}`}
+                        className="flex min-h-12 items-center text-xl font-bold underline"
+                      >
+                        {exercise.name}
+                      </Link>
+
+                      <p className="m-0 text-base text-ink-soft">
+                        {item.explanation ??
+                          (preferences.programId === 'rehab'
+                            ? 'Ange din överenskomna dosering.'
+                            : 'Startförslag. Anpassa före start.')}
+                      </p>
+
                       {!exerciseMetadata[exercise.id].variants.some(
                         (variant) =>
                           variant.id === item.variantId &&
                           equipmentFits(
                             variant.equipment,
-
                             preferences.equipment,
                           ),
                       ) ? (
-                        <option value={item.variantId ?? ''}>
-                          Tidigare variant · välj tillgänglig utrustning
-                        </option>
+                        <p role="alert" className="m-0 text-base font-bold">
+                          Den tidigare utrustningen är inte tillgänglig. Välj en
+                          variant nedan eller ta bort övningen.
+                        </p>
                       ) : null}
 
-                      {exerciseMetadata[exercise.id].variants
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          Set
+                          <input
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={item.sets || ''}
+                            onChange={(event) =>
+                              change(index, {
+                                sets: Number(event.target.value),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </label>
 
-                        .filter((variant) =>
-                          equipmentFits(
-                            variant.equipment,
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          {exercise.unit === 'seconds'
+                            ? 'Sekunder'
+                            : exercise.unit === 'meters'
+                              ? 'Meter'
+                              : 'Repetitioner'}
 
-                            preferences.equipment,
-                          ),
-                        )
+                          {exercise.perSide ? ' per sida' : ''}
 
-                        .map((variant) => (
-                          <option key={variant.id} value={variant.id}>
-                            {variant.label}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="600"
+                            value={item.target || ''}
+                            onChange={(event) =>
+                              change(index, {
+                                target: Number(event.target.value),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </label>
 
-                  {exercise.perSide ? (
-                    <label className="flex flex-col gap-1 text-base font-bold">
-                      Arbetande sida
-                      <select
-                        value={
-                          item.sides?.length === 1 ? item.sides[0] : 'both'
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          Total vikt (kg)
+                          <input
+                            type="number"
+                            min="0"
+                            max="500"
+                            step="0.5"
+                            disabled={
+                              !exerciseMetadata[exercise.id].variants
+
+                                .find(
+                                  (variant) => variant.id === item.variantId,
+                                )
+
+                                ?.equipment.some(
+                                  (required) =>
+                                    required.type === 'dumbbell' ||
+                                    required.type === 'kettlebell',
+                                )
+                            }
+                            value={item.weightKg}
+                            onChange={(event) =>
+                              change(index, {
+                                weightKg: Number(event.target.value),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </label>
+
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          Vila (sekunder)
+                          <input
+                            type="number"
+                            min="0"
+                            max="600"
+                            value={item.restSec}
+                            onChange={(event) =>
+                              change(index, {
+                                restSec: Number(event.target.value),
+                              })
+                            }
+                            className={inputClass}
+                          />
+                        </label>
+                      </div>
+
+                      <label className="flex flex-col gap-1 text-base font-bold">
+                        Utrustningsvariant
+                        <select
+                          value={item.variantId ?? ''}
+                          onChange={(event) => {
+                            const variant = exerciseMetadata[
+                              exercise.id
+                            ].variants.find(
+                              (value) => value.id === event.target.value,
+                            );
+
+                            if (variant)
+                              change(index, {
+                                variantId: variant.id,
+
+                                loadIndex: variant.defaultLoadIndex,
+
+                                weightKg:
+                                  exercise.loadLadder[variant.defaultLoadIndex]
+                                    ?.kg ?? 0,
+                              });
+                          }}
+                          className={inputClass}
+                        >
+                          {!exerciseMetadata[exercise.id].variants.some(
+                            (variant) =>
+                              variant.id === item.variantId &&
+                              equipmentFits(
+                                variant.equipment,
+
+                                preferences.equipment,
+                              ),
+                          ) ? (
+                            <option value={item.variantId ?? ''}>
+                              Tidigare variant · välj tillgänglig utrustning
+                            </option>
+                          ) : null}
+
+                          {exerciseMetadata[exercise.id].variants
+
+                            .filter((variant) =>
+                              equipmentFits(
+                                variant.equipment,
+
+                                preferences.equipment,
+                              ),
+                            )
+
+                            .map((variant) => (
+                              <option key={variant.id} value={variant.id}>
+                                {variant.label}
+                              </option>
+                            ))}
+                        </select>
+                      </label>
+
+                      {exercise.perSide ? (
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          Arbetande sida
+                          <select
+                            value={
+                              item.sides?.length === 1 ? item.sides[0] : 'both'
+                            }
+                            onChange={(event) =>
+                              change(index, {
+                                sides:
+                                  event.target.value === 'both'
+                                    ? ['right', 'left']
+                                    : [event.target.value as 'right' | 'left'],
+                              })
+                            }
+                            className={inputClass}
+                          >
+                            <option value="both">
+                              Höger och vänster, en i taget
+                            </option>
+
+                            <option value="right">Endast höger</option>
+
+                            <option value="left">Endast vänster</option>
+                          </select>
+                        </label>
+                      ) : null}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updatePlan((current) =>
+                            current.filter((_, n) => n !== index),
+                          )
                         }
-                        onChange={(event) =>
-                          change(index, {
-                            sides:
-                              event.target.value === 'both'
-                                ? ['right', 'left']
-                                : [event.target.value as 'right' | 'left'],
-                          })
-                        }
-                        className={inputClass}
+                        className="min-h-12 self-start px-2 text-base font-bold underline"
                       >
-                        <option value="both">
-                          Höger och vänster, en i taget
-                        </option>
+                        Ta bort {exercise.name}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
 
-                        <option value="right">Endast höger</option>
+              <label className="flex flex-col gap-2 text-lg font-bold">
+                Lägg till övning
+                <select
+                  className={inputClass}
+                  value={addId}
+                  onChange={(event) =>
+                    setAddId(event.target.value as ExerciseId | '')
+                  }
+                >
+                  <option value="">Välj övning</option>
 
-                        <option value="left">Endast vänster</option>
-                      </select>
-                    </label>
-                  ) : null}
+                  {compatible
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updatePlan((current) =>
-                        current.filter((_, n) => n !== index),
-                      )
-                    }
-                    className="min-h-12 self-start px-2 text-base font-bold underline"
-                  >
-                    Ta bort {exercise.name}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                    .filter(
+                      (exercise) =>
+                        !plan.some((item) => item.exerciseId === exercise.id),
+                    )
 
-          <label className="flex flex-col gap-2 text-lg font-bold">
-            Lägg till övning
-            <select
-              className={inputClass}
-              value={addId}
-              onChange={(event) =>
-                setAddId(event.target.value as ExerciseId | '')
-              }
-            >
-              <option value="">Välj övning</option>
+                    .map((exercise) => (
+                      <option key={exercise.id} value={exercise.id}>
+                        {exercise.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
 
-              {compatible
+              <Button
+                variant="secondary"
+                disabled={!addId || plan.length >= 12}
+                onClick={() => {
+                  if (addId)
+                    updatePlan((current) => [
+                      ...current,
 
-                .filter(
-                  (exercise) =>
-                    !plan.some((item) => item.exerciseId === exercise.id),
-                )
+                      basePlan(addId, preferences),
+                    ]);
 
-                .map((exercise) => (
-                  <option key={exercise.id} value={exercise.id}>
-                    {exercise.name}
-                  </option>
-                ))}
-            </select>
-          </label>
-
-          <Button
-            variant="secondary"
-            disabled={!addId || plan.length >= 12}
-            onClick={() => {
-              if (addId)
-                updatePlan((current) => [
-                  ...current,
-
-                  basePlan(addId, preferences),
-                ]);
-
-              setAddId('');
-            }}
-          >
-            Lägg till i passet
-          </Button>
-
+                  setAddId('');
+                }}
+              >
+                Lägg till i passet
+              </Button>
+            </>
+          ) : (
+            <ReadyWorkout plan={plan} preferences={preferences} />
+          )}
+          {!ready ? (
+            <p role="alert" className="m-0 text-base font-bold">
+              Kontrollera övningar, antal och tillgänglig utrustning under
+              Anpassa passet.
+            </p>
+          ) : null}
           {preferences.programId === 'rehab' ? (
             <label className="flex min-h-12 items-start gap-3 py-3 text-base">
               <input
@@ -613,7 +674,7 @@ function PreviewEditor({
             </label>
           ) : null}
 
-          {preferences.programId === 'rehab' ? (
+          {editing && preferences.programId === 'rehab' ? (
             <>
               <Button
                 variant="secondary"
@@ -657,46 +718,57 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <Button
-            disabled={
-              busy ||
-              !plan.length ||
-              (preferences.programId === 'rehab' && !confirmed)
+          <div
+            className={
+              !editing
+                ? 'fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper px-5 py-4'
+                : ''
             }
-            onClick={async () => {
-              setBusy(true);
-
-              try {
-                const session = await startTrainingSession(
-                  getDb(),
-
-                  preferences,
-
-                  id,
-
-                  plan,
-                );
-
-                try {
-                  sessionStorage.removeItem(draftKey);
-                } catch {
-                  /* No persistent draft to clear. */
-                }
-
-                navigate(`/kansla/${session.id}/before`);
-              } catch (err) {
-                setError(
-                  err instanceof Error
-                    ? err.message
-                    : 'Kunde inte starta passet.',
-                );
-
-                setBusy(false);
-              }
-            }}
           >
-            Starta pass
-          </Button>
+            <div className="mx-auto w-full max-w-xl">
+              <Button
+                disabled={
+                  busy ||
+                  !ready ||
+                  (preferences.programId === 'rehab' && !confirmed)
+                }
+                onClick={async () => {
+                  setBusy(true);
+
+                  try {
+                    const session = await startTrainingSession(
+                      getDb(),
+
+                      preferences,
+
+                      id,
+
+                      plan,
+                    );
+
+                    try {
+                      sessionStorage.removeItem(draftKey);
+                      sessionStorage.removeItem(`${draftKey}.editing`);
+                    } catch {
+                      /* No persistent draft to clear. */
+                    }
+
+                    navigate(`/kansla/${session.id}/before`);
+                  } catch (err) {
+                    setError(
+                      err instanceof Error
+                        ? err.message
+                        : 'Kunde inte starta passet.',
+                    );
+
+                    setBusy(false);
+                  }
+                }}
+              >
+                Börja passet
+              </Button>
+            </div>
+          </div>
         </>
       )}
     </div>
