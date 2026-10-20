@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { Icon } from '../../ui/Icon';
 import { Tally, type TallyItem } from '../../ui/Tally';
 
 export interface SessionFrameProps {
@@ -36,9 +35,7 @@ export function SessionFrame({
         <p className="m-0 flex min-w-0 flex-wrap items-center gap-x-2 text-base font-bold">
           {title}
           <span className="flex items-center gap-1 font-normal text-ink-soft">
-            <Icon name="clock" size={20} />
-            <span className="sr-only">Tid </span>
-            <span>{clock}</span>
+            <span>Passets tid {clock}</span>
           </span>
         </p>
         <button

@@ -233,10 +233,9 @@ h2 {
   grid-template-columns: 1fr 1fr;
   column-gap: 1rem;
   align-content: start;
-  flex: 1 1 3rem;
+  flex: none;
   min-height: 3rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: visible;
 }
 .session-extras details[open] {
   grid-column: 1 / -1;

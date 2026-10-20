@@ -49,6 +49,7 @@ export function SetScreen({
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
   const [weightKg, setWeightKg] = useState(initialWeightKg);
   const [holdDone, setHoldDone] = useState(false);
+  const [stoppedSeconds, setStoppedSeconds] = useState<number | null>(null);
   const hold = useCountdown(() => setHoldDone(true));
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
@@ -70,8 +71,14 @@ export function SetScreen({
   const changeAmount = (value: number) => {
     hold.stop();
     setHoldDone(false);
+    setStoppedSeconds(null);
     setAmount(value);
   };
+  const remaining = hold.running
+    ? hold.seconds
+    : holdDone
+      ? 0
+      : (stoppedSeconds ?? amount);
   return (
     <SessionFrame
       {...frame}
@@ -120,55 +127,81 @@ export function SetScreen({
       {unit === 'seconds' ? (
         <section
           aria-label="Hålltid"
-          className="rounded-md bg-blue px-4 py-2 text-paper"
+          className="rounded-md bg-blue px-3 py-2 text-paper"
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="m-0 text-base font-bold">
                 Hålltid{side ? ` · ${side}` : ''}
               </p>
               <p
                 role="timer"
-                aria-label={`${hold.running ? hold.seconds : holdDone ? 0 : amount} sekunder hålltid kvar`}
-                className="count m-0 text-[5rem] leading-none"
+                aria-label={`${remaining} sekunder hålltid kvar`}
+                className="count m-0 text-[clamp(4.5rem,24vw,6rem)] leading-none"
               >
-                {formatClock(
-                  hold.running ? hold.seconds : holdDone ? 0 : amount,
-                )}
+                {formatClock(remaining)}
               </p>
             </div>
             <button
               type="button"
-              className="min-h-12 max-w-36 rounded-md border-2 border-current px-3 text-base font-bold"
+              className="min-h-14 w-28 rounded-md border-2 border-current px-2 text-base font-bold"
               onClick={() => {
                 setHoldDone(false);
-                if (hold.running) hold.stop();
-                else hold.start(amount);
+                if (hold.running) {
+                  setStoppedSeconds(hold.seconds);
+                  hold.stop();
+                } else {
+                  hold.start(stoppedSeconds ?? amount);
+                  setStoppedSeconds(null);
+                }
               }}
             >
               {hold.running
-                ? 'Avbryt hålltid'
-                : holdDone
-                  ? `Starta om hålltid (${amount} s)`
-                  : `Starta hålltid (${amount} s)`}
+                ? 'Stoppa timer'
+                : stoppedSeconds !== null
+                  ? 'Fortsätt timer'
+                  : holdDone
+                    ? `Starta om hålltid (${amount} s)`
+                    : `Starta hålltid (${amount} s)`}
             </button>
           </div>
           <p role="status" className="m-0 text-base font-bold">
             {holdDone
-              ? 'Hålltiden är klar. Tryck Klar set.'
+              ? 'Hålltiden är klar. Sluta hålla och tryck Klar set.'
               : hold.running
-                ? 'Håll positionen.'
-                : 'Starta när du är på plats.'}
+                ? 'Håll tills timern når 0:00.'
+                : stoppedSeconds !== null
+                  ? 'Timern är stoppad. Fortsätt när du är redo.'
+                  : 'Starta när du är på plats. Timern stannar vid 0:00.'}
           </p>
+          {stoppedSeconds !== null ? (
+            <button
+              type="button"
+              onClick={() => {
+                setStoppedSeconds(null);
+                setHoldDone(false);
+              }}
+              className="min-h-12 text-base font-bold underline"
+            >
+              Nollställ till {amount} sekunder
+            </button>
+          ) : null}
         </section>
       ) : (
-        <p className="m-0 text-xl font-bold">
-          {amount} {UNIT_WORD[unit]}
-          {exercise.perSide ? ' på denna sida' : ''}
-          {weightLabel ? (
-            <span className="font-normal"> · {weightLabel}</span>
-          ) : null}
-        </p>
+        <div>
+          <p className="m-0 text-xl font-bold">
+            {amount} {UNIT_WORD[unit]}
+            {exercise.perSide ? ' på denna sida' : ''}
+            {weightLabel ? (
+              <span className="font-normal"> · {weightLabel}</span>
+            ) : null}
+          </p>
+          <p className="m-0 text-base text-ink-soft">
+            {unit === 'reps'
+              ? 'Räkna repetitionerna själv. Tryck Klar set när du är klar.'
+              : 'Tryck Klar set när du gått hela sträckan.'}
+          </p>
+        </div>
       )}
       <FigureSlot
         exerciseId={exercise.id}
@@ -190,12 +223,7 @@ export function SetScreen({
           {nextCue}
         </p>
       </div>
-      <section
-        className="session-extras"
-        aria-label="Inställningar och teknik"
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard access to bounded scrolling details
-        tabIndex={0}
-      >
+      <section className="session-extras" aria-label="Inställningar och teknik">
         <details name="workout-options">
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold underline">
             Ändra set

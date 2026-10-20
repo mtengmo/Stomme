@@ -31,11 +31,15 @@ for (const viewport of [
     await expect(page.getByRole('region', { name: 'Rörelsen' })).toBeInViewport(
       { ratio: 1 },
     );
-    await technique.hover();
-    await page.mouse.wheel(0, 1000);
-    await expect(
-      technique.getByRole('heading', { name: 'Enklare variant' }),
-    ).toBeVisible();
+    // Instructions expand into the main reader, never a tiny nested scroller.
+    expect(
+      await page
+        .getByRole('region', { name: 'Inställningar och teknik' })
+        .evaluate((el) => el.scrollHeight <= el.clientHeight + 1),
+    ).toBe(true);
+    const easier = technique.getByRole('heading', { name: 'Enklare variant' });
+    await easier.scrollIntoViewIfNeeded();
+    await expect(easier).toBeInViewport({ ratio: 1 });
     await page.screenshot({
       path: test.info().outputPath('inline-technique.png'),
     });
@@ -67,11 +71,9 @@ for (const mode of [
     }, mode.fontScale);
     await page.getByText('Hur gör man?', { exact: true }).click();
     const technique = page.getByRole('region', { name: 'Teknik', exact: true });
-    await technique.hover();
-    await page.mouse.wheel(0, 1500);
-    await expect(
-      technique.getByRole('heading', { name: 'Enklare variant' }),
-    ).toBeVisible();
+    const easier = technique.getByRole('heading', { name: 'Enklare variant' });
+    await easier.scrollIntoViewIfNeeded();
+    await expect(easier).toBeInViewport({ ratio: 1 });
     expect(
       await page
         .locator('[data-step]')
@@ -118,7 +120,18 @@ for (const width of [360, 390, 1280]) {
     await start.click();
     await expect(page.getByRole('timer')).toHaveText('0:20');
     await expect(page.getByRole('timer')).toBeInViewport({ ratio: 1 });
-    await page.clock.fastForward(21_000);
+    await page.clock.fastForward(5_000);
+    await page
+      .getByRole('button', { name: 'Stoppa timer', exact: true })
+      .click();
+    await expect(page.getByRole('timer')).toHaveText('0:15');
+    await page.clock.fastForward(10_000);
+    await expect(page.getByRole('timer')).toHaveText('0:15');
+    await expect(frame).toHaveAttribute('data-step', step ?? '');
+    await page
+      .getByRole('button', { name: 'Fortsätt timer', exact: true })
+      .click();
+    await page.clock.fastForward(16_000);
     await expect(
       page.getByRole('status').filter({ hasText: 'Hålltiden är klar' }),
     ).toBeVisible();
