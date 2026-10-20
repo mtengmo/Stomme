@@ -21,6 +21,7 @@ import {
 import { MuscleMap } from '../../figures/MuscleMap';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
+import { ExerciseDifficulty } from './ExerciseDifficulty';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
@@ -237,6 +238,11 @@ export function ExerciseCardBody({
           </section>
 
           <div className="exercise-guide-notes flex min-w-0 flex-col gap-4">
+            <ExerciseDifficulty
+              exerciseId={exercise.id}
+              variantId={variant.id}
+              loadIndex={selectedLoadIndex}
+            />
             <section aria-label="Muskelgrupper" className="flex flex-col gap-1">
               <div>
                 <h3 className="m-0 inline text-base font-bold">

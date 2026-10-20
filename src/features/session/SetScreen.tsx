@@ -9,6 +9,7 @@ import { useTimedHold } from '../../lib/useTimedHold';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
+import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
@@ -297,6 +298,11 @@ export function SetScreen({
                 : ''}
             </p>
             <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
+            <ExerciseDifficulty
+              exerciseId={exercise.id}
+              variantId={variantId}
+              loadIndex={loadIndex}
+            />
             <ol className="m-0 list-decimal space-y-2 pl-6 text-base">
               {presentation.tips.map((tip) => (
                 <li key={tip}>{tip}</li>

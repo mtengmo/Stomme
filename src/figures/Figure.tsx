@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ExerciseId } from '../domain/types';
+import { hamstringCurlPose } from './additionalPoses';
 import { cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
@@ -16,6 +17,7 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 }
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
+  if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
   const spec = figures[exerciseId];
   if (!spec.middle) return lerpPose(spec.start, spec.end, t);
   return t < 0.5

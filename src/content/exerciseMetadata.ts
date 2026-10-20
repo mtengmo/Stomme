@@ -404,6 +404,50 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
 };
 
 const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
+  'half-squat': [
+    'basic',
+    'Två fötter i golvet och handstöd; sänk och res dig med kontroll.',
+  ],
+  'hamstring-curl': [
+    'basic',
+    'Handstödet hjälper balansen medan du böjer ett knä och håller låren stilla.',
+  ],
+  'single-leg-calf-raise': [
+    'practiced',
+    'Enbensbalans och en kontrollerad tåhävning, även med handstöd.',
+  ],
+  'seated-knee-extension': [
+    'basic',
+    'Stolen stödjer kroppen medan du sträcker ett knä.',
+  ],
+  'straight-leg-raise': [
+    'basic',
+    'Underarmarna stödjer kroppen; håll det lyfta knäet rakt.',
+  ],
+  'prone-leg-raise': [
+    'basic',
+    'Liggande med stöd från golvet; lyft benet utan att vrida bäckenet.',
+  ],
+  'side-lying-hip-abduction': [
+    'basic',
+    'Liggande med det undre benet som stöd; håll bäckenet stilla.',
+  ],
+  'side-lying-hip-adduction': [
+    'practiced',
+    'Placera det övre benet som stöd och lyft det undre utan att rulla kroppen.',
+  ],
+  'calf-stretch': [
+    'basic',
+    'Två fötter i golvet och händerna mot väggen ger stöd.',
+  ],
+  'quadriceps-stretch': [
+    'practiced',
+    'Balans på ett ben medan en hand håller fotleden och den andra tar stöd.',
+  ],
+  'hamstring-stretch': [
+    'basic',
+    'Liggande med golvstöd; händerna håller bakom låret.',
+  ],
   'single-leg-rdl': [
     'technical',
     'Balans på ett ben samtidigt som höften fälls.',

@@ -222,6 +222,22 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await page
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();
+  const curl = page
+    .getByRole('listitem')
+    .filter({ has: page.getByRole('link', { name: /E29.*Stående lårcurl/ }) });
+  await expect(curl).toContainText('Tekniknivå 1/3');
+  const calf = page
+    .getByRole('listitem')
+    .filter({ has: page.getByRole('link', { name: /E08.*Enbens tåhävning/ }) });
+  await expect(calf).toContainText('Tekniknivå 2/3');
+  await curl.screenshot({
+    path: test.info().outputPath('knee-curl-difficulty.png'),
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await curl.screenshot({
+    path: test.info().outputPath('knee-curl-difficulty-desktop.png'),
+  });
+  await page.setViewportSize({ width: 360, height: 800 });
   await expect(
     page.getByRole('button', { name: 'Lägg till E38', exact: true }),
   ).toBeDisabled();

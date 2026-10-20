@@ -7,6 +7,32 @@ import { FigureFrame, movementPose } from './Figure';
 import { figures } from './poses';
 
 describe('catalogue equipment and contacts', () => {
+  it('curls around a fixed knee without shrinking the shin or turning the toes upward', () => {
+    const start = movementPose('hamstring-curl', 0);
+    const distance = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+    for (const t of [0, 0.125, 0.25, 0.5, 0.75, 1]) {
+      const pose = movementPose('hamstring-curl', t);
+      expect(pose.kR).toEqual(start.kR);
+      expect(pose.hip).toEqual(start.hip);
+      expect(pose.aL).toEqual(start.aL);
+      expect(pose.hR).toEqual(start.hR);
+      expect(pose.hL).toEqual(start.hL);
+      expect(distance(pose.kR, pose.aR)).toBeCloseTo(
+        distance(start.kR, start.aR),
+        8,
+      );
+      expect(distance(pose.aR, pose.tR)).toBeCloseTo(
+        distance(start.aR, start.tR),
+        8,
+      );
+    }
+    const end = movementPose('hamstring-curl', 1);
+    expect(end.aR[0]).toBeLessThan(start.aR[0]);
+    expect(end.aR[1]).toBeLessThan(start.aR[1]);
+    expect(end.tR[1]).toBeGreaterThan(end.aR[1]);
+    expect(end).toEqual(figures['hamstring-curl'].end);
+  });
   it.each(exerciseList)(
     '$id renders both working sides and every supported implement count',
     (exercise) => {

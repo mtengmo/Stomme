@@ -205,6 +205,25 @@ const supportedStand = p(
     [99, 177],
   ],
 );
+
+/** Flex at a fixed knee; preserve shin/foot lengths throughout the arc. */
+export function hamstringCurlPose(progress: number): Pose {
+  const angle = Math.min(1, Math.max(0, progress)) * ((2 * Math.PI) / 3);
+  const knee = supportedStand.kR;
+  const rotate = ([x, y]: P): P => {
+    const dx = x - knee[0];
+    const dy = y - knee[1];
+    return [
+      knee[0] + dx * Math.cos(angle) - dy * Math.sin(angle),
+      knee[1] + dx * Math.sin(angle) + dy * Math.cos(angle),
+    ];
+  };
+  return {
+    ...supportedStand,
+    aR: rotate(supportedStand.aR),
+    tR: rotate(supportedStand.tR),
+  };
+}
 const prone = p(
   [37, 165],
   [51, 170],
@@ -527,8 +546,8 @@ export const additionalFigures = {
     props: wall,
   },
   'hamstring-curl': {
-    start: supportedStand,
-    end: { ...supportedStand, kR: [101, 148], aR: [72, 134], tR: [67, 126] },
+    start: hamstringCurlPose(0),
+    end: hamstringCurlPose(1),
     props: wall,
   },
   'seated-knee-extension': {

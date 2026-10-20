@@ -32,6 +32,7 @@ import { equipmentFits } from '../../rules/equipment';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
+import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { KneeCollection } from './KneeCollection';
 import { ReadyWorkout } from './ReadyWorkout';
 import { inputClass } from './TrainingHome';
@@ -399,6 +400,15 @@ function PreviewEditor({
                       >
                         {exercise.name}
                       </Link>
+                      {preferences.programId === 'rehab' &&
+                      preferences.rehabFocus === 'knee' ? (
+                        <ExerciseDifficulty
+                          exerciseId={exercise.id}
+                          variantId={item.variantId}
+                          loadIndex={item.loadIndex}
+                          explain
+                        />
+                      ) : null}
 
                       <p className="m-0 text-base text-ink-soft">
                         {item.explanation ??

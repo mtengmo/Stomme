@@ -16,6 +16,7 @@ import type {
 import { equipmentFits } from '../../rules/equipment';
 
 import { Button } from '../../ui/Button';
+import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
 export function KneeCollection({
   preferences,
@@ -47,6 +48,11 @@ export function KneeCollection({
       >
         Läs AAOS rekommendationer (engelska)
       </a>
+      <p className="m-0 text-base text-ink-soft">
+        Stommes tekniknivå beskriver kontroll och balans: 1 grundläggande, 2
+        viss vana, 3 teknikkrävande. Vikt, antal och dagsform påverkar hur
+        ansträngande övningen känns för dig.
+      </p>
       {(['strength', 'mobility'] as const).map((kind) => (
         <div key={kind}>
           <h3 className="m-0 text-2xl font-bold">
@@ -76,9 +82,12 @@ export function KneeCollection({
                       {exerciseReferences[ex.id]} · {ex.name}
                     </Link>
                     <p className="m-0 text-base">{ex.muscles.join(', ')}</p>
-                    <p className="m-0 text-base text-ink-soft">
-                      {meta.purposes.knee}
-                    </p>
+                    <ExerciseDifficulty
+                      exerciseId={ex.id}
+                      variantId={variant?.id}
+                      loadIndex={variant?.defaultLoadIndex}
+                      explain
+                    />
                     <p className="m-0 text-base text-ink-soft">
                       {variant
                         ? variant.equipment

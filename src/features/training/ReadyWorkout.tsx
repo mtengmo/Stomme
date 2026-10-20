@@ -3,6 +3,7 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
+import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
 export function ReadyWorkout({
   plan,
@@ -21,7 +22,8 @@ export function ReadyWorkout({
       {knee ? (
         <p className="m-0 text-base">
           Värm upp 5–10 minuter med promenad eller lugn cykling. Avbryt en
-          övning som gör ont.
+          övning som gör ont. Tekniknivån beskriver kontroll och balans. Vikt,
+          antal och dagsform påverkar hur ansträngande övningen känns.
         </p>
       ) : null}
       <ol className="m-0 list-none p-0">
@@ -51,6 +53,13 @@ export function ReadyWorkout({
               >
                 {exercise.name}
               </Link>
+              {knee ? (
+                <ExerciseDifficulty
+                  exerciseId={exercise.id}
+                  variantId={item.variantId}
+                  loadIndex={item.loadIndex}
+                />
+              ) : null}
               <p className="m-0 text-lg">
                 {item.sets} × {item.target} {unit}
                 {side}
