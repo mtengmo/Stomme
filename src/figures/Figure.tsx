@@ -59,6 +59,7 @@ export function FigureFrame({
   working = 'right',
   showMuscles = false,
   equipment,
+  viewBox = '14 20 164 168',
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
@@ -66,8 +67,10 @@ export function FigureFrame({
   working?: Working | null;
   showMuscles?: boolean;
   equipment?: Equipment;
+  viewBox?: string;
 }) {
   const spec = figures[exerciseId];
+  const rack = exerciseId === 'kettlebell-rack-carry' && equipment !== null;
   let p = pose;
   // With external load, hands carry it rather than resting on the support.
   if (
@@ -149,7 +152,7 @@ export function FigureFrame({
   const leg = (k: Pt, a: Pt, t: Pt) => line([p.hip, k, a, t]);
   return (
     <svg
-      viewBox="14 20 164 168"
+      viewBox={viewBox}
       role="img"
       aria-hidden="true"
       className="block h-auto w-full"
@@ -171,11 +174,28 @@ export function FigureFrame({
           <path d={line([p.neck, p.hip])} />
           <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
         </g>
+        {rack ? (
+          <g data-equipment="kettlebell" data-grip="rack">
+            <Held kind="kettlebell" at={p.hR} rack />
+          </g>
+        ) : null}
         <g data-body-side="near" stroke={accent} {...limb}>
           <path d={arm(p.eR, p.hR)} />
           <path d={leg(p.kR, p.aR, p.tR)} />
         </g>
-        {heldKind === 'band' ? (
+        {rack ? (
+          <g
+            data-rack-hand="true"
+            stroke={accent}
+            strokeWidth="2"
+            fill="var(--paper)"
+            transform={`rotate(${(Math.atan2(p.hR[0] - p.eR[0], p.eR[1] - p.hR[1]) * 180) / Math.PI} ${p.hR[0]} ${p.hR[1]})`}
+          >
+            <rect x={p.hR[0] - 3} y={p.hR[1] - 4} width="6" height="8" rx="2" />
+            <path d={`M${p.hR[0] - 3} ${p.hR[1]}h4`} />
+          </g>
+        ) : null}
+        {rack ? null : heldKind === 'band' ? (
           <path
             data-equipment="band"
             d={`M${p.hR.join(' ')}L${p.aR[0] + 2} ${p.aR[1] - 2}L${p.hL.join(' ')}`}

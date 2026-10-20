@@ -291,8 +291,8 @@ export const additionalFigures = {
   'kettlebell-rack-carry': {
     start: {
       ...stand,
-      eR: [115, 102],
-      hR: [111, 78],
+      eR: [105, 103],
+      hR: [108, 78],
       kR: [111, 149],
       aR: [120, 174],
       tR: [132, 177],
@@ -302,8 +302,8 @@ export const additionalFigures = {
     },
     end: {
       ...stand,
-      eR: [115, 102],
-      hR: [111, 78],
+      eR: [105, 103],
+      hR: [108, 78],
       kR: [88, 148],
       aR: [79, 174],
       tR: [91, 177],

@@ -16,6 +16,7 @@ import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { ExerciseDifficulty } from './ExerciseDifficulty';
 import { ExerciseMuscles } from './ExerciseMuscles';
+import { KettlebellRackGrip } from './KettlebellRackGrip';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
@@ -219,6 +220,9 @@ export function ExerciseCardBody({
               </h2>
               {!presentation.tips.includes(presentation.cue) ? (
                 <p className="my-2 text-base font-bold">{presentation.cue}</p>
+              ) : null}
+              {exercise.id === 'kettlebell-rack-carry' ? (
+                <KettlebellRackGrip side={workingSide} />
               ) : null}
               <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
                 {presentation.tips.map((tip) => (

@@ -10,6 +10,7 @@ import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { ExerciseMuscles } from '../exercise/ExerciseMuscles';
+import { KettlebellRackGrip } from '../exercise/KettlebellRackGrip';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
@@ -304,6 +305,11 @@ export function SetScreen({
               variantId={variantId}
               loadIndex={loadIndex}
             />
+            {exercise.id === 'kettlebell-rack-carry' ? (
+              <KettlebellRackGrip
+                side={step.side === 'left' ? 'left' : 'right'}
+              />
+            ) : null}
             <ol className="m-0 list-decimal space-y-2 pl-6 text-base">
               {presentation.tips.map((tip) => (
                 <li key={tip}>{tip}</li>

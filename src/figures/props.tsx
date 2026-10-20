@@ -57,10 +57,12 @@ export function Held({
   kind,
   at,
   vertical = false,
+  rack = false,
 }: {
   kind: 'dumbbell' | 'kettlebell';
   at: readonly [number, number];
   vertical?: boolean;
+  rack?: boolean;
 }) {
   const [x, y] = at;
   if (kind === 'dumbbell') {
@@ -78,9 +80,19 @@ export function Held({
     );
   }
   return (
-    <g {...PROP} stroke="var(--equipment)" strokeWidth={4}>
+    <g
+      {...PROP}
+      stroke="var(--equipment)"
+      strokeWidth={4}
+      transform={rack ? `rotate(-55 ${x} ${y})` : undefined}
+    >
       <path d={`M${x - 5} ${y + 2}A5 6 0 0 1 ${x + 5} ${y + 2}`} />
-      <circle cx={x} cy={y + 12} r="9" fill="var(--paper)" />
+      <circle
+        cx={x}
+        cy={y + 12}
+        r="9"
+        fill={rack ? 'var(--equipment)' : 'var(--paper)'}
+      />
     </g>
   );
 }

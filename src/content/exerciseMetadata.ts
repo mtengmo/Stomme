@@ -432,7 +432,7 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'kettlebell',
       1,
       [0, 1, 2],
-      'En kettlebell vid den valda sidans axel, med armbågen nära kroppen.',
+      'Greppa handtaget med en hand vid övre bröstet. Kulan vilar mot underarmens utsida; armbågen är nära revbenen.',
     ],
   ],
 };

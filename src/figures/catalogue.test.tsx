@@ -41,6 +41,29 @@ describe('catalogue equipment and contacts', () => {
     }
   });
 
+  it('supports the rack bell outside the forearm and draws the grip above it', () => {
+    for (const working of ['right', 'left'] as const) {
+      for (const t of [0, 0.5, 1]) {
+        const markup = renderToStaticMarkup(
+          <FigureFrame
+            exerciseId="kettlebell-rack-carry"
+            pose={movementPose('kettlebell-rack-carry', t)}
+            equipment="kettlebell"
+            working={working}
+          />,
+        );
+        expect(markup).toContain('data-grip="rack"');
+        expect(markup).toContain('rotate(-55 108 78)');
+        expect(markup.indexOf('data-grip="rack"')).toBeLessThan(
+          markup.indexOf('data-body-side="near"'),
+        );
+        expect(markup.indexOf('data-rack-hand="true"')).toBeGreaterThan(
+          markup.indexOf('data-body-side="near"'),
+        );
+        expect(markup.match(/data-equipment="kettlebell"/g)).toHaveLength(1);
+      }
+    }
+  });
   it('keeps the kettlebell Romanian deadlift above the floor at the bottom', () => {
     const markup = renderToStaticMarkup(
       <FigureFrame

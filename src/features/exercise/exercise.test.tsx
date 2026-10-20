@@ -19,6 +19,26 @@ beforeEach(async () => {
 afterEach(() => cleanup());
 
 describe('ExerciseCardBody', () => {
+  it('explains the rack grip with a close-up that follows the selected side', async () => {
+    const user = userEvent.setup();
+    render(<ExerciseCardBody exercise={exercises['kettlebell-rack-carry']} />);
+    expect(
+      screen.getByRole('figure', {
+        name: 'Kettlebellgrepp vid axeln, höger sida',
+      }),
+    ).toBeTruthy();
+    expect(screen.getByText('Handen runt handtaget.')).toBeTruthy();
+    expect(screen.getByText('Kulan mot underarmen.')).toBeTruthy();
+    await user.click(
+      screen.getByRole('button', { name: /Höger sida · Byt sida/ }),
+    );
+    expect(
+      screen.getByRole('figure', {
+        name: 'Kettlebellgrepp vid axeln, vänster sida',
+      }),
+    ).toBeTruthy();
+  });
+
   it('shows movement, muscles, and all instructions in one reader', () => {
     const ex = exercises['dead-bug'];
     render(<ExerciseCardBody exercise={ex} />);

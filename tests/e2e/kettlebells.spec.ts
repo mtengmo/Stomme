@@ -28,11 +28,11 @@ for (const width of [360, 1280]) {
         .selectOption(load);
       for (let sample = 0; sample < 3; sample++) {
         await page.clock.runFor(500);
-        await expect(page.locator('[data-equipment="kettlebell"]')).toHaveCount(
-          1,
-        );
         await expect(
-          page.locator('[data-equipment="kettlebell"] circle'),
+          page.locator('.exercise-stage [data-equipment="kettlebell"]'),
+        ).toHaveCount(1);
+        await expect(
+          page.locator('.exercise-stage [data-equipment="kettlebell"] circle'),
         ).toHaveCount(1);
       }
       if (reference !== 'E14') {
@@ -40,7 +40,7 @@ for (const width of [360, 1280]) {
           .getByRole('button', { name: /Höger sida · Byt sida/ })
           .click();
         await expect(
-          page.locator('svg text').filter({ hasText: /^V$/ }),
+          page.locator('.exercise-stage svg text').filter({ hasText: /^V$/ }),
         ).toHaveCount(1);
       }
       await page.screenshot({
@@ -94,7 +94,7 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   await page.reload();
   await expect(page.getByText(/16 kg totalt/).first()).toBeVisible();
   await expect(
-    page.locator('[data-equipment="kettlebell"] circle'),
+    page.locator('.session-movement [data-equipment="kettlebell"] circle'),
   ).toHaveCount(1);
   await page.getByRole('button', { name: 'Klar set', exact: true }).click();
   await expect(page.getByText('Vänster sida', { exact: true })).toBeVisible();

@@ -467,11 +467,11 @@ export const additionalExercises: Exercise[] = [
     'Gång med kettlebell vid axeln',
     ['Bål', 'Axlar', 'Rygg'],
     [
-      'Ta upp kettlebellen med båda händerna och placera den i vald hand vid axeln. Håll handleden rak och armbågen nära kroppen; vikten vilar mot underarmen.',
+      'Hjälp till med båda händerna när du tar upp vikten. Greppa handtaget med vald hand nära övre delen av bröstet. Låt kulan vila mot underarmens utsida, håll handleden i linje med underarmen och armbågen nedåt nära revbenen.',
       'Gå med korta, lugna steg och upprätt överkropp. Håll vikten stilla vid axeln och andas under hela sträckan.',
       'Räkna hela sträckan, även efter en lugn vändning. Stanna, ta hjälp av fria handen och sätt ned vikten kontrollerat. Gå angiven sträcka på varje vald sida.',
     ],
-    'Du lutar åt sidan, svankar eller håller andan.',
+    'Kulan hänger framför handen, handleden viks bakåt eller armbågen pekar ut åt sidan. Du lutar eller håller andan.',
     'Välj en lättare kettlebell eller kortare sträcka. Öva först att hålla vikten stilla vid axeln.',
     [
       single(4, 'kettlebell'),
