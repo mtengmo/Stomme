@@ -1,0 +1,19 @@
+# Code owners are requested automatically as reviewers on pull requests that touch these paths.
+# With the branch ruleset "Require review from Code Owners" turned on, their approval is required.
+
+# Default: the maintainer reviews everything.
+*                                   @mtengmo
+
+# Safety-critical: pain and progression rules, health wording, exercise guidance.
+/src/rules/                         @mtengmo
+/src/content/                       @mtengmo
+/src/features/pain/                 @mtengmo
+/src/features/onboarding/           @mtengmo
+/src/features/settings/             @mtengmo
+
+# Release pipeline and repository settings files.
+/.github/                           @mtengmo
+/vite.config.ts                     @mtengmo
+/index.html                         @mtengmo
+/package.json                       @mtengmo
+/package-lock.json                  @mtengmo
