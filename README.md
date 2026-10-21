@@ -85,3 +85,15 @@ The general knee option now starts with six equipment-compatible exercises and e
 New users choose **Bli starkare**, **Styrka för löpning** or **Träna knäna**, confirm the equipment they want to use, and receive a compact workout. No equipment is preselected; bodyweight is the fallback. Counts appear only when weights are selected. Experience, extra equipment and working side are under **Fler inställningar**. Custom rehab remains available through **Jag har ett eget rehabprogram**.
 
 **Anpassa passet** opens the full exercise editor; the default view shows exercise names, amounts, equipment and working sides with one **Börja passet** action. Readiness and symptom questions still precede exercise. Returning users see the next A/B session (based on completed sessions in their programme) or resume their active workout. Profile changes are under **Ändra**. Existing legacy sessions keep the original week view.
+
+## License
+
+Stomme is free software under the [GNU Affero General Public License v3.0 or later](LICENSE)
+(AGPL-3.0-or-later). Copyright (C) 2026 mtengmo and Stomme contributors.
+
+You may use, study, change and share it, including commercially. If you run a modified version
+as a service for others, you must make your modified source code available under the same
+license. There is no warranty, and the app is not medical advice.
+
+Exercise descriptions and technique guidance that are derived from third-party sources keep
+their own attribution and terms; see [the source review](docs/exercise-source-review.md).

@@ -52,6 +52,10 @@ Run `npm run check`, `npm test` and `npm run build` before you push. CI runs the
 - Add or update tests for logic changes. The rules in `src/rules/` keep 100% branch coverage.
 - Do not commit personal data: no exported backups, real training logs or private screenshots.
 
+## Licensing of contributions
+
+Stomme is licensed under AGPL-3.0-or-later. By opening a pull request you agree that your contribution is licensed under the same terms, and that you have the right to contribute it (it is your own work, or its source allows this). Do not copy text, images or code from sources whose terms are incompatible, and always cite the source for exercise content.
+
 ## Reviews
 
 The maintainer reviews all pull requests. Safety-relevant changes may take longer and may be sent to a physiotherapist for a look before merging.
