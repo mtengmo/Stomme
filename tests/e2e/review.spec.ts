@@ -27,12 +27,12 @@ for (const mode of [
       page.getByRole('heading', { name: 'Granska övningar', exact: true }),
     ).toBeVisible();
     const codes = Array.from(
-      { length: 40 },
+      { length: 48 },
       (_, i) => `E${String(i + 1).padStart(2, '0')}`,
     );
     if (mode.viewport.width < 1024) {
       const picker = page.getByLabel('Välj övning att granska');
-      await expect(picker.getByRole('option')).toHaveCount(40);
+      await expect(picker.getByRole('option')).toHaveCount(48);
       for (const code of codes)
         await expect(
           picker.getByRole('option', { name: new RegExp(`^${code} · `) }),
@@ -53,7 +53,7 @@ for (const mode of [
       page.getByRole('heading', { name: /^E03 · Enbens rumänskt marklyft$/ }),
     ).toBeVisible();
     const poses = page.getByRole('region', { name: 'Rörelsen' });
-    await expect(poses.locator('svg')).toHaveCount(1);
+    await expect(poses.locator('.exercise-stage svg')).toHaveCount(1);
     await expect(
       page.getByRole('heading', { name: 'Så gör du' }),
     ).toBeVisible();

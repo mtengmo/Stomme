@@ -67,7 +67,9 @@ export function SetScreen({
       presentation.equipment === 'kettlebell'
         ? weightKg <= 0
         : weightKg !== 0));
+  const movingTimed = exercise.id === 'heel-slide';
   const hold = useTimedHold({
+    moving: movingTimed,
     seconds: amount,
     side,
     autoStart: unit === 'seconds' && autoStartTimer,
@@ -148,7 +150,7 @@ export function SetScreen({
       </div>
       {unit === 'seconds' ? (
         <section
-          aria-label="Hålltid"
+          aria-label={movingTimed ? 'Övningstid' : 'Hålltid'}
           className="rounded-md bg-blue px-3 py-2 text-paper"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -158,12 +160,14 @@ export function SetScreen({
                   ? 'Gör dig redo'
                   : hold.phase === 'paused'
                     ? 'Pausad'
-                    : 'Hålltid'}
+                    : movingTimed
+                      ? 'Övningstid'
+                      : 'Hålltid'}
                 {side ? ` · ${side}` : ''}
               </p>
               <p
                 role="timer"
-                aria-label={`${remaining} sekunder ${hold.phase === 'prepare' ? 'förberedelse ' : hold.phase === 'paused' ? '' : 'hålltid '}kvar`}
+                aria-label={`${remaining} sekunder ${hold.phase === 'prepare' ? 'förberedelse ' : hold.phase === 'paused' ? '' : movingTimed ? 'övningstid ' : 'hålltid '}kvar`}
                 className="count m-0 text-[clamp(4.5rem,24vw,6rem)] leading-none"
               >
                 {formatClock(remaining)}
@@ -172,11 +176,15 @@ export function SetScreen({
           </div>
           <p role="status" className="m-0 text-base font-bold">
             {hold.phase === 'done'
-              ? 'Hålltiden är klar. Släpp positionen. Setet sparas automatiskt.'
+              ? movingTimed
+                ? 'Övningstiden är klar. Setet sparas automatiskt.'
+                : 'Hålltiden är klar. Släpp positionen. Setet sparas automatiskt.'
               : hold.phase === 'hold'
-                ? 'Håll tills signalen. Setet sparas och nästa steg börjar automatiskt.'
+                ? movingTimed
+                  ? 'Växla ben lugnt tills signalen. Tiden gäller båda benen tillsammans. Setet sparas automatiskt.'
+                  : 'Håll tills signalen. Setet sparas och nästa steg börjar automatiskt.'
                 : hold.phase === 'prepare'
-                  ? `Ta position${side ? ` · ${side}` : ''}. Hålltiden börjar automatiskt.`
+                  ? `Ta position${side ? ` · ${side}` : ''}. ${movingTimed ? 'Övningstiden' : 'Hålltiden'} börjar automatiskt.`
                   : hold.phase === 'paused'
                     ? 'Timern är pausad. Fortsätt när du är redo.'
                     : '5 s förberedelse. Sedan automatiska sidbyten och vila. Ljud om möjligt.'}
@@ -323,7 +331,9 @@ export function SetScreen({
               {unit === 'reps'
                 ? 'Animationen visar tekniken. Räkna repetitionerna själv och tryck Klar set när du är klar.'
                 : unit === 'seconds'
-                  ? 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
+                  ? movingTimed
+                    ? 'Starta och gör dig redo under 5 sekunder. Växla ben lugnt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.'
+                    : 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
                   : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>
             {['step-up', 'split-squat'].includes(exercise.id) ? (

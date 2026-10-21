@@ -220,9 +220,11 @@ describe('catalogue equipment and contacts', () => {
     expect(figures['side-lying-hip-adduction'].end.aR[1]).toBeLessThan(
       figures['side-lying-hip-adduction'].start.aR[1],
     );
-    expect(movementPose('reverse-lunge', 0.5)).toEqual(
-      figures['reverse-lunge'].middle,
-    );
+    const lungeMiddle = movementPose('reverse-lunge', 0.5);
+    const authoredLungeMiddle = figures['reverse-lunge'].middle;
+    expect(lungeMiddle.hip).toEqual(authoredLungeMiddle?.hip);
+    expect(lungeMiddle.aR).toEqual(authoredLungeMiddle?.aR);
+    expect(lungeMiddle.aL).toEqual(authoredLungeMiddle?.aL);
     expect(figures['reverse-lunge'].start.aR).toEqual(
       figures['reverse-lunge'].end.aR,
     );

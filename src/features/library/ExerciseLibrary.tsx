@@ -22,6 +22,7 @@ import {
 } from '../../content/programmes';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
+import { readFavourites } from '../../db/favourites';
 import { getMeta } from '../../db/repo';
 import type { Exercise } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
@@ -31,6 +32,10 @@ import {
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
+import {
+  FavouriteButton,
+  FavouritesProvider,
+} from '../exercise/FavouriteButton';
 import { ExerciseChoice, WorkoutBuilder } from './WorkoutBuilder';
 
 function equipment(exercise: Exercise): string {
@@ -57,8 +62,12 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
           <Icon name="back" className="shrink-0 rotate-180" />
         </Link>
         <p className="m-0 mt-2 text-base">
-          {exerciseReferences[exercise.id]} · Tränar främst:{' '}
-          {primaryMuscleLabel(exercise.id)}
+          {exerciseReferences[exercise.id]} ·{' '}
+          {primaryMuscleLabel(exercise.id) ? (
+            <>Tränar främst: {primaryMuscleLabel(exercise.id)}</>
+          ) : (
+            'Rörlighet och position'
+          )}
         </p>
         <p className="m-0 mt-1 text-base text-ink-soft">
           Utrustning: {equipment(exercise)}
@@ -77,6 +86,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
             ? 'Rörlighet'
             : 'Styrka'}
         </p>
+        <FavouriteButton id={exercise.id} />
         {exercise.optional ? (
           <p className="m-0 mt-2 text-base font-bold">Valfri övning</p>
         ) : null}
@@ -124,6 +134,8 @@ export function ExerciseLibrary() {
   const selected = parseMuscleFilter(search);
   const query = new URLSearchParams(search);
   const training = useLiveQuery(() => getMeta(getDb(), 'training'), []);
+  const favourites = useLiveQuery(() => readFavourites(getDb()), []);
+  const favouritesOnly = query.get('favoriter') === '1';
   const preferences = isTrainingPreferences(training) ? training : undefined;
   const filters: LibraryFilters = {
     aaos: query.get('kalla') === 'aaos',
@@ -173,8 +185,10 @@ export function ExerciseLibrary() {
             template.items.map((item) => item.exerciseId),
           )),
   );
-  const eligible = exerciseList.filter((exercise) =>
-    matchesLibraryFilters(exercise, filters, inventory, mine),
+  const eligible = exerciseList.filter(
+    (exercise) =>
+      (!favouritesOnly || favourites?.includes(exercise.id)) &&
+      matchesLibraryFilters(exercise, filters, inventory, mine),
   );
   const changeFilter = (name: string, value: string) => {
     const next = new URLSearchParams(search);
@@ -207,148 +221,163 @@ export function ExerciseLibrary() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-28">
-      <Link
-        href="/"
-        className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
-      >
-        <Icon name="back" />
-        Till träningen
-      </Link>
-      <header>
-        <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
-        <p className="m-0 mt-3 text-xl">Vad vill du träna?</p>
-        <p className="m-0 mt-2 text-base text-ink-soft">
-          Hela kroppen, knäfokus och löpstyrka. Välj efter syfte, muskler och
-          utrustning.
-        </p>
-      </header>
-      <Link
-        href="/ovningar?syfte=knee&kalla=aaos"
-        className="flex min-h-12 items-center self-start text-base font-bold underline"
-      >
-        AAOS knäövningar · källbaserad samling
-      </Link>
-      <Link
-        href="/granska"
-        className="flex min-h-12 items-center self-start text-base font-bold underline decoration-2 underline-offset-4"
-      >
-        Granska alla övningar
-      </Link>
-      <label className="flex flex-col gap-2 text-lg font-bold">
-        Träningssyfte
-        <select
-          value={filters.purpose}
-          onChange={(event) => changeFilter('syfte', event.target.value)}
-          className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+    <FavouritesProvider>
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-28">
+        <Link
+          href="/"
+          className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
         >
-          <option value="">Alla syften</option>
-          {Object.entries(purposeLabels).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-          <option value="mine">Mitt program</option>
-        </select>
-      </label>
-      <label className="flex flex-col gap-2 text-lg font-bold">
-        Sök efter namn eller nummer
-        <input
-          type="search"
-          value={filters.term}
-          onChange={(event) => changeFilter('sok', event.target.value)}
-          className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
-        />
-      </label>
-      <details>
-        <summary className="flex min-h-12 cursor-pointer items-center text-lg font-bold underline">
-          Fler filter{filters.equipment || filters.level ? ' · aktiva' : ''}
-        </summary>
-        <div className="flex flex-col gap-3 py-3">
-          <label className="flex flex-col gap-2 text-base font-bold">
-            Utrustning
-            <select
-              value={filters.equipment}
-              onChange={(event) => changeFilter('redskap', event.target.value)}
-              className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
-            >
-              <option value="">Alla redskap</option>
-              <option value="available">Min tillgängliga utrustning</option>
-              {Object.entries(equipmentLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-2 text-base font-bold">
-            Teknisk svårighetsgrad
-            <select
-              value={filters.level}
-              onChange={(event) => changeFilter('niva', event.target.value)}
-              className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
-            >
-              <option value="">Alla nivåer</option>
-              {Object.entries(technicalLevelLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </details>
-      {search ? (
-        <button
-          type="button"
-          onClick={() => navigate('/ovningar')}
-          className="min-h-12 self-start text-base font-bold underline"
+          <Icon name="back" />
+          Till träningen
+        </Link>
+        <header>
+          <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
+          <p className="m-0 mt-3 text-xl">Vad vill du träna?</p>
+          <p className="m-0 mt-2 text-base text-ink-soft">
+            Hela kroppen, knäfokus och löpstyrka. Välj efter syfte, muskler och
+            utrustning.
+          </p>
+        </header>
+        <Link
+          href="/ovningar?syfte=knee&kalla=aaos"
+          className="flex min-h-12 items-center self-start text-base font-bold underline"
         >
-          Rensa alla filter
-        </button>
-      ) : null}
-      <fieldset
-        className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0"
-        aria-label="Filtrera på muskelgrupp"
-      >
-        {muscleFilters.map((group) => {
-          const active = group === selected;
-          return (
-            <button
-              key={group ?? 'all'}
-              type="button"
-              aria-pressed={active}
-              onClick={() => changeFilter('muskel', group ?? '')}
-              className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-paper px-3 py-2 text-base font-bold ${active ? 'border-blue text-blue' : 'border-edge text-ink'}`}
-            >
-              {active ? <Icon name="check" size={18} /> : null}
-              {group ? muscleGroups[group].label : 'Alla'}
-            </button>
-          );
-        })}
-      </fieldset>
-      <p role="status" className="m-0 text-base text-ink-soft">
-        {count} {count === 1 ? 'övning' : 'övningar'}
-        {selected ? ` för ${muscleGroups[selected].label.toLowerCase()}` : ''}
-      </p>
-      {count === 0 ? (
-        <p className="m-0 text-xl">
-          Inga övningar matchar dina filter. Rensa filtren eller välj andra
-          alternativ.
+          AAOS knäövningar · källbaserad samling
+        </Link>
+        <Link
+          href="/granska"
+          className="flex min-h-12 items-center self-start text-base font-bold underline decoration-2 underline-offset-4"
+        >
+          Granska alla övningar
+        </Link>
+        <label className="flex flex-col gap-2 text-lg font-bold">
+          Träningssyfte
+          <select
+            value={filters.purpose}
+            onChange={(event) => changeFilter('syfte', event.target.value)}
+            className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+          >
+            <option value="">Alla syften</option>
+            {Object.entries(purposeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+            <option value="mine">Mitt program</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-2 text-lg font-bold">
+          Sök efter namn eller nummer
+          <input
+            type="search"
+            value={filters.term}
+            onChange={(event) => changeFilter('sok', event.target.value)}
+            className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+          />
+        </label>
+        <label className="flex min-h-12 items-center gap-3 text-base font-bold">
+          <input
+            type="checkbox"
+            checked={favouritesOnly}
+            onChange={(event) =>
+              changeFilter('favoriter', event.target.checked ? '1' : '')
+            }
+            className="h-6 w-6"
+          />
+          Bara mina favoriter
+        </label>
+        <details>
+          <summary className="flex min-h-12 cursor-pointer items-center text-lg font-bold underline">
+            Fler filter{filters.equipment || filters.level ? ' · aktiva' : ''}
+          </summary>
+          <div className="flex flex-col gap-3 py-3">
+            <label className="flex flex-col gap-2 text-base font-bold">
+              Utrustning
+              <select
+                value={filters.equipment}
+                onChange={(event) =>
+                  changeFilter('redskap', event.target.value)
+                }
+                className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+              >
+                <option value="">Alla redskap</option>
+                <option value="available">Min tillgängliga utrustning</option>
+                {Object.entries(equipmentLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-2 text-base font-bold">
+              Teknisk svårighetsgrad
+              <select
+                value={filters.level}
+                onChange={(event) => changeFilter('niva', event.target.value)}
+                className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+              >
+                <option value="">Alla nivåer</option>
+                {Object.entries(technicalLevelLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </details>
+        {search ? (
+          <button
+            type="button"
+            onClick={() => navigate('/ovningar')}
+            className="min-h-12 self-start text-base font-bold underline"
+          >
+            Rensa alla filter
+          </button>
+        ) : null}
+        <fieldset
+          className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0"
+          aria-label="Filtrera på muskelgrupp"
+        >
+          {muscleFilters.map((group) => {
+            const active = group === selected;
+            return (
+              <button
+                key={group ?? 'all'}
+                type="button"
+                aria-pressed={active}
+                onClick={() => changeFilter('muskel', group ?? '')}
+                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-paper px-3 py-2 text-base font-bold ${active ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+              >
+                {active ? <Icon name="check" size={18} /> : null}
+                {group ? muscleGroups[group].label : 'Alla'}
+              </button>
+            );
+          })}
+        </fieldset>
+        <p role="status" className="m-0 text-base text-ink-soft">
+          {count} {count === 1 ? 'övning' : 'övningar'}
+          {selected ? ` för ${muscleGroups[selected].label.toLowerCase()}` : ''}
         </p>
-      ) : null}
-      <WorkoutBuilder>
-        <ResultList
-          title={selected ? 'Tränar främst' : 'Alla övningar'}
-          items={primary}
-          id="primary-results"
-        />
-        <ResultList
-          title="Hjälper till"
-          items={secondary}
-          id="secondary-results"
-        />
-      </WorkoutBuilder>
-    </div>
+        {count === 0 ? (
+          <p className="m-0 text-xl">
+            Inga övningar matchar dina filter. Rensa filtren eller välj andra
+            alternativ.
+          </p>
+        ) : null}
+        <WorkoutBuilder>
+          <ResultList
+            title={selected ? 'Tränar främst' : 'Alla övningar'}
+            items={primary}
+            id="primary-results"
+          />
+          <ResultList
+            title="Hjälper till"
+            items={secondary}
+            id="secondary-results"
+          />
+        </WorkoutBuilder>
+      </div>
+    </FavouritesProvider>
   );
 }

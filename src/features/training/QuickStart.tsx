@@ -121,7 +121,9 @@ export function QuickStart() {
                               family(type, event.target.value as '1' | '2')
                             }
                           >
-                            <option value="1">En</option>
+                            <option value="1" translate="no">
+                              1
+                            </option>
                             <option value="2">Två</option>
                           </select>
                         </label>

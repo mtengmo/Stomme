@@ -1,5 +1,7 @@
 import type { Exercise, ExerciseId, Load } from '../domain/types';
 import { additionalExercises } from './additionalExercises';
+import { preferredExerciseNames } from './exerciseAliases';
+import { rehabAdditions } from './rehabAdditions';
 
 const BW: Load = { kg: 0, label: 'Kroppsvikt' };
 const L = (kg: number, label: string): Load => ({ kg, label });
@@ -239,7 +241,11 @@ const list: Exercise[] = [
 export const exerciseList: readonly Exercise[] = [
   ...list,
   ...additionalExercises,
-];
+  ...rehabAdditions,
+].map((exercise) => ({
+  ...exercise,
+  name: preferredExerciseNames[exercise.id] ?? exercise.name,
+}));
 
 export const exercises = Object.fromEntries(
   exerciseList.map((e) => [e.id, e]),

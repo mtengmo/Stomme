@@ -1,11 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-
 import { type SetStateAction, useEffect, useState } from 'react';
-
 import { Link, useLocation } from 'wouter';
-
 import { exerciseMetadata } from '../../content/exerciseMetadata';
-
 import { exerciseList, exercises } from '../../content/exercises';
 import {
   kneeConditioningPlan,
@@ -22,6 +18,7 @@ import {
   readCustomWorkouts,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { readFavourites } from '../../db/favourites';
 import { getMeta, listSessions } from '../../db/repo';
 import {
   canReplaceTrainingPreparation,
@@ -39,6 +36,7 @@ import type {
 } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
+import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
@@ -168,6 +166,7 @@ function PreviewEditor({
   preparationId?: string;
 }) {
   const [, navigate] = useLocation();
+  const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
   const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
 
@@ -372,6 +371,69 @@ function PreviewEditor({
               </p>
 
               {preferences.programId === 'rehab' &&
+              preferences.rehabFocus !== 'knee' &&
+              !customWorkout ? (
+                <section
+                  className="flex flex-col gap-2 border-y-2 border-edge py-3"
+                  aria-label="Eget ländryggspass"
+                >
+                  <h2 className="m-0 text-2xl font-bold">
+                    Ländrygg – personligt rehabprogram
+                  </h2>
+                  <p className="m-0 text-base">
+                    Höftböjarstretch, magliggande på underarmar och hälglidning.
+                    Använd samlingen om rörelserna ingår i ditt överenskomna
+                    program. Du fyller själv i doseringen före start.
+                  </p>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="min-h-12 self-start text-base font-bold underline"
+                    onClick={async () => {
+                      setBusy(true);
+                      setError('');
+                      try {
+                        const workoutId = crypto.randomUUID();
+                        await getDb().transaction(
+                          'rw',
+                          getDb().meta,
+                          async () => {
+                            const current = readCustomWorkouts(
+                              await getMeta(getDb(), 'customWorkouts'),
+                            );
+                            if (current.length >= 30)
+                              throw new Error('Du har redan 30 egna pass.');
+                            await getDb().meta.put({
+                              key: 'customWorkouts',
+                              value: [
+                                ...current,
+                                {
+                                  id: workoutId,
+                                  name: 'Ländrygg – personligt rehabprogram',
+                                  exerciseIds: [
+                                    'kneeling-hip-flexor-stretch',
+                                    'prone-on-forearms',
+                                    'heel-slide',
+                                  ],
+                                },
+                              ],
+                            });
+                          },
+                        );
+                        navigate(`/traning/${id}?workout=${workoutId}`);
+                      } catch {
+                        setError('Kunde inte skapa passet. Försök igen.');
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    Skapa eget ländryggspass
+                  </button>
+                </section>
+              ) : null}
+
+              {preferences.programId === 'rehab' &&
               preferences.rehabFocus === 'knee' ? (
                 <section
                   aria-label="Färdigt knäpass"
@@ -473,6 +535,61 @@ function PreviewEditor({
                       >
                         {exercise.name}
                       </Link>
+                      {favouriteAlternatives(
+                        exercise.id,
+                        favourites ?? [],
+                        plan.map((entry) => entry.exerciseId),
+                        preferences,
+                      ).length > 0 ? (
+                        <label className="flex flex-col gap-1 text-base font-bold">
+                          Byt till en favorit med liknande rörelse
+                          <select
+                            className={inputClass}
+                            value=""
+                            onChange={(event) => {
+                              const replacement = event.target
+                                .value as ExerciseId;
+                              if (
+                                !favouriteAlternatives(
+                                  exercise.id,
+                                  favourites ?? [],
+                                  plan.map((entry) => entry.exerciseId),
+                                  preferences,
+                                ).includes(replacement)
+                              )
+                                return;
+                              const suggested = trainingPlanSuggestion(
+                                basePlan(replacement, preferences),
+                                preferences,
+                                sessions,
+                                logs,
+                              );
+                              updatePlan((current) =>
+                                current.map((entry, n) =>
+                                  n === index
+                                    ? {
+                                        ...suggested,
+                                        explanation: `En av dina favoriter. ${suggested.explanation ?? ''}`,
+                                      }
+                                    : entry,
+                                ),
+                              );
+                            }}
+                          >
+                            <option value="">Behåll {exercise.name}</option>
+                            {favouriteAlternatives(
+                              exercise.id,
+                              favourites ?? [],
+                              plan.map((entry) => entry.exerciseId),
+                              preferences,
+                            ).map((candidate) => (
+                              <option key={candidate} value={candidate}>
+                                {exercises[candidate].name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      ) : null}
                       {preferences.programId === 'rehab' &&
                       preferences.rehabFocus === 'knee' ? (
                         <ExerciseDifficulty

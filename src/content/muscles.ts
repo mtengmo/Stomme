@@ -13,7 +13,8 @@ export type MuscleGroupId =
   | 'biceps'
   | 'triceps'
   | 'forearms'
-  | 'hip-adductors';
+  | 'hip-adductors'
+  | 'hip-flexors';
 
 export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
   quads: { label: 'Framsida lår' },
@@ -29,6 +30,7 @@ export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
   triceps: { label: 'Triceps' },
   forearms: { label: 'Underarmar' },
   'hip-adductors': { label: 'Insida lår' },
+  'hip-flexors': { label: 'Höftböjare' },
 };
 
 export const trainingQualities = {
@@ -217,6 +219,38 @@ export const exerciseMuscles: Record<
     primary: ['core'],
     secondary: ['shoulders', 'back', 'forearms'],
     qualities: ['grip'],
+  },
+  'rear-foot-split-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core'],
+    qualities: ['balance'],
+  },
+  'bench-side-plank-leg-lift': {
+    primary: ['hip-adductors'],
+    secondary: ['core', 'shoulders'],
+    qualities: [],
+  },
+  'kneeling-hip-flexor-stretch': {
+    primary: ['hip-flexors'],
+    secondary: [],
+    qualities: [],
+  },
+  'prone-on-forearms': { primary: [], secondary: [], qualities: [] },
+  'heel-slide': { primary: ['core'], secondary: ['quads'], qualities: [] },
+  'balance-pendulum': {
+    primary: ['glutes', 'hamstrings'],
+    secondary: ['core'],
+    qualities: ['balance'],
+  },
+  'single-leg-chair-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core'],
+    qualities: ['balance'],
+  },
+  'single-leg-floor-bridge': {
+    primary: ['glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: [],
   },
 };
 

@@ -1,3 +1,4 @@
+import { exerciseSearchText } from '../content/exerciseAliases';
 import {
   type EquipmentType,
   exerciseMetadata,
@@ -36,7 +37,7 @@ export function matchesLibraryFilters(
   const term = filters.term.trim().toLocaleLowerCase('sv');
   if (
     term &&
-    !`${exercise.name} ${exerciseReferences[exercise.id]} ${exercise.id}`
+    !`${exercise.name} ${exerciseSearchText(exercise.id)} ${exerciseReferences[exercise.id]}`
       .toLocaleLowerCase('sv')
       .includes(term)
   )

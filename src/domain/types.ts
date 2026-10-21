@@ -38,7 +38,15 @@ export type ExerciseId =
   | 'hamstring-stretch'
   | 'band-leg-press'
   | 'kettlebell-floor-press'
-  | 'kettlebell-rack-carry';
+  | 'kettlebell-rack-carry'
+  | 'rear-foot-split-squat'
+  | 'bench-side-plank-leg-lift'
+  | 'kneeling-hip-flexor-stretch'
+  | 'prone-on-forearms'
+  | 'heel-slide'
+  | 'balance-pendulum'
+  | 'single-leg-chair-squat'
+  | 'single-leg-floor-bridge';
 
 export type Unit = 'reps' | 'seconds' | 'meters';
 export type SideKind = 'ben' | 'sida' | 'hand';
@@ -211,7 +219,8 @@ export interface MetaEntry {
     | 'backup'
     | 'training'
     | 'rehabPlans'
-    | 'customWorkouts';
+    | 'customWorkouts'
+    | 'favourites';
   value: unknown;
 }
 

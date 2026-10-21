@@ -27,7 +27,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
-  await expect(page.getByRole('status')).toHaveText('40 övningar');
+  await expect(page.getByRole('status')).toHaveText('48 övningar');
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,
   );
@@ -42,11 +42,16 @@ test('a selected exercise survives inspection, pain replanning and session reloa
     .first()
     .click();
   await page.getByLabel('Övning i moment 1').selectOption('split-squat');
-  await page.getByRole('link', { name: 'Split squat', exact: true }).click();
+  await page
+    .getByRole('link', {
+      name: 'Station\u00e4rt utfall (split squat)',
+      exact: true,
+    })
+    .click();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   await expect(
     page.getByRole('link', {
-      name: 'Split squat',
+      name: 'Station\u00e4rt utfall (split squat)',
       exact: true,
     }),
   ).toBeVisible();
@@ -54,14 +59,14 @@ test('a selected exercise survives inspection, pain replanning and session reloa
   await answerPain(page, 0);
   await expect(
     page.getByRole('heading', {
-      name: 'Split squat',
+      name: 'Station\u00e4rt utfall (split squat)',
       exact: true,
     }),
   ).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole('heading', {
-      name: 'Split squat',
+      name: 'Station\u00e4rt utfall (split squat)',
       exact: true,
     }),
   ).toBeVisible();
@@ -71,7 +76,7 @@ test('a selected exercise survives inspection, pain replanning and session reloa
   ).toBeVisible();
   await expect(
     page.getByRole('link', {
-      name: 'Split squat',
+      name: 'Station\u00e4rt utfall (split squat)',
       exact: true,
     }),
   ).toBeVisible();

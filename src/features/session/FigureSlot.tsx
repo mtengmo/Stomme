@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { ExerciseId } from '../../domain/types';
-import { Figure, usePrefersReducedMotion } from '../../figures/Figure';
+import {
+  Figure,
+  supportedFrontViews,
+  usePrefersReducedMotion,
+} from '../../figures/Figure';
 
 /** The animated exercise figure; left sets mirror the working side to V. */
 export function FigureSlot({
@@ -17,6 +21,7 @@ export function FigureSlot({
   variantId?: string;
 }) {
   const [paused, setPaused] = useState(false);
+  const [view, setView] = useState<'side' | 'front'>('side');
   const reduced = usePrefersReducedMotion();
   return (
     <section
@@ -32,7 +37,20 @@ export function FigureSlot({
         working={side === 'both' ? null : side}
         paused={paused || reduced}
         stillOnly
+        view={view}
       />
+      {supportedFrontViews.some((id) => id === exerciseId) ? (
+        <button
+          type="button"
+          onClick={() =>
+            setView((angle) => (angle === 'side' ? 'front' : 'side'))
+          }
+          className="absolute top-0 left-0 min-h-12 bg-paper px-2 text-base font-bold underline"
+          aria-label={view === 'side' ? 'Visa framifrån' : 'Visa från sidan'}
+        >
+          {view === 'side' ? 'Framifrån' : 'Från sidan'}
+        </button>
+      ) : null}
       {!reduced ? (
         <button
           type="button"

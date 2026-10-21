@@ -22,8 +22,8 @@ import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { isoWeekNumber } from '../week/passState';
 import { HistoryTrends } from './HistoryTrends';
-
 import { StatusChip } from './labels';
+import { ProgressOverview } from './ProgressOverview';
 
 interface HistoryData {
   sessions: Session[];
@@ -206,6 +206,7 @@ export function History() {
           {filtered.length} pass visas
         </p>
       </div>
+      <ProgressOverview sessions={sessions} logs={setLogs} today={today} />
       <section className="flex flex-col gap-5" aria-label="Alla pass">
         <h2 className="m-0 text-3xl font-bold">Alla pass</h2>
         {filtered.length === 0 ? (

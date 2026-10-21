@@ -1,6 +1,7 @@
 import type { ExerciseId } from '../domain/types';
 import { additionalFigures } from './additionalPoses';
 import type { Pt } from './lerp';
+import { rehabFigures } from './rehabPoses';
 
 /**
  * Side-view skeleton in a 200x200 viewBox, facing right (floor poses: head
@@ -90,6 +91,7 @@ function pose(
 
 export const figures: Record<ExerciseId, FigureSpec> = {
   ...additionalFigures,
+  ...rehabFigures,
   'goblet-chair-squat': {
     start: pose(
       [97, 92],

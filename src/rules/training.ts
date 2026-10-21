@@ -107,6 +107,12 @@ export function trainingSuggestion(
     };
   if (
     complete &&
+    mine.every(
+      (log) =>
+        log.amount >= (previousPlan?.target ?? plan.target) &&
+        log.weightKg === last.weightKg &&
+        log.loadIndex === last.loadIndex,
+    ) &&
     plan.sets <= (previousPlan?.sets ?? plan.sets) &&
     feedback?.effort === 'easy' &&
     previous.checkins?.after?.feeling === 'good' &&

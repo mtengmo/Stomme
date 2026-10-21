@@ -23,6 +23,7 @@ const ids: MuscleGroupId[] = [
   'triceps',
   'forearms',
   'hip-adductors',
+  'hip-flexors',
 ];
 
 const BODY_OUTLINE =
@@ -93,6 +94,12 @@ const shapes: Record<MuscleGroupId, { side: 'front' | 'back'; d: string }[]> = {
     {
       side: 'front',
       d: 'M53 103 L59 107 L57 130 L52 129 Z M61 107 L67 103 L68 129 L63 130 Z',
+    },
+  ],
+  'hip-flexors': [
+    {
+      side: 'front',
+      d: 'M48 82 Q53 79 58 82 L56 94 L51 99 L47 94 Z M62 82 Q67 79 72 82 L73 94 L69 99 L64 94 Z',
     },
   ],
 };

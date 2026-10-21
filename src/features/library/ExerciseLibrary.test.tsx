@@ -39,7 +39,7 @@ afterEach(cleanup);
 describe('exercise library', () => {
   it('shows all exercises, equipment, template links and optional status', () => {
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('40 övningar');
+    expect(screen.getByRole('status').textContent).toBe('48 övningar');
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
@@ -52,7 +52,7 @@ describe('exercise library', () => {
     expect(
       screen.getAllByRole('link', { name: 'Ingår i Pass B' }),
     ).toHaveLength(5);
-    expect(screen.getByText('Valfri övning')).toBeTruthy();
+    expect(screen.getAllByText('Valfri övning').length).toBeGreaterThan(0);
     const wallSit = screen
       .getByRole('link', { name: 'Väggsittning' })
       .closest('li');
@@ -65,7 +65,7 @@ describe('exercise library', () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=hamstrings');
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe(
-      '13 övningar för baksida lår',
+      '15 övningar för baksida lår',
     );
     const primary = screen.getByRole('region', { name: 'Tränar främst' });
     const supporting = screen.getByRole('region', { name: 'Hjälper till' });
@@ -105,7 +105,7 @@ describe('exercise library', () => {
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     window.history.back();
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('40 övningar'),
+      expect(screen.getByRole('status').textContent).toBe('48 övningar'),
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -115,7 +115,7 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('40 övningar');
+    expect(screen.getByRole('status').textContent).toBe('48 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
 });

@@ -282,6 +282,13 @@ const savedRehabPlan = z
   .refine(validateTrainingPlan);
 const metaSchema = z.discriminatedUnion('key', [
   z.strictObject({
+    key: z.literal('favourites'),
+    value: z
+      .array(z.enum(Object.keys(exercises) as [ExerciseId, ...ExerciseId[]]))
+      .max(200)
+      .refine((ids) => new Set(ids).size === ids.length),
+  }),
+  z.strictObject({
     key: z.literal('customWorkouts'),
     value: z
       .array(

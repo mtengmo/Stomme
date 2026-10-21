@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E40 references and original load indices', () => {
+  it('preserves permanent E01–E48 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 40 },
+        { length: 48 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -48,7 +48,11 @@ describe('expanded library integrity', () => {
       expect(metadata.sources.length).toBeGreaterThan(0);
       for (const source of metadata.sources)
         expect(source.url).toMatch(/^https:\/\//);
-      expect(exerciseMuscles[exercise.id].primary.length).toBeGreaterThan(0);
+      if (exercise.id === 'prone-on-forearms') {
+        expect(metadata.kind).toBe('mobility');
+        expect(exerciseMuscles[exercise.id].primary).toEqual([]);
+      } else
+        expect(exerciseMuscles[exercise.id].primary.length).toBeGreaterThan(0);
       for (const variant of metadata.variants) {
         expect(variant.setup.length).toBeGreaterThan(10);
         expect(variant.technicalReason.length).toBeGreaterThan(10);

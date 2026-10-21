@@ -42,6 +42,14 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'band-leg-press': 'E38',
   'kettlebell-floor-press': 'E39',
   'kettlebell-rack-carry': 'E40',
+  'rear-foot-split-squat': 'E41',
+  'bench-side-plank-leg-lift': 'E42',
+  'kneeling-hip-flexor-stretch': 'E43',
+  'prone-on-forearms': 'E44',
+  'heel-slide': 'E45',
+  'balance-pendulum': 'E46',
+  'single-leg-chair-squat': 'E47',
+  'single-leg-floor-bridge': 'E48',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

@@ -5,6 +5,16 @@ import { MuscleMap } from '../../figures/MuscleMap';
 /** The same muscle guidance in the workout's how-to and the full exercise guide. */
 export function ExerciseMuscles({ exerciseId }: { exerciseId: ExerciseId }) {
   const muscles = exerciseMuscles[exerciseId];
+  if (!muscles.primary.length)
+    return (
+      <section aria-label="Muskelgrupper" className="flex flex-col gap-2">
+        <h3 className="m-0 text-base font-bold">Rörlighet och position</h3>
+        <p className="m-0 text-base">
+          Här övar du en position. Ingen särskild muskelgrupp anges som
+          styrketräning.
+        </p>
+      </section>
+    );
   return (
     <section aria-label="Muskelgrupper" className="flex flex-col gap-2">
       <div>

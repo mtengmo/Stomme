@@ -2,6 +2,7 @@ import { Link } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
+import { exerciseMuscles } from '../../content/muscles';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
@@ -14,16 +15,52 @@ export function ReadyWorkout({
 }) {
   const knee =
     preferences.programId === 'rehab' && preferences.rehabFocus === 'knee';
+  const ids = plan.map((item) => item.exerciseId);
+  const primary = new Set(
+    ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),
+  );
+  const missing = [
+    !['quads', 'hamstrings', 'glutes'].some((group) =>
+      primary.has(group as 'quads' | 'hamstrings' | 'glutes'),
+    )
+      ? 'ben och höft'
+      : '',
+    !ids.includes('supported-row') ? 'drag för överkroppen' : '',
+    !ids.some((exerciseId) =>
+      [
+        'floor-press',
+        'kettlebell-floor-press',
+        'shoulder-press',
+        'kettlebell-press',
+      ].includes(exerciseId),
+    )
+      ? 'press för överkroppen'
+      : '',
+    !primary.has('core') ? 'bål' : '',
+  ].filter(Boolean);
   return (
     <section aria-labelledby="ready-workout" className="flex flex-col gap-3">
       <h2 id="ready-workout" className="m-0 text-2xl font-bold">
         Ditt pass · {plan.length} {plan.length === 1 ? 'övning' : 'övningar'}
       </h2>
+      {preferences.programId === 'general' && missing.length > 0 ? (
+        <p className="m-0 text-base">
+          Urvalet täcker inte alla delar av helkroppspasset. Saknas:{' '}
+          {missing.join(', ')}. Se över utrustningen och alternativen under
+          Anpassa passet.
+        </p>
+      ) : null}
       {knee ? (
         <p className="m-0 text-base">
           Värm upp 5–10 minuter med promenad eller lugn cykling. Avbryt en
           övning som gör ont. Tekniknivån beskriver kontroll och balans. Vikt,
           antal och dagsform påverkar hur ansträngande övningen känns.
+        </p>
+      ) : null}
+      {!knee && preferences.programId !== 'rehab' ? (
+        <p className="m-0 text-base text-ink-soft">
+          Förslag nästa pass. Antal bygger på sparade resultat och hur passet
+          kändes. Granska och ändra före start.
         </p>
       ) : null}
       <ol className="m-0 list-none p-0">
@@ -53,6 +90,11 @@ export function ReadyWorkout({
               >
                 {exercise.name}
               </Link>
+              {item.explanation ? (
+                <p className="m-0 text-base text-ink-soft">
+                  {item.explanation}
+                </p>
+              ) : null}
               {knee ? (
                 <ExerciseDifficulty
                   exerciseId={exercise.id}

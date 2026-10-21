@@ -11,7 +11,9 @@ export function useTimedHold({
   side,
   autoStart,
   onDone,
+  moving = false,
 }: {
+  moving?: boolean;
   seconds: number;
   side: string;
   autoStart: boolean;
@@ -50,7 +52,11 @@ export function useTimedHold({
     deadline.current = Date.now() + remainingRef.current * 1_000;
     show(pausedPhase.current, remainingRef.current);
     timerVoice(
-      pausedPhase.current === 'hold' ? 'Fortsätt hålla.' : 'Gör dig redo.',
+      pausedPhase.current === 'hold'
+        ? moving
+          ? 'Fortsätt rörelsen.'
+          : 'Fortsätt hålla.'
+        : 'Gör dig redo.',
     );
   };
   const reset = () => {
@@ -82,11 +88,13 @@ export function useTimedHold({
         deadline.current = Date.now() + duration.current * 1_000;
         show('hold', duration.current);
         timerDone();
-        timerVoice('Börja hålla.');
+        timerVoice(
+          moving ? 'Börja rörelsen. Växla ben lugnt.' : 'Börja hålla.',
+        );
       } else {
         show('done', 0);
         timerDone();
-        timerVoice('Klart. Släpp positionen.');
+        timerVoice(moving ? 'Klart. Vila.' : 'Klart. Släpp positionen.');
         done.current();
       }
     };
@@ -100,7 +108,7 @@ export function useTimedHold({
       document.removeEventListener('visibilitychange', onVisibility);
       if (current.current !== 'done') stopTimerVoice();
     };
-  }, [pause, show]);
+  }, [pause, show, moving]);
 
   return { phase, remaining, start, pause, resume, reset };
 }

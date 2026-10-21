@@ -5,10 +5,15 @@ import {
   kettlebellFloorPressPose,
   seatedKneeExtensionPose,
 } from './additionalPoses';
-import { cycleProgress, lerpPt, type Pt } from './lerp';
+import { constrainLegInterpolation } from './constrainedLegs';
+import { FrontFigureFrame, supportsFrontView } from './frontViews';
+import { CYCLE_MS, cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { figures, POSE_KEYS, type Pose } from './poses';
 import { FloorLine, Held, PropShape } from './props';
+import { heelSlidePose, rehabMovementPose } from './rehabPoses';
+
+export { supportedFrontViews } from './frontViews';
 
 export type Equipment = 'dumbbell' | 'kettlebell' | 'band' | null;
 
@@ -21,15 +26,23 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 }
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
+  const rehabPose = rehabMovementPose(exerciseId, t);
+  if (rehabPose) return rehabPose;
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
     return kettlebellFloorPressPose(t);
   const spec = figures[exerciseId];
-  if (!spec.middle) return lerpPose(spec.start, spec.end, t);
-  return t < 0.5
-    ? lerpPose(spec.start, spec.middle, t * 2)
-    : lerpPose(spec.middle, spec.end, (t - 0.5) * 2);
+  const interpolated = !spec.middle
+    ? lerpPose(spec.start, spec.end, t)
+    : t < 0.5
+      ? lerpPose(spec.start, spec.middle, t * 2)
+      : lerpPose(spec.middle, spec.end, (t - 0.5) * 2);
+  return constrainLegInterpolation(
+    exerciseId,
+    interpolated,
+    spec.middle ? [spec.start, spec.middle, spec.end] : [spec.start, spec.end],
+  );
 }
 
 export function usePrefersReducedMotion(): boolean {
@@ -65,6 +78,8 @@ export function FigureFrame({
   showMuscles = false,
   equipment,
   viewBox = '14 20 164 168',
+  view = 'side',
+  phase = 0,
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
@@ -73,7 +88,20 @@ export function FigureFrame({
   showMuscles?: boolean;
   equipment?: Equipment;
   viewBox?: string;
+  view?: 'side' | 'front';
+  /** Current animation progress, used by the authored front geometry. */
+  phase?: number;
 }) {
+  if (view === 'front' && supportsFrontView(exerciseId))
+    return (
+      <FrontFigureFrame
+        exerciseId={exerciseId}
+        working={working}
+        equipment={equipment}
+        phase={phase}
+        viewBox={viewBox}
+      />
+    );
   const spec = figures[exerciseId];
   const rack = exerciseId === 'kettlebell-rack-carry' && equipment !== null;
   let p = pose;
@@ -246,6 +274,7 @@ export function Figure({
   paused = false,
   showMuscles = false,
   equipment,
+  view = 'side',
 }: {
   exerciseId: ExerciseId;
   working?: Working | null;
@@ -255,6 +284,7 @@ export function Figure({
   /** Segment-attached anatomy hint, available for the reviewed prototypes. */
   showMuscles?: boolean;
   equipment?: Equipment;
+  view?: 'side' | 'front';
 }) {
   const reduced = usePrefersReducedMotion();
   const spec = figures[exerciseId];
@@ -272,7 +302,11 @@ export function Figure({
           ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
           : cycleProgress(
               elapsedMs.current,
-              exerciseId === 'seated-knee-extension' ? 5000 : undefined,
+              exerciseId === 'seated-knee-extension'
+                ? 5000
+                : exerciseId === 'single-leg-floor-bridge'
+                  ? 2000
+                  : undefined,
             ),
       );
       raf = requestAnimationFrame(tick);
@@ -297,6 +331,8 @@ export function Figure({
               working={working}
               equipment={equipment}
               showMuscles={showMuscles}
+              view={view}
+              phase={label === 'Slut' ? 1 : 0}
             />
             <figcaption className="text-center text-base font-bold">
               {label}
@@ -306,19 +342,27 @@ export function Figure({
       </div>
     );
   }
+  const pose = reduced
+    ? spec.start
+    : spec.motion === 'hold'
+      ? spec.end
+      : movementPose(exerciseId, t);
+  const displayedPose =
+    exerciseId === 'heel-slide'
+      ? heelSlidePose(
+          reduced ? 0 : t,
+          Math.floor(elapsedMs.current / CYCLE_MS) % 2 === 1 ? 'L' : 'R',
+        )
+      : pose;
   return (
     <FigureFrame
       exerciseId={exerciseId}
-      pose={
-        reduced
-          ? spec.start
-          : spec.motion === 'hold'
-            ? spec.end
-            : movementPose(exerciseId, t)
-      }
+      pose={displayedPose}
       working={working}
       equipment={equipment}
       showMuscles={showMuscles}
+      view={view}
+      phase={reduced ? 0 : spec.motion === 'hold' ? 1 : t}
     />
   );
 }

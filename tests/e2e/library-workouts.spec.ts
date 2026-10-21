@@ -33,7 +33,7 @@ for (const width of [360, 1280]) {
         exact: true,
       }),
     });
-    await expect(first.locator('svg')).toHaveCount(2); // figure and link arrow
+    await expect(first.locator('svg')).toHaveCount(3); // figure, link arrow and favourite heart
     await first.getByRole('button', { name: /^Visa rörelsen:/ }).click();
     await expect(
       first.getByRole('button', { name: /^Pausa rörelsen:/ }),
@@ -121,7 +121,9 @@ test('reduced motion keeps browsing and review still', async ({ page }) => {
   expect(await page.locator('li svg').first().innerHTML()).toBe(before);
   await page.goto('/#/granska?ovning=E39');
   await expect(
-    page.getByRole('region', { name: 'Rörelsen' }).locator('svg'),
+    page
+      .getByRole('region', { name: 'Rörelsen' })
+      .locator('.exercise-stage svg'),
   ).toHaveCount(1);
   await expect(
     page.getByRole('button', { name: 'Mitt', exact: true }),

@@ -163,6 +163,27 @@ describe('programme-specific progression', () => {
     );
   });
 
+  it('does not increase when a completed set falls short of its target', () => {
+    const belowTarget = logs().map((log) => ({ ...log, amount: 7 }));
+    expect(trainingSuggestion(plan, session(), belowTarget)).toMatchObject({
+      target: 7,
+      explanation:
+        'Samma nivå som senast. Vikt och antal kan anpassas före start.',
+    });
+  });
+
+  it('does not increase when set weights differ despite easy effort and a good after check', () => {
+    const mixedWeights = logs().map((log, index) =>
+      index === 0 ? { ...log, weightKg: 10 } : log,
+    );
+    expect(trainingSuggestion(plan, session(), mixedWeights)).toMatchObject({
+      target: 8,
+      weightKg: 7.5,
+      explanation:
+        'Samma nivå som senast. Vikt och antal kan anpassas före start.',
+    });
+  });
+
   it('checks every set from the previous plan even if the new experience setting asks for fewer sets', () => {
     expect(
       trainingSuggestion(
@@ -195,7 +216,11 @@ describe('programme-specific progression', () => {
   });
 
   it('keeps other programmes and legacy sessions out of the current suggestion', () => {
-    const mine = session({ id: 'mine', startedAt: '2026-10-18T08:00:00.000Z' });
+    const mine = session({
+      id: 'mine',
+      startedAt: '2026-10-18T08:00:00.000Z',
+      plan: [{ ...plan, target: 7 }],
+    });
     const other = session({
       id: 'other',
       programId: 'running',

@@ -435,6 +435,74 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'Greppa handtaget med en hand vid övre bröstet. Kulan vilar mot underarmens utsida; armbågen är nära revbenen.',
     ],
   ],
+  'rear-foot-split-squat': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Utan extra vikt; bakre fotens vrist vilar på en stadig stol eller bänk.',
+      'chair',
+    ],
+  ],
+  'bench-side-plank-leg-lift': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Övre foten stöds på en stadig stol eller bänk; lyft det nedre benet.',
+      'chair',
+    ],
+  ],
+  'kneeling-hip-flexor-stretch': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Knästå på mjukt underlag med främre foten i golvet.',
+    ],
+  ],
+  'prone-on-forearms': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Ligg på mage med bäckenet kvar i underlaget och stöd på underarmarna.',
+    ],
+  ],
+  'heel-slide': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Ligg på rygg och håll hälen i kontakt med underlaget när den glider.',
+    ],
+  ],
+  'balance-pendulum': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Stå på ett ben; använd vid behov en vägg eller stol som stöd.',
+      'support',
+    ],
+  ],
+  'single-leg-chair-squat': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Sänk dig på ett ben mot en stadig stol; extra handstöd kan användas.',
+      'chair',
+    ],
+  ],
+  'single-leg-floor-bridge': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Ena foten i golvet och den andra lyft; överkroppen stöds av golvet.',
+    ],
+  ],
 };
 
 const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
@@ -538,9 +606,93 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Håll axelposition och upprätt bål medan du går med ensidig last.',
   ],
+  'rear-foot-split-squat': [
+    'technical',
+    'Ett ben arbetar medan bakre foten vilar upphöjd; kontrollera djup och balans.',
+  ],
+  'bench-side-plank-leg-lift': [
+    'technical',
+    'Sidostöd med övre foten upphöjd och ett rörligt nedre ben.',
+  ],
+  'kneeling-hip-flexor-stretch': [
+    'basic',
+    'Knästående med brett stöd; rörelsen kommer från en liten bäckenförflyttning.',
+  ],
+  'prone-on-forearms': [
+    'basic',
+    'Underarmarna bär överkroppen medan bäckenet ligger kvar mot underlaget.',
+  ],
+  'heel-slide': [
+    'basic',
+    'Hälen glider med kontakt mot underlaget medan bålen hålls stilla.',
+  ],
+  'balance-pendulum': [
+    'practiced',
+    'Enbensbalans kombineras med höftfällning och kontrollerad knäföring.',
+  ],
+  'single-leg-chair-squat': [
+    'technical',
+    'Ett ben kontrollerar sänkning och uppresning mot en stol.',
+  ],
+  'single-leg-floor-bridge': [
+    'practiced',
+    'Enbens höftsträckning med bäckenet hållet jämnt.',
+  ],
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  const added: Partial<Record<ExerciseId, ExerciseSource>> = {
+    'rear-foot-split-squat': {
+      title: 'Bulgarian Split Squat',
+      publisher: 'National Academy of Sports Medicine',
+      url: 'https://www.nasm.org/resource-center/exercise-library/bulgarian-split-squat',
+      note: 'Stöd för positionen med bakre foten upphöjd. Appens dos och val av stol eller bänk är redaktionella biblioteksförslag.',
+    },
+    'bench-side-plank-leg-lift': {
+      title: 'Modified progressive Copenhagen adduction exercise programme',
+      publisher: 'BMJ Open Sport & Exercise Medicine',
+      url: 'https://bmjopensem.bmj.com/content/5/1/e000570',
+      note: 'Beskriver relaterade Copenhagen-varianter. Källan fastställer inte exakt utförande för bildförlagans repetitiva nedre benlyft; kontrollera mot den tillhörande bilden.',
+    },
+    'kneeling-hip-flexor-stretch': {
+      title: 'Four Hip Flexor Stretches to Relieve Tightness',
+      publisher: 'Hospital for Special Surgery',
+      url: 'https://www.hss.edu/health-library/move-better/hip-flexor-stretch',
+      note: 'Stöd för halvknästående position och bäckenföring. Appens generiska tidsintervall är inte hämtat från individuell ordination.',
+    },
+    'prone-on-forearms': {
+      title: 'Interventions to Improve Prone on Elbows and Quadruped Skills',
+      publisher: 'F.A. Davis Physical Therapy Collection / McGraw Hill',
+      url: 'https://fadavispt.mhmedical.com/content.aspx?bookid=3170&sectionid=264323097',
+      note: 'Källa för underarmsstödd magliggande position. Den anger ingen särskild indikation eller dos.',
+    },
+    'heel-slide': {
+      title: 'Knee exercises',
+      publisher: 'Cambridge University Hospitals NHS Foundation Trust',
+      url: 'https://www.cuh.nhs.uk/patient-information/knee-exercises/',
+      note: 'Källa för hälglidning med fotkontakt. Appens bålkontrollinstruktion och generiska tidsintervall är redaktionella.',
+    },
+    'balance-pendulum': {
+      title: 'Single Leg Balance (Hip Hinge to Knee Drive)',
+      publisher: 'E3 Rehab',
+      url: 'https://www.youtube.com/watch?v=tZ63qfVZ9KU',
+      note: 'Stöd för höftfällning följd av knäföring i enbensbalans. Appen anger ingen automatisk faspaus.',
+    },
+    'single-leg-chair-squat': {
+      title: 'Knee pain leaflet',
+      publisher: 'Norfolk and Waveney Community Health',
+      url: 'https://www.norfolkandwaveneycommunityhealth.nhs.uk/media/xqfl3fv3/knee-pain-leaflet.pdf',
+      note: 'Stöd för stolsknäböjens kontakt och kontrollerade rörelse; den ensidiga varianten följer bildförlagan.',
+    },
+    'single-leg-floor-bridge': {
+      title: 'The Posterior-chain Workout: Single-Leg Glute Bridge',
+      publisher: 'American Council on Exercise',
+      url: 'https://www.acefitness.org/resources/pros/expert-articles/5012/the-posterior-chain-workout/',
+      note: 'Stöd för enbensbäckenlyft på golv. Bildförlagan anger en paus i toppläget; appen visar den inom varje repetition, inte som en setnedräkning.',
+    },
+  };
+  const addedSource = added[id];
+  if (addedSource) return [addedSource];
   if (id === 'kettlebell-floor-press')
     return [
       {
@@ -669,8 +821,13 @@ export const exerciseMetadata = Object.fromEntries(
     ];
     const page = aaosPages[id];
     const purposes: ExerciseMetadata['purposes'] = {};
-    if (!page || id === 'single-leg-calf-raise')
-      purposes.general = `Tränar ${exercise.muscles.slice(0, 2).join(' och ').toLocaleLowerCase('sv')}.`;
+    if (
+      (!page || id === 'single-leg-calf-raise') &&
+      exercise.muscles.length > 0
+    )
+      purposes.general = exercise.muscles.length
+        ? `Tränar ${exercise.muscles.slice(0, 2).join(' och ').toLocaleLowerCase('sv')}.`
+        : 'Rörlighet och position. Följ din överenskomna dosering.';
     if (kneeReasons[id]) purposes.knee = kneeReasons[id];
     if (page)
       purposes.knee =
@@ -697,7 +854,12 @@ export const exerciseMetadata = Object.fromEntries(
       }),
     );
     const metadata: ExerciseMetadata = {
-      kind: id.endsWith('-stretch') ? 'mobility' : 'strength',
+      kind:
+        id.endsWith('-stretch') ||
+        id === 'prone-on-forearms' ||
+        id === 'heel-slide'
+          ? 'mobility'
+          : 'strength',
       purposes,
       variants,
       sources: sourceFor(id),
@@ -718,6 +880,7 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'kettlebell-deadlift';
     if (id === 'single-leg-hip-thrust')
       metadata.easierExerciseId = 'glute-bridge';
+    if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
     return [id, metadata];
   }),
 ) as Record<ExerciseId, ExerciseMetadata>;

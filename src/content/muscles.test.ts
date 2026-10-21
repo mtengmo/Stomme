@@ -15,7 +15,9 @@ describe('muscle guidance content', () => {
     );
     for (const exercise of exerciseList) {
       const guidance = exerciseMuscles[exercise.id];
-      expect(guidance.primary.length, exercise.id).toBeGreaterThan(0);
+      if (exercise.id === 'prone-on-forearms')
+        expect(guidance.primary).toEqual([]);
+      else expect(guidance.primary.length, exercise.id).toBeGreaterThan(0);
       const groups = [...guidance.primary, ...guidance.secondary];
       expect(new Set(groups).size, exercise.id).toBe(groups.length);
       for (const group of groups) expect(muscleGroups[group]).toBeDefined();

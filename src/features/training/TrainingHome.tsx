@@ -318,6 +318,29 @@ export function TrainingHome() {
           Hur känns det dagen efter {trainingName(session)}?
         </Link>
       ))}
+      {preferences.programId !== 'rehab' ? (
+        <details>
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+            Plan framåt och utveckling
+          </summary>
+          <p className="m-0 text-base">
+            Nästa ordinarie pass: {nextId}. Därefter:{' '}
+            {nextId === 'A' ? 'B' : 'A'}. Du kan byta innan du börjar.
+          </p>
+          <p className="mt-2 text-base">
+            Nästa dos bygger på dina sparade set och svar om ansträngning och
+            besvär. Ett lätt, komplett pass utan rapporterade besvär kan ge en
+            extra repetition. Vikt ändrar du själv. Förslaget räknas om efter
+            nästa pass.
+          </p>
+          <Link
+            href="/historik"
+            className="flex min-h-12 items-center text-base font-bold underline"
+          >
+            Se din utveckling
+          </Link>
+        </details>
+      ) : null}
       <details>
         <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
           Ändra
