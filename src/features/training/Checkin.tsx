@@ -8,7 +8,7 @@ import {
 } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta } from '../../db/repo';
-import { recordTrainingCheckin } from '../../db/training';
+import { deferAfterCheckin, recordTrainingCheckin } from '../../db/training';
 import type { SymptomReport, TrainingCheckin } from '../../domain/types';
 import { Button, buttonClass } from '../../ui/Button';
 import { ScorePicker } from '../../ui/ScorePicker';
@@ -330,11 +330,30 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
       >
         Spara och fortsätt
       </Button>
-      <Link href="/" className={buttonClass('secondary')}>
-        {timing === 'before'
-          ? 'Tillbaka utan att starta övningarna'
-          : 'Svara senare'}
-      </Link>
+      {timing === 'after' && session.status === 'in_progress' ? (
+        <Button
+          variant="secondary"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await deferAfterCheckin(getDb(), id, new Date());
+              navigate(`/session/${id}`);
+            } catch {
+              setError('Kunde inte spara. Försök igen.');
+              setBusy(false);
+            }
+          }}
+        >
+          Svara senare
+        </Button>
+      ) : (
+        <Link href="/" className={buttonClass('secondary')}>
+          {timing === 'before'
+            ? 'Tillbaka utan att starta övningarna'
+            : 'Till träningen'}
+        </Link>
+      )}
       <p className="m-0 text-base text-ink-soft">
         Svar sparas lokalt med passet. Ansträngningen bedömer du separat efter
         varje övning.

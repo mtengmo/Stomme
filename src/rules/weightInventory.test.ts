@@ -24,4 +24,42 @@ describe('owned weight choices', () => {
     ]);
     expect(availableWeights(preferences, 'kettlebell', 2)).toEqual([]);
   });
+
+  it('offers one dumbbell only for single-dumbbell variants', () => {
+    const one: TrainingPreferences = {
+      ...preferences,
+      weights: [{ type: 'dumbbell', kg: 8, count: 1 }],
+    };
+    expect(availableWeights(one, 'dumbbell', 1)).toEqual([
+      { totalKg: 8, label: '1 × 8 kg' },
+    ]);
+    expect(availableWeights(one, 'dumbbell', 2)).toEqual([]);
+  });
+
+  it('never pairs two unequal dumbbells into one two-implement load', () => {
+    const unequal: TrainingPreferences = {
+      ...preferences,
+      weights: [
+        { type: 'dumbbell', kg: 5, count: 1 },
+        { type: 'dumbbell', kg: 10, count: 1 },
+      ],
+    };
+    expect(availableWeights(unequal, 'dumbbell', 2)).toEqual([]);
+    expect(availableWeights(unequal, 'dumbbell', 1)).toHaveLength(2);
+  });
+
+  it('lets a matching pair serve a single-implement variant', () => {
+    expect(availableWeights(preferences, 'dumbbell', 1)).toEqual([
+      { totalKg: 5, label: '1 × 5 kg' },
+      { totalKg: 10, label: '1 × 10 kg' },
+    ]);
+  });
+
+  it('offers nothing when no weights are entered or the inventory is deleted', () => {
+    const { weights: _removed, ...none } = preferences;
+    expect(availableWeights(none, 'dumbbell', 2)).toEqual([]);
+    expect(availableWeights({ ...none, weights: [] }, 'kettlebell', 1)).toEqual(
+      [],
+    );
+  });
 });

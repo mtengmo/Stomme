@@ -9,6 +9,7 @@ import {
   kneeRehabSource,
 } from '../../content/kneeRehab';
 import {
+  bodyRegions,
   exerciseMuscles,
   type MuscleGroupId,
   muscleGroups,
@@ -174,7 +175,7 @@ function PreviewEditor({
   const [, navigate] = useLocation();
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}${customWorkout ? `.${customWorkout.id}` : ''}`;
 
   const [plan, setPlan] = useState(() => {
     try {
@@ -318,6 +319,24 @@ function PreviewEditor({
     index: number;
   } | null>(null);
   const [addMuscle, setAddMuscle] = useState<MuscleGroupId | ''>('');
+  const [addRegion, setAddRegion] = useState('');
+  const targetMuscles: readonly MuscleGroupId[] = addMuscle
+    ? [addMuscle]
+    : (bodyRegions.find((region) => region.id === addRegion)?.muscles ?? []);
+  // Primary matches first; supporting matches are labelled as such.
+  const pickable = compatible
+    .filter((exercise) => !plan.some((item) => item.exerciseId === exercise.id))
+    .flatMap((exercise) => {
+      if (targetMuscles.length === 0)
+        return [{ exercise, supporting: false, rank: 0 }];
+      const { primary, secondary } = exerciseMuscles[exercise.id];
+      if (primary.some((muscle) => targetMuscles.includes(muscle)))
+        return [{ exercise, supporting: false, rank: 0 }];
+      if (secondary.some((muscle) => targetMuscles.includes(muscle)))
+        return [{ exercise, supporting: true, rank: 1 }];
+      return [];
+    })
+    .sort((a, b) => a.rank - b.rank);
 
   const active = sessions.find(
     (session) =>
@@ -545,6 +564,14 @@ function PreviewEditor({
                 </details>
               ) : null}
               <h2 className="m-0 text-3xl font-bold">Övningar i passet</h2>
+              {preferences.programId !== 'rehab' ? (
+                <Link
+                  href="/installningar"
+                  className="flex min-h-12 items-center self-start text-base font-bold underline"
+                >
+                  Min utrustning
+                </Link>
+              ) : null}
 
               {plan.length === 0 ? (
                 <p className="m-0 text-base">
@@ -827,6 +854,20 @@ function PreviewEditor({
                                         .map((choice) => choice.label)
                                         .join(', ')}
                                     </span>
+                                    {item.weightKg > 0 &&
+                                    !choices.some(
+                                      (choice) =>
+                                        choice.totalKg === item.weightKg,
+                                    ) ? (
+                                      <span className="font-normal text-ink-soft">
+                                        {item.weightKg} kg finns inte bland dina
+                                        registrerade vikter. Välj en av dem
+                                        eller skriv vikten du använder idag,
+                                        till exempel om du tränar på gym eller
+                                        lånar utrustning. Din sparade utrustning
+                                        ändras inte.
+                                      </span>
+                                    ) : null}
                                   </>
                                 ) : null;
                               })()}
@@ -996,25 +1037,55 @@ function PreviewEditor({
                 })}
               </ol>
 
-              <label className="flex flex-col gap-2 text-lg font-bold">
-                Kroppsdel
-                <select
-                  className={inputClass}
-                  value={addMuscle}
-                  onChange={(event) =>
-                    setAddMuscle(event.target.value as MuscleGroupId | '')
-                  }
-                >
-                  <option value="">Hela kroppen</option>
-                  {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
-                    (group) => (
-                      <option key={group} value={group}>
-                        {muscleGroups[group].label}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </label>
+              <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+                <legend className="mb-2 text-lg font-bold">Kroppsdel</legend>
+                <div className="flex flex-wrap gap-2">
+                  {[{ id: '', label: 'Alla' }, ...bodyRegions].map((region) => (
+                    <button
+                      key={region.id}
+                      type="button"
+                      aria-pressed={!addMuscle && addRegion === region.id}
+                      onClick={() => {
+                        setAddRegion(region.id);
+                        setAddMuscle('');
+                        setAddId('');
+                      }}
+                      className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
+                    >
+                      {region.label}
+                    </button>
+                  ))}
+                </div>
+                <details>
+                  <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                    Mer specifikt
+                  </summary>
+                  <label className="flex flex-col gap-2 text-base font-bold">
+                    Muskelgrupp
+                    <select
+                      className={inputClass}
+                      value={addMuscle}
+                      onChange={(event) => {
+                        setAddMuscle(event.target.value as MuscleGroupId | '');
+                        setAddId('');
+                      }}
+                    >
+                      <option value="">Ingen vald</option>
+                      {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
+                        (group) => (
+                          <option key={group} value={group}>
+                            {muscleGroups[group].label}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+                </details>
+                <p className="m-0 text-base text-ink-soft">
+                  Kroppsdelar är träningsmål, inte en bedömning av vad som
+                  passar dig.
+                </p>
+              </fieldset>
               <label className="flex flex-col gap-2 text-lg font-bold">
                 Lägg till övning
                 <select
@@ -1024,33 +1095,23 @@ function PreviewEditor({
                     setAddId(event.target.value as ExerciseId | '')
                   }
                 >
-                  <option value="">Välj övning</option>
-
-                  {compatible
-
-                    .filter(
-                      (exercise) =>
-                        !addMuscle ||
-                        exerciseMuscles[exercise.id].primary.includes(
-                          addMuscle,
-                        ) ||
-                        exerciseMuscles[exercise.id].secondary.includes(
-                          addMuscle,
-                        ),
-                    )
-
-                    .filter(
-                      (exercise) =>
-                        !plan.some((item) => item.exerciseId === exercise.id),
-                    )
-
-                    .map((exercise) => (
-                      <option key={exercise.id} value={exercise.id}>
-                        {exercise.name}
-                      </option>
-                    ))}
+                  <option value="">
+                    {pickable.length ? 'Välj övning' : 'Inga övningar passar'}
+                  </option>
+                  {pickable.map(({ exercise, supporting }) => (
+                    <option key={exercise.id} value={exercise.id}>
+                      {exercise.name}
+                      {supporting ? ' · stödjer' : ''}
+                    </option>
+                  ))}
                 </select>
               </label>
+              {pickable.length === 0 ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Inga fler övningar passar vald kroppsdel och din utrustning.
+                  Välj Alla eller ändra utrustning i Min utrustning.
+                </p>
+              ) : null}
 
               <Button
                 variant="secondary"

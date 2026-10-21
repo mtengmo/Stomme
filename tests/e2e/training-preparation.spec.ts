@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { completeSets, keepFirstExercises } from './flow';
 
 for (const width of [360, 1280]) {
   test(`unstarted workouts can be edited, switched or replaced (${width})`, async ({
@@ -143,3 +144,81 @@ for (const width of [360, 1280]) {
     ).toBeDisabled();
   });
 }
+
+test('the add-exercise picker narrows by body region and lists primary matches first', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Visa mitt pass', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Anpassa passet', exact: true })
+    .click();
+  const picker = page.getByRole('combobox', {
+    name: 'Lägg till övning',
+    exact: true,
+  });
+  const all = await picker.locator('option').count();
+  await page.getByRole('button', { name: 'Armar', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Armar', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  const arms = await picker.locator('option').count();
+  expect(arms).toBeLessThanOrEqual(all);
+  await page.getByRole('button', { name: 'Alla', exact: true }).click();
+  expect(await picker.locator('option').count()).toBe(all);
+  await page.getByText('Mer specifikt', { exact: true }).click();
+  await page.getByLabel('Muskelgrupp').selectOption('glutes');
+  expect(await picker.locator('option').count()).toBeLessThan(all);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test('a removed exercise can be restored and a deferred after answer can be given later', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Visa mitt pass', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Anpassa passet', exact: true })
+    .click();
+  const rows = page.locator('ol > li > button[aria-expanded]');
+  const count = await rows.count();
+  await rows.last().click();
+  await page.getByRole('button', { name: /^Ta bort / }).click();
+  await expect(rows).toHaveCount(count - 1);
+  await page.getByRole('button', { name: 'Ångra', exact: true }).click();
+  await expect(rows).toHaveCount(count);
+  await keepFirstExercises(page);
+  await page.getByLabel('Set', { exact: true }).fill('1');
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await completeSets(page);
+  await page.getByRole('button', { name: 'Lagom', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Hur kändes passet?' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Svara senare', exact: true }).click();
+  await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();
+  await page
+    .getByRole('link', { name: 'Svara på hur passet kändes', exact: true })
+    .click();
+  await page.getByRole('radio', { name: 'Bra' }).check();
+  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
+  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Svara på hur passet kändes' }),
+  ).toHaveCount(0);
+});

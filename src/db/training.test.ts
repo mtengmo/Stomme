@@ -14,6 +14,7 @@ import { StommeDB } from './db';
 import { logSet, setFeedback } from './repo';
 import {
   canReplaceTrainingPreparation,
+  deferAfterCheckin,
   recordTrainingCheckin,
   saveRehabPlan,
   saveTrainingPreferences,
@@ -302,6 +303,46 @@ describe('programme persistence and safety boundaries', () => {
     ).toEqual(['left', 'left']);
   });
 
+  it('round-trips an owned-weight inventory, accepts old backups without one and rejects damaged weights', async () => {
+    const owned = [
+      { type: 'dumbbell' as const, kg: 5, count: 2 as const },
+      { type: 'dumbbell' as const, kg: 10, count: 2 as const },
+      { type: 'kettlebell' as const, kg: 16, count: 1 as const },
+    ];
+    await saveTrainingPreferences(db, { ...preferences, weights: owned });
+    const backup = await exportAll(db, now);
+    await importAll(db, serializeBackup(backup));
+    expect(await exportAll(db, now)).toEqual(backup);
+    expect((await db.meta.get('training'))?.value).toMatchObject({
+      weights: owned,
+    });
+
+    const withoutWeights = JSON.parse(serializeBackup(backup));
+    for (const row of withoutWeights.meta)
+      if (row.key === 'training') row.value.weights = undefined;
+    expect(() => parseBackup(JSON.stringify(withoutWeights))).not.toThrow();
+
+    for (const damaged of [
+      [{ type: 'dumbbell', kg: -5, count: 2 }],
+      [{ type: 'dumbbell', kg: 5, count: 3 }],
+      [
+        { type: 'dumbbell', kg: 5, count: 2 },
+        { type: 'dumbbell', kg: 5, count: 1 },
+      ],
+    ]) {
+      const bad = JSON.parse(serializeBackup(backup));
+      for (const row of bad.meta)
+        if (row.key === 'training') row.value.weights = damaged;
+      expect(() => parseBackup(JSON.stringify(bad))).toThrow();
+    }
+    await expect(
+      saveTrainingPreferences(db, {
+        ...preferences,
+        weights: [{ type: 'dumbbell', kg: 0, count: 1 }],
+      }),
+    ).rejects.toThrow();
+  });
+
   it('requires the before question before logging and finishing and keeps an unanswered symptom unknown', async () => {
     const session = await startTrainingSession(
       db,
@@ -457,6 +498,59 @@ describe('programme persistence and safety boundaries', () => {
       checkins: { before, after, dayAfter: followup },
       feedback: { 'single-leg-rdl': { effort: 'hard' } },
     });
+  });
+
+  it('completes a deferred after answer once, keeps the completion time and allows a late answer', async () => {
+    const session = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    const finished = new Date('2026-10-20T08:20:00.000Z');
+    await deferAfterCheckin(db, session.id, finished);
+    await deferAfterCheckin(
+      db,
+      session.id,
+      new Date('2026-10-21T08:00:00.000Z'),
+    );
+    expect(await db.sessions.get(session.id)).toMatchObject({
+      status: 'completed',
+      finishedAt: finished.toISOString(),
+    });
+    expect(
+      (await db.sessions.get(session.id))?.checkins?.after,
+    ).toBeUndefined();
+    await recordTrainingCheckin(db, session.id, 'after', after);
+    expect(await db.sessions.get(session.id)).toMatchObject({
+      status: 'completed',
+      finishedAt: finished.toISOString(),
+      checkins: { after },
+    });
+    await expect(
+      recordTrainingCheckin(db, session.id, 'after', after),
+    ).rejects.toThrow(/redan/);
+    await deferAfterCheckin(db, session.id, new Date());
+    expect((await db.sessions.get(session.id))?.finishedAt).toBe(
+      finished.toISOString(),
+    );
+  });
+
+  it('never defers an aborted or legacy session', async () => {
+    const session = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    await db.sessions.update(session.id, { status: 'aborted' });
+    await deferAfterCheckin(db, session.id, new Date());
+    expect((await db.sessions.get(session.id))?.status).toBe('aborted');
+    await expect(
+      recordTrainingCheckin(db, session.id, 'after', after),
+    ).rejects.toThrow();
   });
 
   it('rejects crafted schema2 plans and sets without replacing existing data', async () => {

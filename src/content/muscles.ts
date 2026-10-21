@@ -33,6 +33,35 @@ export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
   'hip-flexors': { label: 'Höftböjare' },
 };
 
+/**
+ * Broad body regions for choosing exercises. They group the muscle groups
+ * above as training targets, not as diagnoses or suitability advice.
+ */
+export const bodyRegions: {
+  id: string;
+  label: string;
+  muscles: readonly MuscleGroupId[];
+}[] = [
+  {
+    id: 'legs',
+    label: 'Ben & säte',
+    muscles: [
+      'quads',
+      'hamstrings',
+      'glutes',
+      'calves',
+      'hip-abductors',
+      'hip-adductors',
+      'hip-flexors',
+    ],
+  },
+  { id: 'core', label: 'Bål', muscles: ['core'] },
+  { id: 'back', label: 'Rygg', muscles: ['back'] },
+  { id: 'chest', label: 'Bröst', muscles: ['chest'] },
+  { id: 'shoulders', label: 'Axlar', muscles: ['shoulders'] },
+  { id: 'arms', label: 'Armar', muscles: ['biceps', 'triceps', 'forearms'] },
+];
+
 export const trainingQualities = {
   balance: { label: 'Balans' },
   grip: { label: 'Grepp' },
