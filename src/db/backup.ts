@@ -167,6 +167,7 @@ const checkin = z.strictObject({
 });
 const effortFeedback = z.strictObject({
   effort: z.enum(['easy', 'ok', 'hard']).optional(),
+  effortSkipped: z.boolean().optional(),
   skipped: z.boolean().optional(),
   symptoms: symptom.nullable().optional(),
 });
@@ -342,6 +343,21 @@ const metaSchema = z.discriminatedUnion('key', [
           ]),
         )
         .max(9),
+      weights: z
+        .array(
+          z.strictObject({
+            type: z.enum(['dumbbell', 'kettlebell']),
+            kg: z.number().positive().max(100),
+            count: z.union([z.literal(1), z.literal(2)]),
+          }),
+        )
+        .max(20)
+        .refine(
+          (items) =>
+            new Set(items.map((item) => `${item.type}:${item.kg}`)).size ===
+            items.length,
+        )
+        .optional(),
     }),
   }),
   z.strictObject({
@@ -446,7 +462,7 @@ export function parseBackup(text: string): BackupFile {
     if (
       !plan ||
       !variant ||
-      !session.checkins?.before ||
+      (session.programId === 'rehab' && !session.checkins?.before) ||
       log.variantId !== variant.id ||
       !variant.loadIndices.includes(log.loadIndex) ||
       !sides.includes(log.side) ||
@@ -465,7 +481,11 @@ export function parseBackup(text: string): BackupFile {
       (s) =>
         s.status === 'in_progress' &&
         setSessions.has(s.id) &&
-        (s.programId ? !s.checkins?.before : !withBefore.has(s.id)),
+        (s.programId === 'rehab'
+          ? !s.checkins?.before
+          : s.programId
+            ? false
+            : !withBefore.has(s.id)),
     )
   ) {
     throw new BackupError(

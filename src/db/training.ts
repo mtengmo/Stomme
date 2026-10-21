@@ -224,7 +224,11 @@ export async function recordTrainingCheckin(
 
     if (session.checkins?.[timing]) throw new Error('Svaret är redan sparat.');
 
-    if (timing !== 'before' && !session.checkins?.before)
+    if (
+      timing !== 'before' &&
+      session.programId === 'rehab' &&
+      !session.checkins?.before
+    )
       throw new Error('Svara på frågorna före passet först.');
 
     if (

@@ -69,6 +69,20 @@ export function isTrainingPreferences(
     (v.rehabFocus === undefined || ['custom', 'knee'].includes(v.rehabFocus)) &&
     (v.rehabSide === undefined ||
       ['right', 'left', 'both'].includes(v.rehabSide)) &&
+    (v.weights === undefined ||
+      (Array.isArray(v.weights) &&
+        v.weights.length <= 20 &&
+        v.weights.every(
+          (item) =>
+            !!item &&
+            (item.type === 'dumbbell' || item.type === 'kettlebell') &&
+            Number.isFinite(item.kg) &&
+            item.kg > 0 &&
+            item.kg <= 100 &&
+            (item.count === 1 || item.count === 2),
+        ) &&
+        new Set(v.weights.map((item) => `${item.type}:${item.kg}`)).size ===
+          v.weights.length)) &&
     Array.isArray(v.equipment) &&
     v.equipment.every(
       (item) =>

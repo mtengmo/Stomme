@@ -305,7 +305,7 @@ describe('programme persistence and safety boundaries', () => {
   it('requires the before question before logging and finishing and keeps an unanswered symptom unknown', async () => {
     const session = await startTrainingSession(
       db,
-      preferences,
+      { ...preferences, programId: 'rehab', rehabFocus: 'custom' },
       'A',
       [plan],
       now,
@@ -478,10 +478,6 @@ describe('programme persistence and safety boundaries', () => {
       (b: typeof valid) => {
         const s = b.sessions[0];
         if (s) s.plan[0] = { ...plan, sides: ['left', 'left'] };
-      },
-      (b: typeof valid) => {
-        const s = b.sessions[0];
-        if (s) s.checkins = {};
       },
       (b: typeof valid) => {
         const l = b.setLogs[0];

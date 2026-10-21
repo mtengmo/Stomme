@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
+import { isTrainingPreferences } from '../../content/programmes';
 import {
   BackupError,
   type BackupFile,
@@ -11,7 +12,9 @@ import {
   parseBackup,
 } from '../../db/backup';
 import { getDb } from '../../db/db';
+import { getMeta, setMeta } from '../../db/repo';
 import { deleteAllData } from '../../db/wipe';
+import type { WeightInventoryItem } from '../../domain/types';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
 import { shareOrDownload } from '../../lib/share';
@@ -21,6 +24,7 @@ import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
+import { WeightInventoryFields } from '../training/WeightInventoryFields';
 import { readBackupMeta } from '../week/BackupReminder';
 import { useUpdate } from './updateContext';
 
@@ -76,6 +80,52 @@ function Section({
 }
 
 const note = 'm-0 text-base text-ink-soft';
+
+function EquipmentInventorySettings() {
+  const stored = useLiveQuery(() => getMeta(getDb(), 'training'), []);
+  const preferences = isTrainingPreferences(stored) ? stored : undefined;
+  const [items, setItems] = useState<WeightInventoryItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [message, setMessage] = useState('');
+  useEffect(() => {
+    if (stored === undefined || loaded) return;
+    setItems(preferences?.weights ?? []);
+    setLoaded(true);
+  }, [stored, preferences, loaded]);
+  if (stored === undefined) return null;
+  if (!preferences)
+    return <p className={note}>Välj träningsinriktning först.</p>;
+  return (
+    <>
+      <WeightInventoryFields
+        value={items}
+        onChange={(next) => {
+          setItems(next);
+          setMessage('');
+        }}
+      />
+      <Button
+        variant="secondary"
+        onClick={async () => {
+          const valid = items.every((item) => item.kg > 0 && item.kg <= 100);
+          if (!valid) return setMessage('Kontrollera vikterna.');
+          await setMeta(getDb(), 'training', {
+            ...preferences,
+            weights: items,
+          });
+          setMessage('Utrustningen är sparad.');
+        }}
+      >
+        Spara min utrustning
+      </Button>
+      {message ? (
+        <p role="status" className="m-0 text-base font-bold">
+          {message}
+        </p>
+      ) : null}
+    </>
+  );
+}
 
 export function Settings() {
   const [view, setView] = useState<View>({ name: 'main' });
@@ -310,6 +360,14 @@ export function Settings() {
       <h1 ref={heading} tabIndex={-1} className={h1}>
         Inställningar
       </h1>
+
+      <Section id="equipment" title="Min utrustning">
+        <p className={note}>
+          Spara vilka fasta vikter du har hemma. Vikten gäller per hantel eller
+          kettlebell.
+        </p>
+        <EquipmentInventorySettings />
+      </Section>
 
       <Section id="set-backup" title="Säkerhetskopia">
         <p className={note}>
