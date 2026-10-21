@@ -56,9 +56,14 @@ async function audit(page: Page, name: string) {
         .trim()
         .slice(0, 30)}"`;
     const visible = (el: Element) => {
-      const closed = el.closest('details:not([open])');
-      if (closed && el !== closed.querySelector(':scope > summary'))
-        return false;
+      // Every closed <details> above the element hides it, except its own
+      // summary; a summary nested in a closed outer <details> is not rendered.
+      for (
+        let d = el.closest('details:not([open])');
+        d;
+        d = d.parentElement?.closest('details:not([open])') ?? null
+      )
+        if (el !== d.querySelector(':scope > summary')) return false;
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
       return (
