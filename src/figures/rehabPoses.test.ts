@@ -138,5 +138,8 @@ describe('rehabilitation movement geometry', () => {
     expect(pose('single-leg-floor-bridge', 1).hip[0]).toBeLessThan(
       start.hip[0],
     );
+    const end = pose('single-leg-floor-bridge', 1);
+    expect(end.tL[0]).toBeGreaterThan(end.aL[0]);
+    expect(end.tL[1]).toBeLessThan(end.aL[1]);
   });
 });

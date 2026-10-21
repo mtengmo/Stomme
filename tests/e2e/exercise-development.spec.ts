@@ -173,9 +173,12 @@ test('personal low-back rehab requires the user to enter a dose', async ({
       exact: true,
     }),
   ).toBeVisible();
-  await expect(page.getByLabel('Set', { exact: true })).toHaveCount(3);
-  for (const input of await page.getByLabel('Set', { exact: true }).all())
-    await expect(input).toHaveValue('');
+  const rows = page.locator('ol > li');
+  await expect(rows).toHaveCount(3);
+  for (let index = 0; index < 3; index++) {
+    await rows.nth(index).getByRole('button').first().click();
+    await expect(page.getByLabel('Set', { exact: true })).toHaveValue('');
+  }
   await expect(
     page.getByRole('button', { name: 'Börja passet', exact: true }),
   ).toBeDisabled();
@@ -192,7 +195,6 @@ test('a favourite can replace a similar movement without growing the workout', a
   await page
     .getByRole('combobox', { name: 'Antal hantlar', exact: true })
     .selectOption('2');
-  await page.getByText('Fler inställningar', { exact: false }).click();
   await page
     .getByRole('combobox', { name: 'Träningsvana', exact: true })
     .selectOption('some');
@@ -211,19 +213,21 @@ test('a favourite can replace a similar movement without growing the workout', a
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
-  const before = await page.getByLabel('Set', { exact: true }).count();
+  const before = await page.locator('ol > li').count();
+  await page
+    .getByRole('button', { name: /Hantelpress på golv.*Ändra/ })
+    .click();
   await page
     .getByLabel('Byt till en favorit med liknande rörelse')
     .selectOption('kettlebell-floor-press');
-  await expect(page.getByLabel('Set', { exact: true })).toHaveCount(before);
+  await expect(page.locator('ol > li')).toHaveCount(before);
   await expect(
-    page.getByRole('link', {
-      name: 'Enarms golvpress med kettlebell',
-      exact: true,
-    }),
+    page
+      .locator('ol > li')
+      .filter({ hasText: 'Enarms golvpress med kettlebell' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: 'Hantelpress på golv', exact: true }),
+    page.locator('ol > li').filter({ hasText: 'Hantelpress på golv' }),
   ).toHaveCount(0);
 });
 

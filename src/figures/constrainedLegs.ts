@@ -54,9 +54,13 @@ export function constrainLegInterpolation(
   referencePoses: readonly Pose[],
 ): Pose {
   if (
-    !['step-up', 'split-squat', 'reverse-lunge', 'forward-lunge'].includes(
-      exerciseId,
-    )
+    ![
+      'step-up',
+      'split-squat',
+      'reverse-lunge',
+      'forward-lunge',
+      'single-leg-rdl',
+    ].includes(exerciseId)
   )
     return pose;
 
@@ -64,7 +68,9 @@ export function constrainLegInterpolation(
   const anchor =
     exerciseId === 'step-up' || exerciseId === 'split-squat'
       ? referencePoses[0]
-      : referencePoses[Math.floor(referencePoses.length / 2)];
+      : exerciseId === 'single-leg-rdl'
+        ? referencePoses.at(-1)
+        : referencePoses[Math.floor(referencePoses.length / 2)];
   if (!anchor) return pose;
   for (const side of ['R', 'L'] as const) {
     const { knee, ankle, toe } = keys[side];

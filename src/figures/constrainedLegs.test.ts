@@ -6,6 +6,19 @@ const distance = (a: readonly number[], b: readonly number[]) =>
   Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
 
 describe('constrained leg interpolation', () => {
+  it('keeps both E03 leg segments stable through the hinge', () => {
+    const samples = [0, 0.2, 0.4, 0.6, 0.8, 1].map((phase) =>
+      movementPose('single-leg-rdl', phase),
+    );
+    for (const side of ['R', 'L'] as const) {
+      const knee = side === 'R' ? 'kR' : 'kL';
+      const ankle = side === 'R' ? 'aR' : 'aL';
+      const upper = samples.map((pose) => distance(pose.hip, pose[knee]));
+      const lower = samples.map((pose) => distance(pose[knee], pose[ankle]));
+      expect(Math.max(...upper) - Math.min(...upper)).toBeLessThan(0.1);
+      expect(Math.max(...lower) - Math.min(...lower)).toBeLessThan(0.1);
+    }
+  });
   it.each([
     'step-up',
     'split-squat',
