@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Stomme: a personal knee-rehab strength programme PWA (Swedish UI).",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0-or-later",
   "engines": {
     "node": ">=24"
   },
