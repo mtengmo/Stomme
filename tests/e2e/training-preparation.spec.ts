@@ -10,7 +10,6 @@ for (const width of [360, 1280]) {
     await page
       .getByRole('button', { name: 'Styrka för löpning', exact: true })
       .click();
-    await page.getByText('Fler inställningar', { exact: false }).click();
     await page
       .getByRole('combobox', { name: 'Träningsvana', exact: true })
       .selectOption('some');
@@ -20,7 +19,22 @@ for (const width of [360, 1280]) {
     await page
       .getByRole('button', { name: 'Anpassa passet', exact: true })
       .click();
+    await page
+      .getByRole('button', { name: /Ändra$/ })
+      .first()
+      .click();
     await page.getByLabel('Set', { exact: true }).first().fill('4');
+    await page.screenshot({
+      path: test.info().outputPath('compact-editor.png'),
+      fullPage: true,
+    });
+    // Ordinary training starts directly; asking first is an explicit choice.
+    await page
+      .getByText('Besvär eller något att anpassa idag?', { exact: true })
+      .click();
+    await page
+      .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
+      .check();
     await page
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
@@ -30,15 +44,16 @@ for (const width of [360, 1280]) {
     await expect(
       page.getByText('Styrka för löpning · Pass A', { exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByText('Träningsvana: Viss vana', { exact: true }),
-    ).toBeVisible();
     await page.screenshot({
       path: test.info().outputPath('preparation-context.png'),
     });
     await page.getByRole('link', { name: 'Ändra passet', exact: true }).click();
     await page
       .getByRole('button', { name: 'Anpassa passet', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: /Ändra$/ })
+      .first()
       .click();
     await expect(page.getByLabel('Set', { exact: true }).first()).toHaveValue(
       '4',
@@ -58,7 +73,7 @@ for (const width of [360, 1280]) {
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
     await expect(
-      page.getByText('Styrka för löpning · Pass B', { exact: true }),
+      page.getByRole('button', { name: 'Klar set', exact: true }),
     ).toBeVisible();
     await page.goto('/#/');
     await page.getByText('Ändra', { exact: true }).click();
@@ -117,14 +132,10 @@ for (const width of [360, 1280]) {
     await page
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
-    await page.getByRole('radio', { name: 'Redo att träna' }).check();
-    await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-    await page
-      .getByRole('button', { name: 'Spara och fortsätt', exact: true })
-      .click();
     await expect(
       page.getByRole('button', { name: 'Klar set', exact: true }),
     ).toBeVisible();
+    await page.getByRole('button', { name: 'Klar set', exact: true }).click();
     await page.goto('/#/');
     await page.getByText('Ändra', { exact: true }).click();
     await expect(

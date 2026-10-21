@@ -9,6 +9,11 @@ import {
   kneeRehabSource,
 } from '../../content/kneeRehab';
 import {
+  exerciseMuscles,
+  type MuscleGroupId,
+  muscleGroups,
+} from '../../content/muscles';
+import {
   experienceLabels,
   isTrainingPreferences,
   trainingName,
@@ -39,6 +44,7 @@ import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
+import { availableWeights } from '../../rules/weightInventory';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { KneeCollection } from './KneeCollection';
@@ -225,6 +231,7 @@ function PreviewEditor({
   }, [draftKey, plan]);
 
   const [confirmed, setConfirmed] = useState(false);
+  const [checkBefore, setCheckBefore] = useState(false);
   const [editing, setEditing] = useState(() => {
     if (
       customWorkout ||
@@ -274,6 +281,7 @@ function PreviewEditor({
 
   function updatePlan(value: SetStateAction<PlannedExercise[]>) {
     setConfirmed(false);
+    setRemoved(null);
     setSaved(false);
     setPlan(value);
   }
@@ -286,6 +294,30 @@ function PreviewEditor({
   );
 
   const [addId, setAddId] = useState<ExerciseId | ''>('');
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(() => {
+    try {
+      const raw = sessionStorage.getItem(`${draftKey}.open`);
+      const stored = raw === null ? Number.NaN : Number(raw);
+      return Number.isInteger(stored) && stored >= 0 && stored < plan.length
+        ? stored
+        : null;
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    try {
+      if (expandedIndex === null) sessionStorage.removeItem(`${draftKey}.open`);
+      else sessionStorage.setItem(`${draftKey}.open`, String(expandedIndex));
+    } catch {
+      /* The open row is a convenience only. */
+    }
+  }, [draftKey, expandedIndex]);
+  const [removed, setRemoved] = useState<{
+    item: PlannedExercise;
+    index: number;
+  } | null>(null);
+  const [addMuscle, setAddMuscle] = useState<MuscleGroupId | ''>('');
 
   const active = sessions.find(
     (session) =>
@@ -520,6 +552,38 @@ function PreviewEditor({
                 </p>
               ) : null}
 
+              <p className="m-0 text-base text-ink-soft">
+                {removed
+                  ? ''
+                  : plan.length > 0
+                    ? 'Ändringar sparas direkt i utkastet.'
+                    : ''}
+              </p>
+              {removed ? (
+                <div
+                  role="status"
+                  className="flex items-center justify-between gap-3 border-2 border-edge px-3"
+                >
+                  <span className="text-base">
+                    Tog bort {exercises[removed.item.exerciseId].name}.
+                  </span>
+                  <button
+                    type="button"
+                    className="min-h-12 min-w-16 px-3 text-base font-bold underline"
+                    onClick={() => {
+                      const back = removed;
+                      updatePlan((current) => {
+                        const next = [...current];
+                        next.splice(back.index, 0, back.item);
+                        return next;
+                      });
+                      setExpandedIndex(back.index);
+                    }}
+                  >
+                    Ångra
+                  </button>
+                </div>
+              ) : null}
               <ol className="m-0 list-none p-0">
                 {plan.map((item, index) => {
                   const exercise = exercises[item.exerciseId];
@@ -527,287 +591,430 @@ function PreviewEditor({
                   return (
                     <li
                       key={exercise.id}
-                      className="flex flex-col gap-3 border-t-2 border-edge py-5"
+                      className={`flex flex-col gap-3 border-t-2 border-edge px-3 py-4 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-paper text-ink'}`}
                     >
-                      <Link
-                        href={`/ovning/${exercise.id}`}
-                        className="flex min-h-12 items-center text-xl font-bold underline"
+                      <button
+                        type="button"
+                        className="flex min-h-12 w-full items-center justify-between gap-3 text-left"
+                        aria-expanded={expandedIndex === index}
+                        onClick={() =>
+                          setExpandedIndex((current) =>
+                            current === index ? null : index,
+                          )
+                        }
                       >
-                        {exercise.name}
-                      </Link>
-                      {favouriteAlternatives(
-                        exercise.id,
-                        favourites ?? [],
-                        plan.map((entry) => entry.exerciseId),
-                        preferences,
-                      ).length > 0 ? (
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          Byt till en favorit med liknande rörelse
-                          <select
-                            className={inputClass}
-                            value=""
-                            onChange={(event) => {
-                              const replacement = event.target
-                                .value as ExerciseId;
-                              if (
-                                !favouriteAlternatives(
+                        <span>
+                          <span className="block text-xl font-bold">
+                            {index + 1}. E
+                            {String(
+                              exerciseList.findIndex(
+                                (entry) => entry.id === exercise.id,
+                              ) + 1,
+                            ).padStart(2, '0')}{' '}
+                            · {exercise.name}
+                          </span>
+                          <span className="block text-base font-normal">
+                            {item.sets || '–'} × {item.target || '–'}
+                            {exercise.perSide ? ' per sida' : ''}
+                            {item.weightKg > 0
+                              ? ` · ${item.weightKg} kg totalt`
+                              : ' · kroppsvikt'}
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-base font-bold underline">
+                          {expandedIndex === index ? 'Stäng' : 'Ändra'}
+                        </span>
+                      </button>
+                      {expandedIndex === index ? (
+                        <>
+                          <Link
+                            href={`/ovning/${exercise.id}`}
+                            className="flex min-h-12 items-center self-start text-base font-bold underline"
+                          >
+                            Visa hur övningen görs
+                          </Link>
+                          {favouriteAlternatives(
+                            exercise.id,
+                            favourites ?? [],
+                            plan.map((entry) => entry.exerciseId),
+                            preferences,
+                          ).length > 0 ? (
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              Byt till en favorit med liknande rörelse
+                              <select
+                                className={inputClass}
+                                value=""
+                                onChange={(event) => {
+                                  const replacement = event.target
+                                    .value as ExerciseId;
+                                  if (
+                                    !favouriteAlternatives(
+                                      exercise.id,
+                                      favourites ?? [],
+                                      plan.map((entry) => entry.exerciseId),
+                                      preferences,
+                                    ).includes(replacement)
+                                  )
+                                    return;
+                                  const suggested = trainingPlanSuggestion(
+                                    basePlan(replacement, preferences),
+                                    preferences,
+                                    sessions,
+                                    logs,
+                                  );
+                                  updatePlan((current) =>
+                                    current.map((entry, n) =>
+                                      n === index
+                                        ? {
+                                            ...suggested,
+                                            explanation: `En av dina favoriter. ${suggested.explanation ?? ''}`,
+                                          }
+                                        : entry,
+                                    ),
+                                  );
+                                }}
+                              >
+                                <option value="">Behåll {exercise.name}</option>
+                                {favouriteAlternatives(
                                   exercise.id,
                                   favourites ?? [],
                                   plan.map((entry) => entry.exerciseId),
                                   preferences,
-                                ).includes(replacement)
-                              )
-                                return;
-                              const suggested = trainingPlanSuggestion(
-                                basePlan(replacement, preferences),
-                                preferences,
-                                sessions,
-                                logs,
-                              );
-                              updatePlan((current) =>
-                                current.map((entry, n) =>
-                                  n === index
-                                    ? {
-                                        ...suggested,
-                                        explanation: `En av dina favoriter. ${suggested.explanation ?? ''}`,
-                                      }
-                                    : entry,
-                                ),
-                              );
-                            }}
-                          >
-                            <option value="">Behåll {exercise.name}</option>
-                            {favouriteAlternatives(
-                              exercise.id,
-                              favourites ?? [],
-                              plan.map((entry) => entry.exerciseId),
-                              preferences,
-                            ).map((candidate) => (
-                              <option key={candidate} value={candidate}>
-                                {exercises[candidate].name}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      ) : null}
-                      {preferences.programId === 'rehab' &&
-                      preferences.rehabFocus === 'knee' ? (
-                        <ExerciseDifficulty
-                          exerciseId={exercise.id}
-                          variantId={item.variantId}
-                          loadIndex={item.loadIndex}
-                          explain
-                        />
-                      ) : null}
+                                ).map((candidate) => (
+                                  <option key={candidate} value={candidate}>
+                                    {exercises[candidate].name}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          ) : null}
+                          {preferences.programId === 'rehab' &&
+                          preferences.rehabFocus === 'knee' ? (
+                            <ExerciseDifficulty
+                              exerciseId={exercise.id}
+                              variantId={item.variantId}
+                              loadIndex={item.loadIndex}
+                              explain
+                            />
+                          ) : null}
 
-                      <p className="m-0 text-base text-ink-soft">
-                        {item.explanation ??
-                          (preferences.programId === 'rehab'
-                            ? 'Ange din överenskomna dosering.'
-                            : 'Startförslag. Anpassa före start.')}
-                      </p>
+                          <p className="m-0 text-base text-ink-soft">
+                            {item.explanation ??
+                              (preferences.programId === 'rehab'
+                                ? 'Ange din överenskomna dosering.'
+                                : 'Startförslag. Anpassa före start.')}
+                          </p>
 
-                      {!exerciseMetadata[exercise.id].variants.some(
-                        (variant) =>
-                          variant.id === item.variantId &&
-                          equipmentFits(
-                            variant.equipment,
-                            preferences.equipment,
-                          ),
-                      ) ? (
-                        <p role="alert" className="m-0 text-base font-bold">
-                          Den tidigare utrustningen är inte tillgänglig. Välj en
-                          variant nedan eller ta bort övningen.
-                        </p>
-                      ) : null}
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          Set
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={item.sets || ''}
-                            onChange={(event) =>
-                              change(index, {
-                                sets: Number(event.target.value),
-                              })
-                            }
-                            className={inputClass}
-                          />
-                        </label>
-
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          {exercise.unit === 'seconds'
-                            ? 'Sekunder'
-                            : exercise.unit === 'meters'
-                              ? 'Meter'
-                              : 'Repetitioner'}
-
-                          {exercise.perSide ? ' per sida' : ''}
-
-                          <input
-                            type="number"
-                            min="1"
-                            max="600"
-                            value={item.target || ''}
-                            onChange={(event) =>
-                              change(index, {
-                                target: Number(event.target.value),
-                              })
-                            }
-                            className={inputClass}
-                          />
-                        </label>
-
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          Total vikt (kg)
-                          <input
-                            type="number"
-                            min="0"
-                            max="500"
-                            step="0.5"
-                            disabled={
-                              !exerciseMetadata[exercise.id].variants
-
-                                .find(
-                                  (variant) => variant.id === item.variantId,
-                                )
-
-                                ?.equipment.some(
-                                  (required) =>
-                                    required.type === 'dumbbell' ||
-                                    required.type === 'kettlebell',
-                                )
-                            }
-                            value={item.weightKg}
-                            onChange={(event) =>
-                              change(index, {
-                                weightKg: Number(event.target.value),
-                              })
-                            }
-                            className={inputClass}
-                          />
-                        </label>
-
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          Vila (sekunder)
-                          <input
-                            type="number"
-                            min="0"
-                            max="600"
-                            value={item.restSec}
-                            onChange={(event) =>
-                              change(index, {
-                                restSec: Number(event.target.value),
-                              })
-                            }
-                            className={inputClass}
-                          />
-                        </label>
-                      </div>
-
-                      <label className="flex flex-col gap-1 text-base font-bold">
-                        Utrustningsvariant
-                        <select
-                          value={item.variantId ?? ''}
-                          onChange={(event) => {
-                            const variant = exerciseMetadata[
-                              exercise.id
-                            ].variants.find(
-                              (value) => value.id === event.target.value,
-                            );
-
-                            if (variant)
-                              change(index, {
-                                variantId: variant.id,
-
-                                loadIndex: variant.defaultLoadIndex,
-
-                                weightKg:
-                                  exercise.loadLadder[variant.defaultLoadIndex]
-                                    ?.kg ?? 0,
-                              });
-                          }}
-                          className={inputClass}
-                        >
                           {!exerciseMetadata[exercise.id].variants.some(
                             (variant) =>
                               variant.id === item.variantId &&
                               equipmentFits(
                                 variant.equipment,
-
                                 preferences.equipment,
                               ),
                           ) ? (
-                            <option value={item.variantId ?? ''}>
-                              Tidigare variant · välj tillgänglig utrustning
-                            </option>
+                            <p role="alert" className="m-0 text-base font-bold">
+                              Den tidigare utrustningen är inte tillgänglig.
+                              Välj en variant nedan eller ta bort övningen.
+                            </p>
                           ) : null}
 
-                          {exerciseMetadata[exercise.id].variants
+                          <div className="grid grid-cols-2 gap-3">
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              Set
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                value={item.sets || ''}
+                                onChange={(event) =>
+                                  change(index, {
+                                    sets: Number(event.target.value),
+                                  })
+                                }
+                                className={inputClass}
+                              />
+                            </label>
 
-                            .filter((variant) =>
-                              equipmentFits(
-                                variant.equipment,
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              {exercise.unit === 'seconds'
+                                ? 'Sekunder'
+                                : exercise.unit === 'meters'
+                                  ? 'Meter'
+                                  : 'Repetitioner'}
 
-                                preferences.equipment,
-                              ),
-                            )
+                              {exercise.perSide ? ' per sida' : ''}
 
-                            .map((variant) => (
-                              <option key={variant.id} value={variant.id}>
-                                {variant.label}
-                              </option>
-                            ))}
-                        </select>
-                      </label>
+                              <input
+                                type="number"
+                                min="1"
+                                max="600"
+                                value={item.target || ''}
+                                onChange={(event) =>
+                                  change(index, {
+                                    target: Number(event.target.value),
+                                  })
+                                }
+                                className={inputClass}
+                              />
+                            </label>
 
-                      {exercise.perSide ? (
-                        <label className="flex flex-col gap-1 text-base font-bold">
-                          Arbetande sida
-                          <select
-                            value={
-                              item.sides?.length === 1 ? item.sides[0] : 'both'
-                            }
-                            onChange={(event) =>
-                              change(index, {
-                                sides:
-                                  event.target.value === 'both'
-                                    ? ['right', 'left']
-                                    : [event.target.value as 'right' | 'left'],
-                              })
-                            }
-                            className={inputClass}
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              Total vikt (kg)
+                              <input
+                                type="number"
+                                min="0"
+                                max="500"
+                                step="0.5"
+                                disabled={
+                                  !exerciseMetadata[exercise.id].variants
+
+                                    .find(
+                                      (variant) =>
+                                        variant.id === item.variantId,
+                                    )
+
+                                    ?.equipment.some(
+                                      (required) =>
+                                        required.type === 'dumbbell' ||
+                                        required.type === 'kettlebell',
+                                    )
+                                }
+                                value={item.weightKg}
+                                onChange={(event) =>
+                                  change(index, {
+                                    weightKg: Number(event.target.value),
+                                  })
+                                }
+                                className={inputClass}
+                                list={`weights-${exercise.id}`}
+                              />
+                              {(() => {
+                                const variant = exerciseMetadata[
+                                  exercise.id
+                                ].variants.find(
+                                  (entry) => entry.id === item.variantId,
+                                );
+                                const weighted = variant?.equipment.find(
+                                  (entry) =>
+                                    entry.type === 'dumbbell' ||
+                                    entry.type === 'kettlebell',
+                                );
+                                const choices = weighted
+                                  ? availableWeights(
+                                      preferences,
+                                      weighted.type as
+                                        | 'dumbbell'
+                                        | 'kettlebell',
+                                      weighted.count,
+                                    )
+                                  : [];
+                                return choices.length ? (
+                                  <>
+                                    <datalist id={`weights-${exercise.id}`}>
+                                      {choices.map((choice) => (
+                                        <option
+                                          key={choice.label}
+                                          value={choice.totalKg}
+                                        >
+                                          {choice.label}
+                                        </option>
+                                      ))}
+                                    </datalist>
+                                    <span className="font-normal text-ink-soft">
+                                      Tillgängligt:{' '}
+                                      {choices
+                                        .map((choice) => choice.label)
+                                        .join(', ')}
+                                    </span>
+                                  </>
+                                ) : null;
+                              })()}
+                            </label>
+
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              Vila (sekunder)
+                              <input
+                                type="number"
+                                min="0"
+                                max="600"
+                                value={item.restSec}
+                                onChange={(event) =>
+                                  change(index, {
+                                    restSec: Number(event.target.value),
+                                  })
+                                }
+                                className={inputClass}
+                              />
+                            </label>
+                          </div>
+
+                          <label className="flex flex-col gap-1 text-base font-bold">
+                            Utrustningsvariant
+                            <select
+                              value={item.variantId ?? ''}
+                              onChange={(event) => {
+                                const variant = exerciseMetadata[
+                                  exercise.id
+                                ].variants.find(
+                                  (value) => value.id === event.target.value,
+                                );
+
+                                if (variant)
+                                  change(index, {
+                                    variantId: variant.id,
+
+                                    loadIndex: variant.defaultLoadIndex,
+
+                                    weightKg:
+                                      exercise.loadLadder[
+                                        variant.defaultLoadIndex
+                                      ]?.kg ?? 0,
+                                  });
+                              }}
+                              className={inputClass}
+                            >
+                              {!exerciseMetadata[exercise.id].variants.some(
+                                (variant) =>
+                                  variant.id === item.variantId &&
+                                  equipmentFits(
+                                    variant.equipment,
+
+                                    preferences.equipment,
+                                  ),
+                              ) ? (
+                                <option value={item.variantId ?? ''}>
+                                  Tidigare variant · välj tillgänglig utrustning
+                                </option>
+                              ) : null}
+
+                              {exerciseMetadata[exercise.id].variants
+
+                                .filter((variant) =>
+                                  equipmentFits(
+                                    variant.equipment,
+
+                                    preferences.equipment,
+                                  ),
+                                )
+
+                                .map((variant) => (
+                                  <option key={variant.id} value={variant.id}>
+                                    {variant.label}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+
+                          {exercise.perSide ? (
+                            <label className="flex flex-col gap-1 text-base font-bold">
+                              Arbetande sida
+                              <select
+                                value={
+                                  item.sides?.length === 1
+                                    ? item.sides[0]
+                                    : 'both'
+                                }
+                                onChange={(event) =>
+                                  change(index, {
+                                    sides:
+                                      event.target.value === 'both'
+                                        ? ['right', 'left']
+                                        : [
+                                            event.target.value as
+                                              | 'right'
+                                              | 'left',
+                                          ],
+                                  })
+                                }
+                                className={inputClass}
+                              >
+                                <option value="both">
+                                  Höger och vänster, en i taget
+                                </option>
+
+                                <option value="right">Endast höger</option>
+
+                                <option value="left">Endast vänster</option>
+                              </select>
+                            </label>
+                          ) : null}
+
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold disabled:opacity-50"
+                              onClick={() => {
+                                updatePlan((current) => {
+                                  const next = [...current];
+                                  const [moved] = next.splice(index, 1);
+                                  if (moved) next.splice(index - 1, 0, moved);
+                                  return next;
+                                });
+                                setExpandedIndex(index - 1);
+                              }}
+                            >
+                              Flytta upp
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === plan.length - 1}
+                              className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold disabled:opacity-50"
+                              onClick={() => {
+                                updatePlan((current) => {
+                                  const next = [...current];
+                                  const [moved] = next.splice(index, 1);
+                                  if (moved) next.splice(index + 1, 0, moved);
+                                  return next;
+                                });
+                                setExpandedIndex(index + 1);
+                              }}
+                            >
+                              Flytta ned
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const gone = plan[index];
+                              updatePlan((current) =>
+                                current.filter((_, n) => n !== index),
+                              );
+                              setExpandedIndex(null);
+                              if (gone) setRemoved({ item: gone, index });
+                            }}
+                            className="min-h-12 self-start px-2 text-base font-bold underline"
                           >
-                            <option value="both">
-                              Höger och vänster, en i taget
-                            </option>
-
-                            <option value="right">Endast höger</option>
-
-                            <option value="left">Endast vänster</option>
-                          </select>
-                        </label>
+                            Ta bort {exercise.name}
+                          </button>
+                        </>
                       ) : null}
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updatePlan((current) =>
-                            current.filter((_, n) => n !== index),
-                          )
-                        }
-                        className="min-h-12 self-start px-2 text-base font-bold underline"
-                      >
-                        Ta bort {exercise.name}
-                      </button>
                     </li>
                   );
                 })}
               </ol>
 
+              <label className="flex flex-col gap-2 text-lg font-bold">
+                Kroppsdel
+                <select
+                  className={inputClass}
+                  value={addMuscle}
+                  onChange={(event) =>
+                    setAddMuscle(event.target.value as MuscleGroupId | '')
+                  }
+                >
+                  <option value="">Hela kroppen</option>
+                  {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
+                    (group) => (
+                      <option key={group} value={group}>
+                        {muscleGroups[group].label}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </label>
               <label className="flex flex-col gap-2 text-lg font-bold">
                 Lägg till övning
                 <select
@@ -820,6 +1027,17 @@ function PreviewEditor({
                   <option value="">Välj övning</option>
 
                   {compatible
+
+                    .filter(
+                      (exercise) =>
+                        !addMuscle ||
+                        exerciseMuscles[exercise.id].primary.includes(
+                          addMuscle,
+                        ) ||
+                        exerciseMuscles[exercise.id].secondary.includes(
+                          addMuscle,
+                        ),
+                    )
 
                     .filter(
                       (exercise) =>
@@ -845,6 +1063,7 @@ function PreviewEditor({
                       basePlan(addId, preferences),
                     ]);
 
+                  if (addId) setExpandedIndex(plan.length);
                   setAddId('');
                 }}
               >
@@ -872,7 +1091,27 @@ function PreviewEditor({
                 ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
                 : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
             </label>
-          ) : null}
+          ) : (
+            <details className="border-y-2 border-edge py-2">
+              <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                Besvär eller något att anpassa idag?
+              </summary>
+              <label className="flex min-h-12 items-start gap-3 py-2 text-base">
+                <input
+                  type="checkbox"
+                  checked={checkBefore}
+                  onChange={(event) => setCheckBefore(event.target.checked)}
+                  className="size-6 shrink-0"
+                />
+                Fråga hur kroppen känns före passet. Annars börjar passet
+                direkt.
+              </label>
+              <p className="m-0 text-base text-ink-soft">
+                Du kan alltid rapportera besvär under passet. Ett överhoppat
+                svar sparas inte som besvärsfritt.
+              </p>
+            </details>
+          )}
 
           {editing && customWorkout ? (
             <>
@@ -979,13 +1218,7 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div
-            className={
-              !editing
-                ? 'fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper px-5 py-4'
-                : ''
-            }
-          >
+          <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper px-5 py-4">
             <div className="mx-auto w-full max-w-xl">
               <Button
                 disabled={
@@ -1012,11 +1245,16 @@ function PreviewEditor({
                     try {
                       sessionStorage.removeItem(draftKey);
                       sessionStorage.removeItem(`${draftKey}.editing`);
+                      sessionStorage.removeItem(`${draftKey}.open`);
                     } catch {
                       /* No persistent draft to clear. */
                     }
 
-                    navigate(`/kansla/${session.id}/before`);
+                    navigate(
+                      preferences.programId === 'rehab' || checkBefore
+                        ? `/kansla/${session.id}/before`
+                        : `/session/${session.id}`,
+                    );
                   } catch (err) {
                     setError(
                       err instanceof Error

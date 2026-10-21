@@ -79,8 +79,12 @@ for (const width of [360, 1280]) {
     await expect(
       page.getByRole('heading', { name: 'Mitt kettlebellpass', exact: true }),
     ).toBeVisible();
-    await expect(page.getByLabel('Set', { exact: true })).toHaveCount(2);
-    await page.getByLabel('Set', { exact: true }).first().fill('1');
+    const rows = page.locator('ol > li > button[aria-expanded]');
+    await expect(rows).toHaveCount(2);
+    await expect(page.getByLabel('Set', { exact: true })).toHaveCount(0);
+    await rows.first().click();
+    await expect(page.getByLabel('Set', { exact: true })).toHaveCount(1);
+    await page.getByLabel('Set', { exact: true }).fill('1');
     await page.getByLabel('Meter per sida').fill('12');
     await page
       .getByRole('button', { name: 'Spara ändringar i eget pass' })
@@ -90,17 +94,16 @@ for (const width of [360, 1280]) {
     ).toBeVisible();
     await page.evaluate(() => sessionStorage.clear());
     await page.reload();
-    await expect(page.getByLabel('Set', { exact: true }).first()).toHaveValue(
-      '1',
-    );
+    await rows.first().click();
+    await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
     await expect(page.getByLabel('Meter per sida')).toHaveValue('12');
     await page
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
-    await page.getByRole('radio', { name: 'Redo att träna' }).check();
-    await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-    await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
-    await expect(page.getByText(/Mitt kettlebellpass/)).toBeVisible();
+    await expect(page).toHaveURL(/#\/session\//);
+    await expect(
+      page.getByRole('button', { name: 'Klar set', exact: true }),
+    ).toBeVisible();
     await page.goto('/#/ovningar');
     await page
       .getByRole('button', { name: 'Ta bort Mitt kettlebellpass', exact: true })
