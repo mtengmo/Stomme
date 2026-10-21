@@ -130,7 +130,7 @@ export function SessionScreen({ id }: { id: string }) {
   }
   if (!open) return <Finished id={id} />;
   if (session.s.programId) {
-    if (!session.s.checkins?.before)
+    if (session.s.programId === 'rehab' && !session.s.checkins?.before)
       return <Redirect to={`/kansla/${id}/before`} />;
     return (
       <Runner

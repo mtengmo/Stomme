@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { sideLabel } from '../../content/copy';
-import type { Exercise } from '../../domain/types';
+import { EFFORT_LABEL, sideLabel } from '../../content/copy';
+import type { Effort, Exercise } from '../../domain/types';
 import { formatClock } from '../../lib/format';
 import { stopTimerVoice, timerVoice } from '../../lib/timerVoice';
 import { useCountdown } from '../../lib/useCountdown';
@@ -21,6 +21,9 @@ interface RestScreenProps {
   /** True when the rest follows a set (not an effort answer): draws the tick. */
   afterSet: boolean;
   autoContinue?: boolean;
+  effortExercise?: Exercise;
+  effort?: Effort;
+  onEffort?(effort: Effort): void;
 }
 /** Huge countdown on timestamps, +15 s, skip; "Nästa" tells what comes after. */
 export function RestScreen({
@@ -32,6 +35,9 @@ export function RestScreen({
   onContinue,
   afterSet,
   autoContinue = false,
+  effortExercise,
+  effort,
+  onEffort,
 }: RestScreenProps) {
   const total = useRef(restSec);
   const [paused, setPaused] = useState(false);
@@ -160,6 +166,29 @@ export function RestScreen({
             {side ? ` · ${side}` : ''}
           </p>
         </div>
+      ) : null}
+      {effortExercise && onEffort ? (
+        <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+          <legend className="text-lg font-bold">
+            Hur ansträngande var {effortExercise.name}?
+          </legend>
+          <p className="m-0 text-base text-ink-soft">
+            Bedöm ansträngningen, inte smärta. Du kan hoppa över frågan.
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(['easy', 'ok', 'hard'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={effort === value}
+                className={`min-h-12 rounded-sm border-2 px-2 text-base font-bold ${effort === value ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+                onClick={() => onEffort(value)}
+              >
+                {EFFORT_LABEL[value]}
+              </button>
+            ))}
+          </div>
+        </fieldset>
       ) : null}
     </SessionFrame>
   );

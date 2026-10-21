@@ -66,6 +66,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [error, setError] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [timedExercise, setTimedExercise] = useState<ExerciseId | null>(null);
+  const [restEffort, setRestEffort] = useState<Effort | undefined>();
   const snackKey = useRef(0);
   const seconds = useElapsed(session.startedAt);
 
@@ -380,6 +381,39 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   }
 
   const ex = exercises[step.exerciseId];
+  const following = steps[cursor + 1];
+  if (following?.kind === 'rest') {
+    const upcoming = nextSetStep(steps, cursor + 2, session.feedback);
+    return (
+      <RestScreen
+        key={cursor}
+        frame={frame}
+        restSec={following.restSec}
+        nextExercise={upcoming ? exercises[upcoming.exerciseId] : undefined}
+        nextStep={upcoming}
+        nextTotalSets={upcoming ? total(upcoming.planIndex) : 0}
+        onContinue={() => {
+          void run(async () => {
+            if (!restEffort)
+              await setFeedback(getDb(), session.id, step.exerciseId, {
+                effortSkipped: true,
+              });
+            setRestEffort(undefined);
+            setCursor(cursor + 2);
+          });
+        }}
+        afterSet
+        effortExercise={ex}
+        effort={restEffort}
+        onEffort={(effort) => {
+          setRestEffort(effort);
+          void run(async () => {
+            await setFeedback(getDb(), session.id, step.exerciseId, { effort });
+          });
+        }}
+      />
+    );
+  }
   return (
     <EffortScreen
       key={cursor}
