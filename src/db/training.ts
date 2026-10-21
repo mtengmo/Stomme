@@ -224,13 +224,20 @@ export async function recordTrainingCheckin(
 
     if (session.checkins?.[timing]) throw new Error('Svaret är redan sparat.');
 
-    if (timing !== 'before' && !session.checkins?.before)
+    if (
+      timing !== 'before' &&
+      session.programId === 'rehab' &&
+      !session.checkins?.before
+    )
       throw new Error('Svara på frågorna före passet först.');
 
     if (
       timing === 'dayAfter'
         ? !trainingDayAfterDue(session, toLocalDate(new Date()))
-        : session.status !== 'in_progress'
+        : timing === 'after'
+          ? // An answer deferred with "Svara senare" may be given later.
+            session.status === 'aborted'
+          : session.status !== 'in_progress'
     )
       throw new Error('Check-in is not due');
 
@@ -250,8 +257,39 @@ export async function recordTrainingCheckin(
         : {}),
 
       ...(timing === 'after'
-        ? { status: 'completed' as const, finishedAt: check.recordedAt }
+        ? session.status === 'completed'
+          ? // Deferred earlier: completion time and counts stay unchanged.
+            {}
+          : {
+              status: 'completed' as const,
+              finishedAt: check.recordedAt,
+            }
         : {}),
+    });
+  });
+}
+
+/**
+ * "Svara senare": the workout is complete, the after answer is still missing.
+ * Without an after answer no automatic increase is suggested. The answer can
+ * be given later; it never changes the completion time.
+ */
+export async function deferAfterCheckin(
+  db: StommeDB,
+  id: string,
+  finishedAt: Date,
+) {
+  await db.transaction('rw', db.sessions, async () => {
+    const session = await db.sessions.get(id);
+    if (
+      !session?.programId ||
+      session.status !== 'in_progress' ||
+      session.checkins?.after
+    )
+      return;
+    await db.sessions.update(id, {
+      status: 'completed',
+      finishedAt: finishedAt.toISOString(),
     });
   });
 }

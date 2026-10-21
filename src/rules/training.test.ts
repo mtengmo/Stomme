@@ -145,6 +145,23 @@ describe('programme-specific progression', () => {
     ],
     ['rehab even after easy painless sets', session({ programId: 'rehab' })],
     [
+      'a deferred ("Svara senare") after answer',
+      session({
+        checkins: {
+          before: {
+            feeling: 'ready',
+            symptoms: null,
+            recordedAt: '2026-10-20T08:00:00.000Z',
+          },
+        },
+      }),
+    ],
+    [
+      'a skipped effort answer',
+      session({ feedback: { 'single-leg-rdl': { effortSkipped: true } } }),
+    ],
+    ['no effort answer', session({ feedback: {} })],
+    [
       'skipped exercise',
       session({
         feedback: { 'single-leg-rdl': { effort: 'easy', skipped: true } },

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { sideLabel } from '../../content/copy';
-import type { Exercise } from '../../domain/types';
+import { EFFORT_LABEL, sideLabel } from '../../content/copy';
+import type { Effort, Exercise } from '../../domain/types';
 import { formatClock } from '../../lib/format';
 import { stopTimerVoice, timerVoice } from '../../lib/timerVoice';
 import { useCountdown } from '../../lib/useCountdown';
@@ -21,6 +21,9 @@ interface RestScreenProps {
   /** True when the rest follows a set (not an effort answer): draws the tick. */
   afterSet: boolean;
   autoContinue?: boolean;
+  effortExercise?: Exercise;
+  effort?: Effort;
+  onEffort?(effort: Effort): void;
 }
 /** Huge countdown on timestamps, +15 s, skip; "Nästa" tells what comes after. */
 export function RestScreen({
@@ -32,6 +35,9 @@ export function RestScreen({
   onContinue,
   afterSet,
   autoContinue = false,
+  effortExercise,
+  effort,
+  onEffort,
 }: RestScreenProps) {
   const total = useRef(restSec);
   const [paused, setPaused] = useState(false);
@@ -103,7 +109,9 @@ export function RestScreen({
         <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
         {afterSet ? <PencilTick size={72} animate variant={1} /> : null}
       </div>
-      <div className="relative mx-auto grid size-60 place-items-center">
+      <div
+        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-40' : 'size-60'}`}
+      >
         <svg
           viewBox="0 0 280 280"
           className="absolute inset-0 size-full -rotate-90"
@@ -130,7 +138,7 @@ export function RestScreen({
           />
         </svg>
         <p
-          className="count m-0 text-[6rem] leading-none"
+          className={`count m-0 leading-none ${effortExercise && onEffort ? 'text-6xl' : 'text-[6rem]'}`}
           role="timer"
           aria-label={`${paused ? savedSeconds.current : timer.seconds} sekunder kvar`}
         >
@@ -141,6 +149,29 @@ export function RestScreen({
               : formatClock(timer.seconds)}
         </p>
       </div>
+      {effortExercise && onEffort ? (
+        <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+          <legend className="text-lg font-bold">
+            Hur ansträngande var {effortExercise.name}?
+          </legend>
+          <p className="m-0 text-base text-ink-soft">
+            Bedöm ansträngningen, inte smärta. Du kan hoppa över frågan.
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(['easy', 'ok', 'hard'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={effort === value}
+                className={`min-h-12 rounded-sm border-2 px-2 text-base font-bold ${effort === value ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+                onClick={() => onEffort(value)}
+              >
+                {EFFORT_LABEL[value]}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
       <p role="status" className="m-0 text-base">
         {paused
           ? 'Vilan är pausad. Fortsätt när du är redo.'

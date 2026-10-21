@@ -13,7 +13,7 @@ export type Stage =
   | 'summary';
 
 const ACTION =
-  /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Spara|Starta – 5 s förberedelse)$/;
+  /^(Klar set|Hoppa över vila|Avsluta pass|Spara|Starta – 5 s förberedelse)$/;
 
 /** Fills the pain picker (score, optional red flags) and saves. */
 export async function answerPain(
@@ -66,7 +66,16 @@ export async function playPassA(
   let sets = 0;
   for (let guard = 0; guard < 80; guard++) {
     const action = page.getByRole('button', { name: ACTION }).first();
-    await action.waitFor();
+    const finalEffort = page.getByRole('heading', {
+      name: /Hur ansträngande/,
+    });
+    await action.or(finalEffort).first().waitFor();
+    if (await finalEffort.count()) {
+      await once('effort');
+      await page.getByRole('button', { name: 'Lagom', exact: true }).click();
+      await expect(finalEffort).toHaveCount(0);
+      continue;
+    }
     const name = (await action.innerText()).trim();
 
     if (name.startsWith('Starta –')) {
@@ -126,6 +135,10 @@ export async function playPassA(
       sets += 1;
     } else if (name === 'Hoppa över vila') {
       await once('rest');
+      if (
+        await page.getByRole('button', { name: 'Lagom', exact: true }).count()
+      )
+        await once('effort');
     } else {
       await once('effort');
     }
@@ -159,4 +172,52 @@ export async function skipFirstExercise(
   await expect(frame).not.toHaveAttribute('data-step', before ?? '');
   await expect(page.getByRole('status')).toContainText('Hoppade över');
   await onStage('set-after-skip');
+}
+
+/**
+ * Removes exercises from the compact editor until `keep` remain, then opens
+ * the first remaining row so its fields can be edited.
+ */
+export async function keepFirstExercises(page: Page, keep = 1): Promise<void> {
+  const rows = page.locator('ol > li > button[aria-expanded]');
+  const remove = page.getByRole('button', { name: /^Ta bort / });
+  while ((await rows.count()) > keep) {
+    if (!(await remove.count())) await rows.last().click();
+    await remove.click();
+  }
+  if (!(await remove.count())) await rows.first().click();
+  await expect(page.getByLabel('Set', { exact: true })).toBeVisible();
+}
+
+/** Completes every remaining set of the current exercise (one tap each). */
+export async function completeSets(page: Page): Promise<void> {
+  const effort = page.getByRole('heading', {
+    name: 'Hur ansträngande var övningen?',
+  });
+  const done = page.getByRole('button', { name: 'Klar set', exact: true });
+  for (let guard = 0; guard < 12; guard++) {
+    await done.or(effort).first().waitFor();
+    if (await effort.count()) return;
+    const before = await page.locator('[data-step]').getAttribute('data-step');
+    await done.click();
+    await expect(async () => {
+      const now = await page
+        .locator('[data-step]')
+        .getAttribute('data-step', { timeout: 250 })
+        .catch(() => null);
+      expect(now).not.toBe(before);
+    }).toPass();
+    if (await page.getByRole('button', { name: 'Hoppa över vila' }).count())
+      await page.getByRole('button', { name: 'Hoppa över vila' }).click();
+  }
+}
+
+/** Empties the compact editor, removing each exercise through its own row. */
+export async function removeAllExercises(page: Page): Promise<void> {
+  const rows = page.locator('ol > li > button[aria-expanded]');
+  const remove = page.getByRole('button', { name: /^Ta bort / });
+  while (await rows.count()) {
+    if (!(await remove.count())) await rows.last().click();
+    await remove.click();
+  }
 }

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { removeAllExercises } from './flow';
 
 for (const width of [360, 1280]) {
   test(`single-kettlebell options have sources and one implement throughout the motion (${width})`, async ({
@@ -74,8 +75,7 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
-  const remove = page.getByRole('button', { name: /^Ta bort / });
-  while (await remove.count()) await remove.last().click();
+  await removeAllExercises(page);
   await page
     .getByRole('combobox', { name: 'Lägg till övning', exact: true })
     .selectOption('kettlebell-floor-press');
@@ -88,9 +88,7 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   await page.getByLabel('Total vikt (kg)', { exact: true }).fill('16');
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
-  await page.getByRole('radio', { name: 'Redo att träna' }).check();
-  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  await expect(page).toHaveURL(/#\/session\//);
   await page.reload();
   await expect(page.getByText(/16 kg totalt/).first()).toBeVisible();
   await expect(

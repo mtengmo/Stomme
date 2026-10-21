@@ -93,9 +93,21 @@ export function Summary({
           {onFinish ? (
             <Button onClick={onFinish}>Avsluta pass</Button>
           ) : (
-            <Link href="/" className={buttonClass('primary')}>
-              Till träningen
-            </Link>
+            <>
+              {session.programId &&
+              session.status === 'completed' &&
+              !session.checkins?.after ? (
+                <Link
+                  href={`/kansla/${session.id}/after`}
+                  className={buttonClass('secondary')}
+                >
+                  Svara på hur passet kändes
+                </Link>
+              ) : null}
+              <Link href="/" className={buttonClass('primary')}>
+                Till träningen
+              </Link>
+            </>
           )}
         </div>
       </div>

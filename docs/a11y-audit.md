@@ -59,3 +59,13 @@ Production browser checks also verify filter/Back restoration, invalid filters, 
 The read-only `#/granska` page adds fixed E01–E11 references, a desktop catalogue/mobile picker, previous/next navigation, stable per-exercise links and both-side start/mid/end frames. References also appear in the library and exercise cards. This metadata does not change stored workout IDs or backup schemas.
 
 All 50 screen audits report no findings, including the review page and its muscle-frame mode in both themes. Mobile-dark and desktop-light browser checks cover all eleven references, direct links, Back/reload restoration, narrow layout and offline review. All 20 production browser tests and 415 unit tests pass; type/lint check and production build pass with the existing CSS warnings. The review route is loaded on demand; initial JavaScript remains about 136.7 KB gzipped. Impeccable's detector reports no findings on the changed surfaces.
+
+## 2026-10-21: workout workflow branch
+
+Result: 90 screen audits (360x800, light and dark), no findings; contrast pairs pass; `impeccable detect` returns no findings.
+
+Two findings were investigated:
+- `unnamed control summary ""` on session set, timed hold and general training set. Cause: a false positive in the audit script. The summary "Visa muskelkarta" sits inside the closed "Hur gör man?" details; its `innerText` is empty because the outer details is closed, yet the script only checked the nearest closed details. It reproduced identically at ab01d14 (audited in a separate worktree), so it predates the workout workflow work. The script now treats a summary nested in any closed details as hidden. The control itself has a real visible name.
+- A 14 px note on the history overview ("Saknade pass betyder saknade mätningar"), also present at ab01d14, is now 16 px.
+
+The training walk now follows the compact editor (rows opened through "Ändra"), the optional pre-check, effort inside the rest screen and the final effort screen.

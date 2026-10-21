@@ -4,6 +4,7 @@ import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
 import type { EquipmentChoice, TrainingPreferences } from '../../domain/types';
 import { Button } from '../../ui/Button';
+import { WeightInventoryFields } from './WeightInventoryFields';
 
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
@@ -19,6 +20,9 @@ export function QuickStart() {
   const [equipment, setEquipment] = useState<EquipmentChoice[]>(['bodyweight']);
   const [experience, setExperience] =
     useState<TrainingPreferences['experience']>('new');
+  const [weights, setWeights] = useState<
+    NonNullable<TrainingPreferences['weights']>
+  >([]);
   const [side, setSide] = useState<'both' | 'right' | 'left'>('both');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -152,6 +156,39 @@ export function QuickStart() {
               </label>
             ))}
           </fieldset>
+          {goal === 'general' || goal === 'running' ? (
+            <label className="flex flex-col gap-2 text-base font-bold">
+              Vana av styrketräning
+              <select
+                className={fieldClass}
+                aria-label="Träningsvana"
+                value={experience}
+                onChange={(event) =>
+                  setExperience(
+                    event.target.value as TrainingPreferences['experience'],
+                  )
+                }
+              >
+                <option value="new">Ny eller på väg tillbaka</option>
+                <option value="some">Viss vana</option>
+                <option value="regular">Tränar regelbundet</option>
+              </select>
+              <span className="font-normal text-ink-soft">
+                Gäller styrketräning. Din löpvana kan vara en annan.
+              </span>
+            </label>
+          ) : null}
+          {equipment.some(
+            (item) =>
+              item.startsWith('dumbbell') || item.startsWith('kettlebell'),
+          ) ? (
+            <details>
+              <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                Ange vikterna du äger
+              </summary>
+              <WeightInventoryFields value={weights} onChange={setWeights} />
+            </details>
+          ) : null}
           <details>
             <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
               Fler inställningar
@@ -175,24 +212,6 @@ export function QuickStart() {
                     </label>
                   ))
                 : null}
-              {goal === 'general' || goal === 'running' ? (
-                <label className="flex flex-col gap-2 text-base font-bold">
-                  Träningsvana
-                  <select
-                    className={fieldClass}
-                    value={experience}
-                    onChange={(event) =>
-                      setExperience(
-                        event.target.value as TrainingPreferences['experience'],
-                      )
-                    }
-                  >
-                    <option value="new">Ny eller på väg tillbaka</option>
-                    <option value="some">Viss vana</option>
-                    <option value="regular">Tränar regelbundet</option>
-                  </select>
-                </label>
-              ) : null}
               {goal === 'knee' || goal === 'custom' ? (
                 <label className="flex flex-col gap-2 text-base font-bold">
                   Arbetande sida
@@ -230,6 +249,7 @@ export function QuickStart() {
                     goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
                   equipment,
                   experience,
+                  ...(weights.length ? { weights } : {}),
                   ...(goal === 'knee' || goal === 'custom'
                     ? {
                         rehabFocus:

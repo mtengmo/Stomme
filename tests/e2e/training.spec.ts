@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { completeSets, keepFirstExercises } from './flow';
 
 test('training setup keeps readiness, symptoms, effort, and after check-in separate', async ({
   page,
@@ -13,7 +14,10 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await expect(page.getByRole('navigation')).toHaveCount(0);
   await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
   await expect(page.getByRole('checkbox', { checked: true })).toHaveCount(0);
-  await expect(page.getByRole('combobox')).toHaveCount(0);
+  await expect(page.getByRole('combobox')).toHaveCount(1);
+  await expect(
+    page.getByRole('combobox', { name: 'Träningsvana', exact: true }),
+  ).toHaveValue('new');
   await page
     .getByRole('button', { name: 'Visa mitt pass', exact: true })
     .click();
@@ -25,12 +29,17 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
-  const removeButtons = page.getByRole('button', { name: /^Ta bort / });
-  while ((await removeButtons.count()) > 1) await removeButtons.last().click();
+  await keepFirstExercises(page);
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.locator('ol').getByRole('link').first().click();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
+  await page
+    .getByText('Besvär eller något att anpassa idag?', { exact: true })
+    .click();
+  await page
+    .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
+    .check();
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
 
   await expect(page).toHaveURL(/#\/kansla\/[^/]+\/before$/);
@@ -47,10 +56,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
 
   await expect(page).toHaveURL(/#\/session\//);
   await expect(page.locator('[data-step]')).toBeVisible();
-  await page.getByRole('button', { name: 'Klar set', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: 'Hur ansträngande var övningen?' }),
-  ).toBeVisible();
+  await completeSets(page);
   await page.getByRole('button', { name: 'Lagom', exact: true }).click();
 
   await expect(page).toHaveURL(/#\/kansla\/[^/]+\/after$/);
@@ -96,16 +102,14 @@ test('running direction uses body-wide check-ins and keeps effort separate from 
   await expect(
     page.getByRole('heading', { name: 'Pass A', exact: true }),
   ).toBeVisible();
-  while ((await page.getByRole('button', { name: /^Ta bort / }).count()) > 1)
-    await page
-      .getByRole('button', { name: /^Ta bort / })
-      .last()
-      .click();
+  await keepFirstExercises(page);
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
-  await page.getByRole('radio', { name: 'Redo att träna' }).check();
-  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
+  // Ordinary training starts directly: no mandatory before questionnaire.
+  await expect(page).toHaveURL(/#\/session\//);
+  await expect(page.getByRole('radio', { name: 'Redo att träna' })).toHaveCount(
+    0,
+  );
   await page
     .getByRole('button', { name: 'Rapportera smärta eller besvär' })
     .click();
@@ -118,7 +122,7 @@ test('running direction uses body-wide check-ins and keeps effort separate from 
     .getByText('2', { exact: true })
     .click();
   await page.getByRole('button', { name: 'Spara besvär', exact: true }).click();
-  await page.getByRole('button', { name: 'Klar set', exact: true }).click();
+  await completeSets(page);
   await page.getByRole('button', { name: 'Lätt', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Hur kändes passet?' }),
@@ -247,11 +251,14 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await page
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();
-  await expect(page.getByRole('button', { name: /^Ta bort / })).toHaveCount(6);
-  const remove = page
-    .getByRole('button', { name: /^Ta bort / })
-    .filter({ hasNotText: 'Rakt benlyft' });
-  while (await remove.count()) await remove.first().click();
+  const rows = page.locator('ol > li > button[aria-expanded]');
+  await expect(rows).toHaveCount(6);
+  const others = rows.filter({ hasNotText: 'Rakt benlyft' });
+  while (await others.count()) {
+    await others.first().click();
+    await page.getByRole('button', { name: /^Ta bort / }).click();
+  }
+  await rows.first().click();
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('3');
   await expect(
     page.getByRole('combobox', { name: 'Arbetande sida', exact: true }),
@@ -270,6 +277,7 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
+  await page.locator('ol > li > button[aria-expanded]').first().click();
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
   await expect(
     page.getByLabel('Repetitioner per sida', { exact: true }),

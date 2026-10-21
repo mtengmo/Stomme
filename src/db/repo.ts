@@ -163,7 +163,7 @@ export async function logSet(
   return db.transaction('rw', db.sessions, db.setLogs, async () => {
     const session = await requireOpen(db, sessionId);
     if (session.programId) {
-      if (!session.checkins?.before)
+      if (session.programId === 'rehab' && !session.checkins?.before)
         throw new Error('Svara på frågorna före passet först.');
       const planned = session.plan.find(
         (p) => p.exerciseId === input.exerciseId,

@@ -90,7 +90,10 @@ function isDone(
     );
   }
   if (step.kind === 'effort') {
-    return feedback[step.exerciseId]?.effort !== undefined;
+    return (
+      feedback[step.exerciseId]?.effort !== undefined ||
+      feedback[step.exerciseId]?.effortSkipped === true
+    );
   }
   return true; // rests are not persisted, so they never block a resume
 }

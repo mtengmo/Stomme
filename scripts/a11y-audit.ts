@@ -56,9 +56,14 @@ async function audit(page: Page, name: string) {
         .trim()
         .slice(0, 30)}"`;
     const visible = (el: Element) => {
-      const closed = el.closest('details:not([open])');
-      if (closed && el !== closed.querySelector(':scope > summary'))
-        return false;
+      // Every closed <details> above the element hides it, except its own
+      // summary; a summary nested in a closed outer <details> is not rendered.
+      for (
+        let d = el.closest('details:not([open])');
+        d;
+        d = d.parentElement?.closest('details:not([open])') ?? null
+      )
+        if (el !== d.querySelector(':scope > summary')) return false;
       const r = el.getBoundingClientRect();
       const s = getComputedStyle(el);
       return (
@@ -230,21 +235,37 @@ async function theme(scheme: 'light' | 'dark') {
   for (let g = 0; g < 80; g++) {
     const a = page
       .getByRole('button', {
-        name: /^(Klar set|Hoppa över vila|Lagom|Spara|Starta – 5 s förberedelse)$/,
+        name: /^(Klar set|Hoppa över vila|Spara|Starta – 5 s förberedelse)$/,
       })
       .first();
-    await a.waitFor();
+    const finalEffort = page.getByRole('heading', {
+      name: /Hur ansträngande/,
+    });
+    await a.or(finalEffort).first().waitFor();
+    if (await finalEffort.count()) {
+      if (!seen.has('effort')) {
+        seen.add('effort');
+        await audit(page, tag('effort'));
+      }
+      await page.getByRole('button', { name: 'Lagom', exact: true }).click();
+      await finalEffort.waitFor({ state: 'detached' });
+      continue;
+    }
     const n = (await a.innerText()).trim();
+    if (
+      n === 'Hoppa över vila' &&
+      !seen.has('rest effort') &&
+      (await page.getByRole('button', { name: 'Lagom', exact: true }).count())
+    ) {
+      seen.add('rest effort');
+      await audit(page, tag('rest with effort'));
+    }
     if (n.startsWith('Starta –')) {
       await audit(page, tag('timed hold'));
       await page
         .getByRole('button', { name: 'Hoppa över övningen', exact: true })
         .click();
       continue;
-    }
-    if (n === 'Lagom' && !seen.has('effort')) {
-      seen.add('effort');
-      await audit(page, tag('effort'));
     }
     if (n === 'Spara' && !seen.has('after')) {
       seen.add('after');
@@ -347,14 +368,22 @@ async function theme(scheme: 'light' | 'dark') {
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
   await audit(training, tag('optional workout editor'));
-  while (
-    (await training.getByRole('button', { name: /^Ta bort / }).count()) > 1
-  )
-    await training
-      .getByRole('button', { name: /^Ta bort / })
-      .last()
-      .click();
+  const trainingRows = training.locator('ol > li > button[aria-expanded]');
+  while ((await trainingRows.count()) > 1) {
+    if (!(await training.getByRole('button', { name: /^Ta bort / }).count()))
+      await trainingRows.last().click();
+    await training.getByRole('button', { name: /^Ta bort / }).click();
+  }
+  if (!(await training.getByRole('button', { name: /^Ta bort / }).count()))
+    await trainingRows.first().click();
+  await audit(training, tag('open workout row'));
   await training.getByLabel('Set', { exact: true }).fill('1');
+  await training
+    .getByText('Besvär eller något att anpassa idag?', { exact: true })
+    .click();
+  await training
+    .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
+    .check();
   await training
     .getByRole('button', { name: 'Börja passet', exact: true })
     .click();
@@ -376,7 +405,15 @@ async function theme(scheme: 'light' | 'dark') {
     .click();
   await audit(training, tag('exercise symptom report'));
   await training.getByRole('button', { name: 'Avbryt rapport' }).click();
-  await training.getByRole('button', { name: 'Klar set', exact: true }).click();
+  const trainingEffort = training.getByRole('heading', {
+    name: 'Hur ansträngande var övningen?',
+  });
+  while (!(await trainingEffort.count())) {
+    await training
+      .getByRole('button', { name: 'Klar set', exact: true })
+      .click();
+    await training.waitForTimeout(150);
+  }
   await training.getByRole('button', { name: 'Lagom', exact: true }).click();
   await training.getByRole('heading', { name: 'Hur kändes passet?' }).waitFor();
   await audit(training, tag('training after check'));
@@ -438,10 +475,14 @@ async function theme(scheme: 'light' | 'dark') {
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();
   await audit(training, tag('AAOS exercise selection'));
-  const removeKnee = training
-    .getByRole('button', { name: /^Ta bort / })
+  const kneeRows = training
+    .locator('ol > li > button[aria-expanded]')
     .filter({ hasNotText: 'Rakt benlyft' });
-  while (await removeKnee.count()) await removeKnee.first().click();
+  while (await kneeRows.count()) {
+    await kneeRows.first().click();
+    await training.getByRole('button', { name: /^Ta bort / }).click();
+  }
+  await training.locator('ol > li > button[aria-expanded]').first().click();
   await training
     .getByText('Välj övningar från AAOS · 12 övningar', { exact: true })
     .click();

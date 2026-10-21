@@ -243,7 +243,7 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
         toe(ankle),
         freeKnee,
         freeAnkle,
-        toe(freeAnkle),
+        [freeAnkle[0] + 7, freeAnkle[1] - 7],
       ],
     );
   },

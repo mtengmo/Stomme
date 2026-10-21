@@ -28,7 +28,7 @@ it('asks only about focus first and persists only explicitly selected equipment 
       .getByRole('combobox', { name: 'Träningsvana' })
       .closest('details')
       ?.hasAttribute('open'),
-  ).toBe(false);
+  ).toBe(undefined);
   await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
   await user.selectOptions(
     screen.getByRole('combobox', { name: 'Antal hantlar' }),
@@ -99,7 +99,7 @@ it('preserves a returning user’s active session and makes resuming the primary
   });
 });
 
-it('returns from the before-workout questions to an editable prepared workout', async () => {
+it('starts ordinary running strength without a mandatory before questionnaire', async () => {
   await setMeta(getDb(), 'training', {
     programId: 'running',
     equipment: ['bodyweight'],
@@ -109,15 +109,9 @@ it('returns from the before-workout questions to an editable prepared workout', 
   const user = userEvent.setup();
   render(<App />);
   await user.click(await screen.findByRole('button', { name: 'Börja passet' }));
-  await screen.findByRole('heading', { name: 'Hur känns kroppen?' });
-  expect(screen.getByText('Träningsvana: Viss vana')).toBeTruthy();
-  await user.click(screen.getByRole('link', { name: 'Ändra passet' }));
-  await user.click(
-    await screen.findByRole('button', { name: 'Anpassa passet' }),
-  );
+  await screen.findByRole('button', { name: 'Klar set' });
   expect(
-    screen.getAllByLabelText('Set', { exact: true }).length,
-  ).toBeGreaterThan(0);
-  expect(screen.queryByText('Du har redan ett pågående pass.')).toBeNull();
+    screen.queryByRole('heading', { name: 'Hur känns kroppen?' }),
+  ).toBeNull();
   expect(await getDb().sessions.count()).toBe(1);
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseList } from './exercises';
 import {
+  bodyRegions,
   exerciseMuscles,
   muscleGroups,
   parseMuscleFilter,
@@ -33,6 +34,22 @@ describe('muscle guidance content', () => {
     expect(parseMuscleFilter('muskel=calves')).toBe('calves');
     for (const value of ['unknown', 'constructor', 'toString', '']) {
       expect(parseMuscleFilter(`muskel=${value}`)).toBeNull();
+    }
+  });
+});
+
+describe('broad body regions', () => {
+  it('cover every muscle group exactly once', () => {
+    const grouped = bodyRegions.flatMap((region) => [...region.muscles]);
+    expect([...grouped].sort()).toEqual(Object.keys(muscleGroups).sort());
+    expect(new Set(grouped).size).toBe(grouped.length);
+  });
+
+  it('give every exercise with a primary muscle a region to be found in', () => {
+    const grouped = new Set(bodyRegions.flatMap((region) => region.muscles));
+    for (const exercise of exerciseList) {
+      const { primary } = exerciseMuscles[exercise.id];
+      for (const muscle of primary) expect(grouped.has(muscle)).toBe(true);
     }
   });
 });

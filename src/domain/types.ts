@@ -92,10 +92,18 @@ export type EquipmentChoice =
   | 'support'
   | 'step'
   | 'band';
+export interface WeightInventoryItem {
+  type: 'dumbbell' | 'kettlebell';
+  /** Weight of one implement, in kg. */
+  kg: number;
+  count: 1 | 2;
+}
 export interface TrainingPreferences {
   programId: ProgramId;
   equipment: EquipmentChoice[];
   experience: 'new' | 'some' | 'regular';
+  /** Optional for backwards compatibility with type/count-only preferences. */
+  weights?: WeightInventoryItem[];
   rehabFocus?: 'custom' | 'knee';
   rehabSide?: 'right' | 'left' | 'both';
 }
@@ -156,6 +164,7 @@ export interface PlannedExercise {
 
 export interface ExerciseFeedback {
   effort?: Effort;
+  effortSkipped?: boolean;
   skipped?: boolean;
   symptoms?: SymptomReport | null;
 }
