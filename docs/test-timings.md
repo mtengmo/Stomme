@@ -62,3 +62,9 @@ Notes:
 | 4747 | training: training setup keeps readiness, symptoms, effort, and after check-in separate |
 | 4417 | training: running direction uses body-wide check-ins and keeps effort separate from symptoms |
 | 4382 | guide: timer, movement and completion fit together (360) |
+
+## T2 Coverage gate
+
+`npm run test:cov` = `vitest run --coverage`, threshold 100% branches on `src/rules/**` (v8). Before: 94.26% (26 uncovered branches in 10 files). After: 100%; +15 tests (754 -> 769), two new test files (`prescription.test.ts`, `programRosters.test.ts`). One branch was unreachable by type (`SessionStatus` has three values) and was simplified to an `else` in `progressOverview.ts`; no ignore comments.
+
+Cost: a coverage run is 31-53 s versus 30 s plain (instrumentation). The default 5 s test timeout flaked under coverage (ExerciseLibrary test), so `testTimeout` is now 15 s.

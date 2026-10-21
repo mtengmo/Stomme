@@ -89,3 +89,13 @@ describe('equipment and library filter contracts', () => {
     expect(fits('single-leg-rdl', { term: '  E03  ' })).toBe(true);
   });
 });
+
+describe('source and search filters', () => {
+  it('limits to AAOS-sourced exercises and rejects others', () => {
+    expect(fits('half-squat', { aaos: true })).toBe(true);
+    expect(fits('farmer-carry', { aaos: true })).toBe(false);
+  });
+  it('rejects an exercise whose text does not contain the search term', () => {
+    expect(fits('half-squat', { term: 'qqqqzzzz' })).toBe(false);
+  });
+});

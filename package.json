@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "check": "biome check && tsc --noEmit",
     "test": "vitest run",
+    "test:cov": "vitest run --coverage",
     "test:upgrade": "tsx scripts/test-upgrade.ts",
     "e2e": "npm run build && playwright test",
     "audit:a11y": "tsx scripts/contrast.ts && tsx scripts/a11y-audit.ts",
