@@ -131,3 +131,7 @@ Acceptance includes all three directions (`Allmän styrka`, `Styrka för löpnin
 6. Run static checks, affected unit tests, full browser release flows, light/dark accessibility checks and bounded visual inspection. Preserve the existing first-load JS target and offline behaviour.
 
 Definition of done for the first release: regular installed clients discover and apply updates without incognito; movement, muscles and instructions are in one guide; selected weight/side and saved workout state remain correct. The content expansion follows as separate reviewed releases rather than delaying the reliability fix.
+
+## Workout workflow follow-up
+
+The compact editor, weight inventory, direct start, effort during rest and deferred after answer are on branch `workout-workflow`; see `workout-workflow-plan.md` (Open items) before releasing. Release checks as above, plus `npm run e2e`, `npm run test:upgrade` (run it from PowerShell on Windows: Git Bash `tar` cannot read `C:` paths) and `npm run audit:a11y`.

@@ -475,7 +475,7 @@ export function ProgressOverview({
           ) : (
             <p className="m-0">Inga resultat med de valda filtren.</p>
           )}
-          <p className="m-0 text-sm text-ink-soft">
+          <p className="m-0 text-base text-ink-soft">
             Saknade pass betyder saknade mätningar, inte noll styrka. Äldre
             loggar utan känd utrustning hålls samlade under “Okänd utrustning”.
           </p>

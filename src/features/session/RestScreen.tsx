@@ -109,7 +109,9 @@ export function RestScreen({
         <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
         {afterSet ? <PencilTick size={72} animate variant={1} /> : null}
       </div>
-      <div className="relative mx-auto grid size-60 place-items-center">
+      <div
+        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-40' : 'size-60'}`}
+      >
         <svg
           viewBox="0 0 280 280"
           className="absolute inset-0 size-full -rotate-90"
@@ -136,7 +138,7 @@ export function RestScreen({
           />
         </svg>
         <p
-          className="count m-0 text-[6rem] leading-none"
+          className={`count m-0 leading-none ${effortExercise && onEffort ? 'text-6xl' : 'text-[6rem]'}`}
           role="timer"
           aria-label={`${paused ? savedSeconds.current : timer.seconds} sekunder kvar`}
         >
@@ -147,26 +149,6 @@ export function RestScreen({
               : formatClock(timer.seconds)}
         </p>
       </div>
-      <p role="status" className="m-0 text-base">
-        {paused
-          ? 'Vilan är pausad. Fortsätt när du är redo.'
-          : autoContinue
-            ? 'Nästa hållning börjar automatiskt efter vilan och 5 sekunders förberedelse.'
-            : over
-              ? 'Vilan är klar. Tryck Nästa set när du är redo.'
-              : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}
-      </p>
-      {nextExercise && nextStep ? (
-        <div>
-          <p className="m-0 text-2xl leading-tight font-bold">
-            {nextExercise.name}
-          </p>
-          <p className="m-0 text-xl">
-            Nästa · Set {nextStep.setNumber} av {nextTotalSets}
-            {side ? ` · ${side}` : ''}
-          </p>
-        </div>
-      ) : null}
       {effortExercise && onEffort ? (
         <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
           <legend className="text-lg font-bold">
@@ -189,6 +171,26 @@ export function RestScreen({
             ))}
           </div>
         </fieldset>
+      ) : null}
+      <p role="status" className="m-0 text-base">
+        {paused
+          ? 'Vilan är pausad. Fortsätt när du är redo.'
+          : autoContinue
+            ? 'Nästa hållning börjar automatiskt efter vilan och 5 sekunders förberedelse.'
+            : over
+              ? 'Vilan är klar. Tryck Nästa set när du är redo.'
+              : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}
+      </p>
+      {nextExercise && nextStep ? (
+        <div>
+          <p className="m-0 text-2xl leading-tight font-bold">
+            {nextExercise.name}
+          </p>
+          <p className="m-0 text-xl">
+            Nästa · Set {nextStep.setNumber} av {nextTotalSets}
+            {side ? ` · ${side}` : ''}
+          </p>
+        </div>
       ) : null}
     </SessionFrame>
   );

@@ -413,13 +413,13 @@ function PreviewEditor({
           </button>
           {editing ? (
             <>
-              <p className="m-0 text-base">
-                {preferences.programId === 'rehab'
-                  ? preferences.rehabFocus === 'knee'
+              {preferences.programId === 'rehab' ? (
+                <p className="m-0 text-base">
+                  {preferences.rehabFocus === 'knee'
                     ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
-                    : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'
-                  : 'Startförslaget matchar din utrustning. Anpassa efter din vana; vikten anges totalt för alla redskap.'}
-              </p>
+                    : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'}
+                </p>
+              ) : null}
 
               {preferences.programId === 'rehab' &&
               preferences.rehabFocus !== 'knee' &&
@@ -531,19 +531,6 @@ function PreviewEditor({
                 </section>
               ) : null}
 
-              {preferences.programId !== 'rehab' &&
-              (!compatible.some((exercise) =>
-                ['floor-press', 'kettlebell-floor-press'].includes(exercise.id),
-              ) ||
-                !compatible.some(
-                  (exercise) => exercise.id === 'supported-row',
-                )) ? (
-                <p className="m-0 text-base text-ink-soft">
-                  Fler redskap ger fler press- och dragövningar. Välj bland
-                  tillgängliga övningar nedan.
-                </p>
-              ) : null}
-
               {preferences.programId === 'rehab' &&
               preferences.rehabFocus === 'knee' ? (
                 <details className="border-y-2 border-edge py-2">
@@ -563,29 +550,13 @@ function PreviewEditor({
                   />
                 </details>
               ) : null}
-              <h2 className="m-0 text-3xl font-bold">Övningar i passet</h2>
-              {preferences.programId !== 'rehab' ? (
-                <Link
-                  href="/installningar"
-                  className="flex min-h-12 items-center self-start text-base font-bold underline"
-                >
-                  Min utrustning
-                </Link>
-              ) : null}
-
+              <h2 className="m-0 text-2xl font-bold">Övningar i passet</h2>
               {plan.length === 0 ? (
                 <p className="m-0 text-base">
                   Inga övningar valda ännu. Lägg till övningar nedan.
                 </p>
               ) : null}
 
-              <p className="m-0 text-base text-ink-soft">
-                {removed
-                  ? ''
-                  : plan.length > 0
-                    ? 'Ändringar sparas direkt i utkastet.'
-                    : ''}
-              </p>
               {removed ? (
                 <div
                   role="status"
@@ -1037,6 +1008,35 @@ function PreviewEditor({
                 })}
               </ol>
 
+              {preferences.programId !== 'rehab' ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Startförslaget matchar din utrustning. Anpassa efter din vana;
+                  vikten anges totalt för alla redskap. Ändringar sparas direkt
+                  i utkastet.
+                </p>
+              ) : null}
+              {preferences.programId !== 'rehab' &&
+              (!compatible.some((exercise) =>
+                ['floor-press', 'kettlebell-floor-press'].includes(exercise.id),
+              ) ||
+                !compatible.some(
+                  (exercise) => exercise.id === 'supported-row',
+                )) ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Fler redskap ger fler press- och dragövningar. Välj bland
+                  tillgängliga övningar nedan.
+                </p>
+              ) : null}
+
+              {preferences.programId !== 'rehab' ? (
+                <Link
+                  href="/installningar"
+                  className="flex min-h-12 items-center self-start text-base font-bold underline"
+                >
+                  Min utrustning
+                </Link>
+              ) : null}
+
               <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
                 <legend className="mb-2 text-lg font-bold">Kroppsdel</legend>
                 <div className="flex flex-wrap gap-2">
@@ -1132,7 +1132,14 @@ function PreviewEditor({
               </Button>
             </>
           ) : (
-            <ReadyWorkout plan={plan} preferences={preferences} />
+            <ReadyWorkout
+              plan={plan}
+              preferences={preferences}
+              onChange={(index) => {
+                setExpandedIndex(index);
+                setEditing(true);
+              }}
+            />
           )}
           {!ready ? (
             <p role="alert" className="m-0 text-base font-bold">

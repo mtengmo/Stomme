@@ -118,3 +118,25 @@ Agree shared inventory and check-in contracts before parallel edits. One owner p
 ## Decisions used for this proposal
 
 The user requested a plan, so this document does not authorize implementation or deployment on its own. Suggested defaults are compact accordion editing, subtle alternating neutral rows, optional ordinary pre-check, retained rehab symptom entry, after feedback as the main check, and manual readiness for new timed movements. No extra onboarding questionnaire is proposed.
+
+## Open items
+
+Status after the first implementation pass (branch `workout-workflow`, 2026-10-21). Evidence: unit tests, browser journeys, one bounded mobile visual round (360/390/412 px, light and dark) and the accessibility audit.
+
+Implemented: compact numbered rows with E-number, dose and equipment summary, alternating neutral tint, one open row at a time, open row kept across guide views and reload; remove with Undo; up/down reorder; draft saved on every edit and invalidated when the weight inventory changes; compact read-only overview with "Ändra" per row (three full rows and the start action visible on 390 x 844); broad body-region chips plus "Mer specifikt" muscle select, primary matches before supporting ("· stödjer"), zero-match message; saved weight inventory (per implement, count, total conversion, no automatic pairing of unequal implements, backup round-trip, old backups without inventory); "Min utrustning" in Settings and linked from the editor; unavailable weight explained, manual/borrowed weight still possible without changing the inventory; visible "Vana av styrketräning" in setup; direct start for ordinary training with an optional pre-check; rehab and legacy knee pain gates unchanged; effort answered inside the rest transition (rest timer unaffected, skipped effort cannot qualify an increase); "Svara senare" completes the workout with the after answer pending, the answer can be given later from the summary without changing the completion time, and a missing answer blocks automatic increases.
+
+Partial:
+- Rehab pre-session check still uses the existing full-screen "before" route rather than a compact check inside the preview.
+- Inventory covers fixed dumbbell and kettlebell weights only; no adjustable-setting list, no named non-weighted equipment entries beyond the existing choices, no per-session "Annan utrustning för detta pass" switch (a weight not in the inventory can be typed and is explained).
+- Strength experience is editable from setup and from "Byt inriktning"; the preview shows it but does not offer an inline edit.
+- Focus return after guide view is by preserving the open row, not by moving focus programmatically.
+- "Sparat" feedback is a static note that changes are kept in the draft, not a per-edit confirmation.
+- Experience, difficulty and reported effort are explained in separate places, not in one summary.
+
+Missing (large or ambiguous, deliberately not guessed):
+- Shared picker with search, thumbnails, "Fler filter" (purpose, difficulty, favourites, equipment), movement-pattern alternatives under "Byt övning" and "Visa alla övningar"; the editor still uses a select for the final choice.
+- "Fler inställningar" fold inside an open row (rest and side are always shown).
+- Applying a corrected first-set dose to the remaining unlogged sets.
+- Inventory-aware starting-dose choices and a documented primary-source rationale for any strength-dose policy change; no progression policy was changed.
+- Automatic ready-state after rest when a new movement or equipment is needed (rest still ends on a button).
+- 200 % text zoom and keyboard-only passes were not exercised in a browser.

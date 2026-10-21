@@ -1,6 +1,6 @@
 import { Link } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
-import { exercises } from '../../content/exercises';
+import { exerciseList, exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import { exerciseMuscles } from '../../content/muscles';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
@@ -9,9 +9,12 @@ import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 export function ReadyWorkout({
   plan,
   preferences,
+  onChange,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
+  /** Opens the editor with this exercise's row open. */
+  onChange(index: number): void;
 }) {
   const knee =
     preferences.programId === 'rehab' && preferences.rehabFocus === 'knee';
@@ -64,52 +67,68 @@ export function ReadyWorkout({
         </p>
       ) : null}
       <ol className="m-0 list-none p-0">
-        {plan.map((item) => {
+        {plan.map((item, index) => {
           const exercise = exercises[item.exerciseId];
           const variant = exerciseMetadata[item.exerciseId].variants.find(
             (v) => v.id === item.variantId,
           );
           const unit =
             exercise.unit === 'seconds'
-              ? 'sekunder'
+              ? 'sek'
               : exercise.unit === 'meters'
-                ? 'meter'
-                : 'repetitioner';
+                ? 'm'
+                : '';
           const side = !exercise.perSide
             ? ''
             : item.sides?.length === 1
               ? item.sides[0] === 'left'
-                ? ' · vänster'
-                : ' · höger'
-              : ' · per sida';
+                ? ' vänster'
+                : ' höger'
+              : ' per sida';
+          const number = String(
+            exerciseList.findIndex((entry) => entry.id === exercise.id) + 1,
+          ).padStart(2, '0');
+          const note =
+            item.explanation && !item.explanation.startsWith('Startförslag')
+              ? item.explanation
+              : '';
           return (
-            <li key={item.exerciseId} className="border-b-2 border-edge py-3">
-              <Link
-                href={`/ovning/${item.exerciseId}`}
-                className="flex min-h-12 items-center text-xl font-bold underline"
-              >
-                {exercise.name}
-              </Link>
-              {item.explanation ? (
-                <p className="m-0 text-base text-ink-soft">
-                  {item.explanation}
+            <li
+              key={item.exerciseId}
+              className={`flex items-start justify-between gap-3 border-t-2 border-edge px-3 py-2 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-paper text-ink'}`}
+            >
+              <div className="min-w-0">
+                <Link
+                  href={`/ovning/${item.exerciseId}`}
+                  className="flex min-h-12 items-center text-xl font-bold underline"
+                >
+                  {index + 1}. E{number} · {exercise.name}
+                </Link>
+                <p className="m-0 text-base">
+                  {item.sets} × {item.target}
+                  {unit ? ` ${unit}` : ''}
+                  {side} ·{' '}
+                  {item.weightKg > 0
+                    ? `${item.weightKg} kg totalt`
+                    : (variant?.label ?? 'välj utrustning')}
                 </p>
-              ) : null}
-              {knee ? (
-                <ExerciseDifficulty
-                  exerciseId={exercise.id}
-                  variantId={item.variantId}
-                  loadIndex={item.loadIndex}
-                />
-              ) : null}
-              <p className="m-0 text-lg">
-                {item.sets} × {item.target} {unit}
-                {side}
-              </p>
-              <p className="m-0 text-base text-ink-soft">
-                {variant?.label ?? 'Välj utrustning under Anpassa passet'}
-                {item.weightKg > 0 ? ` · ${item.weightKg} kg totalt` : ''}
-              </p>
+                {note ? <p className="m-0 text-base">{note}</p> : null}
+                {knee ? (
+                  <ExerciseDifficulty
+                    exerciseId={exercise.id}
+                    variantId={item.variantId}
+                    loadIndex={item.loadIndex}
+                  />
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange(index)}
+                aria-label={`Ändra ${exercise.name}`}
+                className="min-h-12 min-w-12 shrink-0 text-base font-bold underline"
+              >
+                Ändra
+              </button>
             </li>
           );
         })}
