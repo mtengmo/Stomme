@@ -7,6 +7,9 @@
  * Files (outDir):
  *   <theme>-<scheme>-week.png        360x1300 viewport, lead card above a Kommande card
  *   <theme>-<scheme>-week-klar.png   360x1300 viewport, Pass A done (Klar chip with pencil tick)
+ *   <theme>-<scheme>-week-800.png    true 360x800 viewport (gap between action bar and nav is printed)
+ *   pain-ja-<theme>-<scheme>.png     pain screen, score 5 and "Skarp smärta" set to Ja, before saving
+ *   pain-warn-<theme>-<scheme>.png   warn screen after saving score 5 without red flags
  *   picker-set-<theme>-<scheme>.png  360x800, Settings Utseende scrolled into view
  *   picker-onb-<theme>-<scheme>-collapsed.png / -expanded.png  360 wide, onboarding (full page, no fixed bars there)
  *   focus-<theme>-<scheme>-<button|radio|nav|link>.png  keyboard Tab focus, 2x, padded close-up
@@ -166,6 +169,68 @@ try {
             await tabTo(page, target);
             await closeUp(page, target, `${out}/focus-${tag}-${name}.png`);
           }
+        }
+        await ctx.close();
+      }
+
+      // True 360x800 week: where does the sticky action bar sit relative to the nav?
+      {
+        const { ctx, page } = await context(browser, theme.id, scheme, 800);
+        await page.goto(url);
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await seed(page, false);
+        await page.reload();
+        await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+        await settle(page);
+        const gap = await page.evaluate(() => {
+          const bar = [...document.querySelectorAll('div.sticky')].find((d) =>
+            d.textContent?.includes('Starta pass'),
+          );
+          const nav = document.querySelector('nav');
+          return {
+            barBottom: bar?.getBoundingClientRect().bottom ?? -1,
+            navTop: nav?.getBoundingClientRect().top ?? -1,
+            scrollY: window.scrollY,
+          };
+        });
+        console.log(
+          `${tag} week 360x800: bar bottom ${gap.barBottom}, nav top ${gap.navTop}, gap ${gap.navTop - gap.barBottom}`,
+        );
+        await page.screenshot({
+          path: `${out}/${tag}-week-800.png`,
+          animations: 'disabled',
+        });
+        await ctx.close();
+      }
+
+      // Pain screen with answers, and the warn screen it leads to.
+      for (const kind of ['ja', 'warn'] as const) {
+        const { ctx, page } = await context(browser, theme.id, scheme, 800);
+        await page.goto(url);
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await page.goto(`${url}#/pass/A`);
+        await page.getByRole('button', { name: 'Starta pass' }).click();
+        await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
+        await page
+          .getByRole('radio', { name: /^5(,|$)/ })
+          .check({ force: true });
+        if (kind === 'ja') {
+          await page.getByRole('switch', { name: 'Skarp smärta' }).click();
+          await settle(page);
+          await page.screenshot({
+            path: `${out}/pain-ja-${tag}.png`,
+            animations: 'disabled',
+          });
+        } else {
+          await page.getByRole('button', { name: 'Spara' }).click();
+          await page
+            .getByRole('heading', { name: 'Smärtan är över 3.' })
+            .waitFor();
+          await settle(page);
+          await page.screenshot({
+            path: `${out}/pain-warn-${tag}.png`,
+            animations: 'disabled',
+          });
         }
         await ctx.close();
       }

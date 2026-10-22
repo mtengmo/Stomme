@@ -35,7 +35,8 @@
   const apply = (keepTheme) => {
     const appearance = read();
     // On a phone change keep the theme the app set (storage may be blocked).
-    if (keepTheme) appearance.theme = root.getAttribute('data-theme') || appearance.theme;
+    if (keepTheme)
+      appearance.theme = root.getAttribute('data-theme') || appearance.theme;
     const dark =
       appearance.scheme === 'dark' ||
       (appearance.scheme === 'system' && !!media && media.matches);

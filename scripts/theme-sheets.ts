@@ -158,3 +158,25 @@ await grid(
   130,
   `${dir}/sheet-focus.png`,
 );
+await grid(
+  combos.flatMap((c) =>
+    ['pain-ja', 'pain-warn'].map((k) => ({
+      name: `${k} ${c}`,
+      file: `${dir}/${k}-${c}.png`,
+    })),
+  ),
+  4,
+  270,
+  600,
+  `${dir}/sheet-pain.png`,
+);
+await grid(
+  combos.map((c) => ({
+    name: `week-800 ${c}`,
+    file: `${dir}/${c}-week-800.png`,
+  })),
+  4,
+  270,
+  600,
+  `${dir}/sheet-week-800.png`,
+);
