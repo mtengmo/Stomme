@@ -3,6 +3,7 @@ import type { Session, SetLog } from '../domain/types';
 import {
   exerciseResults,
   progressExerciseIds,
+  variantLabel,
   weeklyProgress,
 } from './progressOverview';
 
@@ -102,5 +103,28 @@ describe('progress overview aggregation', () => {
       ['s2', 'dumbbell', 'left', [9]],
     ]);
     expect(progressExerciseIds(sessions, logs)).toEqual(['supported-row']);
+  });
+});
+
+describe('labels and unfinished sessions', () => {
+  it('counts an in-progress or aborted session as incomplete', () => {
+    const rows = weeklyProgress(
+      [
+        session('a', '2026-10-20', 'in_progress', 'general'),
+        session('b', '2026-10-20', 'aborted', 'general'),
+      ],
+      '2026-10-21',
+      1,
+    );
+    expect(rows[0]).toMatchObject({ completed: 0, incomplete: 2 });
+  });
+
+  it('labels a known variant and marks an unknown one as an old log', () => {
+    expect(variantLabel('supported-row', 'dumbbell')).not.toBe(
+      'Okänd utrustning (äldre logg)',
+    );
+    expect(variantLabel('supported-row', 'nope')).toBe(
+      'Okänd utrustning (äldre logg)',
+    );
   });
 });

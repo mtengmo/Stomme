@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { completeSets, keepFirstExercises } from './flow';
+import { FRESH_STATE } from './state';
 
-test('training setup keeps readiness, symptoms, effort, and after check-in separate', async ({
-  page,
-}) => {
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
+
+test('training setup keeps readiness, symptoms, effort, and after check-in separate', {
+  tag: '@smoke',
+}, async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();

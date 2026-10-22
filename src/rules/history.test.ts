@@ -106,3 +106,11 @@ describe('honest history summaries', () => {
     expect(loggedVariant({ ...row, variantId: 'invalid' })).toBe('unknown');
   });
 });
+
+describe('legacy symptom summary', () => {
+  it('says the answer is missing for a legacy session without pain logs', () => {
+    expect(symptomSummary({ ...session, programId: undefined }, [])).toBe(
+      'Besvär: svar saknas',
+    );
+  });
+});

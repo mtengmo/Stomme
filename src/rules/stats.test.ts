@@ -201,3 +201,27 @@ describe('painSeries', () => {
     expect(s.dayAfter[0]?.date).toBe('2026-10-14');
   });
 });
+
+describe('loadPerExercise ordering', () => {
+  it('keeps the earliest time of a session even when a later-listed log is older', () => {
+    const pts = loadPerExercise(
+      [
+        log('a', 'step-up', 2, {
+          loggedAt: '2026-10-12T10:03:00.000Z',
+          weightKg: 10,
+        }),
+        log('a', 'step-up', 1, {
+          loggedAt: '2026-10-11T10:00:00.000Z',
+          weightKg: 8,
+        }),
+      ],
+      'step-up',
+    );
+    expect(pts).toHaveLength(1);
+    expect(pts[0]).toMatchObject({
+      weightKg: 10,
+      at: '2026-10-11T10:00:00.000Z',
+      date: '2026-10-11',
+    });
+  });
+});

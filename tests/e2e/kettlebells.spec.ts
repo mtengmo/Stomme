@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { removeAllExercises } from './flow';
+import { FRESH_STATE } from './state';
+
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
 
 for (const width of [360, 1280]) {
   test(`single-kettlebell options have sources and one implement throughout the motion (${width})`, async ({

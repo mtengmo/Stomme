@@ -75,3 +75,15 @@ describe('favourite workout alternatives', () => {
     ).toEqual([]);
   });
 });
+
+describe('experience levels', () => {
+  it('allows practiced but not technical options for some experience', () => {
+    const some = preferences({ experience: 'some' });
+    expect(
+      favouriteAlternatives('dumbbell-rdl', ['single-leg-rdl'], [], some),
+    ).toEqual([]);
+    expect(
+      favouriteAlternatives('goblet-squat', ['half-squat'], [], some),
+    ).toEqual(['half-squat']);
+  });
+});
