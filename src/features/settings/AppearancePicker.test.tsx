@@ -2,13 +2,14 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { APPEARANCE_KEY } from '../../lib/appearance';
+import { APPEARANCE_KEY, clearAppearance } from '../../lib/appearance';
 import { themes } from '../../styles/themes/registry';
 import { AppearancePicker } from './AppearancePicker';
 
 const isChecked = (el: HTMLElement) => (el as HTMLInputElement).checked;
 
 beforeEach(() => {
+  clearAppearance();
   localStorage.clear();
   document.documentElement.removeAttribute('data-theme');
   document.documentElement.removeAttribute('data-scheme');

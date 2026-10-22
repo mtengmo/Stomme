@@ -31,6 +31,6 @@ DESIGN.md is not rewritten yet; phase C (documenter) records the rule changes be
 
 ## Where things live
 
-- `src/styles/themes/<id>.css` (light block, dark block), `src/styles/themes/registry.ts` (registered themes), `src/styles/themes/<id>.palette.ts` (decided, not yet registered: hav, kvallssol, hog-kontrast).
+- `src/styles/themes/<id>.css` (light block, dark block), `src/styles/themes/registry.ts` (registered themes), `src/styles/themes/<id>.ts` (the `ThemeDef` per theme).
 - `src/styles/contrast.ts` (pure WCAG and CIEDE2000, `evaluateTheme`), `src/styles/themes.test.ts` (gate for every registered theme and scheme, and for the pending palettes).
 - `public/theme-boot.js` (blocking boot script), `src/lib/appearance.ts` (runtime get/set/subscribe).

@@ -110,7 +110,7 @@ export function StopScreen({
 }) {
   return (
     <div className="min-h-dvh border-[6px] border-care bg-paper text-ink">
-      <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
+      <div className="mx-auto flex min-h-[calc(100dvh-12px)] max-w-md flex-col px-5">
         <div className="flex flex-1 flex-col gap-4 pt-10">
           <div className="flex items-center gap-3 text-care">
             <Icon name="stop" size={64} />
@@ -136,8 +136,9 @@ export function StopScreen({
           <button
             type="button"
             onClick={onHome}
-            className="flex min-h-16 w-full items-center justify-center rounded-md bg-care px-6 text-xl font-bold text-care-ink active:scale-[0.98]"
+            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-md bg-care px-6 text-xl font-bold text-care-ink active:scale-[0.98]"
           >
+            <Icon name="stop" size={28} />
             {PAIN_COPY.stopDone}
           </button>
         </div>

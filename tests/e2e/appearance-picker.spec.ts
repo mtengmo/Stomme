@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { FRESH_STATE } from './state';
 
 test.use({ viewport: { width: 360, height: 800 } });
 
@@ -6,7 +7,6 @@ test('@themes picking a theme in Settings applies at once and survives reload', 
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/installningar');
   await expect(page.getByRole('heading', { name: 'Utseende' })).toBeVisible();
   await page.getByText('Lagun', { exact: false }).first().click();
@@ -21,7 +21,6 @@ test('@themes the picker rows are at least 56 px and 16 px text, keyboard operab
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/installningar');
   const radios = page
     .getByRole('group', { name: 'Färgtema' })
@@ -46,25 +45,35 @@ test('@themes the picker rows are at least 56 px and 16 px text, keyboard operab
   expect(font).toBeGreaterThanOrEqual(16);
 });
 
-test('@themes onboarding has a collapsed colour chooser and the primary action is unchanged', async ({
-  page,
-}) => {
-  await page.goto('/');
-  const details = page.locator('details', {
-    hasText: 'Välj färger (kan ändras senare)',
+test.describe('@themes onboarding', () => {
+  test.use({ storageState: FRESH_STATE });
+
+  test('@themes onboarding has a collapsed colour chooser and the primary action is unchanged', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const details = page.locator('details', {
+      hasText: 'Välj färger (kan ändras senare)',
+    });
+    await expect(details).not.toHaveAttribute('open', '');
+    await details.getByText('Välj färger (kan ändras senare)').click();
+    await page.getByText('Skymning', { exact: false }).first().click();
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-theme',
+      'kvallssol',
+    );
+    await expect(page.getByRole('button', { name: /Jag förstår/ })).toHaveCount(
+      1,
+    );
+    await page.getByRole('button', { name: /Jag förstår/ }).click();
+    await expect(page.getByRole('button', { name: /Jag förstår/ })).toHaveCount(
+      0,
+    );
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-theme',
+      'kvallssol',
+    );
   });
-  await expect(details).not.toHaveAttribute('open', '');
-  await details.getByText('Välj färger (kan ändras senare)').click();
-  await page.getByText('Skymning', { exact: false }).first().click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'kvallssol');
-  await expect(page.getByRole('button', { name: /Jag förstår/ })).toHaveCount(
-    1,
-  );
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await expect(page.getByRole('button', { name: /Jag förstår/ })).toHaveCount(
-    0,
-  );
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'kvallssol');
 });
 
 test('@themes "Följ telefonen" follows the emulated colour scheme, a fixed choice does not', async ({
@@ -72,7 +81,6 @@ test('@themes "Följ telefonen" follows the emulated colour scheme, a fixed choi
 }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/installningar');
   await expect(
     page.getByRole('radio', { name: 'Följ telefonen' }),
@@ -98,7 +106,6 @@ test('@themes the focus ring is not clipped and uses the double ring in Hög kon
     ),
   );
   await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/installningar');
   const target = page.getByRole('radio', { name: 'Följ telefonen' });
   await target.focus();

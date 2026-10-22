@@ -128,6 +128,25 @@ describe('the gate catches broken themes', () => {
   });
 });
 
+describe('tinted surfaces and reported pairs', () => {
+  it.each(themes)('$id checks coloured text on surface-tint', (theme) => {
+    for (const scheme of SCHEMES) {
+      const names = evaluateTheme(theme, scheme).pairs.map(
+        (p) => `${p.fg} on ${p.bg}`,
+      );
+      for (const fg of ['done', 'accent', 'care', 'info'])
+        expect(names).toContain(`${fg} on surface-tint`);
+    }
+  });
+
+  it('reports care/action without failing on it', () => {
+    const rutat = evaluateTheme(themes[0] as ThemeDef, 'light');
+    expect(rutat.reported).toHaveLength(1);
+    expect(rutat.reported[0]?.deltaE).toBe(0);
+    expect(rutat.failures).toEqual([]);
+  });
+});
+
 describe('Hög kontrast', () => {
   const hk = getTheme('hog-kontrast') as ThemeDef;
 

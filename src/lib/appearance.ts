@@ -62,12 +62,23 @@ function prefersDark(): boolean {
   );
 }
 
+/**
+ * Last appearance applied or stored in this page view. When storage is blocked
+ * (setItem throws) the choice would otherwise snap back to Rutat on the next read.
+ */
+let remembered: Appearance | undefined;
+
 export function getAppearance(): Appearance {
+  let raw: string | null = null;
   try {
-    return parseAppearance(window.localStorage.getItem(APPEARANCE_KEY));
+    raw = window.localStorage.getItem(APPEARANCE_KEY);
   } catch {
-    return { ...DEFAULT_APPEARANCE };
+    // blocked storage: fall through to the remembered choice
   }
+  if (raw === null)
+    return remembered ? { ...remembered } : { ...DEFAULT_APPEARANCE };
+  remembered = parseAppearance(raw);
+  return { ...remembered };
 }
 
 /** Sets data-theme and data-scheme on <html> and the theme-color meta. */
@@ -118,6 +129,7 @@ export function setAppearance(change: Partial<Appearance>): Appearance {
   const next = parseAppearance(
     JSON.stringify({ ...getAppearance(), ...change }),
   );
+  remembered = next;
   try {
     window.localStorage.setItem(APPEARANCE_KEY, JSON.stringify(next));
   } catch {
@@ -130,6 +142,7 @@ export function setAppearance(change: Partial<Appearance>): Appearance {
 
 /** Forgets the stored choice (used by "Radera all data") and applies defaults. */
 export function clearAppearance(): void {
+  remembered = undefined;
   try {
     window.localStorage.removeItem(APPEARANCE_KEY);
   } catch {
@@ -157,19 +170,32 @@ export function themeName(id: string): string {
 }
 
 /**
- * Called once from main.tsx. theme-boot.js has already set the attributes;
- * this keeps the theme-color meta in step with them (also when the boot script
- * reacts to the phone's light/dark switch) and follows changes made in
- * another tab. Returns a cleanup function.
+ * Called once from main.tsx. theme-boot.js normally set the attributes
+ * already; this applies them again (idempotent), follows the phone's
+ * light/dark switch itself, keeps the theme-color meta in step and follows
+ * changes made in another tab. Returns a cleanup function.
  */
 export function initAppearance(): () => void {
-  applyThemeColor();
+  // Idempotent: also covers a boot script that failed to load or is stale.
+  applyAppearance();
+  const media =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-color-scheme: dark)')
+      : undefined;
+  const onPhone = () => {
+    if (getAppearance().scheme === 'system') {
+      applyAppearance();
+      emit();
+    }
+  };
+  media?.addEventListener('change', onPhone);
   const onBoot = () => {
     applyThemeColor();
     emit();
   };
   const onStorage = (event: StorageEvent) => {
     if (event.key === APPEARANCE_KEY || event.key === null) {
+      remembered = undefined;
       applyAppearance();
       emit();
     }
@@ -177,6 +203,7 @@ export function initAppearance(): () => void {
   window.addEventListener(APPEARANCE_EVENT, onBoot);
   window.addEventListener('storage', onStorage);
   return () => {
+    media?.removeEventListener('change', onPhone);
     window.removeEventListener(APPEARANCE_EVENT, onBoot);
     window.removeEventListener('storage', onStorage);
   };

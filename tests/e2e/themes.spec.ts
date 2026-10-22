@@ -79,7 +79,6 @@ test.describe('@themes every registered theme and scheme', () => {
         }));
         expect(expand(read.meta)).toBe(tokens.paper);
         expect(expand(read.paper)).toBe(tokens.paper);
-        await page.getByRole('button', { name: /Jag förstår/ }).click();
 
         // Week: primary button and the done chip compute to their tokens.
         await seedDone(page);

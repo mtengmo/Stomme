@@ -4,9 +4,9 @@ import { getTheme } from '../../src/styles/themes/registry';
 const rutat = getTheme('rutat');
 
 test.describe('appearance boot (production CSP)', () => {
-  test('first paint already has the stored theme and scheme, before the app bundle runs', async ({
-    page,
-  }) => {
+  test('first paint already has the stored theme and scheme, before the app bundle runs', {
+    tag: ['@themes', '@smoke'],
+  }, async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'stomme.appearance',
@@ -30,9 +30,9 @@ test.describe('appearance boot (production CSP)', () => {
     expect(state.background).toBe('rgb(26, 31, 33)');
   });
 
-  test('unknown theme ids fall back to Rutat and the scheme follows the phone', async ({
-    page,
-  }) => {
+  test('unknown theme ids fall back to Rutat and the scheme follows the phone', {
+    tag: '@themes',
+  }, async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem(
         'stomme.appearance',
@@ -48,9 +48,21 @@ test.describe('appearance boot (production CSP)', () => {
     await expect(page.locator('html')).toHaveAttribute('data-scheme', 'light');
   });
 
-  test('the CSP is active, no inline script exists and theme-color follows --paper', async ({
-    page,
-  }) => {
+  test('the app applies the scheme itself when the boot script is blocked', {
+    tag: '@themes',
+  }, async ({ page }) => {
+    await page.route('**/theme-boot.js', (route) => route.abort());
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-scheme', 'dark');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'rutat');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(page.locator('html')).toHaveAttribute('data-scheme', 'light');
+  });
+
+  test('the CSP is active, no inline script exists and theme-color follows --paper', {
+    tag: ['@themes', '@smoke'],
+  }, async ({ page }) => {
     const violations: string[] = [];
     page.on('console', (message) => {
       if (/Content Security Policy/i.test(message.text()))
@@ -77,10 +89,11 @@ test.describe('appearance boot (production CSP)', () => {
     expect(violations).toEqual([]);
   });
 
-  test('"Radera all data" clears the stored appearance', async ({ page }) => {
+  test('"Radera all data" clears the stored appearance', {
+    tag: '@themes',
+  }, async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
-    await page.getByRole('button', { name: /Jag förstår/ }).click();
     await page.evaluate(() =>
       localStorage.setItem(
         'stomme.appearance',

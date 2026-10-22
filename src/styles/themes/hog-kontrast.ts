@@ -2,9 +2,8 @@ import type { ThemeDef } from './types';
 
 /**
  * Hög kontrast A (Vitt): Svart på rent vitt, gul fokusram, blå bock, mörkröd stopp.
- * Decided palette (owner approval 2026-10-22), not yet registered: phase B adds
- * hog-kontrast.css, the registry entry and the picker row. Source:
- * .impeccable/mocks/themes-palettes.md.
+ * Decided palette (owner approval 2026-10-22), registered in registry.ts. Source:
+ * .impeccable/mocks/themes-palettes.md (local, gitignored).
  */
 export const hogKontrast: ThemeDef = {
   id: 'hog-kontrast',
@@ -29,10 +28,10 @@ export const hogKontrast: ThemeDef = {
       edge: '#595959',
       action: '#0b0b0b',
       'action-ink': '#ffffff',
-      done: '#0044cc',
-      accent: '#005e66',
+      done: '#003cb8',
+      accent: '#00525a',
       focus: '#ffd500',
-      info: '#005e66',
+      info: '#00525a',
       today: '#ffb000',
       'today-ink': '#0b0b0b',
       upcoming: '#e6e6e6',

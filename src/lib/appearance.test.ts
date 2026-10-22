@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   APPEARANCE_KEY,
+  appearanceSnapshot,
   applyAppearance,
   applyThemeColor,
   clearAppearance,
@@ -32,6 +33,7 @@ function stubMedia(dark: boolean) {
 }
 
 beforeEach(() => {
+  clearAppearance();
   localStorage.clear();
   document.documentElement.removeAttribute('data-theme');
   document.documentElement.removeAttribute('data-scheme');
@@ -132,6 +134,56 @@ describe('get, set and subscribe', () => {
   });
 });
 
+describe('initAppearance (does not rely on the boot script)', () => {
+  it('applies the stored appearance itself', () => {
+    localStorage.setItem(
+      APPEARANCE_KEY,
+      JSON.stringify({ theme: 'hav', scheme: 'dark' }),
+    );
+    const stop = initAppearance();
+    expect(document.documentElement.dataset.theme).toBe('hav');
+    expect(document.documentElement.dataset.scheme).toBe('dark');
+    stop();
+  });
+
+  it('follows the phone while the choice is system, and only then', () => {
+    const media = stubMedia(false);
+    const stop = initAppearance();
+    expect(document.documentElement.dataset.scheme).toBe('light');
+    media.set(true);
+    expect(document.documentElement.dataset.scheme).toBe('dark');
+    setAppearance({ scheme: 'light' });
+    media.set(false);
+    media.set(true);
+    expect(document.documentElement.dataset.scheme).toBe('light');
+    stop();
+  });
+});
+
+describe('blocked storage', () => {
+  it('keeps the choice made in this page view when setItem throws', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    setAppearance({ theme: 'hav', scheme: 'dark' });
+    expect(getAppearance()).toEqual({ theme: 'hav', scheme: 'dark' });
+    expect(appearanceSnapshot()).toBe('hav|dark|dark');
+    setAppearance({ scheme: 'light' });
+    expect(getAppearance()).toEqual({ theme: 'hav', scheme: 'light' });
+    vi.restoreAllMocks();
+  });
+
+  it('clearAppearance forgets the remembered choice', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('quota');
+    });
+    setAppearance({ theme: 'hav' });
+    clearAppearance();
+    expect(getAppearance()).toEqual(DEFAULT_APPEARANCE);
+    vi.restoreAllMocks();
+  });
+});
+
 describe('theme-color', () => {
   it('copies the computed --paper into the single meta', () => {
     document.documentElement.style.setProperty('--paper', '#1a1f21');
@@ -207,6 +259,18 @@ describe('public/theme-boot.js', () => {
         expect(boot).toMatchObject(document.documentElement.dataset);
       }
     }
+  });
+
+  it('does not reset the theme on a phone change when storage is unreadable', () => {
+    const media = stubMedia(false);
+    run();
+    document.documentElement.setAttribute('data-theme', 'hav');
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    media.set(true);
+    expect(document.documentElement.dataset.theme).toBe('hav');
+    vi.restoreAllMocks();
   });
 
   it('falls back to Rutat and follows the phone when storage throws', () => {

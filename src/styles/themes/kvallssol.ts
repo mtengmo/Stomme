@@ -2,9 +2,8 @@ import type { ThemeDef } from './types';
 
 /**
  * Kvällssol B (Skymning): Mörkare aprikos, mullbärsknapp, ringblomsgul idag, tallgrön bock, indigo.
- * Decided palette (owner approval 2026-10-22), not yet registered: phase B adds
- * kvallssol.css, the registry entry and the picker row. Source:
- * .impeccable/mocks/themes-palettes.md.
+ * Decided palette (owner approval 2026-10-22), registered in registry.ts. Source:
+ * .impeccable/mocks/themes-palettes.md (local, gitignored).
  */
 export const kvallssol: ThemeDef = {
   id: 'kvallssol',

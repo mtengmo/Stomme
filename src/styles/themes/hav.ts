@@ -2,9 +2,8 @@ import type { ThemeDef } from './types';
 
 /**
  * Hav A (Lagun): Sjöglas: blågrönt rutpapper, djup teal-knapp, korallröd bock.
- * Decided palette (owner approval 2026-10-22), not yet registered: phase B adds
- * hav.css, the registry entry and the picker row. Source:
- * .impeccable/mocks/themes-palettes.md.
+ * Decided palette (owner approval 2026-10-22), registered in registry.ts. Source:
+ * .impeccable/mocks/themes-palettes.md (local, gitignored).
  */
 export const hav: ThemeDef = {
   id: 'hav',
@@ -29,7 +28,7 @@ export const hav: ThemeDef = {
       edge: '#557a7d',
       action: '#0b5c61',
       'action-ink': '#f3f9f8',
-      done: '#b23524',
+      done: '#a83020',
       accent: '#1d5b94',
       focus: '#1d5b94',
       info: '#1d5b94',

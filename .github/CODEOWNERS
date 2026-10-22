@@ -17,3 +17,9 @@
 /index.html                         @mtengmo
 /package.json                       @mtengmo
 /package-lock.json                  @mtengmo
+
+# Colour themes, the boot script and the appearance code that applies them.
+/src/styles/themes/                @mtengmo
+/public/theme-boot.js               @mtengmo
+/src/ui/Banner.tsx                  @mtengmo
+/src/lib/appearance.ts              @mtengmo

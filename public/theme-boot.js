@@ -17,6 +17,7 @@
   const read = () => {
     let theme = DEFAULT_THEME;
     let scheme = 'system';
+    let ok = true;
     try {
       const stored = JSON.parse(window.localStorage.getItem(KEY) || 'null');
       if (stored && typeof stored === 'object') {
@@ -26,12 +27,15 @@
       }
     } catch {
       // storage blocked or corrupt: defaults
+      ok = false;
     }
-    return { theme, scheme };
+    return { theme, scheme, ok };
   };
 
-  const apply = () => {
+  const apply = (keepTheme) => {
     const appearance = read();
+    // On a phone change keep the theme the app set (storage may be blocked).
+    if (keepTheme) appearance.theme = root.getAttribute('data-theme') || appearance.theme;
     const dark =
       appearance.scheme === 'dark' ||
       (appearance.scheme === 'system' && !!media && media.matches);
@@ -54,7 +58,8 @@
   apply();
   if (media) {
     const onChange = () => {
-      if (read().scheme === 'system') apply();
+      const current = read();
+      if (current.ok && current.scheme === 'system') apply(true);
     };
     if (media.addEventListener) media.addEventListener('change', onChange);
     else if (media.addListener) media.addListener(onChange);

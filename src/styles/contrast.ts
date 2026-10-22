@@ -133,6 +133,8 @@ export interface ThemeReport {
   missing: string[];
   pairs: PairResult[];
   distinct: DistinctResult[];
+  /** Informational colour differences (see REPORTED_PAIRS); never failures. */
+  reported: DistinctResult[];
   failures: string[];
 }
 
@@ -147,6 +149,11 @@ export const DISTINCT_PAIRS: readonly [TokenName, TokenName][] = [
   ['accent', 'ink'],
   ['accent', 'equipment'],
   ['ink', 'equipment'],
+];
+
+/** Reported, not gating: care and the primary action may share a hue (Rutat: both graphite). */
+export const REPORTED_PAIRS: readonly [TokenName, TokenName][] = [
+  ['care', 'action'],
 ];
 
 type PairSpec = [fg: string, bg: string, kind: 'text' | 'ui'];
@@ -165,6 +172,9 @@ function pairSpecs(theme: ThemeDef, scheme: Scheme): PairSpec[] {
     ['care-ink', 'care', 'text'],
     ['paper', 'accent', 'text'], // text selection
   );
+  // Coloured text on the tinted bar, lead card and selected rows.
+  for (const fg of ['done', 'accent', 'care', 'info'])
+    specs.push([fg, 'surface-tint', 'text']);
   for (const fg of ['edge', 'equipment'])
     for (const bg of bgs) specs.push([fg, bg, 'ui']);
   specs.push(
@@ -204,6 +214,7 @@ export function evaluateTheme(theme: ThemeDef, scheme: Scheme): ThemeReport {
   const missing = TOKEN_NAMES.filter((name) => !tokens[name]).map(String);
   const pairs: PairResult[] = [];
   const distinct: DistinctResult[] = [];
+  const reported: DistinctResult[] = [];
   if (missing.length === 0) {
     for (const [fg, bg, kind] of pairSpecs(theme, scheme)) {
       const min = kind === 'text' ? theme.textMin : UI_MIN;
@@ -213,6 +224,10 @@ export function evaluateTheme(theme: ThemeDef, scheme: Scheme): ThemeReport {
     for (const [a, b] of DISTINCT_PAIRS) {
       const deltaE = deltaE2000(tokens[a] as string, tokens[b] as string);
       distinct.push({ a, b, deltaE, ok: deltaE >= MIN_DELTA_E });
+    }
+    for (const [a, b] of REPORTED_PAIRS) {
+      const deltaE = deltaE2000(tokens[a] as string, tokens[b] as string);
+      reported.push({ a, b, deltaE, ok: deltaE >= MIN_DELTA_E });
     }
   }
   const failures = [
@@ -226,5 +241,5 @@ export function evaluateTheme(theme: ThemeDef, scheme: Scheme): ThemeReport {
         (d) => `deltaE ${d.a}/${d.b} ${d.deltaE.toFixed(1)} < ${MIN_DELTA_E}`,
       ),
   ];
-  return { missing, pairs, distinct, failures };
+  return { missing, pairs, distinct, reported, failures };
 }

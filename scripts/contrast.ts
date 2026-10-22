@@ -24,6 +24,11 @@ for (const theme of themes) {
         `  ${d.ok ? 'PASS' : 'FAIL'} dE ${d.deltaE.toFixed(1).padStart(5)} (min 20)  ${d.a} / ${d.b}`,
       );
     }
+    for (const d of report.reported) {
+      console.log(
+        `  INFO dE ${d.deltaE.toFixed(1).padStart(5)} (not gating)  ${d.a} / ${d.b}`,
+      );
+    }
   }
 }
 console.log(failed ? `\n${failed} failing check(s)` : '\nAll checks pass');

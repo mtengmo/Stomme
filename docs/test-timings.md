@@ -169,3 +169,17 @@ Risks and unverified points:
 - Required checks for a future ruleset: `verify`, `build`, `e2e-result`. Not `deploy`, `a11y` or `upgrade` (`e2e (1)`/`e2e (2)` names depend on the shard list).
 - A push to main/dev while a run is in progress does not cancel it; a newer queued run replaces an older pending one, so the latest commit still deploys.
 - `quality.yml` path filter now also covers `scripts/contrast.ts`, `scripts/test-upgrade.ts`, `scripts/buildVersion.ts`, `src/lib/update.ts`, `src/main.tsx`, `package.json`, `package-lock.json` and the workflow itself.
+
+## Themes branch (phase B, after merging faster-tests)
+
+Single runs on the same machine (not 3-run medians), wall time including `ensure-build`.
+
+| Suite | Result | Time (s) |
+|---|---|---|
+| `npm test` | 66 files, 866 tests | 67 (vitest reports 63) |
+| `npm run test:cov` | 866 tests, rules gate 100% branches passes | 45 |
+| `npm run e2e` | 73 passed | 88 |
+| `npm run e2e:smoke` | 14 passed (12 existing + 2 theme boot tests) | 56 (47.7 in Playwright) |
+| `npm run e2e:themes` | 18 passed (8 theme x scheme flows, 5 picker, 4 boot/CSP/wipe, 1 S1) | 67 (58.5 in Playwright) |
+
+The two added @smoke tests are the boot tests in `tests/e2e/appearance.spec.ts` (first paint with the app bundle blocked; app applies the scheme with the boot script blocked), about 1 s each. The full theme matrix is local-only (`npm run e2e:themes`, also part of `npm run e2e`).
