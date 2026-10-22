@@ -68,3 +68,19 @@ Notes:
 `npm run test:cov` = `vitest run --coverage`, threshold 100% branches on `src/rules/**` (v8). Before: 94.26% (26 uncovered branches in 10 files). After: 100%; +15 tests (754 -> 769), two new test files (`prescription.test.ts`, `programRosters.test.ts`). One branch was unreachable by type (`SessionStatus` has three values) and was simplified to an `else` in `progressOverview.ts`; no ignore comments.
 
 Cost: a coverage run is 31-53 s versus 30 s plain (instrumentation). The default 5 s test timeout flaked under coverage (ExerciseLibrary test), so `testTimeout` is now 15 s.
+
+## T3 Vitest projects
+
+`unit` (30 files, 516 tests, threads, `isolate: false`), `db` (13 files, threads, isolated), `dom` (17 files, forks, isolated). Worker cap is global (`maxWorkers: 6`): vitest refuses different `maxWorkers` per project unless the projects run in sequential groups, which would lose the overlap. All 60 files and 769 tests run.
+
+| Measure | Before (median) | After |
+|---|---|---|
+| `vitest run`, 3 runs | 29.9 s | 25.1, 26.4, 32.0 s, median 26.4 s |
+| `test:cov` | 31-53 s | 21.9 s |
+| `--project unit` | n/a | 1.1-1.3 s |
+| `--project db` | n/a | 4.4 s |
+| `--project dom` | n/a | 13-16 s (24 s once under load) |
+
+`isolate: false` gate: 5 consecutive `vitest run --project unit --sequence.shuffle` runs passed (516/516 each, seeds 1792627239235, ...42425, ...45376, ...48230, ...51879); no file had to move to `db`.
+
+The `dom` project is now the long pole (jsdom environment startup is about 40% of its time). Trying `isolate: false` there only broke `src/lib/update.test.tsx` (7 tests) and saved about 4 s, so it was not adopted (plan keeps `dom` isolated).
