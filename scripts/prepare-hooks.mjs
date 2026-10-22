@@ -1,5 +1,5 @@
 // Installs the Lefthook git hooks on `npm install`. It must never fail the
-// install: no-op in CI, outside a git checkout, or when dev dependencies are
+// install: no-op in CI, with LEFTHOOK=0 at install time, outside a git checkout, or when dev dependencies are
 // not installed (`npm ci --omit=dev`). Plain Node so it needs no dev tools.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';

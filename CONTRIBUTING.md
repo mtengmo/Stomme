@@ -42,7 +42,7 @@ npm test           # unit tests
 npm run e2e        # browser tests (rebuilds only if the sources changed)
 ```
 
-Run `npm run check`, `npm test` and `npm run build` before you push. CI runs the same and a pull request cannot be merged while it fails.
+Run `npm run check`, `npm test` and `npm run build` before you push. CI runs the same plus the browser tests. The maintainer intends to enable a GitHub ruleset that requires the checks `verify`, `build` and `e2e-result` before merging; until it is enabled, a failing CI is not yet enforced by GitHub.
 
 ## Test tiers
 
@@ -52,15 +52,15 @@ Use the cheapest tier that answers your question; the slower tiers run for you b
 |---|---|---|---|
 | Inner loop | While editing | `npm run test:watch` (unit and db tests, reruns affected files), `npm run test:related -- src/rules/stats.ts`, `npm run test:changed`, `npm run check:fast` (lint and types for changed files) | seconds |
 | Pre-push | `git push` | Lefthook runs `npm run check` and `npm run test:cov` in parallel, then `npm run e2e:smoke` (12 tests tagged `@smoke`, including every pain test) | 1-2 minutes |
-| CI | Every pull request and push | `npm run check`, `npm test`, `npm run build`; browser tests (`npm run e2e:ci`, always builds first) join CI with the planned CI restructure | minutes |
-| Nightly | Scheduled, not yet set up | Accessibility audit (`npm run audit:a11y`), `npm run test:upgrade`, theme screenshots | n/a |
+| CI | Every pull request and push | `npm run check`, `npm test`, `npm run build`, and the browser tests in two shards (`npm run e2e:prebuilt` on the built `dist`; locally `npm run e2e:ci` builds first) | minutes |
+| Nightly | Scheduled (`quality.yml`, also on PRs touching styles, shared UI or build config) | Accessibility audit (`npm run audit:a11y`), `npm run test:upgrade`, theme screenshots | n/a |
 
 Details:
 
 - `npm test` runs three vitest projects: `unit` (pure code, shared workers), `db` (IndexedDB singleton) and `dom` (jsdom components). `npm run test:cov` runs all of them with coverage and fails below 100% branch coverage in `src/rules/`. Run one project with `npx vitest run --project unit`. Keep tests in `unit` free of module-level state, because they share workers; a test that stubs globals or uses the database belongs in `db`.
-- `npm run e2e` runs the full browser suite in parallel with the service worker blocked and onboarding already accepted (saved once per run to `test-results/.auth/`, never committed). A spec that tests onboarding or training setup starts from empty state with `test.use({ storageState: FRESH_STATE })`; a spec that needs the service worker (offline, PWA) sets `test.use({ serviceWorkers: 'allow' })`. Tag a test `@smoke` (`test('...', { tag: '@smoke' }, ...)`) only if it protects the main flow or a safety rule.
+- `npm run e2e` runs the full browser suite (it reuses a preview server already listening on port 4173, so stop a stale one if results look old) in parallel with the service worker blocked and onboarding already accepted (saved once per run to `test-results/.auth/`, never committed). A spec that tests onboarding or training setup starts from empty state with `test.use({ storageState: FRESH_STATE })`; a spec that needs the service worker (offline, PWA) sets `test.use({ serviceWorkers: 'allow' })`. Tag a test `@smoke` (`test('...', { tag: '@smoke' }, ...)`) only if it protects the main flow or a safety rule.
 - Fake clocks in browser tests: after the page has loaded, use `freezeClock(page)` from `tests/e2e/flow.ts`, not `page.clock.install()`, so countdowns only move when the test advances them.
-- Hook setup: `npm ci` installs the Lefthook pre-push hook automatically when you work in a git checkout (never in CI). To skip it once use `git push --no-verify` or `LEFTHOOK=0 git push`; to remove it run `npx lefthook uninstall`. CI still runs everything, so a skipped hook only moves the failure to the pull request.
+- Hook setup: `npm ci` installs the Lefthook pre-push hook automatically when you work in a git checkout (never in CI). The pre-push browser step needs Chromium once: `npx playwright install chromium`. To skip the hook once use `git push --no-verify` or `LEFTHOOK=0 git push` (`LEFTHOOK=0` only takes effect when the hook runs; the installer also skips installing when it is set); to remove it run `npx lefthook uninstall`. CI still runs everything, so a skipped hook only moves the failure to the pull request.
 
 ## Style
 

@@ -9,8 +9,10 @@ on:
 permissions:
   contents: read
 
-# One run per ref; a newer pull request push cancels the older run. Pushes to
-# main/dev are never cancelled. Deploys are serialised separately (see deploy).
+# One run per ref. A newer pull request push cancels the older run. For main/dev
+# pushes nothing in progress is cancelled, but a newer queued run replaces an older
+# PENDING one (the latest commit still runs and deploys). Deploys are serialised
+# separately (see deploy).
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -18,6 +20,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -31,6 +34,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
         with:
@@ -43,7 +47,7 @@ jobs:
       - run: npm ci
       - run: npx vite build
       - name: Upload dist for the browser tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist
@@ -58,6 +62,7 @@ jobs:
   e2e:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -72,7 +77,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -81,10 +86,10 @@ jobs:
         run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
       - name: Cache Playwright browsers
         id: browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ env.ImageOS }}-${{ steps.playwright.outputs.version }}
       - name: Install Chromium and system packages
         if: steps.browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
@@ -95,16 +100,28 @@ jobs:
       - run: npm run e2e:prebuilt -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
       - name: Upload failure traces
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-results-${{ matrix.shard }}
           path: test-results
           retention-days: 7
 
+  # Stable name for a future ruleset: required checks are verify, build and
+  # e2e-result (matrix job names change with the shard list).
+  e2e-result:
+    needs: e2e
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fail unless every e2e shard succeeded
+        run: test "${{ needs.e2e.result }}" = "success"
+
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: [verify, build, e2e]
+    needs: [verify, build, e2e, e2e-result]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     # Deploys queue instead of cancelling each other.
     concurrency:
       group: pages

@@ -159,3 +159,13 @@ Risks and unverified points:
 - Linux Chromium timing differs from Windows; the 2-worker shards could expose slower tests, and the 10 s expect timeout is the only headroom. First runs may flake: watch them and read the uploaded `e2e-results-N` traces.
 - Browser cache key is `playwright-<os>-<@playwright/test version from the lockfile>`; `install-deps` runs on a hit, a full `install --with-deps` on a miss. Cache hits cannot be verified without GitHub.
 - Not verifiable locally: that `deploy` is skipped on pull requests (it is guarded by `github.ref == 'refs/heads/main'`, and PR refs are `refs/pull/N/merge`), the `pages` environment behaviour, and the schedule trigger.
+
+## Review follow-ups (CI hardening)
+
+- Job timeouts: verify 15, build 10, e2e shard 20, e2e-result 5, deploy 10, a11y 20, upgrade 30 minutes; Playwright `globalTimeout` 15 min in CI.
+- Playwright in CI: `retries: 1`, `trace: on-first-retry` (so the uploaded `e2e-results-N` artifact holds real traces), reporters `list` plus `github` (a test that passes only on retry is annotated as flaky and must be investigated, not ignored; the pain and safety tests get no exemption), `forbidOnly`, `reuseExistingServer` off in CI (still on locally, so a stale preview on port 4173 can serve old results; stop it if in doubt).
+- Actions: upload-artifact v7, download-artifact v8, cache v6 (latest majors confirmed with `gh api`); Playwright cache key `playwright-<os>-<ImageOS>-<playwright version>`; `install-deps` still runs on a cache hit.
+- New job `e2e-result` (needs e2e, `if: always()`, fails unless the matrix result is `success`) is the stable gate; deploy needs verify, build, e2e and e2e-result.
+- Required checks for a future ruleset: `verify`, `build`, `e2e-result`. Not `deploy`, `a11y` or `upgrade` (`e2e (1)`/`e2e (2)` names depend on the shard list).
+- A push to main/dev while a run is in progress does not cancel it; a newer queued run replaces an older pending one, so the latest commit still deploys.
+- `quality.yml` path filter now also covers `scripts/contrast.ts`, `scripts/test-upgrade.ts`, `scripts/buildVersion.ts`, `src/lib/update.ts`, `src/main.tsx`, `package.json`, `package-lock.json` and the workflow itself.
