@@ -84,3 +84,7 @@ Cost: a coverage run is 31-53 s versus 30 s plain (instrumentation). The default
 `isolate: false` gate: 5 consecutive `vitest run --project unit --sequence.shuffle` runs passed (516/516 each, seeds 1792627239235, ...42425, ...45376, ...48230, ...51879); no file had to move to `db`.
 
 The `dom` project is now the long pole (jsdom environment startup is about 40% of its time). Trying `isolate: false` there only broke `src/lib/update.test.tsx` (7 tests) and saved about 4 s, so it was not adopted (plan keeps `dom` isolated).
+
+## T4 Inner-loop scripts
+
+`test:watch` (unit + db projects, about 5 s for a cold full pass, then only affected files re-run), `test:changed`, `test:related` (e.g. `npm run test:related -- src/rules/stats.ts`: 9 files, 9.4 s because related dom tests are included), `check:fast` (biome on files changed against `main`, then tsc; `vcs.defaultBranch` set to main in `biome.json`). `test:changed` after a config edit runs everything (17.6 s), which is vitest's rule for config changes. The watch rerun time was not measured interactively.
