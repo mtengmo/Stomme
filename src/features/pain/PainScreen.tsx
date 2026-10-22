@@ -80,7 +80,7 @@ function Toggle({
       aria-checked={on}
       onClick={onToggle}
       className={`flex min-h-14 w-full items-center justify-between gap-3 rounded-md bg-surface px-4 text-left text-ink transition-transform duration-150 ease-out active:scale-[0.98] ${size} ${
-        on ? 'border-[3px] border-ink font-bold' : 'border-2 border-edge'
+        on ? 'border-[3px] border-care font-bold' : 'border-2 border-edge'
       }`}
     >
       <span>{label}</span>
@@ -112,9 +112,11 @@ export function StopScreen({
     <div className="min-h-dvh border-[6px] border-care bg-paper text-ink">
       <div className="mx-auto flex min-h-[calc(100dvh-12px)] max-w-md flex-col px-5">
         <div className="flex flex-1 flex-col gap-4 pt-10">
-          <div className="flex items-center gap-3 text-care">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-care">
             <Icon name="stop" size={64} />
-            <p className="m-0 text-6xl leading-none font-extrabold">Stopp</p>
+            <p className="m-0 text-[clamp(2.25rem,18vw,3.75rem)] leading-none font-extrabold">
+              Stopp
+            </p>
           </div>
           <h1
             className={`m-0 leading-none font-extrabold break-words ${dayAfter || afterSession ? 'text-5xl' : 'text-6xl'}`}
@@ -127,7 +129,9 @@ export function StopScreen({
           </h1>
           {dayAfter || afterSession ? null : (
             <>
-              <p className="m-0 text-2xl font-bold">{PAIN_COPY.stopBody}</p>
+              <p className="m-0 text-2xl font-bold break-words">
+                {PAIN_COPY.stopBody}
+              </p>
               <p className="m-0 text-xl">Det du hunnit logga sparas.</p>
             </>
           )}
@@ -138,7 +142,7 @@ export function StopScreen({
             onClick={onHome}
             className="flex min-h-16 w-full items-center justify-center gap-3 rounded-md bg-care px-6 text-xl font-bold text-care-ink active:scale-[0.98]"
           >
-            <Icon name="stop" size={28} />
+            <Icon name="back" size={28} />
             {PAIN_COPY.stopDone}
           </button>
         </div>
