@@ -23,8 +23,6 @@ for (const mode of [
     }) => {
       await page.setViewportSize(mode.viewport);
       await page.emulateMedia({ colorScheme: mode.colorScheme });
-      await page.goto('/');
-      await page.getByRole('button', { name: /Jag förstår/ }).click();
       await page.goto('/#/installningar');
       await page
         .getByRole('link', { name: 'Granska alla övningar', exact: true })

@@ -10,7 +10,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();
@@ -78,7 +78,7 @@ for (const mode of [
 ]) {
   test(`technique remains accessible (${mode.name})`, async ({ page }) => {
     await page.setViewportSize(mode.viewport);
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();
@@ -107,7 +107,7 @@ for (const width of [360, 390, 1280]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 800 });
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();

@@ -1,4 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { FRESH_STATE } from './state';
+
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
 
 for (const width of [360, 1280]) {
   test(`browse previews and reuse a custom workout (${width})`, async ({

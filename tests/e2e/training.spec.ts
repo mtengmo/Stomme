@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { completeSets, keepFirstExercises } from './flow';
+import { FRESH_STATE } from './state';
+
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
 
 test('training setup keeps readiness, symptoms, effort, and after check-in separate', {
   tag: '@smoke',

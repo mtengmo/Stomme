@@ -104,3 +104,21 @@ Findings:
 - Smoke is above the 20 s plan target (17.5-24 s) because the 12 tests include the 8 s Pass A flow and the 8 s training test; they run in parallel but compete for CPU.
 
 Flake found and fixed (cause, not retry): in the cold run 1, `guide.spec.ts` "timer, movement and completion fit together (360)" failed on `toHaveText('0:05')`. `page.clock.install()` lets the fake clock keep running in real time, so a stalled machine let the countdown run past the asserted value. Reproduced deterministically by adding a 1.5 s wait after the start click (received 0:19 instead of 0:05). Fix: `freezeClock()` in `tests/e2e/flow.ts` (install, then `pauseAt`), used in the guide spec and in `playPassA`, so the clock only moves via `fastForward`. The kettlebell, knee-extension and exercise-development specs install the clock before `goto`; pausing there stalls lazy chunk loading (5 failures), so they keep the plain install (they assert animation state, not exact countdown text).
+
+## T6 Shared onboarded storage state
+
+`tests/e2e/global-setup.ts` accepts the disclaimer once and saves `test-results/.auth/onboarded.json` (`storageState({ indexedDB: true })`, regenerated every run, inside the gitignored `test-results/`). It is the default `use.storageState`. Specs that test onboarding or training setup keep fresh state through `test.use({ storageState: FRESH_STATE })` (`tests/e2e/state.ts`): smoke, training, training-preparation, exercise-development, kettlebells, library-workouts (all of them click through "Bli starkare"/setup somewhere). Converted to the shared state: figure-colours, guide, knee-extension, muscles, pain, rack-grip, review, settings. `openPreview(page, true)` and the converted specs also skip the redundant `goto('/')` before the deep link, one page load fewer per test.
+
+Results (machine shared with other jobs, so wall times swing from 38 s to 90 s between identical runs):
+
+| Measure | Before T6 (T5) | After T6 |
+|---|---|---|
+| full e2e wall, quiet runs | 37.1, 39.4, 39.0 s | 39.8, 40.3, 42.4, 43.7, 44.2 s |
+| full e2e wall, loaded runs | 87 s | 58-91 s |
+| sum of test durations (one A/B pair) | 487 s | 255 s |
+
+Wall time did not improve on this machine: with 12 workers on 16 cores the suite is bounded by its longest tests and CPU, and the saving per test (one onboarding click, one page load) is small next to those. The sum of test durations in the A/B pair roughly halved, so the gain should show on slower or CI hardware with 2 workers.
+
+Flake findings (3 consecutive green runs achieved after the fixes: 55/55, 55/55, 55/55; two further green runs before):
+- Failures only appeared in the first run after a pause or under external load (runs of 58-91 s) and were always a 5 s `expect` timeout while a lazily loaded route rendered (`Pass A` heading, technique list, a saved workout link) or a `browser.newContext: Test ended` after a timeout. They did not reproduce in 45 repeated runs of the same test at 16 workers, nor in isolation. Cause: default 5 s expect timeout versus worker over-subscription. Fix: `expect.timeout` 10 s in the config (assertions unchanged) and fewer page loads per test.
+- With 18 workers and `--repeat-each=2` (a deliberate 2x over-subscription) 1 of 110 tests failed per run with the same signature (`library-workouts` 360 saved-workout link, `guide` 200% text `Pass A` heading); not reproduced at normal worker counts.

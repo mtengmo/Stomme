@@ -39,11 +39,21 @@ export async function answerPain(
   await page.getByRole('button', { name: 'Spara' }).click();
 }
 
-/** Onboarding, then the preview of Pass A (nothing started yet). */
-export async function openPreview(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.goto('/#/pass/A');
+/**
+ * Onboarding (skipped when the spec already runs on the shared onboarded
+ * state), then the preview of Pass A (nothing started yet).
+ */
+export async function openPreview(
+  page: Page,
+  onboarded = false,
+): Promise<void> {
+  if (onboarded) {
+    await page.goto('/#/pass/A');
+  } else {
+    await page.goto('/');
+    await page.getByRole('button', { name: /Jag förstår/ }).click();
+    await page.goto('/#/pass/A');
+  }
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
 }
 

@@ -1,5 +1,9 @@
 import { devices, expect, test } from '@playwright/test';
 import { answerPain, playPassA, skipFirstExercise } from './flow';
+import { FRESH_STATE } from './state';
+
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
 

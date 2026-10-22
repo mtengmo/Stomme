@@ -13,8 +13,6 @@ for (const mode of [
       reducedMotion: 'no-preference',
     });
     await page.clock.install();
-    await page.goto('/');
-    await page.getByRole('button', { name: /Jag förstår/ }).click();
     await page.goto('/#/granska?ovning=E30');
     await expect(
       page.getByRole('heading', {

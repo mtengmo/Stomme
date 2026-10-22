@@ -4,7 +4,7 @@ import { answerPain, openPreview } from './flow';
 test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
 
 async function startPass(page: import('@playwright/test').Page) {
-  await openPreview(page);
+  await openPreview(page, true);
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await expect(page.getByRole('heading', { name: /Hur känns/ })).toBeVisible();
 }
