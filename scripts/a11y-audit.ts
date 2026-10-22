@@ -6,7 +6,12 @@
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
-import { type Browser, chromium, type Page } from '@playwright/test';
+import {
+  type Browser,
+  type BrowserContext,
+  chromium,
+  type Page,
+} from '@playwright/test';
 
 // Each run owns its server; a stale worktree server must not pass an audit.
 const reservation = createServer();
@@ -133,6 +138,15 @@ async function audit(page: Page, name: string) {
   }
 }
 
+/** AUDIT_THEME=<id> runs the whole audit in another registered theme (default: Rutat). */
+const AUDIT_THEME = process.env.AUDIT_THEME;
+async function applyAuditTheme(ctx: BrowserContext): Promise<void> {
+  if (!AUDIT_THEME) return;
+  await ctx.addInitScript(
+    `localStorage.setItem('stomme.appearance', ${JSON.stringify(JSON.stringify({ theme: AUDIT_THEME, scheme: 'system' }))})`,
+  );
+}
+
 async function theme(scheme: 'light' | 'dark') {
   const browser = await chromium.launch();
   browsers.add(browser);
@@ -141,10 +155,11 @@ async function theme(scheme: 'light' | 'dark') {
     colorScheme: scheme,
     reducedMotion: 'reduce',
   });
+  await applyAuditTheme(ctx);
   const page = await ctx.newPage();
   await page.addInitScript('window.__name = (f) => f');
   const base = `http://localhost:${PORT}`;
-  const tag = (s: string) => `${scheme} ${s}`;
+  const tag = (s: string) => `${AUDIT_THEME ?? 'rutat'} ${scheme} ${s}`;
   await page.goto(base);
   await page.getByRole('heading', { name: /Välkommen/ }).waitFor();
   await audit(page, tag('onboarding'));
@@ -347,6 +362,7 @@ async function theme(scheme: 'light' | 'dark') {
     colorScheme: scheme,
     reducedMotion: 'reduce',
   });
+  await applyAuditTheme(trainingContext);
   const training = await trainingContext.newPage();
   await training.addInitScript('window.__name = (f) => f');
   await training.goto(base);

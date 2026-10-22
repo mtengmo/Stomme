@@ -21,6 +21,14 @@ DESIGN.md is not rewritten yet; phase C (documenter) records the rule changes be
 3. **Care screens** (pain, stop, warn) use a warning icon, a bold Swedish word ("Avbryt", "Stopp"), a heavy outline and `--care`. `--care` reaches 4.5:1 (7:1 in Hög kontrast) on paper and surface and differs from `--done` and `--accent` by deltaE2000 >= 20 (checked in `npm test`). `--care` is the outermost lightness (darkest in light, lightest in dark) so it separates in greyscale and under red-green colour blindness.
 4. **Tokens.** `paper, surface, surface-tint, line, ink, ink-soft, edge, action, action-ink, done, accent, focus, info, today, today-ink, upcoming, upcoming-ink, care, care-ink, equipment`. `--red` is now `--done`, `--blue` is `--accent`, `--amber` is `--today`.
 
+## Phase B notes
+
+- Themes are wired (Rutat, Hav Lagun, Kvällssol Skymning, Hög kontrast Vitt). Settings has "Utseende" (Färgtema radio list with live swatch, Ljust / Mörkt / Följ telefonen); onboarding has a collapsed "Välj färger (kan ändras senare)".
+- Grid switch: `--grid-line` (transparent in Hög kontrast). Focus ring: `--focus-outline` plus `--focus-ring` (double ring in Hög kontrast light only).
+- Stop screen: 6 px `--care` frame, icon plus "Stopp", `--care` button. In Rutat this replaces the old graphite-filled screen (care is graphite there).
+- Pencil tick on every "Klar" chip (week chip, history chip). Primary actions use `--action`/`--action-ink`; bars, nav and the lead pass card use `--surface-tint`; cards and fields use `--surface`.
+- Tests: `npm run e2e:themes` (@themes), `npm run shots:themes` (48 captures plus greyscale report), `AUDIT_THEME=<id>` for the a11y audit.
+
 ## Where things live
 
 - `src/styles/themes/<id>.css` (light block, dark block), `src/styles/themes/registry.ts` (registered themes), `src/styles/themes/<id>.palette.ts` (decided, not yet registered: hav, kvallssol, hog-kontrast).
