@@ -277,9 +277,37 @@ async function theme(scheme: 'light' | 'dark') {
     }
     if (n.startsWith('Starta –')) {
       await audit(page, tag('timed hold'));
-      await page
-        .getByRole('button', { name: 'Hoppa över övningen', exact: true })
-        .click();
+      const stepBefore = await page
+        .locator('[data-step]')
+        .getAttribute('data-step');
+      try {
+        await page
+          .getByRole('button', { name: 'Hoppa över övningen', exact: true })
+          .click({ timeout: 10_000 });
+        // Wait for the screen to change: the next loop pass must not re-read the
+        // stale "Starta" button, which on a slow machine was audited a second time
+        // after the session had already moved on.
+        await page.waitForFunction(
+          (before) =>
+            document.querySelector('[data-step]')?.getAttribute('data-step') !==
+            before,
+          stepBefore,
+        );
+      } catch (error) {
+        const state = await page.evaluate(() => ({
+          h1: document.querySelector('h1')?.textContent,
+          step: document
+            .querySelector('[data-step]')
+            ?.getAttribute('data-step'),
+          buttons: [...document.querySelectorAll('button')].map((b) =>
+            b.textContent?.trim(),
+          ),
+        }));
+        throw new Error(
+          `${scheme}: could not skip the timed hold; page state ${JSON.stringify(state)}`,
+          { cause: error },
+        );
+      }
       continue;
     }
     if (n === 'Spara' && !seen.has('after')) {

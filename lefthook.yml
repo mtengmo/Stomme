@@ -1,0 +1,14 @@
+# Pre-push gate (target 60 s): static checks and the rules coverage gate run
+# in parallel, then the @smoke browser tests. Bypass once with
+# `git push --no-verify` or `LEFTHOOK=0 git push`.
+pre-push:
+  jobs:
+    - group:
+        parallel: true
+        jobs:
+          - name: check
+            run: npm run check
+          - name: test:cov
+            run: npm run test:cov
+    - name: e2e:smoke
+      run: npm run e2e:smoke

@@ -34,10 +34,8 @@ export function weeklyProgress(
       if (session.status === 'completed') {
         row.completed++;
         row.byProgramme[programme]++;
-      } else if (
-        session.status === 'aborted' ||
-        session.status === 'in_progress'
-      ) {
+      } else {
+        // SessionStatus is only completed, aborted or in_progress.
         row.incomplete++;
       }
     }

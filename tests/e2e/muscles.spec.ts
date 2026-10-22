@@ -6,8 +6,6 @@ test.use({ ...devices['Pixel 7'], viewport: { width: 360, height: 800 } });
 test('muscle filters survive exercise navigation and browser Back', async ({
   page,
 }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/ovningar');
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
@@ -36,7 +34,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
 test('a selected exercise survives inspection, pain replanning and session reload', async ({
   page,
 }) => {
-  await openPreview(page);
+  await openPreview(page, true);
   await page
     .getByRole('button', { name: 'Byt övning', exact: true })
     .first()
@@ -94,8 +92,6 @@ test('a selected exercise survives inspection, pain replanning and session reloa
 test('muscle highlights have a text alternative and respect reduced motion', async ({
   page,
 }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
   await page.goto('/#/ovning/dead-bug');
   await expect(
     page.getByRole('heading', { name: 'Tränar främst' }),
@@ -132,7 +128,7 @@ test('muscle highlights have a text alternative and respect reduced motion', asy
 test('optional sixth exercise wraps inside the narrow week card', async ({
   page,
 }) => {
-  await openPreview(page);
+  await openPreview(page, true);
   await page.getByRole('button', { name: 'Starta pass', exact: true }).click();
   await answerPain(page, 5);
   await page.getByRole('switch', { name: /väggsittning/i }).click();

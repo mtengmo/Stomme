@@ -1,5 +1,16 @@
 import { expect, type Page } from '@playwright/test';
 
+/**
+ * Installs a fake clock that only moves when the test advances it
+ * (fastForward/runFor). A plain `clock.install()` lets time flow in real time,
+ * so a loaded machine can let a countdown run past the value being asserted.
+ */
+export async function freezeClock(page: Page): Promise<void> {
+  const now = Date.now();
+  await page.clock.install({ time: now });
+  await page.clock.pauseAt(now + 1_000);
+}
+
 export type Stage =
   | 'preview'
   | 'pain'
@@ -28,11 +39,21 @@ export async function answerPain(
   await page.getByRole('button', { name: 'Spara' }).click();
 }
 
-/** Onboarding, then the preview of Pass A (nothing started yet). */
-export async function openPreview(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.goto('/#/pass/A');
+/**
+ * Onboarding (skipped when the spec already runs on the shared onboarded
+ * state), then the preview of Pass A (nothing started yet).
+ */
+export async function openPreview(
+  page: Page,
+  onboarded = false,
+): Promise<void> {
+  if (onboarded) {
+    await page.goto('/#/pass/A');
+  } else {
+    await page.goto('/');
+    await page.getByRole('button', { name: /Jag förstår/ }).click();
+    await page.goto('/#/pass/A');
+  }
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
 }
 
@@ -80,7 +101,7 @@ export async function playPassA(
 
     if (name.startsWith('Starta –')) {
       await once('set-timed');
-      await page.clock.install();
+      await freezeClock(page);
       await action.click();
       // Pass A ends with two right/left pairs of 20-second side planks.
       for (let set = 0; set < 2; set++) {

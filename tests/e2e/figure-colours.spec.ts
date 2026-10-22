@@ -16,7 +16,6 @@ for (const mode of [
       reducedMotion: 'no-preference',
     });
     await page.goto('/');
-    await page.getByRole('button', { name: /Jag förstår/ }).click();
     for (const sample of [
       { id: 'dumbbell-rdl', equipment: 'dumbbell' },
       { id: 'kettlebell-rack-carry', equipment: 'kettlebell' },

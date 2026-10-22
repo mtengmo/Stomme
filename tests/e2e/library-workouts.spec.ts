@@ -1,4 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { FRESH_STATE } from './state';
+
+// Covers onboarding or training setup, so it starts from a first visit.
+test.use({ storageState: FRESH_STATE });
 
 for (const width of [360, 1280]) {
   test(`browse previews and reuse a custom workout (${width})`, async ({
@@ -72,10 +76,13 @@ for (const width of [360, 1280]) {
     await page
       .getByRole('button', { name: 'Spara eget pass', exact: true })
       .click();
+    // Wait for the write to show up before reloading; a reload can abort it.
+    const saved = page.getByRole('link', {
+      name: 'Mitt kettlebellpass · 2 övningar',
+    });
+    await expect(saved).toBeVisible();
     await page.reload();
-    await page
-      .getByRole('link', { name: 'Mitt kettlebellpass · 2 övningar' })
-      .click();
+    await saved.click();
     await expect(
       page.getByRole('heading', { name: 'Mitt kettlebellpass', exact: true }),
     ).toBeVisible();

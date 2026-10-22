@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { answerPain, openPreview } from './flow';
+import { answerPain, freezeClock, openPreview } from './flow';
 
 for (const viewport of [
   { width: 360, height: 800 },
@@ -10,7 +10,7 @@ for (const viewport of [
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();
@@ -78,7 +78,7 @@ for (const mode of [
 ]) {
   test(`technique remains accessible (${mode.name})`, async ({ page }) => {
     await page.setViewportSize(mode.viewport);
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();
@@ -107,7 +107,7 @@ for (const width of [360, 390, 1280]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 800 });
-    await openPreview(page);
+    await openPreview(page, true);
     await page
       .getByRole('button', { name: 'Starta pass', exact: true })
       .click();
@@ -128,7 +128,7 @@ for (const width of [360, 390, 1280]) {
     ).toBeVisible();
     const frame = page.locator('[data-step]');
     const step = await frame.getAttribute('data-step');
-    await page.clock.install();
+    await freezeClock(page);
     const start = page.getByRole('button', { name: /^Starta –/ });
     await expect(start).toBeInViewport({ ratio: 1 });
     await expect(page.getByRole('region', { name: 'Rörelsen' })).toBeInViewport(

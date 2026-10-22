@@ -413,3 +413,33 @@ describe('question validation', () => {
     },
   );
 });
+
+describe('fallbacks when the previous session lacks detail', () => {
+  const bare = { ...plan, sides: undefined, variantId: undefined };
+  it('has no result to build on when the previous session logged nothing for the exercise', () => {
+    expect(trainingSuggestion(plan, session(), []).explanation).toBe(
+      'Inget komplett resultat att utgå från. Välj själv.',
+    );
+  });
+  it('falls back to the new plan when the previous plan, check-ins and sides are absent', () => {
+    const previous = session({ plan: [], checkins: undefined });
+    const perSide = trainingSuggestion(bare, previous, logs());
+    expect(perSide.target).toBe(8);
+    expect(perSide.explanation).toContain('Samma nivå');
+    const both = trainingSuggestion(
+      { ...bare, exerciseId: 'goblet-squat' },
+      previous,
+      logs().map((log) => ({
+        ...log,
+        exerciseId: 'goblet-squat' as const,
+        side: 'both' as const,
+      })),
+    );
+    expect(both.explanation).toBeTruthy();
+  });
+  it('does not ask the next day without any check-ins or symptoms', () => {
+    expect(
+      trainingDayAfterDue(session({ checkins: undefined }), '2026-10-21'),
+    ).toBe(false);
+  });
+});
