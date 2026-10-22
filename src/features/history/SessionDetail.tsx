@@ -252,7 +252,7 @@ function ExerciseSets({
     (a, b) => a - b,
   );
   return (
-    <div className="flex flex-col gap-2 rounded-md border-2 border-edge bg-paper p-4">
+    <div className="flex flex-col gap-2 rounded-md border-2 border-edge bg-surface p-4">
       <h3 className="m-0 flex flex-wrap items-baseline justify-between gap-x-3 text-xl font-bold">
         <Link
           href={`/ovning/${exerciseId}`}

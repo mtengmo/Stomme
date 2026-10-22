@@ -7,7 +7,7 @@
 (() => {
   const KEY = 'stomme.appearance';
   // Registered theme ids; a test checks this list against the registry.
-  const THEMES = ['rutat'];
+  const THEMES = ['rutat', 'hav', 'kvallssol', 'hog-kontrast'];
   const DEFAULT_THEME = 'rutat';
   const root = document.documentElement;
   const media = window.matchMedia

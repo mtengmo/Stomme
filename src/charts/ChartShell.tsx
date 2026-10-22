@@ -90,7 +90,7 @@ export function ChartShell({
         aria-expanded={asTable}
         aria-controls={asTable ? tableId : undefined}
         onClick={() => setAsTable((v) => !v)}
-        className="min-h-12 self-start rounded-md border-2 border-edge bg-paper px-4 text-base font-bold text-ink"
+        className="min-h-12 self-start rounded-md border-2 border-edge bg-surface px-4 text-base font-bold text-ink"
       >
         {asTable ? 'Visa som diagram' : 'Visa som tabell'}
       </button>

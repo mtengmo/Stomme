@@ -265,7 +265,7 @@ export function SetScreen({
                   step="0.5"
                   value={weightKg}
                   onChange={(event) => setWeightKg(Number(event.target.value))}
-                  className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-xl text-ink"
+                  className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-xl text-ink"
                 />
                 <span className="text-base font-normal text-ink-soft">
                   {presentation.variant.label} · samma redskap som i passplanen

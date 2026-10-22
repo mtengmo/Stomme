@@ -30,7 +30,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Huvudmeny"
-      className="fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-ink bg-paper pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-ink bg-surface-tint pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="m-0 mx-auto flex max-w-md list-none p-0">
         {tabs.map((t) => {
@@ -42,7 +42,7 @@ export function BottomNav() {
                 aria-current={active ? 'page' : undefined}
                 className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline ${
                   active
-                    ? 'border-ink font-bold text-ink'
+                    ? 'border-action font-bold text-ink'
                     : 'border-transparent text-ink-soft'
                 }`}
               >

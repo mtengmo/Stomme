@@ -1,9 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { evaluateTheme } from './contrast';
-import { hav } from './themes/hav.palette';
-import { hogKontrast } from './themes/hog-kontrast.palette';
-import { kvallssol } from './themes/kvallssol.palette';
 import {
   DEFAULT_THEME_ID,
   getTheme,
@@ -75,9 +72,11 @@ describe.each(themes)('theme $id', (theme) => {
       );
       expect(block, `${theme.id} ${scheme} block`).toBeDefined();
       const declared = Object.fromEntries(
-        [...(block?.[2] ?? '').matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6})/g)].map(
-          (m) => [m[1], m[2]],
-        ),
+        [...(block?.[2] ?? '').matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6})/g)]
+          .filter((m) =>
+            (TOKEN_NAMES as readonly string[]).includes(m[1] ?? ''),
+          )
+          .map((m) => [m[1], m[2]]),
       );
       expect(declared).toEqual(theme.tokens[scheme]);
     }
@@ -129,12 +128,20 @@ describe('the gate catches broken themes', () => {
   });
 });
 
-// Decided palettes (phase B wires them): they must already pass the same gate.
-describe('decided palettes awaiting registration', () => {
-  for (const palette of [hav, kvallssol, hogKontrast]) runGate(palette);
+describe('Hög kontrast', () => {
+  const hk = getTheme('hog-kontrast') as ThemeDef;
 
-  it('Hög kontrast asks for 7:1 text and a double focus ring in light', () => {
-    expect(hogKontrast.textMin).toBe(7);
-    expect(hogKontrast.focus.light.kind).toBe('double');
+  it('asks for 7:1 text, has no grid and a double focus ring in light', () => {
+    expect(hk.textMin).toBe(7);
+    expect(hk.grid).toBe(false);
+    expect(hk.focus.light.kind).toBe('double');
+    expect(hk.focus.dark.kind).toBe('offset');
+  });
+
+  it('draws the double ring and hides the grid in CSS', () => {
+    const css = read('src/styles/themes/hog-kontrast.css').replaceAll('"', "'");
+    expect(css).toMatch(/--grid-line: transparent/);
+    expect(css).toMatch(/--focus-outline: #0b0b0b/);
+    expect(css).toMatch(/--focus-ring: 0 0 0 3px #ffd500/);
   });
 });

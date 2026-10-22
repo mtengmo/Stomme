@@ -28,7 +28,7 @@ const FLAG_KEYS: (keyof Flags)[] = ['sharp', 'swelling', 'locking'];
 /** Fixed bottom area for the primary action, in thumb reach. */
 function Actions({ children }: { children: ReactNode }) {
   return (
-    <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-ink bg-surface-tint px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
       {children}
     </div>
   );
@@ -79,7 +79,7 @@ function Toggle({
       role="switch"
       aria-checked={on}
       onClick={onToggle}
-      className={`flex min-h-14 w-full items-center justify-between gap-3 rounded-md bg-paper px-4 text-left text-ink transition-transform duration-150 ease-out active:scale-[0.98] ${size} ${
+      className={`flex min-h-14 w-full items-center justify-between gap-3 rounded-md bg-surface px-4 text-left text-ink transition-transform duration-150 ease-out active:scale-[0.98] ${size} ${
         on ? 'border-[3px] border-ink font-bold' : 'border-2 border-edge'
       }`}
     >
@@ -97,7 +97,7 @@ type Outcome =
   | { kind: 'warn'; wallSit: boolean; reasons: PainReason[] }
   | undefined;
 
-/** Stop screen: an ink field with paper text (no red), clearly unlike the warn screen. */
+/** Stop screen: paper inside a 6 px --care frame, icon plus the word Stopp, a --care button. */
 export function StopScreen({
   dayAfter = false,
   afterSession = false,
@@ -109,10 +109,13 @@ export function StopScreen({
   onHome(): void;
 }) {
   return (
-    <div className="min-h-dvh bg-ink text-paper">
+    <div className="min-h-dvh border-[6px] border-care bg-paper text-ink">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col px-5">
         <div className="flex flex-1 flex-col gap-4 pt-10">
-          <Icon name="stop" size={64} />
+          <div className="flex items-center gap-3 text-care">
+            <Icon name="stop" size={64} />
+            <p className="m-0 text-6xl leading-none font-extrabold">Stopp</p>
+          </div>
           <h1
             className={`m-0 leading-none font-extrabold break-words ${dayAfter || afterSession ? 'text-5xl' : 'text-6xl'}`}
           >
@@ -129,11 +132,11 @@ export function StopScreen({
             </>
           )}
         </div>
-        <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-paper bg-ink px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-care bg-surface-tint px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <button
             type="button"
             onClick={onHome}
-            className="flex min-h-16 w-full items-center justify-center rounded-md bg-paper px-6 text-xl font-bold text-ink active:scale-[0.98]"
+            className="flex min-h-16 w-full items-center justify-center rounded-md bg-care px-6 text-xl font-bold text-care-ink active:scale-[0.98]"
           >
             {PAIN_COPY.stopDone}
           </button>
@@ -271,7 +274,7 @@ export function PainScreen({
     return (
       <Shell>
         <div className="flex flex-1 flex-col gap-4 pt-10">
-          <Icon name="warning" size={56} />
+          <Icon name="warning" size={56} className="text-care" />
           <h1 className="m-0 text-6xl leading-none font-extrabold">
             {dayAfter && worse
               ? PAIN_COPY.warnTitleDayAfter

@@ -77,8 +77,8 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
             onClick={() => setPicked(e)}
             className={`min-h-12 shrink-0 snap-start whitespace-nowrap rounded-sm border-2 px-3 text-base font-bold ${
               on
-                ? 'border-ink bg-ink text-paper'
-                : 'border-edge bg-paper text-ink'
+                ? 'border-action bg-action text-action-ink'
+                : 'border-edge bg-surface text-ink'
             }`}
           >
             {chipName(e)}

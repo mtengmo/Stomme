@@ -26,7 +26,7 @@ import { WeekView } from '../week/WeekView';
 import { QuickStart } from './QuickStart';
 
 const inputClass =
-  'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+  'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
 export { inputClass };
 

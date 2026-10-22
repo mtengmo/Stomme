@@ -33,7 +33,7 @@ export function DayAfterNotices({
       {due ? (
         <section
           aria-label="Dagen efter"
-          className="flex flex-col gap-3 rounded-md border-[3px] border-ink bg-paper p-4"
+          className="flex flex-col gap-3 rounded-md border-[3px] border-ink bg-surface p-4"
         >
           <div className="flex items-start gap-3">
             <Icon name="bell" className="mt-1 shrink-0" />

@@ -21,7 +21,7 @@ export function Snackbar({ message, onUndo, onExpire }: SnackbarProps) {
   return (
     <div
       role="status"
-      className="flex items-center justify-between gap-3 border-t border-edge bg-paper px-5 py-1 text-ink"
+      className="flex items-center justify-between gap-3 border-t border-edge bg-surface px-5 py-1 text-ink"
     >
       <span className="text-base">{message}</span>
       <button

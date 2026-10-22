@@ -33,7 +33,7 @@ export function FavouriteButton({ id }: { id: ExerciseId }) {
         type="button"
         aria-pressed={selected}
         disabled={busy || !favourites}
-        className="inline-flex min-h-12 items-center gap-2 rounded-sm border-2 border-edge bg-paper px-3 text-base font-bold text-ink"
+        className="inline-flex min-h-12 items-center gap-2 rounded-sm border-2 border-edge bg-surface px-3 text-base font-bold text-ink"
         onClick={async () => {
           setBusy(true);
           setError(false);

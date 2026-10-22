@@ -589,7 +589,7 @@ function PreviewEditor({
                   return (
                     <li
                       key={exercise.id}
-                      className={`flex flex-col gap-3 border-t-2 border-edge px-3 py-4 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-paper text-ink'}`}
+                      className={`flex flex-col gap-3 border-t-2 border-edge px-3 py-4 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-surface text-ink'}`}
                     >
                       <button
                         type="button"
@@ -1050,7 +1050,7 @@ function PreviewEditor({
                         setAddMuscle('');
                         setAddId('');
                       }}
-                      className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-ink bg-ink text-paper' : 'border-edge text-ink'}`}
+                      className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
                     >
                       {region.label}
                     </button>
@@ -1286,7 +1286,7 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper px-5 py-4">
+          <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-surface-tint px-5 py-4">
             <div className="mx-auto w-full max-w-xl">
               <Button
                 disabled={

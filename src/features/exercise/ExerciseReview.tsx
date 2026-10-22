@@ -79,7 +79,7 @@ export function ExerciseReview() {
               onChange={(event) =>
                 navigate(`/granska?ovning=${event.target.value}`)
               }
-              className="min-h-12 min-w-0 rounded-sm border-2 border-ink bg-paper px-2 text-base text-ink"
+              className="min-h-12 min-w-0 rounded-sm border-2 border-ink bg-surface px-2 text-base text-ink"
             >
               {catalogue.map((item) => (
                 <option key={item.id} value={exerciseReferences[item.id]}>

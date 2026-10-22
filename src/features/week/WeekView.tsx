@@ -59,18 +59,14 @@ function StateChip({
     <span
       className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-accent text-accent' : chipStyle[state]}`}
     >
-      <Icon
-        name={
-          active
-            ? 'clock'
-            : state === 'done'
-              ? 'check'
-              : state === 'today'
-                ? 'sun'
-                : 'clock'
-        }
-        size={18}
-      />
+      {!active && state === 'done' ? (
+        <PencilTick size={22} />
+      ) : (
+        <Icon
+          name={active ? 'clock' : state === 'today' ? 'sun' : 'clock'}
+          size={18}
+        />
+      )}
       {active ? 'Pågår' : STATE_LABEL[state]}
     </span>
   );
@@ -165,7 +161,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
               className={`relative flex size-11 flex-col items-center justify-center rounded-sm border-2 text-base leading-none ${
                 isToday
                   ? 'border-ink bg-today font-bold text-today-ink'
-                  : 'border-edge bg-paper text-ink'
+                  : 'border-edge bg-surface text-ink'
               }`}
             >
               <span>{DAY_NAMES[i]}</span>
@@ -202,8 +198,10 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
             <li
               key={id}
               data-state={state}
-              className={`flex flex-col rounded-md border-[3px] bg-paper ${
-                lead ? 'gap-4 border-ink p-5' : 'gap-3 border-edge p-4'
+              className={`flex flex-col rounded-md border-[3px] ${
+                lead
+                  ? 'gap-4 border-ink bg-surface-tint p-5'
+                  : 'gap-3 border-edge bg-surface p-4'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -247,7 +245,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         />
       ) : null}
 
-      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
         {active ? (
           <Link

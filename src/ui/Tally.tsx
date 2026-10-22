@@ -51,7 +51,7 @@ export function Tally({ items, label, size = 48, tone = 'ink' }: TallyProps) {
           style={{ width: size, height: size }}
           className={`count relative grid shrink-0 place-items-center rounded-full border-[3px] ${
             item.active
-              ? 'border-ink bg-ink text-paper'
+              ? 'border-action bg-action text-action-ink'
               : `bg-paper ${tone === 'ink' ? 'border-ink' : 'border-edge'}`
           }`}
         >

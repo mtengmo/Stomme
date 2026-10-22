@@ -1,5 +1,6 @@
 import type { Effort, Session, Unit } from '../../domain/types';
 import { Icon } from '../../ui/Icon';
+import { PencilTick } from '../../ui/PencilTick';
 
 export const EFFORT_LABEL: Record<Effort, string> = {
   easy: 'Lätt',
@@ -28,7 +29,7 @@ export function StatusChip({ session }: { session: Session }) {
   if (session.status === 'completed')
     return (
       <span className={`${base} border-2 border-done text-done`}>
-        <Icon name="check" size={18} />
+        <PencilTick size={22} />
         Klar
       </span>
     );

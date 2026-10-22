@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<
   render() {
     if (!this.state.failed) return this.props.children;
     const link =
-      'flex min-h-14 w-full items-center justify-center rounded-md border-[3px] border-ink bg-paper px-6 text-xl font-bold text-ink no-underline';
+      'flex min-h-14 w-full items-center justify-center rounded-md border-[3px] border-ink bg-surface px-6 text-xl font-bold text-ink no-underline';
     return (
       <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 px-5 pt-10 pb-8">
         <h1 className="m-0 text-6xl leading-none font-extrabold">
