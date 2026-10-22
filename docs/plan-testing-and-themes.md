@@ -1,6 +1,6 @@
 # Plan: faster testing and selectable colour themes
 
-Status: proposed, 2026-10-21 (architect plan, not yet approved by the owner). Planning only.
+Status: approved by the owner on 2026-10-22 ("Go") with the default answers to the five owner questions at the end. T8/T9 (CI restructure) wait until T1-T7 are measured and get an Opus review; theme palettes (T11) need the owner's A/B pick before T12 onward.
 
 ## Summary and recommended order
 
