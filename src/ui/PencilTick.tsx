@@ -40,7 +40,7 @@ export function PencilTick({
       viewBox="0 0 48 48"
       aria-hidden="true"
       focusable="false"
-      className={`fill-done ${animate ? 'tick-new' : ''} ${className}`}
+      className={`fill-(--done-mark) ${animate ? 'tick-new' : ''} ${className}`}
       style={{ transform: `rotate(${s.rotate}deg)`, ...(fill ? { fill } : {}) }}
     >
       <path d={s.d} />

@@ -43,7 +43,7 @@ function restText(sessions: Session[], now: Date): string | null {
 }
 
 const chipStyle: Record<PassState, string> = {
-  done: 'border-2 border-done text-done',
+  done: 'border-2 border-(--done-chip-border) bg-(--done-fill) text-(--done-fill-ink)',
   today: 'bg-today text-today-ink',
   upcoming: 'bg-upcoming text-upcoming-ink',
 };
@@ -60,7 +60,7 @@ function StateChip({
       className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-accent text-accent' : chipStyle[state]}`}
     >
       {!active && state === 'done' ? (
-        <PencilTick size={22} />
+        <PencilTick size={22} fill="var(--done-fill-ink)" />
       ) : (
         <Icon
           name={active ? 'clock' : state === 'today' ? 'sun' : 'clock'}

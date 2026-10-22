@@ -24,7 +24,22 @@ export const TOKEN_NAMES = [
 ] as const;
 
 export type TokenName = (typeof TOKEN_NAMES)[number];
-export type TokenSet = Record<TokenName, string>;
+
+/**
+ * Optional "done chip" tokens. A theme that cannot make --done readable as text
+ * on its tinted surfaces (Hav light: coral) builds the Klar chip as a solid fill
+ * with ink text instead. Without them the chip is an outline in --done.
+ * done-mark is the non-text pencil tick (day strip, tally, rest screen).
+ */
+export const OPTIONAL_TOKEN_NAMES = [
+  'done-fill',
+  'done-fill-ink',
+  'done-mark',
+] as const;
+export type OptionalTokenName = (typeof OPTIONAL_TOKEN_NAMES)[number];
+
+export type TokenSet = Record<TokenName, string> &
+  Partial<Record<OptionalTokenName, string>>;
 export type Scheme = 'light' | 'dark';
 export const SCHEMES: readonly Scheme[] = ['light', 'dark'];
 

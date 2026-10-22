@@ -123,8 +123,8 @@ export interface PairResult {
 }
 
 export interface DistinctResult {
-  a: TokenName;
-  b: TokenName;
+  a: string;
+  b: string;
   deltaE: number;
   ok: boolean;
 }
@@ -137,6 +137,9 @@ export interface ThemeReport {
   reported: DistinctResult[];
   failures: string[];
 }
+
+/** Rutat's --done (light): the colour a theme's done colour is compared against in reports. */
+export const RUTAT_DONE = '#b52a23';
 
 export const MIN_DELTA_E = 20;
 export const UI_MIN = 3;
@@ -224,6 +227,51 @@ export function evaluateTheme(theme: ThemeDef, scheme: Scheme): ThemeReport {
     for (const [a, b] of DISTINCT_PAIRS) {
       const deltaE = deltaE2000(tokens[a] as string, tokens[b] as string);
       distinct.push({ a, b, deltaE, ok: deltaE >= MIN_DELTA_E });
+    }
+    // Optional done chip: ink on the fill (text), the non-text mark (3:1), and distinct from care and accent.
+    const fill = tokens['done-fill'];
+    if (fill) {
+      const ink = tokens['done-fill-ink'] as string;
+      const mark = tokens['done-mark'] as string;
+      const extra: [string, string, string, 'text' | 'ui'][] = [
+        ['done-fill-ink', ink, fill, 'text'],
+        ['done-mark', mark, tokens.paper as string, 'ui'],
+        ['done-mark', mark, tokens.surface as string, 'ui'],
+        ['done-mark', mark, tokens['surface-tint'] as string, 'ui'],
+      ];
+      const names = [
+        'done-fill-ink on done-fill',
+        'done-mark on paper',
+        'done-mark on surface',
+        'done-mark on surface-tint',
+      ];
+      for (const [i, [, f, b, kind]] of extra.entries()) {
+        const min = kind === 'text' ? theme.textMin : UI_MIN;
+        const ratio = contrastRatio(f, b);
+        const [fg, bg] = (names[i] as string).split(' on ') as [string, string];
+        pairs.push({ fg, bg, kind, min, ratio, ok: ratio >= min - 1e-9 });
+      }
+      for (const [name, color] of [
+        ['done-fill', fill],
+        ['done-mark', mark],
+      ] as const) {
+        for (const other of ['care', 'accent'] as const) {
+          const deltaE = deltaE2000(color, tokens[other] as string);
+          distinct.push({
+            a: name,
+            b: other,
+            deltaE,
+            ok: deltaE >= MIN_DELTA_E,
+          });
+        }
+        const vsRutat = deltaE2000(color, RUTAT_DONE);
+        reported.push({
+          a: name,
+          b: 'rutat done',
+          deltaE: vsRutat,
+          ok: vsRutat >= 15,
+        });
+      }
     }
     for (const [a, b] of REPORTED_PAIRS) {
       const deltaE = deltaE2000(tokens[a] as string, tokens[b] as string);

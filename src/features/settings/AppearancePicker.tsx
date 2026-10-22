@@ -33,9 +33,13 @@ function Swatch({ theme, dark }: { theme: ThemeDef; dark: boolean }) {
       </span>
       <span
         className="inline-flex h-8 items-center gap-1 rounded-sm border-2 px-1.5"
-        style={{ background: t.surface, borderColor: t.done, color: t.done }}
+        style={{
+          background: t['done-fill'] ?? t.surface,
+          borderColor: t['done-mark'] ?? t.done,
+          color: t['done-fill-ink'] ?? t.done,
+        }}
       >
-        <PencilTick size={20} fill={t.done} />
+        <PencilTick size={20} fill={t['done-fill-ink'] ?? t.done} />
         Klar
       </span>
       <span

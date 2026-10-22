@@ -24,6 +24,11 @@
   --focus-ring: none;
   /* Same ring drawn inside, for controls at the screen edge (bottom nav). */
   --focus-ring-inset: none;
+  /* Klar chip: an outline in --done unless a theme asks for a fill (hav.css). */
+  --done-fill: transparent;
+  --done-fill-ink: var(--done);
+  --done-mark: var(--done);
+  --done-chip-border: var(--done);
 }
 
 @theme inline {

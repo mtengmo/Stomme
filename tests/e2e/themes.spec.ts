@@ -89,7 +89,15 @@ test.describe('@themes every registered theme and scheme', () => {
         await expect(start).toHaveCSS('color', rgb(tokens['action-ink']));
         const chip = page.getByText('Klar', { exact: true }).first();
         await expect(chip).toBeVisible();
-        await expect(chip).toHaveCSS('color', rgb(tokens.done));
+        await expect(chip).toHaveCSS(
+          'color',
+          rgb(tokens['done-fill-ink'] ?? tokens.done),
+        );
+        if (tokens['done-fill'])
+          await expect(chip).toHaveCSS(
+            'background-color',
+            rgb(tokens['done-fill']),
+          );
         await noOverflow(page);
 
         // Stop screen: 6 px --care frame, icon and the word Stopp.

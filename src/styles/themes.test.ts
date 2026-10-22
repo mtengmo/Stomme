@@ -4,6 +4,7 @@ import { evaluateTheme } from './contrast';
 import {
   DEFAULT_THEME_ID,
   getTheme,
+  OPTIONAL_TOKEN_NAMES,
   SCHEMES,
   type ThemeDef,
   TOKEN_NAMES,
@@ -74,7 +75,9 @@ describe.each(themes)('theme $id', (theme) => {
       const declared = Object.fromEntries(
         [...(block?.[2] ?? '').matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6})/g)]
           .filter((m) =>
-            (TOKEN_NAMES as readonly string[]).includes(m[1] ?? ''),
+            [...TOKEN_NAMES, ...OPTIONAL_TOKEN_NAMES].includes(
+              (m[1] ?? '') as never,
+            ),
           )
           .map((m) => [m[1], m[2]]),
       );
@@ -144,6 +147,55 @@ describe('tinted surfaces and reported pairs', () => {
     expect(rutat.reported).toHaveLength(1);
     expect(rutat.reported[0]?.deltaE).toBe(0);
     expect(rutat.failures).toEqual([]);
+  });
+});
+
+describe('Hav light done chip (solid coral fill with ink text)', () => {
+  const hav = getTheme('hav') as ThemeDef;
+
+  it('checks ink on the fill, the mark on every surface and distinctness', () => {
+    const report = evaluateTheme(hav, 'light');
+    const names = report.pairs.map((p) => `${p.fg} on ${p.bg}`);
+    for (const n of [
+      'done-fill-ink on done-fill',
+      'done-mark on paper',
+      'done-mark on surface',
+      'done-mark on surface-tint',
+    ])
+      expect(names).toContain(n);
+    expect(report.failures).toEqual([]);
+    const fill = report.pairs.find((p) => p.fg === 'done-fill-ink');
+    expect(fill?.ratio).toBeGreaterThanOrEqual(4.5);
+    expect(report.reported.map((r) => `${r.a}/${r.b}`)).toEqual(
+      expect.arrayContaining(['done-fill/rutat done', 'done-mark/rutat done']),
+    );
+    expect(
+      report.reported.find((r) => r.a === 'done-fill')?.deltaE,
+    ).toBeGreaterThanOrEqual(15);
+  });
+
+  it('fails a fill whose text is too weak or a mark that is too pale', () => {
+    const weak = structuredClone(hav);
+    weak.tokens.light['done-fill-ink'] = '#a0a0a0';
+    expect(
+      evaluateTheme(weak, 'light').failures.some((f) =>
+        f.startsWith('done-fill-ink on done-fill'),
+      ),
+    ).toBe(true);
+    const pale = structuredClone(hav);
+    pale.tokens.light['done-mark'] = '#f0a090';
+    expect(
+      evaluateTheme(pale, 'light').failures.some((f) =>
+        f.startsWith('done-mark on'),
+      ),
+    ).toBe(true);
+  });
+
+  it('leaves the other themes and Hav dark without a fill', () => {
+    for (const t of themes) {
+      expect(t.tokens.dark['done-fill']).toBeUndefined();
+      if (t.id !== 'hav') expect(t.tokens.light['done-fill']).toBeUndefined();
+    }
   });
 });
 

@@ -14,6 +14,10 @@
   --action: #0b5c61;
   --action-ink: #f3f9f8;
   --done: #b1340e;
+  --done-fill: #ec6b50;
+  --done-fill-ink: #0e2a2d;
+  --done-mark: #d1502f;
+  --done-chip-border: var(--done-mark);
   --accent: #1d5b94;
   --focus: #1d5b94;
   --info: #1d5b94;
@@ -28,6 +32,11 @@
 
 :root[data-theme="hav"][data-scheme="dark"] {
   color-scheme: dark;
+  /* Dark keeps the outline chip in --done. */
+  --done-fill: transparent;
+  --done-fill-ink: var(--done);
+  --done-mark: var(--done);
+  --done-chip-border: var(--done);
   --paper: #0f2224;
   --surface: #142d30;
   --surface-tint: #1b3b3e;
