@@ -71,6 +71,8 @@ html {
   caret-color: var(--blue);
   scrollbar-color: var(--ink-soft) var(--paper);
   scrollbar-width: thin;
+  /* Keep focused and scrolled-to controls clear of the fixed bottom navigation. */
+  scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
 body {
