@@ -139,6 +139,18 @@ export function clearAppearance(): void {
   emit();
 }
 
+/** Stable snapshot string for useSyncExternalStore ('theme|scheme|resolved'). */
+export function appearanceSnapshot(): string {
+  const { theme, scheme } = getAppearance();
+  const resolved =
+    typeof document === 'undefined'
+      ? 'light'
+      : document.documentElement.dataset.scheme === 'dark'
+        ? 'dark'
+        : 'light';
+  return `${theme}|${scheme}|${resolved}`;
+}
+
 /** Display name of a theme id (falls back to the id). */
 export function themeName(id: string): string {
   return getTheme(id)?.name ?? id;

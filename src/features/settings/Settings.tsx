@@ -26,6 +26,7 @@ import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
 import { WeightInventoryFields } from '../training/WeightInventoryFields';
 import { readBackupMeta } from '../week/BackupReminder';
+import { AppearancePicker } from './AppearancePicker';
 import { useUpdate } from './updateContext';
 
 type View =
@@ -367,6 +368,10 @@ export function Settings() {
           kettlebell.
         </p>
         <EquipmentInventorySettings />
+      </Section>
+
+      <Section id="set-appearance" title="Utseende">
+        <AppearancePicker />
       </Section>
 
       <Section id="set-backup" title="Säkerhetskopia">
