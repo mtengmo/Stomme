@@ -142,3 +142,20 @@ Measured (`lefthook run pre-push`, machine under external load): 100 s total = c
 | unit + db only (`test:watch` cold) | n/a | about 5 s |
 | `npm run e2e` | 40.4 s + 8 s build | 38-44 s, build skipped when unchanged |
 | `npm run e2e:smoke` | n/a | 18-24 s |
+
+## T8 CI restructure (deploy.yml) and T9 quality.yml
+
+Jobs: `verify` (npm run check, test:cov), `build` (full-history checkout, `vite build`, uploads artifact `dist`, plus the Pages artifact on main), `e2e` (needs build, matrix shard 1/2, downloads `dist`, `npm run e2e:prebuilt -- --shard=N/2`), `deploy` (main only, needs verify, build and e2e, `pages` concurrency group on this job only). Workflow concurrency `ci-${{ github.ref }}`, cancelling only for pull requests. `permissions: contents: read` at workflow level; `pages: write` and `id-token: write` only on `deploy`; no secrets. New script `e2e:prebuilt` = `playwright test` (no build). `quality.yml`: nightly 03:17 UTC, manual, and PRs touching `src/styles/**`, `src/ui/**`, `index.html`, `vite.config.ts`, `scripts/a11y-audit.ts`; jobs `a11y` (one run, the script covers light and dark and has no scheme argument) and `upgrade` (uploads `test-results/pwa-upgrade`); theme e2e/shots are a TODO comment.
+
+Local simulation of each job's commands with `CI=1` (this machine, lightly loaded): npm ci 107 s (cold, includes deleting node_modules), check 6.6 s, test:cov 24.7 s (769 tests), vite build 5.1 s, e2e shard 1/2 46.9 s (28 tests, 2 workers), shard 2/2 53.6 s (27 tests, 2 workers). YAML checked with `@action-validator/cli` (deploy.yml clean, quality.yml only the warning that `paths` globs are not validated) and yaml-lint. actionlint was not available through npx.
+
+Expected PR wall time on GitHub runners (2 vCPU, estimated, not measured): verify about 2 min (install 40 s plus 1 min of checks and tests), build about 1 min, then e2e shards in parallel about 4-5 min each including browser cache restore. Wall time is roughly build + slowest shard = 5-7 min, versus about 3 min before (no e2e in CI). Queue time drops to zero for PRs (own concurrency group, older PR runs cancelled). Main deploy is gated by the same path plus the deploy step.
+
+Risks and unverified points:
+- Required status checks: if branch protection requires the old job `build`, add `verify` and `e2e (1)`, `e2e (2)` (matrix names) as required; `build` still exists but no longer runs checks or tests.
+- `actions/upload-artifact@v4`, `download-artifact@v4` and `cache@v4` are used because they are known to exist; the file pins other actions at newer majors (checkout v7, upload-pages-artifact v5). Dependabot will propose bumps; confirm on the first run that these resolve.
+- `vite.config.ts` computes the version from git history even for `vite preview`, so the e2e (and quality) jobs also use `fetch-depth: 0`; a shallow clone would throw under CI. The CI shallow-clone failure was not simulated.
+- The `dist` artifact is built from the same commit, so the e2e job tests exactly what deploys; the Pages artifact is uploaded separately from the same `dist`.
+- Linux Chromium timing differs from Windows; the 2-worker shards could expose slower tests, and the 10 s expect timeout is the only headroom. First runs may flake: watch them and read the uploaded `e2e-results-N` traces.
+- Browser cache key is `playwright-<os>-<@playwright/test version from the lockfile>`; `install-deps` runs on a hit, a full `install --with-deps` on a miss. Cache hits cannot be verified without GitHub.
+- Not verifiable locally: that `deploy` is skipped on pull requests (it is guarded by `github.ref == 'refs/heads/main'`, and PR refs are `refs/pull/N/merge`), the `pages` environment behaviour, and the schedule trigger.
