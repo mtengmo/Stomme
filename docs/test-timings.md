@@ -137,7 +137,7 @@ Measured (`lefthook run pre-push`, machine under external load): 100 s total = c
 
 | Suite | Baseline | Now |
 |---|---|---|
-| `npm test` | 29.9 s | about 26 s (25-27 s) |
+| `npm test` | 29.9 s | 18.6 s on a quiet machine (25-27 s when loaded) |
 | `npm run test:cov` | 31-53 s (and failing the gate) | 22-31 s, gate passes |
 | unit + db only (`test:watch` cold) | n/a | about 5 s |
 | `npm run e2e` | 40.4 s + 8 s build | 38-44 s, build skipped when unchanged |
