@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { initAppearance } from './lib/appearance';
 import { initInstall } from './lib/install';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import '@fontsource/barlow-condensed/700.css';
@@ -11,6 +12,9 @@ const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element #root is missing from index.html');
 }
+
+// theme-boot.js set the theme before first paint; keep theme-color in step.
+initAppearance();
 
 // Capture beforeinstallprompt before any component mounts (M6.3).
 initInstall();
