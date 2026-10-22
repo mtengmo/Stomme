@@ -59,14 +59,13 @@ jobs:
         with:
           path: dist
 
-  e2e:
+  # Browser smoke tests only (the @smoke tag: pain gate, Pass A flow, offline, settings
+  # import/delete, PWA). The full suite, the a11y audit and the upgrade test run locally
+  # (npm run e2e, npm run audit:a11y, npm run test:upgrade) or on demand via quality.yml.
+  smoke:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -96,30 +95,19 @@ jobs:
       - name: Install system packages only (browser cached)
         if: steps.browsers.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      # Uses the downloaded dist; CI=1 gives 2 workers per shard.
-      - run: npm run e2e:prebuilt -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+      # Uses the downloaded dist; CI=1 sets the CI worker count and retries.
+      - run: npm run e2e:prebuilt -- --grep @smoke
       - name: Upload failure traces
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-results-${{ matrix.shard }}
+          name: smoke-results
           path: test-results
           retention-days: 7
 
-  # Stable name for a future ruleset: required checks are verify, build and
-  # e2e-result (matrix job names change with the shard list).
-  e2e-result:
-    needs: e2e
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Fail unless every e2e shard succeeded
-        run: test "${{ needs.e2e.result }}" = "success"
-
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: [verify, build, e2e, e2e-result]
+    needs: [verify, build, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Deploys queue instead of cancelling each other.

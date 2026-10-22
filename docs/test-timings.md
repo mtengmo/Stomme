@@ -169,3 +169,12 @@ Risks and unverified points:
 - Required checks for a future ruleset: `verify`, `build`, `e2e-result`. Not `deploy`, `a11y` or `upgrade` (`e2e (1)`/`e2e (2)` names depend on the shard list).
 - A push to main/dev while a run is in progress does not cancel it; a newer queued run replaces an older pending one, so the latest commit still deploys.
 - `quality.yml` path filter now also covers `scripts/contrast.ts`, `scripts/test-upgrade.ts`, `scripts/buildVersion.ts`, `src/lib/update.ts`, `src/main.tsx`, `package.json`, `package-lock.json` and the workflow itself.
+
+## Update 2026-10-22: CI runs the smoke tests only
+
+Decision (owner): this is a hobby app, so GitHub runs the fast gate only and the slow suites run on the owner's machine.
+
+- `deploy.yml`: `verify`, `build`, `smoke` (one job, `npm run e2e:prebuilt -- --grep @smoke`, 12 tests), `deploy` (main only, needs verify, build and smoke). The sharded `e2e` job and the `e2e-result` aggregate are gone. Failure traces are uploaded as `smoke-results`.
+- `quality.yml` is manual only (`workflow_dispatch`): `a11y` and `upgrade`. No nightly schedule, no pull-request triggers.
+- Required checks for a future ruleset: `verify`, `build`, `smoke`. Not `deploy`, `a11y` or `upgrade`.
+- Why: in the first run on GitHub the browser tests themselves took under a minute per shard; one shard spent 11.5 minutes installing Chromium and system packages (both shards raced to fill the browser cache). A single job removes the race. The full suite, the accessibility audit and the upgrade test stay available locally (`npm run e2e`, `npm run audit:a11y`, `npm run test:upgrade`).
