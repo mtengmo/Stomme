@@ -34,6 +34,18 @@ test('@themes the picker rows are at least 56 px and 16 px text, keyboard operab
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(56);
     expect(box?.width ?? 0).toBeLessThanOrEqual(360);
   }
+  // The light/dark rows are controls too: at least 56 px as well.
+  const schemeRadios = page
+    .getByRole('group', { name: 'Ljust eller mörkt' })
+    .getByRole('radio');
+  expect(await schemeRadios.count()).toBe(3);
+  for (let i = 0; i < 3; i++) {
+    const box = await schemeRadios
+      .nth(i)
+      .locator('xpath=following-sibling::span[1]')
+      .boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(56);
+  }
   await radios.first().focus();
   await page.keyboard.press('ArrowDown');
   await expect(radios.nth(1)).toBeChecked();

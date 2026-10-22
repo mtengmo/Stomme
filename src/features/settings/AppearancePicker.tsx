@@ -136,7 +136,7 @@ export function AppearancePicker() {
                 className="peer sr-only"
               />
               <span
-                className={`flex min-h-12 items-center gap-3 rounded-md border-[3px] px-3 text-base font-bold ${ring} ${
+                className={`flex min-h-14 items-center gap-3 rounded-md border-[3px] px-3 text-base font-bold ${ring} ${
                   selected
                     ? 'border-action bg-surface-tint'
                     : 'border-edge bg-surface'
