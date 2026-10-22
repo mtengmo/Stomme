@@ -126,3 +126,19 @@ Flake findings (3 consecutive green runs achieved after the fixes: 55/55, 55/55,
 ## T7 ensure-build
 
 `scripts/ensure-build.ts` (`npm run ensure-build`) compares the newest mtime in `src/` (test files and `src/test/` ignored), `public/`, `index.html`, `vite.config.ts`, `package.json`, `package-lock.json`, `tsconfig.json` and `pwa-assets.config.ts` with `dist/index.html`. `e2e` and `e2e:smoke` use it; `e2e:ci` always runs `npm run build`. Verified: missing dist builds; unchanged sources print "up to date" in about 1 s instead of an 8 s build; touching `src/App.tsx` rebuilds; touching a `*.test.tsx` does not. Saving: about 8 s on every local e2e run with no source change.
+
+## T10 Lefthook pre-push
+
+`lefthook.yml`: group of `check` and `test:cov` in parallel, then `e2e:smoke`. Installed by `npm run prepare` (`scripts/prepare-hooks.mjs`, plain Node): does nothing when `CI` is set, `LEFTHOOK=0`, there is no `.git`, or lefthook is not installed (`--omit=dev`), and never fails the install. Verified in a scratch git repo: CI=1 installs nothing; normal installs `pre-push`; no `.git` exits 0. Bypass: `git push --no-verify` or `LEFTHOOK=0 git push`. The hook was not installed in this worktree (a worktree shares `.git/hooks` with the main repository); it was run with `npx lefthook run pre-push`.
+
+Measured (`lefthook run pre-push`, machine under external load): 100 s total = check 2.6 s and test:cov 67 s in parallel (70 s), then e2e:smoke 33 s. On a quiet machine the parts are about 3 s, 22-31 s and 18-24 s, so about 50-60 s; the plan's 60 s target is met only when the machine is idle. The coverage run is the long part (it runs all 769 tests, because the 100% rule coverage is partly exercised by dom tests).
+
+## Summary of end state (quiet-machine medians)
+
+| Suite | Baseline | Now |
+|---|---|---|
+| `npm test` | 29.9 s | about 26 s (25-27 s) |
+| `npm run test:cov` | 31-53 s (and failing the gate) | 22-31 s, gate passes |
+| unit + db only (`test:watch` cold) | n/a | about 5 s |
+| `npm run e2e` | 40.4 s + 8 s build | 38-44 s, build skipped when unchanged |
+| `npm run e2e:smoke` | n/a | 18-24 s |

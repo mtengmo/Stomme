@@ -9,6 +9,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "prepare": "node scripts/prepare-hooks.mjs",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
@@ -53,6 +54,7 @@
     "@vitest/coverage-v8": "^5.0.5",
     "fake-indexeddb": "^6.2.6",
     "jsdom": "^29.1.1",
+    "lefthook": "^2.2.2",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
