@@ -9,7 +9,9 @@ async function startPass(page: import('@playwright/test').Page) {
   await expect(page.getByRole('heading', { name: /Hur känns/ })).toBeVisible();
 }
 
-test('pain before -> session -> pain after with ok', async ({ page }) => {
+test('pain before -> session -> pain after with ok', { tag: '@smoke' }, async ({
+  page,
+}) => {
   await startPass(page);
   await answerPain(page, 1);
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
@@ -31,9 +33,9 @@ test('pain before -> session -> pain after with ok', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
 });
 
-test('a red flag stops the pass and shows the banner afterwards', async ({
-  page,
-}) => {
+test('a red flag stops the pass and shows the banner afterwards', {
+  tag: '@smoke',
+}, async ({ page }) => {
   await startPass(page);
   await answerPain(page, 1, ['Skarp smärta']);
   await expect(
@@ -48,7 +50,9 @@ test('a red flag stops the pass and shows the banner afterwards', async ({
   ).toBeVisible();
 });
 
-test('a score above 3 warns and can continue anyway', async ({ page }) => {
+test('a score above 3 warns and can continue anyway', {
+  tag: '@smoke',
+}, async ({ page }) => {
   await startPass(page);
   await answerPain(page, 6);
   await expect(

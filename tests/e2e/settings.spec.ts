@@ -12,7 +12,9 @@ async function toSettings(page: import('@playwright/test').Page) {
   ).toBeVisible();
 }
 
-test('export produces a downloaded backup file', async ({ page }) => {
+test('export produces a downloaded backup file', { tag: '@smoke' }, async ({
+  page,
+}) => {
   await toSettings(page);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -24,9 +26,9 @@ test('export produces a downloaded backup file', async ({ page }) => {
   await expect(page.getByRole('status')).toContainText('laddades ner');
 });
 
-test('import round trip: keep, then replace with a safety backup', async ({
-  page,
-}) => {
+test('import round trip: keep, then replace with a safety backup', {
+  tag: '@smoke',
+}, async ({ page }) => {
   await toSettings(page);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -60,9 +62,9 @@ test('import round trip: keep, then replace with a safety backup', async ({
   await expect(page.getByRole('alert')).toContainText('kunde inte läsas');
 });
 
-test('delete all data needs two steps and returns to onboarding', async ({
-  page,
-}) => {
+test('delete all data needs two steps and returns to onboarding', {
+  tag: '@smoke',
+}, async ({ page }) => {
   await toSettings(page);
   await page.getByRole('button', { name: 'Radera all data' }).click();
   await expect(

@@ -88,3 +88,19 @@ The `dom` project is now the long pole (jsdom environment startup is about 40% o
 ## T4 Inner-loop scripts
 
 `test:watch` (unit + db projects, about 5 s for a cold full pass, then only affected files re-run), `test:changed`, `test:related` (e.g. `npm run test:related -- src/rules/stats.ts`: 9 files, 9.4 s because related dom tests are included), `check:fast` (biome on files changed against `main`, then tsc; `vcs.defaultBranch` set to main in `biome.json`). `test:changed` after a config edit runs everything (17.6 s), which is vitest's rule for config changes. The watch rerun time was not measured interactively.
+
+## T5 Playwright config and tags
+
+`fullyParallel: true`, `workers: '75%'` locally (12 of 16 here; 2 in CI), `serviceWorkers: 'block'` by default; opt-in (`serviceWorkers: 'allow'`) for `pwa.spec.ts`, the offline smoke test and the narrow-viewport review test (it reloads offline). 12 tests tagged `@smoke` (Pass A flow, offline, skip, inline technique, 3 pain, pwa, export, import, delete, main training flow); `npm run e2e:smoke`.
+
+| Measure | Before | After |
+|---|---|---|
+| full e2e, 55 tests | 40.4 s median (64.5 cold, 40.4, 39.6) | 39.4 s median (87.4 cold, 39.4, 39.0) |
+| `@smoke` (12 tests) | n/a | 17.5 s and 24.2 s (26 s with the build check) |
+
+Findings:
+- On this 16-core machine the baseline was already 8 workers with parallel files; going to 12 workers with `fullyParallel` and blocking the service worker saved about 1 s. The suite is limited by its few long tests (6-8 s each) and CPU, not by worker count. The plan's 86 s -> 40-50 s gain was therefore already in the baseline here; the real wins are expected on slower machines and CI (2 workers per shard, no precache download per test).
+- The first run after a build is consistently slow (64 s and 87 s versus 38-40 s warm); cold file cache for `dist` and the Playwright browser.
+- Smoke is above the 20 s plan target (17.5-24 s) because the 12 tests include the 8 s Pass A flow and the 8 s training test; they run in parallel but compete for CPU.
+
+Flake found and fixed (cause, not retry): in the cold run 1, `guide.spec.ts` "timer, movement and completion fit together (360)" failed on `toHaveText('0:05')`. `page.clock.install()` lets the fake clock keep running in real time, so a stalled machine let the countdown run past the asserted value. Reproduced deterministically by adding a 1.5 s wait after the start click (received 0:19 instead of 0:05). Fix: `freezeClock()` in `tests/e2e/flow.ts` (install, then `pauseAt`), used in the guide spec and in `playPassA`, so the clock only moves via `fastForward`. The kettlebell, knee-extension and exercise-development specs install the clock before `goto`; pausing there stalls lazy chunk loading (5 failures), so they keep the plain install (they assert animation state, not exact countdown text).

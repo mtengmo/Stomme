@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-test('manifest is served, icons resolve, service worker registers', async ({
-  page,
-  request,
-}) => {
+test.use({ serviceWorkers: 'allow' });
+
+test('manifest is served, icons resolve, service worker registers', {
+  tag: '@smoke',
+}, async ({ page, request }) => {
   await page.goto('/');
   const href = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(href).toBeTruthy();

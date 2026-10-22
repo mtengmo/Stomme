@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { answerPain, openPreview } from './flow';
+import { answerPain, freezeClock, openPreview } from './flow';
 
 for (const viewport of [
   { width: 360, height: 800 },
@@ -128,7 +128,7 @@ for (const width of [360, 390, 1280]) {
     ).toBeVisible();
     const frame = page.locator('[data-step]');
     const step = await frame.getAttribute('data-step');
-    await page.clock.install();
+    await freezeClock(page);
     const start = page.getByRole('button', { name: /^Starta –/ });
     await expect(start).toBeInViewport({ ratio: 1 });
     await expect(page.getByRole('region', { name: 'Rörelsen' })).toBeInViewport(

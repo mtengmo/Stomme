@@ -1,5 +1,16 @@
 import { expect, type Page } from '@playwright/test';
 
+/**
+ * Installs a fake clock that only moves when the test advances it
+ * (fastForward/runFor). A plain `clock.install()` lets time flow in real time,
+ * so a loaded machine can let a countdown run past the value being asserted.
+ */
+export async function freezeClock(page: Page): Promise<void> {
+  const now = Date.now();
+  await page.clock.install({ time: now });
+  await page.clock.pauseAt(now + 1_000);
+}
+
 export type Stage =
   | 'preview'
   | 'pain'
@@ -80,7 +91,7 @@ export async function playPassA(
 
     if (name.startsWith('Starta –')) {
       await once('set-timed');
-      await page.clock.install();
+      await freezeClock(page);
       await action.click();
       // Pass A ends with two right/left pairs of 20-second side planks.
       for (let set = 0; set < 2; set++) {
