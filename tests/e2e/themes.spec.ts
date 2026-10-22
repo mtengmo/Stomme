@@ -119,3 +119,48 @@ test.describe('@themes every registered theme and scheme', () => {
     }
   }
 });
+
+test('@themes the stop screen button fits at 360 px and at 200% zoom, with a return arrow', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/#/pass/A');
+  await page.getByRole('button', { name: 'Starta pass' }).click();
+  await answerPain(page, 1, ['Skarp smärta']);
+  const button = page.getByRole('button', { name: 'Till träningen' });
+  await expect(button).toBeVisible();
+  // The no-entry glyph belongs to the heading only: the button has one icon, the back arrow.
+  await expect(button.locator('svg')).toHaveCount(1);
+  await expect(page.locator('svg path[d="M15 5l-7 7 7 7"]')).toHaveCount(1);
+  // 200% zoom of a 360 px screen is a 180 CSS px viewport.
+  for (const width of [360, 180]) {
+    await page.setViewportSize({ width, height: 800 });
+    const box = await button.boundingBox();
+    expect(box?.x ?? -1).toBeGreaterThanOrEqual(0);
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width);
+    await noOverflow(page);
+  }
+});
+
+test('@themes the week action bar sits flush on the nav on short and tall screens', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await seedDone(page);
+  for (const height of [800, 1300]) {
+    await page.setViewportSize({ width: 360, height });
+    await page.reload();
+    await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
+    const gap = await page.evaluate(() => {
+      const bar = [...document.querySelectorAll('div.sticky')].find((d) =>
+        d.textContent?.includes('Starta pass'),
+      );
+      const nav = document.querySelector('nav');
+      return (
+        (nav?.getBoundingClientRect().top ?? -1) -
+        (bar?.getBoundingClientRect().bottom ?? -2)
+      );
+    });
+    expect(gap, `gap at ${height}px`).toBe(0);
+  }
+});

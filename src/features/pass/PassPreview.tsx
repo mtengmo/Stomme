@@ -133,7 +133,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-4 px-5 pt-3 pb-28">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 px-5 pt-3 pb-[var(--app-nav-height)]">
       <Link
         href="/"
         className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold text-ink no-underline"

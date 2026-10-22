@@ -122,7 +122,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const last = summary.days[6] ?? today;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-5 px-5 pt-5 pb-28">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-5 pb-[var(--app-nav-height)]">
       <header>
         <h1 className="m-0 text-5xl leading-none font-extrabold">
           Vecka {isoWeekNumber(today)}
