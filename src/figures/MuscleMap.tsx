@@ -140,7 +140,7 @@ function Body({
           patternUnits="userSpaceOnUse"
         >
           <rect width="5" height="5" fill="var(--paper)" />
-          <path d="M0 0V5" stroke="var(--blue)" strokeWidth="2" />
+          <path d="M0 0V5" stroke="var(--accent)" strokeWidth="2" />
         </pattern>
       </defs>
       <g
@@ -163,9 +163,9 @@ function Body({
               key={`${id}-${d}`}
               d={d}
               clipPath={`url(#${clipId})`}
-              fill={role === 'primary' ? 'var(--blue)' : `url(#${patternId})`}
+              fill={role === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
               fillOpacity={role === 'primary' ? 0.48 : 1}
-              stroke="var(--blue)"
+              stroke="var(--accent)"
               strokeWidth="1.5"
               strokeLinejoin="round"
             />
@@ -227,7 +227,7 @@ function LegendSwatch({ kind }: { kind: 'primary' | 'secondary' }) {
           patternUnits="userSpaceOnUse"
         >
           <rect width="4" height="4" fill="var(--paper)" />
-          <path d="M0 0V4" stroke="var(--blue)" strokeWidth="1.5" />
+          <path d="M0 0V4" stroke="var(--accent)" strokeWidth="1.5" />
         </pattern>
       </defs>
       <rect
@@ -236,8 +236,8 @@ function LegendSwatch({ kind }: { kind: 'primary' | 'secondary' }) {
         width="17"
         height="17"
         rx="2"
-        fill={kind === 'primary' ? 'var(--blue)' : `url(#${patternId})`}
-        stroke="var(--blue)"
+        fill={kind === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
+        stroke="var(--accent)"
         strokeWidth="2"
       />
     </svg>

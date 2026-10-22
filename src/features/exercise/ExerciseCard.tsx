@@ -177,7 +177,7 @@ export function ExerciseCardBody({
                     type="button"
                     aria-pressed={view === angle}
                     onClick={() => setView(angle)}
-                    className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-blue aria-pressed:text-blue"
+                    className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-accent aria-pressed:text-accent"
                   >
                     {angle === 'side' ? 'Från sidan' : 'Framifrån'}
                   </button>

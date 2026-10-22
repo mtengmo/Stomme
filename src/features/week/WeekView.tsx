@@ -43,8 +43,8 @@ function restText(sessions: Session[], now: Date): string | null {
 }
 
 const chipStyle: Record<PassState, string> = {
-  done: 'border-2 border-red text-red',
-  today: 'bg-amber text-amber-ink',
+  done: 'border-2 border-done text-done',
+  today: 'bg-today text-today-ink',
   upcoming: 'bg-upcoming text-upcoming-ink',
 };
 
@@ -57,7 +57,7 @@ function StateChip({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-blue text-blue' : chipStyle[state]}`}
+      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-accent text-accent' : chipStyle[state]}`}
     >
       <Icon
         name={
@@ -164,7 +164,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
               aria-label={`${DAY_NAMES[i]} ${Number(d.slice(8))}${isDone ? ', pass klart' : ''}${isToday ? ', idag' : ''}`}
               className={`relative flex size-11 flex-col items-center justify-center rounded-sm border-2 text-base leading-none ${
                 isToday
-                  ? 'border-ink bg-amber font-bold text-amber-ink'
+                  ? 'border-ink bg-today font-bold text-today-ink'
                   : 'border-edge bg-paper text-ink'
               }`}
             >
@@ -214,7 +214,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
                     {templates[id].name}
                   </h2>
                   {lead ? (
-                    <p className="m-0 mt-2 text-lg font-bold text-blue">
+                    <p className="m-0 mt-2 text-lg font-bold text-accent">
                       Nästa pass
                     </p>
                   ) : null}

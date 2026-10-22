@@ -347,7 +347,7 @@ export function ExerciseLibrary() {
                 type="button"
                 aria-pressed={active}
                 onClick={() => changeFilter('muskel', group ?? '')}
-                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-paper px-3 py-2 text-base font-bold ${active ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-paper px-3 py-2 text-base font-bold ${active ? 'border-accent text-accent' : 'border-edge text-ink'}`}
               >
                 {active ? <Icon name="check" size={18} /> : null}
                 {group ? muscleGroups[group].label : 'Alla'}

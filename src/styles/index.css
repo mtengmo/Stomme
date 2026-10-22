@@ -14,12 +14,6 @@
   /* Layout, not theme. Colour tokens live in themes/<id>.css. */
   --grid: 24px;
   --app-nav-height: calc(67px + env(safe-area-inset-bottom));
-
-  /* Step 1 of the token rename: old names alias the new ones (removed in step 2). */
-  --red: var(--done);
-  --blue: var(--accent);
-  --amber: var(--today);
-  --amber-ink: var(--today-ink);
 }
 
 @theme inline {
@@ -43,10 +37,6 @@
   --color-care: var(--care);
   --color-care-ink: var(--care-ink);
   --color-equipment: var(--equipment);
-  --color-red: var(--red);
-  --color-blue: var(--blue);
-  --color-amber: var(--amber);
-  --color-amber-ink: var(--amber-ink);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-count: "Barlow Condensed", sans-serif-condensed, sans-serif;
 }
@@ -58,7 +48,7 @@ html {
   font-size: 100%;
   font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
-  caret-color: var(--blue);
+  caret-color: var(--accent);
   scrollbar-color: var(--ink-soft) var(--paper);
   scrollbar-width: thin;
 }
@@ -76,12 +66,12 @@ body {
 }
 
 ::selection {
-  background: var(--blue);
+  background: var(--accent);
   color: var(--paper);
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
   border-radius: 4px;
 }

@@ -27,7 +27,7 @@ export function StatusChip({ session }: { session: Session }) {
     'inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold';
   if (session.status === 'completed')
     return (
-      <span className={`${base} border-2 border-red text-red`}>
+      <span className={`${base} border-2 border-done text-done`}>
         <Icon name="check" size={18} />
         Klar
       </span>
@@ -40,7 +40,7 @@ export function StatusChip({ session }: { session: Session }) {
       </span>
     );
   return (
-    <span className={`${base} border-2 border-blue text-blue`}>
+    <span className={`${base} border-2 border-accent text-accent`}>
       <Icon name="clock" size={18} />
       Pågår
     </span>

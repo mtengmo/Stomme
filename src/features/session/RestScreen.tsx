@@ -163,7 +163,7 @@ export function RestScreen({
                 key={value}
                 type="button"
                 aria-pressed={effort === value}
-                className={`min-h-12 rounded-sm border-2 px-2 text-base font-bold ${effort === value ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+                className={`min-h-12 rounded-sm border-2 px-2 text-base font-bold ${effort === value ? 'border-accent text-accent' : 'border-edge text-ink'}`}
                 onClick={() => onEffort(value)}
               >
                 {EFFORT_LABEL[value]}

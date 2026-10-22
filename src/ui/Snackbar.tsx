@@ -27,7 +27,7 @@ export function Snackbar({ message, onUndo, onExpire }: SnackbarProps) {
       <button
         type="button"
         onClick={onUndo}
-        className="-mr-3 min-h-12 min-w-16 px-3 text-base font-bold text-blue underline decoration-2 underline-offset-4"
+        className="-mr-3 min-h-12 min-w-16 px-3 text-base font-bold text-accent underline decoration-2 underline-offset-4"
       >
         Ångra
       </button>

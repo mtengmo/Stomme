@@ -58,7 +58,7 @@ export function ExerciseReview() {
                 <Link
                   href={exerciseReviewHref(item.id)}
                   aria-current={exercise.id === item.id ? 'page' : undefined}
-                  className={`flex min-h-12 gap-3 py-3 text-base underline ${exercise.id === item.id ? 'font-bold text-blue' : 'text-ink'}`}
+                  className={`flex min-h-12 gap-3 py-3 text-base underline ${exercise.id === item.id ? 'font-bold text-accent' : 'text-ink'}`}
                 >
                   <span>{exerciseReferences[item.id]}</span>
                   <span>{item.name}</span>

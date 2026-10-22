@@ -153,7 +153,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
                 cy={y(p.weightKg)}
                 r={isLast ? 6 : 4.5}
                 className={
-                  isLast ? 'fill-blue stroke-paper' : 'fill-ink stroke-paper'
+                  isLast ? 'fill-accent stroke-paper' : 'fill-ink stroke-paper'
                 }
                 strokeWidth={2}
               />
@@ -163,7 +163,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
                   y={y(p.weightKg) - 12}
                   textAnchor="middle"
                   fontSize={18}
-                  className={`count ${isLast ? 'fill-blue' : 'fill-ink'}`}
+                  className={`count ${isLast ? 'fill-accent' : 'fill-ink'}`}
                 >
                   {p.amount}
                 </text>
