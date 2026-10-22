@@ -114,7 +114,6 @@ try {
         await page.screenshot({
           path: `${out}/${theme ? `${theme}-` : ''}${scheme}-${name}.png`,
           animations: 'disabled',
-          fullPage: allThemes && name === 'week',
         });
       };
 
@@ -128,11 +127,14 @@ try {
       await page.getByText('Visa muskelkarta', { exact: true }).click();
       await page.getByRole('img', { name: 'Kropp bakifrån' }).waitFor();
       await shot(page, 'muscle-map');
-      await seedOpenSession(page, allThemes);
-      await page.goto(url);
-      await page.reload();
-      await page.getByRole('link', { name: /Fortsätt passet/ }).waitFor();
-      await shot(page, 'week');
+      // Week captures for --all-themes come from theme-review.ts (seeded, viewport only).
+      if (!allThemes) {
+        await seedOpenSession(page, false);
+        await page.goto(url);
+        await page.reload();
+        await page.getByRole('link', { name: /Fortsätt passet/ }).waitFor();
+        await shot(page, 'week');
+      }
       await context.close();
 
       ({ context, page } = await fresh());

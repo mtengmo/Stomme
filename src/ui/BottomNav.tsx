@@ -40,7 +40,7 @@ export function BottomNav() {
               <Link
                 href={t.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline ${
+                className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline focus-visible:outline-offset-[-6px] focus-visible:[box-shadow:var(--focus-ring-inset)] ${
                   active
                     ? 'border-action font-bold text-ink'
                     : 'border-transparent text-ink-soft'

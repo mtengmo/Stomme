@@ -27,6 +27,7 @@
   --grid-line: transparent;
   --focus-outline: #0b0b0b;
   --focus-ring: 0 0 0 3px #ffd500;
+  --focus-ring-inset: inset 0 0 0 3px #ffd500;
 }
 
 :root[data-theme="hog-kontrast"][data-scheme="dark"] {
@@ -54,4 +55,5 @@
   --grid-line: transparent;
   --focus-outline: var(--focus);
   --focus-ring: none;
+  --focus-ring-inset: none;
 }

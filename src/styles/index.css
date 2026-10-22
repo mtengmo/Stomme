@@ -22,6 +22,8 @@
   --grid-line: var(--line);
   --focus-outline: var(--focus);
   --focus-ring: none;
+  /* Same ring drawn inside, for controls at the screen edge (bottom nav). */
+  --focus-ring-inset: none;
 }
 
 @theme inline {
