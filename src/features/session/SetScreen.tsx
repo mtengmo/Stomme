@@ -143,7 +143,7 @@ export function SetScreen({
           {side ? (
             <>
               {' '}
-              · <span className="text-blue">{side}</span>
+              · <span className="text-accent">{side}</span>
             </>
           ) : null}
         </p>
@@ -151,7 +151,7 @@ export function SetScreen({
       {unit === 'seconds' ? (
         <section
           aria-label={movingTimed ? 'Övningstid' : 'Hålltid'}
-          className="rounded-md bg-blue px-3 py-2 text-paper"
+          className="rounded-md bg-accent px-3 py-2 text-paper"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -265,7 +265,7 @@ export function SetScreen({
                   step="0.5"
                   value={weightKg}
                   onChange={(event) => setWeightKg(Number(event.target.value))}
-                  className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-xl text-ink"
+                  className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-xl text-ink"
                 />
                 <span className="text-base font-normal text-ink-soft">
                   {presentation.variant.label} · samma redskap som i passplanen

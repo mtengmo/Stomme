@@ -58,7 +58,7 @@ export function ExerciseReview() {
                 <Link
                   href={exerciseReviewHref(item.id)}
                   aria-current={exercise.id === item.id ? 'page' : undefined}
-                  className={`flex min-h-12 gap-3 py-3 text-base underline ${exercise.id === item.id ? 'font-bold text-blue' : 'text-ink'}`}
+                  className={`flex min-h-12 gap-3 py-3 text-base underline ${exercise.id === item.id ? 'font-bold text-accent' : 'text-ink'}`}
                 >
                   <span>{exerciseReferences[item.id]}</span>
                   <span>{item.name}</span>
@@ -79,7 +79,7 @@ export function ExerciseReview() {
               onChange={(event) =>
                 navigate(`/granska?ovning=${event.target.value}`)
               }
-              className="min-h-12 min-w-0 rounded-sm border-2 border-ink bg-paper px-2 text-base text-ink"
+              className="min-h-12 min-w-0 rounded-sm border-2 border-ink bg-surface px-2 text-base text-ink"
             >
               {catalogue.map((item) => (
                 <option key={item.id} value={exerciseReferences[item.id]}>

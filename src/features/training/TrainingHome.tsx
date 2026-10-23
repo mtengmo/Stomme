@@ -26,7 +26,7 @@ import { WeekView } from '../week/WeekView';
 import { QuickStart } from './QuickStart';
 
 const inputClass =
-  'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+  'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
 export { inputClass };
 
@@ -69,7 +69,7 @@ export function TrainingSetup({
         {(Object.keys(programmeNames) as ProgramId[]).map((id) => (
           <label
             key={id}
-            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${programId === id ? 'border-blue' : 'border-edge'}`}
+            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${programId === id ? 'border-accent' : 'border-edge'}`}
           >
             <input
               type="radio"

@@ -45,6 +45,8 @@ export default defineConfig({
             'src/lib/format.test.ts',
             'src/features/**/*.test.ts',
             'src/ui/*.test.ts',
+            'src/styles/**/*.test.ts',
+            'src/test/*.test.ts',
           ],
           pool: 'threads',
           isolate: false,
@@ -71,7 +73,8 @@ export default defineConfig({
           name: 'dom',
           environment: 'node',
           setupFiles: ['./src/test/setup.ts'],
-          include: ['src/**/*.test.tsx'],
+          // appearance.test.ts needs jsdom, localStorage and a matchMedia stub.
+          include: ['src/**/*.test.tsx', 'src/lib/appearance.test.ts'],
           exclude: ['src/figures/**'],
           pool: 'forks',
           isolate: true,

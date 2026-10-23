@@ -57,7 +57,7 @@ export function SessionFrame({
       </div>
       <div className="-mx-5 flex shrink-0 flex-col">
         {snack}
-        <div className="flex flex-col gap-1 border-t-[3px] border-ink bg-paper px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-col gap-1 border-t-[3px] border-ink bg-surface-tint px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {actions}
         </div>
       </div>

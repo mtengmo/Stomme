@@ -17,7 +17,7 @@ interface StepperProps {
 }
 
 const stepBtn =
-  'grid size-16 shrink-0 place-items-center rounded-md border-[3px] border-ink bg-paper text-ink transition-transform duration-150 ease-out active:scale-[0.96] disabled:opacity-40';
+  'grid size-16 shrink-0 place-items-center rounded-md border-[3px] border-ink bg-surface text-ink transition-transform duration-150 ease-out active:scale-[0.96] disabled:opacity-40';
 
 const stepBtnSm = stepBtn.replace('size-16', 'size-12');
 

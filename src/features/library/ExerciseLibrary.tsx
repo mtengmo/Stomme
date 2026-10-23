@@ -255,7 +255,7 @@ export function ExerciseLibrary() {
           <select
             value={filters.purpose}
             onChange={(event) => changeFilter('syfte', event.target.value)}
-            className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+            className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
           >
             <option value="">Alla syften</option>
             {Object.entries(purposeLabels).map(([value, label]) => (
@@ -272,7 +272,7 @@ export function ExerciseLibrary() {
             type="search"
             value={filters.term}
             onChange={(event) => changeFilter('sok', event.target.value)}
-            className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+            className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
           />
         </label>
         <label className="flex min-h-12 items-center gap-3 text-base font-bold">
@@ -298,7 +298,7 @@ export function ExerciseLibrary() {
                 onChange={(event) =>
                   changeFilter('redskap', event.target.value)
                 }
-                className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+                className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
               >
                 <option value="">Alla redskap</option>
                 <option value="available">Min tillgängliga utrustning</option>
@@ -314,7 +314,7 @@ export function ExerciseLibrary() {
               <select
                 value={filters.level}
                 onChange={(event) => changeFilter('niva', event.target.value)}
-                className="min-h-12 rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink"
+                className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
               >
                 <option value="">Alla nivåer</option>
                 {Object.entries(technicalLevelLabels).map(([value, label]) => (
@@ -347,7 +347,7 @@ export function ExerciseLibrary() {
                 type="button"
                 aria-pressed={active}
                 onClick={() => changeFilter('muskel', group ?? '')}
-                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-paper px-3 py-2 text-base font-bold ${active ? 'border-blue text-blue' : 'border-edge text-ink'}`}
+                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-surface px-3 py-2 text-base font-bold ${active ? 'border-accent text-accent' : 'border-edge text-ink'}`}
               >
                 {active ? <Icon name="check" size={18} /> : null}
                 {group ? muscleGroups[group].label : 'Alla'}

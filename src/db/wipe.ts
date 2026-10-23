@@ -1,6 +1,10 @@
+import { clearAppearance } from '../lib/appearance';
 import type { StommeDB } from './db';
 
-/** Wipes every table, including meta (so the app returns to onboarding). */
+/**
+ * Wipes every table, including meta (so the app returns to onboarding), and
+ * the device-local appearance choice.
+ */
 export async function deleteAllData(db: StommeDB): Promise<void> {
   await db.transaction(
     'rw',
@@ -17,4 +21,5 @@ export async function deleteAllData(db: StommeDB): Promise<void> {
       ]);
     },
   );
+  clearAppearance();
 }

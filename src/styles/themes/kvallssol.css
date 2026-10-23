@@ -1,0 +1,51 @@
+/*
+ * Theme "Kvällssol Skymning". Values mirror ThemeDef in ./kvallssol.ts
+ * (themes.test.ts checks they agree).
+ */
+:root[data-theme="kvallssol"] {
+  color-scheme: light;
+  --paper: #f8d9bf;
+  --surface: #fdeee0;
+  --surface-tint: #f0c49c;
+  --line: #efcfb2;
+  --ink: #2a1520;
+  --ink-soft: #57394a;
+  --edge: #84606c;
+  --action: #7a2453;
+  --action-ink: #fdeee0;
+  --done: #135c43;
+  --accent: #3a3f9c;
+  --focus: #3a3f9c;
+  --info: #3a3f9c;
+  --today: #f6b13a;
+  --today-ink: #2a1520;
+  --upcoming: #efcdb0;
+  --upcoming-ink: #4a2e3d;
+  --care: #1b1630;
+  --care-ink: #fdeee0;
+  --equipment: #8a4a0e;
+}
+
+:root[data-theme="kvallssol"][data-scheme="dark"] {
+  color-scheme: dark;
+  --paper: #21141c;
+  --surface: #2c1a25;
+  --surface-tint: #3e2032;
+  --line: #2d1b26;
+  --ink: #fbe9dc;
+  --ink-soft: #d6b6bf;
+  --edge: #a07f8b;
+  --action: #f2a0c8;
+  --action-ink: #21141c;
+  --done: #4fbf8f;
+  --accent: #b4b8ff;
+  --focus: #b4b8ff;
+  --info: #b4b8ff;
+  --today: #f6b13a;
+  --today-ink: #21141c;
+  --upcoming: #3a2833;
+  --upcoming-ink: #e6cbd3;
+  --care: #fff4e6;
+  --care-ink: #21141c;
+  --equipment: #ff9f50;
+}

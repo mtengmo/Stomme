@@ -1,6 +1,4 @@
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useLocation } from 'wouter';
-import { getDb } from '../db/db';
 import { Icon, type IconName } from './Icon';
 
 const tabs: { href: string; label: string; icon: IconName }[] = [
@@ -12,25 +10,18 @@ const tabs: { href: string; label: string; icon: IconName }[] = [
 /** Exact match for the root tab; sub-routes (/historik/:id) keep their tab active. */
 export function isTabActive(href: string, location: string): boolean {
   return href === '/'
-    ? location === '/'
+    ? location === '/' ||
+        location.startsWith('/traning/') ||
+        location.startsWith('/pass/')
     : location === href || location.startsWith(`${href}/`);
 }
 
 export function BottomNav() {
   const [location] = useLocation();
-  const started = useLiveQuery(async () => {
-    if (location !== '/') return true;
-    const [meta, count] = await Promise.all([
-      getDb().meta.bulkGet(['training', 'program']),
-      getDb().sessions.count(),
-    ]);
-    return meta.some(Boolean) || count > 0;
-  }, [location]);
-  if (location === '/' && !started) return null;
   return (
     <nav
       aria-label="Huvudmeny"
-      className="fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-ink bg-paper pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-ink bg-surface-tint pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="m-0 mx-auto flex max-w-md list-none p-0">
         {tabs.map((t) => {
@@ -40,9 +31,9 @@ export function BottomNav() {
               <Link
                 href={t.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline ${
+                className={`flex min-h-16 flex-col items-center justify-center gap-0.5 border-b-4 text-base no-underline focus-visible:outline-offset-[-6px] focus-visible:[box-shadow:var(--focus-ring-inset)] ${
                   active
-                    ? 'border-ink font-bold text-ink'
+                    ? 'border-action font-bold text-ink'
                     : 'border-transparent text-ink-soft'
                 }`}
               >
