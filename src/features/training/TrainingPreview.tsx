@@ -683,6 +683,7 @@ function PreviewEditor({
                           </span>
                           <span className="block text-base font-normal">
                             {item.sets || '–'} × {item.target || '–'}
+                            {exercise.unit === 'laps' ? ' varv' : ''}
                             {exercise.perSide ? ' per sida' : ''}
                             {item.weightKg > 0
                               ? ` · ${item.weightKg} kg totalt`

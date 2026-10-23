@@ -71,9 +71,10 @@ export function ReadyWorkout({
       ) : null}
       {physio ? (
         <p className="m-0 text-base">
-          {physioKneeFitCount(preferences)} av {physioKneeTotal} övningar passar
-          din utrustning. Setvilan på 60 sekunder är appens justerbara standard.
-          Avbryt en övning som gör ont.
+          Förifyllt från fysioterapeutens knäprogram. Kontrollera mot ditt
+          papper och ändra vid behov. {physioKneeFitCount(preferences)} av{' '}
+          {physioKneeTotal} övningar passar din utrustning. Setvilan på 60
+          sekunder är appens justerbara standard. Avbryt en övning som gör ont.
         </p>
       ) : null}
       {!knee && !physio && preferences.programId !== 'rehab' ? (
@@ -104,7 +105,9 @@ export function ReadyWorkout({
                 : ' höger'
               : ' per sida';
           const note =
-            item.explanation && !item.explanation.startsWith('Startförslag')
+            item.explanation &&
+            !item.explanation.startsWith('Startförslag') &&
+            !(physio && item.explanation.startsWith('Förifyllt'))
               ? item.explanation
               : '';
           return (

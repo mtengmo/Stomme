@@ -141,7 +141,7 @@ export function QuickStart() {
           <button
             type="button"
             onClick={() => setGoal('physio')}
-            className="min-h-12 self-start text-base underline"
+            className="min-h-12 self-start text-left text-base underline"
           >
             Jag har fysioterapeutens knäprogram (9 övningar)
           </button>
