@@ -56,7 +56,14 @@ export interface FigureSpec {
   props: Prop[];
   held?: { kind: 'dumbbell' | 'kettlebell'; hands: ('hR' | 'hL')[] };
   /** A band between two points (replaces the default hand-ankle-hand band). */
-  band?: { from: PoseKey | Pt; to: PoseKey };
+  band?: {
+    from: PoseKey | Pt;
+    to: PoseKey;
+    /** Length at which the band is taut; shorter ends make it hang slack. */
+    rest?: number;
+    /** Shift both ends, e.g. up the shin so the band clears the foot strokes. */
+    offset?: Pt;
+  };
 }
 
 /** Swap near and far side so the left side is the working one. */

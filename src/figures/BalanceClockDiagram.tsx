@@ -33,7 +33,10 @@ export function BalanceClockDiagram({
       : working === 'right'
         ? 'höger'
         : 'det stående';
-  const description = `Balansklockan sedd uppifrån. Du står på ${side} ben i mitten med tårna mot 12. Fyra punkter ligger runt foten: 12 rakt fram, 3 åt höger, 6 rakt bakom och 9 åt vänster. Peta med den fria tån på varje punkt i tur och ordning och tillbaka till mitten.`;
+  const instruction =
+    'Sedd uppifrån: stå på foten i mitten och håll i ett stöd. Nudda golvet med den andra tån på 12, 3, 6 och 9 och tillbaka till mitten mellan varje.';
+  const animation = 'Rörelsen ovan visar 12 och 6.';
+  const description = `Balansklockan sedd uppifrån. Du står på ${side} ben i mitten med tårna mot 12. Fyra punkter ligger runt foten: 12 rakt fram, 3 åt höger, 6 rakt bakom och 9 åt vänster. ${instruction.replace('Sedd uppifrån: ', '')} ${animation}`;
   return (
     <figure
       className="m-0 flex items-center gap-3"
@@ -84,7 +87,6 @@ export function BalanceClockDiagram({
                 fontSize="13"
                 fontWeight="800"
                 fill="var(--ink)"
-                fontFamily="system-ui, sans-serif"
               >
                 {hour}
               </text>
@@ -94,20 +96,18 @@ export function BalanceClockDiagram({
         {working ? (
           <text
             x={CENTRE}
-            y={CENTRE + 9}
+            y={CENTRE + 5.5}
             textAnchor="middle"
-            fontSize="22"
+            fontSize="16"
             fontWeight="800"
             fill="var(--accent)"
-            fontFamily="system-ui, sans-serif"
           >
             {working === 'right' ? 'H' : 'V'}
           </text>
         ) : null}
       </svg>
       <figcaption className="text-base text-ink-soft">
-        Sedd uppifrån: foten i mitten står still, den andra tån pekar mot 12, 3,
-        6 och 9.
+        {instruction} {animation}
       </figcaption>
     </figure>
   );
