@@ -7,9 +7,6 @@ describe('balance clock copy', () => {
   const ex = exercises['balance-clock'];
   const meta = exerciseMetadata['balance-clock'];
   it('requires holding on in every text and keeps the support variant', () => {
-    expect(ex.tips[0]).toBe(
-      'Håll i en vägg eller stol hela tiden.'.length ? ex.tips[0] : '',
-    );
     expect(ex.tips[0]).toMatch(/^Håll i en vägg eller stol hela tiden\./);
     expect(ex.easierVariant).toMatch(/Håll i/);
     for (const variant of meta.variants) {
