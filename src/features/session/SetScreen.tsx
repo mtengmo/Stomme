@@ -328,7 +328,7 @@ export function SetScreen({
             {exercise.id === 'balance-clock' ? (
               <BalanceClockDiagram
                 working={step.side === 'both' ? null : step.side}
-                paused={reducedMotion}
+                paused
               />
             ) : null}
             <ExerciseMuscles exerciseId={exercise.id} />
