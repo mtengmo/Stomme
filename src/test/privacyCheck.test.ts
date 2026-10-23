@@ -28,7 +28,9 @@ describe('privacy check', () => {
     expect(result.stdout).toContain('nothing to check');
   });
   it('passes when no term occurs', () => {
-    const result = run('# comment\nqzxjvkwpfm-not-present\n');
+    // Built from pieces so the term itself never appears in a tracked file.
+    const absent = ['qzxjvk', 'wpfm', 'not', 'present'].join('-');
+    const result = run(`# comment\n${absent}\n`);
     expect(result.status).toBe(0);
   });
   it('fails and prints the hit, case-insensitively, without echoing the term', () => {
