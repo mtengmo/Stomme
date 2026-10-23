@@ -32,7 +32,7 @@ async function openPhysio(
   render(<App />);
   await user.click(
     await screen.findByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
+      name: 'Jag har fysioterapeutens knäprogram',
     }),
   );
   await user.click(
@@ -70,18 +70,47 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
   expect(rows()).toHaveLength(9);
   expect(screen.getByRole('navigation', { name: 'Huvudmeny' })).toBeTruthy();
   expect(screen.getAllByText(/1 × 5 varv/).length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Stegring av övning 4.')).toHaveLength(1);
+  expect(screen.getAllByText('Nästa steg på papperet: övning 5.')).toHaveLength(
+    1,
+  );
+  expect(screen.getAllByText(/Hållningen på 5 sekunder/)).toHaveLength(1);
   expect(
-    screen.getAllByText(/Stegring av övning 4 \(E30 Sittande knästräckning\)/),
+    screen.getAllByText(/Förifyllt från fysioterapeutens knäprogram\./),
   ).toHaveLength(1);
-  expect(screen.getByText(/Nästa steg på papperet: övning 5/)).toBeTruthy();
+  expect(screen.getByText(/^5\. E51/)).toBeTruthy();
   expect(screen.queryByText(/rekommenderad/i)).toBeNull();
 
   const start = screen.getByRole('button', {
     name: 'Börja passet',
   }) as HTMLButtonElement;
   expect(start.disabled).toBe(true);
+  const reason = screen.getByText(
+    'Bekräfta att du jämfört med pappret för att börja.',
+  );
+  expect(start.getAttribute('aria-describedby')).toBe(reason.id);
   await user.click(screen.getByRole('checkbox', { name: CONFIRM }));
   expect(start.disabled).toBe(false);
+  expect(
+    screen.queryByText('Bekräfta att du jämfört med pappret för att börja.'),
+  ).toBeNull();
+});
+
+it('shows added exercises compactly in the collection and no technique level', async () => {
+  const user = userEvent.setup();
+  await openPhysio(user);
+  await user.click(screen.getByRole('button', { name: 'Anpassa passet' }));
+  expect(screen.queryByText('Kroppsdel')).toBeNull();
+  expect(screen.queryByLabelText('Lägg till övning')).toBeNull();
+  expect(screen.queryByText(/Tekniknivå/)).toBeNull();
+  await user.click(await screen.findByRole('button', { name: /E49 · / }));
+  await user.click(await screen.findByRole('button', { name: /^Ta bort / }));
+  await user.click(screen.getByText(/Välj övningar från programmet/));
+  expect(screen.getAllByText(/Ingår i passet/)).toHaveLength(8);
+  expect(
+    (screen.getByRole('button', { name: 'Lägg till E49' }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(false);
 });
 
 it('offers 7 of 9 without a band', async () => {

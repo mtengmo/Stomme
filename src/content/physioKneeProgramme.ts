@@ -5,7 +5,6 @@ import type {
 } from '../domain/types';
 import { equipmentFits } from '../rules/equipment';
 import { exerciseMetadata } from './exerciseMetadata';
-import { exerciseReferences } from './exerciseReferences';
 import { exercises } from './exercises';
 
 export interface PhysioKneeItem {
@@ -106,8 +105,14 @@ export const physioKneeBanner =
 export const physioKneeConfirmLabel =
   'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten.';
 
-const holdNote =
-  'Hållningen på 5 sekunder kommer från AAOS: följ ditt papper om det skiljer sig.';
+export const physioHoldNote =
+  'Hållningen på 5 sekunder (övning 4 och 6) kommer från AAOS: följ ditt papper om det skiljer sig.';
+
+export const physioSwapNote =
+  'Byt till ett nästa steg först när du och din fysioterapeut kommit överens.';
+
+export const physioForm =
+  'Förifyllt från fysioterapeutens knäprogram. Kontrollera mot ditt papper och ändra vid behov.';
 
 export function physioKneeItemFor(
   exerciseId: ExerciseId,
@@ -115,33 +120,20 @@ export function physioKneeItemFor(
   return physioKneeItems.find((item) => item.exerciseId === exerciseId);
 }
 
-function itemName(sheetNo: number): string {
-  const item = physioKneeItems.find((entry) => entry.sheetNo === sheetNo);
-  return item
-    ? `${exerciseReferences[item.exerciseId]} ${exercises[item.exerciseId].name}`
-    : '';
-}
-
 /**
- * Informational notes derived at draw time from `progressionOf`. Nothing is
- * stored and the app never swaps an exercise by itself.
+ * Short informational notes derived at draw time from `progressionOf`.
+ * Nothing is stored and the app never swaps an exercise by itself.
  */
 export function physioProgressionNotes(exerciseId: ExerciseId): string[] {
   const item = physioKneeItemFor(exerciseId);
   if (!item) return [];
   const notes: string[] = [];
   if (item.progressionOf !== undefined)
-    notes.push(
-      `Stegring av övning ${item.progressionOf} (${itemName(item.progressionOf)}).`,
-    );
+    notes.push(`Stegring av övning ${item.progressionOf}.`);
   const next = physioKneeItems.find(
     (entry) => entry.progressionOf === item.sheetNo,
   );
-  if (next)
-    notes.push(
-      `Nästa steg på papperet: övning ${next.sheetNo} (${itemName(next.sheetNo)}). Byt när du och din fysioterapeut kommit överens.`,
-    );
-  if (item.sheetNo === 4 || item.sheetNo === 6) notes.push(holdNote);
+  if (next) notes.push(`Nästa steg på papperet: övning ${next.sheetNo}.`);
   return notes;
 }
 

@@ -70,11 +70,13 @@ export function RehabCollection({
           Läs AAOS rekommendationer (engelska)
         </a>
       )}
-      <p className="m-0 text-base text-ink-soft">
-        Stommes tekniknivå beskriver kontroll och balans: 1 grundläggande, 2
-        viss vana, 3 teknikkrävande. Vikt, antal och dagsform påverkar hur
-        ansträngande övningen känns för dig.
-      </p>
+      {physio ? null : (
+        <p className="m-0 text-base text-ink-soft">
+          Stommes tekniknivå beskriver kontroll och balans: 1 grundläggande, 2
+          viss vana, 3 teknikkrävande. Vikt, antal och dagsform påverkar hur
+          ansträngande övningen känns för dig.
+        </p>
+      )}
       {physio ? (
         <ul className="m-0 list-none p-0">
           {physioKneeItems.map((item) => {
@@ -85,6 +87,18 @@ export function RehabCollection({
                 equipmentFits(v.equipment, preferences.equipment),
             );
             const added = plan.some((p) => p.exerciseId === ex.id);
+            if (added)
+              return (
+                <li
+                  key={item.sheetNo}
+                  className="flex min-h-12 flex-wrap items-center gap-x-2 border-b-2 border-edge py-2 text-base"
+                >
+                  <span className="font-bold">
+                    Papperets övning {item.sheetNo}: {item.sheetLabel}
+                  </span>
+                  <span>{exerciseReferences[ex.id]} · Ingår i passet</span>
+                </li>
+              );
             return (
               <li
                 key={item.sheetNo}
@@ -105,28 +119,20 @@ export function RehabCollection({
                   {ex.perSide ? ' per sida' : ''}
                 </p>
                 {physioProgressionNotes(ex.id).map((note) => (
-                  <p key={note} className="m-0 text-base text-ink-soft">
+                  <p key={note} className="m-0 text-base">
                     {note}
                   </p>
                 ))}
-                <ExerciseDifficulty
-                  exerciseId={ex.id}
-                  variantId={variant?.id}
-                  loadIndex={variant?.defaultLoadIndex}
-                  explain
-                />
-                <p className="m-0 text-base text-ink-soft">
-                  {equipmentText(variant)}
-                </p>
-                <Button
-                  variant="secondary"
-                  disabled={added || !variant || plan.length >= 12}
-                  onClick={() => onAdd(ex.id)}
-                >
-                  {added
-                    ? `${exerciseReferences[ex.id]} tillagd`
-                    : `Lägg till ${exerciseReferences[ex.id]}`}
-                </Button>
+                <p className="m-0 text-base">{equipmentText(variant)}</p>
+                {variant ? (
+                  <Button
+                    variant="secondary"
+                    disabled={plan.length >= 12}
+                    onClick={() => onAdd(ex.id)}
+                  >
+                    Lägg till {exerciseReferences[ex.id]}
+                  </Button>
+                ) : null}
               </li>
             );
           })}

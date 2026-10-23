@@ -131,20 +131,22 @@ export function QuickStart() {
               </Button>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={() => setGoal('custom')}
-            className="mt-2 min-h-12 self-start text-base underline"
-          >
-            Jag har ett eget rehabprogram
-          </button>
-          <button
-            type="button"
-            onClick={() => setGoal('physio')}
-            className="min-h-12 self-start text-left text-base underline"
-          >
-            Jag har fysioterapeutens knäprogram (9 övningar)
-          </button>
+          <div className="flex flex-col">
+            <button
+              type="button"
+              onClick={() => setGoal('custom')}
+              className="min-h-12 self-start text-left text-base underline"
+            >
+              Jag har ett eget rehabprogram
+            </button>
+            <button
+              type="button"
+              onClick={() => setGoal('physio')}
+              className="min-h-12 self-start text-left text-base underline"
+            >
+              Jag har fysioterapeutens knäprogram
+            </button>
+          </div>
         </>
       ) : (
         <>

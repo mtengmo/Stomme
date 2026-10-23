@@ -17,7 +17,9 @@ import {
 } from '../../content/muscles';
 import {
   physioKneeBanner,
+  physioKneeConfirmLabel,
   physioKneeFitCount,
+  physioKneeItemFor,
   physioKneeItems,
   physioKneePlan,
   physioKneePlanItem,
@@ -369,6 +371,26 @@ function PreviewEditor({
       session.status === 'in_progress' && session.id !== preparationId,
   );
 
+  const physioPaper =
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
+  const confirmBox = (
+    <label className="flex min-h-12 items-start gap-3 py-2 text-base">
+      <input
+        type="checkbox"
+        checked={confirmed}
+        onChange={(event) => setConfirmed(event.target.checked)}
+        aria-describedby={
+          physioPaper && !confirmed ? 'start-blocked' : undefined
+        }
+        className="size-6 shrink-0"
+      />
+      {rehabGroup(preferences) === 'aaos'
+        ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
+        : rehabGroup(preferences) === 'physio'
+          ? physioKneeConfirmLabel
+          : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
+    </label>
+  );
   const change = (index: number, patch: Partial<PlannedExercise>) =>
     updatePlan((current) =>
       current.map((item, n) => (n === index ? { ...item, ...patch } : item)),
@@ -660,6 +682,7 @@ function PreviewEditor({
               <ol className="m-0 list-none p-0">
                 {plan.map((item, index) => {
                   const exercise = exercises[item.exerciseId];
+                  const paperNo = physioKneeItemFor(item.exerciseId)?.sheetNo;
 
                   return (
                     <li
@@ -678,8 +701,12 @@ function PreviewEditor({
                       >
                         <span>
                           <span className="block text-xl font-bold">
-                            {index + 1}. {exerciseReferences[exercise.id]} ·{' '}
-                            {exercise.name}
+                            {physioPaper
+                              ? paperNo
+                                ? `${paperNo}. `
+                                : ''
+                              : `${index + 1}. `}
+                            {exerciseReferences[exercise.id]} · {exercise.name}
                           </span>
                           <span className="block text-base font-normal">
                             {item.sets || '–'} × {item.target || '–'}
@@ -777,12 +804,15 @@ function PreviewEditor({
                               )
                             : null}
 
-                          <p className="m-0 text-base text-ink-soft">
-                            {item.explanation ??
-                              (preferences.programId === 'rehab'
-                                ? 'Ange din överenskomna dosering.'
-                                : 'Startförslag. Anpassa före start.')}
-                          </p>
+                          {physioPaper &&
+                          item.explanation?.startsWith('Förifyllt') ? null : (
+                            <p className="m-0 text-base text-ink-soft">
+                              {item.explanation ??
+                                (preferences.programId === 'rehab'
+                                  ? 'Ange din överenskomna dosering.'
+                                  : 'Startförslag. Anpassa före start.')}
+                            </p>
+                          )}
 
                           {!exerciseMetadata[exercise.id].variants.some(
                             (variant) =>
@@ -1120,99 +1150,112 @@ function PreviewEditor({
                 </Link>
               ) : null}
 
-              <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-                <legend className="mb-2 text-lg font-bold">Kroppsdel</legend>
-                <div className="flex flex-wrap gap-2">
-                  {[{ id: '', label: 'Alla' }, ...bodyRegions].map((region) => (
-                    <button
-                      key={region.id}
-                      type="button"
-                      aria-pressed={!addMuscle && addRegion === region.id}
-                      onClick={() => {
-                        setAddRegion(region.id);
-                        setAddMuscle('');
-                        setAddId('');
-                      }}
-                      className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
-                    >
-                      {region.label}
-                    </button>
-                  ))}
-                </div>
-                <details>
-                  <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                    Mer specifikt
-                  </summary>
-                  <label className="flex flex-col gap-2 text-base font-bold">
-                    Muskelgrupp
-                    <select
-                      className={inputClass}
-                      value={addMuscle}
-                      onChange={(event) => {
-                        setAddMuscle(event.target.value as MuscleGroupId | '');
-                        setAddId('');
-                      }}
-                    >
-                      <option value="">Ingen vald</option>
-                      {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
-                        (group) => (
-                          <option key={group} value={group}>
-                            {muscleGroups[group].label}
-                          </option>
+              {physioPaper ? null : (
+                <>
+                  <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+                    <legend className="mb-2 text-lg font-bold">
+                      Kroppsdel
+                    </legend>
+                    <div className="flex flex-wrap gap-2">
+                      {[{ id: '', label: 'Alla' }, ...bodyRegions].map(
+                        (region) => (
+                          <button
+                            key={region.id}
+                            type="button"
+                            aria-pressed={!addMuscle && addRegion === region.id}
+                            onClick={() => {
+                              setAddRegion(region.id);
+                              setAddMuscle('');
+                              setAddId('');
+                            }}
+                            className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
+                          >
+                            {region.label}
+                          </button>
                         ),
                       )}
+                    </div>
+                    <details>
+                      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                        Mer specifikt
+                      </summary>
+                      <label className="flex flex-col gap-2 text-base font-bold">
+                        Muskelgrupp
+                        <select
+                          className={inputClass}
+                          value={addMuscle}
+                          onChange={(event) => {
+                            setAddMuscle(
+                              event.target.value as MuscleGroupId | '',
+                            );
+                            setAddId('');
+                          }}
+                        >
+                          <option value="">Ingen vald</option>
+                          {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
+                            (group) => (
+                              <option key={group} value={group}>
+                                {muscleGroups[group].label}
+                              </option>
+                            ),
+                          )}
+                        </select>
+                      </label>
+                    </details>
+                    <p className="m-0 text-base text-ink-soft">
+                      Kroppsdelar är träningsmål, inte en bedömning av vad som
+                      passar dig.
+                    </p>
+                  </fieldset>
+                  <label className="flex flex-col gap-2 text-lg font-bold">
+                    Lägg till övning
+                    <select
+                      className={inputClass}
+                      value={addId}
+                      onChange={(event) =>
+                        setAddId(event.target.value as ExerciseId | '')
+                      }
+                    >
+                      <option value="">
+                        {pickable.length
+                          ? 'Välj övning'
+                          : 'Inga övningar passar'}
+                      </option>
+                      {pickable.map(({ exercise, supporting }) => (
+                        <option key={exercise.id} value={exercise.id}>
+                          {exercise.name}
+                          {supporting ? ' · stödjer' : ''}
+                        </option>
+                      ))}
                     </select>
                   </label>
-                </details>
-                <p className="m-0 text-base text-ink-soft">
-                  Kroppsdelar är träningsmål, inte en bedömning av vad som
-                  passar dig.
-                </p>
-              </fieldset>
-              <label className="flex flex-col gap-2 text-lg font-bold">
-                Lägg till övning
-                <select
-                  className={inputClass}
-                  value={addId}
-                  onChange={(event) =>
-                    setAddId(event.target.value as ExerciseId | '')
-                  }
-                >
-                  <option value="">
-                    {pickable.length ? 'Välj övning' : 'Inga övningar passar'}
-                  </option>
-                  {pickable.map(({ exercise, supporting }) => (
-                    <option key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                      {supporting ? ' · stödjer' : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {pickable.length === 0 ? (
-                <p className="m-0 text-base text-ink-soft">
-                  Inga fler övningar passar vald kroppsdel och din utrustning.
-                  Välj Alla eller ändra utrustning i Min utrustning.
-                </p>
-              ) : null}
+                  {pickable.length === 0 ? (
+                    <p className="m-0 text-base text-ink-soft">
+                      Inga fler övningar passar vald kroppsdel och din
+                      utrustning. Välj Alla eller ändra utrustning i Min
+                      utrustning.
+                    </p>
+                  ) : null}
 
-              <Button
-                variant="secondary"
-                disabled={!addId || plan.length >= 12}
-                onClick={() => {
-                  if (addId)
-                    updatePlan((current) => [
-                      ...current,
+                  <Button
+                    variant="secondary"
+                    disabled={!addId || plan.length >= 12}
+                    onClick={() => {
+                      if (addId)
+                        updatePlan((current) => [
+                          ...current,
 
-                      basePlan(addId, preferences),
-                    ]);
+                          basePlan(addId, preferences),
+                        ]);
 
-                  if (addId) setExpandedIndex(plan.length);
-                  setAddId('');
-                }}
-              >
-                Lägg till i passet
-              </Button>
+                      if (addId) setExpandedIndex(plan.length);
+                      setAddId('');
+                    }}
+                  >
+                    Lägg till i passet
+                  </Button>
+                </>
+              )}
             </>
           ) : (
             <ReadyWorkout
@@ -1230,21 +1273,9 @@ function PreviewEditor({
               Anpassa passet.
             </p>
           ) : null}
-          {preferences.programId === 'rehab' ? (
-            <label className="flex min-h-12 items-start gap-3 py-3 text-base">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(event) => setConfirmed(event.target.checked)}
-                className="size-6 shrink-0"
-              />
-              {rehabGroup(preferences) === 'aaos'
-                ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
-                : rehabGroup(preferences) === 'physio'
-                  ? 'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten.'
-                  : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
-            </label>
-          ) : (
+          {preferences.programId === 'rehab' && !physioPaper ? (
+            confirmBox
+          ) : preferences.programId === 'rehab' ? null : (
             <details className="border-y-2 border-edge py-2">
               <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
                 Besvär eller något att anpassa idag?
@@ -1371,9 +1402,18 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-4">
-            <div className="mx-auto w-full max-w-xl">
+          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-3">
+            <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
+              {physioPaper ? confirmBox : null}
+              {physioPaper && !confirmed ? (
+                <p id="start-blocked" className="m-0 text-base font-bold">
+                  Bekräfta att du jämfört med pappret för att börja.
+                </p>
+              ) : null}
               <Button
+                aria-describedby={
+                  physioPaper && !confirmed ? 'start-blocked' : undefined
+                }
                 disabled={
                   busy ||
                   !ready ||

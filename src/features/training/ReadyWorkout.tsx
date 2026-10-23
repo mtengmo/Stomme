@@ -5,9 +5,13 @@ import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import { exerciseMuscles } from '../../content/muscles';
 import {
+  physioForm,
+  physioHoldNote,
   physioKneeFitCount,
+  physioKneeItemFor,
   physioKneeTotal,
   physioProgressionNotes,
+  physioSwapNote,
 } from '../../content/physioKneeProgramme';
 import { rehabGroup } from '../../content/programmes';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
@@ -71,10 +75,9 @@ export function ReadyWorkout({
       ) : null}
       {physio ? (
         <p className="m-0 text-base">
-          Förifyllt från fysioterapeutens knäprogram. Kontrollera mot ditt
-          papper och ändra vid behov. {physioKneeFitCount(preferences)} av{' '}
-          {physioKneeTotal} övningar passar din utrustning. Setvilan på 60
-          sekunder är appens justerbara standard. Avbryt en övning som gör ont.
+          {physioForm} {physioKneeFitCount(preferences)} av {physioKneeTotal}{' '}
+          övningar passar din utrustning. Setvilan på 60 sekunder är appens
+          justerbara standard. Avbryt en övning som gör ont.
         </p>
       ) : null}
       {!knee && !physio && preferences.programId !== 'rehab' ? (
@@ -104,6 +107,12 @@ export function ReadyWorkout({
                 ? ' vänster'
                 : ' höger'
               : ' per sida';
+          const sheetNo = physioKneeItemFor(item.exerciseId)?.sheetNo;
+          const lead = physio
+            ? sheetNo
+              ? `${sheetNo}. `
+              : ''
+            : `${index + 1}. `;
           const note =
             item.explanation &&
             !item.explanation.startsWith('Startförslag') &&
@@ -120,8 +129,8 @@ export function ReadyWorkout({
                   href={`/ovning/${item.exerciseId}`}
                   className="flex min-h-12 items-center text-xl font-bold underline"
                 >
-                  {index + 1}. {exerciseReferences[exercise.id]} ·{' '}
-                  {exercise.name}
+                  {lead}
+                  {exerciseReferences[exercise.id]} · {exercise.name}
                 </Link>
                 <p className="m-0 text-base">
                   {item.sets} × {item.target}
@@ -159,6 +168,16 @@ export function ReadyWorkout({
           );
         })}
       </ol>
+      {physio ? (
+        <p className="m-0 text-base">
+          Numren är papperets övningsnummer. {physioSwapNote}
+          {ids.some(
+            (id) => id === 'seated-knee-extension' || id === 'hamstring-curl',
+          )
+            ? ` ${physioHoldNote}`
+            : ''}
+        </p>
+      ) : null}
       {knee ? (
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">

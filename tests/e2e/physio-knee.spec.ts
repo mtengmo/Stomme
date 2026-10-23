@@ -12,7 +12,7 @@ async function openProgramme(
   await page.goto('/');
   await page
     .getByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
+      name: 'Jag har fysioterapeutens knäprogram',
     })
     .click();
   await page.getByRole('checkbox', { name: 'Stabil stol eller bänk' }).check();
@@ -43,11 +43,9 @@ test('physio programme: prefilled overview, confirmation gate, notes and navigat
     page.getByText(/9 av 9 övningar passar din utrustning/),
   ).toBeVisible();
   await expect(page.locator('#ready-workout ~ ol > li')).toHaveCount(9);
+  await expect(page.getByText('Stegring av övning 4.')).toBeVisible();
   await expect(
-    page.getByText('Stegring av övning 4 (E30 Sittande knästräckning).'),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/Nästa steg på papperet: övning 5/).first(),
+    page.getByText('Nästa steg på papperet: övning 5.'),
   ).toBeVisible();
   await expect(page.getByText(/rekommenderad/i)).toHaveCount(0);
 

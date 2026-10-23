@@ -105,19 +105,17 @@ describe('physio knee programme', () => {
 
   it('derives progression notes at draw time', () => {
     expect(physioProgressionNotes('band-knee-extension')).toEqual([
-      'Stegring av övning 4 (E30 Sittande knästräckning).',
+      'Stegring av övning 4.',
     ]);
-    expect(physioProgressionNotes('band-hip-extension')[0]).toMatch(
-      /^Stegring av övning 6 \(E29 /,
-    );
-    const four = physioProgressionNotes('seated-knee-extension');
-    expect(four[0]).toMatch(
-      /^Nästa steg på papperet: övning 5 \(E51 .+\)\. Byt när du och din fysioterapeut kommit överens\.$/,
-    );
-    expect(four).toContain(
-      'Hållningen på 5 sekunder kommer från AAOS: följ ditt papper om det skiljer sig.',
-    );
-    expect(physioProgressionNotes('hamstring-curl')).toHaveLength(2);
+    expect(physioProgressionNotes('band-hip-extension')).toEqual([
+      'Stegring av övning 6.',
+    ]);
+    expect(physioProgressionNotes('seated-knee-extension')).toEqual([
+      'Nästa steg på papperet: övning 5.',
+    ]);
+    expect(physioProgressionNotes('hamstring-curl')).toEqual([
+      'Nästa steg på papperet: övning 7.',
+    ]);
     expect(physioProgressionNotes('quad-set')).toEqual([]);
   });
 });
