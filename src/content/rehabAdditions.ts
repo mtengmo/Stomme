@@ -91,7 +91,7 @@ export const rehabAdditions: Exercise[] = [
     [
       'Lägg dig på mage med benen avslappnade och bäckenet kvar mot underlaget.',
       'Placera armbågarna ungefär under axlarna och vila på underarmarna. Lyft bröstkorgen bekvämt utan att trycka upp på raka armar.',
-      'Sänk överkroppen lugnt tillbaka till underlaget.',
+      'Håll läget under tiden som visas och andas lugnt. Sänk sedan överkroppen tillbaka till underlaget.',
     ],
     'Armbågarna sträcks så att rörelsen blir en armhävningsliknande press.',
     'Vila på magen med huvudet vänt åt sidan om underarmsstödet inte känns bekvämt.',

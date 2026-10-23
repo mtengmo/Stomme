@@ -43,7 +43,7 @@ First-use setup offers Allmän styrka, Styrka för löpning and Mitt rehabprogra
 
 Readiness, exercise effort and symptoms are separate answers. Report symptoms with body area/side, including during an exercise. General/running suggestions use only that direction's completed history; symptoms block automatic increases and rehab never progresses automatically. Conditional next-day questions appear inside the app. See the policy in [the implementation plan](docs/general-strength-plan.md).
 
-The library combines purpose, muscle, equipment and technical-level filters, supports name/reference search and links to the AAOS-derived knee collection. Source content and differences are documented in [the source review](docs/exercise-source-review.md). Historical sessions and schema-1 backups remain supported; new exports use schema 2.
+The library combines purpose, muscle, equipment and technical-level filters, supports name/reference search and links to the AAOS-derived knee collection. Source content and differences are documented in [the source review](docs/exercise-source-review.md), with the E01–E53 text/pose findings in [the animation audit](docs/exercise-animation-audit.md). Historical sessions and schema-1 backups remain supported; new exports use schema 2.
 
 Settings always shows the installed version/commit and offers Sök efter uppdatering. Update checks run on registration, foreground return, reconnect and periodically while visible/online. Applying an update requires consent and defers reload during active workout/input routes, including when another tab accepts an update. See [update recovery](docs/update-recovery.md) for an old client that has not yet received this mechanism.
 

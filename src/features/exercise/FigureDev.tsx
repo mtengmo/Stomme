@@ -1,9 +1,8 @@
 import { exerciseList } from '../../content/exercises';
-import { FigureFrame, lerpPose, movementPose } from '../../figures/Figure';
+import { FigureFrame, movementPose } from '../../figures/Figure';
 import { figures } from '../../figures/poses';
 
-/** The knee-programme figures define their own mid-cycle pose. */
-const PHYSIO_IDS: ReadonlySet<string> = new Set([
+const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'quad-set',
   'seated-knee-flexion',
   'band-knee-extension',
@@ -34,22 +33,11 @@ export function FigureDev() {
                       exerciseId={ex.id}
                       pose={
                         k === 'middle'
-                          ? PHYSIO_IDS.has(ex.id)
-                            ? movementPose(ex.id, 0.5)
-                            : lerpPose(
-                                figures[ex.id].start,
-                                figures[ex.id].end,
-                                0.5,
-                              )
+                          ? movementPose(ex.id, 0.5)
                           : figures[ex.id][k]
                       }
                       working={w}
-                      showMuscles={[
-                        'goblet-chair-squat',
-                        'single-leg-rdl',
-                        'dead-bug',
-                        'quad-set',
-                      ].includes(ex.id)}
+                      showMuscles={false}
                     />
                     <p className="m-0 text-center text-base">
                       {k === 'start'
@@ -62,7 +50,7 @@ export function FigureDev() {
                 )),
               )}
             </div>
-            {PHYSIO_IDS.has(ex.id) ? (
+            {SEQUENCE_IDS.has(ex.id) ? (
               <div
                 className="mt-2 grid grid-cols-3 gap-1"
                 data-testid="figure-sequence"

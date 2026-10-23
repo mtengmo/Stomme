@@ -213,7 +213,6 @@ export function ExerciseCardBody({
             >
               <Figure
                 exerciseId={exercise.id}
-                stillOnly={review}
                 working={working}
                 equipment={presentation.equipment}
                 paused={paused || reducedMotion}

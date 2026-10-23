@@ -276,6 +276,12 @@ export function FigureFrame({
     !showMuscles || exerciseId === 'quad-set' ? 'var(--accent)' : 'var(--ink)';
   const farSide =
     working === null && !showMuscles ? 'var(--accent)' : 'var(--edge)';
+  // Dead bug and bird dog pair the selected arm with the opposite leg.
+  // Colour those two moving limbs together so the picture agrees with the
+  // instruction instead of implying an ipsilateral arm/leg pair.
+  const crossBody =
+    working !== null &&
+    (exerciseId === 'dead-bug' || exerciseId === 'bird-dog');
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
     working === 'left' ? 'translate(192 0) scale(-1 1)' : undefined;
@@ -316,7 +322,10 @@ export function FigureFrame({
         ) : null}
         <g data-body-side="far" stroke={farSide} {...limb}>
           <path d={arm(p.eL, p.hL)} />
-          <path d={leg(p.kL, p.aL, p.tL)} />
+          <path
+            d={leg(p.kL, p.aL, p.tL)}
+            stroke={crossBody ? 'var(--accent)' : undefined}
+          />
         </g>
         <g stroke="var(--ink)" {...limb}>
           <path d={line([p.neck, p.hip])} />
@@ -328,8 +337,14 @@ export function FigureFrame({
           </g>
         ) : null}
         <g data-body-side="near" stroke={accent} {...limb}>
-          <path d={arm(p.eR, p.hR)} />
-          <path d={leg(p.kR, p.aR, p.tR)} />
+          <path
+            d={arm(p.eR, p.hR)}
+            stroke={crossBody ? 'var(--accent)' : undefined}
+          />
+          <path
+            d={leg(p.kR, p.aR, p.tR)}
+            stroke={crossBody ? 'var(--edge)' : undefined}
+          />
         </g>
         {rack ? (
           <g

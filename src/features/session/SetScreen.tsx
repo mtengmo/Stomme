@@ -4,7 +4,6 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
-import { usePrefersReducedMotion } from '../../figures/Figure';
 import { formatClock } from '../../lib/format';
 import { useTimedHold } from '../../lib/useTimedHold';
 import type { SetStep } from '../../rules/sessionPlan';
@@ -56,7 +55,6 @@ export function SetScreen({
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
   const [weightKg, setWeightKg] = useState(initialWeightKg);
-  const reducedMotion = usePrefersReducedMotion();
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];

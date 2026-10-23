@@ -134,7 +134,9 @@ test('reduced motion keeps browsing and review still', async ({ page }) => {
     page
       .getByRole('region', { name: 'Rörelsen' })
       .locator('.exercise-stage svg'),
-  ).toHaveCount(1);
+  ).toHaveCount(2);
+  await expect(page.getByText('Start', { exact: true })).toBeVisible();
+  await expect(page.getByText('Slut', { exact: true })).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Mitt', exact: true }),
   ).toHaveCount(0);

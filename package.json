@@ -32,6 +32,7 @@
     "audit:a11y": "tsx scripts/contrast.ts && tsx scripts/a11y-audit.ts",
     "shots": "npm run build && tsx scripts/screenshots.ts",
     "shots:muscles": "tsx scripts/muscle-shots.ts",
+    "shots:exercises": "tsx scripts/exercise-review-shots.ts",
     "icons": "pwa-assets-generator"
   },
   "dependencies": {

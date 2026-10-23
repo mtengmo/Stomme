@@ -86,6 +86,29 @@ describe('catalogue equipment and contacts', () => {
     }
   });
 
+  it.each(['dead-bug', 'bird-dog'] as const)(
+    '%s highlights the selected arm and opposite leg',
+    (exerciseId) => {
+      for (const showMuscles of [false, true]) {
+        const markup = renderToStaticMarkup(
+          <FigureFrame
+            exerciseId={exerciseId}
+            pose={movementPose(exerciseId, 1)}
+            working="right"
+            showMuscles={showMuscles}
+          />,
+        );
+        const far = markup.split('data-body-side="far"')[1]?.split('</g>')[0];
+        const near = markup.split('data-body-side="near"')[1]?.split('</g>')[0];
+        expect(far).toContain('<path');
+        expect(far).toContain('stroke="var(--accent)"');
+        expect(near).toContain('<path');
+        expect(near).toContain('stroke="var(--accent)"');
+        expect(near).toContain('stroke="var(--edge)"');
+      }
+    },
+  );
+
   it('supports the rack bell outside the forearm and draws the grip above it', () => {
     for (const working of ['right', 'left'] as const) {
       for (const t of [0, 0.5, 1]) {

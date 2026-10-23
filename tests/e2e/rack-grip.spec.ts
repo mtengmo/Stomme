@@ -8,7 +8,10 @@ for (const mode of [
     page,
   }) => {
     await page.setViewportSize({ width: mode.width, height: 900 });
-    await page.emulateMedia({ colorScheme: mode.colorScheme });
+    await page.emulateMedia({
+      colorScheme: mode.colorScheme,
+      reducedMotion: 'no-preference',
+    });
     await page.goto('/#/granska?ovning=E40');
     const movement = page.getByRole('region', { name: 'Rörelsen' });
     await expect(movement.locator('[data-grip="rack"]')).toHaveCount(1);
