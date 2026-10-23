@@ -43,8 +43,15 @@ describe('exercise library', () => {
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
+    // Read the links once: one getByRole per exercise walks the whole
+    // accessibility tree 53 times and times out under coverage.
+    const linkNames = new Set(
+      Array.from(document.querySelectorAll('a')).map((a) =>
+        (a.getAttribute('aria-label') ?? a.textContent ?? '').trim(),
+      ),
+    );
     for (const exercise of Object.values(exercises)) {
-      expect(screen.getByRole('link', { name: exercise.name })).toBeTruthy();
+      expect(linkNames.has(exercise.name), exercise.name).toBe(true);
     }
     expect(
       screen.getAllByRole('link', { name: 'Ingår i Pass A' }),
