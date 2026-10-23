@@ -77,12 +77,15 @@ test('physio programme: seven items without a band, fixing it, saved plan wins, 
       /Papperets övning 5: Knästräckning med gummiband – kräver träningsband/,
     ),
   ).toBeVisible();
+  await expect(
+    page.getByText(/7 av 9 övningar passar din utrustning/),
+  ).toBeVisible();
   await page.getByRole('link', { name: 'Ändra utrustning' }).click();
   await page.getByRole('checkbox', { name: 'Träningsband' }).check();
   await page.getByRole('button', { name: 'Spara träningsinriktning' }).click();
   await expect(page.locator('#ready-workout ~ ol > li')).toHaveCount(9);
   await expect(
-    page.getByText(/7 av 9 övningar passar din utrustning/),
+    page.getByText(/9 av 9 övningar passar din utrustning/),
   ).toBeVisible();
 
   await page
