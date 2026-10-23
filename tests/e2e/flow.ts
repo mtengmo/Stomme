@@ -105,7 +105,7 @@ export async function playPassA(
       await action.click();
       // Pass A ends with two right/left pairs of 20-second side planks.
       for (let set = 0; set < 2; set++) {
-        for (const side of ['Höger sida', 'Vänster sida']) {
+        for (const side of ['Höger sida nedåt', 'Vänster sida nedåt']) {
           await expect(page.getByText(side, { exact: true })).toBeVisible();
           await expect(page.getByRole('timer')).toHaveText('0:05');
           await page.clock.fastForward(5_000);

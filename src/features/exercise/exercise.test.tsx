@@ -29,9 +29,7 @@ describe('ExerciseCardBody', () => {
     ).toBeTruthy();
     expect(screen.getByText('Handen runt handtaget.')).toBeTruthy();
     expect(screen.getByText('Kulan mot underarmen.')).toBeTruthy();
-    await user.click(
-      screen.getByRole('button', { name: /Höger sida · Byt sida/ }),
-    );
+    await user.click(screen.getByRole('button', { name: /Byt sida/ }));
     expect(
       screen.getByRole('figure', {
         name: 'Kettlebellgrepp vid axeln, vänster sida',
@@ -122,6 +120,6 @@ describe('inline workout technique', () => {
     expect(screen.queryByText(/och blå linje/)).toBeNull();
     cleanup();
     render(<ExerciseCardBody exercise={exercises['step-up']} side="left" />);
-    expect(screen.getByText(/vänster sida arbetar/)).toBeTruthy();
+    expect(screen.getByText(/Stå på det vänstra benet/)).toBeTruthy();
   });
 });

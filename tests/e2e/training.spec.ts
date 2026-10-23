@@ -201,7 +201,9 @@ test('rehab uses explicitly entered dose and selected left side through reload',
     page.getByRole('button', { name: 'Klar set', exact: true }),
   ).toBeVisible();
   await page.reload();
-  await expect(page.getByText('Vänster ben', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Vänster ben rör sig', { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText(/Sedan: byt till vänster/)).toHaveCount(0);
   await page.getByRole('button', { name: 'Klar set', exact: true }).click();
   await expect(

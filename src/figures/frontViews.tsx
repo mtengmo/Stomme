@@ -8,6 +8,9 @@ export const supportedFrontViews = [
   'goblet-squat',
   'dumbbell-rdl',
   'kettlebell-rack-carry',
+  'step-up',
+  'rear-foot-split-squat',
+  'suitcase-carry',
 ] as const satisfies readonly ExerciseId[];
 
 export type FrontViewExercise = (typeof supportedFrontViews)[number];
@@ -47,6 +50,66 @@ export function frontMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'step-up' || exerciseId === 'rear-foot-split-squat') {
+    const step = exerciseId === 'step-up';
+    const hipY = step ? mix(108, 84, t) : mix(112, 140, t);
+    const neckY = hipY - 44;
+    // Feet occupy distinct depth planes: the support remains fixed while the
+    // trailing foot rises (step-up) or rests on the rear bench (split squat).
+    const selected = {
+      knee: point(82, step ? mix(117, 113, t) : mix(146, 155, t)),
+      ankle: point(82, step ? 143 : 174),
+      toe: point(72, step ? 146 : 177),
+    };
+    const other = {
+      knee: point(118, step ? mix(140, 113, t) : mix(132, 155, t)),
+      ankle: point(120, step ? mix(174, 138, t) : 139),
+      toe: point(130, step ? mix(177, 141, t) : 142),
+    };
+    const right = working === 'left' ? other : selected;
+    const left = working === 'left' ? selected : other;
+    // Anatomical right is always viewer-left; select geometry before placing it.
+    const place = (p: Pt, side: 'R' | 'L'): Pt =>
+      point(
+        side === 'R' ? 100 - Math.abs(p[0] - 100) : 100 + Math.abs(p[0] - 100),
+        p[1],
+      );
+    return skeleton(
+      point(100, neckY - 14),
+      point(100, neckY),
+      point(100, hipY),
+      point(78, neckY + 22),
+      point(72, neckY + 44),
+      point(122, neckY + 22),
+      point(128, neckY + 44),
+      place(right.knee, 'R'),
+      place(right.ankle, 'R'),
+      place(right.toe, 'R'),
+      place(left.knee, 'L'),
+      place(left.ankle, 'L'),
+      place(left.toe, 'L'),
+    );
+  }
+  if (exerciseId === 'suitcase-carry') {
+    const stride = Math.sin(2 * Math.PI * t);
+    const rightLift = Math.max(0, stride);
+    const leftLift = Math.max(0, -stride);
+    return skeleton(
+      point(100, 46),
+      point(100, 60),
+      point(100, 104),
+      point(78, 84),
+      point(72, 108),
+      point(122, 84),
+      point(128, 108),
+      point(82, 140 - 6 * rightLift),
+      point(80, 174 - 9 * rightLift),
+      point(70, 177 - 9 * rightLift),
+      point(118, 146 - 6 * leftLift),
+      point(120, 174 - 9 * leftLift),
+      point(130, 177 - 9 * leftLift),
+    );
+  }
   if (exerciseId === 'goblet-squat') {
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
@@ -141,9 +204,12 @@ export function FrontFigureFrame({
     equipment === 'band'
       ? null
       : equipment === undefined
-        ? exerciseId === 'kettlebell-rack-carry'
-          ? 'kettlebell'
-          : 'dumbbell'
+        ? exerciseId === 'rear-foot-split-squat'
+          ? null
+          : exerciseId === 'kettlebell-rack-carry' ||
+              exerciseId === 'suitcase-carry'
+            ? 'kettlebell'
+            : 'dumbbell'
         : equipment;
   const rackSide: 'R' | 'L' = working === 'left' ? 'L' : 'R';
   const heldAt: Pt[] =
@@ -151,9 +217,10 @@ export function FrontFigureFrame({
       ? []
       : exerciseId === 'goblet-squat'
         ? [[100, pose.neck[1] + 11]]
-        : exerciseId === 'kettlebell-rack-carry'
+        : exerciseId === 'kettlebell-rack-carry' ||
+            exerciseId === 'suitcase-carry'
           ? [rackSide === 'R' ? pose.hR : pose.hL]
-          : kind === 'kettlebell'
+          : kind === 'kettlebell' && exerciseId !== 'step-up'
             ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
             : [pose.hR, pose.hL];
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
@@ -167,7 +234,7 @@ export function FrontFigureFrame({
 
   return (
     <svg
-      viewBox={viewBox}
+      viewBox={exerciseId === 'step-up' ? '14 0 164 188' : viewBox}
       role="img"
       aria-hidden="true"
       className="block h-auto w-full"
@@ -175,6 +242,22 @@ export function FrontFigureFrame({
     >
       <title>{`${exerciseId} – front`}</title>
       <FloorLine />
+      {exerciseId === 'step-up' || exerciseId === 'rear-foot-split-squat' ? (
+        <g
+          data-support={exerciseId === 'step-up' ? 'step' : 'rear-bench'}
+          fill="var(--surface)"
+          stroke="var(--equipment)"
+          strokeWidth="2"
+        >
+          <rect
+            x={(exerciseId === 'step-up') === (working !== 'left') ? 61 : 107}
+            y={exerciseId === 'step-up' ? 146 : 142}
+            width="34"
+            height={exerciseId === 'step-up' ? 31 : 35}
+            rx="2"
+          />
+        </g>
+      ) : null}
       {heldIsRack && kind === 'kettlebell' ? (
         <g data-equipment="kettlebell" data-grip="rack">
           <Held kind="kettlebell" at={heldAt[0] ?? pose.hR} rack />

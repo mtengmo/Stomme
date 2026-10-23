@@ -59,7 +59,7 @@ export const rehabAdditions: Exercise[] = [
     [
       'Ligg på sidan med underarmen i golvet och armbågen under axeln. Placera den övre foten på en stadig bänk och ha den nedre foten lätt mot golvet.',
       'Pressa genom underarmen och den övre foten så att höften lyfts till en rak sidoplanka. Håll kroppen stabil och lyft den nedre foten mot den övre.',
-      'Sänk den nedre foten till golvet med kontroll. Sänk sedan höften lugnt. Benlyft och återgång är en repetition.',
+      'Sänk den nedre foten kontrollerat till golvet medan höften hålls uppe. Ett benlyft och en sänkning är en repetition. Sänk höften lugnt när setet är klart.',
     ],
     'Höften sjunker, kroppen vrids eller underbenet svingas upp med fart.',
     'Låt höften vila i golvet och öva en liten rörelse med det nedre benet.',

@@ -124,7 +124,7 @@ for (const width of [360, 390, 1280]) {
       page.getByRole('heading', { name: 'Sidoplanka', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText(/Sedan: byt till vänster sida. Du får 5 sekunder/),
+      page.getByText(/Sedan: Vänster sida nedåt. Du får 5 sekunder/),
     ).toBeVisible();
     const frame = page.locator('[data-step]');
     const step = await frame.getAttribute('data-step');
@@ -151,7 +151,9 @@ for (const width of [360, 390, 1280]) {
       .getByRole('button', { name: 'Fortsätt timer', exact: true })
       .click();
     await page.clock.fastForward(15_000);
-    await expect(page.getByText('Vänster sida', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Vänster sida nedåt', { exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole('timer')).toHaveText('0:05');
     await page.clock.fastForward(5_000);
     await expect(page.getByRole('timer')).toHaveText('0:20');
@@ -170,12 +172,16 @@ for (const width of [360, 390, 1280]) {
       .getByRole('button', { name: 'Fortsätt vila', exact: true })
       .click();
     await page.clock.fastForward(60_000);
-    await expect(page.getByText('Höger sida', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Höger sida nedåt', { exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole('timer')).toHaveText('0:05');
     await page.clock.fastForward(5_000);
     await expect(page.getByRole('timer')).toHaveText('0:20');
     await page.clock.fastForward(20_000);
-    await expect(page.getByText('Vänster sida', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Vänster sida nedåt', { exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole('timer')).toHaveText('0:05');
     await page.clock.fastForward(5_000);
     await expect(page.getByRole('timer')).toHaveText('0:20');

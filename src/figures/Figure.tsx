@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { ExerciseId } from '../domain/types';
 import {
   hamstringCurlPose,
@@ -17,7 +18,7 @@ import {
   type Pose,
   type PoseKey,
 } from './poses';
-import { FloorLine, Held, PropShape } from './props';
+import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
 
 export { supportedFrontViews } from './frontViews';
@@ -70,13 +71,14 @@ export function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-/** Hold at the end of a repetition, where it differs from the default. */
-const END_HOLD_MS: Partial<Record<ExerciseId, number>> = {
-  'seated-knee-extension': 5000,
-  'band-knee-extension': 5000,
-  'single-leg-floor-bridge': 2000,
-  'quad-set': 3000,
-};
+/** Demonstration timing follows the same explicit repetition cues as the guide. */
+export function demonstrationTiming(id: ExerciseId) {
+  const metadata = exerciseMetadata[id];
+  return {
+    endHoldMs: (metadata.holdSeconds ?? (id === 'quad-set' ? 3 : 0.8)) * 1000,
+    startHoldMs: (metadata.relaxSeconds ?? 0.8) * 1000,
+  };
+}
 
 const nudge = (pt: Pt, by: Pt | undefined): Pt =>
   by ? [pt[0] + by[0], pt[1] + by[1]] : pt;
@@ -199,6 +201,10 @@ export function FigureFrame({
     wallX !== undefined &&
     (working === 'left' ? 192 - wallX : wallX) < 48;
   const rack = exerciseId === 'kettlebell-rack-carry' && equipment !== null;
+  const pressGrip =
+    (exerciseId === 'kettlebell-press' ||
+      exerciseId === 'kettlebell-floor-press') &&
+    equipment !== null;
   let p = pose;
   // With external load, hands carry it rather than resting on the support.
   if (
@@ -331,9 +337,17 @@ export function FigureFrame({
           <path d={line([p.neck, p.hip])} />
           <circle cx={p.head[0]} cy={p.head[1]} r="9" fill="var(--paper)" />
         </g>
-        {rack ? (
-          <g data-equipment="kettlebell" data-grip="rack">
-            <Held kind="kettlebell" at={p.hR} rack />
+        {rack || pressGrip ? (
+          <g
+            data-equipment="kettlebell"
+            data-grip={pressGrip ? 'press' : 'rack'}
+          >
+            <Held
+              kind="kettlebell"
+              at={p.hR}
+              rack
+              angle={pressGrip ? pressGripAngle(p.eR, p.hR) : undefined}
+            />
           </g>
         ) : null}
         <g data-body-side="near" stroke={accent} {...limb}>
@@ -346,7 +360,7 @@ export function FigureFrame({
             stroke={crossBody ? 'var(--edge)' : undefined}
           />
         </g>
-        {rack ? (
+        {rack || pressGrip ? (
           <g
             data-rack-hand="true"
             stroke={accent}
@@ -358,7 +372,7 @@ export function FigureFrame({
             <path d={`M${p.hR[0] - 3} ${p.hR[1]}h4`} />
           </g>
         ) : null}
-        {rack ? null : spec.band && equipment !== null ? (
+        {rack || pressGrip ? null : spec.band && equipment !== null ? (
           <path
             data-equipment="band"
             d={bandShape(spec.band, p).d}
@@ -442,7 +456,11 @@ export function Figure({
       setT(
         spec.motion === 'ballistic'
           ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-          : cycleProgress(elapsedMs.current, END_HOLD_MS[exerciseId]),
+          : cycleProgress(
+              elapsedMs.current,
+              demonstrationTiming(exerciseId).endHoldMs,
+              demonstrationTiming(exerciseId).startHoldMs,
+            ),
       );
       raf = requestAnimationFrame(tick);
     };

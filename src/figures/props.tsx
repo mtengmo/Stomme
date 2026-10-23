@@ -1,6 +1,18 @@
 import type { Prop } from './poses';
 
 export const FLOOR_Y = 178;
+
+/** Supported press grip: bell body beside and below the hand, along the forearm. */
+export function pressGripAngle(
+  elbow: readonly [number, number],
+  hand: readonly [number, number],
+): number {
+  return (
+    (Math.atan2(elbow[1] - hand[1], elbow[0] - hand[0]) * 180) / Math.PI -
+    90 -
+    55
+  );
+}
 const PROP = {
   stroke: 'var(--edge)',
   strokeWidth: 3,
@@ -58,11 +70,13 @@ export function Held({
   at,
   vertical = false,
   rack = false,
+  angle,
 }: {
   kind: 'dumbbell' | 'kettlebell';
   at: readonly [number, number];
   vertical?: boolean;
   rack?: boolean;
+  angle?: number;
 }) {
   const [x, y] = at;
   if (kind === 'dumbbell') {
@@ -84,7 +98,13 @@ export function Held({
       {...PROP}
       stroke="var(--equipment)"
       strokeWidth={4}
-      transform={rack ? `rotate(-55 ${x} ${y})` : undefined}
+      transform={
+        angle !== undefined
+          ? `rotate(${angle} ${x} ${y})`
+          : rack
+            ? `rotate(-55 ${x} ${y})`
+            : undefined
+      }
     >
       <path d={`M${x - 5} ${y + 2}A5 6 0 0 1 ${x + 5} ${y + 2}`} />
       <circle

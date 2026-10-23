@@ -3,6 +3,7 @@ import { type SetStateAction, useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
+import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exerciseList, exercises } from '../../content/exercises';
 import {
   kneeConditioningPlan,
@@ -1045,6 +1046,8 @@ function PreviewEditor({
                             <label className="flex flex-col gap-1 text-base font-bold">
                               Arbetande sida
                               <select
+                                aria-label="Arbetande sida"
+                                aria-describedby={`side-cue-${index}`}
                                 value={
                                   item.sides?.length === 1
                                     ? item.sides[0]
@@ -1072,6 +1075,20 @@ function PreviewEditor({
 
                                 <option value="left">Endast vänster</option>
                               </select>
+                              <span
+                                id={`side-cue-${index}`}
+                                className="text-base font-normal text-ink-soft"
+                              >
+                                {
+                                  exerciseSideCue(
+                                    exercise.id,
+                                    item.sides?.length === 1 &&
+                                      item.sides[0] === 'left'
+                                      ? 'left'
+                                      : 'right',
+                                  )?.explanation
+                                }
+                              </span>
                             </label>
                           ) : null}
 

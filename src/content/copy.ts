@@ -5,6 +5,7 @@ import type {
   ReasonCode,
   Unit,
 } from '../domain/types';
+import { exerciseSideCue } from './exerciseSideCues';
 
 export const UNIT_WORD: Record<Unit, string> = {
   reps: 'reps',
@@ -30,10 +31,12 @@ const SIDE_NOUN = { ben: 'ben', sida: 'sida', hand: 'hand' } as const;
 
 /** "Höger ben", "Vänster sida", "Höger hand"; empty for two-sided exercises. */
 export function sideLabel(
-  ex: Pick<Exercise, 'perSide' | 'sideKind'>,
+  ex: Pick<Exercise, 'perSide' | 'sideKind'> & Partial<Pick<Exercise, 'id'>>,
   side: 'right' | 'left' | 'both',
 ): string {
   if (!ex.perSide || side === 'both') return '';
+  const cue = ex.id ? exerciseSideCue(ex.id, side) : undefined;
+  if (cue) return cue.label.charAt(0).toUpperCase() + cue.label.slice(1);
   const noun = SIDE_NOUN[ex.sideKind ?? 'ben'];
   return `${side === 'right' ? 'Höger' : 'Vänster'} ${noun}`;
 }

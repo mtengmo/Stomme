@@ -81,7 +81,7 @@ export function SetScreen({
   const timerActive = hold.phase === 'prepare' || hold.phase === 'hold';
   const nextCue =
     step.side === 'right' && !singleSide
-      ? `Sedan: byt till vänster ${exercise.sideKind === 'ben' ? 'ben' : exercise.sideKind === 'hand' ? 'hand' : 'sida'}${unit === 'seconds' ? '. Du får 5 sekunder att byta.' : ', utan vila.'}`
+      ? `Sedan: ${sideLabel(exercise, 'left')}.${unit === 'seconds' ? ' Du får 5 sekunder att byta.' : ' Byt utan vila.'}`
       : step.setNumber < totalSets
         ? 'Sedan: vila före nästa set.'
         : 'Sedan: bedöm hur ansträngande övningen var.';

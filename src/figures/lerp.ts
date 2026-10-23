@@ -12,13 +12,18 @@ export function lerp(a: number, b: number, t: number): number {
 }
 
 /** 0 = start pose, 1 = end pose: hold, ease to end, hold, ease back. */
-export function cycleProgress(ms: number, endHoldMs = HOLD_MS): number {
-  const cycleMs = HOLD_MS + 2 * TWEEN_MS + endHoldMs;
+export function cycleProgress(
+  ms: number,
+  endHoldMs = HOLD_MS,
+  startHoldMs = HOLD_MS,
+): number {
+  const cycleMs = startHoldMs + 2 * TWEEN_MS + endHoldMs;
   const m = ((ms % cycleMs) + cycleMs) % cycleMs;
-  if (m < HOLD_MS) return 0;
-  if (m < HOLD_MS + TWEEN_MS) return easeInOut((m - HOLD_MS) / TWEEN_MS);
-  if (m < HOLD_MS + TWEEN_MS + endHoldMs) return 1;
-  return 1 - easeInOut((m - HOLD_MS - TWEEN_MS - endHoldMs) / TWEEN_MS);
+  if (m < startHoldMs) return 0;
+  if (m < startHoldMs + TWEEN_MS)
+    return easeInOut((m - startHoldMs) / TWEEN_MS);
+  if (m < startHoldMs + TWEEN_MS + endHoldMs) return 1;
+  return 1 - easeInOut((m - startHoldMs - TWEEN_MS - endHoldMs) / TWEEN_MS);
 }
 
 export type Pt = readonly [number, number];

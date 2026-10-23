@@ -24,9 +24,7 @@ for (const mode of [
       'viewBox',
       '94 73 43 42',
     );
-    await movement
-      .getByRole('button', { name: /Höger sida · Byt sida/ })
-      .click();
+    await movement.getByRole('button', { name: /Byt sida/ }).click();
     const left = page.getByRole('figure', {
       name: 'Kettlebellgrepp vid axeln, vänster sida',
     });

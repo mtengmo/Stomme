@@ -2,6 +2,8 @@
 
 Reviewed 2026-10-23 against the current E01–E53 catalogue.
 
+Follow-up correction and implementation: [the handoff and verification record](animation-fix-handoff.md) documents the subsequent E42 wording, E27/E39 grip, side-label and timing fixes, plus three additional front views. The group results below describe the initial static/source inspection, not full-loop or beginner-usability certification. E42's initial instruction to lower the hip each repetition has been corrected to match the raised-hip loop. The review page already animated with normal motion preferences; that release improved its reduced-motion frames.
+
 ## Method
 
 - Compared every instruction's setup, moving limb, direction, return, support contact and equipment with the authored start, midpoint and end poses.

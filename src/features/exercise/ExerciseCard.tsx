@@ -6,6 +6,7 @@ import {
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
+import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
 import { templates } from '../../content/templates';
@@ -22,6 +23,7 @@ import { Icon } from '../../ui/Icon';
 import { ExerciseDifficulty } from './ExerciseDifficulty';
 import { ExerciseMuscles } from './ExerciseMuscles';
 import { FavouriteButton } from './FavouriteButton';
+import { KettlebellPressGrip } from './KettlebellPressGrip';
 import { KettlebellRackGrip } from './KettlebellRackGrip';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
@@ -64,6 +66,7 @@ export function ExerciseCardBody({
   const overlayActive =
     view === 'side' && overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id);
   const working = exercise.perSide ? workingSide : null;
+  const sideCue = working ? exerciseSideCue(exercise.id, working) : undefined;
   const physio = ASK_PHYSIO[exercise.id];
   const selectedLoadIndex = loadIndex ?? selectedLoad;
   const basePresentation = loadPresentation(
@@ -130,12 +133,15 @@ export function ExerciseCardBody({
       {exercise.perSide ? (
         <button
           type="button"
+          aria-label={`${sideCue?.label ?? (workingSide === 'right' ? 'Höger sida' : 'Vänster sida')} · Byt sida`}
           onClick={() =>
             setWorkingSide((value) => (value === 'right' ? 'left' : 'right'))
           }
           className="min-h-12 text-base font-bold underline"
         >
-          {workingSide === 'right' ? 'Höger' : 'Vänster'} sida · Byt sida
+          {sideCue?.label ??
+            `${workingSide === 'right' ? 'Höger' : 'Vänster'} sida`}{' '}
+          · Byt sida
         </button>
       ) : null}
     </div>
@@ -225,13 +231,7 @@ export function ExerciseCardBody({
             {working || !overlayActive || equipment ? (
               <p className="m-0 text-base text-ink-soft">
                 {working
-                  ? isClock
-                    ? working === 'right'
-                      ? 'H: höger fot rör sig. Du står på vänster ben.'
-                      : 'V: vänster fot rör sig. Du står på höger ben.'
-                    : working === 'right'
-                      ? 'H: höger sida arbetar.'
-                      : 'V: vänster sida arbetar.'
+                  ? `${working === 'right' ? 'H' : 'V'}: ${sideCue?.explanation ?? (working === 'right' ? 'höger sida arbetar.' : 'vänster sida arbetar.')}`
                   : !overlayActive
                     ? 'Blått: båda sidor arbetar.'
                     : ''}
@@ -262,6 +262,14 @@ export function ExerciseCardBody({
               ) : null}
               {exercise.id === 'kettlebell-rack-carry' ? (
                 <KettlebellRackGrip side={workingSide} />
+              ) : null}
+              {equipment === 'kettlebell' &&
+              (exercise.id === 'kettlebell-press' ||
+                exercise.id === 'kettlebell-floor-press') ? (
+                <KettlebellPressGrip
+                  exerciseId={exercise.id}
+                  side={workingSide}
+                />
               ) : null}
               <ol className="m-0 flex list-decimal flex-col gap-3 pl-6 text-lg">
                 {presentation.tips.map((tip) => (

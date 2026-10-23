@@ -35,7 +35,7 @@ for (const mode of [
     await page.screenshot({
       path: test.info().outputPath('E30-right-extended.png'),
     });
-    await page.getByRole('button', { name: /Höger sida · Byt sida/ }).click();
+    await page.getByRole('button', { name: /Byt sida/ }).click();
     await expect(page.locator('.exercise-stage svg > g')).toHaveAttribute(
       'transform',
       'translate(192 0) scale(-1 1)',
