@@ -18,7 +18,7 @@ A second rehab sub-group beside the AAOS "knee conditioning" group (`rehabFocus:
 | 6 | Stående knäböjning | 2 x 10 | E29 `hamstring-curl`, bodyweight + support | Reuse (same movement) |
 | 7 | Höftextension med gummiband | 2 x 10 | **E52 `band-hip-extension`** "Stående höftsträckning med gummiband" | New. Band + support; the moving leg is the chosen side; progression of 6 |
 | 8 | Knäböj vid stol | 2 x 10 | E01 `goblet-chair-squat`, existing bodyweight + chair variant | Reuse. Add "ta stöd mot armstöden vid behov" to its easier option |
-| 9 | Balansklockan | 1 x 5 varv | **E53 `balance-clock`** "Balansklocka på ett ben" | New. Unit `laps`, perSide (the standing leg) |
+| 9 | Balansklockan | 1 x 5 varv | **E53 `balance-clock`** "Balansklocka på ett ben" | New. Unit laps, perSide (the MOVING foot) |
 
 New entries E49-E53 are appended in E-number order. Item 5 is a separate exercise (not a variant of E30), because E30's source is AAOS and band history must not mix with bodyweight history.
 
@@ -48,7 +48,7 @@ Extend `FigureSpec` with `band?: { from: PoseKey | Pt; to: PoseKey }`; Figure dr
 - E50 seated knee bend: chair prop, hip fixed on the seat; the ankle slides along the floor from in front of the knee to under the seat edge; solve the knee with `joint()` so bone lengths stay constant; foot on the floor. Risk: foot passing through chair legs.
 - E51 band knee extension: reuse `seatedKneeExtensionPose`; the band runs from a fixed point at the bottom of the rear chair leg to `aR`; same 5000 ms cycle.
 - E52 band hip extension: standing with a hand on wall/chair; the near leg extends about 20 degrees back with a straight knee; the trunk stays vertical (`neck.x` within 2 of `hip.x`); short dashed band loop from `aL` to `aR`.
-- E53 balance clock (highest risk): side view, the near blue leg stands, the far leg's toe touches forward (middle pose) then back (end pose); plus a small static top-view `BalanceClockDiagram` (standing foot in the centre, dots at 12/3/6/9) with an accessible text alternative.
+- E53 balance-clock: near blue leg moves, far leg stands, hands on a wall in every frame; the top-view diagram is the main teaching element: five dots on the moving foot's half of the clock (right: 12, 1.30, 3, 4.30, 6; left: 12, 10.30, 9, 7.30, 6) highlighted in order, still numbered when paused or in reduced motion.
 - Review: a full animation cycle (not only start/end); contact points stay fixed; standing vs moving leg clear; band attached in every phase; reduced-motion start/end frames; colours in every theme; nothing traced from any third-party drawing.
 
 ## Group model and flow
@@ -73,9 +73,9 @@ Unit: ids E49-E53 unique and in order; the group has 9 items with the right dose
 ## Owner answers (defaults, approved)
 
 1. Prefill all nine, including progressions 5 and 7 alongside 4 and 6: yes; notes mark them as progressions.
-2. Doses are per chosen side (existing "Arbetande sida"; "both" gives each side the full dose); for the balance clock the chosen side is the standing leg.
+2. Doses are per chosen side (existing "Arbetande sida"; "both" gives each side the full dose); for the balance clock the chosen side is the standing leg. (superseded for E53 by decision 21: the chosen side is the moving foot; one varv = five taps)
 3. No hold number for E49; E29/E30 keep the AAOS 5-second text plus "följ ditt papper om det skiljer sig".
-4. "10 x 2" = 2 sets of 10; one "varv" = a touch at 12, 3, 6 and 9 and back to start.
+4. "10 x 2" = 2 sets of 10; one "varv" = a touch at 12, 3, 6 and 9 and back to start. (superseded for E53 by decision 21: the chosen side is the moving foot; one varv = five taps)
 5. Offered as a secondary QuickStart link and a TrainingSetup option, not a main goal button.
 
 ## Tasks and order
@@ -90,4 +90,5 @@ Unit: ids E49-E53 unique and in order; the group has 9 items with the right dose
 - The confirm box sits in the sticky bar next to the start button; its label ends with "(krävs för att börja)." and the disabled button points to it with aria-describedby. A tick without a valid saved draft is cleared on load.
 - The QuickStart link reads "Jag har fysioterapeutens knäprogram (9 övningar)" with the hint "Annat papper? Välj eget rehabprogram ovan."
 - E53 requires holding on to a wall or chair in every text, and E51 describes the band anchored low at the front chair leg. The set screen says which leg moves (E52) or stands (E53).
+- The E53 set screen reads 'Den valda sidan är foten som nuddar. Du står på det andra benet.'
 - `npm run privacy:check` runs `scripts/privacy-check.ts` against the local gitignored `.privacy-denylist`.
