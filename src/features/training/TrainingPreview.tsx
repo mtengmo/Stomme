@@ -16,6 +16,15 @@ import {
   muscleGroups,
 } from '../../content/muscles';
 import {
+  physioKneeBanner,
+  physioKneeFitCount,
+  physioKneeItems,
+  physioKneePlan,
+  physioKneePlanItem,
+  physioKneeTotal,
+  physioProgressionNotes,
+} from '../../content/physioKneeProgramme';
+import {
   experienceLabels,
   isTrainingPreferences,
   rehabGroup,
@@ -50,11 +59,12 @@ import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { availableWeights } from '../../rules/weightInventory';
+import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
-import { KneeCollection } from './KneeCollection';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
+import { RehabCollection } from './RehabCollection';
 import { inputClass } from './TrainingHome';
 
 function available(preferences: TrainingPreferences) {
@@ -110,7 +120,8 @@ function basePlan(
   };
 }
 
-function defaultPlan(
+/** Saved plan, then the last session for the focus, then the group's starter values. */
+export function defaultPlan(
   preferences: TrainingPreferences,
 
   id: TemplateId,
@@ -140,7 +151,11 @@ function defaultPlan(
 
         explanation: 'Din senast använda dosering. Kontrollera före start.',
       })) ??
-      (rehabGroupOf(focus) === 'aaos' ? kneeConditioningPlan(preferences) : [])
+      (rehabGroupOf(focus) === 'aaos'
+        ? kneeConditioningPlan(preferences)
+        : rehabGroupOf(focus) === 'physio'
+          ? physioKneePlan(preferences)
+          : [])
     );
   }
 
@@ -401,6 +416,11 @@ function PreviewEditor({
         ) : null}
       </header>
 
+      {preferences.programId === 'rehab' &&
+      rehabGroup(preferences) === 'physio' ? (
+        <Banner>{physioKneeBanner}</Banner>
+      ) : null}
+
       {active ? (
         <>
           <p className="m-0 text-lg">Du har redan ett pågående pass.</p>
@@ -545,18 +565,60 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              rehabGroup(preferences) === 'aaos' ? (
+              rehabGroup(preferences) === 'physio' ? (
+                <section
+                  aria-label="Fysioterapeutens knäprogram"
+                  className="flex flex-col gap-3"
+                >
+                  <p className="m-0 text-base text-ink-soft">
+                    {physioKneeFitCount(preferences)} av {physioKneeTotal}{' '}
+                    övningar passar din utrustning. 60 sekunders setvila är
+                    appens justerbara standard. Ingen automatisk ökning.
+                  </p>
+                  <details>
+                    <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                      Återställ till programmets startvärden
+                    </summary>
+                    <p className="m-0 text-base">
+                      Ersätter övningarna i förhandsvisningen med startvärdena
+                      ovan. Ditt sparade program ändras först när du sparar
+                      igen.
+                    </p>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        updatePlan(physioKneePlan(preferences));
+                        setAddId('');
+                      }}
+                    >
+                      Återställ till programmets startvärden
+                    </Button>
+                  </details>
+                </section>
+              ) : null}
+
+              {preferences.programId === 'rehab' &&
+              rehabGroup(preferences) !== 'custom' ? (
                 <details className="border-y-2 border-edge py-2">
                   <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
-                    Välj övningar från AAOS · 12 övningar
+                    {rehabGroup(preferences) === 'physio'
+                      ? `Välj övningar från programmet · ${physioKneeTotal} övningar`
+                      : 'Välj övningar från AAOS · 12 övningar'}
                   </summary>
-                  <KneeCollection
+                  <RehabCollection
                     preferences={preferences}
                     plan={plan}
                     onAdd={(exerciseId) => {
+                      const paper =
+                        rehabGroup(preferences) === 'physio'
+                          ? physioKneeItems.find(
+                              (entry) => entry.exerciseId === exerciseId,
+                            )
+                          : undefined;
                       updatePlan((current) => [
                         ...current,
-                        basePlan(exerciseId, preferences),
+                        (paper && physioKneePlanItem(paper, preferences)) ||
+                          basePlan(exerciseId, preferences),
                       ]);
                       setAddId('');
                     }}
@@ -703,6 +765,16 @@ function PreviewEditor({
                               explain
                             />
                           ) : null}
+
+                          {rehabGroup(preferences) === 'physio'
+                            ? physioProgressionNotes(item.exerciseId).map(
+                                (note) => (
+                                  <p key={note} className="m-0 text-base">
+                                    {note}
+                                  </p>
+                                ),
+                              )
+                            : null}
 
                           <p className="m-0 text-base text-ink-soft">
                             {item.explanation ??

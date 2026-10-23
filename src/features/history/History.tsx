@@ -175,6 +175,9 @@ export function History() {
             <option value="general">Allmän styrka</option>
             <option value="running">Styrka för löpning</option>
             <option value="knee">Knärehab · AAOS</option>
+            <option value="knee-physio">
+              Knärehab · Fysioterapeutens program
+            </option>
             <option value="rehab">Mitt eget rehabprogram</option>
             <option value="legacy">Ursprungligt knä- och löpprogram</option>
           </select>

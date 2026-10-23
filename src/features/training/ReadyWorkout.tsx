@@ -1,8 +1,14 @@
 import { Link } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
-import { exerciseList, exercises } from '../../content/exercises';
+import { exerciseReferences } from '../../content/exerciseReferences';
+import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import { exerciseMuscles } from '../../content/muscles';
+import {
+  physioKneeFitCount,
+  physioKneeTotal,
+  physioProgressionNotes,
+} from '../../content/physioKneeProgramme';
 import { rehabGroup } from '../../content/programmes';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
@@ -19,6 +25,8 @@ export function ReadyWorkout({
 }) {
   const knee =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
+  const physio =
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
   const ids = plan.map((item) => item.exerciseId);
   const primary = new Set(
     ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),
@@ -61,7 +69,14 @@ export function ReadyWorkout({
           antal och dagsform påverkar hur ansträngande övningen känns.
         </p>
       ) : null}
-      {!knee && preferences.programId !== 'rehab' ? (
+      {physio ? (
+        <p className="m-0 text-base">
+          {physioKneeFitCount(preferences)} av {physioKneeTotal} övningar passar
+          din utrustning. Setvilan på 60 sekunder är appens justerbara standard.
+          Avbryt en övning som gör ont.
+        </p>
+      ) : null}
+      {!knee && !physio && preferences.programId !== 'rehab' ? (
         <p className="m-0 text-base text-ink-soft">
           Förslag nästa pass. Antal bygger på sparade resultat och hur passet
           kändes. Granska och ändra före start.
@@ -88,9 +103,6 @@ export function ReadyWorkout({
                 ? ' vänster'
                 : ' höger'
               : ' per sida';
-          const number = String(
-            exerciseList.findIndex((entry) => entry.id === exercise.id) + 1,
-          ).padStart(2, '0');
           const note =
             item.explanation && !item.explanation.startsWith('Startförslag')
               ? item.explanation
@@ -105,7 +117,8 @@ export function ReadyWorkout({
                   href={`/ovning/${item.exerciseId}`}
                   className="flex min-h-12 items-center text-xl font-bold underline"
                 >
-                  {index + 1}. E{number} · {exercise.name}
+                  {index + 1}. {exerciseReferences[exercise.id]} ·{' '}
+                  {exercise.name}
                 </Link>
                 <p className="m-0 text-base">
                   {item.sets} × {item.target}
@@ -116,6 +129,13 @@ export function ReadyWorkout({
                     : (variant?.label ?? 'välj utrustning')}
                 </p>
                 {note ? <p className="m-0 text-base">{note}</p> : null}
+                {physio
+                  ? physioProgressionNotes(item.exerciseId).map((text) => (
+                      <p key={text} className="m-0 text-base text-ink-soft">
+                        {text}
+                      </p>
+                    ))
+                  : null}
                 {knee ? (
                   <ExerciseDifficulty
                     exerciseId={exercise.id}

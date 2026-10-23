@@ -143,6 +143,9 @@ export function TrainingSetup({
               <option value="knee">
                 Allmän knäträning – färdigt AAOS-baserat pass
               </option>
+              <option value="knee-physio">
+                Fysioterapeutens knäprogram (9 övningar)
+              </option>
             </select>
           </label>
           <label className="flex flex-col gap-2 text-lg font-bold">
