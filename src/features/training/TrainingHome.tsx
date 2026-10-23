@@ -173,6 +173,12 @@ export function TrainingSetup({
               <option value="left">Vänster</option>
             </select>
           </label>
+          {rehabGroupOf(rehabFocus) === 'physio' ? (
+            <p className="m-0 text-base text-ink-soft">
+              För balansklockan är det foten som rör sig; benet du står på
+              tränar balansen.
+            </p>
+          ) : null}
           <p className="m-0 text-base">
             {rehabGroupOf(rehabFocus) === 'aaos'
               ? 'Du får ett färdigt, redigerbart startpass för allmän knäträning. Övningsurval och startdos bygger på AAOS-programmet. Passet anpassas till din utrustning och valda sida.'

@@ -291,7 +291,8 @@ export function QuickStart() {
                 <option value="left">Endast vänster</option>
               </select>
               <span className="font-normal text-ink-soft">
-                Antalen gäller varje sida. För balansklockan är det stödbenet.
+                Antalen gäller varje sida. För balansklockan är det foten som
+                rör sig; benet du står på tränar balansen.
               </span>
             </label>
           ) : null}

@@ -538,7 +538,7 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'bodyweight',
       1,
       [0],
-      'Stå på ett ben och håll i en vägg eller stol hela tiden.',
+      'Håll i en vägg eller stol hela tiden. Stå på ena benet; den valda foten nuddar golvet på sin egen sida.',
       'support',
     ],
   ],
@@ -691,7 +691,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
   ],
   'balance-clock': [
     'practiced',
-    'Enbensbalans med handstöd medan den fria foten når mot flera punkter.',
+    'Enbensbalans med handstöd medan den valda foten nuddar fem punkter på sin egen sida.',
   ],
 };
 
