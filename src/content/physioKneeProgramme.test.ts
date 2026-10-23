@@ -5,6 +5,8 @@ import { exerciseMetadata } from './exerciseMetadata';
 import {
   physioKneeFitCount,
   physioKneeItems,
+  physioKneeMissing,
+  physioKneeMissingText,
   physioKneePlan,
   physioProgressionNotes,
 } from './physioKneeProgramme';
@@ -117,5 +119,27 @@ describe('physio knee programme', () => {
       'Nästa steg på papperet: övning 7.',
     ]);
     expect(physioProgressionNotes('quad-set')).toEqual([]);
+  });
+
+  it('names what is missing', () => {
+    expect(physioKneeMissingText(prefs())).toBe('');
+    expect(physioKneeMissing(prefs())).toEqual([]);
+    expect(
+      physioKneeMissingText(prefs(['bodyweight', 'chair', 'support'])),
+    ).toBe('Saknas: träningsband (övning 5, 7).');
+    expect(
+      physioKneePlan(prefs(['bodyweight', 'chair', 'support'])),
+    ).toHaveLength(7);
+    expect(
+      physioKneePlan(prefs(['bodyweight', 'chair', 'support', 'band'])),
+    ).toHaveLength(9);
+    expect(physioKneePlan(prefs(['bodyweight']))).toHaveLength(2);
+    const text = physioKneeMissingText(prefs(['bodyweight']));
+    expect(text).toContain('träningsband (övning 5, 7)');
+    expect(text).toContain('stol (övning 3, 4, 5, 8)');
+    expect(text).toContain('vägg eller stabilt stöd');
+    expect(
+      physioKneeMissing(prefs(['bodyweight'])).map((m) => m.item.sheetNo),
+    ).toEqual([3, 4, 5, 6, 7, 8, 9]);
   });
 });

@@ -35,12 +35,14 @@ async function openPhysio(
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     }),
   );
-  await user.click(
-    screen.getByRole('checkbox', { name: 'Stabil stol eller bänk' }),
-  );
-  await user.click(
-    screen.getByRole('checkbox', { name: 'Vägg eller stabilt stöd' }),
-  );
+  // Chair and support are ticked by default; the band is the user's choice.
+  expect(
+    (
+      screen.getByRole('checkbox', {
+        name: 'Stabil stol eller bänk',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(true);
   if (band)
     await user.click(screen.getByRole('checkbox', { name: 'Träningsband' }));
   await user.selectOptions(
@@ -52,8 +54,10 @@ async function openPhysio(
 }
 
 const rows = () =>
-  within(screen.getByRole('region', { name: /Ditt pass/ })).getAllByRole(
-    'listitem',
+  Array.from(
+    screen
+      .getByRole('region', { name: /Ditt pass/ })
+      .querySelectorAll('ol > li'),
   );
 
 it('routes from the QuickStart link to a prefilled overview that needs confirmation', async () => {
@@ -305,4 +309,68 @@ it('shows the prefill note only for the untouched prefill', async () => {
   expect(
     screen.queryByText(/Förifyllt från fysioterapeutens knäprogram\./),
   ).toBeNull();
+});
+
+it('lists what a missing band left out and lets the user fix it', async () => {
+  const user = userEvent.setup();
+  await openPhysio(user, false);
+  expect(rows()).toHaveLength(7);
+  expect(
+    screen.getByText(/Saknas: träningsband \(övning 5, 7\)\./),
+  ).toBeTruthy();
+  expect(
+    screen.getByText(
+      /Papperets övning 5: Knästräckning med gummiband – kräver träningsband/,
+    ),
+  ).toBeTruthy();
+  expect(
+    screen.getByText(
+      /Papperets övning 7: Höftextension med gummiband – kräver träningsband/,
+    ),
+  ).toBeTruthy();
+  await user.click(screen.getByRole('link', { name: 'Ändra utrustning' }));
+  await user.click(
+    await screen.findByRole('checkbox', { name: 'Träningsband' }),
+  );
+  await user.click(
+    screen.getByRole('button', { name: 'Spara träningsinriktning' }),
+  );
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect(rows()).toHaveLength(9);
+  expect(screen.queryByText(/Saknas:/)).toBeNull();
+});
+
+it('explains the band at its checkbox and keeps explicit choices', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole('button', {
+      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
+    }),
+  );
+  expect(
+    screen.getByText('Träningsband behövs för övning 5 och 7.'),
+  ).toBeTruthy();
+  const chair = screen.getByRole('checkbox', {
+    name: 'Stabil stol eller bänk',
+  }) as HTMLInputElement;
+  expect(chair.checked).toBe(true);
+  expect(
+    (screen.getByRole('checkbox', { name: 'Träningsband' }) as HTMLInputElement)
+      .checked,
+  ).toBe(false);
+  await user.click(chair);
+  await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
+  await user.click(
+    screen.getByRole('button', {
+      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
+    }),
+  );
+  expect(
+    (
+      screen.getByRole('checkbox', {
+        name: 'Stabil stol eller bänk',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(false);
 });

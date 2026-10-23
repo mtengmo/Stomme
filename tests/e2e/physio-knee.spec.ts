@@ -15,8 +15,6 @@ async function openProgramme(
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     })
     .click();
-  await page.getByRole('checkbox', { name: 'Stabil stol eller bänk' }).check();
-  await page.getByRole('checkbox', { name: 'Vägg eller stabilt stöd' }).check();
   if (withBand)
     await page.getByRole('checkbox', { name: 'Träningsband' }).check();
   await page
@@ -66,11 +64,23 @@ test('physio programme: prefilled overview, confirmation gate, notes and navigat
   await expect(start).toBeDisabled();
 });
 
-test('physio programme: seven items without a band, saved plan wins, balance clock counts laps', async ({
+test('physio programme: seven items without a band, fixing it, saved plan wins, balance clock counts laps', async ({
   page,
 }) => {
   await openProgramme(page, false);
   await expect(page.locator('#ready-workout ~ ol > li')).toHaveCount(7);
+  await expect(
+    page.getByText(/Saknas: träningsband \(övning 5, 7\)/),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      /Papperets övning 5: Knästräckning med gummiband – kräver träningsband/,
+    ),
+  ).toBeVisible();
+  await page.getByRole('link', { name: 'Ändra utrustning' }).click();
+  await page.getByRole('checkbox', { name: 'Träningsband' }).check();
+  await page.getByRole('button', { name: 'Spara träningsinriktning' }).click();
+  await expect(page.locator('#ready-workout ~ ol > li')).toHaveCount(9);
   await expect(
     page.getByText(/7 av 9 övningar passar din utrustning/),
   ).toBeVisible();

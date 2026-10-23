@@ -146,6 +146,48 @@ function fitsItem(item: PhysioKneeItem, preferences: TrainingPreferences) {
     : undefined;
 }
 
+const needLabel: Record<string, string> = {
+  band: 'träningsband',
+  chair: 'stol',
+  support: 'vägg eller stabilt stöd',
+};
+
+export interface PhysioMissing {
+  item: PhysioKneeItem;
+  /** Equipment the item needs that the user has not ticked, in words. */
+  needs: string[];
+}
+
+/** Paper items left out because of missing equipment, with what each one needs. */
+export function physioKneeMissing(
+  preferences: TrainingPreferences,
+): PhysioMissing[] {
+  return physioKneeItems.flatMap((item) => {
+    if (fitsItem(item, preferences)) return [];
+    const variant = exerciseMetadata[item.exerciseId].variants.find(
+      (v) => v.id === item.variantId,
+    );
+    const needs = (variant?.equipment ?? [])
+      .filter((req) => !equipmentFits([req], preferences.equipment))
+      .map((req) => needLabel[req.type] ?? req.type);
+    return [{ item, needs }];
+  });
+}
+
+/** "Saknas: träningsband (övning 5, 7)." or an empty string when all nine fit. */
+export function physioKneeMissingText(
+  preferences: TrainingPreferences,
+): string {
+  const byNeed = new Map<string, number[]>();
+  for (const { item, needs } of physioKneeMissing(preferences))
+    for (const need of needs)
+      byNeed.set(need, [...(byNeed.get(need) ?? []), item.sheetNo]);
+  if (byNeed.size === 0) return '';
+  return `Saknas: ${[...byNeed.entries()]
+    .map(([need, nos]) => `${need} (övning ${nos.join(', ')})`)
+    .join('; ')}.`;
+}
+
 /** Number of the nine paper items that fit the user's equipment. */
 export function physioKneeFitCount(preferences: TrainingPreferences): number {
   return physioKneeItems.filter((item) => fitsItem(item, preferences)).length;
