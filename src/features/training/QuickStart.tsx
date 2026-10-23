@@ -88,12 +88,15 @@ export function QuickStart() {
       heading.current?.focus();
     }
   }, [goal]);
-  const toggle = (item: EquipmentChoice, checked: boolean) =>
+  const touched = useRef(false);
+  const toggle = (item: EquipmentChoice, checked: boolean) => {
+    touched.current = true;
     setEquipment((values) =>
       checked
         ? [...new Set([...values, item])]
         : values.filter((value) => value !== item),
     );
+  };
   function family(type: 'dumbbell' | 'kettlebell', count: '0' | '1' | '2') {
     setEquipment((values) => [
       ...values.filter((value) => !value.startsWith(type)),
@@ -141,7 +144,18 @@ export function QuickStart() {
             </button>
             <button
               type="button"
-              onClick={() => setGoal('physio')}
+              onClick={() => {
+                // Everyone has a chair and a wall: start with them ticked unless the user chose before.
+                if (!touched.current && !Array.isArray(draft.equipment))
+                  setEquipment((values) => [
+                    ...new Set<EquipmentChoice>([
+                      ...values,
+                      'chair',
+                      'support',
+                    ]),
+                  ]);
+                setGoal('physio');
+              }}
               className="min-h-12 self-start text-left text-base underline"
             >
               Jag har fysioterapeutens knäprogram (9 övningar)
@@ -213,18 +227,22 @@ export function QuickStart() {
                   : []),
               ] as const
             ).map(([value, label]) => (
-              <label
-                key={value}
-                className="flex min-h-12 items-center gap-3 text-lg"
-              >
-                <input
-                  className="size-6"
-                  type="checkbox"
-                  checked={equipment.includes(value)}
-                  onChange={(event) => toggle(value, event.target.checked)}
-                />
-                {label}
-              </label>
+              <div key={value}>
+                <label className="flex min-h-12 items-center gap-3 text-lg">
+                  <input
+                    className="size-6"
+                    type="checkbox"
+                    checked={equipment.includes(value)}
+                    onChange={(event) => toggle(value, event.target.checked)}
+                  />
+                  {label}
+                </label>
+                {value === 'band' ? (
+                  <p className="m-0 pl-9 text-base text-ink-soft">
+                    Träningsband behövs för övning 5 och 7.
+                  </p>
+                ) : null}
+              </div>
             ))}
           </fieldset>
           {goal === 'general' || goal === 'running' ? (
