@@ -42,18 +42,18 @@ npm test           # unit tests
 npm run e2e        # browser tests (rebuilds only if the sources changed)
 ```
 
-Run `npm run check`, `npm test` and `npm run build` before you push. CI runs the same plus the browser tests. The maintainer intends to enable a GitHub ruleset that requires the checks `verify`, `build` and `e2e-result` before merging; until it is enabled, a failing CI is not yet enforced by GitHub.
+Run `npm run check`, `npm test` and `npm run build` before you push. CI runs the same plus the browser smoke tests. The maintainer intends to enable a GitHub ruleset that requires the checks `verify`, `build` and `smoke` before merging; until it is enabled, a failing CI is not yet enforced by GitHub.
 
 ## Test tiers
 
-Use the cheapest tier that answers your question; the slower tiers run for you before a push and in CI.
+Use the cheapest tier that answers your question. GitHub only runs the fast tiers (to keep CI quick and the repo a hobby-sized setup); the slow ones are run on your own machine.
 
 | Tier | When | Commands | Time (typical) |
 |---|---|---|---|
 | Inner loop | While editing | `npm run test:watch` (unit and db tests, reruns affected files), `npm run test:related -- src/rules/stats.ts`, `npm run test:changed`, `npm run check:fast` (lint and types for changed files) | seconds |
 | Pre-push | `git push` | Lefthook runs `npm run check` and `npm run test:cov` in parallel, then `npm run e2e:smoke` (12 tests tagged `@smoke`, including every pain test) | 1-2 minutes |
-| CI | Every pull request and push | `npm run check`, `npm test`, `npm run build`, and the browser tests in two shards (`npm run e2e:prebuilt` on the built `dist`; locally `npm run e2e:ci` builds first) | minutes |
-| Nightly | Scheduled (`quality.yml`, also on PRs touching styles, shared UI or build config) | Accessibility audit (`npm run audit:a11y`), `npm run test:upgrade`, theme screenshots | n/a |
+| CI | Every pull request and push | `npm run check`, `npm run test:cov`, `npm run build`, and the browser smoke tests (`@smoke`) against the built `dist` in one job (`npm run e2e:prebuilt -- --grep @smoke`) | 2-3 minutes |
+| Full local run | Before a bigger release or after UI/styling/service-worker changes | `npm run e2e` (full browser suite), `npm run audit:a11y`, `npm run test:upgrade`; `quality.yml` can also run the audit and upgrade test on GitHub by hand (Actions tab, "Run workflow") | several minutes |
 
 Details:
 

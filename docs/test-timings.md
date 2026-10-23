@@ -183,3 +183,12 @@ Single runs on the same machine (not 3-run medians), wall time including `ensure
 | `npm run e2e:themes` | 18 passed (8 theme x scheme flows, 5 picker, 4 boot/CSP/wipe, 1 S1) | 67 (58.5 in Playwright) |
 
 The two added @smoke tests are the boot tests in `tests/e2e/appearance.spec.ts` (first paint with the app bundle blocked; app applies the scheme with the boot script blocked), about 1 s each. The full theme matrix is local-only (`npm run e2e:themes`, also part of `npm run e2e`).
+
+## Update 2026-10-22: CI runs the smoke tests only
+
+Decision (owner): this is a hobby app, so GitHub runs the fast gate only and the slow suites run on the owner's machine.
+
+- `deploy.yml`: `verify`, `build`, `smoke` (one job, `npm run e2e:prebuilt -- --grep @smoke`, 12 tests), `deploy` (main only, needs verify, build and smoke). The sharded `e2e` job and the `e2e-result` aggregate are gone. Failure traces are uploaded as `smoke-results`.
+- `quality.yml` is manual only (`workflow_dispatch`): `a11y` and `upgrade`. No nightly schedule, no pull-request triggers.
+- Required checks for a future ruleset: `verify`, `build`, `smoke`. Not `deploy`, `a11y` or `upgrade`.
+- Why: in the first run on GitHub the browser tests themselves took under a minute per shard; one shard spent 11.5 minutes installing Chromium and system packages (both shards raced to fill the browser cache). A single job removes the race. The full suite, the accessibility audit and the upgrade test stay available locally (`npm run e2e`, `npm run audit:a11y`, `npm run test:upgrade`).
