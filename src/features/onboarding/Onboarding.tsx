@@ -67,6 +67,10 @@ export function Onboarding() {
           <AppearancePicker />
         </div>
       </details>
+      <p className="m-0 text-base text-ink-soft">
+        Har du en säkerhetskopia från förut? När du gått vidare importerar du
+        den under Inställningar.
+      </p>
       <div className="mt-auto pt-2">
         <Button onClick={() => void acceptOnboarding()}>
           Jag förstår, fortsätt
