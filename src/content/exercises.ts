@@ -18,7 +18,7 @@ const list: Exercise[] = [
     ],
     commonMistake: 'Knäna faller inåt när du reser dig.',
     easierVariant:
-      'Utan vikt med armarna framför kroppen, eller sätt en kudde på stolen.',
+      'Utan vikt med armarna framför kroppen, sätt en kudde på stolen eller ta stöd mot armstöden vid behov.',
     unit: 'reps',
     perSide: false,
     range: { start: 10, max: 12, step: 1 },

@@ -25,7 +25,7 @@ export function matchesLibraryFilters(
   const meta = exerciseMetadata[exercise.id];
   if (
     filters.aaos &&
-    !meta.sources.some((source) => source.url.includes('orthoinfo.aaos.org'))
+    !meta.sources.some((source) => source.url?.includes('orthoinfo.aaos.org'))
   )
     return false;
   if (

@@ -8,7 +8,7 @@ import { WeightInventoryFields } from './WeightInventoryFields';
 
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
-type Goal = 'general' | 'running' | 'knee' | 'custom';
+type Goal = 'general' | 'running' | 'knee' | 'physio' | 'custom';
 const goals: { id: Goal; label: string }[] = [
   { id: 'general', label: 'Bli starkare' },
   { id: 'running', label: 'Styrka för löpning' },
@@ -46,7 +46,9 @@ export function QuickStart() {
   const [, navigate] = useLocation();
   const [draft] = useState(readDraft);
   const [goal, setGoal] = useState<Goal | null>(
-    goals.some((g) => g.id === draft.goal) || draft.goal === 'custom'
+    goals.some((g) => g.id === draft.goal) ||
+      draft.goal === 'custom' ||
+      draft.goal === 'physio'
       ? (draft.goal ?? null)
       : null,
   );
@@ -129,22 +131,36 @@ export function QuickStart() {
               </Button>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={() => setGoal('custom')}
-            className="mt-2 min-h-12 self-start text-base underline"
-          >
-            Jag har ett eget rehabprogram
-          </button>
+          <div className="flex flex-col">
+            <button
+              type="button"
+              onClick={() => setGoal('custom')}
+              className="min-h-12 self-start text-left text-base underline"
+            >
+              Jag har ett eget rehabprogram
+            </button>
+            <button
+              type="button"
+              onClick={() => setGoal('physio')}
+              className="min-h-12 self-start text-left text-base underline"
+            >
+              Jag har fysioterapeutens knäprogram (9 övningar)
+            </button>
+            <p className="m-0 text-base text-ink-soft">
+              Annat papper? Välj eget rehabprogram ovan.
+            </p>
+          </div>
         </>
       ) : (
         <>
           <p className="m-0 text-lg">
-            Välj det du vill använda. Utan val blir det ett pass med kroppsvikt.
+            {goal === 'physio'
+              ? 'Välj det du har hemma. Övningar som kräver annat än det du väljer lämnas bort. Utan val blir det bara övningar med kroppsvikt.'
+              : 'Välj det du vill använda. Utan val blir det ett pass med kroppsvikt.'}
           </p>
           <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
             <legend className="sr-only">Utrustning</legend>
-            {goal !== 'knee'
+            {goal !== 'knee' && goal !== 'physio'
               ? (['dumbbell', 'kettlebell'] as const).map((type) => {
                   const count = equipment.includes(`${type}-2`)
                     ? '2'
@@ -192,6 +208,9 @@ export function QuickStart() {
               [
                 ['chair', 'Stabil stol eller bänk'],
                 ['support', 'Vägg eller stabilt stöd'],
+                ...(goal === 'physio'
+                  ? ([['band', 'Träningsband']] as const)
+                  : []),
               ] as const
             ).map(([value, label]) => (
               <label
@@ -241,12 +260,29 @@ export function QuickStart() {
               <WeightInventoryFields value={weights} onChange={setWeights} />
             </details>
           ) : null}
+          {goal === 'physio' ? (
+            <label className="flex flex-col gap-2 text-base font-bold">
+              Arbetande sida
+              <select
+                className={fieldClass}
+                value={side}
+                onChange={(event) => setSide(event.target.value as typeof side)}
+              >
+                <option value="both">Höger och vänster</option>
+                <option value="right">Endast höger</option>
+                <option value="left">Endast vänster</option>
+              </select>
+              <span className="font-normal text-ink-soft">
+                Antalen gäller varje sida. För balansklockan är det stödbenet.
+              </span>
+            </label>
+          ) : null}
           <details>
             <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
               Fler inställningar
             </summary>
             <div className="flex flex-col gap-3 pt-2">
-              {goal !== 'knee'
+              {goal !== 'knee' && goal !== 'physio'
                 ? (['step', 'band'] as const).map((value) => (
                     <label
                       key={value}
@@ -299,16 +335,22 @@ export function QuickStart() {
                 try {
                   await saveTrainingPreferences(getDb(), {
                     programId:
-                      goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
+                      goal === 'knee' || goal === 'custom' || goal === 'physio'
+                        ? 'rehab'
+                        : goal,
                     equipment,
                     experience,
                     ...(weights.length ? { weights } : {}),
-                    ...(goal === 'knee' || goal === 'custom'
+                    ...(goal === 'knee' ||
+                    goal === 'custom' ||
+                    goal === 'physio'
                       ? {
                           rehabFocus:
                             goal === 'knee'
                               ? ('knee' as const)
-                              : ('custom' as const),
+                              : goal === 'physio'
+                                ? ('knee-physio' as const)
+                                : ('custom' as const),
                           rehabSide: side,
                         }
                       : {}),
@@ -325,7 +367,11 @@ export function QuickStart() {
                 }
               }}
             >
-              {goal === 'custom' ? 'Öppna mitt rehabprogram' : 'Visa mitt pass'}
+              {goal === 'custom'
+                ? 'Öppna mitt rehabprogram'
+                : goal === 'physio'
+                  ? 'Visa mitt program'
+                  : 'Visa mitt pass'}
             </Button>
           </div>
         </>

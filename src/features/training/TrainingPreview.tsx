@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { type SetStateAction, useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
+import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList, exercises } from '../../content/exercises';
 import {
   kneeConditioningPlan,
@@ -15,8 +16,21 @@ import {
   muscleGroups,
 } from '../../content/muscles';
 import {
+  physioKneeBanner,
+  physioKneeConfirmLabel,
+  physioKneeFitCount,
+  physioKneeItemFor,
+  physioKneeItems,
+  physioKneePlan,
+  physioKneePlanItem,
+  physioKneeTotal,
+  physioProgressionNotes,
+} from '../../content/physioKneeProgramme';
+import {
   experienceLabels,
   isTrainingPreferences,
+  rehabGroup,
+  rehabGroupOf,
   trainingName,
 } from '../../content/programmes';
 import {
@@ -35,6 +49,7 @@ import {
 import type {
   ExerciseId,
   PlannedExercise,
+  RehabFocus,
   Session,
   SetLog,
   TemplateId,
@@ -46,11 +61,12 @@ import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { availableWeights } from '../../rules/weightInventory';
+import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
-import { KneeCollection } from './KneeCollection';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
+import { RehabCollection } from './RehabCollection';
 import { inputClass } from './TrainingHome';
 
 function available(preferences: TrainingPreferences) {
@@ -106,7 +122,8 @@ function basePlan(
   };
 }
 
-function defaultPlan(
+/** Saved plan, then the last session for the focus, then the group's starter values. */
+export function defaultPlan(
   preferences: TrainingPreferences,
 
   id: TemplateId,
@@ -115,7 +132,7 @@ function defaultPlan(
 
   logs: SetLog[],
 
-  savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>,
+  savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
 ): PlannedExercise[] {
   if (preferences.programId === 'rehab') {
     const focus = preferences.rehabFocus ?? 'custom';
@@ -135,7 +152,12 @@ function defaultPlan(
         ...plan,
 
         explanation: 'Din senast använda dosering. Kontrollera före start.',
-      })) ?? (focus === 'knee' ? kneeConditioningPlan(preferences) : [])
+      })) ??
+      (rehabGroupOf(focus) === 'aaos'
+        ? kneeConditioningPlan(preferences)
+        : rehabGroupOf(focus) === 'physio'
+          ? physioKneePlan(preferences)
+          : [])
     );
   }
 
@@ -169,7 +191,7 @@ function PreviewEditor({
 
   logs: SetLog[];
 
-  savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>;
+  savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>;
   customWorkout?: CustomWorkout;
   preparationId?: string;
 }) {
@@ -233,13 +255,24 @@ function PreviewEditor({
   }, [draftKey, plan]);
 
   const [flags0] = useState(() => readFlags(draftKey));
-  const [confirmed, setConfirmed] = useState(flags0.confirmed);
+  const [confirmed, setConfirmed] = useState(() => {
+    if (!flags0.confirmed) return false;
+    try {
+      // A tick belongs to the draft it was given for; without a valid draft it is stale.
+      return (
+        sessionStorage.getItem(draftKey) !== null && validateTrainingPlan(plan)
+      );
+    } catch {
+      return false;
+    }
+  });
   const [checkBefore, setCheckBefore] = useState(flags0.checkBefore);
   const [editing, setEditing] = useState(() => {
     if (
       customWorkout ||
       !validateTrainingPlan(plan) ||
-      (preferences.programId === 'rehab' && preferences.rehabFocus !== 'knee')
+      (preferences.programId === 'rehab' &&
+        rehabGroup(preferences) === 'custom')
     )
       return true;
     try {
@@ -259,7 +292,7 @@ function PreviewEditor({
     validateTrainingPlan(plan) &&
     !(
       preferences.programId === 'rehab' &&
-      preferences.rehabFocus === 'knee' &&
+      rehabGroup(preferences) === 'aaos' &&
       plan.some(
         (item) =>
           !kneeRehabExercises.some(
@@ -292,7 +325,7 @@ function PreviewEditor({
   const compatible = available(preferences).filter(
     (ex) =>
       preferences.programId !== 'rehab' ||
-      preferences.rehabFocus !== 'knee' ||
+      rehabGroup(preferences) !== 'aaos' ||
       kneeRehabExercises.some((knee) => knee.id === ex.id),
   );
 
@@ -348,6 +381,26 @@ function PreviewEditor({
       session.status === 'in_progress' && session.id !== preparationId,
   );
 
+  const physioPaper =
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
+  const confirmBox = (
+    <label
+      id={physioPaper ? 'start-blocked' : undefined}
+      className="flex min-h-12 items-start gap-3 text-base leading-snug"
+    >
+      <input
+        type="checkbox"
+        checked={confirmed}
+        onChange={(event) => setConfirmed(event.target.checked)}
+        className="size-6 shrink-0"
+      />
+      {rehabGroup(preferences) === 'aaos'
+        ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
+        : rehabGroup(preferences) === 'physio'
+          ? `${physioKneeConfirmLabel.slice(0, -1)} (krävs för att börja).`
+          : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
+    </label>
+  );
   const change = (index: number, patch: Partial<PlannedExercise>) =>
     updatePlan((current) =>
       current.map((item, n) => (n === index ? { ...item, ...patch } : item)),
@@ -395,6 +448,11 @@ function PreviewEditor({
         ) : null}
       </header>
 
+      {preferences.programId === 'rehab' &&
+      rehabGroup(preferences) === 'physio' ? (
+        <Banner>{physioKneeBanner}</Banner>
+      ) : null}
+
       {active ? (
         <>
           <p className="m-0 text-lg">Du har redan ett pågående pass.</p>
@@ -420,14 +478,16 @@ function PreviewEditor({
             <>
               {preferences.programId === 'rehab' ? (
                 <p className="m-0 text-base">
-                  {preferences.rehabFocus === 'knee'
+                  {rehabGroup(preferences) === 'aaos'
                     ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
-                    : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'}
+                    : rehabGroup(preferences) === 'physio'
+                      ? 'Kontrollera övningar, sida och antal mot ditt papper från fysioterapeuten.'
+                      : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'}
                 </p>
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus !== 'knee' &&
+              rehabGroup(preferences) === 'custom' &&
               !customWorkout ? (
                 <section
                   className="flex flex-col gap-2 border-y-2 border-edge py-3"
@@ -490,7 +550,7 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus === 'knee' ? (
+              rehabGroup(preferences) === 'aaos' ? (
                 <section
                   aria-label="Färdigt knäpass"
                   className="flex flex-col gap-3"
@@ -537,18 +597,60 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus === 'knee' ? (
+              rehabGroup(preferences) === 'physio' ? (
+                <section
+                  aria-label="Fysioterapeutens knäprogram"
+                  className="flex flex-col gap-3"
+                >
+                  <p className="m-0 text-base text-ink-soft">
+                    {physioKneeFitCount(preferences)} av {physioKneeTotal}{' '}
+                    övningar passar din utrustning. 60 sekunders setvila är
+                    appens justerbara standard. Ingen automatisk ökning.
+                  </p>
+                  <details>
+                    <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                      Återställ till programmets startvärden
+                    </summary>
+                    <p className="m-0 text-base">
+                      Ersätter övningarna i förhandsvisningen med startvärdena
+                      ovan. Ditt sparade program ändras först när du sparar
+                      igen.
+                    </p>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        updatePlan(physioKneePlan(preferences));
+                        setAddId('');
+                      }}
+                    >
+                      Återställ till programmets startvärden
+                    </Button>
+                  </details>
+                </section>
+              ) : null}
+
+              {preferences.programId === 'rehab' &&
+              rehabGroup(preferences) !== 'custom' ? (
                 <details className="border-y-2 border-edge py-2">
                   <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
-                    Välj övningar från AAOS · 12 övningar
+                    {rehabGroup(preferences) === 'physio'
+                      ? `Välj övningar från programmet · ${physioKneeTotal} övningar`
+                      : 'Välj övningar från AAOS · 12 övningar'}
                   </summary>
-                  <KneeCollection
+                  <RehabCollection
                     preferences={preferences}
                     plan={plan}
                     onAdd={(exerciseId) => {
+                      const paper =
+                        rehabGroup(preferences) === 'physio'
+                          ? physioKneeItems.find(
+                              (entry) => entry.exerciseId === exerciseId,
+                            )
+                          : undefined;
                       updatePlan((current) => [
                         ...current,
-                        basePlan(exerciseId, preferences),
+                        (paper && physioKneePlanItem(paper, preferences)) ||
+                          basePlan(exerciseId, preferences),
                       ]);
                       setAddId('');
                     }}
@@ -590,6 +692,7 @@ function PreviewEditor({
               <ol className="m-0 list-none p-0">
                 {plan.map((item, index) => {
                   const exercise = exercises[item.exerciseId];
+                  const paperNo = physioKneeItemFor(item.exerciseId)?.sheetNo;
 
                   return (
                     <li
@@ -608,16 +711,16 @@ function PreviewEditor({
                       >
                         <span>
                           <span className="block text-xl font-bold">
-                            {index + 1}. E
-                            {String(
-                              exerciseList.findIndex(
-                                (entry) => entry.id === exercise.id,
-                              ) + 1,
-                            ).padStart(2, '0')}{' '}
-                            · {exercise.name}
+                            {physioPaper
+                              ? paperNo
+                                ? `${paperNo}. `
+                                : ''
+                              : `${index + 1}. `}
+                            {exerciseReferences[exercise.id]} · {exercise.name}
                           </span>
                           <span className="block text-base font-normal">
                             {item.sets || '–'} × {item.target || '–'}
+                            {exercise.unit === 'laps' ? ' varv' : ''}
                             {exercise.perSide ? ' per sida' : ''}
                             {item.weightKg > 0
                               ? ` · ${item.weightKg} kg totalt`
@@ -692,7 +795,7 @@ function PreviewEditor({
                             </label>
                           ) : null}
                           {preferences.programId === 'rehab' &&
-                          preferences.rehabFocus === 'knee' ? (
+                          rehabGroup(preferences) === 'aaos' ? (
                             <ExerciseDifficulty
                               exerciseId={exercise.id}
                               variantId={item.variantId}
@@ -701,12 +804,25 @@ function PreviewEditor({
                             />
                           ) : null}
 
-                          <p className="m-0 text-base text-ink-soft">
-                            {item.explanation ??
-                              (preferences.programId === 'rehab'
-                                ? 'Ange din överenskomna dosering.'
-                                : 'Startförslag. Anpassa före start.')}
-                          </p>
+                          {rehabGroup(preferences) === 'physio'
+                            ? physioProgressionNotes(item.exerciseId).map(
+                                (note) => (
+                                  <p key={note} className="m-0 text-base">
+                                    {note}
+                                  </p>
+                                ),
+                              )
+                            : null}
+
+                          {physioPaper &&
+                          item.explanation?.startsWith('Förifyllt') ? null : (
+                            <p className="m-0 text-base text-ink-soft">
+                              {item.explanation ??
+                                (preferences.programId === 'rehab'
+                                  ? 'Ange din överenskomna dosering.'
+                                  : 'Startförslag. Anpassa före start.')}
+                            </p>
+                          )}
 
                           {!exerciseMetadata[exercise.id].variants.some(
                             (variant) =>
@@ -744,7 +860,9 @@ function PreviewEditor({
                                 ? 'Sekunder'
                                 : exercise.unit === 'meters'
                                   ? 'Meter'
-                                  : 'Repetitioner'}
+                                  : exercise.unit === 'laps'
+                                    ? 'Varv'
+                                    : 'Repetitioner'}
 
                               {exercise.perSide ? ' per sida' : ''}
 
@@ -1042,99 +1160,112 @@ function PreviewEditor({
                 </Link>
               ) : null}
 
-              <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-                <legend className="mb-2 text-lg font-bold">Kroppsdel</legend>
-                <div className="flex flex-wrap gap-2">
-                  {[{ id: '', label: 'Alla' }, ...bodyRegions].map((region) => (
-                    <button
-                      key={region.id}
-                      type="button"
-                      aria-pressed={!addMuscle && addRegion === region.id}
-                      onClick={() => {
-                        setAddRegion(region.id);
-                        setAddMuscle('');
-                        setAddId('');
-                      }}
-                      className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
-                    >
-                      {region.label}
-                    </button>
-                  ))}
-                </div>
-                <details>
-                  <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                    Mer specifikt
-                  </summary>
-                  <label className="flex flex-col gap-2 text-base font-bold">
-                    Muskelgrupp
-                    <select
-                      className={inputClass}
-                      value={addMuscle}
-                      onChange={(event) => {
-                        setAddMuscle(event.target.value as MuscleGroupId | '');
-                        setAddId('');
-                      }}
-                    >
-                      <option value="">Ingen vald</option>
-                      {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
-                        (group) => (
-                          <option key={group} value={group}>
-                            {muscleGroups[group].label}
-                          </option>
+              {physioPaper ? null : (
+                <>
+                  <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+                    <legend className="mb-2 text-lg font-bold">
+                      Kroppsdel
+                    </legend>
+                    <div className="flex flex-wrap gap-2">
+                      {[{ id: '', label: 'Alla' }, ...bodyRegions].map(
+                        (region) => (
+                          <button
+                            key={region.id}
+                            type="button"
+                            aria-pressed={!addMuscle && addRegion === region.id}
+                            onClick={() => {
+                              setAddRegion(region.id);
+                              setAddMuscle('');
+                              setAddId('');
+                            }}
+                            className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
+                          >
+                            {region.label}
+                          </button>
                         ),
                       )}
+                    </div>
+                    <details>
+                      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                        Mer specifikt
+                      </summary>
+                      <label className="flex flex-col gap-2 text-base font-bold">
+                        Muskelgrupp
+                        <select
+                          className={inputClass}
+                          value={addMuscle}
+                          onChange={(event) => {
+                            setAddMuscle(
+                              event.target.value as MuscleGroupId | '',
+                            );
+                            setAddId('');
+                          }}
+                        >
+                          <option value="">Ingen vald</option>
+                          {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
+                            (group) => (
+                              <option key={group} value={group}>
+                                {muscleGroups[group].label}
+                              </option>
+                            ),
+                          )}
+                        </select>
+                      </label>
+                    </details>
+                    <p className="m-0 text-base text-ink-soft">
+                      Kroppsdelar är träningsmål, inte en bedömning av vad som
+                      passar dig.
+                    </p>
+                  </fieldset>
+                  <label className="flex flex-col gap-2 text-lg font-bold">
+                    Lägg till övning
+                    <select
+                      className={inputClass}
+                      value={addId}
+                      onChange={(event) =>
+                        setAddId(event.target.value as ExerciseId | '')
+                      }
+                    >
+                      <option value="">
+                        {pickable.length
+                          ? 'Välj övning'
+                          : 'Inga övningar passar'}
+                      </option>
+                      {pickable.map(({ exercise, supporting }) => (
+                        <option key={exercise.id} value={exercise.id}>
+                          {exercise.name}
+                          {supporting ? ' · stödjer' : ''}
+                        </option>
+                      ))}
                     </select>
                   </label>
-                </details>
-                <p className="m-0 text-base text-ink-soft">
-                  Kroppsdelar är träningsmål, inte en bedömning av vad som
-                  passar dig.
-                </p>
-              </fieldset>
-              <label className="flex flex-col gap-2 text-lg font-bold">
-                Lägg till övning
-                <select
-                  className={inputClass}
-                  value={addId}
-                  onChange={(event) =>
-                    setAddId(event.target.value as ExerciseId | '')
-                  }
-                >
-                  <option value="">
-                    {pickable.length ? 'Välj övning' : 'Inga övningar passar'}
-                  </option>
-                  {pickable.map(({ exercise, supporting }) => (
-                    <option key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                      {supporting ? ' · stödjer' : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {pickable.length === 0 ? (
-                <p className="m-0 text-base text-ink-soft">
-                  Inga fler övningar passar vald kroppsdel och din utrustning.
-                  Välj Alla eller ändra utrustning i Min utrustning.
-                </p>
-              ) : null}
+                  {pickable.length === 0 ? (
+                    <p className="m-0 text-base text-ink-soft">
+                      Inga fler övningar passar vald kroppsdel och din
+                      utrustning. Välj Alla eller ändra utrustning i Min
+                      utrustning.
+                    </p>
+                  ) : null}
 
-              <Button
-                variant="secondary"
-                disabled={!addId || plan.length >= 12}
-                onClick={() => {
-                  if (addId)
-                    updatePlan((current) => [
-                      ...current,
+                  <Button
+                    variant="secondary"
+                    disabled={!addId || plan.length >= 12}
+                    onClick={() => {
+                      if (addId)
+                        updatePlan((current) => [
+                          ...current,
 
-                      basePlan(addId, preferences),
-                    ]);
+                          basePlan(addId, preferences),
+                        ]);
 
-                  if (addId) setExpandedIndex(plan.length);
-                  setAddId('');
-                }}
-              >
-                Lägg till i passet
-              </Button>
+                      if (addId) setExpandedIndex(plan.length);
+                      setAddId('');
+                    }}
+                  >
+                    Lägg till i passet
+                  </Button>
+                </>
+              )}
             </>
           ) : (
             <ReadyWorkout
@@ -1152,19 +1283,9 @@ function PreviewEditor({
               Anpassa passet.
             </p>
           ) : null}
-          {preferences.programId === 'rehab' ? (
-            <label className="flex min-h-12 items-start gap-3 py-3 text-base">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(event) => setConfirmed(event.target.checked)}
-                className="size-6 shrink-0"
-              />
-              {preferences.rehabFocus === 'knee'
-                ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
-                : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
-            </label>
-          ) : (
+          {preferences.programId === 'rehab' && !physioPaper ? (
+            confirmBox
+          ) : preferences.programId === 'rehab' ? null : (
             <details className="border-y-2 border-edge py-2">
               <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
                 Besvär eller något att anpassa idag?
@@ -1291,9 +1412,14 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-4">
-            <div className="mx-auto w-full max-w-xl">
+          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-2">
+            <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
+              {physioPaper ? confirmBox : null}
               <Button
+                className={physioPaper ? 'min-h-14!' : ''}
+                aria-describedby={
+                  physioPaper && !confirmed ? 'start-blocked' : undefined
+                }
                 disabled={
                   busy ||
                   !ready ||
@@ -1371,7 +1497,7 @@ export function TrainingPreview({ id }: { id: string }) {
       preparationId,
 
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
-        | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
+        | Partial<Record<RehabFocus, PlannedExercise[]>>
         | undefined,
     };
   }, []);

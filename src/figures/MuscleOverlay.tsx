@@ -11,6 +11,9 @@ type Region = {
   shape: 'thigh' | 'hip' | 'trunk';
   a: Pt;
   b?: Pt;
+  /** 0..1: how hard the muscle works right now (primary fill opacity). */
+  strength?: number;
+  width?: number;
 };
 
 function lowerCore(pose: Pose): Region {
@@ -29,6 +32,7 @@ function segment(
   group: MuscleGroupId,
   role: 'primary' | 'secondary',
   patternId: string,
+  strength = 1,
 ) {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
@@ -44,7 +48,7 @@ function segment(
       rx={width / 2}
       transform={`rotate(${angle} ${a[0]} ${a[1]})`}
       fill={role === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
-      fillOpacity={role === 'primary' ? 0.48 : 1}
+      fillOpacity={role === 'primary' ? 0.48 - 0.46 * (1 - strength) : 1}
       stroke="var(--accent)"
       strokeWidth="1.5"
     />
@@ -114,6 +118,18 @@ export function MuscleOverlay({
       regions.push({ group: 'glutes', shape: 'hip', a: pose.hip });
     if (roleFor('core')) regions.push(lowerCore(pose));
   }
+  if (exerciseId === 'quad-set' && roleFor('quads')) {
+    // The thigh muscle tightens as the knee presses down.
+    const pressed = Math.max(0, Math.min(1, (pose.kR[1] - 168.5) / 5));
+    regions.push({
+      group: 'quads',
+      shape: 'thigh',
+      a: pose.hip,
+      b: pose.kR,
+      strength: pressed,
+      width: 12 + 10 * pressed,
+    });
+  }
   if (exerciseId === 'dead-bug' && roleFor('core')) {
     regions.push(lowerCore(pose));
   }
@@ -133,7 +149,7 @@ export function MuscleOverlay({
           <path d="M0 0V5" stroke="var(--accent)" strokeWidth="2" />
         </pattern>
       </defs>
-      {regions.map(({ group, shape, a, b }) => {
+      {regions.map(({ group, shape, a, b, strength, width }) => {
         const role = roleFor(group);
         if (!role) return null;
         if (shape === 'hip') return circle(a, 9, group, role, patternId);
@@ -141,10 +157,11 @@ export function MuscleOverlay({
         return segment(
           a,
           b,
-          shape === 'trunk' ? 13 : 8,
+          width ?? (shape === 'trunk' ? 13 : 8),
           group,
           role,
           patternId,
+          strength,
         );
       })}
     </g>

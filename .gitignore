@@ -7,3 +7,4 @@ screenshots/
 .impeccable/mocks/
 test-results/
 coverage/
+.privacy-denylist

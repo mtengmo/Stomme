@@ -6,6 +6,7 @@ import {
   experienceLabels,
   isTrainingPreferences,
   programmeNames,
+  rehabGroupOf,
   trainingName,
 } from '../../content/programmes';
 import { getDb } from '../../db/db';
@@ -17,6 +18,7 @@ import {
 import type {
   EquipmentChoice,
   ProgramId,
+  RehabFocus,
   TrainingPreferences,
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
@@ -48,7 +50,7 @@ export function TrainingSetup({
   const [experience, setExperience] = useState<
     TrainingPreferences['experience']
   >(current?.experience ?? 'new');
-  const [rehabFocus, setRehabFocus] = useState<'custom' | 'knee'>(
+  const [rehabFocus, setRehabFocus] = useState<RehabFocus>(
     current?.rehabFocus ?? 'custom',
   );
   const [rehabSide, setRehabSide] = useState<'right' | 'left' | 'both'>(
@@ -135,13 +137,14 @@ export function TrainingSetup({
             <select
               className={inputClass}
               value={rehabFocus}
-              onChange={(e) =>
-                setRehabFocus(e.target.value as 'custom' | 'knee')
-              }
+              onChange={(e) => setRehabFocus(e.target.value as RehabFocus)}
             >
               <option value="custom">Mitt eget rehabprogram</option>
               <option value="knee">
                 Allmän knäträning – färdigt AAOS-baserat pass
+              </option>
+              <option value="knee-physio">
+                Fysioterapeutens knäprogram (9 övningar)
               </option>
             </select>
           </label>
@@ -160,9 +163,11 @@ export function TrainingSetup({
             </select>
           </label>
           <p className="m-0 text-base">
-            {rehabFocus === 'knee'
+            {rehabGroupOf(rehabFocus) === 'aaos'
               ? 'Du får ett färdigt, redigerbart startpass för allmän knäträning. Övningsurval och startdos bygger på AAOS-programmet. Passet anpassas till din utrustning och valda sida.'
-              : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
+              : rehabGroupOf(rehabFocus) === 'physio'
+                ? 'Kontrollera övningar, sida och antal mot ditt papper från fysioterapeuten.'
+                : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
           </p>
         </>
       ) : null}

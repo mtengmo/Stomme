@@ -17,6 +17,7 @@ const UNIT_WORD: Record<Unit, string> = {
   reps: 'rep.',
   seconds: 's',
   meters: 'm',
+  laps: 'varv',
 };
 
 /** Short label for a chip: the name without the parenthesis. */

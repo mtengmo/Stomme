@@ -242,7 +242,7 @@ test('new catalogue animations render without overflow', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   const frames: { label: string; image: string }[] = [];
-  for (let n = 41; n <= 48; n++) {
+  for (let n = 41; n <= 53; n++) {
     await page.goto(`/#/granska?ovning=E${n}`);
     await expect(
       page.getByRole('heading', { name: new RegExp(`^E${n} · `) }),

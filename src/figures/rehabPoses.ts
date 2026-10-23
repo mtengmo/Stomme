@@ -3,7 +3,13 @@ import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 
 /** Solve a two-segment limb with a fixed endpoint; bend chooses the visible side. */
-function joint(a: Pt, b: Pt, upper: number, lower: number, bend = 1): Pt {
+export function joint(
+  a: Pt,
+  b: Pt,
+  upper: number,
+  lower: number,
+  bend = 1,
+): Pt {
   const dx = b[0] - a[0],
     dy = b[1] - a[1];
   const d = Math.max(0.001, Math.hypot(dx, dy));

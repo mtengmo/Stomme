@@ -443,3 +443,31 @@ describe('fallbacks when the previous session lacks detail', () => {
     ).toBe(false);
   });
 });
+
+describe('laps are never progressed', () => {
+  it('keeps the lap target after an easy, symptom-free session', () => {
+    const lapsPlan: PlannedExercise = {
+      ...plan,
+      exerciseId: 'balance-clock',
+      target: 3,
+      loadIndex: 0,
+      weightKg: 0,
+      variantId: 'bodyweight',
+    };
+    const lapLogs = logs().map((l) => ({
+      ...l,
+      exerciseId: 'balance-clock' as const,
+      amount: 3,
+      loadIndex: 0,
+      weightKg: 0,
+      variantId: 'bodyweight',
+    }));
+    const previous = session({
+      plan: [lapsPlan],
+      feedback: { 'balance-clock': { effort: 'easy' } },
+    });
+    const suggestion = trainingSuggestion(lapsPlan, previous, lapLogs);
+    expect(suggestion.target).toBe(3);
+    expect(suggestion.explanation).not.toMatch(/\+1/);
+  });
+});

@@ -185,3 +185,8 @@ Follow the implementation sequence above. Run the combined checks before committ
 - Copenhagen support/lever-arm context: https://www.sportsmith.co/articles/measuring-monitoring-and-training-for-athletic-hip-and-groin-function/ . This establishes related variants, not an exact source for the pictured lower-leg repetition.
 - User follow-up: “1 → a” was probably in an input form showing the number of dumbbells (hantlar). Start reproduction with equipment quantity fields/options in Edge, comparing translation off/on and distinguishing equipment count from weight. Exact field and cause remain unconfirmed.
 - Await exercise numbers with strange legs. These narrow reproduction work but do not block the catalogue/geometry audit.
+
+
+## Note: second rehab group (prefill exception)
+
+The rule that rehab doses are entered by the user still holds for custom rehab. The 'knee-physio' group is an owner-approved exception: prefilled, editable doses on a new start behind a required confirmation, with no automatic progression (plan.md section 12, decision 20).
