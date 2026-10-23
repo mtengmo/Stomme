@@ -99,7 +99,7 @@ export function QuickStart() {
     ]);
   }
   return (
-    <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[calc(var(--app-nav-height)+1.5rem)]">
+    <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[var(--app-nav-height)]">
       {goal ? (
         <button
           type="button"
@@ -285,47 +285,49 @@ export function QuickStart() {
               </p>
             </div>
           </details>
-          {error ? (
-            <p role="alert" className="m-0 text-base font-bold">
-              {error}
-            </p>
-          ) : null}
-          <Button
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              setError('');
-              try {
-                await saveTrainingPreferences(getDb(), {
-                  programId:
-                    goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
-                  equipment,
-                  experience,
-                  ...(weights.length ? { weights } : {}),
-                  ...(goal === 'knee' || goal === 'custom'
-                    ? {
-                        rehabFocus:
-                          goal === 'knee'
-                            ? ('knee' as const)
-                            : ('custom' as const),
-                        rehabSide: side,
-                      }
-                    : {}),
-                });
-                clearDraft();
-                navigate('/traning/A');
-              } catch (err) {
-                setError(
-                  err instanceof Error
-                    ? err.message
-                    : 'Kunde inte spara. Försök igen.',
-                );
-                setBusy(false);
-              }
-            }}
-          >
-            {goal === 'custom' ? 'Öppna mitt rehabprogram' : 'Visa mitt pass'}
-          </Button>
+          <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
+            {error ? (
+              <p role="alert" className="m-0 text-base font-bold">
+                {error}
+              </p>
+            ) : null}
+            <Button
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setError('');
+                try {
+                  await saveTrainingPreferences(getDb(), {
+                    programId:
+                      goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
+                    equipment,
+                    experience,
+                    ...(weights.length ? { weights } : {}),
+                    ...(goal === 'knee' || goal === 'custom'
+                      ? {
+                          rehabFocus:
+                            goal === 'knee'
+                              ? ('knee' as const)
+                              : ('custom' as const),
+                          rehabSide: side,
+                        }
+                      : {}),
+                  });
+                  clearDraft();
+                  navigate('/traning/A');
+                } catch (err) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : 'Kunde inte spara. Försök igen.',
+                  );
+                  setBusy(false);
+                }
+              }}
+            >
+              {goal === 'custom' ? 'Öppna mitt rehabprogram' : 'Visa mitt pass'}
+            </Button>
+          </div>
         </>
       )}
     </div>

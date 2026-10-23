@@ -49,6 +49,7 @@ import { availableWeights } from '../../rules/weightInventory';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { KneeCollection } from './KneeCollection';
+import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
 import { inputClass } from './TrainingHome';
 
@@ -231,8 +232,9 @@ function PreviewEditor({
     }
   }, [draftKey, plan]);
 
-  const [confirmed, setConfirmed] = useState(false);
-  const [checkBefore, setCheckBefore] = useState(false);
+  const [flags0] = useState(() => readFlags(draftKey));
+  const [confirmed, setConfirmed] = useState(flags0.confirmed);
+  const [checkBefore, setCheckBefore] = useState(flags0.checkBefore);
   const [editing, setEditing] = useState(() => {
     if (
       customWorkout ||
@@ -317,7 +319,10 @@ function PreviewEditor({
   const [removed, setRemoved] = useState<{
     item: PlannedExercise;
     index: number;
-  } | null>(null);
+  } | null>(flags0.removed);
+  useEffect(() => {
+    writeFlags(draftKey, { confirmed, checkBefore, removed });
+  }, [draftKey, confirmed, checkBefore, removed]);
   const [addMuscle, setAddMuscle] = useState<MuscleGroupId | ''>('');
   const [addRegion, setAddRegion] = useState('');
   const targetMuscles: readonly MuscleGroupId[] = addMuscle
@@ -1314,6 +1319,7 @@ function PreviewEditor({
                       sessionStorage.removeItem(draftKey);
                       sessionStorage.removeItem(`${draftKey}.editing`);
                       sessionStorage.removeItem(`${draftKey}.open`);
+                      clearFlags(draftKey);
                     } catch {
                       /* No persistent draft to clear. */
                     }
