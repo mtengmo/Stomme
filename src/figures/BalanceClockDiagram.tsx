@@ -89,10 +89,10 @@ export function BalanceClockDiagram({
           }
         >
           <path
-            d="M80 62C86 62 88 70 87 78C86 86 84 92 80 92C76 92 74 86 73 78C72 70 74 62 80 62Z"
+            d="M80 54C89 54 92 66 90 78C88 90 85 100 80 100C75 100 72 90 70 78C68 66 71 54 80 54Z"
             fill="var(--paper)"
             stroke="var(--edge)"
-            strokeWidth="3"
+            strokeWidth="4"
             strokeLinejoin="round"
           />
         </g>

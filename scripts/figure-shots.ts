@@ -143,7 +143,13 @@ try {
               if (current.startsWith('Höger') !== (side === 'right'))
                 await toggle.click();
               const label = `${side} phase ${phase}`;
-              card.push({ label, image: await region.screenshot() });
+              card.push({
+                label,
+                image: await (id === 'balance-clock'
+                  ? page.locator('.exercise-stage')
+                  : region
+                ).screenshot(),
+              });
               const svg = page.locator('.exercise-stage svg');
               await svg.evaluate((e) => {
                 (e as unknown as SVGElement).style.cssText =
@@ -154,10 +160,22 @@ try {
                 (e as unknown as SVGElement).style.cssText = '';
               });
             }
-            if (id === 'balance-clock' && side === 'right')
+            if (id === 'balance-clock') {
+              const diagram = page.getByTestId('balance-clock-diagram');
+              await diagram.screenshot({
+                path: `${out}/diagram-${tag}-${side}.png`,
+              });
+              const pause = page.getByRole('button', {
+                name: /Pausa rörelsen/,
+              });
+              await pause.click();
+              await diagram.screenshot({
+                path: `${out}/diagram-${tag}-${side}-paused.png`,
+              });
               await page
-                .getByTestId('balance-clock-diagram')
-                .screenshot({ path: `${out}/diagram-${tag}.png` });
+                .getByRole('button', { name: /Spela rörelsen/ })
+                .click();
+            }
             await sheet(
               page,
               card,
