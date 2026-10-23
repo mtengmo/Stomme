@@ -186,23 +186,33 @@ describe('knee programme figures', () => {
     expect(angle).toBeCloseTo(20, 4);
   });
 
-  it('balance clock: standing leg fixed; free toe taps forward in the middle and back at the end', () => {
+  it('balance clock: the far leg stands fixed; the near (working) toe taps forward in the middle and back at the end', () => {
     const s = balanceClockPose(0);
     for (const t of STEPS) {
       const p = balanceClockPose(t);
-      expect(p.aR).toEqual(s.aR);
-      expect(p.tR).toEqual(s.tR);
-      expect(p.tL[1]).toBeLessThanOrEqual(177 + 1e-9);
+      expect(p.kL).toEqual(s.kL);
+      expect(p.aL).toEqual(s.aL);
+      expect(p.tL).toEqual(s.tL);
+      expect(p.tR[1]).toBeLessThanOrEqual(177 + 1e-9);
+      // Bone lengths stay constant.
+      expect(Math.hypot(p.hip[0] - p.kR[0], p.hip[1] - p.kR[1])).toBeCloseTo(
+        30,
+        4,
+      );
+      expect(Math.hypot(p.kR[0] - p.aR[0], p.kR[1] - p.aR[1])).toBeCloseTo(
+        27,
+        4,
+      );
     }
     const mid = balanceClockPose(0.5);
     const end = balanceClockPose(1);
-    expect(mid.tL[0]).toBeGreaterThan(mid.hip[0] + 20);
-    expect(end.tL[0]).toBeLessThan(end.hip[0] - 15);
-    expect(mid.tL[1]).toBeCloseTo(177, 6);
-    // The swinging knee never travels far in front of the standing knee.
+    expect(mid.tR[0]).toBeGreaterThan(mid.hip[0] + 20);
+    expect(end.tR[0]).toBeLessThan(end.hip[0] - 15);
+    expect(mid.tR[1]).toBeCloseTo(177, 6);
+    expect(end.tR[1]).toBeCloseTo(177, 6);
+    // The moving knee never travels far in front of the standing knee.
     for (const t of STEPS)
-      expect(balanceClockPose(t).kL[0] - s.kR[0]).toBeLessThan(13);
-    expect(end.tL[1]).toBeCloseTo(177, 6);
+      expect(balanceClockPose(t).kR[0] - s.kL[0]).toBeLessThan(13);
   });
 
   it('left sets mirror the scene and keep blue on the working limb', () => {
@@ -247,15 +257,47 @@ describe('knee programme figures', () => {
     expect(render('quad-set', null)).not.toContain('data-equipment');
   });
 
-  it('balance clock diagram: text alternative, four dots, theme tokens only', () => {
-    const html = renderToStaticMarkup(<BalanceClockDiagram working="left" />);
+  const dotsOf = (html: string) =>
+    [...html.matchAll(/data-clock-dot="([^"]+)"/g)].map((m) => m[1]);
+
+  it('balance clock diagram right: dots 12, 1.30, 3, 4.30, 6 and no 9', () => {
+    const html = renderToStaticMarkup(<BalanceClockDiagram working="right" />);
     expect(html).toContain('role="img"');
-    expect(html).toContain('aria-labelledby');
     expect(html).toMatch(/<title[^>]*>Balansklockan sedd uppifrån/);
-    for (const hour of [12, 3, 6, 9])
-      expect(html).toContain(`data-clock-dot="${hour}"`);
-    expect(html).toContain('>V<');
+    expect(dotsOf(html)).toEqual(['12', '1.30', '3', '4.30', '6']);
+    expect(html).toContain('stå på vänster ben');
+    expect(html).toContain('halv två');
+    expect(html).toContain('Punkterna lyses upp i tur och ordning.');
+    expect(html).toContain('clock-dot-cycle');
     expect(html).not.toMatch(/#[0-9a-fA-F]{3,6}|rgb\(/);
+  });
+
+  it('balance clock diagram left mirrors: 12, 10.30, 9, 7.30, 6 and no 3', () => {
+    const html = renderToStaticMarkup(<BalanceClockDiagram working="left" />);
+    expect(dotsOf(html)).toEqual(['12', '10.30', '9', '7.30', '6']);
+    expect(html).toContain('stå på höger ben');
+    expect(html).toContain('halv elva');
+    expect(html).not.toContain('data-clock-dot="3"');
+  });
+
+  it('balance clock diagram without a side shows the right half and mentions the mirror', () => {
+    const html = renderToStaticMarkup(<BalanceClockDiagram working={null} />);
+    expect(dotsOf(html)).toEqual(['12', '1.30', '3', '4.30', '6']);
+    expect(html).toContain('speglas');
+  });
+
+  it('balance clock diagram paused: no animation and numbers 1-5', () => {
+    const html = renderToStaticMarkup(
+      <BalanceClockDiagram working="right" paused />,
+    );
+    expect(html).not.toContain('clock-dot-cycle');
+    for (const n of [1, 2, 3, 4, 5])
+      expect(html).toContain(`data-order="${n}"`);
+    expect(html).toContain('Punkterna är numrerade i ordning.');
+    const running = renderToStaticMarkup(
+      <BalanceClockDiagram working="right" />,
+    );
+    expect(running).not.toContain('data-order=');
   });
 
   it('the bands stay visible in every phase, slack at the start and straight when taut', () => {

@@ -200,8 +200,9 @@ const dwell = (u: number) => {
 };
 
 /**
- * Side view of the balance clock: the near leg stands, the far foot taps the
- * floor in front (middle pose) and behind (end pose), lifting between taps.
+ * Side view of the balance clock: the far leg stands, the near (working, blue)
+ * foot taps the floor in front (middle pose) and behind (end pose), lifting
+ * between taps.
  */
 export function balanceClockPose(progress: number): Pose {
   const t = clamp01(progress);
@@ -217,11 +218,11 @@ export function balanceClockPose(progress: number): Pose {
   );
   const lift = CLOCK.lift * Math.sin(Math.PI * u);
   const toeTip: Pt = [toeX, CLOCK.floorToeY - lift];
-  const farAnkle: Pt = [
+  const moveAnkle: Pt = [
     toeTip[0] - footLength * Math.cos(angle),
     toeTip[1] - footLength * Math.sin(angle),
   ];
-  const farKnee = joint(hip, farAnkle, thigh, shin, -1);
+  const moveKnee = joint(hip, moveAnkle, thigh, shin, -1);
   const standKnee = joint(hip, standAnkle, thigh, shin, -1);
   // Counterbalance: the trunk leans slightly away from the reaching foot.
   const lean = rad(
@@ -246,7 +247,7 @@ export function balanceClockPose(progress: number): Pose {
       joint(neck, CLOCK.handFar, 33, 33, 1),
       CLOCK.handFar,
     ],
-    [standKnee, standAnkle, toe(standAnkle), farKnee, farAnkle, toeTip],
+    [moveKnee, moveAnkle, toeTip, standKnee, standAnkle, toe(standAnkle)],
   );
 }
 
