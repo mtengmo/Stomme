@@ -10,6 +10,7 @@ import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
 import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
+import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import type { Equipment } from '../../figures/Figure';
 import {
   Figure,
@@ -31,6 +32,7 @@ const MUSCLE_OVERLAY_EXERCISES = new Set<ExerciseId>([
   'goblet-chair-squat',
   'single-leg-rdl',
   'dead-bug',
+  'quad-set',
 ]);
 
 /** One bounded reader that keeps movement, muscle focus and coaching together. */
@@ -197,6 +199,9 @@ export function ExerciseCardBody({
                 view={view}
               />
             </div>
+            {exercise.id === 'balance-clock' && view === 'side' ? (
+              <BalanceClockDiagram working={working} />
+            ) : null}
             {review ? equipmentControls : null}
             {!reducedMotion ? (
               <button

@@ -9,7 +9,14 @@ import { constrainLegInterpolation } from './constrainedLegs';
 import { FrontFigureFrame, supportsFrontView } from './frontViews';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
-import { figures, POSE_KEYS, type Pose } from './poses';
+import { physioMovementPose } from './physioPoses';
+import {
+  type FigureSpec,
+  figures,
+  POSE_KEYS,
+  type Pose,
+  type PoseKey,
+} from './poses';
 import { FloorLine, Held, PropShape } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
 
@@ -28,6 +35,8 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   const rehabPose = rehabMovementPose(exerciseId, t);
   if (rehabPose) return rehabPose;
+  const physioPose = physioMovementPose(exerciseId, t);
+  if (physioPose) return physioPose;
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
@@ -59,6 +68,37 @@ export function usePrefersReducedMotion(): boolean {
     return () => mq.removeEventListener('change', on);
   }, []);
   return reduced;
+}
+
+/** Hold at the end of a repetition, where it differs from the default. */
+const END_HOLD_MS: Partial<Record<ExerciseId, number>> = {
+  'seated-knee-extension': 5000,
+  'band-knee-extension': 5000,
+  'single-leg-floor-bridge': 2000,
+  'quad-set': 3000,
+};
+
+/** Both ends of the band for this figure, resolved against the current pose. */
+export function bandEndpoints(
+  band: NonNullable<FigureSpec['band']>,
+  pose: Pose,
+): [Pt, Pt] {
+  const from: Pt =
+    typeof band.from === 'string' ? pose[band.from as PoseKey] : band.from;
+  return [from, pose[band.to]];
+}
+
+/**
+ * DEV only review hook: `?phase=0..1` in the hash (for example
+ * `#/ovning/quad-set?phase=0.5`) freezes the figure at that cycle phase.
+ */
+function forcedPhase(): number | undefined {
+  if (!import.meta.env.DEV || typeof window === 'undefined') return undefined;
+  const raw = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get(
+    'phase',
+  );
+  const value = raw === null ? Number.NaN : Number(raw);
+  return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : undefined;
 }
 
 const W = 6;
@@ -196,6 +236,20 @@ export function FigureFrame({
           <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
         ))}
         <FloorLine />
+        {exerciseId === 'quad-set' ? (
+          // Floor-contact cue under the knee: fades in as the knee presses down.
+          <line
+            data-testid="press-cue"
+            x1={p.kR[0] - 9}
+            y1="177"
+            x2={p.kR[0] + 9}
+            y2="177"
+            stroke="var(--accent)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity={Math.max(0, Math.min(1, (p.kR[1] - 168.5) / 5))}
+          />
+        ) : null}
         {showMuscles ? (
           <MuscleOverlay exerciseId={exerciseId} pose={p} />
         ) : null}
@@ -228,7 +282,17 @@ export function FigureFrame({
             <path d={`M${p.hR[0] - 3} ${p.hR[1]}h4`} />
           </g>
         ) : null}
-        {rack ? null : heldKind === 'band' ? (
+        {rack ? null : spec.band && equipment !== null ? (
+          <path
+            data-equipment="band"
+            d={line([...bandEndpoints(spec.band, p)])}
+            fill="none"
+            stroke="var(--equipment)"
+            strokeWidth="3"
+            strokeDasharray="5 3"
+            strokeLinecap="round"
+          />
+        ) : heldKind === 'band' ? (
           <path
             data-equipment="band"
             d={`M${p.hR.join(' ')}L${p.aR[0] + 2} ${p.aR[1] - 2}L${p.hL.join(' ')}`}
@@ -286,13 +350,14 @@ export function Figure({
   equipment?: Equipment;
   view?: 'side' | 'front';
 }) {
-  const reduced = usePrefersReducedMotion();
+  const forced = forcedPhase();
+  const reduced = usePrefersReducedMotion() && forced === undefined;
   const spec = figures[exerciseId];
   const [t, setT] = useState(0);
   const elapsedMs = useRef(0);
 
   useEffect(() => {
-    if (reduced || paused) return;
+    if (reduced || paused || forced !== undefined) return;
     let raf = 0;
     const t0 = performance.now() - elapsedMs.current;
     const tick = (now: number) => {
@@ -300,20 +365,13 @@ export function Figure({
       setT(
         spec.motion === 'ballistic'
           ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-          : cycleProgress(
-              elapsedMs.current,
-              exerciseId === 'seated-knee-extension'
-                ? 5000
-                : exerciseId === 'single-leg-floor-bridge'
-                  ? 2000
-                  : undefined,
-            ),
+          : cycleProgress(elapsedMs.current, END_HOLD_MS[exerciseId]),
       );
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, paused, spec.motion, exerciseId]);
+  }, [reduced, paused, forced, spec.motion, exerciseId]);
 
   if (reduced && !stillOnly) {
     return (
@@ -344,9 +402,11 @@ export function Figure({
   }
   const pose = reduced
     ? spec.start
-    : spec.motion === 'hold'
-      ? spec.end
-      : movementPose(exerciseId, t);
+    : forced !== undefined
+      ? movementPose(exerciseId, forced)
+      : spec.motion === 'hold'
+        ? spec.end
+        : movementPose(exerciseId, t);
   const displayedPose =
     exerciseId === 'heel-slide'
       ? heelSlidePose(
@@ -362,7 +422,7 @@ export function Figure({
       equipment={equipment}
       showMuscles={showMuscles}
       view={view}
-      phase={reduced ? 0 : spec.motion === 'hold' ? 1 : t}
+      phase={forced ?? (reduced ? 0 : spec.motion === 'hold' ? 1 : t)}
     />
   );
 }
