@@ -53,8 +53,16 @@ describe('side-neutral copy', () => {
   it('has no fixed side words in tips of one-sided exercises', async () => {
     const { exerciseList } = await import('./exercises');
     for (const ex of exerciseList.filter((e) => e.perSide)) {
-      const text = [...ex.tips, ex.commonMistake, ex.easierVariant].join(' ');
+      // The balance clock names both foot-specific lists, in tip 2 only.
+      const tips =
+        ex.id === 'balance-clock'
+          ? ex.tips.filter((_, index) => index !== 1)
+          : ex.tips;
+      const text = [...tips, ex.commonMistake, ex.easierVariant].join(' ');
       expect(text, ex.id).not.toMatch(/h(ö|o)ger|vänster/i);
     }
+    expect(exerciseList.find((e) => e.id === 'balance-clock')?.tips[1]).toMatch(
+      /höger fot.*vänster fot/,
+    );
   });
 });

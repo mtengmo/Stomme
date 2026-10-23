@@ -141,6 +141,20 @@ export function ExerciseCardBody({
     </div>
   );
 
+  const isClock = exercise.id === 'balance-clock' && view === 'side';
+  const pauseControl = !reducedMotion ? (
+    <button
+      type="button"
+      aria-pressed={paused}
+      onClick={() => setPaused((value) => !value)}
+      className="min-h-12 self-start px-2 text-base font-bold underline"
+    >
+      {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
+    </button>
+  ) : (
+    <p className="sr-only">Rörelsen visas stilla med minskad rörelse.</p>
+  );
+
   return (
     <div className="exercise-guide flex min-h-0 min-w-0 flex-1 flex-col">
       {showTitle ? (
@@ -186,6 +200,14 @@ export function ExerciseCardBody({
                 ))}
               </fieldset>
             ) : null}
+            {isClock ? (
+              <BalanceClockDiagram
+                working={working}
+                paused={paused || reducedMotion}
+              >
+                {pauseControl}
+              </BalanceClockDiagram>
+            ) : null}
             <div
               className={`exercise-stage rounded-md border-2 border-edge p-2 ${review ? 'review-stage' : ''}`}
             >
@@ -199,30 +221,18 @@ export function ExerciseCardBody({
                 view={view}
               />
             </div>
-            {exercise.id === 'balance-clock' && view === 'side' ? (
-              <BalanceClockDiagram working={working} />
-            ) : null}
             {review ? equipmentControls : null}
-            {!reducedMotion ? (
-              <button
-                type="button"
-                aria-pressed={paused}
-                onClick={() => setPaused((value) => !value)}
-                className="min-h-12 self-start px-2 text-base font-bold underline"
-              >
-                {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
-              </button>
-            ) : (
-              <p className="sr-only">
-                Rörelsen visas stilla med minskad rörelse.
-              </p>
-            )}
+            {isClock ? null : pauseControl}
             {working || !overlayActive || equipment ? (
               <p className="m-0 text-base text-ink-soft">
                 {working
-                  ? working === 'right'
-                    ? 'H: höger sida arbetar.'
-                    : 'V: vänster sida arbetar.'
+                  ? isClock
+                    ? working === 'right'
+                      ? 'H: höger fot rör sig. Du står på vänster ben.'
+                      : 'V: vänster fot rör sig. Du står på höger ben.'
+                    : working === 'right'
+                      ? 'H: höger sida arbetar.'
+                      : 'V: vänster sida arbetar.'
                   : !overlayActive
                     ? 'Blått: båda sidor arbetar.'
                     : ''}

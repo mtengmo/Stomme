@@ -4,6 +4,8 @@
  *   compare: dev-page sections and a few cards of the pre-existing figures
  *            (rutat light and dark), for before/after pixel comparison.
  *   dev:     only the dev-page sections of E49-E53 (with the frame strip).
+ *   final:   full-card 360x640 captures of E53 (right/left, animated/paused)
+ *            in rutat light and hog-kontrast dark, plus a layout report.
  *   review:  E49-E53 on the dev page and the exercise card: start/mid/end at
  *            card size and 128 px, a mid-cycle frame sequence, three themes,
  *            light and dark.
@@ -15,8 +17,14 @@ import { exerciseList } from '../src/content/exercises';
 
 const out = process.argv[2];
 const mode = process.argv[3];
-if (!out || (mode !== 'compare' && mode !== 'review' && mode !== 'dev'))
-  throw new Error('usage: figure-shots.ts <outDir> <compare|review|dev>');
+if (
+  !out ||
+  (mode !== 'compare' &&
+    mode !== 'review' &&
+    mode !== 'dev' &&
+    mode !== 'final')
+)
+  throw new Error('usage: figure-shots.ts <outDir> <compare|review|dev|final>');
 mkdirSync(out, { recursive: true });
 
 const port = 5311;
@@ -94,9 +102,13 @@ try {
   const themes =
     mode === 'compare'
       ? ['rutat']
-      : ['rutat', 'hav', 'kvallssol', 'hog-kontrast'];
+      : mode === 'final'
+        ? ['rutat', 'hog-kontrast']
+        : ['rutat', 'hav', 'kvallssol', 'hog-kontrast'];
   for (const theme of themes) {
     for (const colorScheme of ['light', 'dark'] as const) {
+      if (mode === 'final' && (theme === 'rutat') !== (colorScheme === 'light'))
+        continue;
       const context = await browser.newContext({
         viewport: { width: 360, height: 900 },
         deviceScaleFactor: mode === 'dev' ? 2 : 1,
@@ -106,6 +118,66 @@ try {
       const page = await context.newPage();
       await prepare(page, theme);
       const tag = `${theme}-${colorScheme}`;
+      if (mode === 'final') {
+        await context.close();
+        const fin = await browser.newContext({
+          viewport: { width: 360, height: 640 },
+          deviceScaleFactor: 2,
+          colorScheme,
+          reducedMotion: 'no-preference',
+        });
+        const fp = await fin.newPage();
+        await prepare(fp, theme);
+        for (const side of ['right', 'left'] as const) {
+          await fp.goto(`${base}/#/ovning/balance-clock?phase=0.25`);
+          await fp.getByTestId('balance-clock-diagram').waitFor();
+          const toggle = fp.getByRole('button', { name: /Byt sida/ });
+          if (
+            ((await toggle.textContent()) ?? '').startsWith('Höger') !==
+            (side === 'right')
+          )
+            await toggle.click();
+          const resume = fp.getByRole('button', { name: 'Spela rörelsen' });
+          if (await resume.count()) await resume.click();
+          for (const state of ['animated', 'paused'] as const) {
+            if (state === 'paused')
+              await fp.getByRole('button', { name: 'Pausa rörelsen' }).click();
+            await fp.evaluate(
+              `window.scrollTo(0, 0); document.querySelectorAll('*').forEach(function (e) { e.scrollTop = 0; })`,
+            );
+            await fp.screenshot({
+              path: `${out}/fullcard-${tag}-${side}-${state}.png`,
+            });
+            // A string keeps tsx helpers (__name) out of the browser.
+            const boxes = await fp.evaluate(`(() => {
+              var rect = function (e) {
+                var r = e && e.getBoundingClientRect();
+                return r ? { top: Math.round(r.top), bottom: Math.round(r.bottom) } : null;
+              };
+              var byText = function (re) {
+                return Array.from(document.querySelectorAll('button,p')).find(function (e) { return re.test(e.textContent || ''); });
+              };
+              return {
+                viewportHeight: innerHeight,
+                sideButton: rect(byText(/Byt sida/)),
+                diagram: rect(document.querySelector('[data-testid="balance-clock-diagram"]')),
+                pause: rect(byText(/(Pausa|Spela) rörelsen/)),
+                stage: rect(document.querySelector('.exercise-stage')),
+                legend: rect(byText(/rör sig. Du står/)),
+              };
+            })()`);
+            console.log(tag, side, state, JSON.stringify(boxes));
+            await fp.evaluate(
+              `document.querySelector('[data-testid="exercise-guide-scroll"]').scrollTop = 330`,
+            );
+            await fp.screenshot({
+              path: `${out}/fullcard-${tag}-${side}-${state}-scrolled.png`,
+            });
+          }
+        }
+        await fin.close();
+        continue;
+      }
       await page.goto(`${base}/#/dev/figurer`);
       await page.getByRole('heading', { name: 'Figurer' }).waitFor();
       const wanted =
@@ -143,7 +215,13 @@ try {
               if (current.startsWith('Höger') !== (side === 'right'))
                 await toggle.click();
               const label = `${side} phase ${phase}`;
-              card.push({ label, image: await region.screenshot() });
+              card.push({
+                label,
+                image: await (id === 'balance-clock'
+                  ? page.locator('.exercise-stage')
+                  : region
+                ).screenshot(),
+              });
               const svg = page.locator('.exercise-stage svg');
               await svg.evaluate((e) => {
                 (e as unknown as SVGElement).style.cssText =
@@ -154,10 +232,22 @@ try {
                 (e as unknown as SVGElement).style.cssText = '';
               });
             }
-            if (id === 'balance-clock' && side === 'right')
+            if (id === 'balance-clock') {
+              const diagram = page.getByTestId('balance-clock-diagram');
+              await diagram.screenshot({
+                path: `${out}/diagram-${tag}-${side}.png`,
+              });
+              const pause = page.getByRole('button', {
+                name: /Pausa rörelsen/,
+              });
+              await pause.click();
+              await diagram.screenshot({
+                path: `${out}/diagram-${tag}-${side}-paused.png`,
+              });
               await page
-                .getByTestId('balance-clock-diagram')
-                .screenshot({ path: `${out}/diagram-${tag}.png` });
+                .getByRole('button', { name: /Spela rörelsen/ })
+                .click();
+            }
             await sheet(
               page,
               card,
