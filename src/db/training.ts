@@ -2,10 +2,15 @@ import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
 import { kneeRehabExercises } from '../content/kneeRehab';
 
-import { isTrainingPreferences } from '../content/programmes';
+import {
+  isTrainingPreferences,
+  rehabGroup,
+  rehabGroupOf,
+} from '../content/programmes';
 
 import type {
   PlannedExercise,
+  RehabFocus,
   Session,
   TemplateId,
   TrainingCheckin,
@@ -137,7 +142,7 @@ export async function startTrainingSession(
     !isTrainingPreferences(preferences) ||
     !validateTrainingPlan(plan) ||
     (preferences.programId === 'rehab' &&
-      preferences.rehabFocus === 'knee' &&
+      rehabGroup(preferences) === 'aaos' &&
       plan.some(
         (p) => !kneeRehabExercises.some((ex) => ex.id === p.exerciseId),
       )) ||
@@ -298,10 +303,13 @@ export async function deferAfterCheckin(
 
 export async function saveRehabPlan(
   db: StommeDB,
-  focus: 'custom' | 'knee',
+  focus: RehabFocus,
   plan: PlannedExercise[],
 ) {
-  if (!['custom', 'knee'].includes(focus) || !validateTrainingPlan(plan))
+  if (
+    !['custom', 'knee', 'knee-physio'].includes(focus) ||
+    !validateTrainingPlan(plan)
+  )
     throw new Error(
       'Kontrollera övningar, antal, vikt och sidor innan du sparar.',
     );
@@ -328,7 +336,7 @@ export async function saveRehabPlan(
           return (
             !variant ||
             !equipmentFits(variant.equipment, preferences.equipment) ||
-            (focus === 'knee' &&
+            (rehabGroupOf(focus) === 'aaos' &&
               !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
           );
         })
@@ -337,7 +345,7 @@ export async function saveRehabPlan(
           'Kontrollera rehabinriktning och tillgänglig utrustning.',
         );
       const previous = (await db.meta.get('rehabPlans'))?.value as
-        | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
+        | Partial<Record<RehabFocus, PlannedExercise[]>>
         | undefined;
 
       await db.meta.put({

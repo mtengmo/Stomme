@@ -3,6 +3,7 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseList, exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import { exerciseMuscles } from '../../content/muscles';
+import { rehabGroup } from '../../content/programmes';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
@@ -17,7 +18,7 @@ export function ReadyWorkout({
   onChange(index: number): void;
 }) {
   const knee =
-    preferences.programId === 'rehab' && preferences.rehabFocus === 'knee';
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
   const ids = plan.map((item) => item.exerciseId);
   const primary = new Set(
     ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),

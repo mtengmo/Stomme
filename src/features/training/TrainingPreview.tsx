@@ -17,6 +17,8 @@ import {
 import {
   experienceLabels,
   isTrainingPreferences,
+  rehabGroup,
+  rehabGroupOf,
   trainingName,
 } from '../../content/programmes';
 import {
@@ -35,6 +37,7 @@ import {
 import type {
   ExerciseId,
   PlannedExercise,
+  RehabFocus,
   Session,
   SetLog,
   TemplateId,
@@ -115,7 +118,7 @@ function defaultPlan(
 
   logs: SetLog[],
 
-  savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>,
+  savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
 ): PlannedExercise[] {
   if (preferences.programId === 'rehab') {
     const focus = preferences.rehabFocus ?? 'custom';
@@ -135,7 +138,8 @@ function defaultPlan(
         ...plan,
 
         explanation: 'Din senast använda dosering. Kontrollera före start.',
-      })) ?? (focus === 'knee' ? kneeConditioningPlan(preferences) : [])
+      })) ??
+      (rehabGroupOf(focus) === 'aaos' ? kneeConditioningPlan(preferences) : [])
     );
   }
 
@@ -169,7 +173,7 @@ function PreviewEditor({
 
   logs: SetLog[];
 
-  savedPlans?: Partial<Record<'custom' | 'knee', PlannedExercise[]>>;
+  savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>;
   customWorkout?: CustomWorkout;
   preparationId?: string;
 }) {
@@ -239,7 +243,8 @@ function PreviewEditor({
     if (
       customWorkout ||
       !validateTrainingPlan(plan) ||
-      (preferences.programId === 'rehab' && preferences.rehabFocus !== 'knee')
+      (preferences.programId === 'rehab' &&
+        rehabGroup(preferences) === 'custom')
     )
       return true;
     try {
@@ -259,7 +264,7 @@ function PreviewEditor({
     validateTrainingPlan(plan) &&
     !(
       preferences.programId === 'rehab' &&
-      preferences.rehabFocus === 'knee' &&
+      rehabGroup(preferences) === 'aaos' &&
       plan.some(
         (item) =>
           !kneeRehabExercises.some(
@@ -292,7 +297,7 @@ function PreviewEditor({
   const compatible = available(preferences).filter(
     (ex) =>
       preferences.programId !== 'rehab' ||
-      preferences.rehabFocus !== 'knee' ||
+      rehabGroup(preferences) !== 'aaos' ||
       kneeRehabExercises.some((knee) => knee.id === ex.id),
   );
 
@@ -420,14 +425,16 @@ function PreviewEditor({
             <>
               {preferences.programId === 'rehab' ? (
                 <p className="m-0 text-base">
-                  {preferences.rehabFocus === 'knee'
+                  {rehabGroup(preferences) === 'aaos'
                     ? 'Ett färdigt allmänt knäpass med styrka och rörlighet. Kontrollera övningar, sida och antal före start.'
-                    : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'}
+                    : rehabGroup(preferences) === 'physio'
+                      ? 'Kontrollera övningar, sida och antal mot ditt papper från fysioterapeuten.'
+                      : 'Lägg till övningarna och doseringen från din fysioterapeut. Välj vilken sida som ska arbeta.'}
                 </p>
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus !== 'knee' &&
+              rehabGroup(preferences) === 'custom' &&
               !customWorkout ? (
                 <section
                   className="flex flex-col gap-2 border-y-2 border-edge py-3"
@@ -490,7 +497,7 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus === 'knee' ? (
+              rehabGroup(preferences) === 'aaos' ? (
                 <section
                   aria-label="Färdigt knäpass"
                   className="flex flex-col gap-3"
@@ -537,7 +544,7 @@ function PreviewEditor({
               ) : null}
 
               {preferences.programId === 'rehab' &&
-              preferences.rehabFocus === 'knee' ? (
+              rehabGroup(preferences) === 'aaos' ? (
                 <details className="border-y-2 border-edge py-2">
                   <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
                     Välj övningar från AAOS · 12 övningar
@@ -692,7 +699,7 @@ function PreviewEditor({
                             </label>
                           ) : null}
                           {preferences.programId === 'rehab' &&
-                          preferences.rehabFocus === 'knee' ? (
+                          rehabGroup(preferences) === 'aaos' ? (
                             <ExerciseDifficulty
                               exerciseId={exercise.id}
                               variantId={item.variantId}
@@ -1160,9 +1167,11 @@ function PreviewEditor({
                 onChange={(event) => setConfirmed(event.target.checked)}
                 className="size-6 shrink-0"
               />
-              {preferences.rehabFocus === 'knee'
+              {rehabGroup(preferences) === 'aaos'
                 ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
-                : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
+                : rehabGroup(preferences) === 'physio'
+                  ? 'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten.'
+                  : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
             </label>
           ) : (
             <details className="border-y-2 border-edge py-2">
@@ -1371,7 +1380,7 @@ export function TrainingPreview({ id }: { id: string }) {
       preparationId,
 
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
-        | Partial<Record<'custom' | 'knee', PlannedExercise[]>>
+        | Partial<Record<RehabFocus, PlannedExercise[]>>
         | undefined,
     };
   }, []);
