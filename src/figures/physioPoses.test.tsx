@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { exerciseList } from '../content/exercises';
 import { BalanceClockDiagram } from './BalanceClockDiagram';
-import { bandEndpoints, FigureFrame, movementPose } from './Figure';
+import { bandEndpoints, bandShape, FigureFrame, movementPose } from './Figure';
 import type { Pt } from './lerp';
 import {
   BAND_KNEE_ANCHOR,
@@ -147,11 +147,20 @@ describe('knee programme figures', () => {
       const [from, to] = bandEndpoints(band, p);
       expect(from).toEqual(BAND_KNEE_ANCHOR);
       expect(to).toEqual(p.aR);
+      const { points } = bandShape(band, p);
+      expect(points[0]).toEqual(from);
+      expect(points.at(-1)).toEqual(to);
       for (const obstacle of [rearLeg, frontLeg, [p.kL, p.aL] as [Pt, Pt]])
-        expect(
-          intersects(from, to, obstacle[0], obstacle[1]),
-          `band crosses an obstacle at t=${t}`,
-        ).toBe(false);
+        for (let i = 1; i < points.length; i++)
+          expect(
+            intersects(
+              points[i - 1] as Pt,
+              points[i] as Pt,
+              obstacle[0],
+              obstacle[1],
+            ),
+            `band crosses an obstacle at t=${t}`,
+          ).toBe(false);
     }
   });
 
@@ -163,9 +172,12 @@ describe('knee programme figures', () => {
       expect(Math.abs(p.neck[0] - p.hip[0])).toBeLessThan(2);
       expect(d(p.hip, p.aR)).toBeCloseTo(d(p.hip, p.kR) + d(p.kR, p.aR), 6);
       const [from, to] = bandEndpoints(band, p);
-      expect(from).toEqual(p.aL);
-      expect(to).toEqual(p.aR);
+      expect(from).toEqual([p.aL[0], p.aL[1] - 7]);
+      expect(to).toEqual([p.aR[0], p.aR[1] - 7]);
       expect(p.aL).toEqual(bandHipExtensionPose(0).aL);
+      // The stance leg is straight and never moves.
+      expect(d(p.hip, p.aL)).toBeCloseTo(d(p.hip, p.kL) + d(p.kL, p.aL), 6);
+      expect(p.kL).toEqual(bandHipExtensionPose(0).kL);
     }
     const end = bandHipExtensionPose(1);
     const angle =
@@ -189,7 +201,7 @@ describe('knee programme figures', () => {
     expect(mid.tL[1]).toBeCloseTo(177, 6);
     // The swinging knee never travels far in front of the standing knee.
     for (const t of STEPS)
-      expect(balanceClockPose(t).kL[0] - s.kR[0]).toBeLessThan(16);
+      expect(balanceClockPose(t).kL[0] - s.kR[0]).toBeLessThan(13);
     expect(end.tL[1]).toBeCloseTo(177, 6);
   });
 
@@ -244,6 +256,54 @@ describe('knee programme figures', () => {
       expect(html).toContain(`data-clock-dot="${hour}"`);
     expect(html).toContain('>V<');
     expect(html).not.toMatch(/#[0-9a-fA-F]{3,6}|rgb\(/);
+  });
+
+  it('the bands stay visible in every phase, slack at the start and straight when taut', () => {
+    for (const id of ['band-knee-extension', 'band-hip-extension'] as const) {
+      const band = figures[id].band;
+      if (!band) throw new Error('band expected');
+      const start = bandShape(band, at(id, 0));
+      expect(start.d).toContain('C');
+      const origin = start.points[0] ?? [0, 0];
+      const bbox = start.points.reduce(
+        (m, p) => Math.max(m, Math.hypot(p[0] - origin[0], p[1] - origin[1])),
+        0,
+      );
+      expect(bbox).toBeGreaterThan(4);
+      expect(bandShape(band, at(id, 1)).points).toHaveLength(2);
+    }
+  });
+
+  it('quad set: framed to fill the card and keeps a blue working leg in overlay mode', () => {
+    const html = renderToStaticMarkup(
+      <FigureFrame exerciseId="quad-set" pose={quadSetPose(1)} showMuscles />,
+    );
+    expect(html).toContain('viewBox="24 128 160 52"');
+    expect(html).toMatch(/data-body-side="near" stroke="var\(--accent\)"/);
+  });
+
+  it('the side marker moves away from a mirrored wall', () => {
+    const marker = (
+      id: 'band-hip-extension' | 'wall-sit',
+      w: 'left' | 'right',
+    ) =>
+      renderToStaticMarkup(
+        <FigureFrame exerciseId={id} pose={figures[id].end} working={w} />,
+      ).match(/<text x="(\d+)"/)?.[1];
+    expect(marker('band-hip-extension', 'right')).toBe('20');
+    expect(marker('band-hip-extension', 'left')).toBe('172');
+    expect(marker('wall-sit', 'left')).toBe('20');
+    expect(marker('wall-sit', 'right')).toBe('20');
+  });
+
+  it('balance clock: a wall support is drawn and a hand rests on it in every phase', () => {
+    const props = figures['balance-clock'].props;
+    const wall = props.find((pr) => pr.type === 'wall');
+    expect(wall).toBeDefined();
+    for (const t of STEPS) {
+      const p = balanceClockPose(t);
+      expect(p.hR[0]).toBeCloseTo(wall?.type === 'wall' ? wall.x - 2 : 0, 6);
+    }
   });
 
   it('the catalogue lists all five', () => {

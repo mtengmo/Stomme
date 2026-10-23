@@ -78,6 +78,9 @@ const END_HOLD_MS: Partial<Record<ExerciseId, number>> = {
   'quad-set': 3000,
 };
 
+const nudge = (pt: Pt, by: Pt | undefined): Pt =>
+  by ? [pt[0] + by[0], pt[1] + by[1]] : pt;
+
 /** Both ends of the band for this figure, resolved against the current pose. */
 export function bandEndpoints(
   band: NonNullable<FigureSpec['band']>,
@@ -85,8 +88,51 @@ export function bandEndpoints(
 ): [Pt, Pt] {
   const from: Pt =
     typeof band.from === 'string' ? pose[band.from as PoseKey] : band.from;
-  return [from, pose[band.to]];
+  return [nudge(from, band.offset), nudge(pose[band.to], band.offset)];
 }
+
+/**
+ * The band as a drawn curve. While the ends are closer than the band's rest
+ * length it hangs slack as a loop, so it stays visible at the start pose; at
+ * full stretch it is a straight line. `points` samples the same curve.
+ */
+export function bandShape(
+  band: NonNullable<FigureSpec['band']>,
+  pose: Pose,
+): { d: string; points: Pt[] } {
+  const [a, b] = bandEndpoints(band, pose);
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const slack = band.rest ? Math.max(0, 1 - len / band.rest) : 0;
+  if (slack === 0) return { d: line([a, b]), points: [a, b] };
+  const t: Pt = len > 0.5 ? [(b[0] - a[0]) / len, (b[1] - a[1]) / len] : [1, 0];
+  const lift = 11 * slack;
+  const lean = 5 * slack;
+  const c1: Pt = [a[0] + t[0] * lean, a[1] + t[1] * lean - lift];
+  const c2: Pt = [b[0] + t[0] * lean, b[1] + t[1] * lean - lift];
+  const points = Array.from({ length: 17 }, (_, i): Pt => {
+    const u = i / 16;
+    const m = 1 - u;
+    return [
+      m ** 3 * a[0] +
+        3 * m * m * u * c1[0] +
+        3 * m * u * u * c2[0] +
+        u ** 3 * b[0],
+      m ** 3 * a[1] +
+        3 * m * m * u * c1[1] +
+        3 * m * u * u * c2[1] +
+        u ** 3 * b[1],
+    ];
+  });
+  return {
+    d: `M${a.join(' ')}C${c1.join(' ')} ${c2.join(' ')} ${b.join(' ')}`,
+    points,
+  };
+}
+
+/** Per-exercise framing: a lying body would otherwise sit small in the card. */
+const FRAMING: Partial<Record<ExerciseId, string>> = {
+  'quad-set': '24 128 160 52',
+};
 
 /**
  * DEV only review hook: `?phase=0..1` in the hash (for example
@@ -117,7 +163,7 @@ export function FigureFrame({
   working = 'right',
   showMuscles = false,
   equipment,
-  viewBox = '14 20 164 168',
+  viewBox: viewBoxProp,
   view = 'side',
   phase = 0,
 }: {
@@ -132,6 +178,7 @@ export function FigureFrame({
   /** Current animation progress, used by the authored front geometry. */
   phase?: number;
 }) {
+  const viewBox = viewBoxProp ?? FRAMING[exerciseId] ?? '14 20 164 168';
   if (view === 'front' && supportsFrontView(exerciseId))
     return (
       <FrontFigureFrame
@@ -143,6 +190,14 @@ export function FigureFrame({
       />
     );
   const spec = figures[exerciseId];
+  const [vbX = 14, vbY = 20] = viewBox.split(' ').map(Number);
+  const framed = viewBoxProp === undefined && FRAMING[exerciseId] !== undefined;
+  // The side marker sits top left, or top right when a mirrored wall is there.
+  const wallX = spec.props.find((pr) => pr.type === 'wall')?.x;
+  const markerOnRight =
+    !framed &&
+    wallX !== undefined &&
+    (working === 'left' ? 192 - wallX : wallX) < 48;
   const rack = exerciseId === 'kettlebell-rack-carry' && equipment !== null;
   let p = pose;
   // With external load, hands carry it rather than resting on the support.
@@ -215,7 +270,10 @@ export function FigureFrame({
       eL: [p.neck[0] + 19, p.neck[1] + 10],
       hL: [p.neck[0] + 41, p.neck[1] + 12],
     };
-  const accent = !showMuscles ? 'var(--accent)' : 'var(--ink)';
+  // The quad-set overlay sits behind a blue limb, so the leg never fuses with
+  // the torso into one dark bar.
+  const accent =
+    !showMuscles || exerciseId === 'quad-set' ? 'var(--accent)' : 'var(--ink)';
   const farSide =
     working === null && !showMuscles ? 'var(--accent)' : 'var(--edge)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
@@ -238,17 +296,20 @@ export function FigureFrame({
         <FloorLine />
         {exerciseId === 'quad-set' ? (
           // Floor-contact cue under the knee: fades in as the knee presses down.
-          <line
+          <g
             data-testid="press-cue"
-            x1={p.kR[0] - 9}
-            y1="177"
-            x2={p.kR[0] + 9}
-            y2="177"
+            fill="none"
             stroke="var(--accent)"
             strokeWidth="3"
             strokeLinecap="round"
+            strokeLinejoin="round"
             opacity={Math.max(0, Math.min(1, (p.kR[1] - 168.5) / 5))}
-          />
+          >
+            <line x1={p.kR[0] - 13} y1="177" x2={p.kR[0] + 13} y2="177" />
+            <path
+              d={`M${p.kR[0] - 6} ${p.kR[1] - 15}L${p.kR[0]} ${p.kR[1] - 9}L${p.kR[0] + 6} ${p.kR[1] - 15}`}
+            />
+          </g>
         ) : null}
         {showMuscles ? (
           <MuscleOverlay exerciseId={exerciseId} pose={p} />
@@ -285,7 +346,7 @@ export function FigureFrame({
         {rack ? null : spec.band && equipment !== null ? (
           <path
             data-equipment="band"
-            d={line([...bandEndpoints(spec.band, p)])}
+            d={bandShape(spec.band, p).d}
             fill="none"
             stroke="var(--equipment)"
             strokeWidth="3"
@@ -316,8 +377,9 @@ export function FigureFrame({
       </g>
       {working ? (
         <text
-          x="20"
-          y="58"
+          x={framed ? vbX + 6 : markerOnRight ? 172 : 20}
+          y={framed ? vbY + 25 : 58}
+          textAnchor={markerOnRight ? 'end' : undefined}
           fontSize="28"
           fontWeight="800"
           fill="var(--accent)"

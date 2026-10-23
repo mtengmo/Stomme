@@ -132,8 +132,9 @@ export const BAND_HIP = {
   thigh: 30,
   shin: 27,
   farThigh: 31,
-  farShin: 28,
-  farAnkle: [107, 174] as Pt,
+  farShin: 27,
+  // Hip-to-ankle equals thigh + shin: the stance leg is straight.
+  farAnkle: [98 + Math.sqrt(58 ** 2 - 57 ** 2), 174] as Pt,
   startAngle: 0,
   /** Degrees behind vertical at the end of the movement. */
   endAngle: 20,
@@ -184,7 +185,11 @@ export const CLOCK = {
   forward: { toeX: 131, angle: 48 },
   back: { toeX: 80, angle: 72 },
   floorToeY: 177,
-  lift: 3,
+  handNear: [155, 98] as Pt,
+  handFar: [155, 102] as Pt,
+  lift: 2,
+  /** Degrees the foot flattens mid-swing so the leg stays long and low. */
+  flatten: 18,
   leanDeg: 5,
 } as const;
 
@@ -207,7 +212,9 @@ export function balanceClockPose(progress: number): Pose {
   const from = first ? CLOCK.together : CLOCK.forward;
   const to = first ? CLOCK.forward : CLOCK.back;
   const toeX = mix(from.toeX, to.toeX, u);
-  const angle = rad(mix(from.angle, to.angle, u));
+  const angle = rad(
+    mix(from.angle, to.angle, u) - CLOCK.flatten * Math.sin(Math.PI * u),
+  );
   const lift = CLOCK.lift * Math.sin(Math.PI * u);
   const toeTip: Pt = [toeX, CLOCK.floorToeY - lift];
   const farAnkle: Pt = [
@@ -232,11 +239,12 @@ export function balanceClockPose(progress: number): Pose {
     head,
     neck,
     hip,
+    // Both hands rest on the wall the whole time; the elbows follow.
     [
-      [neck[0] + 11, neck[1] + 23],
-      [neck[0] + 18, neck[1] + 42],
-      [neck[0] - 10, neck[1] + 23],
-      [neck[0] - 16, neck[1] + 42],
+      joint(neck, CLOCK.handNear, 33, 33, 1),
+      CLOCK.handNear,
+      joint(neck, CLOCK.handFar, 33, 33, 1),
+      CLOCK.handFar,
     ],
     [standKnee, standAnkle, toe(standAnkle), farKnee, farAnkle, toeTip],
   );
@@ -266,19 +274,19 @@ export const physioFigures: Record<PhysioFigureId, FigureSpec> = {
     start: seatedKneeExtensionPose(0),
     end: seatedKneeExtensionPose(1),
     props: kneeChair,
-    band: { from: BAND_KNEE_ANCHOR, to: 'aR' },
+    band: { from: BAND_KNEE_ANCHOR, to: 'aR', rest: 50 },
   },
   'band-hip-extension': {
     start: bandHipExtensionPose(0),
     end: bandHipExtensionPose(1),
     props: wall,
-    band: { from: 'aL', to: 'aR' },
+    band: { from: 'aL', to: 'aR', rest: 28, offset: [0, -7] },
   },
   'balance-clock': {
     start: balanceClockPose(0),
     middle: balanceClockPose(0.5),
     end: balanceClockPose(1),
-    props: [],
+    props: wall,
   },
 };
 

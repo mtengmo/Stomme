@@ -154,6 +154,10 @@ try {
                 (e as unknown as SVGElement).style.cssText = '';
               });
             }
+            if (id === 'balance-clock' && side === 'right')
+              await page
+                .getByTestId('balance-clock-diagram')
+                .screenshot({ path: `${out}/diagram-${tag}.png` });
             await sheet(
               page,
               card,
