@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
@@ -34,7 +40,11 @@ describe('onboarding gating', () => {
     expect(
       await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
     ).toBeTruthy();
-    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Huvudmeny' }))
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Träning', 'Historik', 'Inställningar']);
     const stored = await getMeta<{ acceptedAt: string }>(getDb(), 'onboarding');
     expect(stored?.acceptedAt).toBeTruthy();
   });
@@ -45,7 +55,11 @@ describe('onboarding gating', () => {
     expect(
       await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
     ).toBeTruthy();
-    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Huvudmeny' }))
+        .getAllByRole('link')
+        .map((l) => l.textContent),
+    ).toEqual(['Träning', 'Historik', 'Inställningar']);
     expect(screen.queryByText(/Välkommen till Stomme/)).toBeNull();
     expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
   });

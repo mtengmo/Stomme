@@ -14,16 +14,68 @@ const goals: { id: Goal; label: string }[] = [
   { id: 'running', label: 'Styrka för löpning' },
   { id: 'knee', label: 'Träna knäna' },
 ];
+
+/** Answers survive leaving via the bottom nav (kept per tab, cleared on save). */
+const DRAFT_KEY = 'stomme.quickstart.draft';
+interface Draft {
+  goal: Goal | null;
+  equipment: EquipmentChoice[];
+  experience: TrainingPreferences['experience'];
+  weights: NonNullable<TrainingPreferences['weights']>;
+  side: 'both' | 'right' | 'left';
+}
+function readDraft(): Partial<Draft> {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    return parsed && typeof parsed === 'object'
+      ? (parsed as Partial<Draft>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+function clearDraft(): void {
+  try {
+    sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* No draft to clear. */
+  }
+}
 export function QuickStart() {
   const [, navigate] = useLocation();
-  const [goal, setGoal] = useState<Goal | null>(null);
-  const [equipment, setEquipment] = useState<EquipmentChoice[]>(['bodyweight']);
-  const [experience, setExperience] =
-    useState<TrainingPreferences['experience']>('new');
+  const [draft] = useState(readDraft);
+  const [goal, setGoal] = useState<Goal | null>(
+    goals.some((g) => g.id === draft.goal) || draft.goal === 'custom'
+      ? (draft.goal ?? null)
+      : null,
+  );
+  const [equipment, setEquipment] = useState<EquipmentChoice[]>(
+    Array.isArray(draft.equipment) ? draft.equipment : ['bodyweight'],
+  );
+  const [experience, setExperience] = useState<
+    TrainingPreferences['experience']
+  >(
+    draft.experience === 'some' || draft.experience === 'regular'
+      ? draft.experience
+      : 'new',
+  );
   const [weights, setWeights] = useState<
     NonNullable<TrainingPreferences['weights']>
-  >([]);
-  const [side, setSide] = useState<'both' | 'right' | 'left'>('both');
+  >(Array.isArray(draft.weights) ? draft.weights : []);
+  const [side, setSide] = useState<'both' | 'right' | 'left'>(
+    draft.side === 'right' || draft.side === 'left' ? draft.side : 'both',
+  );
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ goal, equipment, experience, weights, side }),
+      );
+    } catch {
+      /* Draft is a convenience only. */
+    }
+  }, [goal, equipment, experience, weights, side]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
@@ -47,7 +99,7 @@ export function QuickStart() {
     ]);
   }
   return (
-    <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-10">
+    <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[var(--app-nav-height)]">
       {goal ? (
         <button
           type="button"
@@ -233,46 +285,49 @@ export function QuickStart() {
               </p>
             </div>
           </details>
-          {error ? (
-            <p role="alert" className="m-0 text-base font-bold">
-              {error}
-            </p>
-          ) : null}
-          <Button
-            disabled={busy}
-            onClick={async () => {
-              setBusy(true);
-              setError('');
-              try {
-                await saveTrainingPreferences(getDb(), {
-                  programId:
-                    goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
-                  equipment,
-                  experience,
-                  ...(weights.length ? { weights } : {}),
-                  ...(goal === 'knee' || goal === 'custom'
-                    ? {
-                        rehabFocus:
-                          goal === 'knee'
-                            ? ('knee' as const)
-                            : ('custom' as const),
-                        rehabSide: side,
-                      }
-                    : {}),
-                });
-                navigate('/traning/A');
-              } catch (err) {
-                setError(
-                  err instanceof Error
-                    ? err.message
-                    : 'Kunde inte spara. Försök igen.',
-                );
-                setBusy(false);
-              }
-            }}
-          >
-            {goal === 'custom' ? 'Öppna mitt rehabprogram' : 'Visa mitt pass'}
-          </Button>
+          <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
+            {error ? (
+              <p role="alert" className="m-0 text-base font-bold">
+                {error}
+              </p>
+            ) : null}
+            <Button
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setError('');
+                try {
+                  await saveTrainingPreferences(getDb(), {
+                    programId:
+                      goal === 'knee' || goal === 'custom' ? 'rehab' : goal,
+                    equipment,
+                    experience,
+                    ...(weights.length ? { weights } : {}),
+                    ...(goal === 'knee' || goal === 'custom'
+                      ? {
+                          rehabFocus:
+                            goal === 'knee'
+                              ? ('knee' as const)
+                              : ('custom' as const),
+                          rehabSide: side,
+                        }
+                      : {}),
+                  });
+                  clearDraft();
+                  navigate('/traning/A');
+                } catch (err) {
+                  setError(
+                    err instanceof Error
+                      ? err.message
+                      : 'Kunde inte spara. Försök igen.',
+                  );
+                  setBusy(false);
+                }
+              }}
+            >
+              {goal === 'custom' ? 'Öppna mitt rehabprogram' : 'Visa mitt pass'}
+            </Button>
+          </div>
         </>
       )}
     </div>

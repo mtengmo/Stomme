@@ -1,6 +1,4 @@
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, useLocation } from 'wouter';
-import { getDb } from '../db/db';
 import { Icon, type IconName } from './Icon';
 
 const tabs: { href: string; label: string; icon: IconName }[] = [
@@ -12,21 +10,14 @@ const tabs: { href: string; label: string; icon: IconName }[] = [
 /** Exact match for the root tab; sub-routes (/historik/:id) keep their tab active. */
 export function isTabActive(href: string, location: string): boolean {
   return href === '/'
-    ? location === '/'
+    ? location === '/' ||
+        location.startsWith('/traning/') ||
+        location.startsWith('/pass/')
     : location === href || location.startsWith(`${href}/`);
 }
 
 export function BottomNav() {
   const [location] = useLocation();
-  const started = useLiveQuery(async () => {
-    if (location !== '/') return true;
-    const [meta, count] = await Promise.all([
-      getDb().meta.bulkGet(['training', 'program']),
-      getDb().sessions.count(),
-    ]);
-    return meta.some(Boolean) || count > 0;
-  }, [location]);
-  if (location === '/' && !started) return null;
   return (
     <nav
       aria-label="Huvudmeny"

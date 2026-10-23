@@ -8,6 +8,7 @@ import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
 
 beforeEach(async () => {
+  sessionStorage.clear();
   window.location.hash = '#/';
   await getDb().delete();
   await getDb().open();
@@ -20,7 +21,7 @@ it('asks only about focus first and persists only explicitly selected equipment 
   await screen.findByRole('heading', { name: 'Vad vill du träna?' });
   expect(screen.queryByRole('checkbox')).toBeNull();
   expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
-  expect(screen.queryByRole('navigation')).toBeNull();
+  expect(screen.getByRole('navigation', { name: 'Huvudmeny' })).toBeTruthy();
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
   expect(screen.queryByRole('checkbox', { checked: true })).toBeNull();
   expect(
@@ -114,4 +115,17 @@ it('starts ordinary running strength without a mandatory before questionnaire', 
     screen.queryByRole('heading', { name: 'Hur känns kroppen?' }),
   ).toBeNull();
   expect(await getDb().sessions.count()).toBe(1);
+});
+
+it('keeps first-use answers when leaving through the nav and coming back', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+  await user.click(screen.getByRole('link', { name: 'Inställningar' }));
+  await screen.findByRole('heading', { name: 'Inställningar' });
+  expect(screen.queryByRole('checkbox', { name: 'Hantlar' })).toBeNull();
+  await user.click(screen.getByRole('link', { name: 'Träning' }));
+  const box = await screen.findByRole('checkbox', { name: 'Hantlar' });
+  expect((box as HTMLInputElement).checked).toBe(true);
 });

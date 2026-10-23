@@ -6,6 +6,12 @@ describe('isTabActive', () => {
     expect(isTabActive('/', '/')).toBe(true);
     expect(isTabActive('/', '/historik')).toBe(false);
   });
+  it('treats the workout and pass previews as the Träning tab', () => {
+    for (const loc of ['/traning/A', '/pass/B']) {
+      expect(isTabActive('/', loc)).toBe(true);
+      expect(isTabActive('/historik', loc)).toBe(false);
+    }
+  });
   it('keeps exactly one tab active on history and its sub-routes', () => {
     for (const loc of ['/historik', '/historik/abc']) {
       const active = ['/', '/historik', '/installningar'].filter((h) =>

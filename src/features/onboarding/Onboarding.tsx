@@ -58,6 +58,10 @@ export function Onboarding() {
           Integritet – dina uppgifter
         </summary>
         <PrivacyNotice />
+        <p className="mt-3 mb-0 text-base">
+          Har du en säkerhetskopia från förut? När du gått vidare importerar du
+          den under Inställningar.
+        </p>
       </details>
       <details>
         <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
