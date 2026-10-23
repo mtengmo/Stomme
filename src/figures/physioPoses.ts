@@ -181,13 +181,13 @@ export const CLOCK = {
   trunk: 44,
   footLength: 10.44,
   /** Keyframes of the free foot: toe x on the floor and the foot angle. */
-  together: { toeX: 118, angle: 16.7 },
-  forward: { toeX: 131, angle: 48 },
+  together: { toeX: 110, angle: 16.7 },
+  forward: { toeX: 132, angle: 68 },
   back: { toeX: 80, angle: 72 },
   floorToeY: 177,
   handNear: [155, 98] as Pt,
   handFar: [155, 102] as Pt,
-  lift: 2,
+  lift: 7,
   /** Degrees the foot flattens mid-swing so the leg stays long and low. */
   flatten: 18,
   leanDeg: 5,

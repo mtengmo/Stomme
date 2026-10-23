@@ -16,7 +16,7 @@ for (const width of [360, 1280]) {
     await expect(diagram).toBeVisible();
     await expect(diagram.locator('[data-clock-dot]')).toHaveCount(5);
     await expect(diagram.locator('.clock-dot-cycle')).toHaveCount(5);
-    await expect(diagram.locator('[data-order]')).toHaveCount(0);
+    await expect(diagram.locator('[data-order]')).toHaveCount(5);
     await page
       .getByRole('button', { name: 'Pausa rörelsen', exact: true })
       .click();
