@@ -186,6 +186,12 @@ export function ExerciseCardBody({
                 ))}
               </fieldset>
             ) : null}
+            {exercise.id === 'balance-clock' && view === 'side' ? (
+              <BalanceClockDiagram
+                working={working}
+                paused={paused || reducedMotion}
+              />
+            ) : null}
             <div
               className={`exercise-stage rounded-md border-2 border-edge p-2 ${review ? 'review-stage' : ''}`}
             >
@@ -199,9 +205,6 @@ export function ExerciseCardBody({
                 view={view}
               />
             </div>
-            {exercise.id === 'balance-clock' && view === 'side' ? (
-              <BalanceClockDiagram working={working} />
-            ) : null}
             {review ? equipmentControls : null}
             {!reducedMotion ? (
               <button

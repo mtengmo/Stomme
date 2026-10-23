@@ -1,114 +1,163 @@
 import { useId } from 'react';
 import type { Working } from './Figure';
 
-const CENTRE = 60;
-const REACH = 46;
-/** Clock positions around the standing foot, as degrees clockwise from 12. */
+const CENTRE = 80;
+const REACH = 52;
+const CYCLE_SECONDS = 5;
+
+/** Clock positions on the moving foot's own side, clockwise from 12 (right). */
 const DOTS = [
-  { hour: 12, angle: 0 },
-  { hour: 3, angle: 90 },
-  { hour: 6, angle: 180 },
-  { hour: 9, angle: 270 },
+  { name: '12', angle: 0, inside: true },
+  { name: '1.30', angle: 45, inside: false },
+  { name: '3', angle: 90, inside: true },
+  { name: '4.30', angle: 135, inside: false },
+  { name: '6', angle: 180, inside: true },
 ] as const;
 
-const at = (angle: number): [number, number] => [
-  CENTRE + REACH * Math.sin((angle * Math.PI) / 180),
-  CENTRE - REACH * Math.cos((angle * Math.PI) / 180),
-];
+const MIRROR_NAME: Record<string, string> = {
+  '12': '12',
+  '1.30': '10.30',
+  '3': '9',
+  '4.30': '7.30',
+  '6': '6',
+};
+
+const STYLE = `
+@keyframes clock-dot-glow { 0%, 20% { opacity: 1 } 24%, 100% { opacity: 0 } }
+.clock-dot-cycle { opacity: 0; animation: clock-dot-glow ${CYCLE_SECONDS}s linear infinite }
+`;
 
 /**
- * Static top view of the balance clock: the standing foot in the middle (toes
- * towards 12) and a dot at 12, 3, 6 and 9 for the free toe to touch. Theme
- * tokens only; the text alternative describes the same layout.
+ * Top view of the balance clock, the main teaching element: the standing foot
+ * in the middle and five dots on the moving foot's own side. The dots light up
+ * one after another; `paused` (the pause button or reduced motion) shows a
+ * still picture with order numbers instead. Theme tokens only.
  */
 export function BalanceClockDiagram({
   working = 'right',
+  paused = false,
 }: {
   working?: Working | null;
+  paused?: boolean;
 }) {
   const id = useId();
-  const side =
-    working === 'left'
-      ? 'vänster'
-      : working === 'right'
-        ? 'höger'
-        : 'det stående';
-  const instruction =
-    'Sedd uppifrån: stå på foten i mitten och håll i ett stöd. Nudda golvet med den andra tån på 12, 3, 6 och 9 och tillbaka till mitten mellan varje.';
-  const animation = 'Rörelsen ovan visar 12 och 6.';
-  const description = `Balansklockan sedd uppifrån. Du står på ${side} ben i mitten med tårna mot 12. Fyra punkter ligger runt foten: 12 rakt fram, 3 åt höger, 6 rakt bakom och 9 åt vänster. ${instruction.replace('Sedd uppifrån: ', '')} ${animation}`;
+  const left = working === 'left';
+  const sign = left ? -1 : 1;
+  const standing = left ? 'höger' : 'vänster';
+  const moving = left ? 'vänster' : 'höger';
+  const times = left
+    ? '12, halv elva, 9, halv åtta och 6'
+    : '12, halv två, 3, halv fem och 6';
+  const caption = `Sedd uppifrån: håll i ett stöd och stå på ${standing} ben i mitten. Nudda med ${moving} tå klockan ${times}, i den ordningen, och för tillbaka foten till mitten mellan varje. Bilden från sidan visar 12 och 6.${working ? '' : ' Använder du andra foten speglas bilden.'}`;
+  const state = paused
+    ? 'Punkterna är numrerade i ordning.'
+    : 'Punkterna lyses upp i tur och ordning.';
+  const points = left
+    ? 'Fem punkter ligger på vänster sida: 12 rakt fram, halv elva snett fram, 9 rakt åt vänster, halv åtta snett bak och 6 rakt bakom.'
+    : 'Fem punkter ligger på höger sida: 12 rakt fram, halv två snett fram, 3 rakt åt höger, halv fem snett bak och 6 rakt bakom.';
+  const description = `Balansklockan sedd uppifrån. Du står på ${standing} ben i mitten med tårna mot 12. ${points} ${caption} ${state}`;
+  const pos = (angle: number, r: number): [number, number] => [
+    CENTRE + sign * r * Math.sin((angle * Math.PI) / 180),
+    CENTRE - r * Math.cos((angle * Math.PI) / 180),
+  ];
+  const arcEnd = pos(180, REACH);
+  const arcStart = pos(0, REACH);
   return (
     <figure
-      className="m-0 flex items-center gap-3"
+      className="m-0 flex flex-col items-center gap-2"
       data-testid="balance-clock-diagram"
     >
       <svg
-        viewBox="0 0 120 120"
+        viewBox="0 0 160 160"
         role="img"
         aria-labelledby={`${id}-title`}
-        className="block h-auto w-32 shrink-0"
+        className="block h-auto w-[14rem] max-w-full"
       >
         <title id={`${id}-title`}>{description}</title>
-        <circle
-          cx={CENTRE}
-          cy={CENTRE}
-          r={REACH}
+        {paused ? null : <style>{STYLE}</style>}
+        <path
+          d={`M${arcStart[0]} ${arcStart[1]}A${REACH} ${REACH} 0 0 ${left ? 0 : 1} ${arcEnd[0]} ${arcEnd[1]}`}
           fill="none"
           stroke="var(--edge)"
           strokeWidth="3"
           strokeDasharray="2 6"
           strokeLinecap="round"
         />
-        <g transform={working === 'left' ? 'translate(120 0) scale(-1 1)' : ''}>
+        <g
+          transform={
+            left ? `translate(${CENTRE * 2} 0) scale(-1 1)` : undefined
+          }
+        >
           <path
-            d="M60 42C67 42 69 52 68 62C67 72 65 79 60 79C55 79 53 72 52 62C51 52 53 42 60 42Z"
+            d="M80 62C86 62 88 70 87 78C86 86 84 92 80 92C76 92 74 86 73 78C72 70 74 62 80 62Z"
             fill="var(--paper)"
-            stroke="var(--accent)"
+            stroke="var(--edge)"
             strokeWidth="3"
             strokeLinejoin="round"
           />
         </g>
-        {DOTS.map(({ hour, angle }) => {
-          const [x, y] = at(angle);
+        {DOTS.map(({ name, angle, inside }, index) => {
+          const label = left ? (MIRROR_NAME[name] ?? name) : name;
+          const [x, y] = pos(angle, REACH);
+          const [lx, ly] = pos(angle, REACH + 24);
           return (
-            <g key={hour} data-clock-dot={hour}>
+            <g key={name} data-clock-dot={label}>
               <circle
                 cx={x}
                 cy={y}
-                r="10"
+                r="11"
                 fill="var(--paper)"
                 stroke="var(--ink)"
                 strokeWidth="3"
               />
+              {paused ? null : (
+                <circle
+                  className="clock-dot-cycle"
+                  data-cycle-dot={label}
+                  cx={x}
+                  cy={y}
+                  r="15"
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="4"
+                  style={{ animationDelay: `${index}s` }}
+                />
+              )}
               <text
-                x={x}
-                y={y + 4.5}
+                x={inside ? x : lx}
+                y={(inside ? y : ly) + 4.5}
                 textAnchor="middle"
-                fontSize="13"
+                fontSize={inside ? 13 : 12}
                 fontWeight="800"
                 fill="var(--ink)"
               >
-                {hour}
+                {label}
               </text>
+              {paused ? (
+                <g data-order={index + 1}>
+                  <circle
+                    cx={x - sign * 10}
+                    cy={y - 10}
+                    r="7"
+                    fill="var(--accent)"
+                  />
+                  <text
+                    x={x - sign * 10}
+                    y={y - 6}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fontWeight="800"
+                    fill="var(--paper)"
+                  >
+                    {index + 1}
+                  </text>
+                </g>
+              ) : null}
             </g>
           );
         })}
-        {working ? (
-          <text
-            x={CENTRE}
-            y={CENTRE + 5.5}
-            textAnchor="middle"
-            fontSize="16"
-            fontWeight="800"
-            fill="var(--accent)"
-          >
-            {working === 'right' ? 'H' : 'V'}
-          </text>
-        ) : null}
       </svg>
-      <figcaption className="text-base text-ink-soft">
-        {instruction} {animation}
-      </figcaption>
+      <figcaption className="text-base text-ink-soft">{caption}</figcaption>
     </figure>
   );
 }
