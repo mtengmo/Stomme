@@ -65,7 +65,7 @@ Details:
 ## Style
 
 - UI text is Swedish. Code, identifiers and comments are English.
-- Follow the visual system in [DESIGN.md](DESIGN.md): red is reserved for "done", colour is never the only signal, touch targets are at least 48 px, text at least 16 px, and light and dark themes both work. Attach 360 px screenshots (light and dark) to UI pull requests.
+- Follow the visual system in [DESIGN.md](DESIGN.md): each theme has exactly one "done" colour (red in the default theme) used for nothing else, colour is never the only signal, touch targets are at least 48 px, text at least 16 px, and light and dark themes both work. Attach 360 px screenshots (light and dark) to UI pull requests.
 - Keep pull requests small and focused. One idea per PR.
 - Add or update tests for logic changes. The rules in `src/rules/` keep 100% branch coverage.
 - Do not commit personal data: no exported backups, real training logs or private screenshots.
