@@ -691,7 +691,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
   ],
   'balance-clock': [
     'practiced',
-    'Enbensbalans medan den fria foten når mot flera punkter.',
+    'Enbensbalans med handstöd medan den fria foten når mot flera punkter.',
   ],
 };
 
