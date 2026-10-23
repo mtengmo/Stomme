@@ -346,7 +346,7 @@ export function ProgressOverview({
             <>
               <div
                 role="img"
-                aria-label={`Diagram med loggade setvärden i ${exercises[selectedId].unit}. Tabellen nedan innehåller datumen och varje värde.`}
+                aria-label={`Diagram med loggade setvärden i ${exercises[selectedId].unit === 'laps' ? 'varv' : exercises[selectedId].unit}. Tabellen nedan innehåller datumen och varje värde.`}
                 className="overflow-x-auto"
               >
                 <svg

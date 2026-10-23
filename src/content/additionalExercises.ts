@@ -52,7 +52,9 @@ function entry(
         ? { start: 20, max: 30, step: 5 }
         : unit === 'meters'
           ? { start: 10, max: 20, step: 5 }
-          : { start: 8, max: 12, step: 1 },
+          : unit === 'laps'
+            ? { start: 3, max: 6, step: 1 }
+            : { start: 8, max: 12, step: 1 },
     loadLadder: loads,
     startLoadIndex: 0,
     week1LoadIndex: 0,

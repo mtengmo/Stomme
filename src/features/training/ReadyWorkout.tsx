@@ -78,7 +78,9 @@ export function ReadyWorkout({
               ? 'sek'
               : exercise.unit === 'meters'
                 ? 'm'
-                : '';
+                : exercise.unit === 'laps'
+                  ? 'varv'
+                  : '';
           const side = !exercise.perSide
             ? ''
             : item.sides?.length === 1

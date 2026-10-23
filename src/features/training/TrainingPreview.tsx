@@ -751,7 +751,9 @@ function PreviewEditor({
                                 ? 'Sekunder'
                                 : exercise.unit === 'meters'
                                   ? 'Meter'
-                                  : 'Repetitioner'}
+                                  : exercise.unit === 'laps'
+                                    ? 'Varv'
+                                    : 'Repetitioner'}
 
                               {exercise.perSide ? ' per sida' : ''}
 

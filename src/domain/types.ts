@@ -48,7 +48,7 @@ export type ExerciseId =
   | 'single-leg-chair-squat'
   | 'single-leg-floor-bridge';
 
-export type Unit = 'reps' | 'seconds' | 'meters';
+export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
 
 /** kg = total external load (2x5 kg -> 10). */
