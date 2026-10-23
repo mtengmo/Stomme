@@ -37,6 +37,11 @@ const BONES: [PoseKey, PoseKey][] = [
   ['neck', 'eL'],
   ['eL', 'hL'],
 ];
+const cross = (o: Pt, a: Pt, b: Pt) =>
+  (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+/** Proper segment intersection (touching end points do not count). */
+const intersects = (a: Pt, b: Pt, c: Pt, e: Pt) =>
+  cross(a, b, c) * cross(a, b, e) < 0 && cross(c, e, a) * cross(c, e, b) < 0;
 const at = (id: PhysioFigureId, t: number): Pose => movementPose(id, t);
 
 describe('knee programme figures', () => {
@@ -75,38 +80,78 @@ describe('knee programme figures', () => {
     expect(b.tR[1]).toBeLessThan(a.tR[1] - 4);
   });
 
-  it('seated flexion: hip fixed, foot on the floor, in front of the knee then under the seat, clear of chair legs', () => {
+  it('quad set: the floor cue under the knee fades in as the knee presses', () => {
+    const cue = (t: number) =>
+      renderToStaticMarkup(
+        <FigureFrame exerciseId="quad-set" pose={quadSetPose(t)} />,
+      ).match(/data-testid="press-cue"[^>]*opacity="([^"]+)"/)?.[1];
+    expect(Number(cue(0))).toBe(0);
+    expect(Number(cue(1))).toBeCloseTo(1, 6);
+  });
+
+  it('seated flexion: hip fixed, foot on the floor, shin from about 10 degrees forward to about 27 back, thigh clear of the seat', () => {
     const start = seatedKneeFlexionPose(0);
     const chair = figures['seated-knee-flexion'].props[0];
     if (chair?.type !== 'chair') throw new Error('chair expected');
-    const frontLeg = chair.x + chair.w - 2 - (chair.legInset ?? 0);
+    const shin = (p: Pose) =>
+      (Math.atan2(p.aR[0] - p.kR[0], p.aR[1] - p.kR[1]) * 180) / Math.PI;
+    expect(shin(start)).toBeGreaterThan(8);
+    expect(shin(start)).toBeLessThan(14);
     expect(start.aR[0]).toBeGreaterThan(start.kR[0]);
     for (const t of STEPS) {
       const p = seatedKneeFlexionPose(t);
       expect(p.hip).toEqual(start.hip);
       expect(p.aR[1]).toBe(174);
       expect(p.tR[1]).toBe(177);
-      expect(p.kR[1]).toBeLessThan(chair.y);
-      expect(Math.min(p.aR[0], p.aL[0]) - 3).toBeGreaterThan(frontLeg + 1.5);
+      expect(p.kR[1] + 3).toBeLessThan(chair.y);
     }
     const end = seatedKneeFlexionPose(1);
-    expect(end.aR[0]).toBeLessThan(end.kR[0]);
+    expect(shin(end)).toBeLessThan(-24);
+    expect(shin(end)).toBeGreaterThan(-31);
     expect(end.aR[0]).toBeLessThan(chair.x + chair.w);
   });
 
-  it('band knee extension: same movement as E30, band anchored at the rear chair leg and the ankle', () => {
+  it('seated flexion: the chair is drawn behind the figure, so the foot passes in front of its legs', () => {
+    const html = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="seated-knee-flexion"
+        pose={figures['seated-knee-flexion'].end}
+      />,
+    );
+    const chair = html.indexOf('V178');
+    expect(chair).toBeGreaterThan(-1);
+    expect(html.indexOf('data-body-side="near"')).toBeGreaterThan(chair);
+    expect(html.indexOf('data-body-side="far"')).toBeGreaterThan(chair);
+  });
+
+  it('band knee extension: same movement as E30, anchored at the front chair leg and the ankle, never crossing a chair leg or the far shin', () => {
     const band = figures['band-knee-extension'].band;
     if (!band) throw new Error('band expected');
     expect(band.from).toEqual(BAND_KNEE_ANCHOR);
     const chair = figures['band-knee-extension'].props[0];
     if (chair?.type !== 'chair') throw new Error('chair expected');
-    expect(BAND_KNEE_ANCHOR[0]).toBe(chair.x + 2);
+    const rearLeg: [Pt, Pt] = [
+      [chair.x + 2, chair.y],
+      [chair.x + 2, 178],
+    ];
+    const frontLeg: [Pt, Pt] = [
+      [chair.x + chair.w - 2, chair.y],
+      [chair.x + chair.w - 2, 178],
+    ];
+    // The anchor stands just in front of the front leg, on the floor side.
+    expect(BAND_KNEE_ANCHOR[0] - frontLeg[0][0]).toBeGreaterThan(1.5);
+    expect(BAND_KNEE_ANCHOR[1]).toBeGreaterThan(chair.y);
     for (const t of STEPS) {
       const p = at('band-knee-extension', t);
       expect(p).toEqual(movementPose('seated-knee-extension', t));
       const [from, to] = bandEndpoints(band, p);
       expect(from).toEqual(BAND_KNEE_ANCHOR);
       expect(to).toEqual(p.aR);
+      for (const obstacle of [rearLeg, frontLeg, [p.kL, p.aL] as [Pt, Pt]])
+        expect(
+          intersects(from, to, obstacle[0], obstacle[1]),
+          `band crosses an obstacle at t=${t}`,
+        ).toBe(false);
     }
   });
 
@@ -142,6 +187,9 @@ describe('knee programme figures', () => {
     expect(mid.tL[0]).toBeGreaterThan(mid.hip[0] + 20);
     expect(end.tL[0]).toBeLessThan(end.hip[0] - 15);
     expect(mid.tL[1]).toBeCloseTo(177, 6);
+    // The swinging knee never travels far in front of the standing knee.
+    for (const t of STEPS)
+      expect(balanceClockPose(t).kL[0] - s.kR[0]).toBeLessThan(16);
     expect(end.tL[1]).toBeCloseTo(177, 6);
   });
 

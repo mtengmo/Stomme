@@ -43,7 +43,7 @@ export const POSE_KEYS: readonly PoseKey[] = [
 ];
 
 export type Prop =
-  | { type: 'chair'; x: number; y: number; w: number; legInset?: number }
+  | { type: 'chair'; x: number; y: number; w: number }
   | { type: 'step'; x: number; y: number; w: number }
   | { type: 'wall'; x: number }
   | { type: 'mat'; x1: number; x2: number };

@@ -48,7 +48,7 @@ function segment(
       rx={width / 2}
       transform={`rotate(${angle} ${a[0]} ${a[1]})`}
       fill={role === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
-      fillOpacity={role === 'primary' ? 0.48 - 0.34 * (1 - strength) : 1}
+      fillOpacity={role === 'primary' ? 0.48 - 0.44 * (1 - strength) : 1}
       stroke="var(--accent)"
       strokeWidth="1.5"
     />
@@ -127,7 +127,7 @@ export function MuscleOverlay({
       a: pose.hip,
       b: pose.kR,
       strength: pressed,
-      width: 15,
+      width: 12 + 6 * pressed,
     });
   }
   if (exerciseId === 'dead-bug' && roleFor('core')) {

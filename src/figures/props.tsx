@@ -16,13 +16,11 @@ export function FloorLine() {
 export function PropShape({ prop }: { prop: Prop }) {
   switch (prop.type) {
     case 'chair': {
-      const { x, y, w, legInset = 0 } = prop;
+      const { x, y, w } = prop;
       return (
         <g {...PROP}>
           <path d={`M${x} ${y - 46}V${y}H${x + w}`} />
-          <path
-            d={`M${x + 2} ${y}V${FLOOR_Y}M${x + w - 2 - legInset} ${y}V${FLOOR_Y}`}
-          />
+          <path d={`M${x + 2} ${y}V${FLOOR_Y}M${x + w - 2} ${y}V${FLOOR_Y}`} />
         </g>
       );
     }

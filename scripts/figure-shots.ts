@@ -92,7 +92,9 @@ try {
   if (!ready) throw new Error('dev server did not start');
 
   const themes =
-    mode === 'compare' ? ['rutat'] : ['rutat', 'hav', 'hog-kontrast'];
+    mode === 'compare'
+      ? ['rutat']
+      : ['rutat', 'hav', 'kvallssol', 'hog-kontrast'];
   for (const theme of themes) {
     for (const colorScheme of ['light', 'dark'] as const) {
       const context = await browser.newContext({
@@ -124,8 +126,52 @@ try {
           .screenshot({ path: `${out}/dev-${tag}-${ex.id}.png` });
       }
 
-      const ids: readonly string[] =
-        mode === 'dev' ? [] : mode === 'compare' ? CARD_SAMPLES : NEW_IDS;
+      if (mode === 'review') {
+        // Cycle-aligned frames: the dev-only ?phase= hook freezes the figure.
+        const phases = [0, 0.25, 0.5, 0.75, 1];
+        for (const id of NEW_IDS) {
+          for (const side of ['right', 'left'] as const) {
+            const card: { label: string; image: Buffer }[] = [];
+            const slot: { label: string; image: Buffer }[] = [];
+            for (const phase of phases) {
+              await page.goto(`${base}/#/ovning/${id}?phase=${phase}`);
+              const region = page.getByRole('region', { name: 'Rörelsen' });
+              await region.waitFor();
+              // The chosen side persists between visits: set it explicitly.
+              const toggle = page.getByRole('button', { name: /Byt sida/ });
+              const current = (await toggle.textContent()) ?? '';
+              if (current.startsWith('Höger') !== (side === 'right'))
+                await toggle.click();
+              const label = `${side} phase ${phase}`;
+              card.push({ label, image: await region.screenshot() });
+              const svg = page.locator('.exercise-stage svg');
+              await svg.evaluate((e) => {
+                (e as unknown as SVGElement).style.cssText =
+                  'width:128px;height:auto;max-width:none';
+              });
+              slot.push({ label, image: await svg.screenshot() });
+              await svg.evaluate((e) => {
+                (e as unknown as SVGElement).style.cssText = '';
+              });
+            }
+            await sheet(
+              page,
+              card,
+              `${out}/card-${tag}-${id}-${side}.png`,
+              230,
+              5,
+            );
+            await sheet(
+              page,
+              slot,
+              `${out}/slot128-${tag}-${id}-${side}.png`,
+              128,
+              5,
+            );
+          }
+        }
+      }
+      const ids: readonly string[] = mode === 'compare' ? CARD_SAMPLES : [];
       for (const id of ids) {
         await page.clock.install({ time: 0 });
         await page.clock.pauseAt(100);

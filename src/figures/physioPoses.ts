@@ -91,9 +91,9 @@ export const SEATED_FLEXION = {
   thigh: 32,
   shin: 39,
   floorY: 174,
-  startX: 131,
-  endX: 101,
-  farAnkleX: 126,
+  startX: 122,
+  endX: 97,
+  farAnkleX: 130,
 } as const;
 
 /**
@@ -124,7 +124,8 @@ export function seatedKneeFlexionPose(progress: number): Pose {
   );
 }
 
-export const BAND_KNEE_ANCHOR: Pt = [68, 172];
+/** Fixed point at the bottom of the front chair leg, behind the working foot. */
+export const BAND_KNEE_ANCHOR: Pt = [113.5, 172];
 
 export const BAND_HIP = {
   hip: [98, 117] as Pt,
@@ -183,7 +184,7 @@ export const CLOCK = {
   forward: { toeX: 131, angle: 48 },
   back: { toeX: 80, angle: 72 },
   floorToeY: 177,
-  lift: 9,
+  lift: 3,
   leanDeg: 5,
 } as const;
 
@@ -257,9 +258,9 @@ export const physioFigures: Record<PhysioFigureId, FigureSpec> = {
   'seated-knee-flexion': {
     start: seatedKneeFlexionPose(0),
     end: seatedKneeFlexionPose(1),
-    // Front legs sit well back from the seat edge so the sliding foot never
-    // crosses a chair leg.
-    props: [{ type: 'chair', x: 66, y: 142, w: 47, legInset: 22 }],
+    // The chair sits behind the figure in the drawing, so the sliding foot
+    // passes in front of its far-side legs.
+    props: [{ type: 'chair', x: 66, y: 144, w: 47 }],
   },
   'band-knee-extension': {
     start: seatedKneeExtensionPose(0),
