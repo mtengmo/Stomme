@@ -9,7 +9,14 @@ import { constrainLegInterpolation } from './constrainedLegs';
 import { FrontFigureFrame, supportsFrontView } from './frontViews';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
-import { figures, POSE_KEYS, type Pose } from './poses';
+import { physioMovementPose } from './physioPoses';
+import {
+  type FigureSpec,
+  figures,
+  POSE_KEYS,
+  type Pose,
+  type PoseKey,
+} from './poses';
 import { FloorLine, Held, PropShape } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
 
@@ -28,6 +35,8 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   const rehabPose = rehabMovementPose(exerciseId, t);
   if (rehabPose) return rehabPose;
+  const physioPose = physioMovementPose(exerciseId, t);
+  if (physioPose) return physioPose;
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
@@ -59,6 +68,24 @@ export function usePrefersReducedMotion(): boolean {
     return () => mq.removeEventListener('change', on);
   }, []);
   return reduced;
+}
+
+/** Hold at the end of a repetition, where it differs from the default. */
+const END_HOLD_MS: Partial<Record<ExerciseId, number>> = {
+  'seated-knee-extension': 5000,
+  'band-knee-extension': 5000,
+  'single-leg-floor-bridge': 2000,
+  'quad-set': 3000,
+};
+
+/** Both ends of the band for this figure, resolved against the current pose. */
+export function bandEndpoints(
+  band: NonNullable<FigureSpec['band']>,
+  pose: Pose,
+): [Pt, Pt] {
+  const from: Pt =
+    typeof band.from === 'string' ? pose[band.from as PoseKey] : band.from;
+  return [from, pose[band.to]];
 }
 
 const W = 6;
@@ -228,7 +255,17 @@ export function FigureFrame({
             <path d={`M${p.hR[0] - 3} ${p.hR[1]}h4`} />
           </g>
         ) : null}
-        {rack ? null : heldKind === 'band' ? (
+        {rack ? null : spec.band && equipment !== null ? (
+          <path
+            data-equipment="band"
+            d={line([...bandEndpoints(spec.band, p)])}
+            fill="none"
+            stroke="var(--equipment)"
+            strokeWidth="3"
+            strokeDasharray="5 3"
+            strokeLinecap="round"
+          />
+        ) : heldKind === 'band' ? (
           <path
             data-equipment="band"
             d={`M${p.hR.join(' ')}L${p.aR[0] + 2} ${p.aR[1] - 2}L${p.hL.join(' ')}`}
@@ -300,14 +337,7 @@ export function Figure({
       setT(
         spec.motion === 'ballistic'
           ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-          : cycleProgress(
-              elapsedMs.current,
-              exerciseId === 'seated-knee-extension'
-                ? 5000
-                : exerciseId === 'single-leg-floor-bridge'
-                  ? 2000
-                  : undefined,
-            ),
+          : cycleProgress(elapsedMs.current, END_HOLD_MS[exerciseId]),
       );
       raf = requestAnimationFrame(tick);
     };
