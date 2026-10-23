@@ -16,7 +16,10 @@ describe('balance clock copy', () => {
     const all = [...ex.tips, ex.easierVariant, ex.commonMistake].join(' ');
     expect(all).not.toMatch(/vid behov|lätt i|så långt du når/);
     expect(ex.tips[1]).toContain('en kort bit, utan smärta');
-    expect(ex.tips[1]).toContain('Korsa inte');
+    expect(ex.tips[1]).toContain(
+      'Låt aldrig foten gå över till stödbenets andra sida, varken framför eller bakom.',
+    );
+    expect(all).not.toContain('den fria foten');
     expect(ex.tips[1]).toContain('12, halv två, 3, halv fem och 6');
     expect(ex.tips[1]).toContain('12, halv elva, 9, halv åtta och 6');
     expect(all).not.toContain('12, 3, 6 och 9');

@@ -3,6 +3,8 @@ import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
+import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
+import { usePrefersReducedMotion } from '../../figures/Figure';
 import { formatClock } from '../../lib/format';
 import { useTimedHold } from '../../lib/useTimedHold';
 import type { SetStep } from '../../rules/sessionPlan';
@@ -54,6 +56,7 @@ export function SetScreen({
   const [amount, setAmount] = useState(initialAmount);
   const [loadIndex, setLoadIndex] = useState(initialLoadIndex);
   const [weightKg, setWeightKg] = useState(initialWeightKg);
+  const reducedMotion = usePrefersReducedMotion();
   const { range, unit, loadLadder } = exercise;
   const side = sideLabel(exercise, step.side);
   const load = loadLadder[loadIndex];
@@ -153,6 +156,12 @@ export function SetScreen({
             {exercise.id === 'band-hip-extension'
               ? 'Den valda sidan är det ben som rör sig.'
               : 'Den valda sidan är foten som nuddar. Du står på det andra benet.'}
+          </p>
+        ) : null}
+        {exercise.id === 'balance-clock' && step.side !== 'both' ? (
+          <p className="m-0 text-sm text-ink-soft">
+            Ändrat: tidigare betydde vald sida benet du står på. Kontrollera mot
+            ditt papper.
           </p>
         ) : null}
       </div>
@@ -316,6 +325,12 @@ export function SetScreen({
                 ? ` · ${presentation.variant.label}`
                 : ''}
             </p>
+            {exercise.id === 'balance-clock' ? (
+              <BalanceClockDiagram
+                working={step.side === 'both' ? null : step.side}
+                paused={reducedMotion}
+              />
+            ) : null}
             <ExerciseMuscles exerciseId={exercise.id} />
             <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
             <ExerciseDifficulty

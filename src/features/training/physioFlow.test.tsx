@@ -220,6 +220,14 @@ it('counts laps on the set screen and says which leg stands', async () => {
       'Den valda sidan är foten som nuddar. Du står på det andra benet.',
     ),
   ).toBeTruthy();
+  expect(
+    screen.getByText(
+      'Ändrat: tidigare betydde vald sida benet du står på. Kontrollera mot ditt papper.',
+    ),
+  ).toBeTruthy();
+  const diagram = screen.getByTestId('balance-clock-diagram');
+  expect(diagram.textContent).toContain('vänster tå');
+  expect(diagram.querySelectorAll('[data-order]')).toHaveLength(5);
 });
 
 it('says which leg moves for the band hip extension', async () => {
