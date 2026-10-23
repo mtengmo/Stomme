@@ -89,6 +89,6 @@ Unit: ids E49-E53 unique and in order; the group has 9 items with the right dose
 - Rows are numbered by paper number. The technique level is not shown for this group. The collection shows exercises already in the pass as compact "Ingår i passet" rows.
 - The confirm box sits in the sticky bar next to the start button; its label ends with "(krävs för att börja)." and the disabled button points to it with aria-describedby. A tick without a valid saved draft is cleared on load.
 - The QuickStart link reads "Jag har fysioterapeutens knäprogram (9 övningar)" with the hint "Annat papper? Välj eget rehabprogram ovan."
-- E53 requires holding on to a wall or chair in every text, and E51 describes the band anchored low at the front chair leg. The set screen says which leg moves (E52) or stands (E53).
+- E53 requires holding on to a wall or chair in every text, and E51 describes the band anchored low at the front chair leg. The set screen says which leg moves (E52 and E53); for E53 the other leg stands.
 - The E53 set screen reads 'Den valda sidan är foten som nuddar. Du står på det andra benet.'
 - `npm run privacy:check` runs `scripts/privacy-check.ts` against the local gitignored `.privacy-denylist`.
