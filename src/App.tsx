@@ -9,6 +9,7 @@ import { useAppUpdate } from './lib/update';
 import { Banner } from './ui/Banner';
 import { BottomNav } from './ui/BottomNav';
 import { Button } from './ui/Button';
+import { navVisible } from './ui/navVisibility';
 
 // Heavier routes load on demand to keep the first load small.
 const ExerciseCardPage = lazy(() =>
@@ -222,7 +223,7 @@ function Shell() {
           </Switch>
         </Suspense>
       </main>
-      {inSession ? null : <BottomNav />}
+      {navVisible(location) ? <BottomNav /> : null}
     </>
   );
 }

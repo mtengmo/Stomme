@@ -15,7 +15,9 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await expect(
     page.getByRole('heading', { name: 'Vad vill du träna?' }),
   ).toBeVisible();
-  await expect(page.getByRole('navigation')).toHaveCount(0);
+  await expect(
+    page.getByRole('navigation', { name: 'Huvudmeny' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
   await expect(page.getByRole('checkbox', { checked: true })).toHaveCount(0);
   await expect(page.getByRole('combobox')).toHaveCount(1);

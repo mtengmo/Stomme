@@ -349,7 +349,7 @@ function PreviewEditor({
     );
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-28">
+    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-[calc(var(--app-nav-height)+8rem)]">
       <Link
         href="/"
         className="flex min-h-12 items-center text-base font-bold underline"
@@ -1286,7 +1286,7 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-surface-tint px-5 py-4">
+          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-4">
             <div className="mx-auto w-full max-w-xl">
               <Button
                 disabled={
