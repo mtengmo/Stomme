@@ -152,7 +152,7 @@ export function SetScreen({
           <p className="m-0 text-base">
             {exercise.id === 'band-hip-extension'
               ? 'Den valda sidan är det ben som rör sig.'
-              : 'Den valda sidan är det ben du står på.'}
+              : 'Den valda sidan är foten som nuddar. Du står på det andra benet.'}
           </p>
         ) : null}
       </div>

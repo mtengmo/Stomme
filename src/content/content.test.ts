@@ -52,7 +52,10 @@ describe('templates', () => {
 describe('side-neutral copy', () => {
   it('has no fixed side words in tips of one-sided exercises', async () => {
     const { exerciseList } = await import('./exercises');
-    for (const ex of exerciseList.filter((e) => e.perSide)) {
+    // The balance clock names both foot-specific position lists on purpose.
+    for (const ex of exerciseList.filter(
+      (e) => e.perSide && e.id !== 'balance-clock',
+    )) {
       const text = [...ex.tips, ex.commonMistake, ex.easierVariant].join(' ');
       expect(text, ex.id).not.toMatch(/h(ö|o)ger|vänster/i);
     }

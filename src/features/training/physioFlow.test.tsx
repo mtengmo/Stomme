@@ -216,7 +216,9 @@ it('counts laps on the set screen and says which leg stands', async () => {
     screen.getByText('Räkna varven själv. Tryck Klar set när du är klar.'),
   ).toBeTruthy();
   expect(
-    screen.getByText('Den valda sidan är det ben du står på.'),
+    screen.getByText(
+      'Den valda sidan är foten som nuddar. Du står på det andra benet.',
+    ),
   ).toBeTruthy();
 });
 
