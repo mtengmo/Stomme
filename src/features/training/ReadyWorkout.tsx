@@ -9,6 +9,7 @@ import {
   physioHoldNote,
   physioKneeFitCount,
   physioKneeItemFor,
+  physioKneePlan,
   physioKneeTotal,
   physioProgressionNotes,
   physioSwapNote,
@@ -31,6 +32,9 @@ export function ReadyWorkout({
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
   const physio =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
+  const untouched =
+    physio &&
+    JSON.stringify(plan) === JSON.stringify(physioKneePlan(preferences));
   const ids = plan.map((item) => item.exerciseId);
   const primary = new Set(
     ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),
@@ -75,9 +79,10 @@ export function ReadyWorkout({
       ) : null}
       {physio ? (
         <p className="m-0 text-base">
-          {physioForm} {physioKneeFitCount(preferences)} av {physioKneeTotal}{' '}
-          övningar passar din utrustning. Setvilan på 60 sekunder är appens
-          justerbara standard. Avbryt en övning som gör ont.
+          {untouched ? `${physioForm} ` : ''}
+          {physioKneeFitCount(preferences)} av {physioKneeTotal} övningar passar
+          din utrustning. Setvilan på 60 sekunder är appens justerbara standard.
+          Avbryt en övning som gör ont.
         </p>
       ) : null}
       {!knee && !physio && preferences.programId !== 'rehab' ? (

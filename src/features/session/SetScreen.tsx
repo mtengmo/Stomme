@@ -147,6 +147,14 @@ export function SetScreen({
             </>
           ) : null}
         </p>
+        {exercise.id === 'band-hip-extension' ||
+        exercise.id === 'balance-clock' ? (
+          <p className="m-0 text-base">
+            {exercise.id === 'band-hip-extension'
+              ? 'Den valda sidan är det ben som rör sig.'
+              : 'Den valda sidan är det ben du står på.'}
+          </p>
+        ) : null}
       </div>
       {unit === 'seconds' ? (
         <section

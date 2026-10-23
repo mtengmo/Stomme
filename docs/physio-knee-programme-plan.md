@@ -81,3 +81,13 @@ Unit: ids E49-E53 unique and in order; the group has 9 items with the right dose
 ## Tasks and order
 
 1 policy text in docs (Sonnet) > 2 `RehabFocus` + `rehabGroup` + replace checks (Sonnet) and 3 `laps` unit (Sonnet) > 4 Swedish content for E49-E53 (Sonnet, then Opus review), 5 references/aliases/muscles/variant seeds/editorial source (Haiku, after 4), 6 E-number display fix (Haiku) > 7 group module + prefill (Sonnet), 8 backup changes + tests (Sonnet) > 9 UI flow (Sonnet). 10 figures: E49, E51, E52 (Sonnet); E50 and E53 with the clock diagram (Sonnet, Opus review of poses), alongside from task 5. 11 E2E, a11y, theme tests (Sonnet/Haiku) > 12 safety, privacy and copy review (Opus).
+
+## As implemented (supersedes the wording above where it differs)
+
+- Progression notes are short: the earlier row says "Nästa steg på papperet: övning 5.", the later row "Stegring av övning 4." One footer under the overview list says "Övning 5 och 7 är stegringar av 4 och 6. Gör dem bara om de står på ditt papper; ta annars bort dem." and, when item 4 or 6 is present, that the 5-second hold comes from AAOS.
+- The overview shows the "Förifyllt…" note once, and only while the plan equals the untouched prefill. The per-row explanation is not shown for this group.
+- Rows are numbered by paper number. The technique level is not shown for this group. The collection shows exercises already in the pass as compact "Ingår i passet" rows.
+- The confirm box sits in the sticky bar next to the start button; its label ends with "(krävs för att börja)." and the disabled button points to it with aria-describedby. A tick without a valid saved draft is cleared on load.
+- The QuickStart link reads "Jag har fysioterapeutens knäprogram (9 övningar)" with the hint "Annat papper? Välj eget rehabprogram ovan."
+- E53 requires holding on to a wall or chair in every text, and E51 describes the band anchored low at the front chair leg. The set screen says which leg moves (E52) or stands (E53).
+- `npm run privacy:check` runs `scripts/privacy-check.ts` against the local gitignored `.privacy-denylist`.

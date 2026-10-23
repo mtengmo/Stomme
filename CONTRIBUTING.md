@@ -30,6 +30,10 @@ First time with GitHub? The short version:
 2. `git clone` your fork, then `git checkout -b feature/my-change origin/dev` after adding the main repo as `upstream`.
 3. Commit, push to your fork, then click **Compare & pull request** and choose `dev` as the base branch.
 
+## Privacy check
+
+This repository is public, so code, tests, docs and commit messages must not contain personal names, clinic names, source-paper dates or copied third-party text. To check this locally, create a file `.privacy-denylist` in the repository root (one term per line, `#` for comments). The file is ignored by git and must never be committed. Then run `npm run privacy:check`: it searches every tracked file and every commit message, case-insensitively, prints each hit and exits with an error if there is one. Without the file it does nothing.
+
 ## Running it locally
 
 Requires Node 24 and npm.

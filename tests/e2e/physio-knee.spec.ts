@@ -12,7 +12,7 @@ async function openProgramme(
   await page.goto('/');
   await page
     .getByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram',
+      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     })
     .click();
   await page.getByRole('checkbox', { name: 'Stabil stol eller bänk' }).check();
@@ -113,5 +113,7 @@ test('physio programme: seven items without a band, saved plan wins, balance clo
   await page.getByRole('radio', { name: 'Redo att träna' }).check();
   await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
   await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
-  await expect(page.getByText(/varv/i).first()).toBeVisible();
+  await expect(
+    page.getByText('Räkna varven själv. Tryck Klar set när du är klar.'),
+  ).toBeVisible();
 });

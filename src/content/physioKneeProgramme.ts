@@ -10,7 +10,7 @@ import { exercises } from './exercises';
 export interface PhysioKneeItem {
   /** Position on the physiotherapist's paper, 1-based. */
   sheetNo: number;
-  /** Name as written on the paper. */
+  /** Short name shown to the user. */
   sheetLabel: string;
   exerciseId: ExerciseId;
   variantId: string;
@@ -109,7 +109,7 @@ export const physioHoldNote =
   'Hållningen på 5 sekunder (övning 4 och 6) kommer från AAOS: följ ditt papper om det skiljer sig.';
 
 export const physioSwapNote =
-  'Byt till ett nästa steg först när du och din fysioterapeut kommit överens.';
+  'Övning 5 och 7 är stegringar av 4 och 6. Gör dem bara om de står på ditt papper; ta annars bort dem.';
 
 export const physioForm =
   'Förifyllt från fysioterapeutens knäprogram. Kontrollera mot ditt papper och ändra vid behov.';

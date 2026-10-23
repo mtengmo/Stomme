@@ -255,7 +255,17 @@ function PreviewEditor({
   }, [draftKey, plan]);
 
   const [flags0] = useState(() => readFlags(draftKey));
-  const [confirmed, setConfirmed] = useState(flags0.confirmed);
+  const [confirmed, setConfirmed] = useState(() => {
+    if (!flags0.confirmed) return false;
+    try {
+      // A tick belongs to the draft it was given for; without a valid draft it is stale.
+      return (
+        sessionStorage.getItem(draftKey) !== null && validateTrainingPlan(plan)
+      );
+    } catch {
+      return false;
+    }
+  });
   const [checkBefore, setCheckBefore] = useState(flags0.checkBefore);
   const [editing, setEditing] = useState(() => {
     if (

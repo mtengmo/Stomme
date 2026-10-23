@@ -144,8 +144,11 @@ export function QuickStart() {
               onClick={() => setGoal('physio')}
               className="min-h-12 self-start text-left text-base underline"
             >
-              Jag har fysioterapeutens knäprogram
+              Jag har fysioterapeutens knäprogram (9 övningar)
             </button>
+            <p className="m-0 text-base text-ink-soft">
+              Annat papper? Välj eget rehabprogram ovan.
+            </p>
           </div>
         </>
       ) : (
