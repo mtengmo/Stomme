@@ -25,7 +25,7 @@ const programmeLabel: Record<ProgramId | 'legacy', string> = {
   legacy: 'Äldre pass utan programuppgift',
 };
 const inputClass =
-  'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+  'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
 export function ProgressOverview({
   sessions,
@@ -160,7 +160,7 @@ export function ProgressOverview({
             key={count}
             type="button"
             aria-pressed={weeksCount === count}
-            className="min-h-12 rounded-sm border-2 border-edge px-4 font-bold aria-pressed:bg-ink aria-pressed:text-paper"
+            className="min-h-12 rounded-sm border-2 border-edge px-4 font-bold aria-pressed:bg-action aria-pressed:text-action-ink"
             onClick={() => setWeeksCount(count)}
           >
             {count} veckor

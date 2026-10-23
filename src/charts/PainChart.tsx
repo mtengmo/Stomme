@@ -21,7 +21,7 @@ const LABEL: Record<Timing, string> = {
 };
 const TONE: Record<Timing, { fill: string; stroke: string }> = {
   before: { fill: 'fill-paper', stroke: 'stroke-ink' },
-  after: { fill: 'fill-blue', stroke: 'stroke-blue' },
+  after: { fill: 'fill-accent', stroke: 'stroke-accent' },
   dayAfter: { fill: 'fill-edge', stroke: 'stroke-ink-soft' },
 };
 

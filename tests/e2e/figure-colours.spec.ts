@@ -1,4 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { getTheme } from '../../src/styles/themes/registry';
+
+const rutat = getTheme('rutat');
 
 for (const mode of [
   { name: 'mobile light', width: 360, colorScheme: 'light' as const },
@@ -37,9 +40,7 @@ for (const mode of [
         };
       });
       expect(colours.equipment).not.toBe(colours.body);
-      expect(colours.token).toBe(
-        mode.colorScheme === 'light' ? '#9a4b12' : '#ffb66d',
-      );
+      expect(colours.token).toBe(rutat?.tokens[mode.colorScheme].equipment);
       if (sample.id === 'dumbbell-rdl') {
         const near = await movement
           .locator('[data-body-side="near"]')

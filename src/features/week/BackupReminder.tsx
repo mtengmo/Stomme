@@ -64,7 +64,7 @@ export function BackupReminder({
       <div className="mt-1 flex flex-wrap items-center gap-x-5">
         <Link
           href="/installningar"
-          className="inline-flex min-h-12 items-center font-bold text-blue underline underline-offset-4"
+          className="inline-flex min-h-12 items-center font-bold text-accent underline underline-offset-4"
         >
           Öppna inställningar
         </Link>

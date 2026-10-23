@@ -42,7 +42,7 @@ export function ScorePicker({
               className="peer sr-only"
             />
             <span
-              className={`count grid h-14 min-w-12 place-items-center rounded-md border-[3px] border-ink text-3xl transition-transform duration-150 ease-out peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-[3px] peer-focus-visible:outline-blue active:scale-[0.96] ${value === score ? 'bg-ink text-paper' : 'bg-paper text-ink'}`}
+              className={`count grid h-14 min-w-12 place-items-center rounded-md border-[3px] border-ink text-3xl transition-transform duration-150 ease-out peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-[3px] peer-focus-visible:outline-(--focus-outline) peer-focus-visible:[box-shadow:var(--focus-ring)] active:scale-[0.96] ${value === score ? 'bg-action text-action-ink' : 'bg-surface text-ink'}`}
             >
               {score}
             </span>

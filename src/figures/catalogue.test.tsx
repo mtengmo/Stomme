@@ -62,8 +62,8 @@ describe('catalogue equipment and contacts', () => {
           working={null}
         />,
       );
-      expect(markup).toContain('data-body-side="far" stroke="var(--blue)"');
-      expect(markup).toContain('data-body-side="near" stroke="var(--blue)"');
+      expect(markup).toContain('data-body-side="far" stroke="var(--accent)"');
+      expect(markup).toContain('data-body-side="near" stroke="var(--accent)"');
       expect(markup).not.toContain('<text');
     },
   );
@@ -78,7 +78,7 @@ describe('catalogue equipment and contacts', () => {
         />,
       );
       expect(markup).toContain('data-body-side="far" stroke="var(--edge)"');
-      expect(markup).toContain('data-body-side="near" stroke="var(--blue)"');
+      expect(markup).toContain('data-body-side="near" stroke="var(--accent)"');
       expect(markup.split(`data-equipment="${equipment}"`)[1]).toContain(
         'stroke="var(--equipment)"',
       );

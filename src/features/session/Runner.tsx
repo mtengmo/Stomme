@@ -168,7 +168,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           {error ? (
             <p
               role="alert"
-              className="m-0 border-t-[3px] border-ink bg-paper px-5 py-2 text-base font-bold text-ink"
+              className="m-0 border-t-[3px] border-ink bg-surface-tint px-5 py-2 text-base font-bold text-ink"
             >
               {PAIN_COPY.error}
             </p>
@@ -215,7 +215,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           </h1>
           <p className="m-0 text-xl">Det du hunnit logga sparas.</p>
         </div>
-        <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-ink bg-paper px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 -mx-5 flex flex-col gap-3 border-t-[3px] border-ink bg-surface-tint px-5 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <Button onClick={() => setConfirmAbort(false)}>
             Fortsätt passet
           </Button>

@@ -159,7 +159,7 @@ export function FrontFigureFrame({
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
   const color = (side: 'R' | 'L') =>
     working === null || (working === 'right' ? side === 'R' : side === 'L')
-      ? 'var(--blue)'
+      ? 'var(--accent)'
       : 'var(--edge)';
   const arm = (elbow: Pt, hand: Pt) => line([pose.neck, elbow, hand]);
   const leg = (knee: Pt, ankle: Pt, toe: Pt) =>
@@ -230,7 +230,7 @@ export function FrontFigureFrame({
           y="58"
           fontSize="28"
           fontWeight="800"
-          fill="var(--blue)"
+          fill="var(--accent)"
           fontFamily="system-ui, sans-serif"
         >
           {working === 'right' ? 'H' : 'V'}

@@ -43,9 +43,9 @@ function segment(
       height={width}
       rx={width / 2}
       transform={`rotate(${angle} ${a[0]} ${a[1]})`}
-      fill={role === 'primary' ? 'var(--blue)' : `url(#${patternId})`}
+      fill={role === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
       fillOpacity={role === 'primary' ? 0.48 : 1}
-      stroke="var(--blue)"
+      stroke="var(--accent)"
       strokeWidth="1.5"
     />
   );
@@ -65,9 +65,9 @@ function circle(
       cy={at[1]}
       rx={radius}
       ry={radius * 0.68}
-      fill={role === 'primary' ? 'var(--blue)' : `url(#${patternId})`}
+      fill={role === 'primary' ? 'var(--accent)' : `url(#${patternId})`}
       fillOpacity={role === 'primary' ? 0.48 : 1}
-      stroke="var(--blue)"
+      stroke="var(--accent)"
       strokeWidth="1.5"
     />
   );
@@ -130,7 +130,7 @@ export function MuscleOverlay({
           patternUnits="userSpaceOnUse"
         >
           <rect width="5" height="5" fill="var(--paper)" fillOpacity="0.8" />
-          <path d="M0 0V5" stroke="var(--blue)" strokeWidth="2" />
+          <path d="M0 0V5" stroke="var(--accent)" strokeWidth="2" />
         </pattern>
       </defs>
       {regions.map(({ group, shape, a, b }) => {

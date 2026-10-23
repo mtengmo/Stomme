@@ -1,124 +1,1143 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-18T00:00:00Z",
+  "generatedAt": "2026-10-23T00:00:00Z",
   "title": "Design System: Stomme",
   "extensions": {
     "colorMeta": {
-      "paper": { "role": "neutral", "displayName": "Squared Paper", "canonical": "#eef3f0", "tonalRamp": ["#232827", "#3b4240", "#58625f", "#7b8783", "#a2aeaa", "#c5d0cc", "#e0e8e4", "#eef3f0"] },
-      "graphite-ink": { "role": "neutral", "displayName": "Graphite Ink", "canonical": "#23292b", "tonalRamp": ["#23292b", "#343c3f", "#4a5659", "#66766f", "#8a9893", "#aebab5", "#d6e2dc", "#eef3f0"] },
-      "red-pencil": { "role": "primary", "displayName": "Red Pencil", "canonical": "#c22f27", "tonalRamp": ["#4a0f0b", "#721812", "#9a211b", "#c22f27", "#da5a52", "#ea8780", "#f4b5b0", "#fae0dd"] },
-      "blue-ink": { "role": "secondary", "displayName": "Blue Ink", "canonical": "#2b4fa0", "tonalRamp": ["#0f1d3d", "#1a3170", "#2b4fa0", "#4d70c2", "#7894d6", "#a3b7e6", "#cbd6f1", "#e8edf8"] },
-      "today-amber": { "role": "tertiary", "displayName": "Today Amber", "canonical": "#f0b13a", "tonalRamp": ["#4a3207", "#74500d", "#a07015", "#c98f22", "#f0b13a", "#f4c568", "#f8d994", "#fcecc8"] },
-      "paper-dark": { "role": "neutral", "displayName": "Graphite Sheet", "canonical": "#1a1f21", "tonalRamp": ["#1a1f21", "#242b2e", "#2a3134", "#3d484b", "#66766f", "#a9b6b2", "#c3cecb", "#e8eeea"] }
+      "paper": {
+        "role": "neutral",
+        "displayName": "Squared Paper",
+        "canonical": "#eef3f0",
+        "tonalRamp": [
+          "#202d25",
+          "#384f41",
+          "#50715d",
+          "#689379",
+          "#8aac97",
+          "#acc4b6",
+          "#cedcd4",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#eef3f0",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#dfeeed",
+            "dark": "#0f2224"
+          },
+          "kvallssol": {
+            "light": "#f8d9bf",
+            "dark": "#21141c"
+          },
+          "hog-kontrast": {
+            "light": "#ffffff",
+            "dark": "#000000"
+          }
+        }
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#eef3f0",
+        "tonalRamp": [
+          "#202d25",
+          "#384f41",
+          "#50715d",
+          "#689379",
+          "#8aac97",
+          "#acc4b6",
+          "#cedcd4",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#eef3f0",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#f3f9f8",
+            "dark": "#142d30"
+          },
+          "kvallssol": {
+            "light": "#fdeee0",
+            "dark": "#2c1a25"
+          },
+          "hog-kontrast": {
+            "light": "#ffffff",
+            "dark": "#0b0b0b"
+          }
+        }
+      },
+      "surface-tint": {
+        "role": "neutral",
+        "displayName": "Surface Tint",
+        "canonical": "#eef3f0",
+        "tonalRamp": [
+          "#202d25",
+          "#384f41",
+          "#50715d",
+          "#689379",
+          "#8aac97",
+          "#acc4b6",
+          "#cedcd4",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#eef3f0",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#c6e3e0",
+            "dark": "#1b3b3e"
+          },
+          "kvallssol": {
+            "light": "#f0c49c",
+            "dark": "#3e2032"
+          },
+          "hog-kontrast": {
+            "light": "#efefef",
+            "dark": "#1c1c1c"
+          }
+        }
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Grid Line",
+        "canonical": "#d6e2dc",
+        "tonalRamp": [
+          "#202d26",
+          "#384f43",
+          "#507161",
+          "#68937e",
+          "#8aac9b",
+          "#acc4b8",
+          "#cedcd5",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#d6e2dc",
+            "dark": "#242b2e"
+          },
+          "hav": {
+            "light": "#cde3e0",
+            "dark": "#183336"
+          },
+          "kvallssol": {
+            "light": "#efcfb2",
+            "dark": "#2d1b26"
+          },
+          "hog-kontrast": {
+            "light": "#c4c4c4",
+            "dark": "#3d3d3d"
+          }
+        }
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#23292b",
+        "tonalRamp": [
+          "#22282a",
+          "#3c474a",
+          "#57656a",
+          "#71848b",
+          "#91a0a5",
+          "#b1bcbf",
+          "#d1d7d9",
+          "#f1f3f4"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#23292b",
+            "dark": "#e8eeea"
+          },
+          "hav": {
+            "light": "#0e2a2d",
+            "dark": "#e2f1ef"
+          },
+          "kvallssol": {
+            "light": "#2a1520",
+            "dark": "#fbe9dc"
+          },
+          "hog-kontrast": {
+            "light": "#0b0b0b",
+            "dark": "#ffffff"
+          }
+        }
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#4a5659",
+        "tonalRamp": [
+          "#23282a",
+          "#3d474a",
+          "#586669",
+          "#728589",
+          "#92a0a4",
+          "#b1bcbf",
+          "#d1d7d9",
+          "#f1f3f3"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#4a5659",
+            "dark": "#a9b6b2"
+          },
+          "hav": {
+            "light": "#35555a",
+            "dark": "#a3c0bd"
+          },
+          "kvallssol": {
+            "light": "#57394a",
+            "dark": "#d6b6bf"
+          },
+          "hog-kontrast": {
+            "light": "#383838",
+            "dark": "#d9d9d9"
+          }
+        }
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Edge",
+        "canonical": "#66766f",
+        "tonalRamp": [
+          "#232927",
+          "#3e4844",
+          "#5a6861",
+          "#75877f",
+          "#94a29c",
+          "#b3bdb9",
+          "#d2d8d5",
+          "#f1f3f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#66766f",
+            "dark": "#7f8f8a"
+          },
+          "hav": {
+            "light": "#557a7d",
+            "dark": "#6f9693"
+          },
+          "kvallssol": {
+            "light": "#84606c",
+            "dark": "#a07f8b"
+          },
+          "hog-kontrast": {
+            "light": "#595959",
+            "dark": "#a3a3a3"
+          }
+        }
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Action",
+        "canonical": "#23292b",
+        "tonalRamp": [
+          "#22282a",
+          "#3c474a",
+          "#57656a",
+          "#71848b",
+          "#91a0a5",
+          "#b1bcbf",
+          "#d1d7d9",
+          "#f1f3f4"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#23292b",
+            "dark": "#e8eeea"
+          },
+          "hav": {
+            "light": "#0b5c61",
+            "dark": "#5fc4bd"
+          },
+          "kvallssol": {
+            "light": "#7a2453",
+            "dark": "#f2a0c8"
+          },
+          "hog-kontrast": {
+            "light": "#0b0b0b",
+            "dark": "#ffffff"
+          }
+        }
+      },
+      "action-ink": {
+        "role": "neutral",
+        "displayName": "Action Ink",
+        "canonical": "#eef3f0",
+        "tonalRamp": [
+          "#202d25",
+          "#384f41",
+          "#50715d",
+          "#689379",
+          "#8aac97",
+          "#acc4b6",
+          "#cedcd4",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#eef3f0",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#f3f9f8",
+            "dark": "#0b1f21"
+          },
+          "kvallssol": {
+            "light": "#fdeee0",
+            "dark": "#21141c"
+          },
+          "hog-kontrast": {
+            "light": "#ffffff",
+            "dark": "#000000"
+          }
+        }
+      },
+      "done": {
+        "role": "primary",
+        "displayName": "Done Colour",
+        "canonical": "#b52a23",
+        "tonalRamp": [
+          "#400f0c",
+          "#711a16",
+          "#a2261f",
+          "#d33129",
+          "#df5e57",
+          "#e88d88",
+          "#f1bcb9",
+          "#fbeaea"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#b52a23",
+            "dark": "#ff7d70"
+          },
+          "hav": {
+            "light": "#b1340e",
+            "dark": "#ff9b73"
+          },
+          "kvallssol": {
+            "light": "#135c43",
+            "dark": "#4fbf8f"
+          },
+          "hog-kontrast": {
+            "light": "#003cb8",
+            "dark": "#8fb0ff"
+          }
+        }
+      },
+      "done-fill": {
+        "role": "primary",
+        "displayName": "Done Fill (Hav light chip)",
+        "canonical": "Rutat default: transparent",
+        "tonalRamp": [
+          "#451207",
+          "#7a200d",
+          "#ae2e13",
+          "#e33c19",
+          "#eb664a",
+          "#f1937f",
+          "#f7bfb3",
+          "#fdece8"
+        ],
+        "perTheme": {
+          "rutat": {},
+          "hav": {
+            "light": "#ec6b50",
+            "dark": "transparent"
+          },
+          "kvallssol": {},
+          "hog-kontrast": {}
+        }
+      },
+      "done-fill-ink": {
+        "role": "neutral",
+        "displayName": "Done Fill Ink",
+        "canonical": "Rutat default: {done}",
+        "tonalRamp": [
+          "#12363a",
+          "#206067",
+          "#2e8993",
+          "#3cb3c0",
+          "#66c5cf",
+          "#93d6dd",
+          "#bfe7eb",
+          "#ecf8f9"
+        ],
+        "perTheme": {
+          "rutat": {},
+          "hav": {
+            "light": "#0e2a2d"
+          },
+          "kvallssol": {},
+          "hog-kontrast": {}
+        }
+      },
+      "done-mark": {
+        "role": "primary",
+        "displayName": "Done Mark (non-text tick)",
+        "canonical": "Rutat default: {done}",
+        "tonalRamp": [
+          "#3f180e",
+          "#6e2a18",
+          "#9e3c23",
+          "#ce4e2e",
+          "#db755b",
+          "#e59d8b",
+          "#f0c5ba",
+          "#faedea"
+        ],
+        "perTheme": {
+          "rutat": {},
+          "hav": {
+            "light": "#d1502f"
+          },
+          "kvallssol": {},
+          "hog-kontrast": {}
+        }
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Accent",
+        "canonical": "#2b4fa0",
+        "tonalRamp": [
+          "#101e3c",
+          "#1d346a",
+          "#294b98",
+          "#3562c6",
+          "#6185d5",
+          "#8fa8e1",
+          "#bdcced",
+          "#ebeffa"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#2b4fa0",
+            "dark": "#93b2ff"
+          },
+          "hav": {
+            "light": "#1d5b94",
+            "dark": "#8cc2ff"
+          },
+          "kvallssol": {
+            "light": "#3a3f9c",
+            "dark": "#b4b8ff"
+          },
+          "hog-kontrast": {
+            "light": "#00525a",
+            "dark": "#45c08a"
+          }
+        }
+      },
+      "focus": {
+        "role": "secondary",
+        "displayName": "Focus",
+        "canonical": "#2b4fa0",
+        "tonalRamp": [
+          "#101e3c",
+          "#1d346a",
+          "#294b98",
+          "#3562c6",
+          "#6185d5",
+          "#8fa8e1",
+          "#bdcced",
+          "#ebeffa"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#2b4fa0",
+            "dark": "#93b2ff"
+          },
+          "hav": {
+            "light": "#1d5b94",
+            "dark": "#8cc2ff"
+          },
+          "kvallssol": {
+            "light": "#3a3f9c",
+            "dark": "#b4b8ff"
+          },
+          "hog-kontrast": {
+            "light": "#ffd500",
+            "dark": "#ffd500"
+          }
+        }
+      },
+      "info": {
+        "role": "secondary",
+        "displayName": "Info",
+        "canonical": "#2b4fa0",
+        "tonalRamp": [
+          "#101e3c",
+          "#1d346a",
+          "#294b98",
+          "#3562c6",
+          "#6185d5",
+          "#8fa8e1",
+          "#bdcced",
+          "#ebeffa"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#2b4fa0",
+            "dark": "#93b2ff"
+          },
+          "hav": {
+            "light": "#1d5b94",
+            "dark": "#8cc2ff"
+          },
+          "kvallssol": {
+            "light": "#3a3f9c",
+            "dark": "#b4b8ff"
+          },
+          "hog-kontrast": {
+            "light": "#00525a",
+            "dark": "#45c08a"
+          }
+        }
+      },
+      "today": {
+        "role": "tertiary",
+        "displayName": "Today",
+        "canonical": "#f0b13a",
+        "tonalRamp": [
+          "#473005",
+          "#7d550a",
+          "#b37a0e",
+          "#ea9f12",
+          "#f1b545",
+          "#f5cb7b",
+          "#f9e0b1",
+          "#fdf6e7"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#f0b13a",
+            "dark": "#e6aa35"
+          },
+          "hav": {
+            "light": "#f2bb4f",
+            "dark": "#f0b54c"
+          },
+          "kvallssol": {
+            "light": "#f6b13a",
+            "dark": "#f6b13a"
+          },
+          "hog-kontrast": {
+            "light": "#ffb000",
+            "dark": "#ffb000"
+          }
+        }
+      },
+      "today-ink": {
+        "role": "neutral",
+        "displayName": "Today Ink",
+        "canonical": "#23292b",
+        "tonalRamp": [
+          "#22282a",
+          "#3c474a",
+          "#57656a",
+          "#71848b",
+          "#91a0a5",
+          "#b1bcbf",
+          "#d1d7d9",
+          "#f1f3f4"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#23292b",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#0e2a2d",
+            "dark": "#0f2224"
+          },
+          "kvallssol": {
+            "light": "#2a1520",
+            "dark": "#21141c"
+          },
+          "hog-kontrast": {
+            "light": "#0b0b0b",
+            "dark": "#000000"
+          }
+        }
+      },
+      "upcoming": {
+        "role": "neutral",
+        "displayName": "Upcoming",
+        "canonical": "#dde6e2",
+        "tonalRamp": [
+          "#202c27",
+          "#394e45",
+          "#526f62",
+          "#6b9180",
+          "#8caa9d",
+          "#adc3b9",
+          "#cfdbd6",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#dde6e2",
+            "dark": "#2a3134"
+          },
+          "hav": {
+            "light": "#d0e4e1",
+            "dark": "#1f3b3e"
+          },
+          "kvallssol": {
+            "light": "#efcdb0",
+            "dark": "#3a2833"
+          },
+          "hog-kontrast": {
+            "light": "#e6e6e6",
+            "dark": "#2a2a2a"
+          }
+        }
+      },
+      "upcoming-ink": {
+        "role": "neutral",
+        "displayName": "Upcoming Ink",
+        "canonical": "#3d484b",
+        "tonalRamp": [
+          "#22282a",
+          "#3c474a",
+          "#57666a",
+          "#71858b",
+          "#91a1a5",
+          "#b1bcbf",
+          "#d1d8d9",
+          "#f1f3f4"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#3d484b",
+            "dark": "#c3cecb"
+          },
+          "hav": {
+            "light": "#2c4a4e",
+            "dark": "#c0d9d6"
+          },
+          "kvallssol": {
+            "light": "#4a2e3d",
+            "dark": "#e6cbd3"
+          },
+          "hog-kontrast": {
+            "light": "#0b0b0b",
+            "dark": "#ffffff"
+          }
+        }
+      },
+      "care": {
+        "role": "secondary",
+        "displayName": "Care (extreme colour)",
+        "canonical": "#23292b",
+        "tonalRamp": [
+          "#22282a",
+          "#3c474a",
+          "#57656a",
+          "#71848b",
+          "#91a0a5",
+          "#b1bcbf",
+          "#d1d7d9",
+          "#f1f3f4"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#23292b",
+            "dark": "#e8eeea"
+          },
+          "hav": {
+            "light": "#4b1d48",
+            "dark": "#f6e1f0"
+          },
+          "kvallssol": {
+            "light": "#1b1630",
+            "dark": "#fff4e6"
+          },
+          "hog-kontrast": {
+            "light": "#5e0012",
+            "dark": "#ffe6e3"
+          }
+        }
+      },
+      "care-ink": {
+        "role": "neutral",
+        "displayName": "Care Ink",
+        "canonical": "#eef3f0",
+        "tonalRamp": [
+          "#202d25",
+          "#384f41",
+          "#50715d",
+          "#689379",
+          "#8aac97",
+          "#acc4b6",
+          "#cedcd4",
+          "#f0f4f2"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#eef3f0",
+            "dark": "#1a1f21"
+          },
+          "hav": {
+            "light": "#f3f9f8",
+            "dark": "#0f2224"
+          },
+          "kvallssol": {
+            "light": "#fdeee0",
+            "dark": "#21141c"
+          },
+          "hog-kontrast": {
+            "light": "#ffffff",
+            "dark": "#000000"
+          }
+        }
+      },
+      "equipment": {
+        "role": "tertiary",
+        "displayName": "Equipment",
+        "canonical": "#9a4b12",
+        "tonalRamp": [
+          "#442108",
+          "#793b0e",
+          "#ad5414",
+          "#e16e1a",
+          "#ea8e4c",
+          "#f0af80",
+          "#f6d0b4",
+          "#fcf1e8"
+        ],
+        "perTheme": {
+          "rutat": {
+            "light": "#9a4b12",
+            "dark": "#ffb66d"
+          },
+          "hav": {
+            "light": "#7a5410",
+            "dark": "#e2c070"
+          },
+          "kvallssol": {
+            "light": "#8a4a0e",
+            "dark": "#ff9f50"
+          },
+          "hog-kontrast": {
+            "light": "#7a4a00",
+            "dark": "#ffb26b"
+          }
+        }
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Screen titles and the lead pass name, Barlow Condensed 800." },
-      "headline": { "displayName": "Headline", "purpose": "Receding pass names and section headings, Barlow Condensed 700." },
-      "count": { "displayName": "Count", "purpose": "Set tallies, day numbers and progress figures, tabular condensed heavy." },
-      "body": { "displayName": "Body", "purpose": "Paragraphs, list items and button text in the platform sans, 20px." },
-      "label": { "displayName": "Label", "purpose": "Chips, tab labels, notes at the 16px floor." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Screen titles and the lead pass name, Barlow Condensed 800."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Receding pass names and section headings, Barlow Condensed 700."
+      },
+      "count": {
+        "displayName": "Count",
+        "purpose": "Set tallies, day numbers and progress figures, tabular condensed heavy."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs, list items and button text in the platform sans, 20px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chips, tab labels, notes at the 16px floor."
+      }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "focus-ring-double",
+        "value": "0 0 0 3px #ffd500 (with 3px ink outline, offset 3px)",
+        "purpose": "Hög kontrast light only: double focus ring. Inset variant for the bottom nav. The only box-shadow in the system."
+      }
+    ],
     "motion": [
-      { "name": "tick-draw", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1) clip-path inset(0 100% 0 0) to inset(0)", "purpose": "A pencil tick drawing on when a set is newly done; disabled under prefers-reduced-motion." },
-      { "name": "press", "value": "150ms ease-out, scale(0.98)", "purpose": "Button press feedback." }
+      {
+        "name": "tick-draw",
+        "value": "480ms cubic-bezier(0.16, 1, 0.3, 1) clip-path inset(0 100% 0 0) to inset(0)",
+        "purpose": "A pencil tick drawing on when a set is newly done; disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "press",
+        "value": "150ms ease-out, scale(0.98)",
+        "purpose": "Button press feedback."
+      }
     ],
     "breakpoints": [
-      { "name": "content-max", "value": "28rem" }
-    ]
+      {
+        "name": "content-max",
+        "value": "28rem"
+      }
+    ],
+    "themes": {
+      "rutat": {
+        "displayName": "Rutat",
+        "strategy": "Restrained",
+        "doneStatement": "Rödpennan: klart är alltid röd bock.",
+        "light": {
+          "--paper": "#eef3f0",
+          "--surface": "#eef3f0",
+          "--surface-tint": "#eef3f0",
+          "--line": "#d6e2dc",
+          "--ink": "#23292b",
+          "--ink-soft": "#4a5659",
+          "--edge": "#66766f",
+          "--action": "#23292b",
+          "--action-ink": "#eef3f0",
+          "--done": "#b52a23",
+          "--accent": "#2b4fa0",
+          "--focus": "#2b4fa0",
+          "--info": "#2b4fa0",
+          "--today": "#f0b13a",
+          "--today-ink": "#23292b",
+          "--upcoming": "#dde6e2",
+          "--upcoming-ink": "#3d484b",
+          "--care": "#23292b",
+          "--care-ink": "#eef3f0",
+          "--equipment": "#9a4b12"
+        },
+        "dark": {
+          "--paper": "#1a1f21",
+          "--surface": "#1a1f21",
+          "--surface-tint": "#1a1f21",
+          "--line": "#242b2e",
+          "--ink": "#e8eeea",
+          "--ink-soft": "#a9b6b2",
+          "--edge": "#7f8f8a",
+          "--action": "#e8eeea",
+          "--action-ink": "#1a1f21",
+          "--done": "#ff7d70",
+          "--accent": "#93b2ff",
+          "--focus": "#93b2ff",
+          "--info": "#93b2ff",
+          "--today": "#e6aa35",
+          "--today-ink": "#1a1f21",
+          "--upcoming": "#2a3134",
+          "--upcoming-ink": "#c3cecb",
+          "--care": "#e8eeea",
+          "--care-ink": "#1a1f21",
+          "--equipment": "#ffb66d"
+        }
+      },
+      "hav": {
+        "displayName": "Hav Lagun",
+        "strategy": "Committed",
+        "doneStatement": "Korallrött: klart är alltid korallröd bock.",
+        "light": {
+          "--paper": "#dfeeed",
+          "--surface": "#f3f9f8",
+          "--surface-tint": "#c6e3e0",
+          "--line": "#cde3e0",
+          "--ink": "#0e2a2d",
+          "--ink-soft": "#35555a",
+          "--edge": "#557a7d",
+          "--action": "#0b5c61",
+          "--action-ink": "#f3f9f8",
+          "--done": "#b1340e",
+          "--done-fill": "#ec6b50",
+          "--done-fill-ink": "#0e2a2d",
+          "--done-mark": "#d1502f",
+          "--accent": "#1d5b94",
+          "--focus": "#1d5b94",
+          "--info": "#1d5b94",
+          "--today": "#f2bb4f",
+          "--today-ink": "#0e2a2d",
+          "--upcoming": "#d0e4e1",
+          "--upcoming-ink": "#2c4a4e",
+          "--care": "#4b1d48",
+          "--care-ink": "#f3f9f8",
+          "--equipment": "#7a5410"
+        },
+        "dark": {
+          "--done-fill": "transparent",
+          "--paper": "#0f2224",
+          "--surface": "#142d30",
+          "--surface-tint": "#1b3b3e",
+          "--line": "#183336",
+          "--ink": "#e2f1ef",
+          "--ink-soft": "#a3c0bd",
+          "--edge": "#6f9693",
+          "--action": "#5fc4bd",
+          "--action-ink": "#0b1f21",
+          "--done": "#ff9b73",
+          "--accent": "#8cc2ff",
+          "--focus": "#8cc2ff",
+          "--info": "#8cc2ff",
+          "--today": "#f0b54c",
+          "--today-ink": "#0f2224",
+          "--upcoming": "#1f3b3e",
+          "--upcoming-ink": "#c0d9d6",
+          "--care": "#f6e1f0",
+          "--care-ink": "#0f2224",
+          "--equipment": "#e2c070"
+        }
+      },
+      "kvallssol": {
+        "displayName": "Kvällssol Skymning",
+        "strategy": "Full palette",
+        "doneStatement": "Tallgrönt: klart är alltid grön bock.",
+        "light": {
+          "--paper": "#f8d9bf",
+          "--surface": "#fdeee0",
+          "--surface-tint": "#f0c49c",
+          "--line": "#efcfb2",
+          "--ink": "#2a1520",
+          "--ink-soft": "#57394a",
+          "--edge": "#84606c",
+          "--action": "#7a2453",
+          "--action-ink": "#fdeee0",
+          "--done": "#135c43",
+          "--accent": "#3a3f9c",
+          "--focus": "#3a3f9c",
+          "--info": "#3a3f9c",
+          "--today": "#f6b13a",
+          "--today-ink": "#2a1520",
+          "--upcoming": "#efcdb0",
+          "--upcoming-ink": "#4a2e3d",
+          "--care": "#1b1630",
+          "--care-ink": "#fdeee0",
+          "--equipment": "#8a4a0e"
+        },
+        "dark": {
+          "--paper": "#21141c",
+          "--surface": "#2c1a25",
+          "--surface-tint": "#3e2032",
+          "--line": "#2d1b26",
+          "--ink": "#fbe9dc",
+          "--ink-soft": "#d6b6bf",
+          "--edge": "#a07f8b",
+          "--action": "#f2a0c8",
+          "--action-ink": "#21141c",
+          "--done": "#4fbf8f",
+          "--accent": "#b4b8ff",
+          "--focus": "#b4b8ff",
+          "--info": "#b4b8ff",
+          "--today": "#f6b13a",
+          "--today-ink": "#21141c",
+          "--upcoming": "#3a2833",
+          "--upcoming-ink": "#e6cbd3",
+          "--care": "#fff4e6",
+          "--care-ink": "#21141c",
+          "--equipment": "#ff9f50"
+        }
+      },
+      "hog-kontrast": {
+        "displayName": "Hög kontrast Vitt",
+        "strategy": "Restrained",
+        "doneStatement": "Blått: klart är alltid blå bock.",
+        "light": {
+          "--paper": "#ffffff",
+          "--surface": "#ffffff",
+          "--surface-tint": "#efefef",
+          "--line": "#c4c4c4",
+          "--ink": "#0b0b0b",
+          "--ink-soft": "#383838",
+          "--edge": "#595959",
+          "--action": "#0b0b0b",
+          "--action-ink": "#ffffff",
+          "--done": "#003cb8",
+          "--accent": "#00525a",
+          "--focus": "#ffd500",
+          "--info": "#00525a",
+          "--today": "#ffb000",
+          "--today-ink": "#0b0b0b",
+          "--upcoming": "#e6e6e6",
+          "--upcoming-ink": "#0b0b0b",
+          "--care": "#5e0012",
+          "--care-ink": "#ffffff",
+          "--equipment": "#7a4a00",
+          "--grid-line": "transparent",
+          "--focus-outline": "#0b0b0b"
+        },
+        "dark": {
+          "--paper": "#000000",
+          "--surface": "#0b0b0b",
+          "--surface-tint": "#1c1c1c",
+          "--line": "#3d3d3d",
+          "--ink": "#ffffff",
+          "--ink-soft": "#d9d9d9",
+          "--edge": "#a3a3a3",
+          "--action": "#ffffff",
+          "--action-ink": "#000000",
+          "--done": "#8fb0ff",
+          "--accent": "#45c08a",
+          "--focus": "#ffd500",
+          "--info": "#45c08a",
+          "--today": "#ffb000",
+          "--today-ink": "#000000",
+          "--upcoming": "#2a2a2a",
+          "--upcoming-ink": "#ffffff",
+          "--care": "#ffe6e3",
+          "--care-ink": "#000000",
+          "--equipment": "#ffb26b",
+          "--grid-line": "transparent"
+        }
+      }
+    }
   },
   "components": [
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one full-width action per screen.",
+      "description": "The one full-width action per screen; action fill, action-ink text.",
       "html": "<button class=\"ds-btn-primary\">Starta pass</button>",
-      "css": ".ds-btn-primary { display:flex; width:100%; align-items:center; justify-content:center; min-height:64px; padding:0 24px; border:0; border-radius:6px; background:#23292b; color:#eef3f0; font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out, opacity 150ms ease-out; } .ds-btn-primary:active { transform:scale(0.98); } .ds-btn-primary:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; border-radius:4px; } .ds-btn-primary:disabled { opacity:0.5; }"
+      "css": ".ds-btn-primary { display:flex; width:100%; align-items:center; justify-content:center; min-height:64px; padding:0 24px; border:0; border-radius:6px; background:var(--action,#23292b); color:var(--action-ink,#eef3f0); font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out, opacity 150ms ease-out; } .ds-btn-primary:active { transform:scale(0.98); } .ds-btn-primary:focus-visible { outline:3px solid var(--focus-outline,#2b4fa0); outline-offset:3px; box-shadow:var(--focus-ring,none); border-radius:4px; } .ds-btn-primary:disabled { opacity:0.5; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Lesser action with a thick graphite outline.",
-      "html": "<button class=\"ds-btn-secondary\">Avbryt</button>",
-      "css": ".ds-btn-secondary { display:flex; width:100%; align-items:center; justify-content:center; min-height:56px; padding:0 24px; border:3px solid #23292b; border-radius:6px; background:#eef3f0; color:#23292b; font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out; } .ds-btn-secondary:active { transform:scale(0.98); } .ds-btn-secondary:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; }"
+      "description": "Lesser action with a thick ink outline on surface.",
+      "html": "<button class=\"ds-btn-secondary\">Behåll min data</button>",
+      "css": ".ds-btn-secondary { display:flex; width:100%; align-items:center; justify-content:center; min-height:56px; padding:0 24px; border:3px solid var(--ink,#23292b); border-radius:6px; background:var(--surface,#eef3f0); color:var(--ink,#23292b); font:700 20px/1.4 system-ui, sans-serif; transition: transform 150ms ease-out; } .ds-btn-secondary:active { transform:scale(0.98); } .ds-btn-secondary:focus-visible { outline:3px solid var(--focus-outline,#2b4fa0); outline-offset:3px; box-shadow:var(--focus-ring,none); border-radius:4px; }"
+    },
+    {
+      "name": "Care Button",
+      "kind": "button",
+      "refersTo": "button-care",
+      "description": "Stop screen action: care fill, warning icon and the word. Never colour alone.",
+      "html": "<button class=\"ds-btn-care\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3L2 21h20L12 3z\"/><path d=\"M12 10v5M12 18h.01\"/></svg>Stopp</button>",
+      "css": ".ds-btn-care { display:flex; width:100%; align-items:center; justify-content:center; gap:8px; min-height:64px; padding:0 24px; border:0; border-radius:6px; background:var(--care,#23292b); color:var(--care-ink,#eef3f0); font:700 20px/1.4 system-ui, sans-serif; } .ds-btn-care:active { transform:scale(0.98); } .ds-btn-care:focus-visible { outline:3px solid var(--focus-outline,#2b4fa0); outline-offset:3px; box-shadow:var(--focus-ring,none); border-radius:4px; }"
     },
     {
       "name": "State Chips",
       "kind": "chip",
-      "refersTo": "chip-today",
-      "description": "Klar, Idag, Kommande: colour plus icon plus word.",
-      "html": "<span class=\"ds-chip ds-chip-done\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 13l5 5L20 6\"/></svg>Klar</span> <span class=\"ds-chip ds-chip-today\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2\"/></svg>Idag</span>",
-      "css": ".ds-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:4px; font:700 16px/1.4 system-ui, sans-serif; } .ds-chip-done { border:2px solid #c22f27; color:#c22f27; background:#eef3f0; } .ds-chip-today { background:#f0b13a; color:#23292b; }"
+      "refersTo": "chip-done",
+      "description": "Klar, Idag, Kommande: colour plus icon plus word. Klar uses the pencil tick in the theme done colour.",
+      "html": "<span class=\"ds-chip ds-chip-done\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 48 48\" fill=\"currentColor\"><path d=\"M6 27C8 25 10 25 13 30C18 19 28 9 42 4C43 5 43 6 41 8C30 15 22 26 17 39C15 41 13 40 12 38C10 34 8 31 5 29C5 28 5 27 6 27Z\"/></svg>Klar</span> <span class=\"ds-chip ds-chip-today\">Idag</span> <span class=\"ds-chip ds-chip-upcoming\">Kommande</span>",
+      "css": ".ds-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:4px; font:700 16px/1.4 system-ui, sans-serif; } .ds-chip svg { width:18px; height:18px; } .ds-chip-done { border:2px solid var(--done-chip-border,var(--done,#b52a23)); color:var(--done-fill-ink,var(--done,#b52a23)); background:var(--done-fill,transparent); } .ds-chip-today { background:var(--today,#f0b13a); color:var(--today-ink,#23292b); } .ds-chip-upcoming { background:var(--upcoming,#dde6e2); color:var(--upcoming-ink,#3d484b); }"
     },
     {
       "name": "Set Tally",
       "kind": "custom",
       "refersTo": "set-circle",
-      "description": "Row of set circles: digits for sets left, red pencil tick when done.",
-      "html": "<div class=\"ds-tally\"><span class=\"ds-circle\">3</span><span class=\"ds-circle\">2</span><span class=\"ds-circle\"><svg width=\"39\" height=\"39\" viewBox=\"0 0 48 48\" fill=\"#c22f27\"><path d=\"M6 27C8 25 10 25 13 30C18 19 28 9 42 4C43 5 43 6 41 8C30 15 22 26 17 39C15 41 13 40 12 38C10 34 8 31 5 29C5 28 5 27 6 27Z\"/></svg></span></div>",
-      "css": ".ds-tally { display:flex; gap:6px; } .ds-circle { display:grid; place-items:center; width:48px; height:48px; border:3px solid #23292b; border-radius:9999px; background:#eef3f0; color:#23292b; font:800 24px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; }"
+      "description": "Row of set circles: digits for sets left, pencil tick in done-mark when done.",
+      "html": "<div class=\"ds-tally\"><span class=\"ds-circle\">3</span><span class=\"ds-circle\">2</span><span class=\"ds-circle ds-done\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 48 48\" fill=\"currentColor\"><path d=\"M6 27C8 25 10 25 13 30C18 19 28 9 42 4C43 5 43 6 41 8C30 15 22 26 17 39C15 41 13 40 12 38C10 34 8 31 5 29C5 28 5 27 6 27Z\"/></svg></span></div>",
+      "css": ".ds-tally { display:flex; gap:6px; } .ds-circle { display:grid; place-items:center; width:48px; height:48px; border:3px solid var(--ink,#23292b); border-radius:9999px; background:var(--surface,#eef3f0); color:var(--ink,#23292b); font:800 24px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; } .ds-done { color:var(--done-mark,var(--done,#b52a23)); } .ds-done svg { width:34px; height:34px; }"
     },
     {
       "name": "Pass Card (lead)",
       "kind": "card",
       "refersTo": "pass-card-lead",
-      "description": "The next pass: graphite outline, big title and count.",
-      "html": "<div class=\"ds-card\"><h2 class=\"ds-card-title\">Pass A</h2><p class=\"ds-card-next\">Nästa pass</p><p class=\"ds-card-count\">4<span>/10 set</span></p></div>",
-      "css": ".ds-card { padding:20px; border:3px solid #23292b; border-radius:6px; background:#eef3f0; color:#23292b; } .ds-card-title { margin:0; font:700 60px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; } .ds-card-next { margin:8px 0 0; font:700 18px/1.4 system-ui, sans-serif; color:#2b4fa0; } .ds-card-count { margin:16px 0 0; font:800 72px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; } .ds-card-count span { font-size:36px; color:#4a5659; }"
+      "description": "The next pass: ink outline, surface-tint fill, big title and count; shadowless.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-next\">Nästa pass</p><h3 class=\"ds-title\">Underkropp A</h3><span class=\"ds-count\">0/5</span></div>",
+      "css": ".ds-card { padding:20px; border:3px solid var(--ink,#23292b); border-radius:6px; background:var(--surface-tint,#eef3f0); color:var(--ink,#23292b); } .ds-next { margin:0; font:700 16px/1.4 system-ui, sans-serif; color:var(--accent,#2b4fa0); } .ds-title { margin:0; font:800 60px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; } .ds-count { font:800 72px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; font-variant-numeric:tabular-nums; }"
     },
     {
       "name": "Banner",
       "kind": "custom",
       "refersTo": "banner",
-      "description": "Info (blue) or warning (red) note with outline, icon and text.",
-      "html": "<div class=\"ds-banner\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8v.01\"/></svg><div>Appen ger inga medicinska råd.</div></div>",
-      "css": ".ds-banner { display:flex; gap:12px; align-items:flex-start; padding:16px; border:2px solid #2b4fa0; border-radius:6px; background:#eef3f0; color:#23292b; font:400 16px/1.4 system-ui, sans-serif; } .ds-banner svg { color:#2b4fa0; flex-shrink:0; margin-top:2px; }"
+      "description": "Info banner: surface fill, 2px accent outline, icon plus bold sentence. Care tone swaps the outline to care.",
+      "html": "<div class=\"ds-banner\"><b>Ny version finns.</b></div>",
+      "css": ".ds-banner { padding:16px; border:2px solid var(--info,#2b4fa0); border-radius:6px; background:var(--surface,#eef3f0); color:var(--ink,#23292b); font:700 16px/1.4 system-ui, sans-serif; }"
+    },
+    {
+      "name": "Stop Frame",
+      "kind": "custom",
+      "refersTo": "button-care",
+      "description": "Care screen: paper inside a 6px care frame, warning icon plus the word Stopp, care button.",
+      "html": "<div class=\"ds-stop\"><div class=\"ds-stop-head\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3L2 21h20L12 3z\"/><path d=\"M12 10v5M12 18h.01\"/></svg><b>Stopp</b></div><p>Avbryt passet och vila.</p><button class=\"ds-stop-btn\">Avbryt</button></div>",
+      "css": ".ds-stop { padding:20px; border:6px solid var(--care,#23292b); background:var(--paper,#eef3f0); color:var(--ink,#23292b); font:400 20px/1.4 system-ui, sans-serif; } .ds-stop-head { display:flex; align-items:center; gap:12px; color:var(--care,#23292b); font:800 48px/1 'Barlow Condensed', sans-serif-condensed, sans-serif; } .ds-stop-head svg { width:56px; height:56px; } .ds-stop-btn { width:100%; min-height:64px; border:0; border-radius:6px; background:var(--care,#23292b); color:var(--care-ink,#eef3f0); font:700 20px/1.4 system-ui, sans-serif; }"
+    },
+    {
+      "name": "Theme Option",
+      "kind": "custom",
+      "refersTo": "theme-option",
+      "description": "Färgtema radio row, at least 56px tall, swatch row plus Swedish name and variant.",
+      "html": "<label class=\"ds-theme\"><input type=\"radio\" name=\"t\" checked> <span class=\"ds-sw\" style=\"background:#eef3f0\"></span><span class=\"ds-sw\" style=\"background:#b52a23\"></span><span class=\"ds-sw\" style=\"background:#2b4fa0\"></span> <b>Rutat</b></label>",
+      "css": ".ds-theme { display:flex; align-items:center; gap:12px; min-height:56px; padding:12px; border:3px solid var(--ink,#23292b); border-radius:6px; background:var(--surface,#eef3f0); color:var(--ink,#23292b); font:700 16px/1.4 system-ui, sans-serif; } .ds-sw { width:24px; height:24px; border:2px solid var(--ink,#23292b); border-radius:4px; }"
     },
     {
       "name": "Bottom Nav Tab",
       "kind": "nav",
       "refersTo": "nav-tab-active",
-      "description": "Three equal tabs; active is bold with a red underline.",
-      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-tab-active\" href=\"#\">Vecka</a><a class=\"ds-tab\" href=\"#\">Historik</a><a class=\"ds-tab\" href=\"#\">Inställningar</a></nav>",
-      "css": ".ds-nav { display:flex; border-top:3px solid #23292b; background:#eef3f0; } .ds-tab { flex:1; display:flex; align-items:center; justify-content:center; min-height:64px; border-bottom:4px solid transparent; color:#4a5659; font:400 16px/1.4 system-ui, sans-serif; text-decoration:none; } .ds-tab-active { border-bottom-color:#c22f27; color:#23292b; font-weight:700; } .ds-tab:focus-visible { outline:3px solid #2b4fa0; outline-offset:3px; }"
+      "description": "Surface-tint bar with a 3px ink top rule; active tab is bold ink with a 4px ink underline.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-tab-active\">Vecka</a><a class=\"ds-tab\">Historik</a><a class=\"ds-tab\">Inställningar</a></nav>",
+      "css": ".ds-nav { display:flex; background:var(--surface-tint,#eef3f0); border-top:3px solid var(--ink,#23292b); } .ds-tab { flex:1; display:grid; place-items:center; min-height:64px; border-bottom:4px solid transparent; color:var(--ink-soft,#4a5659); font:700 16px/1.4 system-ui, sans-serif; } .ds-tab-active { color:var(--ink,#23292b); border-bottom-color:var(--ink,#23292b); } .ds-tab:focus-visible { outline:3px solid var(--focus-outline,#2b4fa0); outline-offset:3px; box-shadow:var(--focus-ring,none); border-radius:4px; }"
     }
   ],
   "narrative": {
     "northStar": "The Squared Notebook",
-    "overview": "Stomme is a training diary written on pale green-grey squared paper. Graphite ink carries the content, blue ink marks the working side (focus, selection, the next pass, info), and red pencil is reserved for one meaning: done. The page itself is the surface; there is no card shadow, no glass, no gradient. The 24 px grid is printed on the body and everything sits on it.\n\nThe system is built for a phone held at arm's length on the floor: heavy 3 px graphite outlines, text never below 16 px, targets 44 px and up (primary actions 56-64 px), counts set in a tall condensed heavy face so the number reads from across a room. State is always word plus icon plus colour, never colour alone. Light and dark both follow the system; dark is a deep graphite sheet with the same grid at low contrast and softened red and blue.",
+    "overview": "Stomme is a training diary written on squared paper. Ink carries the content, the accent colour marks the working side (focus, selection, the next pass, info), and each theme spends exactly one colour on one meaning: done. The default theme, Rutat, is pale green-grey paper with graphite ink and a red pencil. The page itself is the surface; there is no card shadow, no glass, no gradient. The 24 px grid is printed on the body and everything sits on it, except in Hög kontrast, where the grid is switched off.\n\nThe system is built for a phone held at arm's length on the floor: heavy 3 px outlines, text never below 16 px, targets 44 px and up (primary actions 56-64 px), counts set in a tall condensed heavy face so the number reads from across a room. State is always word plus icon plus colour, never colour alone. The pencil-tick shape is the same in every theme; only its colour changes.\n\nFour themes ship, each in a light and a dark scheme, chosen on the device (see Colors, Themes): Rutat (default, Restrained), Hav \"Lagun\" (Committed, teal paper with coral), Kvällssol \"Skymning\" (Full palette, warm dusk with pine green), Hög kontrast \"Vitt\" (Restrained, 7:1 text, white or black paper, no grid).",
     "keyCharacteristics": [
-      "Squared paper background (24 px grid, 1 px lines) in both themes.",
-      "Thick graphite outlines (3 px) instead of shadows; hierarchy by size and outline weight.",
-      "Red is spent only on completion (pencil ticks, done chip, active-tab underline, stop-list dashes, warning banner).",
+      "Squared paper background (24 px grid, 1 px `--grid-line`) in every theme except Hög kontrast.",
+      "Thick outlines (3 px) instead of shadows; hierarchy by size and outline weight.",
+      "One done colour per theme, used for nothing else; the pencil-tick shape is constant.",
+      "Care screens (pain, stop) are a heavy `--care` frame plus warning icon plus a bold word.",
       "Condensed heavy numerals for headings and counts; plain platform sans for everything else.",
       "Flat, no elevation; one authored motion (a tick drawing on)."
     ],
     "rules": [
-      { "name": "The Red Means Done Rule", "body": "Red pencil marks completion or a hard stop. It is never decoration, never a primary button, never a link.", "section": "colors" },
-      { "name": "The Paper Is The Surface Rule", "body": "Cards, banners, nav and chips sit on `paper` with an outline; depth is never made with a different fill or a shadow.", "section": "colors" },
-      { "name": "The Word And Icon Rule", "body": "Every state colour travels with an icon and a word (Klar, Idag, Kommande).", "section": "colors" },
-      { "name": "The Hundred-Percent Tabular Rule", "body": "Tabular numerals everywhere; any number that changes (sets, dates, weights) uses them.", "section": "typography" },
-      { "name": "The Floor Rule", "body": "No text under 1rem.", "section": "typography" },
-      { "name": "The Outline Not Shadow Rule", "body": "Priority is shown by outline colour, outline weight and size.", "section": "elevation" }
+      {
+        "name": "The One Done Colour Rule",
+        "body": "Each theme declares one `--done` and spends it only on completion. It is never a button, a link or decoration, and never close to `accent` or `care` (deltaE2000 at least 20). The pencil-tick shape is identical in every theme.",
+        "section": "colors"
+      },
+      {
+        "name": "The Care Is Extreme Rule",
+        "body": "`--care` is the outermost lightness of its theme and is the only colour for pain, stop and warn. It is distinct from `done` and `accent`, and always arrives with an icon and a word.",
+        "section": "colors"
+      },
+      {
+        "name": "The Colour Is Never Alone Rule",
+        "body": "Every state colour travels with an icon and a word (Klar, Idag, Kommande, Stopp) or a shape (the tick).",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted Not Shadowed Rule",
+        "body": "Surfaces may use `surface` and `surface-tint` as well as `paper`; depth is still never made with a shadow, glass, gradient or coloured side-stripe.",
+        "section": "colors"
+      },
+      {
+        "name": "The Hundred-Percent Tabular Rule",
+        "body": "Tabular numerals everywhere; any number that changes (sets, dates, weights) uses them.",
+        "section": "typography"
+      },
+      {
+        "name": "The Floor Rule",
+        "body": "No text under 1rem.",
+        "section": "typography"
+      },
+      {
+        "name": "The Outline Not Shadow Rule",
+        "body": "Priority is shown by outline colour, outline weight, size and tint step, never by shadow.",
+        "section": "elevation"
+      }
     ],
     "dos": [
-      "Do keep the 24 px squared grid on the body in light and dark.",
-      "Do use 3 px outlines for primary containers and the graphite or edge-grey pair to separate lead from receding.",
-      "Do use red pencil only for done, stop and warning, and blue ink for focus, selection, next and info.",
-      "Do pair every state colour with an icon and a Swedish word.",
-      "Do keep text at 1rem or larger and primary targets at 56-64 px.",
-      "Do use `.count` (Barlow Condensed 800, tabular) for any number that is a quantity.",
-      "Do honour `prefers-reduced-motion` for any new animation; the tick draw-on is the single authored motion."
+      "**Do** read every colour from a semantic token (`bg-paper`, `text-ink`, `text-done`, `border-care`); never hard-code hex in components.",
+      "**Do** keep the 24 px squared grid on the body in light and dark, via `--grid-line`.",
+      "**Do** use 3 px outlines for primary containers and the ink or edge pair to separate lead from receding.",
+      "**Do** spend `--done` only on completion, and `--accent` on focus, selection, next and info.",
+      "**Do** build care screens as a 6 px `--care` frame or heavy outline, the warning icon and a bold Swedish word.",
+      "**Do** pair every state colour with an icon and a Swedish word, or the pencil-tick shape.",
+      "**Do** keep text at 1rem or larger and primary targets at 56-64 px.",
+      "**Do** use `.count` (Barlow Condensed 800, tabular) for any number that is a quantity.",
+      "**Do** honour `prefers-reduced-motion` for any new animation; the tick draw-on is the single authored motion.",
+      "**Do** run `npm test` (the contrast and deltaE gate) after touching `src/styles/themes/`."
     ],
     "donts": [
-      "Don't add shadows, gradients, glass or tinted card fills; depth is outline and size.",
-      "Don't use the red pencil for buttons, links or decoration.",
-      "Don't use a different fill for surfaces than `paper`.",
-      "Don't replace pencil ticks with a standard check glyph in set or day marks.",
-      "Don't use colour as the only carrier of state.",
-      "Don't let the grid line colour be used for borders or text."
+      "**Don't** add shadows, gradients, glass, gradient text or coloured side-stripes; depth is outline, size and tint step.",
+      "**Don't** use `--done` for buttons, links or decoration, or give it a second meaning.",
+      "**Don't** let `--care` be close to `--done` or `--accent` (deltaE2000 under 20).",
+      "**Don't** replace pencil ticks with a standard check glyph in set or day marks.",
+      "**Don't** use colour as the only carrier of state.",
+      "**Don't** use `grid-line` for borders or text.",
+      "**Don't** put the theme choice in backups or IndexedDB, or swap themes with `prefers-color-scheme` in CSS."
     ]
   }
 }

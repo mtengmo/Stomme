@@ -7,7 +7,7 @@ import { Button } from '../../ui/Button';
 import { WeightInventoryFields } from './WeightInventoryFields';
 
 const fieldClass =
-  'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+  'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 type Goal = 'general' | 'running' | 'knee' | 'custom';
 const goals: { id: Goal; label: string }[] = [
   { id: 'general', label: 'Bli starkare' },

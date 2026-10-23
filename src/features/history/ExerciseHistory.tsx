@@ -94,7 +94,7 @@ export function ExerciseHistory({ id }: { id: string }) {
     'Okänd utrustning';
 
   const inputClass =
-    'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+    'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-28">

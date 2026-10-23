@@ -1,0 +1,56 @@
+/*
+ * Theme "Rutat": grey-green squared paper, graphite and red pencil.
+ * The values mirror ThemeDef in ./rutat.ts (themes.test.ts checks they agree).
+ * :root keeps Rutat light as the fallback, so a page without data-theme looks
+ * like Rutat. Every theme file has a light block and a dark block keyed on
+ * data-theme and data-scheme (set by public/theme-boot.js).
+ */
+:root,
+:root[data-theme="rutat"] {
+  color-scheme: light;
+  --paper: #eef3f0;
+  --surface: #eef3f0;
+  --surface-tint: #eef3f0;
+  --line: #d6e2dc;
+  --ink: #23292b;
+  --ink-soft: #4a5659;
+  --edge: #66766f;
+  --action: #23292b;
+  --action-ink: #eef3f0;
+  --done: #b52a23;
+  --accent: #2b4fa0;
+  --focus: #2b4fa0;
+  --info: #2b4fa0;
+  --today: #f0b13a;
+  --today-ink: #23292b;
+  --upcoming: #dde6e2;
+  --upcoming-ink: #3d484b;
+  --care: #23292b;
+  --care-ink: #eef3f0;
+  --equipment: #9a4b12;
+}
+
+:root[data-scheme="dark"]:not([data-theme]),
+:root[data-theme="rutat"][data-scheme="dark"] {
+  color-scheme: dark;
+  --paper: #1a1f21;
+  --surface: #1a1f21;
+  --surface-tint: #1a1f21;
+  --line: #242b2e;
+  --ink: #e8eeea;
+  --ink-soft: #a9b6b2;
+  --edge: #7f8f8a;
+  --action: #e8eeea;
+  --action-ink: #1a1f21;
+  --done: #ff7d70;
+  --accent: #93b2ff;
+  --focus: #93b2ff;
+  --info: #93b2ff;
+  --today: #e6aa35;
+  --today-ink: #1a1f21;
+  --upcoming: #2a3134;
+  --upcoming-ink: #c3cecb;
+  --care: #e8eeea;
+  --care-ink: #1a1f21;
+  --equipment: #ffb66d;
+}

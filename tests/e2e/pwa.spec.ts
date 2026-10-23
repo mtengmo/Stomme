@@ -46,7 +46,7 @@ test('manifest is served, icons resolve, service worker registers', {
   const appleBody = await appleResponse.body();
   expect(appleBody.readUInt32BE(16)).toBe(180);
   expect(appleBody.readUInt32BE(20)).toBe(180);
-  await expect(page.locator('meta[name="theme-color"]')).toHaveCount(2);
+  await expect(page.locator('meta[name="theme-color"]')).toHaveCount(1);
   const scope = await page.evaluate(async () => {
     const reg = await navigator.serviceWorker.ready;
     return reg.scope;

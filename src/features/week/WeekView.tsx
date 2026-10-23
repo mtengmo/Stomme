@@ -43,8 +43,8 @@ function restText(sessions: Session[], now: Date): string | null {
 }
 
 const chipStyle: Record<PassState, string> = {
-  done: 'border-2 border-red text-red',
-  today: 'bg-amber text-amber-ink',
+  done: 'border-2 border-(--done-chip-border) bg-(--done-fill) text-(--done-fill-ink)',
+  today: 'bg-today text-today-ink',
   upcoming: 'bg-upcoming text-upcoming-ink',
 };
 
@@ -57,20 +57,16 @@ function StateChip({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-blue text-blue' : chipStyle[state]}`}
+      className={`inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-base font-bold ${active ? 'border-2 border-accent text-accent' : chipStyle[state]}`}
     >
-      <Icon
-        name={
-          active
-            ? 'clock'
-            : state === 'done'
-              ? 'check'
-              : state === 'today'
-                ? 'sun'
-                : 'clock'
-        }
-        size={18}
-      />
+      {!active && state === 'done' ? (
+        <PencilTick size={22} fill="var(--done-fill-ink)" />
+      ) : (
+        <Icon
+          name={active ? 'clock' : state === 'today' ? 'sun' : 'clock'}
+          size={18}
+        />
+      )}
       {active ? 'Pågår' : STATE_LABEL[state]}
     </span>
   );
@@ -126,7 +122,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
   const last = summary.days[6] ?? today;
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-5 px-5 pt-5 pb-28">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-5 pb-[var(--app-nav-height)]">
       <header>
         <h1 className="m-0 text-5xl leading-none font-extrabold">
           Vecka {isoWeekNumber(today)}
@@ -164,8 +160,8 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
               aria-label={`${DAY_NAMES[i]} ${Number(d.slice(8))}${isDone ? ', pass klart' : ''}${isToday ? ', idag' : ''}`}
               className={`relative flex size-11 flex-col items-center justify-center rounded-sm border-2 text-base leading-none ${
                 isToday
-                  ? 'border-ink bg-amber font-bold text-amber-ink'
-                  : 'border-edge bg-paper text-ink'
+                  ? 'border-ink bg-today font-bold text-today-ink'
+                  : 'border-edge bg-surface text-ink'
               }`}
             >
               <span>{DAY_NAMES[i]}</span>
@@ -202,8 +198,10 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
             <li
               key={id}
               data-state={state}
-              className={`flex flex-col rounded-md border-[3px] bg-paper ${
-                lead ? 'gap-4 border-ink p-5' : 'gap-3 border-edge p-4'
+              className={`flex flex-col rounded-md border-[3px] ${
+                lead
+                  ? 'gap-4 border-ink bg-surface-tint p-5'
+                  : 'gap-3 border-edge bg-surface p-4'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -214,7 +212,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
                     {templates[id].name}
                   </h2>
                   {lead ? (
-                    <p className="m-0 mt-2 text-lg font-bold text-blue">
+                    <p className="m-0 mt-2 text-lg font-bold text-accent">
                       Nästa pass
                     </p>
                   ) : null}
@@ -247,7 +245,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
         />
       ) : null}
 
-      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
         {rest ? <p className="m-0 text-base text-ink-soft">{rest}</p> : null}
         {active ? (
           <Link

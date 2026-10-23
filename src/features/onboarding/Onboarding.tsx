@@ -2,6 +2,7 @@ import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 import { Button } from '../../ui/Button';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
+import { AppearancePicker } from '../settings/AppearancePicker';
 
 export async function acceptOnboarding(): Promise<void> {
   await setMeta(getDb(), 'onboarding', {
@@ -57,6 +58,14 @@ export function Onboarding() {
           Integritet – dina uppgifter
         </summary>
         <PrivacyNotice />
+      </details>
+      <details>
+        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+          Välj färger (kan ändras senare)
+        </summary>
+        <div className="pt-2">
+          <AppearancePicker />
+        </div>
       </details>
       <div className="mt-auto pt-2">
         <Button onClick={() => void acceptOnboarding()}>

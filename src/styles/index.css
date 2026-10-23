@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "./themes/rutat.css";
+@import "./themes/hav.css";
+@import "./themes/kvallssol.css";
+@import "./themes/hog-kontrast.css";
 
 /*
  * Design tokens, "Rutat skrivbok" (squared school notebook).
@@ -10,53 +14,44 @@
  * main.tsx, font-display: swap), always tabular.
  */
 :root {
-  color-scheme: light;
-  --paper: #eef3f0;
-  --line: #d6e2dc;
-  --ink: #23292b;
-  --ink-soft: #4a5659;
-  --red: #b52a23;
-  --blue: #2b4fa0;
-  --equipment: #9a4b12;
-  --amber: #f0b13a;
-  --amber-ink: #23292b;
-  --edge: #66766f;
-  --upcoming: #dde6e2;
-  --upcoming-ink: #3d484b;
+  /* Layout, not theme. Colour tokens live in themes/<id>.css. */
   --grid: 24px;
   --app-nav-height: calc(67px + env(safe-area-inset-bottom));
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --paper: #1a1f21;
-    --line: #242b2e;
-    --ink: #e8eeea;
-    --ink-soft: #a9b6b2;
-    --red: #ff7d70;
-    --blue: #93b2ff;
-    --equipment: #ffb66d;
-    --amber: #e6aa35;
-    --amber-ink: #1a1f21;
-    --edge: #7f8f8a;
-    --upcoming: #2a3134;
-    --upcoming-ink: #c3cecb;
-  }
+  /* Theme-overridable: grid colour (Hög kontrast has none) and focus ring parts. */
+  --grid-line: var(--line);
+  --focus-outline: var(--focus);
+  --focus-ring: none;
+  /* Same ring drawn inside, for controls at the screen edge (bottom nav). */
+  --focus-ring-inset: none;
+  /* Klar chip: an outline in --done unless a theme asks for a fill (hav.css). */
+  --done-fill: transparent;
+  --done-fill-ink: var(--done);
+  --done-mark: var(--done);
+  --done-chip-border: var(--done);
 }
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-tint: var(--surface-tint);
   --color-line: var(--line);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --color-red: var(--red);
-  --color-blue: var(--blue);
-  --color-amber: var(--amber);
-  --color-amber-ink: var(--amber-ink);
   --color-edge: var(--edge);
+  --color-action: var(--action);
+  --color-action-ink: var(--action-ink);
+  --color-done: var(--done);
+  --color-accent: var(--accent);
+  --color-focus: var(--focus);
+  --color-info: var(--info);
+  --color-today: var(--today);
+  --color-today-ink: var(--today-ink);
   --color-upcoming: var(--upcoming);
   --color-upcoming-ink: var(--upcoming-ink);
+  --color-care: var(--care);
+  --color-care-ink: var(--care-ink);
+  --color-equipment: var(--equipment);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-count: "Barlow Condensed", sans-serif-condensed, sans-serif;
 }
@@ -68,7 +63,7 @@ html {
   font-size: 100%;
   font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
-  caret-color: var(--blue);
+  caret-color: var(--accent);
   scrollbar-color: var(--ink-soft) var(--paper);
   scrollbar-width: thin;
   /* Keep focused and scrolled-to controls clear of the fixed bottom navigation. */
@@ -81,20 +76,21 @@ body {
   line-height: 1.4;
   background-color: var(--paper);
   background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: var(--grid) var(--grid);
   background-position: 11px 11px;
 }
 
 ::selection {
-  background: var(--blue);
+  background: var(--accent);
   color: var(--paper);
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 3px solid var(--focus-outline);
   outline-offset: 3px;
+  box-shadow: var(--focus-ring);
   border-radius: 4px;
 }
 

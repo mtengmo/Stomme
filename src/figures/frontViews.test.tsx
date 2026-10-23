@@ -22,7 +22,7 @@ describe('authored frontal demonstrations', () => {
         phase={0.4}
       />,
     );
-    expect(right).toContain('data-body-side="right" stroke="var(--blue)"');
+    expect(right).toContain('data-body-side="right" stroke="var(--accent)"');
     expect(right).toContain('data-body-side="left" stroke="var(--edge)"');
     expect(right).toContain('>H</text>');
     expect(right).not.toContain('translate(192 0)');
@@ -37,7 +37,7 @@ describe('authored frontal demonstrations', () => {
         phase={0.4}
       />,
     );
-    expect(left).toContain('data-body-side="left" stroke="var(--blue)"');
+    expect(left).toContain('data-body-side="left" stroke="var(--accent)"');
     expect(left).toContain('data-body-side="right" stroke="var(--edge)"');
     expect(left).toContain('>V</text>');
   });

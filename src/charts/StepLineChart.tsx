@@ -77,8 +77,8 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
             onClick={() => setPicked(e)}
             className={`min-h-12 shrink-0 snap-start whitespace-nowrap rounded-sm border-2 px-3 text-base font-bold ${
               on
-                ? 'border-ink bg-ink text-paper'
-                : 'border-edge bg-paper text-ink'
+                ? 'border-action bg-action text-action-ink'
+                : 'border-edge bg-surface text-ink'
             }`}
           >
             {chipName(e)}
@@ -153,7 +153,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
                 cy={y(p.weightKg)}
                 r={isLast ? 6 : 4.5}
                 className={
-                  isLast ? 'fill-blue stroke-paper' : 'fill-ink stroke-paper'
+                  isLast ? 'fill-accent stroke-paper' : 'fill-ink stroke-paper'
                 }
                 strokeWidth={2}
               />
@@ -163,7 +163,7 @@ export function StepLineChart({ logs, exerciseIds }: StepLineChartProps) {
                   y={y(p.weightKg) - 12}
                   textAnchor="middle"
                   fontSize={18}
-                  className={`count ${isLast ? 'fill-blue' : 'fill-ink'}`}
+                  className={`count ${isLast ? 'fill-accent' : 'fill-ink'}`}
                 >
                   {p.amount}
                 </text>

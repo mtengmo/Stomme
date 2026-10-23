@@ -153,7 +153,7 @@ export function History() {
     : (allExercises[0] ?? '');
 
   const selectClass =
-    'min-h-12 w-full rounded-sm border-2 border-edge bg-paper px-3 text-base text-ink';
+    'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-8 px-5 pt-6 pb-28">
@@ -238,7 +238,7 @@ export function History() {
                   <li key={s.id}>
                     <Link
                       href={`/historik/${s.id}`}
-                      className="flex min-h-16 flex-wrap items-center justify-between gap-3 rounded-md border-2 border-edge bg-paper p-4 text-ink no-underline"
+                      className="flex min-h-16 flex-wrap items-center justify-between gap-3 rounded-md border-2 border-edge bg-surface p-4 text-ink no-underline"
                     >
                       <span className="flex flex-col">
                         <span className="count text-3xl leading-none">

@@ -207,7 +207,7 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
                 value={name}
                 maxLength={60}
                 onChange={(event) => setName(event.target.value)}
-                className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-paper px-3 text-ink"
+                className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-surface px-3 text-ink"
               />
             </label>
             <Button

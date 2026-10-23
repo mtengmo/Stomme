@@ -65,10 +65,21 @@ Details:
 ## Style
 
 - UI text is Swedish. Code, identifiers and comments are English.
-- Follow the visual system in [DESIGN.md](DESIGN.md): red is reserved for "done", colour is never the only signal, touch targets are at least 48 px, text at least 16 px, and light and dark themes both work. Attach 360 px screenshots (light and dark) to UI pull requests.
+- Follow the visual system in [DESIGN.md](DESIGN.md): each theme has exactly one "done" colour (red in the default theme) used for nothing else, colour is never the only signal, touch targets are at least 48 px, text at least 16 px, and light and dark themes both work. Attach 360 px screenshots (light and dark) to UI pull requests.
 - Keep pull requests small and focused. One idea per PR.
 - Add or update tests for logic changes. The rules in `src/rules/` keep 100% branch coverage.
 - Do not commit personal data: no exported backups, real training logs or private screenshots.
+
+## Adding a colour theme
+
+1. Add `src/styles/themes/<id>.css` with a light block `:root[data-theme='<id>']` and a dark block `:root[data-theme='<id>'][data-scheme='dark']`, all 20 tokens in both (copy `rutat.css`). A theme without a grid sets `--grid-line: transparent`; a theme with a pale focus colour on a pale page sets `--focus-outline` (outer ring) and `--focus-ring` (inner ring), as `hog-kontrast.css` does.
+2. `@import` it in `src/styles/index.css`.
+3. Add `src/styles/themes/<id>.ts` (a `ThemeDef`: Swedish name, variant, strategy, done-colour statement, `textMin`, grid, focus style, the same token values) and list it in `src/styles/themes/registry.ts`.
+4. Add the id to `THEMES` in `public/theme-boot.js` (a test checks it against the registry).
+5. Gate: `npm test` (completeness, WCAG contrast, deltaE2000 >= 20 for done/care/accent, CSS equals registry), `npm run e2e:themes`, and `AUDIT_THEME=<id> npx tsx scripts/a11y-audit.ts`.
+6. Attach the output of `npm run shots:themes` (6 screens, 360 px, light and dark, plus the greyscale report) and add the theme's section to DESIGN.md. Changes under `src/styles/themes/` need maintainer approval.
+
+Rules: one `--done` colour used for nothing else, `--care` is the outermost lightness and must differ from `--done` and `--accent`, surfaces may use `--surface-tint`, no shadows, gradients, glass or coloured side stripes.
 
 ## Licensing of contributions
 

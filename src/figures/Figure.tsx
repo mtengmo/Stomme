@@ -175,9 +175,9 @@ export function FigureFrame({
       eL: [p.neck[0] + 19, p.neck[1] + 10],
       hL: [p.neck[0] + 41, p.neck[1] + 12],
     };
-  const accent = !showMuscles ? 'var(--blue)' : 'var(--ink)';
+  const accent = !showMuscles ? 'var(--accent)' : 'var(--ink)';
   const farSide =
-    working === null && !showMuscles ? 'var(--blue)' : 'var(--edge)';
+    working === null && !showMuscles ? 'var(--accent)' : 'var(--edge)';
   // Left sets mirror the whole scene so the working limb keeps its geometry.
   const mirror =
     working === 'left' ? 'translate(192 0) scale(-1 1)' : undefined;
@@ -256,7 +256,7 @@ export function FigureFrame({
           y="58"
           fontSize="28"
           fontWeight="800"
-          fill="var(--blue)"
+          fill="var(--accent)"
           fontFamily="system-ui, sans-serif"
         >
           {working === 'right' ? 'H' : 'V'}

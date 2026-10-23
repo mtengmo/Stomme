@@ -66,7 +66,7 @@ export function BarChart({ weeks }: { weeks: WeekVolume[] }) {
                     width={x.bandwidth}
                     height={h}
                     rx={2}
-                    className={current ? 'fill-blue' : 'fill-ink'}
+                    className={current ? 'fill-accent' : 'fill-ink'}
                   />
                   <text
                     x={x.center(i)}
@@ -86,14 +86,14 @@ export function BarChart({ weeks }: { weeks: WeekVolume[] }) {
                     y={BASE - 3}
                     width={x.bandwidth}
                     height={3}
-                    className={current ? 'fill-blue' : 'fill-ink'}
+                    className={current ? 'fill-accent' : 'fill-ink'}
                   />
                   <text
                     x={x.center(i)}
                     y={BASE - 10}
                     textAnchor="middle"
                     fontSize={18}
-                    className={`count ${current ? 'fill-blue' : 'fill-ink-soft'}`}
+                    className={`count ${current ? 'fill-accent' : 'fill-ink-soft'}`}
                   >
                     0
                   </text>
@@ -105,7 +105,7 @@ export function BarChart({ weeks }: { weeks: WeekVolume[] }) {
                   y={BASE + 24}
                   textAnchor="middle"
                   fontSize={16}
-                  className={`count ${current ? 'fill-blue' : 'fill-ink-soft'}`}
+                  className={`count ${current ? 'fill-accent' : 'fill-ink-soft'}`}
                 >
                   v{isoWeekNumber(w.weekStart)}
                 </text>

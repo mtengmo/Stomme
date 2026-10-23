@@ -133,7 +133,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-md flex-col gap-4 px-5 pt-3 pb-28">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 px-5 pt-3 pb-[var(--app-nav-height)]">
       <Link
         href="/"
         className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold text-ink no-underline"
@@ -247,7 +247,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
                         id={`exercise-select-${id}-${slot}`}
                         disabled={starting}
                         value={p.exerciseId}
-                        className="min-h-12 w-full rounded-sm border-2 border-ink bg-paper px-3 text-base text-ink"
+                        className="min-h-12 w-full rounded-sm border-2 border-ink bg-surface px-3 text-base text-ink"
                         onChange={(event) => {
                           const next = [...selected];
                           next[slot] = event.target.value as ExerciseId;
@@ -287,7 +287,7 @@ export function PassPreview({ id }: { id: TemplateId }) {
           );
         })}
       </ol>
-      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-paper px-5 py-3">
+      <div className="sticky bottom-[var(--app-nav-height)] -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
         {error ? (
           <p role="alert" className="m-0 text-base font-bold">
             {error}

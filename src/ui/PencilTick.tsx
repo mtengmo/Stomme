@@ -20,6 +20,8 @@ interface PencilTickProps {
   /** Plays the draw-on once. Only set for a set that was just completed. */
   animate?: boolean;
   className?: string;
+  /** Overrides the --done fill (theme previews). */
+  fill?: string;
 }
 
 export function PencilTick({
@@ -27,6 +29,7 @@ export function PencilTick({
   variant = 0,
   animate = false,
   className = '',
+  fill,
 }: PencilTickProps) {
   const s = STROKES[Math.abs(variant) % STROKES.length] ?? STROKES[0];
   if (!s) return null;
@@ -37,8 +40,8 @@ export function PencilTick({
       viewBox="0 0 48 48"
       aria-hidden="true"
       focusable="false"
-      className={`fill-red ${animate ? 'tick-new' : ''} ${className}`}
-      style={{ transform: `rotate(${s.rotate}deg)` }}
+      className={`fill-(--done-mark) ${animate ? 'tick-new' : ''} ${className}`}
+      style={{ transform: `rotate(${s.rotate}deg)`, ...(fill ? { fill } : {}) }}
     >
       <path d={s.d} />
     </svg>

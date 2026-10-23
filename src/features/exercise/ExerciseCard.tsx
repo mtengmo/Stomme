@@ -108,7 +108,7 @@ export function ExerciseCardBody({
           <select
             value={selectedLoad}
             onChange={(event) => setSelectedLoad(Number(event.target.value))}
-            className="min-h-12 max-w-full rounded-sm border-2 border-edge bg-paper px-2 text-base text-ink"
+            className="min-h-12 max-w-full rounded-sm border-2 border-edge bg-surface px-2 text-base text-ink"
           >
             {exercise.loadLadder.map((load, index) => (
               <option key={load.kg} value={index}>
@@ -177,7 +177,7 @@ export function ExerciseCardBody({
                     type="button"
                     aria-pressed={view === angle}
                     onClick={() => setView(angle)}
-                    className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-blue aria-pressed:text-blue"
+                    className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-accent aria-pressed:text-accent"
                   >
                     {angle === 'side' ? 'Från sidan' : 'Framifrån'}
                   </button>
@@ -473,7 +473,7 @@ export function ExerciseSheet({
       tabIndex={-1}
       className="fixed inset-0 z-50 flex h-dvh flex-col overflow-hidden bg-paper outline-none"
     >
-      <header className="z-10 shrink-0 border-b-[3px] border-ink bg-paper">
+      <header className="z-10 shrink-0 border-b-[3px] border-ink bg-surface-tint">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 py-1">
           <div className="min-w-0">
             <h1 className="m-0 break-words text-lg leading-tight font-bold sm:text-2xl">
