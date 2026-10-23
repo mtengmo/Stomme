@@ -14,7 +14,7 @@ import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 
 const CONFIRM =
-  'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten.';
+  'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten (krävs för att börja).';
 
 beforeEach(async () => {
   sessionStorage.clear();
@@ -85,15 +85,11 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
     name: 'Börja passet',
   }) as HTMLButtonElement;
   expect(start.disabled).toBe(true);
-  const reason = screen.getByText(
-    'Bekräfta att du jämfört med pappret för att börja.',
+  expect(start.getAttribute('aria-describedby')).toBe(
+    screen.getByRole('checkbox', { name: CONFIRM }).closest('label')?.id,
   );
-  expect(start.getAttribute('aria-describedby')).toBe(reason.id);
   await user.click(screen.getByRole('checkbox', { name: CONFIRM }));
   expect(start.disabled).toBe(false);
-  expect(
-    screen.queryByText('Bekräfta att du jämfört med pappret för att börja.'),
-  ).toBeNull();
 });
 
 it('shows added exercises compactly in the collection and no technique level', async () => {

@@ -374,20 +374,20 @@ function PreviewEditor({
   const physioPaper =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
   const confirmBox = (
-    <label className="flex min-h-12 items-start gap-3 py-2 text-base">
+    <label
+      id={physioPaper ? 'start-blocked' : undefined}
+      className="flex min-h-12 items-start gap-3 text-base leading-snug"
+    >
       <input
         type="checkbox"
         checked={confirmed}
         onChange={(event) => setConfirmed(event.target.checked)}
-        aria-describedby={
-          physioPaper && !confirmed ? 'start-blocked' : undefined
-        }
         className="size-6 shrink-0"
       />
       {rehabGroup(preferences) === 'aaos'
         ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
         : rehabGroup(preferences) === 'physio'
-          ? physioKneeConfirmLabel
+          ? `${physioKneeConfirmLabel.slice(0, -1)} (krävs för att börja).`
           : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
     </label>
   );
@@ -1402,15 +1402,11 @@ function PreviewEditor({
             </p>
           ) : null}
 
-          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-3">
+          <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-2">
             <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
               {physioPaper ? confirmBox : null}
-              {physioPaper && !confirmed ? (
-                <p id="start-blocked" className="m-0 text-base font-bold">
-                  Bekräfta att du jämfört med pappret för att börja.
-                </p>
-              ) : null}
               <Button
+                className={physioPaper ? 'min-h-14!' : ''}
                 aria-describedby={
                   physioPaper && !confirmed ? 'start-blocked' : undefined
                 }

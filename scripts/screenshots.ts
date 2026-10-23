@@ -114,15 +114,23 @@ try {
         path: `${OUT}/${size.name}-${scheme}-onboarding.png`,
       });
       await page.getByRole('button', { name: /Jag förstår/ }).click();
-      await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+      await page.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();
       await page.screenshot({
         path: `${OUT}/${size.name}-${scheme}-week-empty.png`,
       });
+      // First use: pick a focus, then the prepared workout opens.
+      await page.getByRole('button', { name: 'Bli starkare' }).click();
+      await page.getByRole('button', { name: 'Visa mitt pass' }).click();
+      await page.getByRole('button', { name: 'Börja passet' }).waitFor();
+      await page.goto(url);
+      await page
+        .getByRole('link', { name: /Visa nästa pass|Fortsätt passet/ })
+        .waitFor();
       for (const scenario of ['done', 'partial'] as const) {
         await page.evaluate(seed, scenario);
         await page.reload();
         await page
-          .getByRole('link', { name: /Starta pass|Fortsätt passet/ })
+          .getByRole('link', { name: /Visa nästa pass|Fortsätt passet/ })
           .waitFor();
         await page.screenshot({
           path: `${OUT}/${size.name}-${scheme}-week-${scenario}.png`,

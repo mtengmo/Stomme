@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const CONFIRM =
-  'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten.';
+  'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten (krävs för att börja).';
 
 test.use({ viewport: { width: 360, height: 800 } });
 
