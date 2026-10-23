@@ -99,6 +99,27 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Enbens bäckenlyft på golv',
     'Single-leg floor bridge',
   ],
+  'quad-set': [
+    'Lårmuskelspänning i ryggläge',
+    'Ryggliggande lårmuskelspänning',
+    'Quad set',
+  ],
+  'seated-knee-flexion': [
+    'Sittande knäböjning',
+    'Sittande knäböjning med fotglidning',
+    'Seated knee flexion',
+  ],
+  'band-knee-extension': [
+    'Knästräckning med gummiband',
+    'Sittande knästräckning med gummiband',
+    'Band knee extension',
+  ],
+  'band-hip-extension': [
+    'Höftextension med gummiband',
+    'Stående höftsträckning med gummiband',
+    'Band hip extension',
+  ],
+  'balance-clock': ['Balansklockan', 'Balansklocka på ett ben', 'Clock reach'],
 };
 
 /** Preferred catalogue labels for existing entries; applying these is a separate UI/content change. */

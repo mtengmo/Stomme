@@ -540,6 +540,37 @@ async function theme(scheme: 'light' | 'dark') {
     .click();
   await audit(training, tag('saved knee programme editor'));
   await trainingContext.close();
+  // The physiotherapist's knee programme: entry link, setup, overview, editor.
+  const physioContext = await browser.newContext({
+    viewport: { width: 360, height: 800 },
+    colorScheme: scheme,
+    reducedMotion: 'reduce',
+  });
+  await applyAuditTheme(physioContext);
+  const physio = await physioContext.newPage();
+  await physio.addInitScript('window.__name = (f) => f');
+  await physio.goto(base);
+  await physio.getByRole('button', { name: /Jag förstår/ }).click();
+  await physio.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();
+  await audit(physio, tag('quick start with physio link'));
+  await physio
+    .getByRole('button', { name: /Jag har fysioterapeutens knäprogram/ })
+    .click();
+  await physio.getByRole('checkbox', { name: 'Träningsband' }).check();
+  await audit(physio, tag('physio setup'));
+  await physio.getByRole('button', { name: 'Visa mitt program' }).click();
+  await physio
+    .getByRole('button', { name: 'Börja passet', exact: true })
+    .waitFor();
+  await audit(physio, tag('physio overview'));
+  await physio.getByRole('button', { name: 'Anpassa passet' }).click();
+  await audit(physio, tag('physio editor'));
+  await physio
+    .getByText(/Välj övningar från programmet/)
+    .first()
+    .click();
+  await audit(physio, tag('physio collection'));
+  await physioContext.close();
   await browser.close();
   browsers.delete(browser);
 }

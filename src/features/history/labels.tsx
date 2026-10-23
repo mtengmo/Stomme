@@ -12,6 +12,7 @@ const UNIT_WORD: Record<Unit, string> = {
   reps: 'rep.',
   seconds: 's',
   meters: 'm',
+  laps: 'varv',
 };
 
 export function amountText(amount: number, unit: Unit): string {

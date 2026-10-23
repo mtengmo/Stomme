@@ -225,3 +225,16 @@ describe('loadPerExercise ordering', () => {
     });
   });
 });
+
+describe('laps in weekly volume', () => {
+  it('counts lap sets but keeps them out of tonnage', () => {
+    const sessions = [session('a', '2026-10-12')];
+    const logs = [
+      log('a', 'balance-clock', 1, { amount: 5, weightKg: 0 }),
+      log('a', 'balance-clock', 2, { amount: 5, weightKg: 10 }),
+    ];
+    const v = weeklyVolume(sessions, logs);
+    expect(v[0]?.sets).toBe(2);
+    expect(v[0]?.tonnageKg).toBe(0);
+  });
+});

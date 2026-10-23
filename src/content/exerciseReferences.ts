@@ -50,6 +50,11 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'balance-pendulum': 'E46',
   'single-leg-chair-squat': 'E47',
   'single-leg-floor-bridge': 'E48',
+  'quad-set': 'E49',
+  'seated-knee-flexion': 'E50',
+  'band-knee-extension': 'E51',
+  'band-hip-extension': 'E52',
+  'balance-clock': 'E53',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

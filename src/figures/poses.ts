@@ -1,6 +1,7 @@
 import type { ExerciseId } from '../domain/types';
 import { additionalFigures } from './additionalPoses';
 import type { Pt } from './lerp';
+import { type PhysioFigureId, physioFigures } from './physioPoses';
 import { rehabFigures } from './rehabPoses';
 
 /**
@@ -54,6 +55,15 @@ export interface FigureSpec {
   motion?: 'controlled' | 'ballistic' | 'hold';
   props: Prop[];
   held?: { kind: 'dumbbell' | 'kettlebell'; hands: ('hR' | 'hL')[] };
+  /** A band between two points (replaces the default hand-ankle-hand band). */
+  band?: {
+    from: PoseKey | Pt;
+    to: PoseKey;
+    /** Length at which the band is taut; shorter ends make it hang slack. */
+    rest?: number;
+    /** Shift both ends, e.g. up the shin so the band clears the foot strokes. */
+    offset?: Pt;
+  };
 }
 
 /** Swap near and far side so the left side is the working one. */
@@ -89,7 +99,7 @@ function pose(
   return { head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL };
 }
 
-export const figures: Record<ExerciseId, FigureSpec> = {
+const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
   ...additionalFigures,
   ...rehabFigures,
   'goblet-chair-squat': {
@@ -547,4 +557,9 @@ export const figures: Record<ExerciseId, FigureSpec> = {
     ),
     props: [{ type: 'wall', x: 64 }],
   },
+};
+
+export const figures: Record<ExerciseId, FigureSpec> = {
+  ...baseFigures,
+  ...physioFigures,
 };

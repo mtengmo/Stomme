@@ -1,6 +1,15 @@
 import { exerciseList } from '../../content/exercises';
-import { FigureFrame, lerpPose } from '../../figures/Figure';
+import { FigureFrame, lerpPose, movementPose } from '../../figures/Figure';
 import { figures } from '../../figures/poses';
+
+/** The knee-programme figures define their own mid-cycle pose. */
+const PHYSIO_IDS: ReadonlySet<string> = new Set([
+  'quad-set',
+  'seated-knee-flexion',
+  'band-knee-extension',
+  'band-hip-extension',
+  'balance-clock',
+]);
 
 /** DEV only: every start/mid/end pose, right then left, static, for review. */
 export function FigureDev() {
@@ -25,11 +34,13 @@ export function FigureDev() {
                       exerciseId={ex.id}
                       pose={
                         k === 'middle'
-                          ? lerpPose(
-                              figures[ex.id].start,
-                              figures[ex.id].end,
-                              0.5,
-                            )
+                          ? PHYSIO_IDS.has(ex.id)
+                            ? movementPose(ex.id, 0.5)
+                            : lerpPose(
+                                figures[ex.id].start,
+                                figures[ex.id].end,
+                                0.5,
+                              )
                           : figures[ex.id][k]
                       }
                       working={w}
@@ -37,6 +48,7 @@ export function FigureDev() {
                         'goblet-chair-squat',
                         'single-leg-rdl',
                         'dead-bug',
+                        'quad-set',
                       ].includes(ex.id)}
                     />
                     <p className="m-0 text-center text-base">
@@ -50,6 +62,24 @@ export function FigureDev() {
                 )),
               )}
             </div>
+            {PHYSIO_IDS.has(ex.id) ? (
+              <div
+                className="mt-2 grid grid-cols-3 gap-1"
+                data-testid="figure-sequence"
+              >
+                {Array.from({ length: 9 }, (_, i) => i / 8).map((t) => (
+                  <div key={t} className="rounded-md border-2 border-edge p-1">
+                    <FigureFrame
+                      exerciseId={ex.id}
+                      pose={movementPose(ex.id, t)}
+                      working={ex.perSide ? 'right' : null}
+                      showMuscles={ex.id === 'quad-set'}
+                    />
+                    <p className="m-0 text-center text-base">t = {t}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </section>
         );
       })}

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import { kneeRehabExercises } from '../content/kneeRehab';
+import { rehabGroupOf } from '../content/programmes';
 import type {
   ExerciseId,
   MetaEntry,
@@ -181,7 +182,7 @@ const sessionSchema = z
     programId: z.enum(['general', 'running', 'rehab']).optional(),
     experience: z.enum(['new', 'some', 'regular']).optional(),
     policyVersion: z.literal(1).optional(),
-    rehabFocus: z.enum(['custom', 'knee']).optional(),
+    rehabFocus: z.enum(['custom', 'knee', 'knee-physio']).optional(),
     checkins: z
       .strictObject({
         before: checkin.optional(),
@@ -213,7 +214,7 @@ const sessionSchema = z
         message: 'Rehab focus requires rehab programme',
       });
     if (
-      session.rehabFocus === 'knee' &&
+      rehabGroupOf(session.rehabFocus) === 'aaos' &&
       session.plan.some(
         (p) => !kneeRehabExercises.some((ex) => ex.id === p.exerciseId),
       )
@@ -319,6 +320,7 @@ const metaSchema = z.discriminatedUnion('key', [
           ),
         )
         .optional(),
+      'knee-physio': savedRehabPlan.optional(),
     }),
   }),
   z.strictObject({
@@ -326,7 +328,7 @@ const metaSchema = z.discriminatedUnion('key', [
     value: z.strictObject({
       programId: z.enum(['general', 'running', 'rehab']),
       experience: z.enum(['new', 'some', 'regular']),
-      rehabFocus: z.enum(['custom', 'knee']).optional(),
+      rehabFocus: z.enum(['custom', 'knee', 'knee-physio']).optional(),
       rehabSide: z.enum(['right', 'left', 'both']).optional(),
       equipment: z
         .array(

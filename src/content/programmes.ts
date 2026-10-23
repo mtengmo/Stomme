@@ -1,6 +1,7 @@
 import type {
   EquipmentChoice,
   ProgramId,
+  RehabFocus,
   TrainingPreferences,
 } from '../domain/types';
 
@@ -66,7 +67,8 @@ export function isTrainingPreferences(
     typeof v.programId === 'string' &&
     Object.hasOwn(programmeNames, v.programId) &&
     ['new', 'some', 'regular'].includes(v.experience ?? '') &&
-    (v.rehabFocus === undefined || ['custom', 'knee'].includes(v.rehabFocus)) &&
+    (v.rehabFocus === undefined ||
+      ['custom', 'knee', 'knee-physio'].includes(v.rehabFocus)) &&
     (v.rehabSide === undefined ||
       ['right', 'left', 'both'].includes(v.rehabSide)) &&
     (v.weights === undefined ||
@@ -91,13 +93,29 @@ export function isTrainingPreferences(
   );
 }
 
+export type RehabGroup = 'custom' | 'aaos' | 'physio';
+
+/** Maps a stored focus to its group; absent means custom. Never test the raw focus string. */
+export function rehabGroupOf(focus: RehabFocus | undefined): RehabGroup {
+  if (focus === 'knee') return 'aaos';
+  if (focus === 'knee-physio') return 'physio';
+  return 'custom';
+}
+
+export function rehabGroup(value: { rehabFocus?: RehabFocus }): RehabGroup {
+  return rehabGroupOf(value.rehabFocus);
+}
+
 export function trainingName(value: {
   programId?: ProgramId;
-  rehabFocus?: 'custom' | 'knee';
+  rehabFocus?: RehabFocus;
 }): string {
-  return value.programId === 'rehab' && value.rehabFocus === 'knee'
+  const group = rehabGroup(value);
+  return value.programId === 'rehab' && group === 'aaos'
     ? 'Knärehab · AAOS'
-    : value.programId
-      ? programmeNames[value.programId]
-      : 'Knä och löpning · ursprungligt program';
+    : value.programId === 'rehab' && group === 'physio'
+      ? 'Knärehab · Fysioterapeutens program'
+      : value.programId
+        ? programmeNames[value.programId]
+        : 'Knä och löpning · ursprungligt program';
 }

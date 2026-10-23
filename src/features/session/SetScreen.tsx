@@ -147,6 +147,14 @@ export function SetScreen({
             </>
           ) : null}
         </p>
+        {exercise.id === 'band-hip-extension' ||
+        exercise.id === 'balance-clock' ? (
+          <p className="m-0 text-base">
+            {exercise.id === 'band-hip-extension'
+              ? 'Den valda sidan är det ben som rör sig.'
+              : 'Den valda sidan är det ben du står på.'}
+          </p>
+        ) : null}
       </div>
       {unit === 'seconds' ? (
         <section
@@ -211,7 +219,9 @@ export function SetScreen({
           <p className="m-0 text-base text-ink-soft">
             {unit === 'reps'
               ? 'Räkna repetitionerna själv. Tryck Klar set när du är klar.'
-              : 'Tryck Klar set när du gått hela sträckan.'}
+              : unit === 'laps'
+                ? 'Räkna varven själv. Tryck Klar set när du är klar.'
+                : 'Tryck Klar set när du gått hela sträckan.'}
           </p>
         </div>
       )}
@@ -330,11 +340,13 @@ export function SetScreen({
             <p className="m-0 text-base text-ink-soft">
               {unit === 'reps'
                 ? 'Animationen visar tekniken. Räkna repetitionerna själv och tryck Klar set när du är klar.'
-                : unit === 'seconds'
-                  ? movingTimed
-                    ? 'Starta och gör dig redo under 5 sekunder. Växla ben lugnt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.'
-                    : 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
-                  : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
+                : unit === 'laps'
+                  ? 'Animationen visar tekniken. Räkna varven själv och tryck Klar set när du är klar.'
+                  : unit === 'seconds'
+                    ? movingTimed
+                      ? 'Starta och gör dig redo under 5 sekunder. Växla ben lugnt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.'
+                      : 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
+                    : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>
             {['step-up', 'split-squat'].includes(exercise.id) ? (
               <p className="m-0 text-base">

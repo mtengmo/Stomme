@@ -49,7 +49,7 @@ export interface ExerciseVariant {
 }
 export interface ExerciseSource {
   title: string;
-  url: string;
+  url?: string;
   publisher: string;
   note: string;
   page?: number;
@@ -503,6 +503,45 @@ const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
       'Ena foten i golvet och den andra lyft; överkroppen stöds av golvet.',
     ],
   ],
+  'quad-set': [
+    ['bodyweight', 1, [0], 'Ligg på rygg med det valda benet utsträckt.'],
+  ],
+  'seated-knee-flexion': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Sitt på en stadig stol och låt foten glida längs golvet.',
+      'chair',
+    ],
+  ],
+  'band-knee-extension': [
+    [
+      'band',
+      1,
+      [0],
+      'Sitt på en stadig stol med bandet fäst lågt vid stolens främre ben och runt vristen.',
+      'chair',
+    ],
+  ],
+  'band-hip-extension': [
+    [
+      'band',
+      1,
+      [0],
+      'Stå vid ett stadigt stöd med bandet runt båda vristerna.',
+      'support',
+    ],
+  ],
+  'balance-clock': [
+    [
+      'bodyweight',
+      1,
+      [0],
+      'Stå på ett ben och håll i en vägg eller stol hela tiden.',
+      'support',
+    ],
+  ],
 };
 
 const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
@@ -638,10 +677,36 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Enbens höftsträckning med bäckenet hållet jämnt.',
   ],
+  'seated-knee-flexion': [
+    'basic',
+    'Stolen bär kroppen medan foten glider längs golvet.',
+  ],
+  'band-knee-extension': [
+    'basic',
+    'Stolen stödjer kroppen; bandets motstånd justeras med bandets styrka.',
+  ],
+  'band-hip-extension': [
+    'practiced',
+    'Enbensbalans med handstöd medan det andra benet för bandet bakåt.',
+  ],
+  'balance-clock': [
+    'practiced',
+    'Enbensbalans med handstöd medan den fria foten når mot flera punkter.',
+  ],
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  const editorial: ExerciseSource = {
+    title: 'Fysioterapeutens knäprogram (Stommes egen beskrivning)',
+    publisher: 'Stomme',
+    note: 'Egen svensk beskrivning utifrån allmänna rörelseprinciper. Ingen klinisk källa; följ ditt papper.',
+  };
   const added: Partial<Record<ExerciseId, ExerciseSource>> = {
+    'quad-set': editorial,
+    'seated-knee-flexion': editorial,
+    'band-knee-extension': editorial,
+    'band-hip-extension': editorial,
+    'balance-clock': editorial,
     'rear-foot-split-squat': {
       title: 'Bulgarian Split Squat',
       publisher: 'National Academy of Sports Medicine',
@@ -857,6 +922,7 @@ export const exerciseMetadata = Object.fromEntries(
       kind:
         id.endsWith('-stretch') ||
         id === 'prone-on-forearms' ||
+        id === 'seated-knee-flexion' ||
         id === 'heel-slide'
           ? 'mobility'
           : 'strength',

@@ -1,8 +1,20 @@
 import { Link } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
-import { exerciseList, exercises } from '../../content/exercises';
+import { exerciseReferences } from '../../content/exerciseReferences';
+import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
 import { exerciseMuscles } from '../../content/muscles';
+import {
+  physioForm,
+  physioHoldNote,
+  physioKneeFitCount,
+  physioKneeItemFor,
+  physioKneePlan,
+  physioKneeTotal,
+  physioProgressionNotes,
+  physioSwapNote,
+} from '../../content/physioKneeProgramme';
+import { rehabGroup } from '../../content/programmes';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
@@ -17,7 +29,12 @@ export function ReadyWorkout({
   onChange(index: number): void;
 }) {
   const knee =
-    preferences.programId === 'rehab' && preferences.rehabFocus === 'knee';
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
+  const physio =
+    preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
+  const untouched =
+    physio &&
+    JSON.stringify(plan) === JSON.stringify(physioKneePlan(preferences));
   const ids = plan.map((item) => item.exerciseId);
   const primary = new Set(
     ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),
@@ -60,7 +77,15 @@ export function ReadyWorkout({
           antal och dagsform påverkar hur ansträngande övningen känns.
         </p>
       ) : null}
-      {!knee && preferences.programId !== 'rehab' ? (
+      {physio ? (
+        <p className="m-0 text-base">
+          {untouched ? `${physioForm} ` : ''}
+          {physioKneeFitCount(preferences)} av {physioKneeTotal} övningar passar
+          din utrustning. Setvilan på 60 sekunder är appens justerbara standard.
+          Avbryt en övning som gör ont.
+        </p>
+      ) : null}
+      {!knee && !physio && preferences.programId !== 'rehab' ? (
         <p className="m-0 text-base text-ink-soft">
           Förslag nästa pass. Antal bygger på sparade resultat och hur passet
           kändes. Granska och ändra före start.
@@ -77,7 +102,9 @@ export function ReadyWorkout({
               ? 'sek'
               : exercise.unit === 'meters'
                 ? 'm'
-                : '';
+                : exercise.unit === 'laps'
+                  ? 'varv'
+                  : '';
           const side = !exercise.perSide
             ? ''
             : item.sides?.length === 1
@@ -85,11 +112,16 @@ export function ReadyWorkout({
                 ? ' vänster'
                 : ' höger'
               : ' per sida';
-          const number = String(
-            exerciseList.findIndex((entry) => entry.id === exercise.id) + 1,
-          ).padStart(2, '0');
+          const sheetNo = physioKneeItemFor(item.exerciseId)?.sheetNo;
+          const lead = physio
+            ? sheetNo
+              ? `${sheetNo}. `
+              : ''
+            : `${index + 1}. `;
           const note =
-            item.explanation && !item.explanation.startsWith('Startförslag')
+            item.explanation &&
+            !item.explanation.startsWith('Startförslag') &&
+            !(physio && item.explanation.startsWith('Förifyllt'))
               ? item.explanation
               : '';
           return (
@@ -102,7 +134,8 @@ export function ReadyWorkout({
                   href={`/ovning/${item.exerciseId}`}
                   className="flex min-h-12 items-center text-xl font-bold underline"
                 >
-                  {index + 1}. E{number} · {exercise.name}
+                  {lead}
+                  {exerciseReferences[exercise.id]} · {exercise.name}
                 </Link>
                 <p className="m-0 text-base">
                   {item.sets} × {item.target}
@@ -113,6 +146,13 @@ export function ReadyWorkout({
                     : (variant?.label ?? 'välj utrustning')}
                 </p>
                 {note ? <p className="m-0 text-base">{note}</p> : null}
+                {physio
+                  ? physioProgressionNotes(item.exerciseId).map((text) => (
+                      <p key={text} className="m-0 text-base text-ink-soft">
+                        {text}
+                      </p>
+                    ))
+                  : null}
                 {knee ? (
                   <ExerciseDifficulty
                     exerciseId={exercise.id}
@@ -133,6 +173,16 @@ export function ReadyWorkout({
           );
         })}
       </ol>
+      {physio ? (
+        <p className="m-0 text-base">
+          Numren är papperets övningsnummer. {physioSwapNote}
+          {ids.some(
+            (id) => id === 'seated-knee-extension' || id === 'hamstring-curl',
+          )
+            ? ` ${physioHoldNote}`
+            : ''}
+        </p>
+      ) : null}
       {knee ? (
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">

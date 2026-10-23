@@ -667,3 +667,47 @@ describe('saved knee rehabilitation programmes', () => {
     expect(() => parseBackup(serializeBackup(backup))).toThrow();
   });
 });
+
+describe('physio knee rehabilitation group', () => {
+  const physio: TrainingPreferences = {
+    programId: 'rehab',
+    experience: 'new',
+    equipment: ['bodyweight'],
+    rehabFocus: 'knee-physio',
+    rehabSide: 'both',
+  };
+  const item: PlannedExercise = {
+    exerciseId: 'glute-bridge',
+    sets: 2,
+    target: 10,
+    loadIndex: 0,
+    weightKg: 0,
+    restSec: 60,
+    variantId: 'bodyweight',
+    sides: ['both'],
+    reason: 'first_time',
+  };
+  it('saves, starts and round-trips a plan without limiting it to the AAOS collection', async () => {
+    await saveTrainingPreferences(db, physio);
+    await saveRehabPlan(db, 'knee-physio', [item]);
+    expect((await db.meta.get('rehabPlans'))?.value).toEqual({
+      'knee-physio': [item],
+    });
+    const session = await startTrainingSession(db, physio, 'A', [item], now);
+    expect(session.rehabFocus).toBe('knee-physio');
+    await importAll(db, serializeBackup(await exportAll(db, now)), { now });
+    expect((await db.sessions.get(session.id))?.rehabFocus).toBe('knee-physio');
+    expect((await db.meta.get('training'))?.value).toEqual(physio);
+  });
+  it('rejects a plan saved under a different focus and unknown focus values in backups', async () => {
+    await saveTrainingPreferences(db, physio);
+    await expect(saveRehabPlan(db, 'custom', [item])).rejects.toThrow();
+    await expect(saveRehabPlan(db, 'knee', [item])).rejects.toThrow();
+    await saveRehabPlan(db, 'knee-physio', [item]);
+    const backup = await exportAll(db, now);
+    const training = backup.meta.find((m) => m.key === 'training');
+    if (!training) throw new Error('Missing training');
+    (training.value as { rehabFocus: string }).rehabFocus = 'knee-other';
+    expect(() => parseBackup(serializeBackup(backup))).toThrow();
+  });
+});

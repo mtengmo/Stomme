@@ -10,12 +10,14 @@ export const UNIT_WORD: Record<Unit, string> = {
   reps: 'reps',
   seconds: 'sek',
   meters: 'm',
+  laps: 'varv',
 };
 
 export const AMOUNT_LABEL: Record<Unit, string> = {
   reps: 'Antal',
   seconds: 'Sekunder',
   meters: 'Meter',
+  laps: 'Varv',
 };
 
 export const EFFORT_LABEL: Record<Effort, string> = {

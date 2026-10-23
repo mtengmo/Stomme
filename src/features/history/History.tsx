@@ -5,7 +5,7 @@ import { BarChart } from '../../charts/BarChart';
 import { PainChart } from '../../charts/PainChart';
 import { StepLineChart } from '../../charts/StepLineChart';
 import { exercises } from '../../content/exercises';
-import { trainingName } from '../../content/programmes';
+import { rehabGroupOf, trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { listSessions } from '../../db/repo';
 import type { PainLog, Session, SetLog } from '../../domain/types';
@@ -106,9 +106,13 @@ export function History() {
         (programme === 'legacy'
           ? !s.programId
           : programme === 'knee'
-            ? s.programId === 'rehab' && s.rehabFocus === 'knee'
-            : s.programId === programme &&
-              (programme !== 'rehab' || s.rehabFocus !== 'knee'))) &&
+            ? s.programId === 'rehab' && rehabGroupOf(s.rehabFocus) === 'aaos'
+            : programme === 'knee-physio'
+              ? s.programId === 'rehab' &&
+                rehabGroupOf(s.rehabFocus) === 'physio'
+              : s.programId === programme &&
+                (programme !== 'rehab' ||
+                  rehabGroupOf(s.rehabFocus) === 'custom'))) &&
       (status === 'all' || s.status === status) &&
       (period === 'all' || s.date >= addDays(today, -Number(period))),
   );
@@ -171,6 +175,9 @@ export function History() {
             <option value="general">Allmän styrka</option>
             <option value="running">Styrka för löpning</option>
             <option value="knee">Knärehab · AAOS</option>
+            <option value="knee-physio">
+              Knärehab · Fysioterapeutens program
+            </option>
             <option value="rehab">Mitt eget rehabprogram</option>
             <option value="legacy">Ursprungligt knä- och löpprogram</option>
           </select>

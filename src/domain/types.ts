@@ -46,9 +46,14 @@ export type ExerciseId =
   | 'heel-slide'
   | 'balance-pendulum'
   | 'single-leg-chair-squat'
-  | 'single-leg-floor-bridge';
+  | 'single-leg-floor-bridge'
+  | 'quad-set'
+  | 'seated-knee-flexion'
+  | 'band-knee-extension'
+  | 'band-hip-extension'
+  | 'balance-clock';
 
-export type Unit = 'reps' | 'seconds' | 'meters';
+export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
 
 /** kg = total external load (2x5 kg -> 10). */
@@ -81,6 +86,7 @@ export interface Exercise {
 
 export type TemplateId = 'A' | 'B';
 
+export type RehabFocus = 'custom' | 'knee' | 'knee-physio';
 export type ProgramId = 'general' | 'running' | 'rehab';
 export type EquipmentChoice =
   | 'bodyweight'
@@ -104,7 +110,7 @@ export interface TrainingPreferences {
   experience: 'new' | 'some' | 'regular';
   /** Optional for backwards compatibility with type/count-only preferences. */
   weights?: WeightInventoryItem[];
-  rehabFocus?: 'custom' | 'knee';
+  rehabFocus?: RehabFocus;
   rehabSide?: 'right' | 'left' | 'both';
 }
 export interface SymptomReport {
@@ -179,7 +185,7 @@ export interface Session {
   /** Experience selected when this workout was prepared. */
   experience?: TrainingPreferences['experience'];
   policyVersion?: number;
-  rehabFocus?: 'custom' | 'knee';
+  rehabFocus?: RehabFocus;
   checkins?: Partial<Record<'before' | 'after' | 'dayAfter', TrainingCheckin>>;
   /** Local date, YYYY-MM-DD. */
   date: string;
