@@ -89,7 +89,17 @@ function pose(
   return { head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL };
 }
 
-export const figures: Record<ExerciseId, FigureSpec> = {
+type PhysioPlaceholderId =
+  | 'quad-set'
+  | 'seated-knee-flexion'
+  | 'band-knee-extension'
+  | 'band-hip-extension'
+  | 'balance-clock';
+
+const baseFigures: Record<
+  Exclude<ExerciseId, PhysioPlaceholderId>,
+  FigureSpec
+> = {
   ...additionalFigures,
   ...rehabFigures,
   'goblet-chair-squat': {
@@ -547,4 +557,32 @@ export const figures: Record<ExerciseId, FigureSpec> = {
     ),
     props: [{ type: 'wall', x: 64 }],
   },
+};
+
+/** Static copy of another exercise's start pose: no motion, no band, no clock diagram. */
+function staticPlaceholder(spec: FigureSpec): FigureSpec {
+  return {
+    start: spec.start,
+    end: spec.start,
+    motion: 'hold',
+    props: spec.props,
+  };
+}
+
+/**
+ * TODO-figure-stage: placeholders only. Each shows a static start pose of a
+ * related exercise until the real drawings (and the band and clock diagram)
+ * are built. They must not be treated as correct technique.
+ */
+export const figures: Record<ExerciseId, FigureSpec> = {
+  ...baseFigures,
+  'quad-set': staticPlaceholder(baseFigures['straight-leg-raise']),
+  'seated-knee-flexion': staticPlaceholder(
+    baseFigures['seated-knee-extension'],
+  ),
+  'band-knee-extension': staticPlaceholder(
+    baseFigures['seated-knee-extension'],
+  ),
+  'band-hip-extension': staticPlaceholder(baseFigures['hamstring-curl']),
+  'balance-clock': staticPlaceholder(baseFigures['balance-pendulum']),
 };

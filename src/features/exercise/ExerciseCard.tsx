@@ -324,16 +324,24 @@ export function ExerciseCardBody({
                   <h3 className="m-0 text-lg font-bold">Källor</h3>
                   <ul className="m-0 flex list-disc flex-col gap-2 pl-6">
                     {metadata.sources.map((source) => (
-                      <li key={`${source.url}-${source.title}`}>
-                        <a
-                          href={source.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-h-12 items-center font-bold underline"
-                        >
-                          {source.publisher}: {source.title}
-                          {source.page ? ` · sida ${source.page}` : ''}
-                        </a>
+                      <li
+                        key={`${source.url ?? source.publisher}-${source.title}`}
+                      >
+                        {source.url ? (
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex min-h-12 items-center font-bold underline"
+                          >
+                            {source.publisher}: {source.title}
+                            {source.page ? ` · sida ${source.page}` : ''}
+                          </a>
+                        ) : (
+                          <span className="font-bold">
+                            {source.publisher}: {source.title}
+                          </span>
+                        )}
                         <p className="m-0">{source.note}</p>
                       </li>
                     ))}

@@ -281,6 +281,19 @@ export const exerciseMuscles: Record<
     secondary: ['hamstrings', 'core'],
     qualities: [],
   },
+  'quad-set': { primary: ['quads'], secondary: [], qualities: [] },
+  'seated-knee-flexion': { primary: [], secondary: [], qualities: [] },
+  'band-knee-extension': { primary: ['quads'], secondary: [], qualities: [] },
+  'band-hip-extension': {
+    primary: ['glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: ['balance'],
+  },
+  'balance-clock': {
+    primary: ['glutes', 'quads'],
+    secondary: ['hip-abductors', 'core'],
+    qualities: ['balance'],
+  },
 };
 
 export function primaryMuscleLabel(exerciseId: ExerciseId): string {

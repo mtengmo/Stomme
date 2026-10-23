@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { type SetStateAction, useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
+import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList, exercises } from '../../content/exercises';
 import {
   kneeConditioningPlan,
@@ -615,13 +616,8 @@ function PreviewEditor({
                       >
                         <span>
                           <span className="block text-xl font-bold">
-                            {index + 1}. E
-                            {String(
-                              exerciseList.findIndex(
-                                (entry) => entry.id === exercise.id,
-                              ) + 1,
-                            ).padStart(2, '0')}{' '}
-                            · {exercise.name}
+                            {index + 1}. {exerciseReferences[exercise.id]} ·{' '}
+                            {exercise.name}
                           </span>
                           <span className="block text-base font-normal">
                             {item.sets || '–'} × {item.target || '–'}

@@ -16,7 +16,7 @@ describe('muscle guidance content', () => {
     );
     for (const exercise of exerciseList) {
       const guidance = exerciseMuscles[exercise.id];
-      if (exercise.id === 'prone-on-forearms')
+      if (['prone-on-forearms', 'seated-knee-flexion'].includes(exercise.id))
         expect(guidance.primary).toEqual([]);
       else expect(guidance.primary.length, exercise.id).toBeGreaterThan(0);
       const groups = [...guidance.primary, ...guidance.secondary];

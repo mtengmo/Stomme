@@ -46,7 +46,12 @@ export type ExerciseId =
   | 'heel-slide'
   | 'balance-pendulum'
   | 'single-leg-chair-squat'
-  | 'single-leg-floor-bridge';
+  | 'single-leg-floor-bridge'
+  | 'quad-set'
+  | 'seated-knee-flexion'
+  | 'band-knee-extension'
+  | 'band-hip-extension'
+  | 'balance-clock';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
