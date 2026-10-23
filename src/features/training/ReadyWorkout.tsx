@@ -9,6 +9,8 @@ import {
   physioHoldNote,
   physioKneeFitCount,
   physioKneeItemFor,
+  physioKneeMissing,
+  physioKneeMissingText,
   physioKneePlan,
   physioKneeTotal,
   physioProgressionNotes,
@@ -76,6 +78,27 @@ export function ReadyWorkout({
           övning som gör ont. Tekniknivån beskriver kontroll och balans. Vikt,
           antal och dagsform påverkar hur ansträngande övningen känns.
         </p>
+      ) : null}
+      {physio && physioKneeMissing(preferences).length > 0 ? (
+        <div className="flex flex-col gap-1 border-2 border-edge p-3 text-base">
+          <p className="m-0 font-bold">
+            {physioKneeMissingText(preferences)}{' '}
+            <Link
+              href="/?andra=utrustning"
+              className="inline-flex min-h-12 items-center underline"
+            >
+              Ändra utrustning
+            </Link>
+          </p>
+          <ul className="m-0 list-none p-0">
+            {physioKneeMissing(preferences).map(({ item, needs }) => (
+              <li key={item.sheetNo} className="py-1">
+                Papperets övning {item.sheetNo}: {item.sheetLabel} – kräver{' '}
+                {needs.join(' och ')}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
       {physio ? (
         <p className="m-0 text-base">

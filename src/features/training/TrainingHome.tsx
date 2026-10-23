@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import {
   equipmentChoices,
   experienceLabels,
@@ -22,6 +22,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
+import { useHashSearch } from '../../lib/hashLocation';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
 import { WeekView } from '../week/WeekView';
@@ -137,7 +138,17 @@ export function TrainingSetup({
             <select
               className={inputClass}
               value={rehabFocus}
-              onChange={(e) => setRehabFocus(e.target.value as RehabFocus)}
+              onChange={(e) => {
+                const focus = e.target.value as RehabFocus;
+                setRehabFocus(focus);
+                // Everyone has a chair and a wall; start with them unless the user chose.
+                if (
+                  rehabGroupOf(focus) === 'physio' &&
+                  !equipment.includes('chair') &&
+                  !equipment.includes('support')
+                )
+                  setEquipment((values) => [...values, 'chair', 'support']);
+              }}
             >
               <option value="custom">Mitt eget rehabprogram</option>
               <option value="knee">
@@ -225,7 +236,11 @@ export function TrainingHome() {
         : undefined;
     return { preferences, sessions, legacyProgramme, preparationId };
   }, []);
-  const [editing, setEditing] = useState(false);
+  const [, navigate] = useLocation();
+  // "/?andra=utrustning" opens the setup directly (used by the physio overview).
+  const wantsSetup =
+    new URLSearchParams(useHashSearch()).get('andra') === 'utrustning';
+  const [editing, setEditing] = useState(wantsSetup);
   if (!data) return null;
   const preferences = isTrainingPreferences(data.preferences)
     ? data.preferences
@@ -246,8 +261,14 @@ export function TrainingHome() {
       <div className="mx-auto max-w-md px-5 pt-5 pb-28">
         <TrainingSetup
           current={preferences}
-          onSaved={() => setEditing(false)}
-          onCancel={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false);
+            if (wantsSetup) navigate('/traning/A');
+          }}
+          onCancel={() => {
+            setEditing(false);
+            if (wantsSetup) navigate('/traning/A');
+          }}
         />
       </div>
     );
