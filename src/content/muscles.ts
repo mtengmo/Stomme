@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { bodyweightDetails } from './bodyweightExercises';
 
 export type MuscleGroupId =
   | 'quads'
@@ -77,6 +78,23 @@ export const exerciseMuscles: Record<
     qualities: ('balance' | 'grip' | 'power')[];
   }
 > = {
+  'push-up': { ...bodyweightDetails['push-up'], qualities: [] },
+  'pull-up': { ...bodyweightDetails['pull-up'], qualities: ['grip'] },
+  'chin-up': { ...bodyweightDetails['chin-up'], qualities: ['grip'] },
+  'back-extension': { ...bodyweightDetails['back-extension'], qualities: [] },
+  'parallel-dip': { ...bodyweightDetails['parallel-dip'], qualities: [] },
+  'lying-leg-raise': { ...bodyweightDetails['lying-leg-raise'], qualities: [] },
+  burpee: { ...bodyweightDetails.burpee, qualities: ['power'] },
+  plank: { ...bodyweightDetails.plank, qualities: [] },
+  'squat-jump': { ...bodyweightDetails['squat-jump'], qualities: ['power'] },
+  'jumping-lunge': {
+    ...bodyweightDetails['jumping-lunge'],
+    qualities: ['power'],
+  },
+  'mountain-climber': {
+    ...bodyweightDetails['mountain-climber'],
+    qualities: [],
+  },
   'goblet-chair-squat': {
     primary: ['quads', 'glutes'],
     secondary: ['core'],

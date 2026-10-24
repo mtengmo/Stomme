@@ -302,22 +302,30 @@ export function QuickStart() {
             </summary>
             <div className="flex flex-col gap-3 pt-2">
               {goal !== 'knee' && goal !== 'physio'
-                ? (['step', 'band'] as const).map((value) => (
-                    <label
-                      key={value}
-                      className="flex min-h-12 items-center gap-3 text-base"
-                    >
-                      <input
-                        className="size-6"
-                        type="checkbox"
-                        checked={equipment.includes(value)}
-                        onChange={(event) =>
-                          toggle(value, event.target.checked)
-                        }
-                      />
-                      {value === 'step' ? 'Träningssteg' : 'Träningsband'}
-                    </label>
-                  ))
+                ? (['step', 'band', 'pull-up-bar', 'dip-bars'] as const).map(
+                    (value) => (
+                      <label
+                        key={value}
+                        className="flex min-h-12 items-center gap-3 text-base"
+                      >
+                        <input
+                          className="size-6"
+                          type="checkbox"
+                          checked={equipment.includes(value)}
+                          onChange={(event) =>
+                            toggle(value, event.target.checked)
+                          }
+                        />
+                        {value === 'step'
+                          ? 'Träningssteg'
+                          : value === 'band'
+                            ? 'Träningsband'
+                            : value === 'pull-up-bar'
+                              ? 'Fast monterad chinsstång'
+                              : 'Stabil dipsställning'}
+                      </label>
+                    ),
+                  )
                 : null}
               {goal === 'knee' || goal === 'custom' ? (
                 <label className="flex flex-col gap-2 text-base font-bold">

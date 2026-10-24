@@ -6,6 +6,7 @@ import {
   kettlebellFloorPressPose,
   seatedKneeExtensionPose,
 } from './additionalPoses';
+import { bodyweightMovementPose } from './bodyweightPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
 import { FrontFigureFrame, supportsFrontView } from './frontViews';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt } from './lerp';
@@ -34,6 +35,8 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 }
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
+  const bodyweightPose = bodyweightMovementPose(exerciseId, t);
+  if (bodyweightPose) return bodyweightPose;
   const rehabPose = rehabMovementPose(exerciseId, t);
   if (rehabPose) return rehabPose;
   const physioPose = physioMovementPose(exerciseId, t);
@@ -133,6 +136,10 @@ export function bandShape(
 
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
 const FRAMING: Partial<Record<ExerciseId, string>> = {
+  'pull-up': '10 0 180 188',
+  'chin-up': '10 0 180 188',
+  burpee: '0 -30 200 218',
+  'squat-jump': '0 0 200 188',
   'quad-set': '24 128 160 52',
 };
 
@@ -454,13 +461,15 @@ export function Figure({
     const tick = (now: number) => {
       elapsedMs.current = now - t0;
       setT(
-        spec.motion === 'ballistic'
-          ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-          : cycleProgress(
-              elapsedMs.current,
-              demonstrationTiming(exerciseId).endHoldMs,
-              demonstrationTiming(exerciseId).startHoldMs,
-            ),
+        spec.motion === 'sequence'
+          ? (elapsedMs.current % 12000) / 12000
+          : spec.motion === 'ballistic'
+            ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
+            : cycleProgress(
+                elapsedMs.current,
+                demonstrationTiming(exerciseId).endHoldMs,
+                demonstrationTiming(exerciseId).startHoldMs,
+              ),
       );
       raf = requestAnimationFrame(tick);
     };
@@ -469,14 +478,32 @@ export function Figure({
   }, [reduced, paused, forced, spec.motion, exerciseId]);
 
   if (reduced && !stillOnly) {
+    const frames: readonly (readonly [string, Pose])[] =
+      exerciseId === 'burpee'
+        ? [
+            ['Stå', movementPose(exerciseId, 0)],
+            ['Händer i golvet', movementPose(exerciseId, 0.125)],
+            ['Armhävning', movementPose(exerciseId, 0.375)],
+            ['Hopp och landning', movementPose(exerciseId, 0.875)],
+          ]
+        : exerciseId === 'squat-jump' || exerciseId === 'mountain-climber'
+          ? [
+              ['Start', movementPose(exerciseId, 0)],
+              [
+                'Rörelse',
+                movementPose(
+                  exerciseId,
+                  exerciseId === 'squat-jump' ? 0.5 : 0.25,
+                ),
+              ],
+            ]
+          : [
+              ['Start', spec.start],
+              ['Slut', spec.end],
+            ];
     return (
       <div className="grid grid-cols-2 gap-2">
-        {(
-          [
-            ['Start', spec.start],
-            ['Slut', spec.end],
-          ] as const
-        ).map(([label, pose]) => (
+        {frames.map(([label, pose]) => (
           <figure key={label} className="m-0">
             <FigureFrame
               exerciseId={exerciseId}

@@ -68,7 +68,8 @@ export function SetScreen({
       presentation.equipment === 'kettlebell'
         ? weightKg <= 0
         : weightKg !== 0));
-  const movingTimed = exercise.id === 'heel-slide';
+  const movingTimed =
+    exercise.id === 'heel-slide' || exercise.id === 'mountain-climber';
   const hold = useTimedHold({
     moving: movingTimed,
     seconds: amount,

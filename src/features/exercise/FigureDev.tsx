@@ -3,6 +3,17 @@ import { FigureFrame, movementPose } from '../../figures/Figure';
 import { figures } from '../../figures/poses';
 
 const SEQUENCE_IDS: ReadonlySet<string> = new Set([
+  'push-up',
+  'pull-up',
+  'chin-up',
+  'back-extension',
+  'parallel-dip',
+  'lying-leg-raise',
+  'burpee',
+  'plank',
+  'squat-jump',
+  'jumping-lunge',
+  'mountain-climber',
   'quad-set',
   'seated-knee-flexion',
   'band-knee-extension',

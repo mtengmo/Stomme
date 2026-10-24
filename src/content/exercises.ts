@@ -1,5 +1,6 @@
 import type { Exercise, ExerciseId, Load } from '../domain/types';
 import { additionalExercises } from './additionalExercises';
+import { bodyweightExercises } from './bodyweightExercises';
 import { preferredExerciseNames } from './exerciseAliases';
 import { rehabAdditions } from './rehabAdditions';
 
@@ -242,6 +243,7 @@ export const exerciseList: readonly Exercise[] = [
   ...list,
   ...additionalExercises,
   ...rehabAdditions,
+  ...bodyweightExercises,
 ].map((exercise) => ({
   ...exercise,
   name: preferredExerciseNames[exercise.id] ?? exercise.name,

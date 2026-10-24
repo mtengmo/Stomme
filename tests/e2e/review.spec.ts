@@ -31,12 +31,12 @@ for (const mode of [
         page.getByRole('heading', { name: 'Granska övningar', exact: true }),
       ).toBeVisible();
       const codes = Array.from(
-        { length: 53 },
+        { length: 64 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       );
       if (mode.viewport.width < 1024) {
         const picker = page.getByLabel('Välj övning att granska');
-        await expect(picker.getByRole('option')).toHaveCount(53);
+        await expect(picker.getByRole('option')).toHaveCount(64);
         for (const code of codes)
           await expect(
             picker.getByRole('option', { name: new RegExp(`^${code} · `) }),

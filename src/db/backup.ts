@@ -342,9 +342,11 @@ const metaSchema = z.discriminatedUnion('key', [
             'support',
             'step',
             'band',
+            'pull-up-bar',
+            'dip-bars',
           ]),
         )
-        .max(9),
+        .max(11),
       weights: z
         .array(
           z.strictObject({

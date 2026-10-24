@@ -24,7 +24,7 @@ describe('catalogue entries E49-E53', () => {
       'E52',
       'E53',
     ]);
-    expect(exerciseList.slice(-5).map((e) => e.id)).toEqual([...ids]);
+    expect(exerciseList.slice(48, 53).map((e) => e.id)).toEqual([...ids]);
     expect(new Set(exerciseList.map((e) => e.id)).size).toBe(
       exerciseList.length,
     );

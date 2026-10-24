@@ -55,6 +55,17 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'band-knee-extension': 'E51',
   'band-hip-extension': 'E52',
   'balance-clock': 'E53',
+  'push-up': 'E54',
+  'pull-up': 'E55',
+  'chin-up': 'E56',
+  'back-extension': 'E57',
+  'parallel-dip': 'E58',
+  'lying-leg-raise': 'E59',
+  burpee: 'E60',
+  plank: 'E61',
+  'squat-jump': 'E62',
+  'jumping-lunge': 'E63',
+  'mountain-climber': 'E64',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

@@ -2,6 +2,17 @@ import type { ExerciseId } from '../domain/types';
 
 /** Searchable names and common terms; stable catalogue IDs stay unchanged. */
 export const exerciseAliases: Record<ExerciseId, string[]> = {
+  'push-up': ['Armhävningar', 'Push up', 'Push-up'],
+  'pull-up': ['Pull ups', 'Pull-ups', 'Chins med överhandsgrepp'],
+  'chin-up': ['Chins', 'Chin ups', 'Underhandsgrepp'],
+  'back-extension': ['Rygglyft', 'Magliggande rygglyft', 'Back extension'],
+  'parallel-dip': ['Dips', 'Parallel bar dip'],
+  'lying-leg-raise': ['Benlyft', 'Dubbelt benlyft', 'Lying leg raise'],
+  burpee: ['Burpees', 'Squat thrust med armhävning och hopp'],
+  plank: ['Plankan', 'Underarmsplanka', 'Forearm plank'],
+  'squat-jump': ['Jumping squats', 'Squat jump', 'Hoppknäböj'],
+  'jumping-lunge': ['Utfall med hopp', 'Jumping lunges', 'Lunge jump'],
+  'mountain-climber': ['Mountain climbers', 'Bergsklättraren'],
   'goblet-chair-squat': ['Stolknäböj', 'Gobletknäböj till stol', 'Chair squat'],
   'step-up': ['Uppsteg på låda', 'Uppsteg', 'Step up', 'Step-up'],
   'single-leg-rdl': [
@@ -20,7 +31,7 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   'single-leg-calf-raise': ['Enbens tåhävning', 'Tåhävning på ett ben'],
   'suitcase-carry': ['Väskbärning', 'Suitcase carry', 'Ensidig bärövning'],
   'bird-dog': ['Fågelhund', 'Bird dog'],
-  'wall-sit': ['Väggsittning', 'Wall sit'],
+  'wall-sit': ['Väggsittning', 'Wall sit', 'Jägarvila'],
   'goblet-squat': ['Gobletknäböj', 'Knäböj med vikt framför bröstet'],
   'kettlebell-deadlift': ['Marklyft med kettlebell', 'Kettlebellmarklyft'],
   'dumbbell-rdl': ['Rumänskt marklyft med hantlar', 'Hantel-RDL'],

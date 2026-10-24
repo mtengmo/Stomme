@@ -51,7 +51,18 @@ export type ExerciseId =
   | 'seated-knee-flexion'
   | 'band-knee-extension'
   | 'band-hip-extension'
-  | 'balance-clock';
+  | 'balance-clock'
+  | 'push-up'
+  | 'pull-up'
+  | 'chin-up'
+  | 'back-extension'
+  | 'parallel-dip'
+  | 'lying-leg-raise'
+  | 'burpee'
+  | 'plank'
+  | 'squat-jump'
+  | 'jumping-lunge'
+  | 'mountain-climber';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
@@ -97,7 +108,9 @@ export type EquipmentChoice =
   | 'chair'
   | 'support'
   | 'step'
-  | 'band';
+  | 'band'
+  | 'pull-up-bar'
+  | 'dip-bars';
 export interface WeightInventoryItem {
   type: 'dumbbell' | 'kettlebell';
   /** Weight of one implement, in kg. */

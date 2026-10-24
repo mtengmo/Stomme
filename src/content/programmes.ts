@@ -40,6 +40,8 @@ export const equipmentChoices: Record<EquipmentChoice, string> = {
   step: 'Träningssteg',
 
   band: 'Träningsband',
+  'pull-up-bar': 'Fast monterad chinsstång',
+  'dip-bars': 'Stabil dipsställning',
 };
 
 export const defaultEquipment: EquipmentChoice[] = [

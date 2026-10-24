@@ -1,5 +1,6 @@
 import type { ExerciseId } from '../domain/types';
 import { additionalFigures } from './additionalPoses';
+import { bodyweightFigures } from './bodyweightPoses';
 import type { Pt } from './lerp';
 import { type PhysioFigureId, physioFigures } from './physioPoses';
 import { rehabFigures } from './rehabPoses';
@@ -46,13 +47,15 @@ export type Prop =
   | { type: 'chair'; x: number; y: number; w: number }
   | { type: 'step'; x: number; y: number; w: number }
   | { type: 'wall'; x: number }
-  | { type: 'mat'; x1: number; x2: number };
+  | { type: 'mat'; x1: number; x2: number }
+  | { type: 'pull-up-bar'; x1: number; x2: number; y: number }
+  | { type: 'dip-bars'; x: number; y: number; w: number };
 
 export interface FigureSpec {
   start: Pose;
   end: Pose;
   middle?: Pose;
-  motion?: 'controlled' | 'ballistic' | 'hold';
+  motion?: 'controlled' | 'ballistic' | 'hold' | 'sequence';
   props: Prop[];
   held?: { kind: 'dumbbell' | 'kettlebell'; hands: ('hR' | 'hL')[] };
   /** A band between two points (replaces the default hand-ankle-hand band). */
@@ -100,6 +103,7 @@ function pose(
 }
 
 const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
+  ...bodyweightFigures,
   ...additionalFigures,
   ...rehabFigures,
   'goblet-chair-squat': {

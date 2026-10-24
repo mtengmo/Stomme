@@ -27,6 +27,22 @@ export function FloorLine() {
 
 export function PropShape({ prop }: { prop: Prop }) {
   switch (prop.type) {
+    case 'pull-up-bar':
+      return (
+        <path
+          d={`M${prop.x1} ${prop.y + 12}V${prop.y}H${prop.x2}V${prop.y + 12}`}
+          {...PROP}
+          stroke="var(--equipment)"
+        />
+      );
+    case 'dip-bars':
+      return (
+        <g {...PROP} stroke="var(--equipment)">
+          <path
+            d={`M${prop.x} ${FLOOR_Y}V${prop.y}h${prop.w}v${FLOOR_Y - prop.y}M${prop.x - 10} ${FLOOR_Y}V${prop.y - 3}h${prop.w}`}
+          />
+        </g>
+      );
     case 'chair': {
       const { x, y, w } = prop;
       return (

@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { bodyweightDetails, isBodyweightAddition } from './bodyweightExercises';
 import { exerciseList, exercises } from './exercises';
 
 export type Purpose = 'general' | 'knee' | 'running';
@@ -10,7 +11,9 @@ export type EquipmentType =
   | 'support'
   | 'step'
   | 'chair'
-  | 'band';
+  | 'band'
+  | 'pull-up-bar'
+  | 'dip-bars';
 export const purposeLabels: Record<Purpose, string> = {
   general: 'Allmän styrka',
   knee: 'Knäfokus',
@@ -29,6 +32,8 @@ export const equipmentLabels: Record<EquipmentType, string> = {
   step: 'Steg',
   chair: 'Stol',
   band: 'Gummiband',
+  'pull-up-bar': 'Chinsstång',
+  'dip-bars': 'Dipsställning',
 };
 export interface EquipmentRequirement {
   type: EquipmentType;
@@ -121,7 +126,7 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'forward-lunge': 'Benstyrka och inbromsning av ett steg framåt.',
 };
 type VariantSeed = [EquipmentType, number, number[], string, EquipmentType?];
-const variantSeeds: Record<ExerciseId, VariantSeed[]> = {
+const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'goblet-chair-squat': [
     [
       'bodyweight',
@@ -880,7 +885,10 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
 export const exerciseMetadata = Object.fromEntries(
   exerciseList.map((exercise) => {
     const id = exercise.id;
-    const [technicalLevel, technicalReason] = technical[id] ?? [
+    const added = isBodyweightAddition(id) ? bodyweightDetails[id] : undefined;
+    const [technicalLevel, technicalReason] = (added
+      ? ([added.level, added.reason] as const)
+      : technical[id]) ?? [
       'basic',
       'Lugn, avgränsad rörelse med en tydlig utgångsposition.',
     ];
@@ -898,7 +906,20 @@ export const exerciseMetadata = Object.fromEntries(
       purposes.knee =
         'Ingår som rörelse i AAOS knäkonditionering; övningsval och dos behöver anpassas med behandlare.';
     if (runningReasons[id]) purposes.running = runningReasons[id];
-    const variants = variantSeeds[id].map(
+    const seeds: VariantSeed[] = added
+      ? [
+          [
+            'bodyweight',
+            1,
+            [0],
+            added.equipment === 'bodyweight'
+              ? 'Utan extra vikt. Följ stegen nedan.'
+              : `Använd ${equipmentLabels[added.equipment].toLocaleLowerCase('sv')} avsedd för kroppsvikt.`,
+            added.equipment === 'bodyweight' ? undefined : added.equipment,
+          ],
+        ]
+      : (variantSeeds[id] ?? []);
+    const variants = seeds.map(
       ([type, count, loadIndices, cue, support]): ExerciseVariant => ({
         id: type,
         label: `${type === 'bodyweight' ? 'Kroppsvikt' : type === 'dumbbell' ? `${count} ${count === 1 ? 'hantel' : 'hantlar'}` : type === 'kettlebell' ? `${count} ${count === 1 ? 'kettlebell' : 'kettlebells'}` : equipmentLabels[type]}${support ? ` + ${equipmentLabels[support].toLocaleLowerCase('sv')}` : ''}`,
@@ -928,8 +949,19 @@ export const exerciseMetadata = Object.fromEntries(
           : 'strength',
       purposes,
       variants,
-      sources: sourceFor(id),
-      reviewedAt: '2026-10-20',
+      sources: added
+        ? [
+            {
+              title: exercise.name,
+              publisher: added.publisher,
+              url: added.source,
+              note:
+                added.note +
+                ' Appens startdos är ett redaktionellt förslag, inte en individuell ordination.',
+            },
+          ]
+        : sourceFor(id),
+      reviewedAt: added ? '2026-10-24' : '2026-10-20',
       sidePolicy: exercise.perSide ? 'choose-side' : 'both',
     };
     if (page && exercise.unit === 'reps' && id !== 'single-leg-calf-raise')
@@ -947,6 +979,8 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'single-leg-hip-thrust')
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
+    if (id === 'jumping-lunge' || id === 'mountain-climber')
+      metadata.sidePolicy = 'alternating';
     return [id, metadata];
   }),
 ) as Record<ExerciseId, ExerciseMetadata>;
