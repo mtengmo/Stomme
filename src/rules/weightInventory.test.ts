@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { TrainingPreferences } from '../domain/types';
-import { availableWeights } from './weightInventory';
+import {
+  availableWeights,
+  startingWeight,
+  weightLabel,
+} from './weightInventory';
 
 const preferences: TrainingPreferences = {
   programId: 'running',
@@ -14,6 +19,28 @@ const preferences: TrainingPreferences = {
 };
 
 describe('owned weight choices', () => {
+  it('starts from owned weights and describes the number of implements', () => {
+    const variant = exerciseMetadata['goblet-squat'].variants.find(
+      (item) => item.id === 'kettlebell',
+    );
+    if (!variant) throw new Error('Missing kettlebell variant');
+    expect(startingWeight(preferences, variant)).toBe(16);
+    expect(startingWeight({ ...preferences, weights: [] }, variant)).toBe(0);
+    expect(weightLabel(16, variant)).toBe('1 × 16 kg');
+    expect(weightLabel(0, variant)).toBe('Ange vikten du använder');
+    expect(
+      weightLabel(5, {
+        ...variant,
+        equipment: [{ type: 'bodyweight', count: 1 }],
+      }),
+    ).toBe('5 kg totalt');
+    expect(
+      weightLabel(10, {
+        ...variant,
+        equipment: [{ type: 'dumbbell', count: 2 }],
+      }),
+    ).toBe('2 × 5 kg · totalt 10 kg');
+  });
   it('converts per-implement weights to honest total loads', () => {
     expect(availableWeights(preferences, 'dumbbell', 2)).toEqual([
       { totalKg: 10, label: '2 × 5 kg · totalt 10 kg' },

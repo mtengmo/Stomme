@@ -7,6 +7,7 @@ import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import { formatClock } from '../../lib/format';
 import { useTimedHold } from '../../lib/useTimedHold';
 import type { SetStep } from '../../rules/sessionPlan';
+import { weightLabel as describeWeight } from '../../rules/weightInventory';
 import { Button } from '../../ui/Button';
 import { Stepper } from '../../ui/Stepper';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
@@ -89,7 +90,7 @@ export function SetScreen({
   const metadata = exerciseMetadata[exercise.id];
   const weightLabel =
     weightKg !== undefined
-      ? `${weightKg} kg totalt`
+      ? describeWeight(weightKg, presentation.variant)
       : load?.kg === 0
         ? 'Kroppsvikt'
         : load?.label;
@@ -287,6 +288,8 @@ export function SetScreen({
                 />
                 <span className="text-base font-normal text-ink-soft">
                   {presentation.variant.label} · samma redskap som i passplanen
+                  {' · '}
+                  {describeWeight(weightKg, presentation.variant)}
                 </span>
               </label>
             ) : loadLadder.length > 1 && load ? (

@@ -9,6 +9,7 @@ import type {
 } from '../domain/types';
 import { daysBetween } from '../lib/dates';
 import { equipmentFits } from './equipment';
+import { variantWeights } from './weightInventory';
 
 /** Keep each direction's history separate and restore only available variants. */
 export function trainingPlanSuggestion(
@@ -16,12 +17,19 @@ export function trainingPlanSuggestion(
   preferences: TrainingPreferences,
   sessions: readonly Session[],
   logs: readonly SetLog[],
+  variantId?: string,
 ): PlannedExercise {
   const previous = sessions
     .filter(
       (session) =>
         session.programId === preferences.programId &&
         session.status === 'completed' &&
+        (!variantId ||
+          session.plan.some(
+            (item) =>
+              item.exerciseId === plan.exerciseId &&
+              item.variantId === variantId,
+          )) &&
         session.plan.some((item) => item.exerciseId === plan.exerciseId),
     )
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt))[0];
@@ -39,7 +47,79 @@ export function trainingPlanSuggestion(
           'Tidigare utrustningsvariant finns inte bland dina val. Nytt startförslag; kontrollera antal och vikt.',
       };
   }
-  return trainingSuggestion(plan, previous, logs);
+  const suggestion = trainingSuggestion(plan, previous, logs);
+  const variant = exerciseMetadata[plan.exerciseId].variants.find(
+    (item) => item.id === suggestion.variantId,
+  );
+  if (!variant) return suggestion;
+  const choices = variantWeights(preferences, variant);
+  if (
+    choices.length &&
+    suggestion.weightKg > 0 &&
+    !choices.some((item) => item.totalKg === suggestion.weightKg)
+  ) {
+    return {
+      ...suggestion,
+      target:
+        logs
+          .filter(
+            (item) =>
+              item.sessionId === previous?.id &&
+              item.exerciseId === plan.exerciseId,
+          )
+          .at(-1)?.amount ?? plan.target,
+      explanation: `Senast använd vikt (${suggestion.weightKg} kg) finns inte bland dina registrerade vikter. Välj tillgänglig vikt eller ange vikten du använder idag. Ingen automatisk ökning.`,
+    };
+  }
+  // A heavier load is an explicit choice: never silently jump to a user's next kettlebell.
+  const next = choices.find((item) => item.totalKg > suggestion.weightKg);
+  const ex = exercises[plan.exerciseId];
+  const previousLogs = logs.filter(
+    (item) =>
+      item.sessionId === previous?.id && item.exerciseId === plan.exerciseId,
+  );
+  const complete =
+    previousPlan &&
+    !previous?.feedback[plan.exerciseId]?.skipped &&
+    Array.from({ length: previousPlan.sets }, (_, i) => i + 1).every(
+      (setNumber) =>
+        (
+          previousPlan.sides ?? (ex.perSide ? ['right', 'left'] : ['both'])
+        ).every((side) =>
+          previousLogs.some(
+            (item) =>
+              item.setNumber === setNumber &&
+              item.side === side &&
+              item.amount >= ex.range.max &&
+              item.weightKg === suggestion.weightKg &&
+              item.loadIndex === suggestion.loadIndex,
+          ),
+        ),
+    );
+  if (
+    previous &&
+    complete &&
+    next &&
+    suggestion.target >= ex.range.max &&
+    ex.unit === 'reps' &&
+    previous.programId !== 'rehab' &&
+    previous.feedback[plan.exerciseId]?.effort === 'easy' &&
+    previous.checkins?.after?.feeling === 'good' &&
+    !Object.values(previous.checkins).some((item) => item?.symptoms) &&
+    !Object.values(previous.feedback).some((item) => item?.symptoms) &&
+    logs
+      .filter(
+        (item) =>
+          item.sessionId === previous.id && item.exerciseId === plan.exerciseId,
+      )
+      .every((item) => item.amount >= ex.range.max)
+  ) {
+    return {
+      ...suggestion,
+      explanation: `${suggestion.explanation} Nästa registrerade vikt är ${next.label}. Viktökning väljer du själv; kontrollera antal repetitioner innan du startar.`,
+    };
+  }
+  return suggestion;
 }
 
 /** General strength uses its own transparent policy, without knee-specific thresholds. */

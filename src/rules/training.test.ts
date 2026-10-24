@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { exercises } from '../content/exercises';
 import type {
   PlannedExercise,
   Session,
@@ -73,6 +74,122 @@ function logs(id = 'previous', amount = 8): SetLog[] {
 }
 
 describe('programme-specific progression', () => {
+  it('keeps an unknown draft variant reviewable and does not invent history for an unowned starting load', () => {
+    const unknown = { ...plan, variantId: 'old-variant' };
+    expect(trainingPlanSuggestion(unknown, preferences, [], []).variantId).toBe(
+      'old-variant',
+    );
+    const result = trainingPlanSuggestion(
+      plan,
+      { ...preferences, weights: [{ type: 'dumbbell', kg: 5, count: 1 }] },
+      [],
+      [],
+    );
+    expect(result).toMatchObject({ weightKg: 7.5, target: plan.target });
+    expect(result.explanation).toMatch(/finns inte/);
+  });
+
+  it.each(['single-leg-rdl', 'goblet-squat'] as const)(
+    'requires all legacy sides and an after answer before suggesting a heavier %s',
+    (exerciseId) => {
+      const ex = exercises[exerciseId];
+      const legacyPlan = {
+        ...plan,
+        exerciseId,
+        sides: undefined,
+        target: ex.range.max,
+      };
+      const previous = session({
+        plan: [legacyPlan],
+        checkins: undefined,
+        feedback: { [exerciseId]: { effort: 'easy' } },
+      });
+      const sides = ex.perSide
+        ? (['right', 'left'] as const)
+        : (['both'] as const);
+      const first = logs()[0];
+      if (!first) throw new Error('Missing set fixture');
+      const records = [1, 2].flatMap((setNumber) =>
+        sides.map((side) => ({
+          ...first,
+          id: `${setNumber}-${side}`,
+          exerciseId,
+          setNumber,
+          side,
+          amount: ex.range.max,
+        })),
+      );
+      const owned: TrainingPreferences = {
+        ...preferences,
+        weights: [
+          { type: 'dumbbell', kg: 7.5, count: 1 },
+          { type: 'dumbbell', kg: 10, count: 1 },
+        ],
+      };
+      const result = trainingPlanSuggestion(
+        legacyPlan,
+        owned,
+        [previous],
+        records,
+      );
+      expect(result.weightKg).toBe(7.5);
+      expect(result.explanation).not.toMatch(/Nästa registrerade/);
+    },
+  );
+  it('restores the requested equipment variant rather than the latest different variant', () => {
+    const bodyweight = session({
+      id: 'newer',
+      startedAt: '2026-10-21T08:00:00Z',
+      plan: [{ ...plan, variantId: 'bodyweight', weightKg: 0, loadIndex: 0 }],
+    });
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [session(), bodyweight],
+        logs(),
+        'dumbbell',
+      ).weightKg,
+    ).toBe(7.5);
+  });
+
+  it('keeps a borrowed weight visible and holds progression when it is not owned', () => {
+    const result = trainingPlanSuggestion(
+      plan,
+      { ...preferences, weights: [{ type: 'dumbbell', kg: 5, count: 1 }] },
+      [session()],
+      logs(),
+    );
+    expect(result).toMatchObject({ weightKg: 7.5, target: 8 });
+    expect(result.explanation).toMatch(/finns inte/);
+  });
+
+  it('offers only an owned next load after complete easy sets at the rep ceiling, without applying it', () => {
+    const ceiling = exercises[plan.exerciseId].range.max;
+    const owned: TrainingPreferences = {
+      ...preferences,
+      weights: [
+        { type: 'dumbbell' as const, kg: 7.5, count: 1 },
+        { type: 'dumbbell' as const, kg: 10, count: 1 },
+      ],
+    };
+    const previous = session({ plan: [{ ...plan, target: ceiling }] });
+    const result = trainingPlanSuggestion(
+      plan,
+      owned,
+      [previous],
+      logs('previous', ceiling),
+    );
+    expect(result.weightKg).toBe(7.5);
+    expect(result.explanation).toMatch(/Nästa registrerade vikt är 1 × 10 kg/);
+    const incomplete = trainingPlanSuggestion(
+      plan,
+      owned,
+      [previous],
+      logs('previous', ceiling).slice(0, 1),
+    );
+    expect(incomplete.explanation).not.toMatch(/Nästa registrerade/);
+  });
   it('proposes one repetition after complete easy sets and an explicitly good symptom-free after answer', () => {
     const suggestion = trainingSuggestion(plan, session(), logs());
     expect(suggestion).toMatchObject({

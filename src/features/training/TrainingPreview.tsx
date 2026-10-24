@@ -61,7 +61,11 @@ import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
-import { availableWeights } from '../../rules/weightInventory';
+import {
+  availableWeights,
+  startingWeight,
+  weightLabel,
+} from '../../rules/weightInventory';
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
@@ -105,7 +109,7 @@ function basePlan(
 
     loadIndex,
 
-    weightKg: exercise.loadLadder[loadIndex]?.kg ?? 0,
+    weightKg: variant ? startingWeight(preferences, variant) : 0,
 
     restSec: 60,
 
@@ -242,7 +246,12 @@ function PreviewEditor({
       return structuredClone(customWorkout.plan);
     if (customWorkout)
       return customWorkout.exerciseIds.map((exerciseId) =>
-        basePlan(exerciseId, preferences),
+        trainingPlanSuggestion(
+          basePlan(exerciseId, preferences),
+          preferences,
+          sessions,
+          logs,
+        ),
       );
     return defaultPlan(preferences, id, sessions, logs, savedPlans);
   });
@@ -931,40 +940,54 @@ function PreviewEditor({
                                       weighted.count,
                                     )
                                   : [];
-                                return choices.length ? (
+                                return (
                                   <>
-                                    <datalist id={`weights-${exercise.id}`}>
-                                      {choices.map((choice) => (
-                                        <option
-                                          key={choice.label}
-                                          value={choice.totalKg}
-                                        >
-                                          {choice.label}
-                                        </option>
-                                      ))}
-                                    </datalist>
-                                    <span className="font-normal text-ink-soft">
-                                      Tillgängligt:{' '}
-                                      {choices
-                                        .map((choice) => choice.label)
-                                        .join(', ')}
-                                    </span>
-                                    {item.weightKg > 0 &&
-                                    !choices.some(
-                                      (choice) =>
-                                        choice.totalKg === item.weightKg,
-                                    ) ? (
+                                    {variant ? (
                                       <span className="font-normal text-ink-soft">
-                                        {item.weightKg} kg finns inte bland dina
-                                        registrerade vikter. Välj en av dem
-                                        eller skriv vikten du använder idag,
-                                        till exempel om du tränar på gym eller
-                                        lånar utrustning. Din sparade utrustning
-                                        ändras inte.
+                                        {weightLabel(item.weightKg, variant)}
+                                      </span>
+                                    ) : null}
+                                    {choices.length ? (
+                                      <>
+                                        <datalist id={`weights-${exercise.id}`}>
+                                          {choices.map((choice) => (
+                                            <option
+                                              key={choice.label}
+                                              value={choice.totalKg}
+                                            >
+                                              {choice.label}
+                                            </option>
+                                          ))}
+                                        </datalist>
+                                        <span className="font-normal text-ink-soft">
+                                          Tillgängligt:{' '}
+                                          {choices
+                                            .map((choice) => choice.label)
+                                            .join(', ')}
+                                        </span>
+                                        {item.weightKg > 0 &&
+                                        !choices.some(
+                                          (choice) =>
+                                            choice.totalKg === item.weightKg,
+                                        ) ? (
+                                          <span className="font-normal text-ink-soft">
+                                            {item.weightKg} kg finns inte bland
+                                            dina registrerade vikter. Välj en av
+                                            dem eller skriv vikten du använder
+                                            idag, till exempel om du tränar på
+                                            gym eller lånar utrustning. Din
+                                            sparade utrustning ändras inte.
+                                          </span>
+                                        ) : null}
+                                      </>
+                                    ) : weighted ? (
+                                      <span className="font-normal text-ink-soft">
+                                        Ingen matchande vikt registrerad. Ange
+                                        vikten du använder idag.
                                       </span>
                                     ) : null}
                                   </>
-                                ) : null;
+                                );
                               })()}
                             </label>
 
@@ -996,17 +1019,31 @@ function PreviewEditor({
                                   (value) => value.id === event.target.value,
                                 );
 
-                                if (variant)
+                                if (variant) {
+                                  const next = trainingPlanSuggestion(
+                                    {
+                                      ...item,
+                                      variantId: variant.id,
+
+                                      loadIndex: variant.defaultLoadIndex,
+
+                                      weightKg: startingWeight(
+                                        preferences,
+                                        variant,
+                                      ),
+                                    },
+                                    preferences,
+                                    sessions,
+                                    logs,
+                                    variant.id,
+                                  );
                                   change(index, {
                                     variantId: variant.id,
-
-                                    loadIndex: variant.defaultLoadIndex,
-
-                                    weightKg:
-                                      exercise.loadLadder[
-                                        variant.defaultLoadIndex
-                                      ]?.kg ?? 0,
+                                    loadIndex: next.loadIndex,
+                                    weightKg: next.weightKg,
+                                    explanation: next.explanation,
                                   });
+                                }
                               }}
                               className={inputClass}
                             >
