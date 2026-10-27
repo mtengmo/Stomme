@@ -289,6 +289,15 @@ function burpee(t: number): Pose {
   return blend(frames[n] as Pose, frames[n + 1] as Pose, local);
 }
 
+/** Stand, squat, push off, fly (apex at 0.575), land into a squat, stand. */
+function squatJump(t: number): Pose {
+  if (t < 0.3) return squat(t / 0.3);
+  if (t < 0.45) return squat(1 - (t - 0.3) / 0.15);
+  if (t < 0.7) return squat(0, 30 * Math.sin((Math.PI * (t - 0.45)) / 0.25));
+  if (t < 0.85) return squat((t - 0.7) / 0.15);
+  return squat(1 - (t - 0.85) / 0.15);
+}
+
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'push-up': pushUp,
   'pull-up': (t) => pull(t, false),
@@ -298,10 +307,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'lying-leg-raise': legRaise,
   burpee,
   plank,
-  'squat-jump': (t) =>
-    t < 0.5
-      ? squat(1 - 2 * t, 30 * Math.sin(Math.PI * t))
-      : squat(2 * t - 1, 30 * Math.sin(Math.PI * t)),
+  'squat-jump': squatJump,
   'jumping-lunge': lunge,
   'mountain-climber': climber,
 };
@@ -320,7 +326,11 @@ export const bodyweightFigures = Object.fromEntries(
       start: handler(0),
       end: handler(1),
       motion:
-        id === 'plank' ? 'hold' : id === 'burpee' ? 'sequence' : 'controlled',
+        id === 'plank'
+          ? 'hold'
+          : id === 'burpee' || id === 'squat-jump'
+            ? 'sequence'
+            : 'controlled',
       props:
         id === 'pull-up' || id === 'chin-up'
           ? [{ type: 'pull-up-bar', x1: 55, x2: 145, y: 31 }]

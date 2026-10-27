@@ -624,7 +624,7 @@ function PreviewEditor({
                   return (
                     <li
                       key={exercise.id}
-                      className={`flex flex-col gap-3 border-t-2 border-edge px-3 py-4 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-surface text-ink'}`}
+                      className={`flex flex-col gap-3 border-t-2 border-edge px-3 py-4 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-[color-mix(in_srgb,var(--ink)_8%,var(--paper))] text-ink'}`}
                     >
                       <button
                         type="button"

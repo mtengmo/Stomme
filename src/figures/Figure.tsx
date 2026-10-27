@@ -462,7 +462,8 @@ export function Figure({
       elapsedMs.current = now - t0;
       setT(
         spec.motion === 'sequence'
-          ? (elapsedMs.current % 12000) / 12000
+          ? (elapsedMs.current % (exerciseId === 'squat-jump' ? 4500 : 12000)) /
+              (exerciseId === 'squat-jump' ? 4500 : 12000)
           : spec.motion === 'ballistic'
             ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
             : cycleProgress(
@@ -493,7 +494,7 @@ export function Figure({
                 'Rörelse',
                 movementPose(
                   exerciseId,
-                  exerciseId === 'squat-jump' ? 0.5 : 0.25,
+                  exerciseId === 'squat-jump' ? 0.575 : 0.25,
                 ),
               ],
             ]

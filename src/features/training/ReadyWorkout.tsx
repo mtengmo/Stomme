@@ -150,7 +150,7 @@ export function ReadyWorkout({
           return (
             <li
               key={item.exerciseId}
-              className={`flex items-start justify-between gap-3 border-t-2 border-edge px-3 py-2 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-surface text-ink'}`}
+              className={`flex items-start justify-between gap-3 border-t-2 border-edge px-3 py-2 ${index % 2 ? 'bg-upcoming text-upcoming-ink' : 'bg-[color-mix(in_srgb,var(--ink)_8%,var(--paper))] text-ink'}`}
             >
               <div className="min-w-0">
                 <Link
