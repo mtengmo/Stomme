@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { addWeight, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -15,10 +16,11 @@ for (const width of [360, 1280]) {
     });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page
-      .getByRole('button', { name: 'Bli starkare', exact: true })
-      .click();
-    await page.getByRole('checkbox', { name: 'Hantlar', exact: true }).check();
+    await quickStart(page, {
+      goal: 'general',
+      equipment: ['Hantlar'],
+      finish: 'equipment',
+    });
     await expect(
       page
         .getByRole('combobox', { name: 'Antal hantlar', exact: true })
@@ -162,12 +164,7 @@ test('personal low-back rehab requires the user to enter a dose', async ({
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page
-    .getByRole('button', { name: 'Jag har ett eget rehabprogram', exact: true })
-    .click();
-  await page
-    .getByRole('button', { name: 'Öppna mitt rehabprogram', exact: true })
-    .click();
+  await quickStart(page, { goal: 'custom' });
   await page
     .getByRole('button', { name: 'Skapa eget ländryggspass', exact: true })
     .click();
@@ -193,18 +190,18 @@ test('a favourite can replace a similar movement without growing the workout', a
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Hantlar', exact: true }).check();
-  await page.getByRole('checkbox', { name: 'Kettlebell', exact: true }).check();
-  await page
-    .getByRole('combobox', { name: 'Antal hantlar', exact: true })
-    .selectOption('2');
-  await page
-    .getByRole('combobox', { name: 'Träningsvana', exact: true })
-    .selectOption('some');
-  await page
-    .getByRole('button', { name: 'Visa mitt pass', exact: true })
-    .click();
+  await quickStart(page, {
+    goal: 'general',
+    equipment: ['Hantlar', 'Kettlebell'],
+    onEquipment: async (p) => {
+      await p
+        .getByRole('combobox', { name: 'Antal hantlar', exact: true })
+        .selectOption('2');
+      await addWeight(p, { type: 'dumbbell', count: 2, kg: 8 });
+      await addWeight(p, { type: 'kettlebell', count: 1, kg: 12 });
+    },
+    level: 'some',
+  });
   await expect(
     page.getByRole('heading', { name: 'Pass A', exact: true }),
   ).toBeVisible();

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { completeSets, keepFirstExercises } from './flow';
+import { completeSets, keepFirstExercises, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -12,15 +12,7 @@ for (const width of [360, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page
-      .getByRole('button', { name: 'Styrka för löpning', exact: true })
-      .click();
-    await page
-      .getByRole('combobox', { name: 'Träningsvana', exact: true })
-      .selectOption('some');
-    await page
-      .getByRole('button', { name: 'Visa mitt pass', exact: true })
-      .click();
+    await quickStart(page, { goal: 'running', level: 'some' });
     await page
       .getByRole('button', { name: 'Anpassa passet', exact: true })
       .click();
@@ -155,10 +147,7 @@ test('the add-exercise picker narrows by body region and lists primary matches f
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Visa mitt pass', exact: true })
-    .click();
+  await quickStart(page, { goal: 'general' });
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
@@ -191,10 +180,7 @@ test('a removed exercise can be restored and a deferred after answer can be give
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Visa mitt pass', exact: true })
-    .click();
+  await quickStart(page, { goal: 'general' });
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();

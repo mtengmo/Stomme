@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { bodyRegions } from '../../content/muscles';
 import {
   equipmentChoices,
   experienceLabels,
@@ -16,6 +17,7 @@ import {
   saveTrainingPreferences,
 } from '../../db/training';
 import type {
+  BodyRegionId,
   EquipmentChoice,
   ProgramId,
   RehabFocus,
@@ -51,6 +53,9 @@ export function TrainingSetup({
   const [experience, setExperience] = useState<
     TrainingPreferences['experience']
   >(current?.experience ?? 'new');
+  const [bodyParts, setBodyParts] = useState<BodyRegionId[]>(
+    current?.bodyParts ?? [],
+  );
   const [rehabFocus, setRehabFocus] = useState<RehabFocus>(
     current?.rehabFocus ?? 'custom',
   );
@@ -131,6 +136,34 @@ export function TrainingSetup({
           </select>
         </label>
       ) : null}
+      {programId === 'general' ? (
+        <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
+          <legend className="mb-1 text-xl font-bold">Fokus</legend>
+          <p className="m-0 text-base text-ink-soft">
+            Välj kroppsdelar att fokusera på. Ingen vald betyder hela kroppen.
+          </p>
+          {bodyRegions.map((region) => (
+            <label
+              key={region.id}
+              className="flex min-h-12 items-center gap-3 text-base"
+            >
+              <input
+                type="checkbox"
+                checked={bodyParts.includes(region.id)}
+                onChange={(event) =>
+                  setBodyParts((values) =>
+                    event.target.checked
+                      ? [...new Set([...values, region.id])]
+                      : values.filter((value) => value !== region.id),
+                  )
+                }
+                className="size-6"
+              />
+              {region.label}
+            </label>
+          ))}
+        </fieldset>
+      ) : null}
       {programId === 'rehab' ? (
         <>
           <label className="flex flex-col gap-2 text-lg font-bold">
@@ -202,7 +235,12 @@ export function TrainingSetup({
             await saveTrainingPreferences(getDb(), {
               programId,
               equipment: [...new Set(['bodyweight' as const, ...equipment])],
-              experience,
+              experience: programId === 'rehab' ? 'new' : experience,
+              // Weights and focus are kept; setup only changes what it shows.
+              ...(current?.weights ? { weights: current.weights } : {}),
+              ...(programId === 'general' && bodyParts.length
+                ? { bodyParts }
+                : {}),
               ...(programId === 'rehab' ? { rehabFocus, rehabSide } : {}),
             });
             onSaved();

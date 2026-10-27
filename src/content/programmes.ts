@@ -4,6 +4,7 @@ import type {
   RehabFocus,
   TrainingPreferences,
 } from '../domain/types';
+import { bodyRegions } from './muscles';
 
 export const experienceLabels: Record<
   TrainingPreferences['experience'],
@@ -73,6 +74,12 @@ export function isTrainingPreferences(
       ['custom', 'knee', 'knee-physio'].includes(v.rehabFocus)) &&
     (v.rehabSide === undefined ||
       ['right', 'left', 'both'].includes(v.rehabSide)) &&
+    (v.bodyParts === undefined ||
+      (Array.isArray(v.bodyParts) &&
+        v.bodyParts.length >= 1 &&
+        v.bodyParts.length <= 6 &&
+        new Set(v.bodyParts).size === v.bodyParts.length &&
+        v.bodyParts.every((part) => bodyRegions.some((r) => r.id === part)))) &&
     (v.weights === undefined ||
       (Array.isArray(v.weights) &&
         v.weights.length <= 20 &&

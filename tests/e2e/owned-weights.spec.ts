@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({ storageState: FRESH_STATE });
@@ -7,14 +8,12 @@ for (const width of [360, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page
-      .getByRole('button', { name: 'Bli starkare', exact: true })
-      .click();
-    await page.getByRole('checkbox', { name: 'Hantlar', exact: true }).check();
-    await page
-      .getByRole('checkbox', { name: 'Kettlebell', exact: true })
-      .check();
-    await page.getByText('Ange vikterna du äger', { exact: true }).click();
+    await quickStart(page, {
+      goal: 'general',
+      equipment: ['Hantlar', 'Kettlebell'],
+      finish: 'equipment',
+    });
+    // The weights panel opens by itself once dumbbells or kettlebells are ticked.
     await page
       .getByRole('button', { name: 'Lägg till vikt', exact: true })
       .click();
@@ -30,6 +29,8 @@ for (const width of [360, 1280]) {
       .last()
       .selectOption('1');
     await page.getByLabel('Kg per redskap', { exact: true }).last().fill('16');
+    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
     await page
       .getByRole('button', { name: 'Visa mitt pass', exact: true })
       .click();

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { quickStart } from './flow';
 
 for (const width of [360, 1280]) {
   test(`new bodyweight exercises can be browsed and saved (${width})`, async ({
@@ -6,12 +7,7 @@ for (const width of [360, 1280]) {
   }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
-    await page
-      .getByRole('button', { name: 'Bli starkare', exact: true })
-      .click();
-    await page
-      .getByRole('button', { name: 'Visa mitt pass', exact: true })
-      .click();
+    await quickStart(page, { goal: 'general' });
     await expect(
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();

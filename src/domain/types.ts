@@ -117,6 +117,14 @@ export interface WeightInventoryItem {
   kg: number;
   count: 1 | 2;
 }
+/** Broad body regions a general programme can be focused on. */
+export type BodyRegionId =
+  | 'legs'
+  | 'core'
+  | 'back'
+  | 'chest'
+  | 'shoulders'
+  | 'arms';
 export interface TrainingPreferences {
   programId: ProgramId;
   equipment: EquipmentChoice[];
@@ -125,6 +133,8 @@ export interface TrainingPreferences {
   weights?: WeightInventoryItem[];
   rehabFocus?: RehabFocus;
   rehabSide?: 'right' | 'left' | 'both';
+  /** General programme only: focus the first sessions on these regions. Absent means whole body. */
+  bodyParts?: BodyRegionId[];
 }
 export interface SymptomReport {
   area: string;

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { removeAllExercises } from './flow';
+import { addWeight, quickStart, removeAllExercises } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -69,11 +69,14 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Kettlebell', exact: true }).check();
-  await page
-    .getByRole('button', { name: 'Visa mitt pass', exact: true })
-    .click();
+  await quickStart(page, {
+    goal: 'general',
+    equipment: ['Kettlebell'],
+    onEquipment: async (p) => {
+      await addWeight(p, { type: 'kettlebell', count: 1, kg: 4 });
+      await addWeight(p, { type: 'kettlebell', count: 1, kg: 16 });
+    },
+  });
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
@@ -84,15 +87,15 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   await page
     .getByRole('button', { name: 'Lägg till i passet', exact: true })
     .click();
-  await expect(page.getByLabel('Total vikt (kg)', { exact: true })).toHaveValue(
-    '4',
-  );
-  await page.getByLabel('Total vikt (kg)', { exact: true }).fill('16');
+  await expect(
+    page.getByRole('spinbutton', { name: /^Total vikt \(kg\)/ }),
+  ).toHaveValue('4');
+  await page.getByRole('spinbutton', { name: /^Total vikt \(kg\)/ }).fill('16');
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
   await expect(page).toHaveURL(/#\/session\//);
   await page.reload();
-  await expect(page.getByText(/16 kg totalt/).first()).toBeVisible();
+  await expect(page.getByText(/1 × 16 kg/).first()).toBeVisible();
   await expect(
     page.locator('.session-movement [data-equipment="kettlebell"] circle'),
   ).toHaveCount(1);

@@ -120,6 +120,8 @@ try {
       });
       // First use: pick a focus, then the prepared workout opens.
       await page.getByRole('button', { name: 'Bli starkare' }).click();
+      await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+      await page.getByRole('button', { name: 'Nästa', exact: true }).click();
       await page.getByRole('button', { name: 'Visa mitt pass' }).click();
       await page.getByRole('button', { name: 'Börja passet' }).waitFor();
       await page.goto(url);

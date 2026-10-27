@@ -613,10 +613,13 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Höftfällning med vikten nära benen och kontrollerad rygg.',
   ],
-  'supported-row': ['practiced', 'Håll överkroppen stilla medan armen drar.'],
+  'supported-row': [
+    'basic',
+    'Stödd hand och stilla överkropp; armen drar med kontroll.',
+  ],
   'floor-press': [
-    'practiced',
-    'Två vikter måste sättas upp och sänkas kontrollerat.',
+    'basic',
+    'Ryggen ligger mot golvet och golvet stoppar rörelsen i botten.',
   ],
   'shoulder-press': [
     'practiced',

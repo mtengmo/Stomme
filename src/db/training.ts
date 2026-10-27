@@ -55,9 +55,11 @@ export async function saveTrainingPreferences(
   if (
     !isTrainingPreferences(preferences) ||
     new Set(preferences.equipment).size !== preferences.equipment.length ||
-    preferences.equipment.length > 9
+    preferences.equipment.length > 11
   )
-    throw new Error('Invalid training preferences');
+    throw new Error(
+      'Ogiltiga träningsval. Kontrollera utrustningen och försök igen.',
+    );
 
   await db.transaction(
     'rw',

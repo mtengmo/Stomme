@@ -29,6 +29,7 @@ async function openPhysio(
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     }),
   );
+  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   // Chair and support are ticked by default; the band is the user's choice.
   expect(
     (
@@ -83,11 +84,60 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
     name: 'Börja passet',
   }) as HTMLButtonElement;
   expect(start.disabled).toBe(true);
-  expect(start.getAttribute('aria-describedby')).toBe(
-    screen.getByRole('checkbox', { name: CONFIRM }).closest('label')?.id,
+  expect(start.getAttribute('aria-describedby')).toBe('start-blocked');
+  expect(document.getElementById('start-blocked')?.textContent).toContain(
+    'Kryssa i rutan ovan',
   );
   await user.click(screen.getByRole('checkbox', { name: CONFIRM }));
   expect(start.disabled).toBe(false);
+  expect(document.getElementById('start-blocked')?.textContent).toBe('');
+});
+
+it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Knärehab' }));
+  await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(
+    (screen.getByRole('button', { name: 'Börja passet' }) as HTMLButtonElement)
+      .disabled,
+  ).toBe(false);
+  await user.click(screen.getByRole('button', { name: 'Anpassa passet' }));
+  expect(screen.getByText(/Vid skada eller efter operation/)).toBeTruthy();
+  expect(screen.getByText(/Ingen automatisk ökning/)).toBeTruthy();
+  expect(
+    (
+      screen.getByRole('button', {
+        name: 'Spara rehabprogram',
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(false);
+  expect(screen.queryByText(/rekommenderad/i)).toBeNull();
+});
+
+it('asks no extra tick for a custom rehab programme and lets the user save', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole('button', {
+      name: 'Jag har ett eget rehabprogram',
+    }),
+  );
+  await user.click(
+    screen.getByRole('button', { name: 'Öppna mitt rehabprogram' }),
+  );
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(
+    screen.getByText(
+      /Lägg till övningarna och doseringen från din fysioterapeut/,
+    ),
+  ).toBeTruthy();
+  expect(document.getElementById('start-blocked')?.textContent).toContain(
+    'Lägg till minst en övning.',
+  );
 });
 
 it('shows added exercises compactly in the collection and no technique level', async () => {
@@ -352,6 +402,8 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     }),
   );
+  expect(screen.getByText(/Träningsband ingår inte i Egenvikt/)).toBeTruthy();
+  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   expect(
     screen.getByText('Träningsband behövs för övning 5 och 7.'),
   ).toBeTruthy();

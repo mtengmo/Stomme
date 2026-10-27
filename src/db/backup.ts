@@ -330,6 +330,12 @@ const metaSchema = z.discriminatedUnion('key', [
       experience: z.enum(['new', 'some', 'regular']),
       rehabFocus: z.enum(['custom', 'knee', 'knee-physio']).optional(),
       rehabSide: z.enum(['right', 'left', 'both']).optional(),
+      bodyParts: z
+        .array(z.enum(['legs', 'core', 'back', 'chest', 'shoulders', 'arms']))
+        .min(1)
+        .max(6)
+        .refine((parts) => new Set(parts).size === parts.length)
+        .optional(),
       equipment: z
         .array(
           z.enum([

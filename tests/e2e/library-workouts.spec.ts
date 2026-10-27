@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { addWeight, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -12,15 +13,11 @@ for (const width of [360, 1280]) {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page
-      .getByRole('button', { name: 'Bli starkare', exact: true })
-      .click();
-    await page
-      .getByRole('checkbox', { name: 'Kettlebell', exact: true })
-      .check();
-    await page
-      .getByRole('button', { name: 'Visa mitt pass', exact: true })
-      .click();
+    await quickStart(page, {
+      goal: 'general',
+      equipment: ['Kettlebell'],
+      onEquipment: (p) => addWeight(p, { type: 'kettlebell', count: 1, kg: 8 }),
+    });
     await expect(
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();

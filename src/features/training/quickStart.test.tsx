@@ -15,26 +15,46 @@ beforeEach(async () => {
   await setMeta(getDb(), 'onboarding', { acceptedAt: '2026-10-20T08:00:00Z' });
 });
 afterEach(cleanup);
-it('asks only about focus first and persists only explicitly selected equipment through Back', async () => {
+const next = (user: ReturnType<typeof userEvent.setup>) =>
+  user.click(screen.getByRole('button', { name: 'Nästa' }));
+
+it('asks one question per screen and keeps answers through Back', async () => {
   const user = userEvent.setup();
   render(<App />);
   await screen.findByRole('heading', { name: 'Vad vill du träna?' });
   expect(screen.queryByRole('checkbox')).toBeNull();
   expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
   expect(screen.getByRole('navigation', { name: 'Huvudmeny' })).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Knärehab' })).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Träna knäna' })).toBeNull();
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
-  expect(screen.queryByRole('checkbox', { checked: true })).toBeNull();
+  const heading = screen.getByRole('heading', {
+    name: 'Egenvikt eller utrustning?',
+  });
+  expect(document.activeElement).toBe(heading);
   expect(
-    screen
-      .getByRole('combobox', { name: 'Träningsvana' })
-      .closest('details')
-      ?.hasAttribute('open'),
-  ).toBe(undefined);
+    (
+      screen.getByRole('radio', {
+        name: 'Egenvikt – kroppen, en stol och en vägg',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(true);
+  expect(screen.queryByRole('checkbox', { name: 'Hantlar' })).toBeNull();
+  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
   await user.selectOptions(
     screen.getByRole('combobox', { name: 'Antal hantlar' }),
     '2',
   );
+  // Owning dumbbells opens the weights panel by itself.
+  expect(
+    screen.getByText('Ange vikterna du äger').closest('details')?.open,
+  ).toBe(true);
+  await next(user);
+  expect(screen.getByRole('group', { name: 'Träningsvana' })).toBeTruthy();
+  expect(screen.queryByText(/rekommenderad/i)).toBeNull();
+  await user.click(screen.getByRole('radio', { name: /Viss vana/ }));
+  await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
   expect(
@@ -44,16 +64,87 @@ it('asks only about focus first and persists only explicitly selected equipment 
       }) as HTMLSelectElement
     ).value,
   ).toBe('2');
+  await next(user);
+  expect(
+    (screen.getByRole('radio', { name: /Viss vana/ }) as HTMLInputElement)
+      .checked,
+  ).toBe(true);
+  await next(user);
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
   await screen.findByRole('button', { name: 'Börja passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
     equipment: ['bodyweight', 'dumbbell-2'],
-    experience: 'new',
+    experience: 'some',
   });
-  expect(screen.queryByLabelText('Set', { exact: true })).toBeNull();
   expect(await getDb().sessions.count()).toBe(0);
 });
+
+it('saves bodyweight as body, chair and wall and a chosen body-part focus', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  await next(user);
+  await next(user);
+  await user.click(screen.getByRole('radio', { name: 'Välj kroppsdelar' }));
+  const button = screen.getByRole('button', {
+    name: 'Visa mitt pass',
+  }) as HTMLButtonElement;
+  expect(button.disabled).toBe(true);
+  expect(screen.getByText(/Välj minst en kroppsdel/)).toBeTruthy();
+  // Shoulders have no exercise with bodyweight only at the beginner level.
+  expect(
+    (screen.getByRole('checkbox', { name: 'Axlar' }) as HTMLInputElement)
+      .disabled,
+  ).toBe(true);
+  await user.click(screen.getByRole('checkbox', { name: 'Ben & säte' }));
+  expect(button.disabled).toBe(false);
+  await user.click(button);
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect((await getDb().meta.get('training'))?.value).toMatchObject({
+    programId: 'general',
+    equipment: ['bodyweight', 'chair', 'support'],
+    experience: 'new',
+    bodyParts: ['legs'],
+  });
+  expect(screen.getByText(/Fokus: Ben & säte/)).toBeTruthy();
+});
+
+it('always saves new for rehab and asks for the side at the equipment step', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Knärehab' }));
+  expect(screen.queryByRole('button', { name: 'Nästa' })).toBeNull();
+  await user.selectOptions(
+    screen.getByRole('combobox', { name: /Arbetande sida/ }),
+    'right',
+  );
+  await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect((await getDb().meta.get('training'))?.value).toMatchObject({
+    programId: 'rehab',
+    experience: 'new',
+    rehabFocus: 'knee',
+    rehabSide: 'right',
+  });
+});
+
+it('falls back to defaults for an old or damaged draft', async () => {
+  sessionStorage.setItem(
+    'stomme.quickstart.draft',
+    JSON.stringify({ goal: 'general', equipment: ['laser'], experience: 7 }),
+  );
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Egenvikt eller utrustning?' });
+  expect(
+    (
+      screen.getByRole('radio', {
+        name: 'Egenvikt – kroppen, en stol och en vägg',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(true);
+});
+
 it('preserves a returning user’s active session and makes resuming the primary action', async () => {
   await setMeta(getDb(), 'training', {
     programId: 'running',
@@ -121,6 +212,7 @@ it('keeps first-use answers when leaving through the nav and coming back', async
   const user = userEvent.setup();
   render(<App />);
   await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
   await user.click(screen.getByRole('link', { name: 'Inställningar' }));
   await screen.findByRole('heading', { name: 'Inställningar' });

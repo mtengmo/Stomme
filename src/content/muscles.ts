@@ -1,4 +1,4 @@
-import type { ExerciseId } from '../domain/types';
+import type { BodyRegionId, ExerciseId } from '../domain/types';
 import { bodyweightDetails } from './bodyweightExercises';
 
 export type MuscleGroupId =
@@ -39,7 +39,7 @@ export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
  * above as training targets, not as diagnoses or suitability advice.
  */
 export const bodyRegions: {
-  id: string;
+  id: BodyRegionId;
   label: string;
   muscles: readonly MuscleGroupId[];
 }[] = [

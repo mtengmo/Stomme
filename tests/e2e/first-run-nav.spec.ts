@@ -1,4 +1,5 @@
 import { devices, expect, test } from '@playwright/test';
+import { quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({
@@ -42,8 +43,11 @@ test('nav tabs are keyboard reachable and the answers survive leaving', async ({
   page,
 }) => {
   await accept(page);
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Hantlar' }).check();
+  await quickStart(page, {
+    goal: 'general',
+    equipment: ['Hantlar'],
+    finish: 'equipment',
+  });
   const tab = page.getByRole('link', { name: 'Historik' });
   await tab.focus();
   await expect(tab).toBeFocused();
@@ -61,8 +65,7 @@ test('workout preview shows the nav above the start bar; the session hides it', 
   page,
 }) => {
   await accept(page);
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page.getByRole('button', { name: 'Visa mitt pass' }).click();
+  await quickStart(page, { goal: 'general' });
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: 'Huvudmeny' });
   await expect(nav).toBeVisible();
@@ -79,8 +82,7 @@ test('preview edits and the Besvär choice survive leaving via the nav; starting
   page,
 }) => {
   await accept(page);
-  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await page.getByRole('button', { name: 'Visa mitt pass' }).click();
+  await quickStart(page, { goal: 'general' });
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();

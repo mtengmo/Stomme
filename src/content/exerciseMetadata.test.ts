@@ -156,3 +156,14 @@ describe('expanded library integrity', () => {
     ).not.toMatch(/hantel|kettlebell|vikt nära bröstet/i);
   });
 });
+
+describe('technical levels used by the starting level', () => {
+  it('rates supported row and the dumbbell floor press as basic', () => {
+    for (const id of ['supported-row', 'floor-press'] as const)
+      for (const variant of exerciseMetadata[id].variants)
+        expect(variant.technicalLevel).toBe('basic');
+    expect(
+      exerciseMetadata['kettlebell-floor-press'].variants[0]?.technicalLevel,
+    ).toBe('practiced');
+  });
+});

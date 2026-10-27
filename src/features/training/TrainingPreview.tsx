@@ -31,7 +31,6 @@ import {
   experienceLabels,
   isTrainingPreferences,
   rehabGroup,
-  rehabGroupOf,
   trainingName,
 } from '../../content/programmes';
 import {
@@ -59,7 +58,6 @@ import type {
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
-import { initialTrainingRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import {
   availableWeights,
@@ -69,10 +67,14 @@ import {
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
+import { basePlan, defaultPlan, painLogsShowPain } from './defaultPlan';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
 import { RehabCollection } from './RehabCollection';
+import { startProblems } from './startReadiness';
 import { inputClass } from './TrainingHome';
+
+export { defaultPlan };
 
 function available(preferences: TrainingPreferences) {
   return exerciseList.filter((exercise) =>
@@ -80,99 +82,6 @@ function available(preferences: TrainingPreferences) {
       equipmentFits(variant.equipment, preferences.equipment),
     ),
   );
-}
-
-function basePlan(
-  id: ExerciseId,
-
-  preferences: TrainingPreferences,
-): PlannedExercise {
-  const exercise = exercises[id];
-
-  const variant = exerciseMetadata[id].variants.find((item) =>
-    equipmentFits(item.equipment, preferences.equipment),
-  );
-
-  const loadIndex = variant?.defaultLoadIndex ?? 0;
-
-  return {
-    exerciseId: id,
-
-    sets:
-      preferences.programId === 'rehab'
-        ? 0
-        : preferences.experience === 'regular'
-          ? 3
-          : 2,
-
-    target: preferences.programId === 'rehab' ? 0 : exercise.range.start,
-
-    loadIndex,
-
-    weightKg: variant ? startingWeight(preferences, variant) : 0,
-
-    restSec: 60,
-
-    reason: 'first_time',
-
-    variantId: variant?.id,
-
-    sides: exercise.perSide
-      ? preferences.programId === 'rehab' &&
-        preferences.rehabSide &&
-        preferences.rehabSide !== 'both'
-        ? [preferences.rehabSide]
-        : ['right', 'left']
-      : ['both'],
-  };
-}
-
-/** Saved plan, then the last session for the focus, then the group's starter values. */
-export function defaultPlan(
-  preferences: TrainingPreferences,
-
-  id: TemplateId,
-
-  sessions: Session[],
-
-  logs: SetLog[],
-
-  savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
-): PlannedExercise[] {
-  if (preferences.programId === 'rehab') {
-    const focus = preferences.rehabFocus ?? 'custom';
-
-    const saved = savedPlans?.[focus];
-
-    if (saved && validateTrainingPlan(saved)) return structuredClone(saved);
-
-    const prior = sessions.find(
-      (session) =>
-        session.programId === 'rehab' &&
-        (session.rehabFocus ?? 'custom') === focus,
-    );
-
-    return (
-      prior?.plan.map((plan) => ({
-        ...plan,
-
-        explanation: 'Din senast använda dosering. Kontrollera före start.',
-      })) ??
-      (rehabGroupOf(focus) === 'aaos'
-        ? kneeConditioningPlan(preferences)
-        : rehabGroupOf(focus) === 'physio'
-          ? physioKneePlan(preferences)
-          : [])
-    );
-  }
-
-  const ids = initialTrainingRoster(preferences, id);
-
-  return ids.map((exerciseId) => {
-    const plan = basePlan(exerciseId, preferences);
-
-    return trainingPlanSuggestion(plan, preferences, sessions, logs);
-  });
 }
 
 function PreviewEditor({
@@ -185,6 +94,7 @@ function PreviewEditor({
   logs,
 
   savedPlans,
+  painReported,
   customWorkout,
   preparationId,
 }: {
@@ -197,13 +107,14 @@ function PreviewEditor({
   logs: SetLog[];
 
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>;
+  painReported?: boolean;
   customWorkout?: CustomWorkout;
   preparationId?: string;
 }) {
   const [, navigate] = useLocation();
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
 
   const [plan, setPlan] = useState(() => {
     try {
@@ -253,7 +164,14 @@ function PreviewEditor({
           logs,
         ),
       );
-    return defaultPlan(preferences, id, sessions, logs, savedPlans);
+    return defaultPlan(
+      preferences,
+      id,
+      sessions,
+      logs,
+      savedPlans,
+      painReported,
+    );
   });
 
   useEffect(() => {
@@ -298,26 +216,8 @@ function PreviewEditor({
       /* Editing remains available without storage. */
     }
   }, [draftKey, editing]);
-  const ready =
-    validateTrainingPlan(plan) &&
-    !(
-      preferences.programId === 'rehab' &&
-      rehabGroup(preferences) === 'aaos' &&
-      plan.some(
-        (item) =>
-          !kneeRehabExercises.some(
-            (exercise) => exercise.id === item.exerciseId,
-          ),
-      )
-    ) &&
-    plan.every((item) => {
-      const variant = exerciseMetadata[item.exerciseId].variants.find(
-        (v) => v.id === item.variantId,
-      );
-      return (
-        !!variant && equipmentFits(variant.equipment, preferences.equipment)
-      );
-    });
+  const problems = startProblems(plan, preferences);
+  const ready = problems.length === 0;
 
   const [busy, setBusy] = useState(false);
 
@@ -394,30 +294,34 @@ function PreviewEditor({
   const physioPaper =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'physio';
   const confirmBox = (
-    <label
-      id={physioPaper ? 'start-blocked' : undefined}
-      className="flex min-h-12 items-start gap-3 text-base leading-snug"
-    >
+    <label className="flex min-h-12 items-start gap-3 text-base leading-snug">
       <input
         type="checkbox"
         checked={confirmed}
         onChange={(event) => setConfirmed(event.target.checked)}
         className="size-6 shrink-0"
       />
-      {rehabGroup(preferences) === 'aaos'
-        ? 'Jag har kontrollerat övningar, sida och antal för det här passet.'
-        : rehabGroup(preferences) === 'physio'
-          ? `${physioKneeConfirmLabel.slice(0, -1)} (krävs för att börja).`
-          : 'Jag har kontrollerat övningar, sida och dosering mot mitt överenskomna rehabprogram.'}
+      {`${physioKneeConfirmLabel.slice(0, -1)} (krävs för att börja).`}
     </label>
   );
+  // Only the physio's paper needs a tick; every edit clears it again.
+  const needsTick = physioPaper && !confirmed;
+  const reasons = [
+    ...problems,
+    ...(needsTick
+      ? ['Kryssa i rutan ovan när du har jämfört med ditt papper.']
+      : []),
+  ];
+  const blockedText = reasons.length
+    ? `${reasons[0]}${reasons.length > 1 ? ` (+${reasons.length - 1} till)` : ''}${problems.length && !editing ? ' Ändra under Anpassa passet.' : ''}`
+    : '';
   const change = (index: number, patch: Partial<PlannedExercise>) =>
     updatePlan((current) =>
       current.map((item, n) => (n === index ? { ...item, ...patch } : item)),
     );
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-[calc(var(--app-nav-height)+8rem)]">
+    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-[calc(var(--app-nav-height)+12rem)]">
       <Link
         href="/"
         className="flex min-h-12 items-center text-base font-bold underline"
@@ -439,6 +343,19 @@ function PreviewEditor({
         {preferences.programId !== 'rehab' ? (
           <p className="m-0 mt-1 text-base text-ink-soft">
             Träningsvana: {experienceLabels[preferences.experience]}
+          </p>
+        ) : null}
+        {preferences.programId === 'general' &&
+        preferences.bodyParts?.length ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Fokus:{' '}
+            {preferences.bodyParts
+              .map(
+                (part) =>
+                  bodyRegions.find((region) => region.id === part)?.label ??
+                  part,
+              )
+              .join(', ')}
           </p>
         ) : null}
         {customWorkout ? (
@@ -1331,15 +1248,7 @@ function PreviewEditor({
               }}
             />
           )}
-          {!ready ? (
-            <p role="alert" className="m-0 text-base font-bold">
-              Kontrollera övningar, antal och tillgänglig utrustning under
-              Anpassa passet.
-            </p>
-          ) : null}
-          {preferences.programId === 'rehab' && !physioPaper ? (
-            confirmBox
-          ) : preferences.programId === 'rehab' ? null : (
+          {preferences.programId === 'rehab' ? null : (
             <details className="border-y-2 border-edge py-2">
               <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
                 Besvär eller något att anpassa idag?
@@ -1365,11 +1274,7 @@ function PreviewEditor({
             <>
               <Button
                 variant="secondary"
-                disabled={
-                  busy ||
-                  !ready ||
-                  (preferences.programId === 'rehab' && !confirmed)
-                }
+                disabled={busy || !ready}
                 onClick={async () => {
                   setBusy(true);
                   setError('');
@@ -1426,7 +1331,10 @@ function PreviewEditor({
             <>
               <Button
                 variant="secondary"
-                disabled={busy || !confirmed || !plan.length}
+                aria-describedby={
+                  !ready || needsTick ? 'start-blocked' : undefined
+                }
+                disabled={busy || !ready || needsTick}
                 onClick={async () => {
                   setBusy(true);
                   setError('');
@@ -1469,16 +1377,17 @@ function PreviewEditor({
           <div className="fixed inset-x-0 bottom-[var(--app-nav-height)] z-10 border-t-2 border-ink bg-surface-tint px-5 py-2">
             <div className="mx-auto flex w-full max-w-xl flex-col gap-1">
               {physioPaper ? confirmBox : null}
+              <p
+                id="start-blocked"
+                aria-live="polite"
+                className="m-0 text-base font-bold empty:hidden"
+              >
+                {blockedText}
+              </p>
               <Button
                 className={physioPaper ? 'min-h-14!' : ''}
-                aria-describedby={
-                  physioPaper && !confirmed ? 'start-blocked' : undefined
-                }
-                disabled={
-                  busy ||
-                  !ready ||
-                  (preferences.programId === 'rehab' && !confirmed)
-                }
+                aria-describedby={reasons.length ? 'start-blocked' : undefined}
+                disabled={busy || reasons.length > 0}
                 onClick={async () => {
                   setBusy(true);
 
@@ -1548,6 +1457,7 @@ export function TrainingPreview({ id }: { id: string }) {
       sessions,
 
       logs: await getDb().setLogs.toArray(),
+      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
       preparationId,
 
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
@@ -1583,7 +1493,7 @@ export function TrainingPreview({ id }: { id: string }) {
     );
   return (
     <PreviewEditor
-      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}`}
+      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}`}
       customWorkout={customWorkout}
       preparationId={data.preparationId}
       preferences={data.preferences}
@@ -1591,6 +1501,7 @@ export function TrainingPreview({ id }: { id: string }) {
       sessions={data.sessions}
       logs={data.logs}
       savedPlans={data.savedPlans}
+      painReported={data.painReported}
     />
   );
 }

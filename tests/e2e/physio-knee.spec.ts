@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { quickStart } from './flow';
 
 const CONFIRM =
   'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten (krävs för att börja).';
@@ -10,17 +11,13 @@ async function openProgramme(
   withBand = true,
 ) {
   await page.goto('/');
-  await page
-    .getByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    })
-    .click();
-  if (withBand)
-    await page.getByRole('checkbox', { name: 'Träningsband' }).check();
-  await page
-    .getByRole('combobox', { name: 'Arbetande sida' })
-    .selectOption('left');
-  await page.getByRole('button', { name: 'Visa mitt program' }).click();
+  // The band needs the Utrustning choice; chair and wall are ticked there by default.
+  await quickStart(page, {
+    goal: 'physio',
+    mode: 'equipment',
+    equipment: withBand ? ['Träningsband'] : [],
+    side: 'left',
+  });
   await expect(
     page.getByRole('button', { name: 'Börja passet', exact: true }),
   ).toBeVisible();

@@ -401,6 +401,10 @@ async function theme(scheme: 'light' | 'dark') {
     .getByRole('button', { name: 'Bli starkare', exact: true })
     .click();
   await audit(training, tag('quick equipment selection'));
+  await training.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await audit(training, tag('quick level selection'));
+  await training.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await audit(training, tag('quick focus selection'));
   await training
     .getByRole('button', { name: 'Visa mitt pass', exact: true })
     .click();
@@ -533,9 +537,6 @@ async function theme(scheme: 'light' | 'dark') {
   await training.getByLabel('Set', { exact: true }).fill('1');
   await training.getByLabel('Repetitioner per sida', { exact: true }).fill('3');
   await training
-    .getByRole('checkbox', { name: /Jag har kontrollerat/ })
-    .check();
-  await training
     .getByRole('button', { name: 'Spara rehabprogram', exact: true })
     .click();
   await audit(training, tag('saved knee programme editor'));
@@ -556,6 +557,7 @@ async function theme(scheme: 'light' | 'dark') {
   await physio
     .getByRole('button', { name: /Jag har fysioterapeutens knäprogram/ })
     .click();
+  await physio.getByRole('radio', { name: 'Utrustning', exact: true }).check();
   await physio.getByRole('checkbox', { name: 'Träningsband' }).check();
   await audit(physio, tag('physio setup'));
   await physio.getByRole('button', { name: 'Visa mitt program' }).click();

@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
+import 'fake-indexeddb/auto';
 import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { afterEach, expect, it, vi } from 'vitest';
+import { getDb } from '../../db/db';
 import { TrainingSetup } from './TrainingHome';
 
 afterEach(cleanup);
@@ -29,4 +32,38 @@ it('explains the moving foot under the side picker for the knee programme only',
     />,
   );
   expect(screen.queryByText(NOTE)).toBeNull();
+});
+
+it('keeps owned weights and the body-part focus when setup is saved', async () => {
+  await getDb().delete();
+  await getDb().open();
+  const weights = [{ type: 'dumbbell' as const, kg: 8, count: 2 as const }];
+  const user = userEvent.setup();
+  render(
+    <TrainingSetup
+      current={{
+        programId: 'general',
+        equipment: ['bodyweight', 'dumbbell-2'],
+        experience: 'some',
+        weights,
+        bodyParts: ['legs'],
+      }}
+      onSaved={() => {}}
+    />,
+  );
+  expect(
+    (screen.getByRole('checkbox', { name: 'Ben & säte' }) as HTMLInputElement)
+      .checked,
+  ).toBe(true);
+  await user.click(screen.getByRole('checkbox', { name: 'Bål' }));
+  await user.click(
+    screen.getByRole('button', { name: 'Spara träningsinriktning' }),
+  );
+  await vi.waitFor(async () =>
+    expect((await getDb().meta.get('training'))?.value).toMatchObject({
+      weights,
+      bodyParts: ['legs', 'core'],
+      experience: 'some',
+    }),
+  );
 });

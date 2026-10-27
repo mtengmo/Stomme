@@ -242,3 +242,103 @@ export async function removeAllExercises(page: Page): Promise<void> {
     await remove.click();
   }
 }
+
+export type QuickStartGoal =
+  | 'general'
+  | 'running'
+  | 'knee'
+  | 'physio'
+  | 'custom';
+const GOAL_BUTTON: Record<QuickStartGoal, string> = {
+  general: 'Bli starkare',
+  running: 'Styrka för löpning',
+  knee: 'Knärehab',
+  physio: 'Jag har fysioterapeutens knäprogram (9 övningar)',
+  custom: 'Jag har ett eget rehabprogram',
+};
+const LEVEL_LABEL = {
+  new: /Ny eller på väg tillbaka/,
+  some: /Viss vana/,
+  regular: /Tränar regelbundet/,
+};
+const FINISH: Record<QuickStartGoal, string> = {
+  general: 'Visa mitt pass',
+  running: 'Visa mitt pass',
+  knee: 'Visa mitt pass',
+  physio: 'Visa mitt program',
+  custom: 'Öppna mitt rehabprogram',
+};
+
+/**
+ * Walks the one-question-per-screen first-use flow. Egenvikt is the default;
+ * `equipment` lists checkbox labels to tick under Utrustning, and `onEquipment`
+ * runs on that screen (counts, weights). `finish: false` stops before the last button.
+ */
+export async function quickStart(
+  page: Page,
+  options: {
+    goal: QuickStartGoal;
+    mode?: 'bodyweight' | 'equipment';
+    equipment?: string[];
+    onEquipment?: (page: Page) => Promise<void>;
+    level?: keyof typeof LEVEL_LABEL;
+    focus?: string[];
+    side?: 'both' | 'right' | 'left';
+    /** 'equipment' stops after the equipment screen; false stops on the last screen. */
+    finish?: boolean | 'equipment';
+  },
+): Promise<void> {
+  const { goal, equipment = [], level, focus, side, finish = true } = options;
+  const mode = options.mode ?? (equipment.length ? 'equipment' : 'bodyweight');
+  await page
+    .getByRole('button', { name: GOAL_BUTTON[goal], exact: true })
+    .click();
+  if (mode === 'equipment') {
+    await page.getByRole('radio', { name: 'Utrustning', exact: true }).check();
+    for (const label of equipment)
+      await page.getByRole('checkbox', { name: label, exact: true }).check();
+  }
+  await options.onEquipment?.(page);
+  if (finish === 'equipment') return;
+  if (side)
+    await page
+      .getByRole('combobox', { name: /Arbetande sida/ })
+      .selectOption(side);
+  if (goal === 'general' || goal === 'running') {
+    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+    if (level)
+      await page.getByRole('radio', { name: LEVEL_LABEL[level] }).check();
+    if (goal === 'general') {
+      await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+      if (focus?.length) {
+        await page.getByRole('radio', { name: 'Välj kroppsdelar' }).check();
+        for (const part of focus)
+          await page.getByRole('checkbox', { name: part, exact: true }).check();
+      }
+    }
+  }
+  if (finish)
+    await page.getByRole('button', { name: FINISH[goal], exact: true }).click();
+}
+
+/** Registers one owned weight on the equipment screen (the weights panel is open by itself). */
+export async function addWeight(
+  page: Page,
+  weight: { type: 'dumbbell' | 'kettlebell'; count: 1 | 2; kg: number },
+): Promise<void> {
+  await page
+    .getByRole('button', { name: 'Lägg till vikt', exact: true })
+    .click();
+  await page
+    .getByRole('combobox', { name: 'Redskap', exact: true })
+    .last()
+    .selectOption(weight.type);
+  await page
+    .getByRole('combobox', { name: 'Antal', exact: true })
+    .last()
+    .selectOption(String(weight.count));
+  await page
+    .getByLabel('Kg per redskap', { exact: true })
+    .last()
+    .fill(String(weight.kg));
+}
