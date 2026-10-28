@@ -29,10 +29,7 @@ export function weightLabel(totalKg: number, variant: ExerciseVariant): string {
   const tool = variant.equipment.find(
     (item) => item.type === 'dumbbell' || item.type === 'kettlebell',
   );
-  if (!tool)
-    return totalKg === 0
-      ? 'Kroppsvikt / utan extern vikt'
-      : `${totalKg} kg totalt`;
+  if (!tool) return totalKg === 0 ? 'Kroppsvikt' : `${totalKg} kg totalt`;
   if (totalKg <= 0) return 'Ange vikten du använder';
   const perItem = Math.round((totalKg / tool.count) * 1000) / 1000;
   return `${tool.count} × ${perItem} kg${tool.count > 1 ? ` · totalt ${totalKg} kg` : ''}`;

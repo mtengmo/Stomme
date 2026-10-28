@@ -37,6 +37,7 @@ test('Räkna själv brings back Klar set and is remembered', async ({ page }) =>
   await openPreview(page, true);
   await page.getByRole('button', { name: 'Starta pass' }).click();
   await answerPain(page, 0);
+  await page.getByText('Ändra set', { exact: true }).click();
   await page.getByRole('switch', { name: 'Räkna själv: av' }).click();
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
   const prefs = await page.evaluate(() =>

@@ -19,6 +19,8 @@ export const purposeLabels: Record<Purpose, string> = {
   knee: 'Knäfokus',
   running: 'Löpstyrka',
 };
+/** The filler cue of plain bodyweight exercises; screens leave it out. */
+export const genericBodyweightCue = 'Utan extra vikt. Följ stegen nedan.';
 export const technicalLevelLabels: Record<TechnicalLevel, string> = {
   basic: 'Grundläggande',
   practiced: 'Viss vana',
@@ -916,7 +918,7 @@ export const exerciseMetadata = Object.fromEntries(
             1,
             [0],
             added.equipment === 'bodyweight'
-              ? 'Utan extra vikt. Följ stegen nedan.'
+              ? genericBodyweightCue
               : `Använd ${equipmentLabels[added.equipment].toLocaleLowerCase('sv')} avsedd för kroppsvikt.`,
             added.equipment === 'bodyweight' ? undefined : added.equipment,
           ],

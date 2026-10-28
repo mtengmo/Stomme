@@ -23,7 +23,6 @@ export function FigureSlot({
   /** Rep counter clock: the figure follows it instead of its own timer. */
   progress?: () => number | undefined;
 }) {
-  const [paused, setPaused] = useState(false);
   const [view, setView] = useState<'side' | 'front'>('side');
   const reduced = usePrefersReducedMotion();
   return (
@@ -38,7 +37,7 @@ export function FigureSlot({
             .equipment
         }
         working={side === 'both' ? null : side}
-        paused={paused || reduced}
+        paused={reduced}
         stillOnly
         view={view}
         progress={progress}
@@ -55,20 +54,11 @@ export function FigureSlot({
           {view === 'side' ? 'Framifrån' : 'Från sidan'}
         </button>
       ) : null}
-      {!reduced ? (
-        <button
-          type="button"
-          aria-pressed={paused}
-          onClick={() => setPaused((value) => !value)}
-          className="absolute top-0 right-0 min-h-12 bg-paper px-2 text-base font-bold underline"
-        >
-          {paused ? 'Spela rörelsen' : 'Pausa rörelsen'}
-        </button>
-      ) : (
+      {reduced ? (
         <span className="sr-only">
           Rörelsen visas stilla med minskad rörelse.
         </span>
-      )}
+      ) : null}
     </section>
   );
 }

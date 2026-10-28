@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
-import { exerciseMetadata } from '../../content/exerciseMetadata';
+import {
+  exerciseMetadata,
+  genericBodyweightCue,
+} from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
@@ -450,29 +453,11 @@ export function SetScreen({
           </p>
         </div>
       )}
-      {tempo ? (
-        <div>
-          {!seenIntro && counter.phase === 'idle' && autoCount ? (
-            <p className="m-0 text-base">
-              Nytt: appen räknar repetitionerna åt dig. Välj Räkna själv om du
-              hellre räknar och trycker Klar set.
-            </p>
-          ) : null}
-          {counter.phase === 'idle' || !autoCount ? (
-            <button
-              type="button"
-              role="switch"
-              aria-checked={manual}
-              onClick={() => {
-                saveManual(exercise.id, !manual);
-                setManual(!manual);
-              }}
-              className="min-h-12 text-base font-bold underline"
-            >
-              Räkna själv: {manual ? 'på' : 'av'}
-            </button>
-          ) : null}
-        </div>
+      {tempo && !seenIntro && counter.phase === 'idle' && autoCount ? (
+        <p className="m-0 text-base">
+          Nytt: appen räknar repetitionerna åt dig. Du kan räkna själv under
+          Ändra set.
+        </p>
       ) : null}
       <FigureSlot
         exerciseId={exercise.id}
@@ -482,7 +467,9 @@ export function SetScreen({
         progress={autoCount && counterLive ? counter.progress : undefined}
       />
       <div>
-        <p className="m-0 text-base font-bold">{presentation.cue}</p>
+        {presentation.cue !== genericBodyweightCue ? (
+          <p className="m-0 text-base font-bold">{presentation.cue}</p>
+        ) : null}
         {metadata.holdSeconds ? (
           <p className="m-0 text-base">
             Håll varje repetition i {metadata.holdSeconds} sekunder.
@@ -517,7 +504,7 @@ export function SetScreen({
               onInc={() => changeAmount(amount + range.step)}
               decDisabled={amount <= range.step}
             />
-            {weightKg !== undefined ? (
+            {weightKg !== undefined && takesWeight ? (
               <label className="flex flex-col gap-2 text-lg font-bold">
                 Total vikt (kg)
                 <input
@@ -526,7 +513,6 @@ export function SetScreen({
                   max="500"
                   step="0.5"
                   value={weightKg}
-                  disabled={!takesWeight}
                   onChange={(event) => setWeightKg(Number(event.target.value))}
                   className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-xl text-ink"
                 />
@@ -534,9 +520,6 @@ export function SetScreen({
                   {presentation.variant.label} · samma redskap som i passplanen
                   {' · '}
                   {describeWeight(weightKg, presentation.variant)}
-                  {takesWeight
-                    ? ''
-                    : ' · ingen extra vikt kan anges för kroppsvikt'}
                 </span>
               </label>
             ) : loadLadder.length > 1 && load ? (
@@ -558,6 +541,21 @@ export function SetScreen({
                 {load.kg === 0 ? 'Kroppsvikt' : load.label}
               </p>
             ) : null}
+            {tempo ? (
+              <button
+                type="button"
+                role="switch"
+                aria-checked={manual}
+                disabled={counterLive}
+                onClick={() => {
+                  saveManual(exercise.id, !manual);
+                  setManual(!manual);
+                }}
+                className="min-h-12 self-start text-base font-bold underline disabled:no-underline disabled:opacity-60"
+              >
+                Räkna själv: {manual ? 'på' : 'av'}
+              </button>
+            ) : null}
           </section>
         </details>
         <details name="workout-options">
@@ -570,7 +568,8 @@ export function SetScreen({
           >
             <p className="m-0 text-base font-bold">
               {weightLabel}
-              {presentation.variant.label !== weightLabel
+              {presentation.variant.label !== weightLabel &&
+              metadata.variants.length > 1
                 ? ` · ${presentation.variant.label}`
                 : ''}
             </p>

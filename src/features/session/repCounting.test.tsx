@@ -115,7 +115,10 @@ describe('rep counting on the set screen', () => {
 
   it('Räkna själv switches to the manual Klar set and is remembered', () => {
     const { onDone } = show('goblet-squat');
-    act(() => screen.getByRole('switch', { name: 'Räkna själv: av' }).click());
+    act(() => {
+      screen.getByText('Ändra set').click();
+      screen.getByRole('switch', { name: 'Räkna själv: av' }).click();
+    });
     expect(
       JSON.parse(window.localStorage.getItem('stomme.repCount.prefs') ?? '{}')
         .manual['goblet-squat'],
@@ -191,7 +194,7 @@ describe('pace buttons', () => {
 });
 
 describe('body weight exercises', () => {
-  it('lock the total weight at zero so a set can always be saved', () => {
+  it('show no weight box, so a set can always be saved', () => {
     const onDone = vi.fn();
     render(
       <SetScreen
@@ -214,8 +217,7 @@ describe('body weight exercises', () => {
       />,
     );
     act(() => screen.getByText('Ändra set').click());
-    const input = screen.getByRole('spinbutton', { name: /Total vikt/ });
-    expect((input as HTMLInputElement).disabled).toBe(true);
-    expect(screen.getByText(/ingen extra vikt kan anges/)).toBeTruthy();
+    expect(screen.queryByRole('spinbutton', { name: /Total vikt/ })).toBeNull();
+    expect(screen.queryByText(/extra vikt/)).toBeNull();
   });
 });

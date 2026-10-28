@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import {
   equipmentLabels,
   exerciseMetadata,
+  genericBodyweightCue,
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
@@ -125,7 +126,7 @@ export function ExerciseCardBody({
       ) : (
         <p className="m-0 text-base font-bold">{presentation.load.label}</p>
       )}
-      {variant.label ? (
+      {variant.label && metadata.variants.length > 1 ? (
         <p className="m-0 text-base" data-testid="selected-exercise-variant">
           Variant: {variant.label}
         </p>
@@ -257,7 +258,8 @@ export function ExerciseCardBody({
               >
                 Så gör du
               </h2>
-              {!presentation.tips.includes(presentation.cue) ? (
+              {presentation.cue !== genericBodyweightCue &&
+              !presentation.tips.includes(presentation.cue) ? (
                 <p className="my-2 text-base font-bold">{presentation.cue}</p>
               ) : null}
               {exercise.id === 'kettlebell-rack-carry' ? (
