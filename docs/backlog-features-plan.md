@@ -12,6 +12,6 @@ Each feature is checked before its own commit: types/lint, relevant logic/databa
 ## Progress
 
 - Exercise picker: complete. Types/lint, production build, 20 component tests and 17 browser scenarios passed, including 320/360/412 px light/dark checks. Visual review and interface detection passed.
-- Flexible equipment: core/API design reviewed; implementation waits for the picker commit.
+- Flexible equipment: complete. Explicit adjustable settings, physical counts and per-workout snapshots preserve home settings and old backups. All 1,389 tests passed with 100% rules branch coverage; types/lint, production build and nine browser scenarios passed. Mobile light/dark captures and interface detection reviewed.
 - Front views: pending.
 - Physiotherapist report: pending.

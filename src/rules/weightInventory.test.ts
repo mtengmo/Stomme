@@ -89,4 +89,36 @@ describe('owned weight choices', () => {
       [],
     );
   });
+
+  it('offers explicit adjustable settings for one physical matching set', () => {
+    const adjustable: TrainingPreferences = {
+      ...preferences,
+      weights: [{ type: 'dumbbell', kg: 10, count: 2 }],
+      adjustableWeights: [
+        { type: 'dumbbell', count: 2, settingsKg: [10, 5] },
+        { type: 'kettlebell', count: 1, settingsKg: [8, 12] },
+      ],
+    };
+    expect(availableWeights(adjustable, 'dumbbell', 2)).toEqual([
+      { totalKg: 10, label: '2 × 5 kg · totalt 10 kg' },
+      { totalKg: 20, label: '2 × 10 kg · totalt 20 kg' },
+    ]);
+    expect(availableWeights(adjustable, 'kettlebell', 2)).toEqual([]);
+    expect(availableWeights(adjustable, 'kettlebell', 1)).toEqual([
+      { totalKg: 8, label: '1 × 8 kg' },
+      { totalKg: 12, label: '1 × 12 kg' },
+    ]);
+  });
+
+  it('does not combine a fixed single and an adjustable single into an assumed pair', () => {
+    const singles: TrainingPreferences = {
+      ...preferences,
+      weights: [{ type: 'dumbbell', kg: 10, count: 1 }],
+      adjustableWeights: [{ type: 'dumbbell', count: 1, settingsKg: [5, 10] }],
+    };
+    expect(availableWeights(singles, 'dumbbell', 2)).toEqual([]);
+    expect(
+      availableWeights(singles, 'dumbbell', 1).map((item) => item.totalKg),
+    ).toEqual([5, 10]);
+  });
 });

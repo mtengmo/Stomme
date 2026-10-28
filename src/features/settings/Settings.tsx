@@ -14,7 +14,10 @@ import {
 import { getDb } from '../../db/db';
 import { getMeta, setMeta } from '../../db/repo';
 import { deleteAllData } from '../../db/wipe';
-import type { WeightInventoryItem } from '../../domain/types';
+import type {
+  AdjustableWeightItem,
+  WeightInventoryItem,
+} from '../../domain/types';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
 import { restoreRepPrefs } from '../../lib/repPrefs';
@@ -25,6 +28,7 @@ import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
+import { AdjustableWeightFields } from '../training/AdjustableWeightFields';
 import { WeightInventoryFields } from '../training/WeightInventoryFields';
 import { readBackupMeta } from '../week/BackupReminder';
 import { AppearancePicker } from './AppearancePicker';
@@ -87,11 +91,16 @@ function EquipmentInventorySettings() {
   const stored = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const preferences = isTrainingPreferences(stored) ? stored : undefined;
   const [items, setItems] = useState<WeightInventoryItem[]>([]);
+  const [adjustableItems, setAdjustableItems] = useState<
+    AdjustableWeightItem[]
+  >([]);
+  const [adjustableValid, setAdjustableValid] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState('');
   useEffect(() => {
     if (stored === undefined || loaded) return;
     setItems(preferences?.weights ?? []);
+    setAdjustableItems(preferences?.adjustableWeights ?? []);
     setLoaded(true);
   }, [stored, preferences, loaded]);
   if (stored === undefined) return null;
@@ -106,15 +115,31 @@ function EquipmentInventorySettings() {
           setMessage('');
         }}
       />
+      <AdjustableWeightFields
+        value={adjustableItems}
+        onChange={(next) => {
+          setAdjustableItems(next);
+          setMessage('');
+        }}
+        onValidityChange={setAdjustableValid}
+      />
       <Button
         variant="secondary"
         onClick={async () => {
           const valid = items.every((item) => item.kg > 0 && item.kg <= 100);
           if (!valid) return setMessage('Kontrollera vikterna.');
-          await setMeta(getDb(), 'training', {
+          if (!adjustableValid)
+            return setMessage('Kontrollera de justerbara vikterna.');
+          const next = {
             ...preferences,
             weights: items,
-          });
+            adjustableWeights: adjustableItems,
+          };
+          if (!isTrainingPreferences(next))
+            return setMessage(
+              'Kontrollera vikterna. Varje fast vikt och justerbart redskap får bara finnas en gång.',
+            );
+          await setMeta(getDb(), 'training', next);
           setMessage('Utrustningen är sparad.');
         }}
       >

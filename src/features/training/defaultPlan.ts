@@ -134,6 +134,7 @@ export function defaultPlan(
     if (saved && validateTrainingPlan(saved)) return structuredClone(saved);
     const prior = sessions.find(
       (session) =>
+        !session.equipmentOverride &&
         session.programId === 'rehab' &&
         (session.rehabFocus ?? 'custom') === focus,
     );

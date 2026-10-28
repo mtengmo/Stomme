@@ -4,8 +4,10 @@ import { kneeRehabExercises } from '../content/kneeRehab';
 
 import {
   isTrainingPreferences,
+  isWorkoutEquipment,
   rehabGroup,
   rehabGroupOf,
+  withWorkoutEquipment,
 } from '../content/programmes';
 
 import type {
@@ -15,6 +17,7 @@ import type {
   TemplateId,
   TrainingCheckin,
   TrainingPreferences,
+  WorkoutEquipment,
 } from '../domain/types';
 
 import { toLocalDate } from '../lib/dates';
@@ -139,9 +142,17 @@ export async function startTrainingSession(
 
   now = new Date(),
   customWorkout?: { id: string; name: string },
-  options: { workoutMode?: 'short'; fullPlan?: PlannedExercise[] } = {},
+  options: {
+    workoutMode?: 'short';
+    fullPlan?: PlannedExercise[];
+    equipmentOverride?: WorkoutEquipment;
+  } = {},
 ): Promise<Session> {
   const fullPlan = options.fullPlan;
+  const equipmentOverride = options.equipmentOverride;
+  if (equipmentOverride !== undefined && !isWorkoutEquipment(equipmentOverride))
+    throw new Error('Kontrollera övningar, antal, vikt och sidor.');
+  const effective = withWorkoutEquipment(preferences, equipmentOverride);
   const invalidShort =
     options.workoutMode === 'short'
       ? preferences.programId === 'rehab' ||
@@ -168,6 +179,7 @@ export async function startTrainingSession(
       : fullPlan !== undefined;
   if (
     !isTrainingPreferences(preferences) ||
+    !isTrainingPreferences(effective) ||
     !validateTrainingPlan(plan) ||
     invalidShort ||
     (preferences.programId === 'rehab' &&
@@ -180,9 +192,7 @@ export async function startTrainingSession(
         (value) => value.id === item.variantId,
       );
 
-      return (
-        !variant || !equipmentFits(variant.equipment, preferences.equipment)
-      );
+      return !variant || !equipmentFits(variant.equipment, effective.equipment);
     })
   )
     throw new Error('Kontrollera övningar, antal, vikt och sidor.');
@@ -213,6 +223,18 @@ export async function startTrainingSession(
           ? {
               workoutMode: 'short' as const,
               fullPlan: structuredClone(fullPlan),
+            }
+          : {}),
+
+        ...(equipmentOverride
+          ? {
+              equipmentOverride: {
+                equipment: [...equipmentOverride.equipment],
+                weights: structuredClone(equipmentOverride.weights ?? []),
+                adjustableWeights: structuredClone(
+                  equipmentOverride.adjustableWeights ?? [],
+                ),
+              },
             }
           : {}),
 

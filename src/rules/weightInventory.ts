@@ -40,14 +40,21 @@ export function availableWeights(
   type: 'dumbbell' | 'kettlebell',
   requiredCount: number,
 ): { totalKg: number; label: string }[] {
-  return (preferences.weights ?? [])
-    .filter((item) => item.type === type && item.count >= requiredCount)
-    .map((item) => ({
-      totalKg: item.kg * requiredCount,
+  const kilograms = [
+    ...(preferences.weights ?? [])
+      .filter((item) => item.type === type && item.count >= requiredCount)
+      .map((item) => item.kg),
+    ...(preferences.adjustableWeights ?? [])
+      .filter((item) => item.type === type && item.count >= requiredCount)
+      .flatMap((item) => item.settingsKg),
+  ];
+  return [...new Set(kilograms)]
+    .sort((a, b) => a - b)
+    .map((kg) => ({
+      totalKg: kg * requiredCount,
       label:
         requiredCount === 1
-          ? `1 × ${item.kg} kg`
-          : `${requiredCount} × ${item.kg} kg · totalt ${item.kg * requiredCount} kg`,
-    }))
-    .sort((a, b) => a.totalKg - b.totalKg);
+          ? `1 × ${kg} kg`
+          : `${requiredCount} × ${kg} kg · totalt ${kg * requiredCount} kg`,
+    }));
 }

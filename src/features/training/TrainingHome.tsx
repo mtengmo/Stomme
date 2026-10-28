@@ -240,6 +240,9 @@ export function TrainingSetup({
               experience: programId === 'rehab' ? 'new' : experience,
               // Weights and focus are kept; setup only changes what it shows.
               ...(current?.weights ? { weights: current.weights } : {}),
+              ...(current?.adjustableWeights
+                ? { adjustableWeights: current.adjustableWeights }
+                : {}),
               ...(programId === 'general' && bodyParts.length
                 ? { bodyParts }
                 : {}),

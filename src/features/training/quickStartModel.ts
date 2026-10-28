@@ -4,6 +4,7 @@ import {
   isTrainingPreferences,
 } from '../../content/programmes';
 import type {
+  AdjustableWeightItem,
   BodyRegionId,
   EquipmentChoice,
   TrainingPreferences,
@@ -80,6 +81,7 @@ export interface Draft {
   equipment: EquipmentChoice[];
   experience: Experience;
   weights: NonNullable<TrainingPreferences['weights']>;
+  adjustableWeights: NonNullable<TrainingPreferences['adjustableWeights']>;
   side: Side;
   focus: Focus;
   bodyParts: BodyRegionId[];
@@ -92,6 +94,7 @@ export const emptyDraft: Draft = {
   equipment: [],
   experience: 'new',
   weights: [],
+  adjustableWeights: [],
   side: 'both',
   focus: 'all',
   bodyParts: [],
@@ -125,6 +128,9 @@ export function readDraft(raw: string | null): Draft {
   const weights = Array.isArray(value.weights)
     ? (value.weights as Draft['weights'])
     : [];
+  const adjustableWeights = Array.isArray(value.adjustableWeights)
+    ? (value.adjustableWeights as AdjustableWeightItem[])
+    : [];
   const bodyParts =
     Array.isArray(value.bodyParts) &&
     new Set(value.bodyParts).size === value.bodyParts.length &&
@@ -148,6 +154,14 @@ export function readDraft(raw: string | null): Draft {
       weights,
     })
       ? weights
+      : [],
+    adjustableWeights: isTrainingPreferences({
+      programId: 'general',
+      experience: 'new',
+      equipment: [],
+      adjustableWeights,
+    })
+      ? adjustableWeights
       : [],
     side: value.side === 'right' || value.side === 'left' ? value.side : 'both',
     focus: value.focus === 'select' ? 'select' : 'all',
@@ -184,6 +198,9 @@ export function preferencesFromDraft(
     experience: rehab ? 'new' : draft.experience,
     ...((!rehab || goal === 'custom') && tools && draft.weights.length
       ? { weights: draft.weights }
+      : {}),
+    ...((!rehab || goal === 'custom') && tools && draft.adjustableWeights.length
+      ? { adjustableWeights: draft.adjustableWeights }
       : {}),
     ...(bodyParts.length ? { bodyParts } : {}),
     ...(rehab

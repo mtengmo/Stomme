@@ -100,6 +100,14 @@ describe('optional harder exercises', () => {
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
     ).toEqual([]);
   });
+  it('does not count borrowed equipment as home progression evidence', () => {
+    const data = fixture();
+    required(data.sessions[1]).equipmentOverride = {
+      equipment: ['bodyweight'],
+      weights: [],
+    };
+    expect(suggest(data)).toEqual([]);
+  });
   it.each([
     ['wall-push-up', 'knee-push-up'],
     ['knee-push-up', 'push-up'],

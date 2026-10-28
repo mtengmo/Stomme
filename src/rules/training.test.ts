@@ -196,6 +196,40 @@ describe('programme-specific progression', () => {
       ).explanation,
     ).toMatch(/Besvär/);
   });
+  it('keeps borrowed workouts out of home progression evidence while retaining their symptom signal', () => {
+    const borrowed = session({
+      equipmentOverride: {
+        equipment: ['bodyweight', 'dumbbell-1'],
+        weights: [],
+      },
+    });
+    expect(
+      trainingPlanSuggestion(plan, preferences, [borrowed], logs()).target,
+    ).toBe(plan.target);
+    const older = session({
+      id: 'older',
+      startedAt: '2026-10-19T08:00:00.000Z',
+    });
+    const newerBorrowed = session({
+      id: 'borrowed-later',
+      startedAt: '2026-10-21T08:00:00.000Z',
+      equipmentOverride: {
+        equipment: ['bodyweight', 'dumbbell-1'],
+        weights: [],
+      },
+      feedback: {
+        'single-leg-rdl': { symptoms: { area: 'Knä', side: 'left', score: 2 } },
+      },
+    });
+    const result = trainingPlanSuggestion(
+      plan,
+      preferences,
+      [newerBorrowed, older],
+      logs('older'),
+    );
+    expect(result.target).toBe(8);
+    expect(result.explanation).toMatch(/Besvär/);
+  });
   it('keeps an unknown draft variant reviewable and does not invent history for an unowned starting load', () => {
     const unknown = { ...plan, variantId: 'old-variant' };
     expect(trainingPlanSuggestion(unknown, preferences, [], []).variantId).toBe(

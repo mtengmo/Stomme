@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import { kneeRehabExercises } from '../content/kneeRehab';
-import { rehabGroupOf } from '../content/programmes';
+import { isWorkoutEquipment, rehabGroupOf } from '../content/programmes';
 import type {
   ExerciseId,
   MetaEntry,
@@ -13,6 +13,7 @@ import type {
 } from '../domain/types';
 import { isRealDate, toLocalDate } from '../lib/dates';
 import { type ShareResult, shareOrDownload } from '../lib/share';
+import { equipmentFits } from '../rules/equipment';
 import { validateCheckin } from '../rules/training';
 import { isWeeklySchedule } from '../rules/weeklySchedule';
 import type { StommeDB } from './db';
@@ -159,6 +160,63 @@ const plannedExercise = z
     }
   });
 
+const equipmentChoicesSchema = z
+  .array(
+    z.enum([
+      'bodyweight',
+      'dumbbell-1',
+      'dumbbell-2',
+      'kettlebell-1',
+      'kettlebell-2',
+      'chair',
+      'support',
+      'step',
+      'band',
+      'pull-up-bar',
+      'dip-bars',
+    ]),
+  )
+  .max(11);
+const fixedWeightsSchema = z
+  .array(
+    z.strictObject({
+      type: z.enum(['dumbbell', 'kettlebell']),
+      kg: z.number().positive().max(100),
+      count: z.union([z.literal(1), z.literal(2)]),
+    }),
+  )
+  .max(20)
+  .refine(
+    (items) =>
+      new Set(items.map((item) => `${item.type}:${item.kg}`)).size ===
+      items.length,
+  );
+const adjustableWeightsSchema = z
+  .array(
+    z.strictObject({
+      type: z.enum(['dumbbell', 'kettlebell']),
+      count: z.union([z.literal(1), z.literal(2)]),
+      settingsKg: z
+        .array(z.number().positive().max(100))
+        .min(1)
+        .max(20)
+        .refine((values) => new Set(values).size === values.length),
+    }),
+  )
+  .max(2)
+  .refine(
+    (items) => new Set(items.map((item) => item.type)).size === items.length,
+  );
+const workoutEquipmentSchema = z
+  .strictObject({
+    equipment: equipmentChoicesSchema.refine(
+      (items) => new Set(items).size === items.length,
+    ),
+    weights: fixedWeightsSchema.optional(),
+    adjustableWeights: adjustableWeightsSchema.optional(),
+  })
+  .refine(isWorkoutEquipment);
+
 const symptom = z.strictObject({
   area: z.string().trim().min(1).max(100),
   side: z.enum(['right', 'left', 'both', 'unspecified']),
@@ -184,6 +242,7 @@ const sessionSchema = z
     customWorkoutName: z.string().min(1).max(60).optional(),
     workoutMode: z.literal('short').optional(),
     fullPlan: z.array(plannedExercise).min(1).max(12).optional(),
+    equipmentOverride: workoutEquipmentSchema.optional(),
     programId: z.enum(['general', 'running', 'rehab']).optional(),
     experience: z.enum(['new', 'some', 'regular']).optional(),
     policyVersion: z.literal(1).optional(),
@@ -213,6 +272,23 @@ const sessionSchema = z
     note: z.string().max(5000).optional(),
   })
   .superRefine((session, ctx) => {
+    if (
+      session.equipmentOverride &&
+      (!session.programId ||
+        [...session.plan, ...(session.fullPlan ?? [])].some((item) => {
+          const variant = exerciseMetadata[item.exerciseId].variants.find(
+            (candidate) => candidate.id === item.variantId,
+          );
+          return (
+            !variant ||
+            !equipmentFits(
+              variant.equipment,
+              session.equipmentOverride?.equipment ?? [],
+            )
+          );
+        }))
+    )
+      ctx.addIssue({ code: 'custom', message: 'Invalid workout equipment' });
     if (
       (session.workoutMode === 'short' &&
         (session.programId === 'rehab' ||
@@ -407,38 +483,9 @@ const metaSchema = z.discriminatedUnion('key', [
         .max(6)
         .refine((parts) => new Set(parts).size === parts.length)
         .optional(),
-      equipment: z
-        .array(
-          z.enum([
-            'bodyweight',
-            'dumbbell-1',
-            'dumbbell-2',
-            'kettlebell-1',
-            'kettlebell-2',
-            'chair',
-            'support',
-            'step',
-            'band',
-            'pull-up-bar',
-            'dip-bars',
-          ]),
-        )
-        .max(11),
-      weights: z
-        .array(
-          z.strictObject({
-            type: z.enum(['dumbbell', 'kettlebell']),
-            kg: z.number().positive().max(100),
-            count: z.union([z.literal(1), z.literal(2)]),
-          }),
-        )
-        .max(20)
-        .refine(
-          (items) =>
-            new Set(items.map((item) => `${item.type}:${item.kg}`)).size ===
-            items.length,
-        )
-        .optional(),
+      equipment: equipmentChoicesSchema,
+      weights: fixedWeightsSchema.optional(),
+      adjustableWeights: adjustableWeightsSchema.optional(),
     }),
   }),
   z.strictObject({

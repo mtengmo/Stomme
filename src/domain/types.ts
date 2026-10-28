@@ -124,6 +124,19 @@ export interface WeightInventoryItem {
   kg: number;
   count: 1 | 2;
 }
+/** One adjustable set: all `count` implements can share one selected setting at a time. */
+export interface AdjustableWeightItem {
+  type: 'dumbbell' | 'kettlebell';
+  count: 1 | 2;
+  /** Available kilograms per implement; choices, not simultaneous implements. */
+  settingsKg: number[];
+}
+/** Complete equipment available for this workout, including borrowed items. */
+export interface WorkoutEquipment {
+  equipment: EquipmentChoice[];
+  weights?: WeightInventoryItem[];
+  adjustableWeights?: AdjustableWeightItem[];
+}
 /** Broad body regions a general programme can be focused on. */
 export type BodyRegionId =
   | 'legs'
@@ -138,6 +151,7 @@ export interface TrainingPreferences {
   experience: 'new' | 'some' | 'regular';
   /** Optional for backwards compatibility with type/count-only preferences. */
   weights?: WeightInventoryItem[];
+  adjustableWeights?: AdjustableWeightItem[];
   rehabFocus?: RehabFocus;
   rehabSide?: 'right' | 'left' | 'both';
   /** General programme only: focus the first sessions on these regions. Absent means whole body. */
@@ -215,6 +229,8 @@ export interface Session {
   workoutMode?: 'short';
   /** Original full plan for restoring a short preparation after reload. */
   fullPlan?: PlannedExercise[];
+  /** Equipment used for this workout; absent means the saved home selection. */
+  equipmentOverride?: WorkoutEquipment;
   /** Absent on original knee/running sessions. */
   programId?: ProgramId;
   /** Experience selected when this workout was prepared. */

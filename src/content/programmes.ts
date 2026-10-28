@@ -3,6 +3,7 @@ import type {
   ProgramId,
   RehabFocus,
   TrainingPreferences,
+  WorkoutEquipment,
 } from '../domain/types';
 import { bodyRegions } from './muscles';
 
@@ -94,12 +95,66 @@ export function isTrainingPreferences(
         ) &&
         new Set(v.weights.map((item) => `${item.type}:${item.kg}`)).size ===
           v.weights.length)) &&
+    (v.adjustableWeights === undefined ||
+      (Array.isArray(v.adjustableWeights) &&
+        v.adjustableWeights.length <= 2 &&
+        v.adjustableWeights.every(
+          (item) =>
+            !!item &&
+            (item.type === 'dumbbell' || item.type === 'kettlebell') &&
+            (item.count === 1 || item.count === 2) &&
+            Array.isArray(item.settingsKg) &&
+            item.settingsKg.length >= 1 &&
+            item.settingsKg.length <= 20 &&
+            item.settingsKg.every(
+              (kg) => Number.isFinite(kg) && kg > 0 && kg <= 100,
+            ) &&
+            new Set(item.settingsKg).size === item.settingsKg.length,
+        ) &&
+        new Set(v.adjustableWeights.map((item) => item.type)).size ===
+          v.adjustableWeights.length)) &&
     Array.isArray(v.equipment) &&
     v.equipment.every(
       (item) =>
         typeof item === 'string' && Object.hasOwn(equipmentChoices, item),
     )
   );
+}
+
+/** A workout override is a full effective selection, not a change to home settings. */
+export function isWorkoutEquipment(value: unknown): value is WorkoutEquipment {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const item = value as Record<string, unknown>;
+  return (
+    Object.keys(item).every((key) =>
+      ['equipment', 'weights', 'adjustableWeights'].includes(key),
+    ) &&
+    isTrainingPreferences({
+      programId: 'general',
+      experience: 'new',
+      equipment: item.equipment,
+      weights: item.weights,
+      adjustableWeights: item.adjustableWeights,
+    }) &&
+    Array.isArray(item.equipment) &&
+    item.equipment.length <= 11 &&
+    new Set(item.equipment).size === item.equipment.length
+  );
+}
+
+/** Returns home as-is when no override is selected; otherwise a detached effective copy. */
+export function withWorkoutEquipment(
+  home: TrainingPreferences,
+  override?: WorkoutEquipment,
+): TrainingPreferences {
+  return override
+    ? {
+        ...home,
+        equipment: [...override.equipment],
+        weights: structuredClone(override.weights ?? []),
+        adjustableWeights: structuredClone(override.adjustableWeights ?? []),
+      }
+    : home;
 }
 
 export type RehabGroup = 'custom' | 'aaos' | 'physio';

@@ -22,7 +22,8 @@ export function harderExerciseSuggestions(
     .filter(
       (session) =>
         session.programId === preferences.programId &&
-        session.workoutMode !== 'short',
+        session.workoutMode !== 'short' &&
+        !session.equipmentOverride,
     )
     .flatMap((session) =>
       session.plan

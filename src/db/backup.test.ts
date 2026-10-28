@@ -11,6 +11,7 @@ import {
   exportAll,
   importAll,
   MAX_IMPORT_BYTES,
+  parseBackup,
   serializeBackup,
 } from './backup';
 import { StommeDB } from './db';
@@ -93,6 +94,35 @@ async function valid() {
   await seed();
   return exportAll(db, new Date('2026-10-20T10:00:00Z'));
 }
+
+it('round-trips explicit adjustable settings and rejects malformed settings', async () => {
+  const backup = await valid();
+  const training = {
+    programId: 'general',
+    experience: 'new',
+    equipment: ['bodyweight', 'dumbbell-2'],
+    weights: [{ type: 'dumbbell', kg: 8, count: 2 }],
+    adjustableWeights: [{ type: 'dumbbell', count: 2, settingsKg: [5, 10] }],
+  };
+  backup.meta.push({ key: 'training', value: training });
+  expect(
+    parseBackup(serializeBackup(backup)).meta.find(
+      (entry) => entry.key === 'training',
+    )?.value,
+  ).toEqual(training);
+  if (training.adjustableWeights[0])
+    training.adjustableWeights[0].settingsKg = [5, 5];
+  expect(() => parseBackup(serializeBackup(backup))).toThrow();
+  training.adjustableWeights = [
+    { type: 'dumbbell', count: 2, settingsKg: [5, 10] },
+  ];
+  training.equipment = ['bodyweight', 'bodyweight'];
+  expect(
+    parseBackup(serializeBackup(backup)).meta.some(
+      (entry) => entry.key === 'training',
+    ),
+  ).toBe(true);
+});
 const text = (b: object) => JSON.stringify(b);
 
 async function snapshot() {

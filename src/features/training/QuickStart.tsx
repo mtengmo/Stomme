@@ -7,6 +7,7 @@ import { saveTrainingPreferences } from '../../db/training';
 import type { EquipmentChoice, TrainingPreferences } from '../../domain/types';
 import { regionsAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
+import { AdjustableWeightFields } from './AdjustableWeightFields';
 import {
   allowedEquipment,
   type Draft,
@@ -57,8 +58,17 @@ const headings: Record<Step, string> = {
 export function QuickStart() {
   const [, navigate] = useLocation();
   const [draft, setDraft] = useState(loadDraft);
-  const { goal, step, mode, equipment, experience, weights, side, focus } =
-    draft;
+  const {
+    goal,
+    step,
+    mode,
+    equipment,
+    experience,
+    weights,
+    adjustableWeights,
+    side,
+    focus,
+  } = draft;
   const update = (patch: Partial<Draft>) =>
     setDraft((current) => ({ ...current, ...patch }));
   useEffect(() => {
@@ -70,6 +80,7 @@ export function QuickStart() {
   }, [draft]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [adjustableValid, setAdjustableValid] = useState(true);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(step !== 'goal');
   useEffect(() => {
@@ -151,6 +162,10 @@ export function QuickStart() {
   );
 
   async function save() {
+    if (hasTools && !adjustableValid) {
+      setError('Kontrollera de justerbara vikterna innan du fortsätter.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -357,10 +372,20 @@ export function QuickStart() {
                         value={weights}
                         onChange={(next) => update({ weights: next })}
                       />
-                      {weights.length === 0 ? (
+                      <div className="mt-4 border-t-2 border-edge pt-4">
+                        <AdjustableWeightFields
+                          value={adjustableWeights}
+                          onChange={(next) =>
+                            update({ adjustableWeights: next })
+                          }
+                          onValidityChange={setAdjustableValid}
+                        />
+                      </div>
+                      {weights.length === 0 &&
+                      adjustableWeights.length === 0 ? (
                         <p className="m-0 pt-2 text-base font-bold">
-                          Ange dina vikter för att få övningar med
-                          hantel/kettlebell.
+                          Ange fasta vikter eller de justerbara vikter du kan
+                          ställa in för att få övningar med hantel/kettlebell.
                         </p>
                       ) : null}
                     </details>

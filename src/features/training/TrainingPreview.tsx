@@ -25,8 +25,10 @@ import {
 import {
   experienceLabels,
   isTrainingPreferences,
+  isWorkoutEquipment,
   rehabGroup,
   trainingName,
+  withWorkoutEquipment,
 } from '../../content/programmes';
 import {
   type CustomWorkout,
@@ -51,6 +53,7 @@ import type {
   TemplateId,
   TrainingPreferences,
   TrainingRoutines,
+  WorkoutEquipment,
 } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
@@ -77,6 +80,7 @@ import { RehabCollection } from './RehabCollection';
 import { RoutineControls } from './RoutineControls';
 import { startProblems } from './startReadiness';
 import { inputClass } from './TrainingHome';
+import { WorkoutEquipmentControls } from './WorkoutEquipmentControls';
 
 export { defaultPlan };
 
@@ -102,8 +106,16 @@ function PreviewEditor({
   customWorkout,
   preparationId,
   savedRoutines,
+  homePreferences,
+  equipmentOverride,
+  onEquipmentChange,
+  onStarted,
 }: {
   preferences: TrainingPreferences;
+  homePreferences?: TrainingPreferences;
+  equipmentOverride?: WorkoutEquipment;
+  onEquipmentChange?(value: WorkoutEquipment | undefined): void;
+  onStarted?(): void;
 
   id: TemplateId;
 
@@ -120,7 +132,7 @@ function PreviewEditor({
   const [, navigate] = useLocation();
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
   const preparation = sessions.find(
     (session) =>
       session.id === preparationId &&
@@ -484,6 +496,13 @@ function PreviewEditor({
         </>
       ) : (
         <>
+          {onEquipmentChange ? (
+            <WorkoutEquipmentControls
+              home={homePreferences ?? preferences}
+              override={equipmentOverride}
+              onApply={onEquipmentChange}
+            />
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -1306,7 +1325,10 @@ function PreviewEditor({
               }}
             />
           )}
-          {!short && !customWorkout && preferences.programId !== 'rehab' ? (
+          {!equipmentOverride &&
+          !short &&
+          !customWorkout &&
+          preferences.programId !== 'rehab' ? (
             <RoutineControls
               plan={plan}
               programId={preferences.programId}
@@ -1365,7 +1387,7 @@ function PreviewEditor({
             </details>
           )}
 
-          {editing && customWorkout ? (
+          {!equipmentOverride && editing && customWorkout ? (
             <>
               <Button
                 variant="secondary"
@@ -1422,7 +1444,10 @@ function PreviewEditor({
               </Link>
             </>
           ) : null}
-          {editing && !customWorkout && preferences.programId === 'rehab' ? (
+          {!equipmentOverride &&
+          editing &&
+          !customWorkout &&
+          preferences.programId === 'rehab' ? (
             <>
               <Button
                 variant="secondary"
@@ -1490,16 +1515,19 @@ function PreviewEditor({
                     const session = await startTrainingSession(
                       getDb(),
 
-                      preferences,
+                      homePreferences ?? preferences,
 
                       id,
 
                       workoutPlan,
                       new Date(),
                       customWorkout,
-                      short
-                        ? { workoutMode: 'short', fullPlan: plan }
-                        : undefined,
+                      {
+                        ...(short
+                          ? { workoutMode: 'short' as const, fullPlan: plan }
+                          : {}),
+                        ...(equipmentOverride ? { equipmentOverride } : {}),
+                      },
                     );
 
                     try {
@@ -1513,6 +1541,7 @@ function PreviewEditor({
                       /* No persistent draft to clear. */
                     }
 
+                    onStarted?.();
                     navigate(
                       preferences.programId === 'rehab' || checkBefore
                         ? `/kansla/${session.id}/before`
@@ -1593,8 +1622,8 @@ export function TrainingPreview({ id }: { id: string }) {
       </div>
     );
   return (
-    <PreviewEditor
-      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}`}
+    <EquipmentPreview
+      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
       customWorkout={customWorkout}
       preparationId={data.preparationId}
       preferences={data.preferences}
@@ -1604,6 +1633,57 @@ export function TrainingPreview({ id }: { id: string }) {
       savedPlans={data.savedPlans}
       savedRoutines={data.savedRoutines}
       painReported={data.painReported}
+    />
+  );
+}
+
+function EquipmentPreview(props: Parameters<typeof PreviewEditor>[0]) {
+  const home = props.preferences;
+  const storageKey = `stomme.workout-equipment.${home.programId}.${props.id}.${props.customWorkout?.id ?? 'standard'}.${JSON.stringify(home)}`;
+  const preparation = props.sessions.find(
+    (session) => session.id === props.preparationId,
+  );
+  const [override, setOverride] = useState<WorkoutEquipment | undefined>(() => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw !== null) {
+        const value: unknown = JSON.parse(raw);
+        if (value === null) return undefined;
+        if (isWorkoutEquipment(value)) return value;
+      }
+    } catch {
+      /* Use the durable preparation if storage is unavailable. */
+    }
+    return preparation?.equipmentOverride;
+  });
+  const effective = withWorkoutEquipment(home, override);
+  const matchingPreparation =
+    JSON.stringify(preparation?.equipmentOverride) === JSON.stringify(override);
+  return (
+    <PreviewEditor
+      {...props}
+      key={JSON.stringify(override ?? null)}
+      homePreferences={home}
+      preferences={effective}
+      equipmentOverride={override}
+      preparationId={matchingPreparation ? props.preparationId : undefined}
+      savedRoutines={override ? undefined : props.savedRoutines}
+      onStarted={() => {
+        try {
+          sessionStorage.removeItem(storageKey);
+        } catch {
+          /* Optional tab state. */
+        }
+      }}
+      onEquipmentChange={(value) => {
+        try {
+          sessionStorage.setItem(storageKey, JSON.stringify(value ?? null));
+        } catch {
+          /* Works in memory. */
+        }
+        setOverride(value);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }}
     />
   );
 }

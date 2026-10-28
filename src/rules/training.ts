@@ -34,6 +34,7 @@ export function trainingPlanSuggestion(
         session.programId === preferences.programId &&
         session.status === 'completed' &&
         session.workoutMode !== 'short' &&
+        !session.equipmentOverride &&
         (!variantId ||
           session.plan.some(
             (item) =>

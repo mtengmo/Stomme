@@ -15,6 +15,7 @@ import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { ShortWorkoutNotice } from '../session/ShortWorkoutNotice';
 import { TimeoutBanner } from '../session/TimeoutNotice';
+import { WorkoutEquipmentNotice } from '../session/WorkoutEquipmentNotice';
 import { CheckinHistory } from './CheckinHistory';
 import { amountText, EFFORT_LABEL, kgText, StatusChip } from './labels';
 
@@ -120,6 +121,7 @@ export function SessionDetail({ id }: { id: string }) {
         </div>
         {session.abortReason === 'timeout' ? <TimeoutBanner /> : null}
         <ShortWorkoutNotice session={session} />
+        <WorkoutEquipmentNotice session={session} />
       </header>
 
       <p className="m-0 text-base">

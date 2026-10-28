@@ -10,6 +10,7 @@ import { PencilTick } from '../../ui/PencilTick';
 import { SummaryNextLevel } from '../training/NextLevelSuggestions';
 import { ShortWorkoutNotice } from './ShortWorkoutNotice';
 import { TimeoutBanner } from './TimeoutNotice';
+import { WorkoutEquipmentNotice } from './WorkoutEquipmentNotice';
 
 interface SummaryProps {
   session: Session;
@@ -46,6 +47,7 @@ export function Summary({
         </p>
         {session.abortReason === 'timeout' ? <TimeoutBanner /> : null}
         <ShortWorkoutNotice session={session} />
+        <WorkoutEquipmentNotice session={session} />
         <ul className="m-0 flex list-none flex-col p-0">
           {session.programId ? (
             <li className="pb-3 text-lg font-bold">

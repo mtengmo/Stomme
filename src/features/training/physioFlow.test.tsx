@@ -100,7 +100,7 @@ it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving'
   await user.click(await screen.findByRole('button', { name: 'Knärehab' }));
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
   await screen.findByRole('button', { name: 'Börja passet' });
-  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(screen.queryByRole('checkbox', { name: CONFIRM })).toBeNull();
   expect(
     (screen.getByRole('button', { name: 'Börja passet' }) as HTMLButtonElement)
       .disabled,
@@ -130,7 +130,7 @@ it('asks no extra tick for a custom rehab programme and lets the user save', asy
     screen.getByRole('button', { name: 'Öppna mitt rehabprogram' }),
   );
   await screen.findByRole('button', { name: 'Börja passet' });
-  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(screen.queryByRole('checkbox', { name: CONFIRM })).toBeNull();
   expect(
     screen.getByText(
       /Lägg till övningarna och doseringen från din fysioterapeut/,

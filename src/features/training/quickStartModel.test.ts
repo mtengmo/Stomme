@@ -66,6 +66,26 @@ describe('quick start model', () => {
     expect(readDraft(JSON.stringify(draft))).toEqual(draft);
   });
 
+  it('reads and validates explicit adjustable settings in a saved draft', () => {
+    const item = {
+      type: 'dumbbell' as const,
+      count: 2 as const,
+      settingsKg: [2.5, 5, 7.5],
+    };
+    const valid = readDraft(
+      JSON.stringify({ ...emptyDraft, adjustableWeights: [item] }),
+    );
+    expect(valid.adjustableWeights).toEqual([item]);
+    expect(
+      readDraft(
+        JSON.stringify({
+          ...emptyDraft,
+          adjustableWeights: [{ ...item, settingsKg: [5, 5] }],
+        }),
+      ).adjustableWeights,
+    ).toEqual([]);
+  });
+
   it('maps Egenvikt to body, chair and wall without weights', () => {
     const prefs = preferencesFromDraft({
       ...emptyDraft,
@@ -75,6 +95,7 @@ describe('quick start model', () => {
     });
     expect(prefs.equipment).toEqual(BODYWEIGHT_EQUIPMENT);
     expect(prefs.weights).toBeUndefined();
+    expect(prefs.adjustableWeights).toBeUndefined();
     expect(isTrainingPreferences(prefs)).toBe(true);
   });
 
@@ -114,19 +135,29 @@ describe('quick start model', () => {
 
   it('offers tools and weights for custom rehab but not for knee or physio', () => {
     const weights = [{ type: 'dumbbell' as const, kg: 8, count: 2 as const }];
+    const adjustableWeights = [
+      {
+        type: 'kettlebell' as const,
+        count: 1 as const,
+        settingsKg: [8, 12, 16],
+      },
+    ];
     const draft = {
       ...emptyDraft,
       mode: 'equipment' as const,
       equipment: ['dumbbell-2' as const],
       weights,
+      adjustableWeights,
     };
     const custom = preferencesFromDraft({ ...draft, goal: 'custom' });
     expect(custom.equipment).toContain('dumbbell-2');
     expect(custom.weights).toEqual(weights);
+    expect(custom.adjustableWeights).toEqual(adjustableWeights);
     for (const goal of ['knee', 'physio'] as const) {
       const prefs = preferencesFromDraft({ ...draft, goal });
       expect(prefs.equipment).not.toContain('dumbbell-2');
       expect(prefs.weights).toBeUndefined();
+      expect(prefs.adjustableWeights).toBeUndefined();
     }
   });
 });

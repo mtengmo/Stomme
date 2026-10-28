@@ -8,6 +8,7 @@ import type {
   TrainingCheckin,
   TrainingPreferences,
 } from '../domain/types';
+import { basePlan } from '../features/training/defaultPlan';
 import { buildSteps } from '../rules/sessionPlan';
 import { exportAll, importAll, parseBackup, serializeBackup } from './backup';
 import { StommeDB } from './db';
@@ -66,6 +67,67 @@ afterEach(async () => {
 });
 
 describe('programme persistence and safety boundaries', () => {
+  it('uses a borrowed workout snapshot without changing home equipment', async () => {
+    const home: TrainingPreferences = {
+      ...preferences,
+      equipment: ['bodyweight'],
+      weights: [],
+    };
+    const override = {
+      equipment: ['bodyweight' as const, 'dumbbell-2' as const],
+      adjustableWeights: [
+        { type: 'dumbbell' as const, count: 2 as const, settingsKg: [5, 8] },
+      ],
+    };
+    const borrowedPlan = basePlan('floor-press', {
+      ...home,
+      ...override,
+    });
+    expect(borrowedPlan.weightKg).toBe(10);
+    await saveTrainingPreferences(db, home);
+    await expect(
+      startTrainingSession(db, home, 'A', [borrowedPlan], now),
+    ).rejects.toThrow();
+    const session = await startTrainingSession(
+      db,
+      home,
+      'A',
+      [borrowedPlan],
+      now,
+      undefined,
+      { equipmentOverride: override },
+    );
+    expect(session.equipmentOverride).toEqual({
+      ...override,
+      weights: [],
+    });
+    expect((await db.meta.get('training'))?.value).toEqual(home);
+    override.adjustableWeights[0]?.settingsKg.push(12);
+    expect(
+      (await db.sessions.get(session.id))?.equipmentOverride
+        ?.adjustableWeights?.[0]?.settingsKg,
+    ).toEqual([5, 8]);
+    expect(
+      parseBackup(serializeBackup(await exportAll(db))).sessions[0]
+        ?.equipmentOverride,
+    ).toEqual(session.equipmentOverride);
+    const invalidBackup = await exportAll(db);
+    const equipmentRecord = invalidBackup.sessions[0]?.equipmentOverride;
+    if (!equipmentRecord?.adjustableWeights?.[0])
+      throw new Error('Missing adjustable workout fixture');
+    equipmentRecord.adjustableWeights[0].settingsKg = [5, 5];
+    expect(() => parseBackup(serializeBackup(invalidBackup))).toThrow();
+    await expect(
+      startTrainingSession(db, home, 'A', [borrowedPlan], now, undefined, {
+        equipmentOverride: { ...override, equipment: ['bodyweight'] },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      startTrainingSession(db, home, 'A', [borrowedPlan], now, undefined, {
+        equipmentOverride: { equipment: null } as never,
+      }),
+    ).rejects.toThrow('Kontrollera');
+  });
   it('stores a short plan with its original full plan and rejects an unsafe short preparation', async () => {
     const full = [
       { ...plan, sets: 3 },
