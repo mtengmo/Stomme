@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   prefillAmount,
+  type RepTempo,
   repPosition,
   repProgress,
   repSeconds,
   repTempo,
+  scaleTempo,
 } from './repTempo';
 
 describe('repTempo', () => {
@@ -124,5 +126,19 @@ describe('ballistic beats', () => {
     if (!t) throw new Error('tempo');
     expect(t.sequence).toBe(false);
     expect(repProgress(t, 1000)).toBe(1);
+  });
+});
+
+describe('scaleTempo', () => {
+  it('scales movement and relax but keeps prescribed holds', () => {
+    const base = repTempo('wall-sit') ?? repTempo('goblet-squat');
+    expect(base).not.toBeNull();
+    const slow = scaleTempo(base as RepTempo, 1.5);
+    expect(slow.upMs).toBe(Math.round((base as RepTempo).upMs * 1.5));
+    expect(slow.holdMs).toBe((base as RepTempo).holdMs);
+    expect(slow.repMs).toBe(
+      slow.upMs + slow.holdMs + slow.downMs + slow.relaxMs,
+    );
+    expect(scaleTempo(base as RepTempo, 1)).toBe(base);
   });
 });

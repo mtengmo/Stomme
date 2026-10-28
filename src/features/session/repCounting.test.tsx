@@ -154,3 +154,25 @@ describe('rep counting on the set screen', () => {
     },
   );
 });
+
+describe('pace buttons', () => {
+  it('slows and quickens the suggested beat and remembers it', () => {
+    show('goblet-squat');
+    expect(screen.getByText(/Takt: ca 4 s/)).toBeTruthy();
+    click('Långsammare');
+    expect(screen.getByText(/Takt: ca 5 s/)).toBeTruthy();
+    expect(window.localStorage.getItem('stomme.repCount.pace')).toBe('3');
+    click('Snabbare');
+    click('Snabbare');
+    expect(screen.getByText(/Takt: ca 3 s/)).toBeTruthy();
+  });
+
+  it('locks the buttons while a rep is being counted', () => {
+    show('goblet-squat', true);
+    advance(6_000);
+    expect(
+      (screen.getByRole('button', { name: 'Snabbare' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+  });
+});

@@ -71,6 +71,25 @@ export function repTempo(id: ExerciseId): RepTempo | null {
   };
 }
 
+/** Pace steps for the quicker/slower buttons; a bigger factor is a slower beat. */
+export const PACE_FACTORS = [0.7, 0.85, 1, 1.25, 1.5, 1.8] as const;
+export const DEFAULT_PACE = 2;
+
+/** Scales the movement and relax phases; prescribed holds keep their length. */
+export function scaleTempo(tempo: RepTempo, factor: number): RepTempo {
+  if (factor === 1) return tempo;
+  const upMs = Math.round(tempo.upMs * factor);
+  const downMs = Math.round(tempo.downMs * factor);
+  const relaxMs = Math.round(tempo.relaxMs * factor);
+  return {
+    ...tempo,
+    upMs,
+    downMs,
+    relaxMs,
+    repMs: upMs + tempo.holdMs + downMs + relaxMs,
+  };
+}
+
 export interface RepPosition {
   /** Repetitions finished: counted when the movement is back at the start. */
   completed: number;

@@ -7,7 +7,13 @@ import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import { formatClock } from '../../lib/format';
 import { useRepCounter } from '../../lib/useRepCounter';
 import { useTimedHold } from '../../lib/useTimedHold';
-import { repSeconds, repTempo } from '../../rules/repTempo';
+import {
+  DEFAULT_PACE,
+  PACE_FACTORS,
+  repSeconds,
+  repTempo,
+  scaleTempo,
+} from '../../rules/repTempo';
 import type { SetStep } from '../../rules/sessionPlan';
 import { weightLabel as describeWeight } from '../../rules/weightInventory';
 import { Button } from '../../ui/Button';
@@ -26,6 +32,27 @@ function readFlag(key: string): boolean {
     return window.localStorage.getItem(key) === '1';
   } catch {
     return false;
+  }
+}
+const PACE_KEY = 'stomme.repCount.pace';
+function readPace(): number {
+  try {
+    const stored = Number(window.localStorage.getItem(PACE_KEY));
+    return Number.isInteger(stored) &&
+      window.localStorage.getItem(PACE_KEY) !== null &&
+      stored >= 0 &&
+      stored < PACE_FACTORS.length
+      ? stored
+      : DEFAULT_PACE;
+  } catch {
+    return DEFAULT_PACE;
+  }
+}
+function writePace(value: number): void {
+  try {
+    window.localStorage.setItem(PACE_KEY, String(value));
+  } catch {
+    // The choice still applies for this screen.
   }
 }
 function writeFlag(key: string, on: boolean): void {
@@ -114,7 +141,15 @@ export function SetScreen({
       if (!busy && !invalidWeight) onDone(amount, loadIndex, weightKg);
     },
   });
-  const tempo = unit === 'reps' ? repTempo(exercise.id) : null;
+  const [pace, setPace] = useState(readPace);
+  const baseTempo = unit === 'reps' ? repTempo(exercise.id) : null;
+  const tempo = baseTempo
+    ? scaleTempo(baseTempo, PACE_FACTORS[pace] ?? 1)
+    : null;
+  const changePace = (next: number) => {
+    setPace(next);
+    writePace(next);
+  };
   const [manual, setManual] = useState(() => readFlag(MANUAL_KEY));
   const [seenIntro] = useState(() => readFlag(SEEN_KEY));
   const autoCount = tempo !== null && !manual;
@@ -139,6 +174,11 @@ export function SetScreen({
     counter.phase === 'active' ||
     counter.phase === 'resuming';
   const counterLive = counterRunning || counter.phase === 'paused';
+  // The beat changes before starting or while paused, never mid-rep.
+  const canChangePace =
+    counter.phase === 'idle' ||
+    counter.phase === 'prepare' ||
+    counter.phase === 'paused';
   const toggleCounter = () => {
     if (counterRunning) counter.pause();
     else if (counter.phase === 'paused') counter.resume();
@@ -379,6 +419,24 @@ export function SetScreen({
             Takt: ca {repSeconds(tempo)} s per repetition. Förslag på takt,
             anpassa efter dig.
           </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              disabled={!canChangePace || pace === 0}
+              onClick={() => changePace(pace - 1)}
+              className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
+            >
+              Snabbare
+            </button>
+            <button
+              type="button"
+              disabled={!canChangePace || pace === PACE_FACTORS.length - 1}
+              onClick={() => changePace(pace + 1)}
+              className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
+            >
+              Långsammare
+            </button>
+          </div>
           {counterLive && counter.phase !== 'prepare' ? (
             <button
               type="button"

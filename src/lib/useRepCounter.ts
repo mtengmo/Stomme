@@ -62,6 +62,20 @@ export function useRepCounter({
   total.current = reps;
   const tempoRef = useRef(tempo);
   tempoRef.current = tempo;
+  // A pace change while paused keeps the position inside the rep.
+  const lastRepMs = useRef(tempo?.repMs);
+  const repMs = tempo?.repMs;
+  useEffect(() => {
+    const before = lastRepMs.current;
+    lastRepMs.current = repMs;
+    if (!repMs || !before || repMs === before) return;
+    if (current.current !== 'paused' || !tempoRef.current) return;
+    activeMs.current = (activeMs.current * repMs) / before;
+    lastCompleted.current = repPosition(
+      tempoRef.current,
+      activeMs.current,
+    ).completed;
+  }, [repMs]);
 
   const show = useCallback((next: Phase) => {
     current.current = next;
