@@ -73,6 +73,71 @@ function plank(): Pose {
     hL: [p.neck[0] - 17, 171],
   };
 }
+
+/** Elevated toe contacts; the whole trunk pivots about the feet. */
+function declinePushUp(t: number): Pose {
+  const ankle: Pt = [165, 134];
+  const angle = mix(-3.0, -3.3, t);
+  const neck = polar(ankle, 110, angle);
+  const hip = polar(ankle, 64, angle);
+  const startNeck = polar(ankle, 110, -3.0);
+  const hand: Pt = [startNeck[0], 174];
+  const farHand: Pt = [startNeck[0] + 4, 171];
+  const length = (174 - startNeck[1]) / 2;
+  return pose(
+    polar(neck, 14, angle),
+    neck,
+    hip,
+    [
+      joint(neck, hand, length, length, -1),
+      hand,
+      joint(neck, farHand, length, length, -1),
+      farHand,
+    ],
+    [
+      polar(ankle, 32, angle),
+      ankle,
+      [174, 137],
+      polar([162, 131], 32, angle),
+      [162, 131],
+      [171, 134],
+    ],
+  );
+}
+
+function diamondPushUp(t: number): Pose {
+  const p = pushUp(t);
+  // Both hands meet under the chest; elbows fold back alongside the trunk.
+  const hand: Pt = [68, 174],
+    farHand: Pt = [70, 172];
+  return {
+    ...p,
+    hR: hand,
+    hL: farHand,
+    eR: joint(p.neck, hand, 25, 25, -1),
+    eL: joint(p.neck, farHand, 25, 25, -1),
+  };
+}
+
+function plankArmLift(t: number): Pose {
+  const p = plank();
+  // One cycle includes both arms and returns to both forearms on the mat.
+  const right = Math.max(0, Math.sin(2 * Math.PI * t));
+  const left = Math.max(0, -Math.sin(2 * Math.PI * t));
+  const raisedElbow: Pt = [p.neck[0] - 23, p.neck[1] - 3];
+  const raisedHand: Pt = [p.neck[0] - 46, p.neck[1] - 6];
+  const point = (a: Pt, b: Pt, phase: number): Pt => [
+    mix(a[0], b[0], phase),
+    mix(a[1], b[1], phase),
+  ];
+  return {
+    ...p,
+    eR: point(p.eR, raisedElbow, right),
+    hR: point(p.hR, raisedHand, right),
+    eL: point(p.eL, raisedElbow, left),
+    hL: point(p.hL, raisedHand, left),
+  };
+}
 function pull(t: number, chin: boolean): Pose {
   const neck: Pt = [100, mix(80, 36, t)],
     hip: Pt = [100, neck[1] + 43];
@@ -421,6 +486,9 @@ function crunch(t: number): Pose {
 }
 
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
+  'decline-push-up': declinePushUp,
+  'diamond-push-up': diamondPushUp,
+  'plank-arm-lift': plankArmLift,
   'push-up': pushUp,
   'pull-up': (t) => pull(t, false),
   'chin-up': (t) => pull(t, true),
@@ -450,7 +518,7 @@ export const bodyweightFigures = Object.fromEntries(
     id,
     {
       start: handler(0),
-      end: handler(1),
+      end: handler(id === 'plank-arm-lift' ? 0.25 : 1),
       motion:
         id === 'plank'
           ? 'hold'
@@ -458,13 +526,15 @@ export const bodyweightFigures = Object.fromEntries(
             ? 'sequence'
             : 'controlled',
       props:
-        id === 'pull-up' || id === 'chin-up'
-          ? [{ type: 'pull-up-bar', x1: 55, x2: 145, y: 31 }]
-          : id === 'parallel-dip'
-            ? [{ type: 'dip-bars', x: 101, y: 117, w: 32 }]
-            : id === 'wall-push-up'
-              ? [{ type: 'wall', x: 157 }]
-              : [{ type: 'mat', x1: 18, x2: 187 }],
+        id === 'decline-push-up'
+          ? [{ type: 'chair', x: 154, y: 137, w: 32 }]
+          : id === 'pull-up' || id === 'chin-up'
+            ? [{ type: 'pull-up-bar', x1: 55, x2: 145, y: 31 }]
+            : id === 'parallel-dip'
+              ? [{ type: 'dip-bars', x: 101, y: 117, w: 32 }]
+              : id === 'wall-push-up'
+                ? [{ type: 'wall', x: 157 }]
+                : [{ type: 'mat', x1: 18, x2: 187 }],
     },
   ]),
 ) as Record<BodyweightId, FigureSpec>;

@@ -3,6 +3,7 @@ import { exerciseMetadata } from '../content/exerciseMetadata';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import { rehabAdditionIds } from '../content/rosterSlots';
 import type {
+  BodyRegionId,
   EquipmentChoice,
   TemplateId,
   TrainingPreferences,
@@ -47,6 +48,16 @@ const equipmentSets: [string, EquipmentChoice[]][] = [
 ];
 
 describe('initial training roster', () => {
+  it('fills a running roster without apparatus using unique basic bodyweight work', () => {
+    const roster = buildRoster(
+      { programId: 'running', experience: 'new', equipment: [] },
+      'A',
+    );
+    expect(roster.ids.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(roster.ids).size).toBe(roster.ids.length);
+    expect(roster.ids).toContain('glute-bridge');
+    expect(roster.ids).toContain('dead-bug');
+  });
   it('is empty for rehab', () => {
     expect(
       initialTrainingRoster(
@@ -54,6 +65,15 @@ describe('initial training roster', () => {
         'A',
       ),
     ).toEqual([]);
+  });
+  it('leaves an unknown region empty instead of inventing a workout', () => {
+    const preferences: TrainingPreferences = {
+      programId: 'general',
+      experience: 'new',
+      equipment: [],
+      bodyParts: ['unknown' as BodyRegionId],
+    };
+    expect(initialTrainingRoster(preferences, 'A')).toEqual([]);
   });
 
   for (const programId of ['general', 'running'] as const)
@@ -220,15 +240,29 @@ describe('basic push-ups and calf raise in the rosters', () => {
     expect(roster.notes['knee-push-up']).toBeUndefined();
   });
 
-  it('keeps regular users on push-up or dips', () => {
+  it('gives regular users an advanced push-up with a same-slot fallback', () => {
     const ids = buildRoster(
       { programId: 'general', experience: 'regular', equipment: everything },
       'A',
     ).ids;
     expect(ids).not.toContain('knee-push-up');
-    expect(ids.some((id) => id === 'push-up' || id === 'parallel-dip')).toBe(
-      true,
-    );
+    expect(ids).toContain('decline-push-up');
+    expect(
+      buildRoster(
+        {
+          programId: 'general',
+          experience: 'regular',
+          equipment: ['bodyweight'],
+        },
+        'A',
+      ).ids,
+    ).toContain('diamond-push-up');
+    for (const experience of ['new', 'some'] as const) {
+      const roster = rosterFor(experience);
+      expect(roster.ids).toContain('knee-push-up');
+      expect(roster.ids).not.toContain('decline-push-up');
+      expect(roster.ids).not.toContain('diamond-push-up');
+    }
   });
 
   it('never rosters wall push-up or crunch', () => {

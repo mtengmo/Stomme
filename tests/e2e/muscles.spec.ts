@@ -25,7 +25,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
-  await expect(page.getByRole('status')).toHaveText('68 övningar');
+  await expect(page.getByRole('status')).toHaveText('71 övningar');
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,
   );

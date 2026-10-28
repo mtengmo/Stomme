@@ -7,6 +7,7 @@ import type { Session, SetLog } from '../../domain/types';
 import { formatMinutes } from '../../lib/format';
 import { Button, buttonClass } from '../../ui/Button';
 import { PencilTick } from '../../ui/PencilTick';
+import { SummaryNextLevel } from '../training/NextLevelSuggestions';
 import { TimeoutBanner } from './TimeoutNotice';
 
 interface SummaryProps {
@@ -88,6 +89,7 @@ export function Summary({
             );
           })}
         </ul>
+        <SummaryNextLevel session={session} />
       </div>
       <div className="sticky bottom-0 -mx-5 flex flex-col">
         {snack}

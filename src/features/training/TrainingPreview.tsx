@@ -73,6 +73,7 @@ import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { basePlan, defaultPlan, painLogsShowPain } from './defaultPlan';
+import { NextLevelSuggestions } from './NextLevelSuggestions';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
 import { RehabCollection } from './RehabCollection';
@@ -1309,6 +1310,19 @@ function PreviewEditor({
               }}
             />
           )}
+          <NextLevelSuggestions
+            plan={plan}
+            preferences={preferences}
+            sessions={sessions}
+            logs={logs}
+            onChoose={(from, to) => {
+              updatePlan((current) =>
+                current.map((item) =>
+                  item.exerciseId === from ? basePlan(to, preferences) : item,
+                ),
+              );
+            }}
+          />
           {preferences.programId === 'rehab' ? null : (
             <details className="border-y-2 border-edge py-2">
               <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">

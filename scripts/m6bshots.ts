@@ -15,10 +15,13 @@ async function up(url: string) {
   throw new Error('no server');
 }
 mkdirSync(OUT, { recursive: true });
-const srv = spawn('npx', ['vite', '--port', String(PORT), '--strictPort'], {
-  shell: true,
-  stdio: 'ignore',
-});
+const srv = spawn(
+  process.execPath,
+  ['node_modules/vite/bin/vite.js', '--port', String(PORT), '--strictPort'],
+  {
+    stdio: 'ignore',
+  },
+);
 try {
   const base = `http://localhost:${PORT}`;
   await up(base);
@@ -34,9 +37,20 @@ try {
         colorScheme: scheme,
         reducedMotion: 'reduce',
       });
+      // tsx preserves function names with __name inside serialized callbacks.
+      await ctx.addInitScript(
+        "window.__name = (fn) => fn; localStorage.setItem('stomme.repCount.manual', '1');",
+      );
       const page = await ctx.newPage();
       await page.goto(base);
       await page.getByRole('button', { name: /Jag förstår/ }).click();
+
+      await page.goto(`${base}/#/dev/demo`);
+      await page
+        .getByRole('button', { name: 'Fyll med syntetisk testdata' })
+        .click();
+      await page.getByText(/Fyllde med/).waitFor();
+      await page.goto(base);
 
       // after red flag: stop screen, then the banner on the week view
       await page.getByRole('link', { name: 'Starta pass' }).click();
@@ -104,6 +118,8 @@ try {
         colorScheme: scheme,
         reducedMotion: 'reduce',
       });
+      // tsx preserves function names with __name inside serialized callbacks.
+      await ctx2.addInitScript('window.__name = (fn) => fn;');
       const p2 = await ctx2.newPage();
       await p2.route('**/features/history/History.tsx*', (r) =>
         r.fulfill({

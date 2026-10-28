@@ -2,6 +2,13 @@ import type { ExerciseId } from '../domain/types';
 
 /** Searchable names and common terms; stable catalogue IDs stay unchanged. */
 export const exerciseAliases: Record<ExerciseId, string[]> = {
+  'decline-push-up': ['Decline push-up', 'Armhävning med fötter på stol'],
+  'diamond-push-up': [
+    'Diamond push-up',
+    'Diamantarmhävning',
+    'Smala armhävningar',
+  ],
+  'plank-arm-lift': ['Planka med armlyft', 'Plank with arm lift'],
   'push-up': ['Armhävningar', 'Push up', 'Push-up'],
   'pull-up': ['Pull ups', 'Pull-ups', 'Chins med överhandsgrepp'],
   'chin-up': ['Chins', 'Chin ups', 'Underhandsgrepp'],

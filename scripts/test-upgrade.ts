@@ -29,7 +29,12 @@ execFileSync(
   ['archive', '96f2913', '--format=tar', `--output=${archive}`],
   { cwd: root },
 );
-execFileSync('tar', ['-xf', archive, '-C', baseline]);
+// Git Bash's GNU tar treats drive letters as remote archive locations.
+const tar =
+  process.platform === 'win32'
+    ? join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'tar.exe')
+    : 'tar';
+execFileSync(tar, ['-xf', archive, '-C', baseline]);
 const builds = {
   legacy: join(work, 'build-legacy'),
   A: join(work, 'build-A'),
@@ -217,6 +222,8 @@ async function installed(build: keyof typeof builds = 'A') {
     reducedMotion: 'reduce',
   });
   contexts.push(context);
+  // tsx preserves function names with __name inside serialized callbacks.
+  await context.addInitScript('window.__name = (fn) => fn;');
   const page = await context.newPage();
   await page.goto(origin);
   await page.evaluate(async () => {

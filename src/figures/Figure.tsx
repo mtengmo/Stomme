@@ -145,6 +145,8 @@ export function bandShape(
 
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
 const FRAMING: Partial<Record<ExerciseId, string>> = {
+  'plank-arm-lift': '0 20 200 168',
+  'decline-push-up': '14 20 182 168',
   'pull-up': '10 0 180 188',
   'chin-up': '10 0 180 188',
   burpee: '0 -30 200 218',
@@ -506,7 +508,9 @@ export function Figure({
             ['Armhävning', movementPose(exerciseId, 0.375)],
             ['Hopp och landning', movementPose(exerciseId, 0.875)],
           ]
-        : exerciseId === 'squat-jump' || exerciseId === 'mountain-climber'
+        : exerciseId === 'squat-jump' ||
+            exerciseId === 'mountain-climber' ||
+            exerciseId === 'plank-arm-lift'
           ? [
               ['Start', movementPose(exerciseId, 0)],
               [

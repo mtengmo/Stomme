@@ -33,7 +33,7 @@ export function HistorySummary({
       value: (
         <Link
           href={`/historik/${s.last.id}`}
-          className="font-bold text-ink underline"
+          className="inline-flex min-h-12 items-center font-bold text-ink underline"
         >
           {s.last.customWorkoutName ?? `Pass ${s.last.templateId}`} ·{' '}
           {formatWeekday(s.last.date)} {formatShortDate(s.last.date)}

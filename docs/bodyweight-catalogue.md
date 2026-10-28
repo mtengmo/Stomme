@@ -48,3 +48,21 @@ Visual evidence uses the DEV catalogue's real movement path and sequence strips.
 ## Easier push-up and calf steps (E65–E68)
 
 2026-10-28. Four more entries expand 64 to 68 exercises. The easier chain is E54 to E65 to E66, and E08 to E67. E65 is a basic horizontal press and the first pick for new or some users with no weights; E66 and E68 are library only and never enter a roster. E67 replaces a lost calf exercise for lower-level running users. Sources: NASM modified push-up (E65), NASM incline push-up, which names a wall (E66), ACE standing calf raises at a wall (E67), ACE crunch (E68). Each URL was opened on 2026-10-28.
+
+## Harder variants and optional progression (E69–E71)
+
+2026-10-28. The catalogue now has 71 entries; earlier IDs and references are unchanged.
+
+| Reference | Exercise | Technique level | Checked source |
+| --- | --- | --- | --- |
+| E69 | Armhävning med fötterna upphöjda | technical | [NASM decline push-up](https://www.nasm.org/resource-center/exercise-library/decline-push-up) |
+| E70 | Smala armhävningar | technical | [PureGym diamond press-ups](https://www.puregym.com/exercises/chest/press-up/diamond-press-ups/) |
+| E71 | Planka med armlyft | practiced | [University of Calgary front plank with arm lifts](https://www.ucalgary.ca/shred-injuries/all-sports/soccer/front-plank-arm-lifts) |
+
+All three source URLs were opened before implementation on 2026-10-28. Swedish instructions are original summaries; doses are editable app proposals. E69 uses a low, stable chair; E70 has close hand placement. These are upper-body/core exercises, not knee-dominant loading, and have `kneeLoaded: false`. None enters a rehab roster automatically. No weighted push-up or calf hold was added.
+
+E71 alternates arms. Each lift and return counts once in total, rather than the source's per-arm count. It uses manual rep counting because its demonstration cycle shows both arms. Reduced motion includes a raised-arm frame. All three new movement paths have sampled contact and geometry tests and were visually checked in `/dev/figurer`.
+
+The harder links are wall → knee → push-up → decline, and two-leg → single-leg calf raise. Diamond is offered alongside decline after push-ups, including when no chair is available. Both harder push-ups link back to push-up. General rosters retain a same-slot knee/push-up fallback for lower experience levels; registered weighted presses retain priority over unweighted variants.
+
+“Prova nästa nivå” is an optional preview/summary suggestion. It requires the latest two attempts in the same programme to be completed, every planned set/side at the catalogue maximum, effort easy, an after-check of good, and no symptoms since the older attempt. Aborted/skipped attempts, early-ended sets, extra weight, missing results and mismatched variants block it. Rehab is excluded. Equipment must fit. A preview switch requires an explicit tap and uses the new exercise's start dose; it never edits saved workouts or completed history automatically.

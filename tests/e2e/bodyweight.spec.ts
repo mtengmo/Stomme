@@ -29,6 +29,9 @@ for (const width of [360, 1280]) {
       'E66',
       'E67',
       'E68',
+      'E69',
+      'E70',
+      'E71',
     ]) {
       await search.fill(number);
       const row = page.getByRole('listitem').filter({

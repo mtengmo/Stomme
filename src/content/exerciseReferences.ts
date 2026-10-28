@@ -2,6 +2,9 @@ import type { ExerciseId } from '../domain/types';
 
 /** Permanent display references, independent of catalogue or workout order. */
 export const exerciseReferences: Record<ExerciseId, string> = {
+  'decline-push-up': 'E69',
+  'diamond-push-up': 'E70',
+  'plank-arm-lift': 'E71',
   'goblet-chair-squat': 'E01',
   'step-up': 'E02',
   'single-leg-rdl': 'E03',

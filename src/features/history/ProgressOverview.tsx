@@ -344,133 +344,161 @@ export function ProgressOverview({
           </p>
           {weightResults.length ? (
             <>
-              <div
-                role="img"
-                aria-label={`Diagram med loggade setvärden i ${exercises[selectedId].unit === 'laps' ? 'varv' : exercises[selectedId].unit}. Tabellen nedan innehåller datumen och varje värde.`}
-                className="overflow-x-auto"
-              >
-                <svg
-                  viewBox="0 0 600 180"
-                  className="h-48 min-w-full"
-                  aria-hidden="true"
+              <div className="flex flex-col gap-2">
+                <h4 className="m-0 text-xl font-bold">
+                  {exercises[selectedId].name}
+                </h4>
+                <p className="m-0 text-base text-ink-soft">
+                  {variantLabel(selectedId, selectedVariant)} ·{' '}
+                  {selectedSide === 'both'
+                    ? 'båda samtidigt'
+                    : sideLabels[selectedSide as SetLog['side']]}
+                </p>
+                <div
+                  role="img"
+                  aria-label={`Diagram med loggade setvärden från ${formatShortDate(firstDate)} till ${formatShortDate(lastDate)}. Listan nedan innehåller datumen och varje värde.`}
                 >
-                  <text x="12" y="18" fontSize="12">
-                    {amountText(maxAmount, exercises[selectedId].unit)}
-                  </text>
-                  <text x="12" y="166" fontSize="12">
-                    {amountText(minAmount, exercises[selectedId].unit)}
-                  </text>
-                  {plotLogs.map(({ session, log }, index) => {
-                    const sameDayIndex = plotLogs
-                      .slice(0, index)
-                      .filter(
-                        (point) => point.session.date === session.date,
-                      ).length;
-                    const x =
-                      68 +
-                      (daysBetween(firstDate, session.date) / dateSpan) * 510;
-                    const y =
-                      150 - ((log.amount - minAmount) / amountSpan) * 120;
-                    return (
+                  <p className="m-0 text-base">
+                    {amountText(minAmount, exercises[selectedId].unit)}–
+                    {amountText(maxAmount, exercises[selectedId].unit)} ·{' '}
+                    {selectedWeight > 0
+                      ? `${selectedWeight} kg totalt`
+                      : 'kroppsvikt'}
+                  </p>
+                  <svg
+                    viewBox="0 0 280 112"
+                    className="block h-28 w-full"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M 12 8 V 100 H 268"
+                      fill="none"
+                      stroke="var(--edge)"
+                    />
+                    {plotLogs.map(({ session, log }) => (
                       <circle
                         key={log.id}
-                        cx={x + sameDayIndex * 5}
-                        cy={y}
-                        r="5"
+                        cx={
+                          16 +
+                          (daysBetween(firstDate, session.date) / dateSpan) *
+                            248
+                        }
+                        cy={92 - ((log.amount - minAmount) / amountSpan) * 72}
+                        r="3"
                         fill="currentColor"
                       >
                         <title>{`${formatShortDate(session.date)} · set ${log.setNumber}: ${amountText(log.amount, exercises[selectedId].unit)}`}</title>
                       </circle>
-                    );
-                  })}
-                </svg>
+                    ))}
+                  </svg>
+                  <div className="flex justify-between gap-3 text-base text-ink-soft">
+                    <span>{formatShortDate(firstDate)}</span>
+                    <span>{formatShortDate(lastDate)}</span>
+                  </div>
+                </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-base">
-                  <caption className="pb-2 text-left text-xl font-bold">
-                    {exercises[selectedId].name} ·{' '}
-                    {variantLabel(selectedId, selectedVariant)} ·{' '}
-                    {selectedSide === 'both'
-                      ? 'båda samtidigt'
-                      : sideLabels[selectedSide as SetLog['side']]}
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col" className="py-2">
-                        Datum och program
-                      </th>
-                      <th scope="col">Set</th>
-                      <th scope="col">Ansträngning</th>
-                      <th scope="col">Besvär och tidpunkt</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {weightResults.map(({ session, logs: setLogs }) => {
-                      const planned = session.plan
-                        .filter((item) => item.exerciseId === selectedId)
-                        .reduce((sum, item) => sum + item.sets, 0);
-                      const feedback = session.feedback[selectedId];
-                      return (
-                        <tr
-                          key={`${session.id}-${selectedVariant}-${selectedSide}`}
-                          className="border-t-2 border-edge align-top"
-                        >
-                          <th scope="row" className="py-3 font-normal">
-                            <strong>{formatShortDate(session.date)}</strong>
-                            <br />
-                            {trainingName(session)}
-                            <br />
-                            {session.status === 'completed'
-                              ? 'Avslutat pass'
-                              : session.status === 'aborted'
-                                ? 'Avbrutet pass'
-                                : 'Pågående pass'}
-                            <br />
-                            {setLogs.length} av {planned} planerade set loggade
-                          </th>
-                          <td className="py-3">
-                            {setLogs.map((log) => (
-                              <div key={log.id}>
-                                Set {log.setNumber}:{' '}
-                                {amountText(
-                                  log.amount,
-                                  exercises[selectedId].unit,
-                                )}{' '}
-                                ·{' '}
-                                {log.weightKg > 0
-                                  ? `${log.weightKg} kg totalt`
-                                  : 'kroppsvikt'}
-                              </div>
-                            ))}
-                          </td>
-                          <td className="py-3">
-                            {feedback?.effort
-                              ? EFFORT_LABEL[feedback.effort]
-                              : 'Svar saknas'}
-                          </td>
-                          <td className="py-3">
-                            Vid övningen: {symptomText(feedback?.symptoms)}
-                            <p className="my-2">
+              <ol aria-label="Resultat per pass" className="m-0 list-none p-0">
+                {[...weightResults]
+                  .reverse()
+                  .map(({ session, logs: setLogs }) => {
+                    const planned = session.plan
+                      .filter((item) => item.exerciseId === selectedId)
+                      .reduce((sum, item) => sum + item.sets, 0);
+                    const feedback = session.feedback[selectedId];
+                    const amounts = [
+                      ...new Set(setLogs.map((log) => log.amount)),
+                    ];
+                    const amount =
+                      amounts.length === 1
+                        ? `${setLogs.length} × ${amountText(amounts[0] ?? 0, exercises[selectedId].unit)}`
+                        : `${setLogs.length} set · ${setLogs.map((log) => log.amount).join(' / ')} ${exercises[selectedId].unit === 'reps' ? 'repetitioner' : exercises[selectedId].unit === 'seconds' ? 'sekunder' : exercises[selectedId].unit === 'meters' ? 'meter' : 'varv'}`;
+                    return (
+                      <li
+                        key={`${session.id}-${selectedVariant}-${selectedSide}`}
+                        className="flex flex-col gap-1 border-t-2 border-edge py-3 text-base"
+                      >
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                          <strong>{formatShortDate(session.date)}</strong>
+                          <span className="font-bold">{amount}</span>
+                        </div>
+                        <p className="m-0 text-ink-soft">
+                          {selectedWeight > 0
+                            ? `${selectedWeight} kg totalt`
+                            : 'Kroppsvikt'}{' '}
+                          ·{' '}
+                          {feedback?.effort
+                            ? EFFORT_LABEL[feedback.effort]
+                            : 'Ansträngning: svar saknas'}
+                        </p>
+                        {session.status !== 'completed' ? (
+                          <p className="m-0 font-bold">
+                            {session.status === 'aborted'
+                              ? 'Avbrutet pass'
+                              : 'Pågående pass'}
+                          </p>
+                        ) : null}
+                        <details>
+                          <summary className="min-h-12 cursor-pointer py-3 font-bold">
+                            Visa pass och svar
+                          </summary>
+                          <div className="flex flex-col gap-2 pb-2">
+                            <p className="m-0">
+                              {trainingName(session)} ·{' '}
+                              {session.status === 'completed'
+                                ? 'Avslutat pass'
+                                : session.status === 'aborted'
+                                  ? 'Avbrutet pass'
+                                  : 'Pågående pass'}
+                            </p>
+                            <p className="m-0">
+                              {setLogs.length} av {planned} planerade set
+                              loggade med vald vikt och sida.
+                            </p>
+                            <ul className="m-0 list-none p-0">
+                              {setLogs.map((log) => (
+                                <li key={log.id}>
+                                  Set {log.setNumber}:{' '}
+                                  {amountText(
+                                    log.amount,
+                                    exercises[selectedId].unit,
+                                  )}{' '}
+                                  ·{' '}
+                                  {log.weightKg > 0
+                                    ? `${log.weightKg} kg totalt`
+                                    : 'kroppsvikt'}
+                                </li>
+                              ))}
+                            </ul>
+                            <p className="m-0">
+                              Vid övningen: {symptomText(feedback?.symptoms)}
+                            </p>
+                            <p className="m-0">
                               Före:{' '}
                               {symptomText(session.checkins?.before?.symptoms)}
                             </p>
-                            <p className="my-2">
+                            <p className="m-0">
                               Efter:{' '}
                               {symptomText(session.checkins?.after?.symptoms)}
                             </p>
-                            <p className="my-2">
+                            <p className="m-0">
                               Dagen efter:{' '}
                               {symptomText(
                                 session.checkins?.dayAfter?.symptoms,
                               )}
                             </p>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            <a
+                              href={`#/historik/${session.id}`}
+                              className="flex min-h-12 items-center font-bold underline"
+                            >
+                              Öppna passet
+                            </a>
+                          </div>
+                        </details>
+                      </li>
+                    );
+                  })}
+              </ol>
             </>
           ) : (
             <p className="m-0">Inga resultat med de valda filtren.</p>

@@ -27,6 +27,7 @@ describe('repTempo', () => {
   it('keeps ballistic, laps, meters and seconds manual', () => {
     for (const id of [
       'mountain-climber',
+      'plank-arm-lift',
       'pull-up',
       'chin-up',
       'parallel-dip',

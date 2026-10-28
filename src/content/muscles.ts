@@ -78,6 +78,9 @@ export const exerciseMuscles: Record<
     qualities: ('balance' | 'grip' | 'power')[];
   }
 > = {
+  'decline-push-up': { ...bodyweightDetails['decline-push-up'], qualities: [] },
+  'diamond-push-up': { ...bodyweightDetails['diamond-push-up'], qualities: [] },
+  'plank-arm-lift': { ...bodyweightDetails['plank-arm-lift'], qualities: [] },
   'push-up': { ...bodyweightDetails['push-up'], qualities: [] },
   'pull-up': { ...bodyweightDetails['pull-up'], qualities: ['grip'] },
   'chin-up': { ...bodyweightDetails['chin-up'], qualities: ['grip'] },

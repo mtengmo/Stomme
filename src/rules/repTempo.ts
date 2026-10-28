@@ -6,6 +6,8 @@ import { easeInOut } from '../figures/lerp';
 /** Counted by hand: the pace is the user's. */
 const MANUAL_REPS: readonly ExerciseId[] = [
   'mountain-climber',
+  // Each alternating arm lift counts once; the demo cycle shows both arms.
+  'plank-arm-lift',
   // Often taken to failure, so a fixed beat would be wrong.
   'pull-up',
   'chin-up',

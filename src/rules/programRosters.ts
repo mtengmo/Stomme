@@ -1,4 +1,7 @@
-import { exerciseMetadata } from '../content/exerciseMetadata';
+import {
+  type ExerciseVariant,
+  exerciseMetadata,
+} from '../content/exerciseMetadata';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import {
   generalSlots,
@@ -47,7 +50,8 @@ function fits(id: ExerciseId, preferences: TrainingPreferences): boolean {
 }
 
 function levelOf(id: ExerciseId, preferences: TrainingPreferences) {
-  return chooseVariant(id, preferences)?.technicalLevel ?? 'technical';
+  // Called only for candidates that passed fits() and usable().
+  return (chooseVariant(id, preferences) as ExerciseVariant).technicalLevel;
 }
 
 function usable(id: ExerciseId, preferences: TrainingPreferences): boolean {
@@ -95,7 +99,8 @@ function pickFromSlot(
     return { id: pool[0] as ExerciseId };
   const score = (id: ExerciseId) =>
     levelRankOf(levelOf(id, preferences)) +
-    (isLoaded(id, preferences) ? 1.5 : 0);
+    // A registered weighted variant keeps priority over unweighted difficulty.
+    (isLoaded(id, preferences) ? 2.5 : 0);
   return {
     id: pool.reduce((best, id) => (score(id) > score(best) ? id : best)),
   };
@@ -220,28 +225,8 @@ export function buildRoster(
       : preferences.bodyParts?.length
         ? focused(preferences, template, preferences.bodyParts, context)
         : wholeBody(preferences, template, context);
-  // Focused rosters that found nothing stay empty so the reason is shown to the user.
-  if (preferences.programId === 'general' && preferences.bodyParts?.length)
-    return roster;
-  if (roster.ids.length < 3) {
-    const levels = allowedLevels(preferences.experience);
-    for (const id of [
-      'goblet-chair-squat',
-      'glute-bridge',
-      'dead-bug',
-      'bird-dog',
-      'plank',
-    ] as const) {
-      if (
-        fits(id, preferences) &&
-        usable(id, preferences) &&
-        levels.includes(levelOf(id, preferences)) &&
-        !roster.ids.includes(id)
-      )
-        roster.ids.push(id);
-      if (roster.ids.length >= 4) break;
-    }
-  }
+  // Whole-body and running slots already provide at least three apparatus-free
+  // options at every level. A focused selection may intentionally stay empty.
   return roster;
 }
 

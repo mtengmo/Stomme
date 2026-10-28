@@ -31,7 +31,7 @@ Requires Node 24 and npm. Install with `npm ci`.
 
 ## Exercise review
 
-Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All 38 exercises have fixed references E01–E38, independent of workout order. The read-only view includes names, IDs, muscles, instructions, source attribution and static start/mid/end frames for each side. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
+Open [Granska övningar](https://stomme.tengmo.com/#/granska) from Settings or the exercise library. All 71 exercises have fixed references E01–E71, independent of workout order. The read-only view includes names, IDs, muscles, instructions, source attribution and static start/mid/end frames for each side. A particular exercise can be linked directly, for example `#/granska?ovning=E03`.
 
 The reader combines movement, muscle information and instructions in one internally scrolling view. Review one large pose using Start/Mitt/Slut and switch sides as needed. Selecting a weight changes the equipment diagram and handling instructions. Session help uses the variant and actual total weight currently selected in that set.
 

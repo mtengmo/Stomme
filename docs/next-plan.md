@@ -1,41 +1,40 @@
-# Next steps (as of 2026-10-28, `main` at 7f9e957)
+# Next steps (as of 2026-10-28)
 
-Work finished and merged: new quick start, level-driven plans, hands-free rep counting with beeps and per-exercise pace, session timeout, four new exercises, grouped exercise picker, Historik summary, filler-text cleanup. Everything below is open.
+Implementation from the Claude handoff is on `feature/next-plan`. No merge or push to `main` is authorised by this handoff.
 
-## 1. Harder push-ups and "Prova nästa nivå" (recommended first)
+## Finished
 
-Why: beginners now have wall and knee push-ups, but nothing harder than the regular push-up except dips, and nothing tells you when to move up the ladder.
+- E69 decline push-up and E70 diamond push-up (`technical`), plus E71 plank with arm lifts (`practiced`). IDs, stable references, aliases, source notes, muscle tags, equipment, catalogue, backup round-trip and geometry tests are updated. Source URLs were opened before use; figures were checked in `/dev/figurer`, including reduced-motion framing. E71 is counted manually: one alternating arm lift per rep.
+- Harder/easier links for wall → knee → push-up → decline/diamond and calf raise → single-leg calf raise. New/some rosters retain the knee-push-up fallback; regular bodyweight users can receive a harder press. Registered weighted presses keep priority. No weighted push-up or optional calf hold was added.
+- “Prova nästa nivå” on preview and completed-session summary. The latest two same-programme attempts must be complete, with every set/side at the top of the range, effort easy and after-check good. Symptoms since the older attempt block it. Missing/aborted/skipped/early-ended results do not qualify. Rehab is excluded. Equipment is checked, the exercise never switches automatically, and an explicit preview switch uses its start dose.
+- “Resultat per övning” now has a small chart and short newest-first session rows: date, sets/reps and weight. Programme, full set values, symptoms and missing answers are available in an accessible disclosure, with a session-detail link. Programme/equipment/side/weight filters remain separate. Incomplete session status stays visible. History's latest-session link now has a 48 px target.
+- Upgrade runner: native Windows tar handles drive-letter paths, and the browser contexts support tsx's serialized callback helpers. Accessibility and M6 screenshot scripts use manual counting; the latter seeds the legacy programme explicitly and starts Vite without a shell wrapper.
+- Refreshed `.impeccable/design.json` from the existing design context. `CLAUDE.md` is absent from this checkout, so there is no implementer name to repair.
 
-- Add exercises (same pattern as E65–E68: ExerciseId union, `bodyweightExercises.ts`, poses in `bodyweightPoses.ts`, references E69+, aliases, muscles, tests, `docs/bodyweight-catalogue.md`):
-  - Armhävning med fötterna upphöjda (decline), level `technical`.
-  - Smala armhävningar (diamond), level `technical`.
-  - Planka med armlyft, level `practiced`.
-  - Tåhävning på ett ben already exists; add a hold variant only if wanted.
-- Add a "harder" link next to `easierExerciseId` (`harderExerciseId`) for the chain wall -> knee -> push-up -> decline/diamond, and calf-raise -> single-leg-calf-raise.
-- "Prova nästa nivå": after two sessions at the top of the rep range with effort "lätt", suggest the next exercise in the chain on the preview/summary. Never switch automatically. Rehab excluded.
-- Verify: roster tests per level (new / some / regular), no push-up without a slot fallback, source URLs opened before use, figures checked in `/dev/figurer`.
-- Weighted push-ups (rucksack/vest) are deliberately NOT planned yet. If wanted later: new equipment type, weight field and plan-validation change, behind the "Tränar regelbundet" level.
+## Verification
 
-## 2. Historik: Resultat per övning
+- `npm run check` and `npm run build` pass. Check reports only existing Biome warnings/deprecation information.
+- `npm run test:cov`: 1,348 tests passed, 100% branch coverage in `src/rules/`. Removed unreachable roster top-up code and redundant fallback branches; apparatus-free running rosters and missing historical check-ins have explicit regression coverage.
+- Mobile preview/history tests pass at 320/360/412 px in light and dark, including explicit switching, start dosage, draft reload, varied set results, missing answers, session-detail links and overflow checks. Screenshots were inspected. The existing bodyweight/catalogue browser checks also pass.
+- `npm run test:upgrade`: all six scenarios pass, including the unmodified old-client bootstrap, offline retry, active workout and multiple tabs.
+- M6 screenshot runner completes at 360/412 px in both schemes.
+- Full browser suite: 104 passed initially; the two failures were stale 68-exercise assertions. After updating them to 71, all 12 checks in the affected/mobile specs pass against the final build. No functional browser failures remain.
+- Accessibility: contrast checks pass; the final structural audit covers 104 screens at 360×800 in light/dark with no findings. The design detector reports no findings on changed screens.
+- `deploy.yml` uploads and deploys Pages from `main`; `dev` is a separate Cloudflare deployment. The latest completed [quality run](https://github.com/mtengmo/Stomme/actions/runs/39821006034) succeeded on 2026-10-22, before this handoff's script changes; the local runs above verify the current scripts.
+- Local screenshot/log artifacts: `.impeccable/review/next-plan/` (ignored by git). Recreate mobile screenshots with `npx playwright test tests/e2e/next-plan.spec.ts` and inspect figures with `npm run dev` → `#/dev/figurer`.
 
-The table inside "Din utveckling" (`src/features/history/ProgressOverview.tsx`, "Resultat per övning") is very tall and cramped on phones: narrow columns, every word wraps. Redesign as short rows per session (date, sets x reps, weight) with a small chart above; check at 320/360/412 px with real screenshots.
+## Decisions waiting for the owner
 
-## 3. Decisions waiting for the owner
+- Old knee programme: a forgotten session with every set logged is ended as “avbruten” (`timeout`) after 90 minutes. Choose whether to keep that cautious behaviour (no progression without after-pain feedback) or complete such sessions. `StaleSession` has not been deleted.
+- Keep or remove the one-time “Nytt: appen räknar repetitionerna åt dig…” line on the set screen.
+- Old merged local branches may be deleted: `start-flow-redesign`, `rep-counting`, `timeout-and-exercises`, `history-summary`, `fix-bodyweight-weight`. They have been left intact.
 
-- Old knee programme: a forgotten session with every set logged is now ended as "avbruten" (reason `timeout`) after 90 minutes instead of being completable from the week-page banner. `src/features/week/StaleSession.tsx` is practically unreachable. Choose: keep (cautious: no progression without the after-pain answer) or complete such sessions. Then delete or keep `StaleSession`.
-- One-time line "Nytt: appen räknar repetitionerna åt dig…" on the set screen: keep or remove.
-- Old local branches can be deleted: `start-flow-redesign`, `rep-counting`, `timeout-and-exercises`, `history-summary`, `fix-bodyweight-weight` (all merged).
+## Still needs a real device
 
-## 4. Unverified / cleanup
+- Beeps, Swedish speech (requires an installed Swedish voice), figure comprehension and floor-use ergonomics have not been tested on a physical phone. Browser screenshots and geometry checks do not replace that check. Use `npm run dev -- --host`.
+- After an authorised release, reload the installed app twice and check the displayed commit. No deployment or installed-app reload was performed here.
+- Pace and “Räkna själv” remain per-exercise backup data. Older cached app versions cannot restore backups containing `abortReason: 'timeout'` or the new metadata; existing IDs and backup schema remain unchanged.
 
-- Never tried on a real phone: beeps, spoken Swedish (needs a Swedish voice), figures (knee push-up, calf raise look acceptable but calf raise reads as a lean), layouts. Test with `npm run dev -- --host`.
-- `npm run test:upgrade` cannot start in this Git Bash (tar path error), so the reworked `scripts/test-upgrade.ts`, `scripts/a11y-audit.ts` and `scripts/m6bshots.ts` have only been type-checked; check the GitHub quality run.
-- Check whether `deploy.yml` publishes `main`; reload the installed app twice to get new versions.
-- Slow unit tests (`repFlow`, `physioFlow`) time out under machine load: raise their timeouts if CI is flaky.
-- `.impeccable/design.json` is older than `DESIGN.md`; run `/impeccable document` to refresh when convenient.
-- CLAUDE.md names the implementer `developer-billy`, but the agent that exists is `developer-willy`.
-- Pace and "Räkna själv" are per exercise and stored in the backup; backups with `abortReason: 'timeout'` or the new meta key cannot be restored by an older cached app version.
+## Working convention
 
-## How to work next time
-
-Plan with `architect-einstein` (Opus), verify with `reviewer` (Opus), implement with `developer-willy` (Sonnet, Haiku for mechanical parts), commit on a branch, merge and push to `main` only when asked. Use `/impeccable` for any screen change and look at real screenshots at 320/360/412 px before committing.
+Use a feature branch, preserve the Swedish notebook design, and inspect real mobile screenshots before committing UI changes. Run check, coverage tests and build; run browser/accessibility/upgrade checks for relevant changes. Commit on the feature branch. Merge or push only when asked. Named Claude agents from the original handoff are not required by this repository.

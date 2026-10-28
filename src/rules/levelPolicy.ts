@@ -21,6 +21,9 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'floor-press': 'horizontal-press',
   'kettlebell-floor-press': 'horizontal-press',
   'push-up': 'horizontal-press',
+  'decline-push-up': 'horizontal-press',
+  'diamond-push-up': 'horizontal-press',
+  'plank-arm-lift': 'core',
   'knee-push-up': 'horizontal-press',
   'wall-push-up': 'horizontal-press',
   'shoulder-press': 'overhead-press',
@@ -160,7 +163,8 @@ export function chooseStartingWeight(
             ? 0
             : Math.min(Math.ceil(last / 2), last - 1);
   return {
-    totalKg: choices[index]?.totalKg ?? 0,
+    // choices is non-empty and every branch clamps index to [0, last].
+    totalKg: (choices[index] as (typeof choices)[number]).totalKg,
     heavy: index === last && last > 0 && options.heavyAllowed,
   };
 }

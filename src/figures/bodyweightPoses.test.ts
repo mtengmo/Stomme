@@ -35,6 +35,36 @@ describe('bodyweight movement paths', () => {
     }
     expect(movementPose('push-up', 1).neck[1]).toBeGreaterThan(start.neck[1]);
   });
+  it.each(['decline-push-up', 'diamond-push-up'] as const)(
+    '%s keeps planted hands, feet and a rigid trunk',
+    (id) => {
+      const start = movementPose(id, 0);
+      for (let n = 0; n <= 40; n++) {
+        const p = movementPose(id, n / 40);
+        expect(p.hR).toEqual(start.hR);
+        expect(p.hL).toEqual(start.hL);
+        expect(p.aR).toEqual(start.aR);
+        expect(distance(p.neck, p.hip)).toBeCloseTo(
+          distance(start.neck, start.hip),
+          8,
+        );
+      }
+      expect(movementPose(id, 1).neck[1]).toBeGreaterThan(start.neck[1]);
+      if (id === 'decline-push-up') expect(start.aR[1]).toBeLessThan(150);
+    },
+  );
+  it('plank arm lift keeps the trunk still and alternates the lifted arm', () => {
+    const start = movementPose('plank-arm-lift', 0);
+    const right = movementPose('plank-arm-lift', 0.25);
+    const left = movementPose('plank-arm-lift', 0.75);
+    expect(right.hL).toEqual(start.hL);
+    expect(left.hR).toEqual(start.hR);
+    expect(right.hR[1]).toBeLessThan(start.hR[1] - 30);
+    expect(left.hL[1]).toBeLessThan(start.hL[1] - 30);
+    expect(right.hip).toEqual(start.hip);
+    expect(left.neck).toEqual(start.neck);
+    expect(figures['plank-arm-lift'].end.hR[1]).toBeLessThan(start.hR[1] - 30);
+  });
   it.each(['pull-up', 'chin-up', 'parallel-dip'] as const)(
     '%s retains both apparatus contacts',
     (id) => {

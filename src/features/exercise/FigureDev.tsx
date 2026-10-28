@@ -3,6 +3,9 @@ import { FigureFrame, movementPose } from '../../figures/Figure';
 import { figures } from '../../figures/poses';
 
 const SEQUENCE_IDS: ReadonlySet<string> = new Set([
+  'decline-push-up',
+  'diamond-push-up',
+  'plank-arm-lift',
   'push-up',
   'pull-up',
   'chin-up',

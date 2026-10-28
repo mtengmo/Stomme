@@ -72,6 +72,7 @@ export interface ExerciseMetadata {
   holdSeconds?: number;
   relaxSeconds?: number;
   easierExerciseId?: ExerciseId;
+  harderExerciseId?: ExerciseId;
 }
 
 const aaosUrl =
@@ -967,6 +968,9 @@ export const exerciseMetadata = Object.fromEntries(
           ]
         : sourceFor(id),
       reviewedAt: [
+        'decline-push-up',
+        'diamond-push-up',
+        'plank-arm-lift',
         'knee-push-up',
         'wall-push-up',
         'calf-raise',
@@ -994,6 +998,17 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
     if (id === 'push-up') metadata.easierExerciseId = 'knee-push-up';
+    if (id === 'wall-push-up') metadata.harderExerciseId = 'knee-push-up';
+    if (id === 'knee-push-up') metadata.harderExerciseId = 'push-up';
+    if (id === 'push-up') metadata.harderExerciseId = 'decline-push-up';
+    if (id === 'decline-push-up' || id === 'diamond-push-up')
+      metadata.easierExerciseId = 'push-up';
+    if (id === 'calf-raise')
+      metadata.harderExerciseId = 'single-leg-calf-raise';
+    if (id === 'plank-arm-lift') {
+      metadata.easierExerciseId = 'plank';
+      metadata.sidePolicy = 'alternating';
+    }
     if (id === 'knee-push-up') metadata.easierExerciseId = 'wall-push-up';
     if (id === 'single-leg-calf-raise')
       metadata.easierExerciseId = 'calf-raise';

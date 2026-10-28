@@ -141,6 +141,10 @@ async function audit(page: Page, name: string) {
 /** AUDIT_THEME=<id> runs the whole audit in another registered theme (default: Rutat). */
 const AUDIT_THEME = process.env.AUDIT_THEME;
 async function applyAuditTheme(ctx: BrowserContext): Promise<void> {
+  // Use manual counting to inspect set controls without waiting through real reps.
+  await ctx.addInitScript(
+    "window.__name = (fn) => fn; localStorage.setItem('stomme.repCount.manual', '1');",
+  );
   if (!AUDIT_THEME) return;
   await ctx.addInitScript(
     `localStorage.setItem('stomme.appearance', ${JSON.stringify(JSON.stringify({ theme: AUDIT_THEME, scheme: 'system' }))})`,
@@ -157,7 +161,6 @@ async function theme(scheme: 'light' | 'dark') {
   });
   await applyAuditTheme(ctx);
   const page = await ctx.newPage();
-  await page.addInitScript('window.__name = (f) => f');
   const base = `http://localhost:${PORT}`;
   const tag = (s: string) => `${AUDIT_THEME ?? 'rutat'} ${scheme} ${s}`;
   await page.goto(base);
@@ -205,9 +208,16 @@ async function theme(scheme: 'light' | 'dark') {
   await audit(page, tag('session detail'));
   await page.getByRole('button', { name: 'Radera passet' }).click();
   await audit(page, tag('session detail delete confirm'));
+  await page.getByRole('button', { name: 'Behåll passet' }).click();
 
   // settings confirmations
-  await page.goto(`${base}/#/installningar`);
+  await page
+    .getByRole('navigation', { name: 'Huvudmeny' })
+    .getByRole('link', { name: 'Inställningar', exact: true })
+    .click();
+  await page
+    .getByRole('heading', { name: 'Inställningar', exact: true })
+    .waitFor();
   await page.getByRole('button', { name: 'Radera all data' }).click();
   await audit(page, tag('delete confirm'));
   await page.keyboard.press('Escape');
@@ -384,7 +394,6 @@ async function theme(scheme: 'light' | 'dark') {
     );
   // error boundary: make the History route throw on render
   const p2 = await ctx.newPage();
-  await p2.addInitScript('window.__name = (f) => f');
   await p2.route('**/features/history/History.tsx*', (r) =>
     r.fulfill({
       contentType: 'text/javascript',
@@ -403,7 +412,6 @@ async function theme(scheme: 'light' | 'dark') {
   });
   await applyAuditTheme(trainingContext);
   const training = await trainingContext.newPage();
-  await training.addInitScript('window.__name = (f) => f');
   await training.goto(base);
   await training.getByRole('button', { name: /Jag förstår/ }).click();
   await training.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();
@@ -560,7 +568,6 @@ async function theme(scheme: 'light' | 'dark') {
   });
   await applyAuditTheme(physioContext);
   const physio = await physioContext.newPage();
-  await physio.addInitScript('window.__name = (f) => f');
   await physio.goto(base);
   await physio.getByRole('button', { name: /Jag förstår/ }).click();
   await physio.getByRole('heading', { name: 'Vad vill du träna?' }).waitFor();

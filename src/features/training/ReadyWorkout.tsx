@@ -54,6 +54,12 @@ export function ReadyWorkout({
         'kettlebell-floor-press',
         'shoulder-press',
         'kettlebell-press',
+        'wall-push-up',
+        'knee-push-up',
+        'push-up',
+        'decline-push-up',
+        'diamond-push-up',
+        'parallel-dip',
       ].includes(exerciseId),
     )
       ? 'press för överkroppen'

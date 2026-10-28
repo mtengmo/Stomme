@@ -140,6 +140,11 @@ for (const width of [360, 1280]) {
     await expect(
       progress.getByRole('combobox', { name: 'Övning', exact: true }),
     ).toHaveValue('supported-row');
+    await expect(progress.getByText('2 × 12 rep.')).toBeVisible();
+    await progress
+      .getByText('Visa pass och svar', { exact: true })
+      .first()
+      .click();
     await expect(progress.getByText(/Set 1: 12/)).toBeVisible();
     await progress
       .getByRole('button', { name: '12 veckor', exact: true })

@@ -1,4 +1,7 @@
 export type ExerciseId =
+  | 'decline-push-up'
+  | 'diamond-push-up'
+  | 'plank-arm-lift'
   | 'goblet-chair-squat'
   | 'step-up'
   | 'single-leg-rdl'

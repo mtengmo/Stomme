@@ -233,10 +233,50 @@ export const bodyweightExercises: Exercise[] = [
     'reps',
     15,
   ),
+  exercise(
+    'decline-push-up',
+    'Armhävning med fötterna upphöjda',
+    ['Bröst', 'Axlar', 'Triceps'],
+    [
+      'Stöd händerna i golvet och tårna på en låg, stadig stol som inte kan glida. Håll kroppen rak.',
+      'Sänk bröstet lugnt mellan händerna med armbågarna snett bakåt. Behåll samma linje genom höft och rygg.',
+      'Pressa upp igen utan att kasta med kroppen. Ned och upp räknas som en repetition.',
+    ],
+    'Höften hänger ned eller stolen rör sig.',
+    'Sätt fötterna i golvet och gör en vanlig armhävning.',
+  ),
+  exercise(
+    'diamond-push-up',
+    'Smala armhävningar',
+    ['Triceps', 'Bröst', 'Axlar'],
+    [
+      'Stöd på tårna och sätt händerna tätt under bröstet. Låt tummar och pekfingrar bilda en diamant om det känns bekvämt.',
+      'Böj armarna nära sidorna och sänk bröstet kontrollerat mot händerna. Håll höften i linje med kroppen.',
+      'Tryck genom handflatorna och räta ut armarna. En sänkning och upppressning är en repetition.',
+    ],
+    'Armbågarna far ut åt sidorna eller ryggen svankar.',
+    'Flytta händerna bredare och välj en vanlig armhävning.',
+  ),
+  exercise(
+    'plank-arm-lift',
+    'Planka med armlyft',
+    ['Bål', 'Axlar'],
+    [
+      'Stöd på underarmar och tår. Håll nacke, rygg och ben i en linje och ha lite avstånd mellan fötterna.',
+      'Sträck en arm framåt utan att vrida bäckenet. Stanna kort, sätt ned underarmen och växla arm.',
+      'Räkna varje armlyft och återgång som en repetition totalt. Fortsätt växelvis och sätt ned knäna när setet är klart.',
+    ],
+    'Bäckenet vrids eller höften sjunker när armen lyfts.',
+    'Behåll båda underarmarna i golvet och välj vanlig planka.',
+    6,
+  ),
 ];
 
 export type BodyweightId = (typeof bodyweightIds)[number];
 export const bodyweightIds = [
+  'decline-push-up',
+  'diamond-push-up',
+  'plank-arm-lift',
   'push-up',
   'pull-up',
   'chin-up',
@@ -267,6 +307,39 @@ export const bodyweightDetails: Record<
     note: string;
   }
 > = {
+  'decline-push-up': {
+    equipment: 'chair',
+    level: 'technical',
+    reason: 'Upphöjda fötter ökar kraven på press och bålkontroll.',
+    primary: ['chest', 'shoulders'],
+    secondary: ['triceps', 'core'],
+    source:
+      'https://www.nasm.org/resource-center/exercise-library/decline-push-up',
+    publisher: 'NASM',
+    note: 'Fötterna på en låg, stadig stol. Ingen extra vikt. Startdosen är appens förslag.',
+  },
+  'diamond-push-up': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason: 'Smalt handstöd kräver mer kontroll och tricepsstyrka.',
+    primary: ['triceps', 'chest'],
+    secondary: ['shoulders', 'core'],
+    source:
+      'https://www.puregym.com/exercises/chest/press-up/diamond-press-ups/',
+    publisher: 'PureGym',
+    note: 'Smalt handstöd under bröstet, med diamantform när det känns bekvämt. Ingen extra vikt.',
+  },
+  'plank-arm-lift': {
+    equipment: 'bodyweight',
+    level: 'practiced',
+    reason: 'Bålen hålls stilla medan en arm i taget lämnar golvet.',
+    primary: ['core'],
+    secondary: ['shoulders', 'glutes'],
+    source:
+      'https://www.ucalgary.ca/shred-injuries/all-sports/soccer/front-plank-arm-lifts',
+    publisher: 'University of Calgary',
+    note: 'Underarmsplanka med växelvisa armlyft. Appen räknar varje armlyft totalt, medan källan anger repetitioner per arm.',
+  },
   'push-up': {
     equipment: 'bodyweight',
     level: 'practiced',

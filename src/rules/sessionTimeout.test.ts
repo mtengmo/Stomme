@@ -20,6 +20,11 @@ describe('lastActivity', () => {
   it('is the start when nothing else was recorded', () => {
     expect(lastActivity(session(), [], [])).toBe(iso(0));
   });
+  it('ignores missing optional check-ins in older records', () => {
+    expect(
+      lastActivity(session({ checkins: { after: undefined } }), [], []),
+    ).toBe(iso(0));
+  });
 
   it('takes the latest of sets, pain readings and check-ins', () => {
     const s = session({
