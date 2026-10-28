@@ -362,7 +362,7 @@ export async function abortSession(
  * Ends open sessions with no activity for 90 minutes, in ONE transaction that
  * re-reads everything so a set logged at the same moment wins.
  * - nothing recorded: deleted (like an abandoned preparation);
- * - programme session with every non-skipped set logged: completed;
+ * - every non-skipped set logged: completed;
  * - anything else: aborted with reason 'timeout' (never a pain stop).
  * finishedAt is the last activity, so the duration stays honest.
  * Returns the ids of sessions that were ended or removed.
@@ -393,7 +393,7 @@ export async function expireStaleSessions(
         !s.note?.trim()
       ) {
         await db.sessions.delete(s.id);
-      } else if (s.programId && allSetsLogged(s, logs)) {
+      } else if (allSetsLogged(s, logs)) {
         await db.sessions.update(s.id, {
           status: 'completed',
           finishedAt: last,

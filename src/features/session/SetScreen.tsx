@@ -27,24 +27,6 @@ import { KettlebellRackGrip } from '../exercise/KettlebellRackGrip';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
-const SEEN_KEY = 'stomme.repCount.seen';
-
-function readFlag(key: string): boolean {
-  try {
-    return window.localStorage.getItem(key) === '1';
-  } catch {
-    return false;
-  }
-}
-function writeFlag(key: string, on: boolean): void {
-  try {
-    if (on) window.localStorage.setItem(key, '1');
-    else window.localStorage.removeItem(key);
-  } catch {
-    // The choice still applies for this screen.
-  }
-}
-
 /** Extra facts about how the reps were counted, saved with the set. */
 export interface CountInfo {
   counting?: 'auto' | 'manual';
@@ -136,7 +118,6 @@ export function SetScreen({
     savePace(exercise.id, next);
   };
   const [manual, setManual] = useState(() => isManual(exercise.id));
-  const [seenIntro] = useState(() => readFlag(SEEN_KEY));
   const autoCount = tempo !== null && !manual;
   const unsaved = useRef<{ count: number; early: boolean } | null>(null);
   const counter = useRepCounter({
@@ -215,7 +196,6 @@ export function SetScreen({
             onClick={() => {
               if (autoCount) {
                 if (counter.phase === 'idle') {
-                  writeFlag(SEEN_KEY, true);
                   onStartTimer?.();
                   counter.start();
                 } else if (counter.phase === 'done') {
@@ -453,12 +433,6 @@ export function SetScreen({
           </p>
         </div>
       )}
-      {tempo && !seenIntro && counter.phase === 'idle' && autoCount ? (
-        <p className="m-0 text-base">
-          Nytt: appen räknar repetitionerna åt dig. Du kan räkna själv under
-          Ändra set.
-        </p>
-      ) : null}
       <FigureSlot
         exerciseId={exercise.id}
         side={step.side}
