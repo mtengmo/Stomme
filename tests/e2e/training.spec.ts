@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { completeSets, keepFirstExercises, quickStart } from './flow';
+import {
+  addExercise,
+  completeSets,
+  keepFirstExercises,
+  quickStart,
+} from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -176,10 +181,7 @@ test('rehab uses explicitly entered dose and selected left side through reload',
   await expect(
     page.getByRole('heading', { name: 'Mitt rehabpass', exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole('combobox', { name: 'Lägg till övning', exact: true })
-    .selectOption('straight-leg-raise');
-  await page.getByRole('button', { name: 'Lägg till i passet' }).click();
+  await addExercise(page, 'straight-leg-raise');
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('');
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.getByLabel('Repetitioner per sida', { exact: true }).fill('3');

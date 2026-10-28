@@ -151,22 +151,21 @@ test('the add-exercise picker narrows by body region and lists primary matches f
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
-  const picker = page.getByRole('combobox', {
-    name: 'Lägg till övning',
-    exact: true,
-  });
-  const all = await picker.locator('option').count();
+  await page
+    .getByRole('button', { name: 'Lägg till övning', exact: true })
+    .click();
+  const results = page.locator('main').getByRole('listitem');
+  const all = await results.count();
   await page.getByRole('button', { name: 'Armar', exact: true }).click();
   await expect(
     page.getByRole('button', { name: 'Armar', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
-  const arms = await picker.locator('option').count();
-  expect(arms).toBeLessThanOrEqual(all);
+  expect(await results.count()).toBeLessThanOrEqual(all);
   await page.getByRole('button', { name: 'Alla', exact: true }).click();
-  expect(await picker.locator('option').count()).toBe(all);
+  await expect(results).toHaveCount(all);
   await page.getByText('Mer specifikt', { exact: true }).click();
-  await page.getByLabel('Muskelgrupp').selectOption('glutes');
-  expect(await picker.locator('option').count()).toBeLessThan(all);
+  await page.getByRole('button', { name: 'Säte', exact: true }).click();
+  expect(await results.count()).toBeLessThan(all);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

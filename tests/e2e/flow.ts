@@ -1,4 +1,19 @@
 import { expect, type Page } from '@playwright/test';
+import { exerciseReferences } from '../../src/content/exerciseReferences';
+import type { ExerciseId } from '../../src/domain/types';
+
+/** Pick an exercise through the searchable editor chooser. */
+export async function addExercise(page: Page, exerciseId: ExerciseId) {
+  await page
+    .getByRole('button', { name: 'Lägg till övning', exact: true })
+    .click();
+  await page.getByLabel('Sök övning', { exact: true }).fill(exerciseId);
+  await page
+    .getByRole('listitem')
+    .filter({ hasText: exerciseReferences[exerciseId] })
+    .getByRole('button', { name: 'Lägg till övningen', exact: true })
+    .click();
+}
 
 /**
  * Installs a fake clock that only moves when the test advances it

@@ -1,11 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { type SetStateAction, useEffect, useState } from 'react';
+import { type SetStateAction, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import {
-  exerciseMetadata,
-  type TechnicalLevel,
-  technicalLevelLabels,
-} from '../../content/exerciseMetadata';
+import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exerciseList, exercises } from '../../content/exercises';
@@ -14,12 +10,7 @@ import {
   kneeRehabExercises,
   kneeRehabSource,
 } from '../../content/kneeRehab';
-import {
-  bodyRegions,
-  exerciseMuscles,
-  type MuscleGroupId,
-  muscleGroups,
-} from '../../content/muscles';
+import { bodyRegions } from '../../content/muscles';
 import {
   physioKneeBanner,
   physioKneeConfirmLabel,
@@ -64,7 +55,6 @@ import type {
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
-import { chooseVariant, levelRankOf } from '../../rules/levelPolicy';
 import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
@@ -79,6 +69,7 @@ import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { basePlan, defaultPlan, painLogsShowPain } from './defaultPlan';
+import { ExercisePicker } from './ExercisePicker';
 import { NextLevelSuggestions } from './NextLevelSuggestions';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
@@ -279,7 +270,30 @@ function PreviewEditor({
       kneeRehabExercises.some((knee) => knee.id === ex.id),
   );
 
-  const [addId, setAddId] = useState<ExerciseId | ''>('');
+  const [picker, setPicker] = useState<ExerciseId | 'add' | null>(() => {
+    try {
+      const value = sessionStorage.getItem(`${draftKey}.picker`);
+      return value === 'add' || plan.some((item) => item.exerciseId === value)
+        ? (value as ExerciseId | 'add')
+        : null;
+    } catch {
+      return null;
+    }
+  });
+  const restoreFocus = useRef<string | null>(null);
+  useEffect(() => {
+    try {
+      if (picker) sessionStorage.setItem(`${draftKey}.picker`, picker);
+      else sessionStorage.removeItem(`${draftKey}.picker`);
+    } catch {
+      /* Picker still works without storage. */
+    }
+    if (picker === null && restoreFocus.current) {
+      const target = restoreFocus.current;
+      restoreFocus.current = null;
+      requestAnimationFrame(() => document.getElementById(target)?.focus());
+    }
+  }, [draftKey, picker]);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(() => {
     try {
       const raw = sessionStorage.getItem(`${draftKey}.open`);
@@ -306,70 +320,6 @@ function PreviewEditor({
   useEffect(() => {
     writeFlags(draftKey, { confirmed, checkBefore, removed });
   }, [draftKey, confirmed, checkBefore, removed]);
-  const [addMuscle, setAddMuscle] = useState<MuscleGroupId | ''>('');
-  const [addRegion, setAddRegion] = useState('');
-  const targetMuscles: readonly MuscleGroupId[] = addMuscle
-    ? [addMuscle]
-    : (bodyRegions.find((region) => region.id === addRegion)?.muscles ?? []);
-  // Primary matches first; supporting matches are labelled as such.
-  const pickable = compatible
-    .filter((exercise) => !plan.some((item) => item.exerciseId === exercise.id))
-    .flatMap((exercise) => {
-      if (targetMuscles.length === 0)
-        return [{ exercise, supporting: false, rank: 0 }];
-      const { primary, secondary } = exerciseMuscles[exercise.id];
-      if (primary.some((muscle) => targetMuscles.includes(muscle)))
-        return [{ exercise, supporting: false, rank: 0 }];
-      if (secondary.some((muscle) => targetMuscles.includes(muscle)))
-        return [{ exercise, supporting: true, rank: 1 }];
-      return [];
-    })
-    .sort((a, b) => a.rank - b.rank);
-  // The picker groups by body region and orders each group from basic to technical.
-  // An exercise's level is its easiest variant's.
-  const levelOf = (id: ExerciseId): TechnicalLevel =>
-    chooseVariant(id, preferences)?.technicalLevel ??
-    exerciseMetadata[id].variants.reduce<TechnicalLevel>(
-      (lowest, variant) =>
-        levelRankOf(variant.technicalLevel) < levelRankOf(lowest)
-          ? variant.technicalLevel
-          : lowest,
-      'technical',
-    );
-  const pickableGroups = bodyRegions
-    .map((group) => ({
-      label: group.label,
-      items: pickable
-        .filter(
-          ({ exercise }) =>
-            bodyRegions.find((region) =>
-              exerciseMuscles[exercise.id].primary.some((muscle) =>
-                region.muscles.includes(muscle),
-              ),
-            )?.label === group.label,
-        )
-        .sort(
-          (a, b) =>
-            a.rank - b.rank ||
-            levelRankOf(levelOf(a.exercise.id)) -
-              levelRankOf(levelOf(b.exercise.id)) ||
-            a.exercise.name.localeCompare(b.exercise.name, 'sv'),
-        ),
-    }))
-    .filter((group) => group.items.length > 0)
-    // With a muscle filter, groups holding a primary match come before supporting-only groups.
-    .sort(
-      (a, b) =>
-        Number(a.items.every((item) => item.supporting)) -
-        Number(b.items.every((item) => item.supporting)),
-    );
-  const ungrouped = pickable.filter(
-    ({ exercise }) =>
-      !pickableGroups.some((group) =>
-        group.items.some((item) => item.exercise.id === exercise.id),
-      ),
-  );
-
   const active = sessions.find(
     (session) =>
       session.status === 'in_progress' && session.id !== preparationId,
@@ -402,6 +352,63 @@ function PreviewEditor({
   const change = (index: number, patch: Partial<PlannedExercise>) =>
     updatePlan((current) =>
       current.map((item, n) => (n === index ? { ...item, ...patch } : item)),
+    );
+
+  if (picker && !active)
+    return (
+      <div className="mx-auto flex max-w-xl flex-col gap-4 px-5 pt-4 pb-28">
+        <ExercisePicker
+          headingLevel={1}
+          preferences={preferences}
+          selectedIds={plan.map((item) => item.exerciseId)}
+          replacingId={picker === 'add' ? undefined : picker}
+          allowedIds={
+            preferences.programId === 'rehab' &&
+            rehabGroup(preferences) === 'aaos'
+              ? kneeRehabExercises.map((exercise) => exercise.id)
+              : undefined
+          }
+          pickerKey={`${draftKey}.picker-filters.${picker}`}
+          onCancel={() => {
+            restoreFocus.current =
+              picker === 'add'
+                ? 'open-exercise-picker'
+                : `exercise-row-${picker}`;
+            setPicker(null);
+          }}
+          onChoose={(next) => {
+            if (
+              !compatible.some((exercise) => exercise.id === next) ||
+              plan.some(
+                (item) =>
+                  item.exerciseId === next && item.exerciseId !== picker,
+              )
+            )
+              return;
+            if (picker === 'add' && plan.length >= 12) return;
+            const index =
+              picker === 'add'
+                ? plan.length
+                : plan.findIndex((item) => item.exerciseId === picker);
+            if (index < 0) return;
+            if (next !== picker) {
+              const first = basePlan(next, preferences);
+              const item =
+                preferences.programId === 'rehab'
+                  ? first
+                  : trainingPlanSuggestion(first, preferences, sessions, logs);
+              updatePlan((current) =>
+                picker === 'add'
+                  ? [...current, item]
+                  : current.map((old, n) => (n === index ? item : old)),
+              );
+            }
+            setExpandedIndex(index);
+            restoreFocus.current = `exercise-row-${next}`;
+            setPicker(null);
+          }}
+        />
+      </div>
     );
 
   return (
@@ -648,7 +655,6 @@ function PreviewEditor({
                       variant="secondary"
                       onClick={() => {
                         updatePlan(kneeConditioningPlan(preferences));
-                        setAddId('');
                       }}
                     >
                       Använd färdigt knäpass
@@ -681,7 +687,6 @@ function PreviewEditor({
                       variant="secondary"
                       onClick={() => {
                         updatePlan(physioKneePlan(preferences));
-                        setAddId('');
                       }}
                     >
                       Återställ till programmets startvärden
@@ -713,7 +718,6 @@ function PreviewEditor({
                         (paper && physioKneePlanItem(paper, preferences)) ||
                           basePlan(exerciseId, preferences),
                       ]);
-                      setAddId('');
                     }}
                   />
                 </details>
@@ -763,6 +767,7 @@ function PreviewEditor({
                       <button
                         type="button"
                         className="flex min-h-12 w-full items-center justify-between gap-3 text-left"
+                        id={`exercise-row-${exercise.id}`}
                         aria-expanded={expandedIndex === index}
                         onClick={() =>
                           setExpandedIndex((current) =>
@@ -800,6 +805,14 @@ function PreviewEditor({
                           >
                             Visa hur övningen görs
                           </Link>
+                          {!physioPaper ? (
+                            <Button
+                              variant="secondary"
+                              onClick={() => setPicker(exercise.id)}
+                            >
+                              Byt övning
+                            </Button>
+                          ) : null}
                           {favouriteAlternatives(
                             exercise.id,
                             favourites ?? [],
@@ -1266,122 +1279,14 @@ function PreviewEditor({
               ) : null}
 
               {physioPaper ? null : (
-                <>
-                  <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-                    <legend className="mb-2 text-lg font-bold">
-                      Kroppsdel
-                    </legend>
-                    <div className="flex flex-wrap gap-2">
-                      {[{ id: '', label: 'Alla' }, ...bodyRegions].map(
-                        (region) => (
-                          <button
-                            key={region.id}
-                            type="button"
-                            aria-pressed={!addMuscle && addRegion === region.id}
-                            onClick={() => {
-                              setAddRegion(region.id);
-                              setAddMuscle('');
-                              setAddId('');
-                            }}
-                            className={`min-h-12 rounded-sm border-2 px-3 text-base font-bold ${!addMuscle && addRegion === region.id ? 'border-action bg-action text-action-ink' : 'border-edge text-ink'}`}
-                          >
-                            {region.label}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                    <details>
-                      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                        Mer specifikt
-                      </summary>
-                      <label className="flex flex-col gap-2 text-base font-bold">
-                        Muskelgrupp
-                        <select
-                          className={inputClass}
-                          value={addMuscle}
-                          onChange={(event) => {
-                            setAddMuscle(
-                              event.target.value as MuscleGroupId | '',
-                            );
-                            setAddId('');
-                          }}
-                        >
-                          <option value="">Ingen vald</option>
-                          {(Object.keys(muscleGroups) as MuscleGroupId[]).map(
-                            (group) => (
-                              <option key={group} value={group}>
-                                {muscleGroups[group].label}
-                              </option>
-                            ),
-                          )}
-                        </select>
-                      </label>
-                    </details>
-                    <p className="m-0 text-base text-ink-soft">
-                      Kroppsdelar är träningsmål, inte en bedömning av vad som
-                      passar dig.
-                    </p>
-                  </fieldset>
-                  <label className="flex flex-col gap-2 text-lg font-bold">
-                    Lägg till övning
-                    <select
-                      className={inputClass}
-                      value={addId}
-                      onChange={(event) =>
-                        setAddId(event.target.value as ExerciseId | '')
-                      }
-                    >
-                      <option value="">
-                        {pickable.length
-                          ? 'Välj övning'
-                          : 'Inga övningar passar'}
-                      </option>
-                      {[
-                        ...pickableGroups,
-                        { label: 'Övrigt', items: ungrouped },
-                      ]
-                        .filter((group) => group.items.length > 0)
-                        .map((group) => (
-                          <optgroup key={group.label} label={group.label}>
-                            {group.items.map(({ exercise, supporting }) => (
-                              <option key={exercise.id} value={exercise.id}>
-                                {exercise.name} ·{' '}
-                                {technicalLevelLabels[
-                                  levelOf(exercise.id)
-                                ].toLowerCase()}
-                                {supporting ? ' · stödjer' : ''}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                    </select>
-                  </label>
-                  {pickable.length === 0 ? (
-                    <p className="m-0 text-base text-ink-soft">
-                      Inga fler övningar passar vald kroppsdel och din
-                      utrustning. Välj Alla eller ändra utrustning i Min
-                      utrustning.
-                    </p>
-                  ) : null}
-
-                  <Button
-                    variant="secondary"
-                    disabled={!addId || plan.length >= 12}
-                    onClick={() => {
-                      if (addId)
-                        updatePlan((current) => [
-                          ...current,
-
-                          basePlan(addId, preferences),
-                        ]);
-
-                      if (addId) setExpandedIndex(plan.length);
-                      setAddId('');
-                    }}
-                  >
-                    Lägg till i passet
-                  </Button>
-                </>
+                <Button
+                  id="open-exercise-picker"
+                  variant="secondary"
+                  disabled={plan.length >= 12}
+                  onClick={() => setPicker('add')}
+                >
+                  Lägg till övning
+                </Button>
               )}
             </>
           ) : (
@@ -1602,6 +1507,7 @@ function PreviewEditor({
                       sessionStorage.removeItem(`${draftKey}.editing`);
                       sessionStorage.removeItem(`${draftKey}.open`);
                       sessionStorage.removeItem(`${draftKey}.short`);
+                      sessionStorage.removeItem(`${draftKey}.picker`);
                       clearFlags(draftKey);
                     } catch {
                       /* No persistent draft to clear. */

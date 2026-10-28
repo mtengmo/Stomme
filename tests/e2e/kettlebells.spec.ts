@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addWeight, quickStart, removeAllExercises } from './flow';
+import { addExercise, addWeight, quickStart, removeAllExercises } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -81,12 +81,7 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
   await removeAllExercises(page);
-  await page
-    .getByRole('combobox', { name: 'Lägg till övning', exact: true })
-    .selectOption('kettlebell-floor-press');
-  await page
-    .getByRole('button', { name: 'Lägg till i passet', exact: true })
-    .click();
+  await addExercise(page, 'kettlebell-floor-press');
   await expect(
     page.getByRole('spinbutton', { name: /^Total vikt \(kg\)/ }),
   ).toHaveValue('4');
