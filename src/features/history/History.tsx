@@ -21,9 +21,13 @@ import { loggedExerciseIds, weeklyVolume } from '../../rules/stats';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { isoWeekNumber } from '../week/passState';
+import { HistorySummary } from './HistorySummary';
 import { HistoryTrends } from './HistoryTrends';
 import { StatusChip } from './labels';
 import { ProgressOverview } from './ProgressOverview';
+
+/** The newest sessions shown before the full list is opened. */
+const LIST_LIMIT = 5;
 
 interface HistoryData {
   sessions: Session[];
@@ -78,6 +82,8 @@ export function History() {
   const [period, setPeriod] = useState('all');
 
   const [exercise, setExercise] = useState('');
+
+  const [showAll, setShowAll] = useState(false);
 
   if (!data) return null;
 
@@ -146,6 +152,18 @@ export function History() {
 
   const hasPain = legacyPain.length > 0;
 
+  const activeFilters = [programme, status, period].filter(
+    (value) => value !== 'all',
+  ).length;
+
+  const visible =
+    showAll || filtered.length <= LIST_LIMIT
+      ? filtered
+      : filtered.slice(0, LIST_LIMIT);
+
+  const listTitle =
+    visible.length === filtered.length ? 'Alla pass' : 'Senaste pass';
+
   const exerciseIds = loggedExerciseIds(legacyLogs);
 
   const allExercises = loggedExerciseIds(filteredLogs);
@@ -160,69 +178,89 @@ export function History() {
     'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-8 px-5 pt-6 pb-28">
+    <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-6 pb-28">
       <h1 className="m-0 text-5xl font-extrabold">Historik</h1>
-      <p className="m-0 text-lg">Se vad du gjorde och hur kroppen kändes.</p>
-      <div className="flex flex-col gap-3">
-        <label className="flex flex-col gap-1 text-base font-bold">
-          Träningsinriktning
-          <select
-            className={selectClass}
-            value={programme}
-            onChange={(e) => setProgramme(e.target.value)}
-          >
-            <option value="all">Alla inriktningar</option>
-            <option value="general">Allmän styrka</option>
-            <option value="running">Styrka för löpning</option>
-            <option value="knee">Knärehab · AAOS</option>
-            <option value="knee-physio">
-              Knärehab · Fysioterapeutens program
-            </option>
-            <option value="rehab">Mitt eget rehabprogram</option>
-            <option value="legacy">Ursprungligt knä- och löpprogram</option>
-          </select>
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-base font-bold">
-            Status
-            <select
-              className={selectClass}
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="all">Alla pass</option>
-              <option value="completed">Klara</option>
-              <option value="aborted">Avbrutna</option>
-              <option value="in_progress">Pågående</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-base font-bold">
-            Period
-            <select
-              className={selectClass}
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-            >
-              <option value="all">Alla datum</option>
-              <option value="28">Senaste 4 veckorna</option>
-              <option value="84">Senaste 12 veckorna</option>
-            </select>
-          </label>
-        </div>
+      <HistorySummary sessions={sessions} painLogs={painLogs} today={today} />
+      <div className="flex flex-col gap-1">
+        <details open={activeFilters > 0}>
+          <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
+            Filtrera
+            {activeFilters > 0 ? ` · ${activeFilters} aktiva` : ''}
+          </summary>
+          <div className="flex flex-col gap-3 pt-1">
+            <label className="flex flex-col gap-1 text-base font-bold">
+              Träningsinriktning
+              <select
+                className={selectClass}
+                value={programme}
+                onChange={(e) => setProgramme(e.target.value)}
+              >
+                <option value="all">Alla inriktningar</option>
+                <option value="general">Allmän styrka</option>
+                <option value="running">Styrka för löpning</option>
+                <option value="knee">Knärehab · AAOS</option>
+                <option value="knee-physio">
+                  Knärehab · Fysioterapeutens program
+                </option>
+                <option value="rehab">Mitt eget rehabprogram</option>
+                <option value="legacy">Ursprungligt knä- och löpprogram</option>
+              </select>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1 text-base font-bold">
+                Status
+                <select
+                  className={selectClass}
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="all">Alla pass</option>
+                  <option value="completed">Klara</option>
+                  <option value="aborted">Avbrutna</option>
+                  <option value="in_progress">Pågående</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-base font-bold">
+                Period
+                <select
+                  className={selectClass}
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value)}
+                >
+                  <option value="all">Alla datum</option>
+                  <option value="28">Senaste 4 veckorna</option>
+                  <option value="84">Senaste 12 veckorna</option>
+                </select>
+              </label>
+            </div>
+            {activeFilters > 0 ? (
+              <button
+                type="button"
+                className="min-h-12 self-start text-base font-bold underline"
+                onClick={() => {
+                  setProgramme('all');
+                  setStatus('all');
+                  setPeriod('all');
+                }}
+              >
+                Rensa filter
+              </button>
+            ) : null}
+          </div>
+        </details>
         <p role="status" className="m-0 text-base text-ink-soft">
           {filtered.length} pass visas
         </p>
       </div>
-      <ProgressOverview sessions={sessions} logs={setLogs} today={today} />
-      <section className="flex flex-col gap-5" aria-label="Alla pass">
-        <h2 className="m-0 text-3xl font-bold">Alla pass</h2>
+      <section className="flex flex-col gap-5" aria-label={listTitle}>
+        <h2 className="m-0 text-3xl font-bold">{listTitle}</h2>
         {filtered.length === 0 ? (
           <p className="m-0 text-lg">
             Inga pass matchar dina filter. Välj en annan inriktning, status
             eller period.
           </p>
         ) : null}
-        {groupByWeek(filtered).map((g) => {
+        {groupByWeek(visible).map((g) => {
           const total = g.sessions.reduce(
             (n, s) => n + (setsBySession.get(s.id)?.size ?? 0),
 
@@ -284,7 +322,17 @@ export function History() {
             </div>
           );
         })}
+        {filtered.length > LIST_LIMIT ? (
+          <button
+            type="button"
+            className={buttonClass('secondary')}
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? 'Visa färre' : `Visa alla ${filtered.length} pass`}
+          </button>
+        ) : null}
       </section>
+      <ProgressOverview sessions={sessions} logs={setLogs} today={today} />
       {allExercises.length ? (
         <section
           aria-labelledby="exercise-history"
@@ -318,7 +366,7 @@ export function History() {
           </p>
         </section>
       ) : null}
-      <HistoryTrends sessions={filtered} today={today} />
+      <HistoryTrends sessions={filtered} />
       <BarChart weeks={weeks} />
       {exerciseIds.length > 0 ? (
         <section aria-label="Ursprungliga programmets belastning">

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { Session, SetLog } from '../domain/types';
-import { loggedVariant, sessionSetProgress, symptomSummary } from './history';
+import type { PainLog, Session, SetLog } from '../domain/types';
+import {
+  historySummary,
+  loggedVariant,
+  sessionSetProgress,
+  symptomSummary,
+} from './history';
 
 const session: Session = {
   id: 's',
@@ -112,5 +117,76 @@ describe('legacy symptom summary', () => {
     expect(symptomSummary({ ...session, programId: undefined }, [])).toBe(
       'Besvär: svar saknas',
     );
+  });
+});
+
+describe('historySummary', () => {
+  const at = (
+    id: string,
+    date: string,
+    status: Session['status'],
+  ): Session => ({
+    ...session,
+    id,
+    date,
+    startedAt: `${date}T08:00:00Z`,
+    status,
+  });
+  const pain = (
+    sessionId: string,
+    score: number,
+    timing: PainLog['timing'],
+  ): PainLog => ({
+    id: `p-${sessionId}-${timing}`,
+    sessionId,
+    date: '2026-10-28',
+    timing,
+    score,
+    location: 'right_knee',
+    redFlags: { sharp: false, swelling: false, locking: false },
+    createdAt: '2026-10-28T09:00:00Z',
+  });
+
+  it('counts this week and the last four calendar weeks from real sessions', () => {
+    // Wednesday 2026-10-28: the week starts Monday 2026-10-26, four weeks back is 2026-10-05.
+    const sessions = [
+      at('a', '2026-10-27', 'completed'),
+      at('b', '2026-10-22', 'completed'),
+      at('c', '2026-10-15', 'aborted'),
+      at('d', '2026-10-06', 'completed'),
+      at('e', '2026-10-04', 'completed'),
+      at('f', '2026-10-28', 'in_progress'),
+    ];
+    const s = historySummary(sessions, [], '2026-10-28');
+    expect(s.weekCompleted).toBe(1);
+    expect(s.fourWeeksCompleted).toBe(3);
+    expect(s.fourWeeksAborted).toBe(1);
+    expect(s.last?.id).toBe('f');
+  });
+
+  it('reports pain only when an after reading exists for the newest session', () => {
+    const sessions = [at('a', '2026-10-27', 'completed')];
+    expect(
+      historySummary(sessions, [], '2026-10-28').lastPainAfter,
+    ).toBeUndefined();
+    expect(
+      historySummary(sessions, [pain('a', 2, 'before')], '2026-10-28')
+        .lastPainAfter,
+    ).toBeUndefined();
+    expect(
+      historySummary(sessions, [pain('a', 2, 'after')], '2026-10-28')
+        .lastPainAfter,
+    ).toBe(2);
+  });
+
+  it('has nothing to report without sessions', () => {
+    const s = historySummary([], [], '2026-10-28');
+    expect(s).toEqual({
+      weekCompleted: 0,
+      fourWeeksCompleted: 0,
+      fourWeeksAborted: 0,
+      last: undefined,
+      lastPainAfter: undefined,
+    });
   });
 });

@@ -284,6 +284,7 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
   await page.getByRole('heading', { name: /Pass A klart/ }).waitFor();
   await page.goto('/#/historik');
+  await page.getByText('Filtrera', { exact: true }).click();
   await page
     .getByRole('combobox', { name: 'Träningsinriktning', exact: true })
     .selectOption('knee');

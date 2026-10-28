@@ -2,19 +2,11 @@ import { Link } from 'wouter';
 
 import type { Session } from '../../domain/types';
 
-import { addDays, formatShortDate, weekStart } from '../../lib/dates';
+import { formatShortDate } from '../../lib/dates';
 
 import { symptomText } from './CheckinHistory';
 
-export function HistoryTrends({
-  sessions,
-  today,
-}: {
-  sessions: Session[];
-  today: string;
-}) {
-  const weeks = [3, 2, 1, 0].map((n) => addDays(weekStart(today), -7 * n));
-
+export function HistoryTrends({ sessions }: { sessions: Session[] }) {
   const recent = sessions.filter((s) => s.programId).slice(0, 8);
 
   return (
@@ -23,51 +15,8 @@ export function HistoryTrends({
       className="flex flex-col gap-4 border-t-[3px] border-ink pt-5"
     >
       <h2 id="history-trends" className="m-0 text-3xl font-bold">
-        Träningsvanor och besvär
+        Besvär vid senaste passen
       </h2>
-      <p className="m-0 text-base text-ink-soft">
-        Följer filtren ovan. Frekvens visar avslutade pass, inte medicinsk
-        förbättring.
-      </p>
-      <table className="w-full border-collapse text-left text-base">
-        <caption className="pb-2 text-left text-xl font-bold">
-          Pass per vecka · senaste 4 veckorna
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col" className="py-2">
-              Vecka från
-            </th>
-            <th scope="col">Klara</th>
-            <th scope="col">Avbrutna</th>
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week) => (
-            <tr key={week} className="border-t-2 border-edge">
-              <th scope="row" className="py-3 font-normal">
-                {formatShortDate(week)}
-              </th>
-              <td>
-                {
-                  sessions.filter(
-                    (s) =>
-                      weekStart(s.date) === week && s.status === 'completed',
-                  ).length
-                }
-              </td>
-              <td>
-                {
-                  sessions.filter(
-                    (s) => weekStart(s.date) === week && s.status === 'aborted',
-                  ).length
-                }
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h3 className="m-0 text-xl font-bold">Besvär vid senaste passen</h3>
       <p className="m-0 text-base text-ink-soft">
         Läs samma kroppsdel och sida över tid. Olika besvär slås inte ihop till
         ett genomsnitt. Saknade svar räknas inte som besvärsfria.
