@@ -58,7 +58,9 @@ test('nav tabs are keyboard reachable and the answers survive leaving', async ({
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Träning' }).click();
-  await expect(page.getByRole('checkbox', { name: 'Hantlar' })).toBeChecked();
+  await expect(
+    page.getByRole('checkbox', { name: 'Hantlar', exact: true }),
+  ).toBeChecked();
 });
 
 test('workout preview shows the nav above the start bar; the session hides it', async ({
