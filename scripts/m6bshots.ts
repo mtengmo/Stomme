@@ -53,10 +53,10 @@ try {
       await page.getByRole('heading', { name: /Passet är klart/ }).waitFor();
       await page.screenshot({ path: `${OUT}/${tag}-after-stop.png` });
       await page.getByRole('button', { name: 'Till träningen' }).click();
-      await page.getByText(/Senast stoppade du/).waitFor();
+      await page.getByText(/Senast avbröt du/).waitFor();
       await page.screenshot({ path: `${OUT}/${tag}-after-stop-week.png` });
 
-      // stale open session
+      // session idle for days: ended by the timeout, with a notice
       await page.evaluate(
         () =>
           new Promise<void>((resolve, reject) => {
@@ -64,7 +64,7 @@ try {
             open.onerror = () => reject(open.error);
             open.onsuccess = () => {
               const db = open.result;
-              const tx = db.transaction('sessions', 'readwrite');
+              const tx = db.transaction(['sessions', 'setLogs'], 'readwrite');
               const d = new Date(Date.now() - 3 * 86400000);
               const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
               tx.objectStore('sessions').put({
@@ -77,13 +77,24 @@ try {
                 plan: [],
                 feedback: {},
               });
+              tx.objectStore('setLogs').put({
+                id: 'stale-set',
+                sessionId: 'stale-1',
+                exerciseId: 'goblet-chair-squat',
+                setNumber: 1,
+                side: 'both',
+                amount: 8,
+                weightKg: 0,
+                loadIndex: 0,
+                loggedAt: d.toISOString(),
+              });
               tx.oncomplete = () => resolve();
               tx.onerror = () => reject(tx.error);
             };
           }),
       );
       await page.reload();
-      await page.getByText(/är inte avslutat/).waitFor();
+      await page.getByText(/avslutades automatiskt/).waitFor();
       await page.screenshot({ path: `${OUT}/${tag}-stale.png` });
       await ctx.close();
 

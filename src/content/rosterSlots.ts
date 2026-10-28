@@ -39,6 +39,7 @@ export const generalSlots: Record<TemplateId, RosterSlot[]> = {
       candidates: [
         'floor-press',
         'kettlebell-floor-press',
+        'knee-push-up',
         'push-up',
         'parallel-dip',
       ],
@@ -108,5 +109,5 @@ export const runningEasier: Partial<Record<ExerciseId, ExerciseId[]>> = {
   'side-plank': ['plank', 'dead-bug'],
   'split-squat': ['step-up', 'goblet-chair-squat', 'wall-sit'],
   'single-leg-hip-thrust': ['glute-bridge'],
-  'single-leg-calf-raise': [],
+  'single-leg-calf-raise': ['calf-raise'],
 };

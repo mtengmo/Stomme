@@ -1,7 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { type SetStateAction, useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { exerciseMetadata } from '../../content/exerciseMetadata';
+import {
+  exerciseMetadata,
+  type TechnicalLevel,
+  technicalLevelLabels,
+} from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exerciseList, exercises } from '../../content/exercises';
@@ -58,6 +62,7 @@ import type {
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
+import { chooseVariant, levelRankOf } from '../../rules/levelPolicy';
 import { trainingPlanSuggestion } from '../../rules/training';
 import {
   availableWeights,
@@ -285,6 +290,50 @@ function PreviewEditor({
       return [];
     })
     .sort((a, b) => a.rank - b.rank);
+  // The picker groups by body region and orders each group from basic to technical.
+  // An exercise's level is its easiest variant's.
+  const levelOf = (id: ExerciseId): TechnicalLevel =>
+    chooseVariant(id, preferences)?.technicalLevel ??
+    exerciseMetadata[id].variants.reduce<TechnicalLevel>(
+      (lowest, variant) =>
+        levelRankOf(variant.technicalLevel) < levelRankOf(lowest)
+          ? variant.technicalLevel
+          : lowest,
+      'technical',
+    );
+  const pickableGroups = bodyRegions
+    .map((group) => ({
+      label: group.label,
+      items: pickable
+        .filter(
+          ({ exercise }) =>
+            bodyRegions.find((region) =>
+              exerciseMuscles[exercise.id].primary.some((muscle) =>
+                region.muscles.includes(muscle),
+              ),
+            )?.label === group.label,
+        )
+        .sort(
+          (a, b) =>
+            a.rank - b.rank ||
+            levelRankOf(levelOf(a.exercise.id)) -
+              levelRankOf(levelOf(b.exercise.id)) ||
+            a.exercise.name.localeCompare(b.exercise.name, 'sv'),
+        ),
+    }))
+    .filter((group) => group.items.length > 0)
+    // With a muscle filter, groups holding a primary match come before supporting-only groups.
+    .sort(
+      (a, b) =>
+        Number(a.items.every((item) => item.supporting)) -
+        Number(b.items.every((item) => item.supporting)),
+    );
+  const ungrouped = pickable.filter(
+    ({ exercise }) =>
+      !pickableGroups.some((group) =>
+        group.items.some((item) => item.exercise.id === exercise.id),
+      ),
+  );
 
   const active = sessions.find(
     (session) =>
@@ -1202,12 +1251,24 @@ function PreviewEditor({
                           ? 'Välj övning'
                           : 'Inga övningar passar'}
                       </option>
-                      {pickable.map(({ exercise, supporting }) => (
-                        <option key={exercise.id} value={exercise.id}>
-                          {exercise.name}
-                          {supporting ? ' · stödjer' : ''}
-                        </option>
-                      ))}
+                      {[
+                        ...pickableGroups,
+                        { label: 'Övrigt', items: ungrouped },
+                      ]
+                        .filter((group) => group.items.length > 0)
+                        .map((group) => (
+                          <optgroup key={group.label} label={group.label}>
+                            {group.items.map(({ exercise, supporting }) => (
+                              <option key={exercise.id} value={exercise.id}>
+                                {exercise.name} ·{' '}
+                                {technicalLevelLabels[
+                                  levelOf(exercise.id)
+                                ].toLowerCase()}
+                                {supporting ? ' · stödjer' : ''}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
                     </select>
                   </label>
                   {pickable.length === 0 ? (

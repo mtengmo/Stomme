@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E64 references and original load indices', () => {
+  it('preserves permanent E01–E68 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 64 },
+        { length: 68 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );

@@ -62,7 +62,11 @@ export type ExerciseId =
   | 'plank'
   | 'squat-jump'
   | 'jumping-lunge'
-  | 'mountain-climber';
+  | 'mountain-climber'
+  | 'knee-push-up'
+  | 'wall-push-up'
+  | 'calf-raise'
+  | 'crunch';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
@@ -217,7 +221,7 @@ export interface Session {
   startedAt: string;
   finishedAt?: string;
   status: SessionStatus;
-  abortReason?: 'pain_stop' | 'user';
+  abortReason?: 'pain_stop' | 'user' | 'timeout';
   programWeek: number;
   plan: PlannedExercise[];
   feedback: Partial<Record<ExerciseId, ExerciseFeedback>>;

@@ -330,7 +330,7 @@ async function theme(scheme: 'light' | 'dark') {
   }
   if (!completed)
     throw new Error(`${scheme}: session did not reach its summary`);
-  // stale open session on the week view
+  // session idle for days: ended by the timeout, with a notice on the week view
   await page.evaluate(
     () =>
       new Promise<void>((resolve, reject) => {
@@ -338,7 +338,7 @@ async function theme(scheme: 'light' | 'dark') {
         open.onerror = () => reject(open.error);
         open.onsuccess = () => {
           const db = open.result;
-          const tx = db.transaction('sessions', 'readwrite');
+          const tx = db.transaction(['sessions', 'setLogs'], 'readwrite');
           const d = new Date(Date.now() - 3 * 86400000);
           const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           tx.objectStore('sessions').put({
@@ -351,14 +351,25 @@ async function theme(scheme: 'light' | 'dark') {
             plan: [],
             feedback: {},
           });
+          tx.objectStore('setLogs').put({
+            id: 'stale-set',
+            sessionId: 'stale-1',
+            exerciseId: 'goblet-chair-squat',
+            setNumber: 1,
+            side: 'both',
+            amount: 8,
+            weightKg: 0,
+            loadIndex: 0,
+            loggedAt: d.toISOString(),
+          });
           tx.oncomplete = () => resolve();
           tx.onerror = () => reject(tx.error);
         };
       }),
   );
   await page.reload();
-  await page.getByText(/är inte avslutat/).waitFor();
-  await audit(page, tag('stale session'));
+  await page.getByText(/avslutades automatiskt/).waitFor();
+  await audit(page, tag('timeout notice'));
   // stop screen
   await page.goto(`${base}/#/stopp/x`);
   await page.waitForTimeout(300);

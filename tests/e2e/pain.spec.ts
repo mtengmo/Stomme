@@ -45,7 +45,7 @@ test('a red flag stops the pass and shows the banner afterwards', {
   await page.getByRole('button', { name: 'Till träningen' }).click();
   await expect(
     page.getByText(
-      'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.',
+      'Senast avbröt du passet för att det gjorde ont. Fråga fysioterapeuten innan nästa pass.',
     ),
   ).toBeVisible();
 });

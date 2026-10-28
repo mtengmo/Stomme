@@ -114,3 +114,28 @@ describe('careState', () => {
     });
   });
 });
+
+describe('careState and a timeout', () => {
+  it('shows no stop banner for a session ended by the idle timeout', () => {
+    const timeout = [
+      sess({
+        id: 't',
+        date: '2026-10-12',
+        status: 'aborted',
+        abortReason: 'timeout',
+      }),
+    ];
+    const stopped = [
+      sess({
+        id: 't',
+        date: '2026-10-12',
+        status: 'aborted',
+        abortReason: 'pain_stop',
+      }),
+    ];
+    expect(careState(stopped, [], '2026-10-12').stopBanner).toBe(true);
+    const state = careState(timeout, [], '2026-10-13');
+    expect(state.stopBanner).toBe(false);
+    expect(state.dayAfterDue).toBeUndefined();
+  });
+});

@@ -1,7 +1,18 @@
 // @vitest-environment jsdom
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cue } from './beep';
 import { useTimedHold } from './useTimedHold';
+
+vi.mock('./beep', () => ({
+  cue: {
+    start: vi.fn(),
+    pause: vi.fn(),
+    rep: vi.fn(),
+    go: vi.fn(),
+    done: vi.fn(),
+  },
+}));
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => {
@@ -109,5 +120,34 @@ describe('hands-free timed holds', () => {
     unmount();
     act(() => vi.advanceTimersByTime(60_000));
     expect(done).not.toHaveBeenCalled();
+  });
+  it('plays start, tick and go cues, and a pause cue only while visible', () => {
+    const { result } = renderHook(() =>
+      useTimedHold({
+        seconds: 10,
+        side: '',
+        autoStart: false,
+        onDone: vi.fn(),
+      }),
+    );
+    act(() => result.current.start());
+    expect(cue.start).toHaveBeenCalledTimes(1);
+    act(() => vi.advanceTimersByTime(1_000));
+    expect(cue.rep).toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(4_000));
+    expect(cue.go).toHaveBeenCalledTimes(1);
+    act(() => result.current.pause());
+    expect(cue.pause).toHaveBeenCalledTimes(1);
+    act(() => result.current.resume());
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => true,
+    });
+    act(() => result.current.pause());
+    expect(cue.pause).toHaveBeenCalledTimes(1);
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
   });
 });

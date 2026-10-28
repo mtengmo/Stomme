@@ -298,6 +298,128 @@ function squatJump(t: number): Pose {
   return squat(1 - (t - 0.85) / 0.15);
 }
 
+/** Knees on the floor: the body pivots at the knees as one rigid lever. */
+function kneePushUp(t: number): Pose {
+  const knee: Pt = [138, 173];
+  const angle = mix(-2.59, -2.96, t);
+  const neck = polar(knee, 82, angle),
+    hip = polar(knee, 36, angle);
+  const startNeck = polar(knee, 82, -2.59);
+  const armLength = (174 - startNeck[1]) / 2;
+  const hand: Pt = [startNeck[0], 174],
+    farHand: Pt = [startNeck[0] + 4, 171];
+  const farKnee: Pt = [knee[0] - 3, knee[1] - 2];
+  const ankle = polar(knee, 34, -0.45),
+    farAnkle = polar(farKnee, 34, -0.55);
+  return pose(
+    polar(neck, 14, angle),
+    neck,
+    hip,
+    [
+      joint(neck, hand, armLength, armLength, -1),
+      hand,
+      joint(neck, farHand, armLength, armLength, -1),
+      farHand,
+    ],
+    [knee, ankle, foot(ankle), farKnee, farAnkle, foot(farAnkle)],
+  );
+}
+/** Standing lean against a wall: hands fixed on the wall, feet planted. */
+function wallPushUp(t: number): Pose {
+  const ankle: Pt = [72, 174];
+  const angle = -mix(1.222, 0.942, t);
+  const neck = polar(ankle, 108, angle),
+    hip = polar(ankle, 63, angle);
+  const hand: Pt = [155, 76],
+    farHand: Pt = [155, 79];
+  const farAnkle: Pt = [68, 174];
+  return pose(
+    polar(neck, 14, angle),
+    neck,
+    hip,
+    [
+      joint(neck, hand, 24, 24, 1),
+      hand,
+      joint(neck, farHand, 24, 24, 1),
+      farHand,
+    ],
+    [
+      polar(ankle, 32, angle),
+      ankle,
+      foot(ankle),
+      polar(farAnkle, 32, angle),
+      farAnkle,
+      foot(farAnkle),
+    ],
+  );
+}
+/** The heels rise about 16 px: each foot (fixed length) rotates about its toe on the floor. */
+const FOOT = 20;
+function calfRaise(t: number): Pose {
+  const lift = mix(Math.asin(0.15), Math.asin(0.95), t);
+  const toeR: Pt = [121, 177],
+    toeL: Pt = [112, 177];
+  const heel = (toe: Pt): Pt => [
+    toe[0] - FOOT * Math.cos(lift),
+    toe[1] - FOOT * Math.sin(lift),
+  ];
+  const ar = heel(toeR),
+    al = heel(toeL);
+  const hip: Pt = [(ar[0] + al[0]) / 2, ar[1] - 68],
+    neck: Pt = [hip[0], hip[1] - 43];
+  return pose(
+    [neck[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [
+      [neck[0] + 8, neck[1] + 22],
+      [neck[0] + 8, neck[1] + 42],
+      [neck[0] + 5, neck[1] + 22],
+      [neck[0] + 5, neck[1] + 42],
+    ],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      toeR,
+      joint(hip, al, 36, 34, -1),
+      al,
+      toeL,
+    ],
+  );
+}
+/** Lying on the back, knees bent: head and shoulders turn about 40 degrees around the mid-back. */
+function crunch(t: number): Pose {
+  const hip: Pt = [97, 169],
+    pivot: Pt = [72, 169],
+    phi = 0.7 * t;
+  const neck: Pt = [
+    pivot[0] - 26 * Math.cos(phi),
+    pivot[1] - 26 * Math.sin(phi),
+  ];
+  const head: Pt = [neck[0] - 14 * Math.cos(phi), neck[1] - 14 * Math.sin(phi)];
+  const ar: Pt = [140, 174],
+    al: Pt = [136, 174];
+  return pose(
+    head,
+    neck,
+    hip,
+    [
+      [neck[0] + 4, neck[1] - 14],
+      [head[0] + 7, head[1] + 4],
+      [neck[0] + 8, neck[1] - 12],
+      [head[0] + 9, head[1] + 7],
+    ],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 34, -1),
+      al,
+      foot(al),
+    ],
+  );
+}
+
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'push-up': pushUp,
   'pull-up': (t) => pull(t, false),
@@ -310,6 +432,10 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'squat-jump': squatJump,
   'jumping-lunge': lunge,
   'mountain-climber': climber,
+  'knee-push-up': kneePushUp,
+  'wall-push-up': wallPushUp,
+  'calf-raise': calfRaise,
+  crunch,
 };
 export function bodyweightMovementPose(
   id: ExerciseId,
@@ -336,7 +462,9 @@ export const bodyweightFigures = Object.fromEntries(
           ? [{ type: 'pull-up-bar', x1: 55, x2: 145, y: 31 }]
           : id === 'parallel-dip'
             ? [{ type: 'dip-bars', x: 101, y: 117, w: 32 }]
-            : [{ type: 'mat', x1: 18, x2: 187 }],
+            : id === 'wall-push-up'
+              ? [{ type: 'wall', x: 157 }]
+              : [{ type: 'mat', x1: 18, x2: 187 }],
     },
   ]),
 ) as Record<BodyweightId, FigureSpec>;

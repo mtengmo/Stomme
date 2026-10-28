@@ -23,6 +23,8 @@ import {
   shouldPromptDayAfter,
 } from '../rules/pain';
 import { programWeek } from '../rules/schedule';
+import { buildSteps } from '../rules/sessionPlan';
+import { isSessionStale, lastActivity } from '../rules/sessionTimeout';
 import type { StommeDB } from './db';
 
 export type NewSession = Omit<Session, 'id'> & { id?: string };
@@ -99,6 +101,7 @@ export async function startSession(
     'rw',
     [db.sessions, db.meta, db.setLogs, db.painLogs],
     async () => {
+      await expireStaleSessions(db, now);
       const active = await getActiveSession(db);
       if (active) return active;
       const today = toLocalDate(now);
@@ -353,6 +356,86 @@ export async function abortSession(
       finishedAt: now.toISOString(),
     });
   });
+}
+
+/**
+ * Ends open sessions with no activity for 90 minutes, in ONE transaction that
+ * re-reads everything so a set logged at the same moment wins.
+ * - nothing recorded: deleted (like an abandoned preparation);
+ * - programme session with every non-skipped set logged: completed;
+ * - anything else: aborted with reason 'timeout' (never a pain stop).
+ * finishedAt is the last activity, so the duration stays honest.
+ * Returns the ids of sessions that were ended or removed.
+ */
+export async function expireStaleSessions(
+  db: StommeDB,
+  now: Date,
+): Promise<string[]> {
+  const ended: string[] = [];
+  const run = async () => {
+    const open = await db.sessions
+      .where('status')
+      .equals('in_progress')
+      .toArray();
+    for (const s of open) {
+      const [logs, pain] = await Promise.all([
+        db.setLogs.where('sessionId').equals(s.id).toArray(),
+        db.painLogs.where('sessionId').equals(s.id).toArray(),
+      ]);
+      const last = lastActivity(s, logs, pain);
+      if (!isSessionStale(last, now)) continue;
+      const hasCheckin = Object.values(s.checkins ?? {}).some(Boolean);
+      if (
+        logs.length === 0 &&
+        pain.length === 0 &&
+        !hasCheckin &&
+        Object.keys(s.feedback ?? {}).length === 0 &&
+        !s.note?.trim()
+      ) {
+        await db.sessions.delete(s.id);
+      } else if (s.programId && allSetsLogged(s, logs)) {
+        await db.sessions.update(s.id, {
+          status: 'completed',
+          finishedAt: last,
+        });
+      } else {
+        await db.sessions.update(s.id, {
+          status: 'aborted',
+          abortReason: 'timeout',
+          finishedAt: last,
+        });
+      }
+      ended.push(s.id);
+    }
+  };
+  // Nested inside a caller's transaction when there is one.
+  if (Dexie.currentTransaction) await run();
+  else
+    await db.transaction(
+      'rw',
+      [db.sessions, db.setLogs, db.painLogs, db.meta],
+      run,
+    );
+  return ended;
+}
+
+function allSetsLogged(s: Session, logs: readonly SetLog[]): boolean {
+  const sets = buildSteps(s.plan, (id) => exercises[id]).filter(
+    (step) => step.kind === 'set',
+  );
+  return (
+    sets.length > 0 &&
+    sets.every(
+      (step) =>
+        s.feedback[step.exerciseId]?.skipped === true ||
+        logs.some(
+          (l) =>
+            l.exerciseId === step.exerciseId &&
+            l.setNumber === step.setNumber &&
+            l.side === step.side,
+        ),
+    )
+  );
 }
 
 /* ---------- Pain ---------- */

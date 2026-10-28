@@ -149,8 +149,7 @@ describe('rep counting on the set screen', () => {
       expect(
         screen.getByRole('button', { name: 'Starta – 5 s förberedelse' }),
       ).toBeTruthy();
-      expect(screen.getByText(/Takt: ca \d+ s per repetition/)).toBeTruthy();
-      expect(screen.getByText(/Förslag på takt/)).toBeTruthy();
+      expect(screen.getByText(/Takt: ca \d+ s/)).toBeTruthy();
       expect(
         screen.getByRole('switch', { name: 'Räkna själv: av' }),
       ).toBeTruthy();

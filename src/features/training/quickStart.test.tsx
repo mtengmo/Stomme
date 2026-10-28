@@ -6,6 +6,7 @@ import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
 import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
+import { toLocalDate } from '../../lib/dates';
 
 beforeEach(async () => {
   window.localStorage.setItem('stomme.repCount.manual', '1');
@@ -155,15 +156,15 @@ it('preserves a returning user’s active session and makes resuming the primary
   const session = await createSession(getDb(), {
     templateId: 'A',
     programId: 'running',
-    date: '2026-10-20',
-    startedAt: '2026-10-20T08:00:00Z',
+    date: toLocalDate(new Date()),
+    startedAt: new Date().toISOString(),
     status: 'in_progress',
     programWeek: 1,
     plan: [],
     feedback: {},
     checkins: {
       before: {
-        recordedAt: '2026-10-20T08:00:00Z',
+        recordedAt: new Date().toISOString(),
         feeling: 'ready',
         symptoms: null,
       },

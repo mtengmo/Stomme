@@ -201,7 +201,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       navigate('/');
     });
 
-  const abortForKnee = () =>
+  const abortForPain = () =>
     run(async () => {
       await abortSession(getDb(), session.id, new Date(), 'pain_stop');
       navigate(`/stopp/${session.id}`);
@@ -223,14 +223,22 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           <Button variant="secondary" disabled={busy} onClick={abort}>
             Avbryt passet
           </Button>
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={abortForPain}
+            aria-describedby="pain-abort-hint"
+          >
+            {PAIN_COPY.stopAbortPain}
+          </Button>
+          <p id="pain-abort-hint" className="m-0 text-center text-base">
+            {PAIN_COPY.stopAbortPainHint}
+          </p>
           {error ? (
             <p role="alert" className="m-0 text-center text-base font-bold">
               {PAIN_COPY.error}
             </p>
           ) : null}
-          <Button variant="secondary" disabled={busy} onClick={abortForKnee}>
-            {PAIN_COPY.stopAbortKnee}
-          </Button>
         </div>
       </div>
     );

@@ -19,6 +19,10 @@
 | Utfall med hopp | New E63 |
 | Sidoplankan | Existing E05 |
 | Mountain Climber | New E64, controlled alternating timed movement |
+| Armhävning på knä | New E65, easier step before E54 (not in the article) |
+| Armhävning mot vägg | New E66, easiest push-up step, library only |
+| Tåhävning på två ben | New E67, easier step before E08 |
+| Magcrunch | New E68, library only; bicycle crunch left out |
 | Bird Dog | Existing E10; basic opposite-limb extension, without the article's additional elbow/knee crunch |
 
 Eleven entries cover ten missing families, expanding 53 to 64 exercises. Existing IDs, E-numbers, programme rosters, prescriptions and history stay intact. These additions appear in the library and custom-workout picker; no automatic rehab assignments or new progression rules.
@@ -40,3 +44,7 @@ Original Swedish setup/move/return instructions, muscle tags, technical difficul
 New geometry checks sample all eleven movement paths: finite coordinates, floor clearance, fixed hand/bar contacts, rigid push-up trunk, continuous constant-length jumping-lunge legs, burpee phase order/loop seam and alternating climber knees. A database test round-trips new equipment and all new exercise IDs in a saved workout. Existing catalogue integrity tests now verify 64 unique references and keep E49–E53 fixed in place.
 
 Visual evidence uses the DEV catalogue's real movement path and sequence strips. Software and visual checks are not clinical validation or beginner comprehension testing.
+
+## Easier push-up and calf steps (E65–E68)
+
+2026-10-28. Four more entries expand 64 to 68 exercises. The easier chain is E54 to E65 to E66, and E08 to E67. E65 is a basic horizontal press and the first pick for new or some users with no weights; E66 and E68 are library only and never enter a roster. E67 replaces a lost calf exercise for lower-level running users. Sources: NASM modified push-up (E65), NASM incline push-up, which names a wall (E66), ACE standing calf raises at a wall (E67), ACE crunch (E68). Each URL was opened on 2026-10-28.

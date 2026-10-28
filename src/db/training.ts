@@ -25,7 +25,7 @@ import { trainingDayAfterDue, validateCheckin } from '../rules/training';
 
 import type { StommeDB } from './db';
 
-import { getActiveSession } from './repo';
+import { expireStaleSessions, getActiveSession } from './repo';
 
 /** A preparation contains no recorded exercise, symptoms or answers to discard. */
 export async function canReplaceTrainingPreparation(
@@ -162,8 +162,9 @@ export async function startTrainingSession(
 
   return db.transaction(
     'rw',
-    [db.sessions, db.setLogs, db.painLogs],
+    [db.sessions, db.meta, db.setLogs, db.painLogs],
     async () => {
+      await expireStaleSessions(db, now);
       const active = await getActiveSession(db);
       if (active) {
         if (!(await canReplaceTrainingPreparation(db, active))) return active;

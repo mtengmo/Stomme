@@ -13,6 +13,15 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   'squat-jump': ['Jumping squats', 'Squat jump', 'Hoppknäböj'],
   'jumping-lunge': ['Utfall med hopp', 'Jumping lunges', 'Lunge jump'],
   'mountain-climber': ['Mountain climbers', 'Bergsklättraren'],
+  'knee-push-up': [
+    'Armhävning med knästöd',
+    'Knäarmhävning',
+    'Modified push-up',
+    'Knee push-up',
+  ],
+  'wall-push-up': ['Väggarmhävning', 'Armhävning mot vägg', 'Wall push-up'],
+  'calf-raise': ['Tåhävning', 'Tåhävningar', 'Vadlyft', 'Calf raise'],
+  crunch: ['Situps', 'Sit-ups', 'Crunch', 'Magövning'],
   'goblet-chair-squat': ['Stolknäböj', 'Gobletknäböj till stol', 'Chair squat'],
   'step-up': ['Uppsteg på låda', 'Uppsteg', 'Step up', 'Step-up'],
   'single-leg-rdl': [

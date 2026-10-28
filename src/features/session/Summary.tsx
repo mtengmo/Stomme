@@ -7,6 +7,7 @@ import type { Session, SetLog } from '../../domain/types';
 import { formatMinutes } from '../../lib/format';
 import { Button, buttonClass } from '../../ui/Button';
 import { PencilTick } from '../../ui/PencilTick';
+import { TimeoutBanner } from './TimeoutNotice';
 
 interface SummaryProps {
   session: Session;
@@ -41,6 +42,7 @@ export function Summary({
         <p className="count m-0 text-4xl text-ink">
           {formatMinutes(seconds)} · {setsDone}/{planned} set
         </p>
+        {session.abortReason === 'timeout' ? <TimeoutBanner /> : null}
         <ul className="m-0 flex list-none flex-col p-0">
           {session.programId ? (
             <li className="pb-3 text-lg font-bold">

@@ -711,3 +711,24 @@ describe('physio knee rehabilitation group', () => {
     expect(() => parseBackup(serializeBackup(backup))).toThrow();
   });
 });
+
+describe('idle sessions', () => {
+  it('ends a stale session with its sets when a new workout starts', async () => {
+    const stale = await startTrainingSession(db, preferences, 'A', [plan], now);
+    await logSet(db, stale.id, input, new Date(now.getTime() + 60_000));
+    const later = new Date(now.getTime() + 3 * 3_600_000);
+    const next = await startTrainingSession(
+      db,
+      preferences,
+      'B',
+      [plan],
+      later,
+    );
+    expect(next.id).not.toBe(stale.id);
+    expect(await db.sessions.get(stale.id)).toMatchObject({
+      status: 'aborted',
+      abortReason: 'timeout',
+    });
+    expect(await db.setLogs.count()).toBe(1);
+  });
+});

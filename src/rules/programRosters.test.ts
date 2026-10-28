@@ -9,7 +9,11 @@ import type {
 } from '../domain/types';
 import { equipmentFits } from './equipment';
 import { allowedLevels, chooseVariant } from './levelPolicy';
-import { initialTrainingRoster, regionsAvailable } from './programRosters';
+import {
+  buildRoster,
+  initialTrainingRoster,
+  regionsAvailable,
+} from './programRosters';
 
 const weights: TrainingPreferences['weights'] = [
   { type: 'dumbbell', kg: 4, count: 2 },
@@ -154,7 +158,7 @@ describe('initial training roster', () => {
       'A',
     );
     expect(ids).not.toContain('floor-press');
-    expect(ids).toContain('push-up');
+    expect(ids).toContain('knee-push-up');
   });
 
   describe('body-part focus', () => {
@@ -197,5 +201,55 @@ describe('initial training roster', () => {
       expect(regions).toContain('legs');
       expect(regions).not.toContain('shoulders');
     });
+  });
+});
+
+describe('basic push-ups and calf raise in the rosters', () => {
+  const rosterFor = (
+    experience: TrainingPreferences['experience'],
+    template: TemplateId = 'A',
+  ) =>
+    buildRoster(
+      { programId: 'general', experience, equipment: bodyweight },
+      template,
+    );
+
+  it('gives new users knee push-ups without the easiest-only note', () => {
+    const roster = rosterFor('new');
+    expect(roster.ids).toContain('knee-push-up');
+    expect(roster.notes['knee-push-up']).toBeUndefined();
+  });
+
+  it('keeps regular users on push-up or dips', () => {
+    const ids = buildRoster(
+      { programId: 'general', experience: 'regular', equipment: everything },
+      'A',
+    ).ids;
+    expect(ids).not.toContain('knee-push-up');
+    expect(ids.some((id) => id === 'push-up' || id === 'parallel-dip')).toBe(
+      true,
+    );
+  });
+
+  it('never rosters wall push-up or crunch', () => {
+    for (const experience of ['new', 'some', 'regular'] as const)
+      for (const template of ['A', 'B'] as const)
+        for (const programId of ['general', 'running'] as const) {
+          const ids = buildRoster(
+            { programId, experience, equipment: everything },
+            template,
+          ).ids;
+          expect(ids).not.toContain('wall-push-up');
+          expect(ids).not.toContain('crunch');
+        }
+  });
+
+  it('gives a new runner calf raise in place of the single-leg version', () => {
+    const ids = buildRoster(
+      { programId: 'running', experience: 'new', equipment: bodyweight },
+      'B',
+    ).ids;
+    expect(ids).not.toContain('single-leg-calf-raise');
+    expect(ids).toContain('calf-raise');
   });
 });

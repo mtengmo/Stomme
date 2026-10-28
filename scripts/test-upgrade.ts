@@ -121,6 +121,12 @@ async function seed(page: Page, includeTraining: boolean) {
       request.onsuccess = () => done(request.result);
       request.onerror = () => reject(request.error);
     });
+    // Recent timestamps: a session idle for 90 minutes is ended automatically.
+    const now = Date.now();
+    const stamp = (minutesAgo: number) =>
+      new Date(now - minutesAgo * 60_000).toISOString();
+    const d = new Date(now);
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const transaction = db.transaction(
       ['meta', 'sessions', 'setLogs', 'painLogs'],
       'readwrite',
@@ -141,8 +147,8 @@ async function seed(page: Page, includeTraining: boolean) {
     transaction.objectStore('sessions').put({
       id: 'upgrade-session',
       templateId: 'A',
-      date: '2026-10-20',
-      startedAt: '2026-10-20T08:00:00Z',
+      date: today,
+      startedAt: stamp(2),
       status: 'in_progress',
       programWeek: 1,
       plan: [
@@ -167,17 +173,17 @@ async function seed(page: Page, includeTraining: boolean) {
       amount: 8,
       weightKg: 0,
       loadIndex: 0,
-      loggedAt: '2026-10-20T08:01:00Z',
+      loggedAt: stamp(1),
     });
     transaction.objectStore('painLogs').put({
       id: 'upgrade-pain',
       sessionId: 'upgrade-session',
       timing: 'before',
-      date: '2026-10-20',
+      date: today,
       score: 0,
       location: 'right_knee',
       redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: '2026-10-20T08:00:00Z',
+      createdAt: stamp(2),
     });
     await new Promise<void>((done, reject) => {
       transaction.oncomplete = () => done();

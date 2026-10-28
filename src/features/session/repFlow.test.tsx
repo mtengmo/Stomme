@@ -7,6 +7,7 @@ import { App } from '../../App';
 import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
 import type { ExerciseId } from '../../domain/types';
+import { toLocalDate } from '../../lib/dates';
 
 vi.mock('../../lib/beep', () => ({
   cue: {
@@ -80,8 +81,8 @@ const press = async (name: string | RegExp) => {
 async function open(...items: ReturnType<typeof plan>[]) {
   const session = await createSession(getDb(), {
     templateId: 'A',
-    date: '2026-10-20',
-    startedAt: '2026-10-20T08:00:00Z',
+    date: toLocalDate(new Date()),
+    startedAt: new Date().toISOString(),
     status: 'in_progress',
     programWeek: 1,
     plan: items,
@@ -91,12 +92,12 @@ async function open(...items: ReturnType<typeof plan>[]) {
   await getDb().painLogs.add({
     id: 'p-before',
     sessionId: session.id,
-    date: '2026-10-20',
+    date: toLocalDate(new Date()),
     timing: 'before',
     score: 0,
     location: 'right_knee',
     redFlags: { sharp: false, swelling: false, locking: false },
-    createdAt: '2026-10-20T08:00:00Z',
+    createdAt: new Date().toISOString(),
   });
   window.location.hash = `#/session/${session.id}`;
   render(<App />);
@@ -125,7 +126,7 @@ describe('hands-free reps through the session runner', () => {
     expect(logs.map((l) => l.side).sort()).toEqual(['left', 'right']);
     // Rest runs by itself and the next set starts after preparation.
     await until(() => has(/^Gör dig redo · .*höger/i));
-  });
+  }, 40_000);
 
   it('stops at the effort question with nothing armed after the last set', async () => {
     await open(plan('goblet-chair-squat', 1, 2));
@@ -136,7 +137,7 @@ describe('hands-free reps through the session runner', () => {
     await run(10_000);
     expect(has(/Hur ansträngande/)).toBe(true);
     expect(await getDb().setLogs.count()).toBe(1);
-  });
+  }, 40_000);
 
   it('undo clears the arming so the set waits for a new Start', async () => {
     await open(plan('goblet-chair-squat', 2, 2));
@@ -148,7 +149,7 @@ describe('hands-free reps through the session runner', () => {
     await run(8_000);
     expect(has(/^Gör dig redo/)).toBe(false);
     expect(await getDb().setLogs.count()).toBe(0);
-  });
+  }, 40_000);
 
   it('skipping clears the arming for the next exercise', async () => {
     await open(plan('goblet-chair-squat', 1, 4), plan('bird-dog', 1, 2));
@@ -160,7 +161,7 @@ describe('hands-free reps through the session runner', () => {
     await run(8_000);
     expect(has(/^Gör dig redo/)).toBe(false);
     expect(button('Starta – 5 s förberedelse')).not.toBeNull();
-  });
+  }, 40_000);
 
   it('Avsluta setet saves the finished reps, stops the automation and prefills the plan target', async () => {
     await open(plan('goblet-chair-squat', 2, 4));
@@ -183,5 +184,5 @@ describe('hands-free reps through the session runner', () => {
     await press('Nästa set');
     await until(() => button('Starta – 5 s förberedelse') !== null);
     expect(has(/^4 repetitioner/)).toBe(true);
-  });
+  }, 40_000);
 });

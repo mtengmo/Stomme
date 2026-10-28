@@ -323,7 +323,22 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
                 : '/',
             );
           } catch (err) {
-            setError(err instanceof Error ? err.message : 'Kunde inte spara.');
+            const gone = !(await getDb()
+              .sessions.get(id)
+              .catch(() => null));
+            const ended =
+              (
+                await getDb()
+                  .sessions.get(id)
+                  .catch(() => null)
+              )?.abortReason === 'timeout';
+            setError(
+              gone || ended
+                ? 'Passet finns inte längre. Det avslutades automatiskt eftersom inget loggats på 90 minuter.'
+                : err instanceof Error
+                  ? err.message
+                  : 'Kunde inte spara.',
+            );
             setBusy(false);
           }
         }}

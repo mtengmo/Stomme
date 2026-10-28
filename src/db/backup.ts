@@ -195,7 +195,7 @@ const sessionSchema = z
     startedAt: instant,
     finishedAt: instant.optional(),
     status: z.enum(['in_progress', 'completed', 'aborted']),
-    abortReason: z.enum(['pain_stop', 'user']).optional(),
+    abortReason: z.enum(['pain_stop', 'user', 'timeout']).optional(),
     programWeek: z.number().int().min(1).max(1000),
     plan: z
       .array(plannedExercise)

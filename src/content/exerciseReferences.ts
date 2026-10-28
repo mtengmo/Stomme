@@ -66,6 +66,10 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'squat-jump': 'E62',
   'jumping-lunge': 'E63',
   'mountain-climber': 'E64',
+  'knee-push-up': 'E65',
+  'wall-push-up': 'E66',
+  'calf-raise': 'E67',
+  crunch: 'E68',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

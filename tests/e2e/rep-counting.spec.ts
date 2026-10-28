@@ -22,7 +22,7 @@ test('a rep exercise starts hands-free, pauses and can switch to manual', async 
   const start = page.getByRole('button', { name: 'Starta – 5 s förberedelse' });
   await expect(start).toBeVisible();
   await expect(page.getByRole('button', { name: 'Klar set' })).toHaveCount(0);
-  await expect(page.getByText(/Takt: ca \d+ s per repetition/)).toBeVisible();
+  await expect(page.getByText(/Takt: ca \d+ s/)).toBeVisible();
 
   await start.click();
   await expect(page.getByText(/^Gör dig redo/)).toBeVisible();

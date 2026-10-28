@@ -27,6 +27,7 @@ import { toLocalDate } from '../../lib/dates';
 import { useHashSearch } from '../../lib/hashLocation';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
+import { TimeoutNotice } from '../session/TimeoutNotice';
 import { WeekView } from '../week/WeekView';
 import { QuickStart } from './QuickStart';
 
@@ -369,6 +370,7 @@ export function TrainingHome() {
           Träningsvana: {experienceLabels[preferences.experience]}
         </p>
       ) : null}
+      <TimeoutNotice />
       <Link
         href={active ? `/session/${active.id}` : `/traning/${nextId}`}
         className={buttonClass('primary')}

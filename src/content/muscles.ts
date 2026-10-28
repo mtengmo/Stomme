@@ -95,6 +95,10 @@ export const exerciseMuscles: Record<
     ...bodyweightDetails['mountain-climber'],
     qualities: [],
   },
+  'knee-push-up': { ...bodyweightDetails['knee-push-up'], qualities: [] },
+  'wall-push-up': { ...bodyweightDetails['wall-push-up'], qualities: [] },
+  'calf-raise': { ...bodyweightDetails['calf-raise'], qualities: [] },
+  crunch: { ...bodyweightDetails.crunch, qualities: [] },
   'goblet-chair-squat': {
     primary: ['quads', 'glutes'],
     secondary: ['core'],

@@ -113,6 +113,10 @@ export function resultLine(
 
 /* ---------- Pain ---------- */
 
+/** Shown when an idle session was ended automatically. */
+export const TIMEOUT_NOTICE =
+  'Passet avslutades automatiskt eftersom inget loggats på 90 minuter. Det du hann logga är sparat.';
+
 export const PAIN_COPY = {
   title: {
     before: 'Hur känns högra knäet nu?',
@@ -135,7 +139,8 @@ export const PAIN_COPY = {
   stopTitle: 'Avbryt passet.',
   stopTitleDayAfter: 'Fråga fysioterapeuten innan nästa pass.',
   stopTitleAfter: 'Passet är klart. Fråga fysioterapeuten innan nästa pass.',
-  stopAbortKnee: 'Avbryt på grund av knäet',
+  stopAbortPain: 'Avbryt – det gör ont',
+  stopAbortPainHint: 'Vid skarp smärta, svullnad eller om en led låser sig.',
   stopBody: 'Fråga fysioterapeuten.',
   stopDone: 'Till träningen',
   warnTitle: 'Smärtan är över 3.',
@@ -147,7 +152,7 @@ export const PAIN_COPY = {
   warnBackHome: 'Till träningen',
   wallSit: 'Lägg till väggsittning sist (3 × 30 s, valfri)',
   banner:
-    'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.',
+    'Senast avbröt du passet för att det gjorde ont. Fråga fysioterapeuten innan nästa pass.',
   dayAfterCardTitle: 'Hur känns knäet idag?',
   dayAfterAnswer: 'Svara',
   dayAfterWarn: 'Knäet var värre dagen efter. Fråga fysioterapeuten.',

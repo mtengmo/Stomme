@@ -9,7 +9,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.goto('/#/ovningar');
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
-  await expect(page.getByRole('status')).toHaveText('5 övningar för vader');
+  await expect(page.getByRole('status')).toHaveText('6 övningar för vader');
   await page
     .getByRole('link', { name: 'Enbens tåhävning', exact: true })
     .click();
@@ -25,7 +25,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
-  await expect(page.getByRole('status')).toHaveText('64 övningar');
+  await expect(page.getByRole('status')).toHaveText('68 övningar');
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,
   );

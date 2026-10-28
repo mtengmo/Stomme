@@ -245,7 +245,7 @@ Definition of done per milestone: CI green; deployed to Pages; `npm run shots` p
 | 4.3 | Review rules + tests vs spec | O (reviewer) | Written sign-off; ambiguities in section 12 |
 | 4.4 | [IMP] Pain UI: 0–10 picker (11 buttons ≥ 48 px, anchors "Ingen"/"Värsta"), red-flag toggles, `before` gate, `after` at end, day-after prompt on week view | S | Red flag -> stop screen ("Avbryt passet. Fråga fysioterapeuten."), session aborted `pain_stop`, logs kept; > 3 -> warning with "Fortsätt ändå"/"Avsluta" and wall-sit option; day-after worse -> warning card |
 | 4.5 | [IMP] Wire `suggestNext` into preview + prefill; "Förra gången: 2×8 · 2×5 kg" / "Idag: 2×9 · 2×5 kg" + one-line reason | S | Prefill = suggestion; overridable; override becomes next base |
-| 4.6 | Banner after `pain_stop` until next session: "Senast stoppade du pga knäet. Fråga fysioterapeuten innan nästa pass." | S | On week view and pass preview |
+| 4.6 | Banner after `pain_stop` until next session: "Senast avbröt du passet för att det gjorde ont. Fråga fysioterapeuten innan nästa pass." | S | On week view and pass preview |
 
 ### M5: History and charts
 | # | Task | Model | Acceptance |
@@ -319,7 +319,7 @@ Magnus's answers 2026-10-18: Q1 keep it generic (no special carry rule; use the 
 
 ### Decisions recorded after the M4 safety review (2026-10-19; defaults, Magnus to confirm)
 13. **No-history pain hold (changes 5.2 rule 2):** a knee-loaded exercise with no finished history and any pain on record (last session or today's 'before' not ok) starts at the week-1 load with template sets, reason pain_hold or pain_stop_hold, and 'Fråga fysioterapeuten' on stop. It counts all pain on record (not only since a last session), so one old warn keeps a never-done knee exercise at the week-1 load until it has been done once.
-14. **Pain mid-session:** the abort confirm has 'Avbryt på grund av knäet', which aborts with reason pain_stop (logs kept, stop banner, day-after prompt, next plan held with 'Fråga fysioterapeuten'). Plain 'Avbryt passet' stays reason user. A red flag in the 'before' reading or during the session aborts; a red flag in the 'after' reading does not (item 19).
+14. **Pain mid-session:** the abort confirm has 'Avbryt – det gör ont', which aborts with reason pain_stop (logs kept, stop banner, day-after prompt, next plan held with 'Fråga fysioterapeuten'). Plain 'Avbryt passet' stays reason user. A red flag in the 'before' reading or during the session aborts; a red flag in the 'after' reading does not (item 19).
 15. **'Before' reading is one-shot:** it cannot be re-entered or overwritten once taken or once any set is logged; the reading and its consequence (abort or replan) are written in one transaction, and the session screen re-checks a stored 'before' reading on load.
 16. **Day-after window:** a day-after reading is only accepted 1-2 calendar days after the session (as shouldPromptDayAfter), and a day-after red flag shows the stop banner but does not abort the completed session. Likewise an 'after' red flag (item 19).
 17. **Import note (M6):** the importer must reject or flag an in-progress session with sets but no 'before' reading.

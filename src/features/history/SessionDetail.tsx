@@ -13,6 +13,7 @@ import { loggedVariant, sessionSetProgress } from '../../rules/history';
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
+import { TimeoutBanner } from '../session/TimeoutNotice';
 import { CheckinHistory } from './CheckinHistory';
 import { amountText, EFFORT_LABEL, kgText, StatusChip } from './labels';
 
@@ -116,6 +117,7 @@ export function SessionDetail({ id }: { id: string }) {
         <div>
           <StatusChip session={session} />
         </div>
+        {session.abortReason === 'timeout' ? <TimeoutBanner /> : null}
       </header>
 
       <p className="m-0 text-base">

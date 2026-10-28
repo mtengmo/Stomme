@@ -79,4 +79,52 @@ describe('bodyweight movement paths', () => {
     expect(right.kR[0]).toBeLessThan(first.hip[0]);
     expect(left.kL[0]).toBeLessThan(first.hip[0]);
   });
+  it('knee push-up pivots on the knees as a rigid lever with fixed hands', () => {
+    const start = movementPose('knee-push-up', 0);
+    for (let n = 0; n <= 40; n++) {
+      const p = movementPose('knee-push-up', n / 40);
+      expect(p.hR).toEqual(start.hR);
+      expect(p.kR).toEqual(start.kR);
+      expect(distance(p.neck, p.kR)).toBeCloseTo(82, 8);
+      expect(distance(p.hip, p.kR)).toBeCloseTo(36, 8);
+    }
+    expect(movementPose('knee-push-up', 1).neck[1]).toBeGreaterThan(
+      start.neck[1],
+    );
+  });
+  it('wall push-up keeps hands on the wall and feet planted while leaning in', () => {
+    const start = movementPose('wall-push-up', 0);
+    const wall = figures['wall-push-up'].props.find((p) => p.type === 'wall');
+    expect(wall).toBeDefined();
+    for (let n = 0; n <= 40; n++) {
+      const p = movementPose('wall-push-up', n / 40);
+      expect(p.hR).toEqual(start.hR);
+      expect(p.aR).toEqual(start.aR);
+      expect(distance(p.neck, p.aR)).toBeCloseTo(108, 8);
+    }
+    expect(movementPose('wall-push-up', 1).neck[0]).toBeGreaterThan(
+      start.neck[0],
+    );
+  });
+  it('calf raise lifts the heels about 8 px with the toes fixed', () => {
+    const start = movementPose('calf-raise', 0),
+      top = movementPose('calf-raise', 1);
+    expect(top.tR).toEqual(start.tR);
+    expect(top.tL).toEqual(start.tL);
+    expect(start.aR[1] - top.aR[1]).toBeCloseTo(16, 8);
+    expect(start.hip[1] - top.hip[1]).toBeCloseTo(16, 8);
+  });
+  it('crunch curls head and shoulders about 40 degrees while hips and feet stay put', () => {
+    const start = movementPose('crunch', 0),
+      top = movementPose('crunch', 1);
+    expect(top.hip).toEqual(start.hip);
+    expect(top.aR).toEqual(start.aR);
+    expect(top.neck[1]).toBeLessThan(start.neck[1] - 5);
+    expect(top.head[1]).toBeLessThan(start.head[1] - 5);
+    const pivot: Pt = [72, 169];
+    expect(distance(top.neck, pivot)).toBeCloseTo(26, 8);
+    expect(
+      Math.atan2(pivot[1] - top.neck[1], pivot[0] - top.neck[0]),
+    ).toBeCloseTo(0.7, 8);
+  });
 });

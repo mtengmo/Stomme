@@ -12,6 +12,7 @@ function exercise(
   easierVariant: string,
   start = 6,
   unit: Exercise['unit'] = 'reps',
+  maxReps = 12,
 ): Exercise {
   return {
     id,
@@ -24,7 +25,7 @@ function exercise(
     perSide: false,
     range: {
       start,
-      max: unit === 'seconds' ? 30 : 12,
+      max: unit === 'seconds' ? 30 : maxReps,
       step: unit === 'seconds' ? 5 : 1,
     },
     loadLadder: [{ kg: 0, label: 'Kroppsvikt' }],
@@ -178,6 +179,60 @@ export const bodyweightExercises: Exercise[] = [
     15,
     'seconds',
   ),
+  exercise(
+    'knee-push-up',
+    'Armhävning på knä',
+    ['Bröst', 'Triceps', 'Axlar'],
+    [
+      'Lägg en hopvikt handduk under knäna. Gå ned på knä med händerna något bredare än axlarna och flytta fram händerna så att kroppen bildar en rak linje från knän till huvud.',
+      'Böj armbågarna snett bakåt och sänk bröstet mot golvet. Håll magen spänd så att höften inte sjunker.',
+      'Pressa golvet ifrån dig tills armarna är raka. Ned och upp är en repetition.',
+    ],
+    'Höften skjuts bakåt mot hälarna eller sjunker så att ryggen svankar.',
+    'Gör armhävningen mot en vägg.',
+  ),
+  exercise(
+    'wall-push-up',
+    'Armhävning mot vägg',
+    ['Bröst', 'Triceps', 'Axlar'],
+    [
+      'Stå en armlängd från en vägg med fötterna ungefär höftbrett. Lägg handflatorna mot väggen i axelhöjd, något bredare än axlarna.',
+      'Böj armbågarna och för bröstet mot väggen med kroppen rak från huvud till hälar. Låt hälarna stå kvar i golvet.',
+      'Pressa dig ifrån väggen tills armarna är raka. Mot och från väggen är en repetition.',
+    ],
+    'Höften skjuts bakåt eller hälarna lyfts när du kommer nära väggen.',
+    'Stå närmare väggen så blir det lättare.',
+  ),
+  exercise(
+    'calf-raise',
+    'Tåhävning på två ben',
+    ['Vader'],
+    [
+      'Stå med fötterna ungefär höftbrett. Håll i en vägg eller stolsrygg vid behov och se rakt fram.',
+      'Pressa upp på tårna så högt du kan utan att fötterna vickar utåt eller inåt.',
+      'Sänk hälarna långsamt tillbaka till golvet. Upp och ned är en repetition.',
+    ],
+    'Du studsar upp och ned eller faller åt sidan på fötterna.',
+    'Ha ett stadigt stöd att hålla i och gå bara upp en liten bit på tårna.',
+    10,
+    'reps',
+    15,
+  ),
+  exercise(
+    'crunch',
+    'Magcrunch',
+    ['Bål'],
+    [
+      'Ligg på rygg med böjda knän och fötterna i golvet. Lägg händerna lätt vid tinningarna eller över bröstet.',
+      'Spänn magen och lyft huvud och axlar en liten bit från golvet. Dra inte i nacken med händerna.',
+      'Sänk lugnt tillbaka. Lyft och sänkning är en repetition.',
+    ],
+    'Du rycker i nacken eller lyfter hela ryggen från golvet.',
+    'Lyft bara huvudet och axlarna en liten bit, eller korsa armarna över bröstet.',
+    10,
+    'reps',
+    15,
+  ),
 ];
 
 export type BodyweightId = (typeof bodyweightIds)[number];
@@ -193,6 +248,10 @@ export const bodyweightIds = [
   'squat-jump',
   'jumping-lunge',
   'mountain-climber',
+  'knee-push-up',
+  'wall-push-up',
+  'calf-raise',
+  'crunch',
 ] as const;
 
 export const bodyweightDetails: Record<
@@ -322,6 +381,50 @@ export const bodyweightDetails: Record<
       'https://www.acefitness.org/resources/everyone/exercise-library/258/mountain-climbers/',
     publisher: 'ACE',
     note: 'Appen visar en lugnare växelvis variant, inte källans snabba samtidiga fotbyte. Tiden gäller båda benen tillsammans.',
+  },
+  'knee-push-up': {
+    equipment: 'bodyweight',
+    level: 'basic',
+    reason: 'Knäna bär en del av kroppsvikten, vilket ger en lugnare start.',
+    primary: ['chest', 'triceps'],
+    secondary: ['shoulders', 'core'],
+    source:
+      'https://www.nasm.org/resource-center/exercise-library/modified-push-up',
+    publisher: 'NASM',
+    note: 'Knästödd armhävning (modified push-up) som steg mot den vanliga armhävningen.',
+  },
+  'wall-push-up': {
+    equipment: 'bodyweight',
+    level: 'basic',
+    reason: 'Stående mot en vägg med lågt belastningskrav.',
+    primary: ['chest', 'triceps'],
+    secondary: ['shoulders', 'core'],
+    source:
+      'https://www.nasm.org/resource-center/exercise-library/incline-push-up',
+    publisher: 'NASM',
+    note: 'NASM beskriver lutande armhävning med händerna på en upphöjd yta, till exempel en vägg. Väggvarianten är det lättaste steget.',
+  },
+  'calf-raise': {
+    equipment: 'bodyweight',
+    level: 'basic',
+    reason: 'Enkel, avgränsad rörelse på båda benen med valfritt stöd.',
+    primary: ['calves'],
+    secondary: [],
+    source:
+      'https://www.acefitness.org/resources/everyone/exercise-library/73/standing-calf-raises-wall/',
+    publisher: 'ACE',
+    note: 'Stående tåhävning med stöd mot vägg. Enklare steg före tåhävning på ett ben.',
+  },
+  crunch: {
+    equipment: 'bodyweight',
+    level: 'basic',
+    reason: 'Litet lyft av huvud och axlar liggande på rygg.',
+    primary: ['core'],
+    secondary: [],
+    source:
+      'https://www.acefitness.org/resources/everyone/exercise-library/52/crunch/',
+    publisher: 'ACE',
+    note: 'Liten rörelse med kontrollerad nacke. Ingen extra belastning.',
   },
 };
 

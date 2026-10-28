@@ -13,6 +13,7 @@ import { PencilTick } from '../../ui/PencilTick';
 import { Tally } from '../../ui/Tally';
 import { careState } from '../pain/careState';
 import { DayAfterNotices, StopBanner } from '../pain/PainNotices';
+import { TimeoutNotice } from '../session/TimeoutNotice';
 import { BackupReminder, readBackupMeta } from './BackupReminder';
 import {
   isoWeekNumber,
@@ -144,6 +145,7 @@ export function WeekView({ now: nowProp }: { now?: Date }) {
 
       {care.stopBanner ? <StopBanner /> : null}
       <DayAfterNotices care={care} today={today} />
+      <TimeoutNotice />
       {stale ? <StaleSession session={stale} /> : null}
 
       <ol

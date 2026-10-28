@@ -328,7 +328,7 @@ export function SetScreen({
                   ? `Ta position${side ? ` · ${side}` : ''}. ${movingTimed ? 'Övningstiden' : 'Hålltiden'} börjar automatiskt.`
                   : hold.phase === 'paused'
                     ? 'Timern är pausad. Fortsätt när du är redo.'
-                    : '5 s förberedelse. Sedan automatiska sidbyten och vila. Ljud om möjligt.'}
+                    : '5 s förberedelse. Sedan automatiska sidbyten och vila.'}
           </p>
           {hold.phase === 'paused' ? (
             <button
@@ -393,9 +393,9 @@ export function SetScreen({
                       ? 'Setet är klart och sparas automatiskt.'
                       : `${amount} repetitioner${exercise.perSide ? ' på denna sida' : ''}. 5 s förberedelse, sedan räknar appen.`}
           </p>
-          <div className="flex flex-wrap items-center gap-x-3">
-            <p className="m-0 text-sm">
-              Takt: ca {repSeconds(tempo)} s per repetition. Förslag på takt.
+          <div className="flex flex-wrap items-center gap-x-4">
+            <p className="m-0 w-full text-base font-bold min-[360px]:w-auto">
+              Takt: ca {repSeconds(tempo)} s
             </p>
             {canChangePace ? (
               <>

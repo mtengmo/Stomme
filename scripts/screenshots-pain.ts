@@ -167,10 +167,10 @@ try {
       await page.getByRole('heading', { name: 'Avbryt passet.' }).waitFor();
       await shot(page, 'pain-stop');
       await page.getByRole('button', { name: 'Till träningen' }).click();
-      await page.getByText(/Senast stoppade du/).waitFor();
+      await page.getByText(/Senast avbröt du/).waitFor();
       await shot(page, 'banner-week');
       await page.getByRole('link', { name: 'Starta pass' }).click();
-      await page.getByText(/Senast stoppade du/).waitFor();
+      await page.getByText(/Senast avbröt du/).waitFor();
       await shot(page, 'banner-preview');
       await page.context().close();
 
@@ -182,7 +182,7 @@ try {
       await page.getByRole('button', { name: 'Klar set' }).waitFor();
       await page.getByRole('button', { name: 'Avbryt', exact: true }).click();
       await page
-        .getByRole('button', { name: 'Avbryt på grund av knäet' })
+        .getByRole('button', { name: 'Avbryt – det gör ont' })
         .waitFor();
       await shot(page, 'abort-confirm');
       await page.context().close();

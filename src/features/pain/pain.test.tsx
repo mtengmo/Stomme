@@ -206,7 +206,7 @@ describe('day after and banner', () => {
     const user = userEvent.setup();
     await seedSession(5, 'aborted', 'pain_stop');
     const text =
-      'Senast stoppade du på grund av knäet. Fråga fysioterapeuten innan nästa pass.';
+      'Senast avbröt du passet för att det gjorde ont. Fråga fysioterapeuten innan nästa pass.';
     render(<App />);
     expect(await screen.findByText(text)).toBeTruthy();
     await user.click(screen.getByRole('link', { name: 'Starta pass' }));
@@ -327,7 +327,7 @@ describe('safety gates', () => {
     render(<App />);
     await user.click(await screen.findByRole('button', { name: 'Avbryt' }));
     await user.click(
-      await screen.findByRole('button', { name: 'Avbryt på grund av knäet' }),
+      await screen.findByRole('button', { name: 'Avbryt – det gör ont' }),
     );
     expect(
       await screen.findByRole('heading', { name: 'Avbryt passet.' }),
@@ -400,9 +400,7 @@ describe('safety gates', () => {
     expect(stored?.status).toBe('completed');
     expect(stored?.abortReason).toBeUndefined();
     await user.click(screen.getByRole('button', { name: 'Till träningen' }));
-    expect(
-      await screen.findByText(/Senast stoppade du på grund av knäet/),
-    ).toBeTruthy();
+    expect(await screen.findByText(/Senast avbröt du passet/)).toBeTruthy();
   });
 
   it('an after warn continues to the summary with Gå vidare', async () => {
@@ -436,9 +434,7 @@ describe('safety gates', () => {
     ).toBeTruthy();
     expect((await getDb().sessions.get(s.id))?.status).toBe('completed');
     await user.click(screen.getByRole('button', { name: 'Till träningen' }));
-    expect(
-      await screen.findByText(/Senast stoppade du på grund av knäet/),
-    ).toBeTruthy();
+    expect(await screen.findByText(/Senast avbröt du passet/)).toBeTruthy();
     cleanup();
     window.location.hash = '#/pass/A';
     render(<App />);

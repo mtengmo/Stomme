@@ -6,6 +6,7 @@ import { Onboarding } from './features/onboarding/Onboarding';
 import { UpdateContext, useUpdate } from './features/settings/updateContext';
 import { useAppHashLocation } from './lib/hashLocation';
 import { useAppUpdate } from './lib/update';
+import { useSessionExpiry } from './lib/useSessionExpiry';
 import { Banner } from './ui/Banner';
 import { BottomNav } from './ui/BottomNav';
 import { Button } from './ui/Button';
@@ -118,6 +119,7 @@ export function App() {
 }
 
 function Shell() {
+  useSessionExpiry();
   const [location] = useLocation();
   const inSession =
     location.startsWith('/session/') ||

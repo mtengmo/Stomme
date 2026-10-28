@@ -964,7 +964,16 @@ export const exerciseMetadata = Object.fromEntries(
             },
           ]
         : sourceFor(id),
-      reviewedAt: added ? '2026-10-24' : '2026-10-20',
+      reviewedAt: [
+        'knee-push-up',
+        'wall-push-up',
+        'calf-raise',
+        'crunch',
+      ].includes(id)
+        ? '2026-10-28'
+        : added
+          ? '2026-10-24'
+          : '2026-10-20',
       sidePolicy: exercise.perSide ? 'choose-side' : 'both',
     };
     if (page && exercise.unit === 'reps' && id !== 'single-leg-calf-raise')
@@ -982,6 +991,10 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'single-leg-hip-thrust')
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
+    if (id === 'push-up') metadata.easierExerciseId = 'knee-push-up';
+    if (id === 'knee-push-up') metadata.easierExerciseId = 'wall-push-up';
+    if (id === 'single-leg-calf-raise')
+      metadata.easierExerciseId = 'calf-raise';
     if (id === 'jumping-lunge' || id === 'mountain-climber')
       metadata.sidePolicy = 'alternating';
     return [id, metadata];
