@@ -378,3 +378,23 @@ describe('backup', () => {
     });
   });
 });
+
+describe('rep counting preferences in the backup', () => {
+  it('round-trips per-exercise pace and rejects unknown values', async () => {
+    const b = await valid();
+    const prefs = { pace: { burpee: 4 }, manual: { 'goblet-squat': true } };
+    await db.meta.put({ key: 'repCountPrefs', value: prefs });
+    const full = await exportAll(db);
+    await db.meta.clear();
+    await importAll(db, serializeBackup(full));
+    expect((await db.meta.get('repCountPrefs'))?.value).toEqual(prefs);
+    const bad = structuredClone(full);
+    bad.meta = bad.meta.map((m) =>
+      m.key === 'repCountPrefs'
+        ? { ...m, value: { pace: { burpee: 9 }, manual: {} } }
+        : m,
+    );
+    await expect(importAll(db, serializeBackup(bad))).rejects.toBeTruthy();
+    expect(b).toBeTruthy();
+  });
+});

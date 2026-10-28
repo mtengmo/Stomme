@@ -263,7 +263,8 @@ export interface MetaEntry {
     | 'training'
     | 'rehabPlans'
     | 'customWorkouts'
-    | 'favourites';
+    | 'favourites'
+    | 'repCountPrefs';
   value: unknown;
 }
 

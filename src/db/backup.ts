@@ -313,6 +313,19 @@ const metaSchema = z.discriminatedUnion('key', [
       .max(30),
   }),
   z.strictObject({
+    key: z.literal('repCountPrefs'),
+    value: z.strictObject({
+      pace: z.partialRecord(
+        z.enum(Object.keys(exercises) as [ExerciseId, ...ExerciseId[]]),
+        z.number().int().min(0).max(5),
+      ),
+      manual: z.partialRecord(
+        z.enum(Object.keys(exercises) as [ExerciseId, ...ExerciseId[]]),
+        z.boolean(),
+      ),
+    }),
+  }),
+  z.strictObject({
     key: z.literal('rehabPlans'),
     value: z.strictObject({
       custom: savedRehabPlan.optional(),

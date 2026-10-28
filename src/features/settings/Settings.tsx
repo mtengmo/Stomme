@@ -17,6 +17,7 @@ import { deleteAllData } from '../../db/wipe';
 import type { WeightInventoryItem } from '../../domain/types';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
+import { restoreRepPrefs } from '../../lib/repPrefs';
 import { shareOrDownload } from '../../lib/share';
 import { type StorageStatus, storageStatus } from '../../lib/storage';
 import { APP_COMMIT, APP_VERSION } from '../../lib/version';
@@ -237,6 +238,7 @@ export function Settings() {
           }
         },
       });
+      await restoreRepPrefs(getDb());
       leave();
       setStatus(
         `Importerat: ${counts.sessions} pass, ${counts.setLogs} set och ${counts.painLogs} smärtvärden. Din tidigare data sparades först som en säkerhetskopia.`,

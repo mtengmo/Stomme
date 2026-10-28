@@ -5,10 +5,10 @@ import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import { formatClock } from '../../lib/format';
+import { isManual, paceFor, saveManual, savePace } from '../../lib/repPrefs';
 import { useRepCounter } from '../../lib/useRepCounter';
 import { useTimedHold } from '../../lib/useTimedHold';
 import {
-  DEFAULT_PACE,
   PACE_FACTORS,
   repSeconds,
   repTempo,
@@ -24,7 +24,6 @@ import { KettlebellRackGrip } from '../exercise/KettlebellRackGrip';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
-const MANUAL_KEY = 'stomme.repCount.manual';
 const SEEN_KEY = 'stomme.repCount.seen';
 
 function readFlag(key: string): boolean {
@@ -32,27 +31,6 @@ function readFlag(key: string): boolean {
     return window.localStorage.getItem(key) === '1';
   } catch {
     return false;
-  }
-}
-const PACE_KEY = 'stomme.repCount.pace';
-function readPace(): number {
-  try {
-    const stored = Number(window.localStorage.getItem(PACE_KEY));
-    return Number.isInteger(stored) &&
-      window.localStorage.getItem(PACE_KEY) !== null &&
-      stored >= 0 &&
-      stored < PACE_FACTORS.length
-      ? stored
-      : DEFAULT_PACE;
-  } catch {
-    return DEFAULT_PACE;
-  }
-}
-function writePace(value: number): void {
-  try {
-    window.localStorage.setItem(PACE_KEY, String(value));
-  } catch {
-    // The choice still applies for this screen.
   }
 }
 function writeFlag(key: string, on: boolean): void {
@@ -141,16 +119,16 @@ export function SetScreen({
       if (!busy && !invalidWeight) onDone(amount, loadIndex, weightKg);
     },
   });
-  const [pace, setPace] = useState(readPace);
+  const [pace, setPace] = useState(() => paceFor(exercise.id));
   const baseTempo = unit === 'reps' ? repTempo(exercise.id) : null;
   const tempo = baseTempo
     ? scaleTempo(baseTempo, PACE_FACTORS[pace] ?? 1)
     : null;
   const changePace = (next: number) => {
     setPace(next);
-    writePace(next);
+    savePace(exercise.id, next);
   };
-  const [manual, setManual] = useState(() => readFlag(MANUAL_KEY));
+  const [manual, setManual] = useState(() => isManual(exercise.id));
   const [seenIntro] = useState(() => readFlag(SEEN_KEY));
   const autoCount = tempo !== null && !manual;
   const unsaved = useRef<{ count: number; early: boolean } | null>(null);
@@ -406,7 +384,7 @@ export function SetScreen({
             {counter.phase === 'prepare'
               ? `Ta position${side ? ` · ${side}` : ''}. Räkningen börjar automatiskt.`
               : counter.phase === 'active'
-                ? 'Räkningen pågår. Setet sparas automatiskt vid sista repetitionen.'
+                ? 'Sparas automatiskt vid sista repetitionen.'
                 : counter.phase === 'paused'
                   ? 'Pausad. Fortsätt när du är redo.'
                   : counter.phase === 'resuming'
@@ -415,27 +393,30 @@ export function SetScreen({
                       ? 'Setet är klart och sparas automatiskt.'
                       : `${amount} repetitioner${exercise.perSide ? ' på denna sida' : ''}. 5 s förberedelse, sedan räknar appen.`}
           </p>
-          <p className="m-0 text-sm">
-            Takt: ca {repSeconds(tempo)} s per repetition. Förslag på takt,
-            anpassa efter dig.
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              disabled={!canChangePace || pace === 0}
-              onClick={() => changePace(pace - 1)}
-              className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
-            >
-              Snabbare
-            </button>
-            <button
-              type="button"
-              disabled={!canChangePace || pace === PACE_FACTORS.length - 1}
-              onClick={() => changePace(pace + 1)}
-              className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
-            >
-              Långsammare
-            </button>
+          <div className="flex flex-wrap items-center gap-x-3">
+            <p className="m-0 text-sm">
+              Takt: ca {repSeconds(tempo)} s per repetition. Förslag på takt.
+            </p>
+            {canChangePace ? (
+              <>
+                <button
+                  type="button"
+                  disabled={pace === 0}
+                  onClick={() => changePace(pace - 1)}
+                  className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
+                >
+                  Snabbare
+                </button>
+                <button
+                  type="button"
+                  disabled={pace === PACE_FACTORS.length - 1}
+                  onClick={() => changePace(pace + 1)}
+                  className="min-h-12 text-base font-bold underline disabled:no-underline disabled:opacity-60"
+                >
+                  Långsammare
+                </button>
+              </>
+            ) : null}
           </div>
           {counterLive && counter.phase !== 'prepare' ? (
             <button
@@ -479,7 +460,7 @@ export function SetScreen({
               role="switch"
               aria-checked={manual}
               onClick={() => {
-                writeFlag(MANUAL_KEY, !manual);
+                saveManual(exercise.id, !manual);
                 setManual(!manual);
               }}
               className="min-h-12 text-base font-bold underline"

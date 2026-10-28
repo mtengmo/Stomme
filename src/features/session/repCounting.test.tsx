@@ -116,7 +116,10 @@ describe('rep counting on the set screen', () => {
   it('Räkna själv switches to the manual Klar set and is remembered', () => {
     const { onDone } = show('goblet-squat');
     act(() => screen.getByRole('switch', { name: 'Räkna själv: av' }).click());
-    expect(window.localStorage.getItem('stomme.repCount.manual')).toBe('1');
+    expect(
+      JSON.parse(window.localStorage.getItem('stomme.repCount.prefs') ?? '{}')
+        .manual['goblet-squat'],
+    ).toBe(true);
     click('Klar set');
     expect(onDone).toHaveBeenCalledWith(3, 0, undefined, {
       counting: 'manual',
@@ -161,18 +164,29 @@ describe('pace buttons', () => {
     expect(screen.getByText(/Takt: ca 4 s/)).toBeTruthy();
     click('Långsammare');
     expect(screen.getByText(/Takt: ca 5 s/)).toBeTruthy();
-    expect(window.localStorage.getItem('stomme.repCount.pace')).toBe('3');
+    expect(
+      JSON.parse(window.localStorage.getItem('stomme.repCount.prefs') ?? '{}')
+        .pace['goblet-squat'],
+    ).toBe(3);
     click('Snabbare');
     click('Snabbare');
     expect(screen.getByText(/Takt: ca 3 s/)).toBeTruthy();
   });
 
-  it('locks the buttons while a rep is being counted', () => {
+  it('keeps the pace and the manual choice per exercise', () => {
+    show('goblet-squat');
+    click('Långsammare');
+    cleanup();
+    show('burpee');
+    expect(screen.getByText(/Takt: ca 6 s/)).toBeTruthy();
+    cleanup();
+    show('goblet-squat');
+    expect(screen.getByText(/Takt: ca 5 s/)).toBeTruthy();
+  });
+
+  it('hides the pace buttons while a rep is being counted', () => {
     show('goblet-squat', true);
     advance(6_000);
-    expect(
-      (screen.getByRole('button', { name: 'Snabbare' }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(true);
+    expect(screen.queryByRole('button', { name: 'Snabbare' })).toBeNull();
   });
 });

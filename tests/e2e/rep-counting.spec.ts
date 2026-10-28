@@ -39,10 +39,8 @@ test('Räkna själv brings back Klar set and is remembered', async ({ page }) =>
   await answerPain(page, 0);
   await page.getByRole('switch', { name: 'Räkna själv: av' }).click();
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();
-  expect(
-    await page.evaluate(
-      (key) => localStorage.getItem(key),
-      REP_COUNT_MANUAL_KEY,
-    ),
-  ).toBe('1');
+  const prefs = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('stomme.repCount.prefs') ?? '{}'),
+  );
+  expect(Object.values(prefs.manual)).toEqual([true]);
 });
