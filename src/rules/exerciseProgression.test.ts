@@ -81,6 +81,25 @@ describe('optional harder exercises', () => {
       ['diamond-push-up'],
     );
   });
+  it('does not count a short success, but a short symptom blocks older full successes', () => {
+    const data = fixture();
+    const short = {
+      ...required(data.sessions[1]),
+      workoutMode: 'short' as const,
+    };
+    expect(
+      suggest({ ...data, sessions: [required(data.sessions[0]), short] }),
+    ).toEqual([]);
+    const symptomatic = {
+      ...short,
+      id: 'short-later',
+      startedAt: '2026-10-23T08:00:00Z',
+      feedback: { 'push-up': { symptoms: symptom } },
+    };
+    expect(
+      suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
+    ).toEqual([]);
+  });
   it.each([
     ['wall-push-up', 'knee-push-up'],
     ['knee-push-up', 'push-up'],

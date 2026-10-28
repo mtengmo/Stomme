@@ -211,6 +211,10 @@ export interface Session {
   templateId: TemplateId;
   customWorkoutId?: string;
   customWorkoutName?: string;
+  /** Absent means a full workout. Short sessions do not establish progression. */
+  workoutMode?: 'short';
+  /** Original full plan for restoring a short preparation after reload. */
+  fullPlan?: PlannedExercise[];
   /** Absent on original knee/running sessions. */
   programId?: ProgramId;
   /** Experience selected when this workout was prepared. */
@@ -271,8 +275,21 @@ export interface MetaEntry {
     | 'rehabPlans'
     | 'customWorkouts'
     | 'favourites'
-    | 'repCountPrefs';
+    | 'repCountPrefs'
+    | 'trainingRoutines'
+    | 'weeklySchedule';
   value: unknown;
+}
+
+export type StandardProgramId = 'general' | 'running';
+export type TrainingRoutines = Partial<
+  Record<StandardProgramId, Partial<Record<TemplateId, PlannedExercise[]>>>
+>;
+
+/** ISO weekdays (Monday 1, Sunday 7); moved replaces one dated occurrence. */
+export interface WeeklySchedule {
+  days: number[];
+  moved?: { from: string; to: string };
 }
 
 export type PainStatus = 'ok' | 'warn' | 'stop';

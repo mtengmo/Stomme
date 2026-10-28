@@ -438,6 +438,9 @@ export function ProgressOverview({
                               : 'Pågående pass'}
                           </p>
                         ) : null}
+                        {session.workoutMode === 'short' ? (
+                          <p className="m-0 font-bold">Kortpass</p>
+                        ) : null}
                         <details>
                           <summary className="min-h-12 cursor-pointer py-3 font-bold">
                             Visa pass och svar

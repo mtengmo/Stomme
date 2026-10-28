@@ -28,6 +28,7 @@ import { useHashSearch } from '../../lib/hashLocation';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
 import { TimeoutNotice } from '../session/TimeoutNotice';
+import { WeeklyPlan } from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
 import { QuickStart } from './QuickStart';
 
@@ -326,7 +327,10 @@ export function TrainingHome() {
       session.status !== 'in_progress',
   );
   const lastCompleted = recent.find(
-    (session) => session.status === 'completed',
+    (session) =>
+      session.status === 'completed' &&
+      session.workoutMode !== 'short' &&
+      !session.customWorkoutId,
   );
   const nextId =
     preferences?.programId === 'rehab' || lastCompleted?.templateId !== 'A'
@@ -381,6 +385,9 @@ export function TrainingHome() {
             ? 'Fortsätt passet'
             : 'Visa nästa pass'}
       </Link>
+      {!active ? (
+        <WeeklyPlan preferences={preferences} sessions={data.sessions} />
+      ) : null}
       {due.map((session) => (
         <Link
           key={session.id}
@@ -460,7 +467,9 @@ export function TrainingHome() {
               href={`/historik/${session.id}`}
               className="flex min-h-12 items-center border-b-2 border-edge text-base underline"
             >
-              {session.date} · Pass {session.templateId} ·{' '}
+              {session.date} ·{' '}
+              {session.workoutMode === 'short' ? 'Kortpass' : 'Pass'}{' '}
+              {session.templateId} ·{' '}
               {session.status === 'completed' ? 'klart' : 'avbrutet'}
             </Link>
           ))}

@@ -74,6 +74,128 @@ function logs(id = 'previous', amount = 8): SetLog[] {
 }
 
 describe('programme-specific progression', () => {
+  it('normalizes legacy side selection when matching saved routine history', () => {
+    const legacy = session({ plan: [{ ...plan, sides: undefined }] });
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [legacy],
+        logs(),
+        plan.variantId,
+        ['right', 'left'],
+      ).explanation,
+    ).toMatch(/förslag/);
+    const bilateral: PlannedExercise = {
+      exerciseId: 'push-up',
+      sets: 2,
+      target: 8,
+      loadIndex: 0,
+      weightKg: 0,
+      restSec: 60,
+      reason: 'first_time',
+      variantId: 'bodyweight',
+    };
+    expect(
+      trainingPlanSuggestion(
+        bilateral,
+        { ...preferences, equipment: ['bodyweight'] },
+        [session({ plan: [bilateral], feedback: {} })],
+        [],
+        bilateral.variantId,
+        ['both'],
+      ).explanation,
+    ).toMatch(/Inget komplett/);
+  });
+  it('does not use short sessions as progression evidence, but short symptoms block a later increase', () => {
+    const full = session();
+    expect(
+      trainingPlanSuggestion(plan, preferences, [full], logs()).target,
+    ).toBe(9);
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [session({ workoutMode: 'short' })],
+        logs(),
+      ).target,
+    ).toBe(8);
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [session({ customWorkoutId: 'custom' })],
+        logs(),
+      ).target,
+    ).toBe(9);
+    const symptomatic = session({
+      id: 'short-later',
+      workoutMode: 'short',
+      startedAt: '2026-10-21T08:00:00.000Z',
+      checkins: {
+        before: {
+          feeling: 'tired',
+          symptoms: { area: 'Knä', side: 'left', score: 2 },
+          recordedAt: '2026-10-21T08:00:00.000Z',
+        },
+      },
+    });
+    const blocked = trainingPlanSuggestion(
+      plan,
+      preferences,
+      [symptomatic, full],
+      logs(),
+    );
+    expect(blocked.target).toBe(8);
+    expect(blocked.explanation).toMatch(/Besvär/);
+    const feedbackSymptoms = session({
+      id: 'short-feedback',
+      workoutMode: 'short',
+      checkins: undefined,
+      feedback: {
+        'single-leg-rdl': { symptoms: { area: 'Knä', side: 'left', score: 2 } },
+      },
+    });
+    expect(
+      trainingPlanSuggestion(plan, preferences, [feedbackSymptoms], [])
+        .explanation,
+    ).toMatch(/Besvär/);
+  });
+  it('holds progression after a newer full session with symptoms on another side', () => {
+    const olderLeft = session();
+    const newerRight = session({
+      id: 'newer-right',
+      startedAt: '2026-10-21T08:00:00.000Z',
+      plan: [{ ...plan, sides: ['right'] }],
+      checkins: {
+        before: {
+          feeling: 'tired',
+          symptoms: { area: 'Knä', side: 'right', score: 2 },
+          recordedAt: '2026-10-21T08:00:00.000Z',
+        },
+      },
+    });
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [newerRight, olderLeft],
+        logs(),
+        plan.variantId,
+        ['left'],
+      ),
+    ).toMatchObject({ target: 8 });
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        preferences,
+        [newerRight, olderLeft],
+        logs(),
+        plan.variantId,
+        ['left'],
+      ).explanation,
+    ).toMatch(/Besvär/);
+  });
   it('keeps an unknown draft variant reviewable and does not invent history for an unowned starting load', () => {
     const unknown = { ...plan, variantId: 'old-variant' };
     expect(trainingPlanSuggestion(unknown, preferences, [], []).variantId).toBe(

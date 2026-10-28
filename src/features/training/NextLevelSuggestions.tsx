@@ -93,6 +93,7 @@ export function SummaryNextLevel({ session }: { session: Session }) {
   if (
     !data ||
     session.status !== 'completed' ||
+    session.workoutMode === 'short' ||
     !isTrainingPreferences(data.preferences) ||
     session.programId !== data.preferences.programId
   )

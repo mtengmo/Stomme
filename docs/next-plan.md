@@ -1,6 +1,6 @@
 # Next steps (as of 2026-10-28)
 
-Implementation from the Claude handoff is on `feature/next-plan`. No merge or push to `main` is authorised by this handoff.
+The exercise/history handoff was merged and pushed as `14cfb28`. The next requested build is now implemented on `feature/training-continuity`: remembered A/B routines, explicit short workouts and local weekly planning. See [the plan and verification](training-continuity-plan.md). No further merge or push has been performed.
 
 ## Finished
 
@@ -11,7 +11,7 @@ Implementation from the Claude handoff is on `feature/next-plan`. No merge or pu
 - Upgrade runner: native Windows tar handles drive-letter paths, and the browser contexts support tsx's serialized callback helpers. Accessibility and M6 screenshot scripts use manual counting; the latter seeds the legacy programme explicitly and starts Vite without a shell wrapper.
 - Refreshed `.impeccable/design.json` from the existing design context. `CLAUDE.md` is absent from this checkout, so there is no implementer name to repair.
 
-## Verification
+## Previous verification (exercise/history handoff)
 
 - `npm run check` and `npm run build` pass. Check reports only existing Biome warnings/deprecation information.
 - `npm run test:cov`: 1,348 tests passed, 100% branch coverage in `src/rules/`. Removed unreachable roster top-up code and redundant fallback branches; apparatus-free running rosters and missing historical check-ins have explicit regression coverage.

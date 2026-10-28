@@ -50,6 +50,7 @@ import {
   startTrainingSession,
   validateTrainingPlan,
 } from '../../db/training';
+import { getTrainingRoutines } from '../../db/trainingRoutines';
 import type {
   ExerciseId,
   PlannedExercise,
@@ -58,11 +59,16 @@ import type {
   SetLog,
   TemplateId,
   TrainingPreferences,
+  TrainingRoutines,
 } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { chooseVariant, levelRankOf } from '../../rules/levelPolicy';
+import {
+  estimateWorkoutMinutes,
+  shortWorkoutPlan,
+} from '../../rules/shortWorkout';
 import { trainingPlanSuggestion } from '../../rules/training';
 import {
   availableWeights,
@@ -77,6 +83,7 @@ import { NextLevelSuggestions } from './NextLevelSuggestions';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
 import { RehabCollection } from './RehabCollection';
+import { RoutineControls } from './RoutineControls';
 import { startProblems } from './startReadiness';
 import { inputClass } from './TrainingHome';
 
@@ -103,6 +110,7 @@ function PreviewEditor({
   painReported,
   customWorkout,
   preparationId,
+  savedRoutines,
 }: {
   preferences: TrainingPreferences;
 
@@ -116,11 +124,18 @@ function PreviewEditor({
   painReported?: boolean;
   customWorkout?: CustomWorkout;
   preparationId?: string;
+  savedRoutines?: TrainingRoutines;
 }) {
   const [, navigate] = useLocation();
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
   const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const preparation = sessions.find(
+    (session) =>
+      session.id === preparationId &&
+      session.templateId === id &&
+      session.customWorkoutId === customWorkout?.id,
+  );
 
   const [plan, setPlan] = useState(() => {
     try {
@@ -147,13 +162,8 @@ function PreviewEditor({
       /* A damaged draft never replaces the saved session. */
     }
 
-    const prepared = sessions.find(
-      (session) =>
-        session.id === preparationId &&
-        session.templateId === id &&
-        session.customWorkoutId === customWorkout?.id,
-    );
-    if (prepared) return structuredClone(prepared.plan);
+    if (preparation)
+      return structuredClone(preparation.fullPlan ?? preparation.plan);
     if (
       customWorkout?.plan &&
       validateTrainingPlan(customWorkout.plan) &&
@@ -177,6 +187,7 @@ function PreviewEditor({
       logs,
       savedPlans,
       painReported,
+      savedRoutines,
     );
   });
 
@@ -224,6 +235,28 @@ function PreviewEditor({
   }, [draftKey, editing]);
   const problems = startProblems(plan, preferences);
   const ready = problems.length === 0;
+  const [shortSelected, setShortSelected] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem(`${draftKey}.short`);
+      return stored === null
+        ? preparation?.workoutMode === 'short'
+        : stored === 'true';
+    } catch {
+      return preparation?.workoutMode === 'short';
+    }
+  });
+  const shortVersion = ready
+    ? shortWorkoutPlan(plan, preferences.programId, Boolean(customWorkout))
+    : null;
+  const short = shortSelected && shortVersion !== null;
+  const workoutPlan = short ? shortVersion.plan : plan;
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`${draftKey}.short`, String(short));
+    } catch {
+      /* Draft remains available in memory. */
+    }
+  }, [draftKey, short]);
 
   const [busy, setBusy] = useState(false);
 
@@ -232,6 +265,7 @@ function PreviewEditor({
   const [saved, setSaved] = useState(false);
 
   function updatePlan(value: SetStateAction<PlannedExercise[]>) {
+    setShortSelected(false);
     setConfirmed(false);
     setRemoved(null);
     setSaved(false);
@@ -445,13 +479,63 @@ function PreviewEditor({
         <>
           <button
             type="button"
-            onClick={() => setEditing((value) => !value)}
+            onClick={() => {
+              setShortSelected(false);
+              setEditing((value) => !value);
+            }}
             className="min-h-12 self-start text-base font-bold underline"
-            aria-expanded={editing}
+            aria-expanded={editing && !short}
           >
-            {editing ? 'Visa passöversikt' : 'Anpassa passet'}
+            {editing && !short
+              ? 'Visa passöversikt'
+              : short
+                ? 'Anpassa hela passet'
+                : 'Anpassa passet'}
           </button>
-          {editing ? (
+          {preferences.programId !== 'rehab' &&
+          !customWorkout &&
+          shortVersion ? (
+            <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+              <legend className="mb-2 text-base font-bold">Passlängd</legend>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  aria-pressed={!short}
+                  onClick={() => setShortSelected(false)}
+                  className="min-h-16 rounded-sm border-2 border-edge px-3 py-2 text-base font-bold aria-pressed:bg-action aria-pressed:text-action-ink"
+                >
+                  Helt pass · ca {shortVersion.fullEstimatedMinutes} min
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={short}
+                  onClick={() => {
+                    setShortSelected(true);
+                    setEditing(false);
+                  }}
+                  className="min-h-16 rounded-sm border-2 border-edge px-3 py-2 text-base font-bold aria-pressed:bg-action aria-pressed:text-action-ink"
+                >
+                  Kortpass · ca {shortVersion.estimatedMinutes} min
+                </button>
+              </div>
+              <p className="m-0 text-base text-ink-soft">
+                Grovt uppskattat med vila och byten. Uppvärmning tillkommer.
+              </p>
+              {short ? (
+                <p className="m-0 text-base">
+                  {workoutPlan.length} av {plan.length} övningar, högst två set
+                  per övning. Vila, tempo och vikt behålls. Kortpasset ändrar
+                  inte ditt vanliga A/B-upplägg.
+                </p>
+              ) : null}
+            </fieldset>
+          ) : preferences.programId !== 'rehab' && ready ? (
+            <p className="m-0 text-base text-ink-soft">
+              Ca {estimateWorkoutMinutes(plan)} minuter med vila och byten.
+              Uppvärmning tillkommer.
+            </p>
+          ) : null}
+          {editing && !short ? (
             <>
               {preferences.programId === 'rehab' ? (
                 <p className="m-0 text-base">
@@ -1302,27 +1386,58 @@ function PreviewEditor({
             </>
           ) : (
             <ReadyWorkout
-              plan={plan}
+              plan={workoutPlan}
+              short={short}
               preferences={preferences}
               onChange={(index) => {
-                setExpandedIndex(index);
+                setExpandedIndex(
+                  plan.findIndex(
+                    (item) =>
+                      item.exerciseId === workoutPlan[index]?.exerciseId,
+                  ),
+                );
+                setShortSelected(false);
                 setEditing(true);
               }}
             />
           )}
-          <NextLevelSuggestions
-            plan={plan}
-            preferences={preferences}
-            sessions={sessions}
-            logs={logs}
-            onChoose={(from, to) => {
-              updatePlan((current) =>
-                current.map((item) =>
-                  item.exerciseId === from ? basePlan(to, preferences) : item,
-                ),
-              );
-            }}
-          />
+          {!short && !customWorkout && preferences.programId !== 'rehab' ? (
+            <RoutineControls
+              plan={plan}
+              programId={preferences.programId}
+              templateId={id}
+              hasSaved={Boolean(savedRoutines?.[preferences.programId]?.[id])}
+              disabled={busy || !ready}
+              onReset={() => {
+                updatePlan(
+                  defaultPlan(
+                    preferences,
+                    id,
+                    sessions,
+                    logs,
+                    savedPlans,
+                    painReported,
+                  ),
+                );
+                setExpandedIndex(null);
+              }}
+            />
+          ) : null}
+          {!short ? (
+            <NextLevelSuggestions
+              plan={plan}
+              preferences={preferences}
+              sessions={sessions}
+              logs={logs}
+              onChoose={(from, to) => {
+                updatePlan((current) =>
+                  current.map((item) =>
+                    item.exerciseId === from ? basePlan(to, preferences) : item,
+                  ),
+                );
+              }}
+            />
+          ) : null}
           {preferences.programId === 'rehab' ? null : (
             <details className="border-y-2 border-edge py-2">
               <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
@@ -1474,15 +1589,19 @@ function PreviewEditor({
 
                       id,
 
-                      plan,
+                      workoutPlan,
                       new Date(),
                       customWorkout,
+                      short
+                        ? { workoutMode: 'short', fullPlan: plan }
+                        : undefined,
                     );
 
                     try {
                       sessionStorage.removeItem(draftKey);
                       sessionStorage.removeItem(`${draftKey}.editing`);
                       sessionStorage.removeItem(`${draftKey}.open`);
+                      sessionStorage.removeItem(`${draftKey}.short`);
                       clearFlags(draftKey);
                     } catch {
                       /* No persistent draft to clear. */
@@ -1504,7 +1623,7 @@ function PreviewEditor({
                   }
                 }}
               >
-                Börja passet
+                {short ? 'Börja kortpasset' : 'Börja passet'}
               </Button>
             </div>
           </div>
@@ -1538,6 +1657,7 @@ export function TrainingPreview({ id }: { id: string }) {
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
         | Partial<Record<RehabFocus, PlannedExercise[]>>
         | undefined,
+      savedRoutines: await getTrainingRoutines(getDb()),
     };
   }, []);
 
@@ -1576,6 +1696,7 @@ export function TrainingPreview({ id }: { id: string }) {
       sessions={data.sessions}
       logs={data.logs}
       savedPlans={data.savedPlans}
+      savedRoutines={data.savedRoutines}
       painReported={data.painReported}
     />
   );

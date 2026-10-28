@@ -13,6 +13,7 @@ import type {
   SetLog,
   TemplateId,
   TrainingPreferences,
+  TrainingRoutines,
 } from '../../domain/types';
 import { equipmentFits } from '../../rules/equipment';
 import {
@@ -125,6 +126,7 @@ export function defaultPlan(
   logs: SetLog[],
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
   painReported = false,
+  savedRoutines?: TrainingRoutines,
 ): PlannedExercise[] {
   if (preferences.programId === 'rehab') {
     const focus = preferences.rehabFocus ?? 'custom';
@@ -147,6 +149,38 @@ export function defaultPlan(
           : [])
     );
   }
+  const saved = savedRoutines?.[preferences.programId]?.[id];
+  if (saved && validateTrainingPlan(saved))
+    return saved.map((item) => {
+      const variant = exerciseMetadata[item.exerciseId].variants.find(
+        (candidate) => candidate.id === item.variantId,
+      );
+      if (!variant || !equipmentFits(variant.equipment, preferences.equipment))
+        return {
+          ...structuredClone(item),
+          explanation:
+            'Den sparade utrustningsvarianten finns inte bland dina val. Välj variant och kontrollera antal och vikt före start.',
+        };
+      const suggestion = trainingPlanSuggestion(
+        item,
+        preferences,
+        sessions,
+        logs,
+        item.variantId,
+        item.sides ??
+          (exercises[item.exerciseId].perSide ? ['right', 'left'] : ['both']),
+      );
+      return {
+        ...structuredClone(item),
+        target: suggestion.target,
+        loadIndex: suggestion.loadIndex,
+        weightKg: suggestion.weightKg,
+        explanation:
+          suggestion.explanation === NO_HISTORY_NOTE
+            ? 'Sparat pass. Kontrollera antal och vikt före start.'
+            : suggestion.explanation,
+      };
+    });
   const painOnRecord = symptomsOnRecord(sessions, painReported);
   const roster = buildRoster(preferences, id, { painOnRecord });
   return roster.ids.map((exerciseId, index) => {

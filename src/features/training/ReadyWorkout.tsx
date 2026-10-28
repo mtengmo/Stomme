@@ -24,11 +24,13 @@ export function ReadyWorkout({
   plan,
   preferences,
   onChange,
+  short = false,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
   /** Opens the editor with this exercise's row open. */
   onChange(index: number): void;
+  short?: boolean;
 }) {
   const knee =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
@@ -69,9 +71,10 @@ export function ReadyWorkout({
   return (
     <section aria-labelledby="ready-workout" className="flex flex-col gap-3">
       <h2 id="ready-workout" className="m-0 text-2xl font-bold">
-        Ditt pass · {plan.length} {plan.length === 1 ? 'övning' : 'övningar'}
+        {short ? 'Ditt kortpass' : 'Ditt pass'} · {plan.length}{' '}
+        {plan.length === 1 ? 'övning' : 'övningar'}
       </h2>
-      {preferences.programId === 'general' && missing.length > 0 ? (
+      {!short && preferences.programId === 'general' && missing.length > 0 ? (
         <p className="m-0 text-base">
           Urvalet täcker inte alla delar av helkroppspasset. Saknas:{' '}
           {missing.join(', ')}. Se över utrustningen och alternativen under
@@ -114,7 +117,7 @@ export function ReadyWorkout({
           Avbryt en övning som gör ont.
         </p>
       ) : null}
-      {!knee && !physio && preferences.programId !== 'rehab' ? (
+      {!short && !knee && !physio && preferences.programId !== 'rehab' ? (
         <p className="m-0 text-base text-ink-soft">
           Förslag nästa pass. Antal bygger på sparade resultat och hur passet
           kändes. Granska och ändra före start.
@@ -150,6 +153,7 @@ export function ReadyWorkout({
           const note =
             item.explanation &&
             !item.explanation.startsWith('Startförslag') &&
+            !item.explanation.startsWith('Sparat pass.') &&
             !(physio && item.explanation.startsWith('Förifyllt'))
               ? item.explanation
               : '';

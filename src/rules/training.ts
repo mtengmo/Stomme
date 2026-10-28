@@ -11,6 +11,14 @@ import { daysBetween } from '../lib/dates';
 import { equipmentFits } from './equipment';
 import { variantWeights } from './weightInventory';
 
+function hasSymptoms(session: Session): boolean {
+  return (
+    session.abortReason === 'pain_stop' ||
+    Object.values(session.checkins ?? {}).some((item) => !!item?.symptoms) ||
+    Object.values(session.feedback).some((item) => !!item?.symptoms)
+  );
+}
+
 /** Keep each direction's history separate and restore only available variants. */
 export function trainingPlanSuggestion(
   plan: PlannedExercise,
@@ -18,18 +26,33 @@ export function trainingPlanSuggestion(
   sessions: readonly Session[],
   logs: readonly SetLog[],
   variantId?: string,
+  matchingSides?: PlannedExercise['sides'],
 ): PlannedExercise {
   const previous = sessions
     .filter(
       (session) =>
         session.programId === preferences.programId &&
         session.status === 'completed' &&
+        session.workoutMode !== 'short' &&
         (!variantId ||
           session.plan.some(
             (item) =>
               item.exerciseId === plan.exerciseId &&
               item.variantId === variantId,
           )) &&
+        (!matchingSides ||
+          session.plan.some((item) => {
+            const sides =
+              item.sides ??
+              (exercises[item.exerciseId].perSide
+                ? ['right', 'left']
+                : ['both']);
+            return (
+              item.exerciseId === plan.exerciseId &&
+              JSON.stringify([...sides].sort()) ===
+                JSON.stringify([...matchingSides].sort())
+            );
+          })) &&
         session.plan.some((item) => item.exerciseId === plan.exerciseId),
     )
     .sort((a, b) => b.startedAt.localeCompare(a.startedAt))[0];
@@ -48,17 +71,39 @@ export function trainingPlanSuggestion(
       };
   }
   const suggestion = trainingSuggestion(plan, previous, logs);
+  const newerSymptoms = sessions.some(
+    (session) =>
+      session.programId === preferences.programId &&
+      (!previous || session.startedAt > previous.startedAt) &&
+      hasSymptoms(session),
+  );
+  const withRecentSymptomHold = (candidate: PlannedExercise) =>
+    newerSymptoms
+      ? {
+          ...candidate,
+          target: Math.min(
+            candidate.target,
+            previousPlan?.target ?? plan.target,
+          ),
+          explanation: [
+            candidate.explanation,
+            'Besvär rapporterades i ett senare pass. Ingen automatisk ökning; kontrollera innan du startar.',
+          ]
+            .filter(Boolean)
+            .join(' '),
+        }
+      : candidate;
   const variant = exerciseMetadata[plan.exerciseId].variants.find(
     (item) => item.id === suggestion.variantId,
   );
-  if (!variant) return suggestion;
+  if (!variant) return withRecentSymptomHold(suggestion);
   const choices = variantWeights(preferences, variant);
   if (
     choices.length &&
     suggestion.weightKg > 0 &&
     !choices.some((item) => item.totalKg === suggestion.weightKg)
   ) {
-    return {
+    return withRecentSymptomHold({
       ...suggestion,
       target:
         logs
@@ -69,7 +114,7 @@ export function trainingPlanSuggestion(
           )
           .at(-1)?.amount ?? plan.target,
       explanation: `Senast använd vikt (${suggestion.weightKg} kg) finns inte bland dina registrerade vikter. Välj tillgänglig vikt eller ange vikten du använder idag. Ingen automatisk ökning.`,
-    };
+    });
   }
   // A heavier load is an explicit choice: never silently jump to a user's next kettlebell.
   const next = choices.find((item) => item.totalKg > suggestion.weightKg);
@@ -98,6 +143,7 @@ export function trainingPlanSuggestion(
     );
   if (
     previous &&
+    !newerSymptoms &&
     complete &&
     next &&
     suggestion.target >= ex.range.max &&
@@ -119,7 +165,7 @@ export function trainingPlanSuggestion(
       explanation: `${suggestion.explanation} Nästa registrerade vikt är ${next.label}. Viktökning väljer du själv; kontrollera antal repetitioner innan du startar.`,
     };
   }
-  return suggestion;
+  return withRecentSymptomHold(suggestion);
 }
 
 /** General strength uses its own transparent policy, without knee-specific thresholds. */
@@ -128,7 +174,7 @@ export function trainingSuggestion(
   previous: Session | undefined,
   logs: readonly SetLog[],
 ): PlannedExercise {
-  if (!previous)
+  if (!previous || previous.workoutMode === 'short')
     return {
       ...plan,
       explanation: 'Startförslag. Anpassa antal och vikt efter din vana.',

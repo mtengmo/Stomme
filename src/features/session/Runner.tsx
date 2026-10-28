@@ -154,7 +154,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     title:
       session.customWorkoutName ??
       (session.programId
-        ? `${programmeNames[session.programId]} · ${session.templateId}`
+        ? `${session.workoutMode === 'short' ? 'Kortpass · ' : ''}${programmeNames[session.programId]} · ${session.templateId}`
         : templates[session.templateId].name),
     stepId: cursor,
     clock: formatClock(seconds),

@@ -19,7 +19,11 @@ export function harderExerciseSuggestions(
   if (preferences.programId === 'rehab' || !next) return [];
   // Include aborted and skipped attempts so an older success cannot hide a setback.
   const attempts = sessions
-    .filter((session) => session.programId === preferences.programId)
+    .filter(
+      (session) =>
+        session.programId === preferences.programId &&
+        session.workoutMode !== 'short',
+    )
     .flatMap((session) =>
       session.plan
         .filter((item) => item.exerciseId === id)

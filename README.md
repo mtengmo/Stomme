@@ -86,6 +86,14 @@ New users answer one question per screen: goal (**Bli starkare**, **Styrka för 
 
 **Anpassa passet** opens the full exercise editor; the default view shows exercise names, amounts, equipment and working sides with one **Börja passet** action. Readiness and symptom questions still precede exercise. When **Börja passet** is disabled, the reason is shown above it. Only the physiotherapist's knee programme asks for a tick that the plan matches the paper; AAOS and custom rehab do not. Returning users see the next A/B session (based on completed sessions in their programme) or resume their active workout. Profile changes are under **Ändra**. Existing legacy sessions keep the original week view.
 
+### Remembered workouts, short sessions and weekly planning
+
+For **Allmän styrka** and **Styrka för löpning**, edits to the ordinary A/B workout apply to today by default. Open **Behålla ändringar till nästa gång? → Behåll som mitt pass A/B** to remember exercises, order, sets, rest, equipment and working sides. Reps and weight can still be suggested from compatible full-session history. **Återställ appens förslag** removes only that saved programme/template. Named custom workouts and rehab plans keep their own save actions.
+
+**Passlängd** offers a shorter version when it can reduce the planned duration: up to four exercises, at most two sets each, preserving rest, tempo and weight. Durations are rough estimates with rest and transitions; warm-up is additional. Switch back to **Helt pass** to restore the full draft. Short sessions are marked **Kortpass**, retain their full-plan snapshot, and count as activity in history. They do not advance the ordinary A/B sequence or establish progression; symptom reports still affect later suggestions. Rehab and named custom workouts are not shortened.
+
+**Veckoplan** on the training home screen stores one to three preferred weekdays and lets you move one occurrence to another local date. Completed ordinary workouts fulfil planned dates; short and custom workouts still count toward weekly activity. The 48-hour rest information is advisory. These settings and saved routines are included in JSON backup. See [the implementation plan](docs/training-continuity-plan.md) for behavior and verification.
+
 ## License
 
 Stomme is free software under the [GNU Affero General Public License v3.0 or later](LICENSE)

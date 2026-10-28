@@ -87,6 +87,136 @@ const general = (
 });
 
 describe('level-driven general start plan', () => {
+  it('restores the saved A order, sets, rest, variant and sides without replacing unavailable equipment', () => {
+    const original = defaultPlan(general('new'), 'A', [], []);
+    const saved = [
+      { ...(original[1] as PlannedExercise), sets: 4, restSec: 90 },
+      { ...(original[0] as PlannedExercise), sets: 3, restSec: 75 },
+    ];
+    const routines = { general: { A: saved } };
+    const restored = defaultPlan(
+      general('new'),
+      'A',
+      [],
+      [],
+      undefined,
+      false,
+      routines,
+    );
+    expect(restored.map((item) => item.exerciseId)).toEqual(
+      saved.map((item) => item.exerciseId),
+    );
+    expect(
+      restored.map((item) => [
+        item.sets,
+        item.restSec,
+        item.variantId,
+        item.sides,
+      ]),
+    ).toEqual(
+      saved.map((item) => [
+        item.sets,
+        item.restSec,
+        item.variantId,
+        item.sides,
+      ]),
+    );
+    if (restored[0]) restored[0].sets = 1;
+    expect(saved[0]?.sets).toBe(4);
+    expect(
+      defaultPlan(general('new'), 'B', [], [], undefined, false, routines),
+    ).toEqual(defaultPlan(general('new'), 'B', [], []));
+    const unavailable = defaultPlan(
+      { ...general('new'), equipment: ['bodyweight'] },
+      'A',
+      [],
+      [],
+      undefined,
+      false,
+      routines,
+    );
+    expect(unavailable.map((item) => item.variantId)).toEqual(
+      saved.map((item) => item.variantId),
+    );
+    expect(
+      unavailable.some((item) =>
+        /utrustningsvarianten/.test(item.explanation ?? ''),
+      ),
+    ).toBe(true);
+  });
+  it('does not carry a left-only result into a right-only saved routine', () => {
+    const right = {
+      ...basePlan('dead-bug', general('new')),
+      sides: ['right'] as ('right' | 'left')[],
+    };
+    const left = { ...right, sides: ['left'] as ('right' | 'left')[] };
+    const prior: Session = {
+      ...session('knee', 2),
+      programId: 'general',
+      plan: [left],
+      feedback: { 'dead-bug': { effort: 'easy' } },
+    };
+    const logs = [
+      {
+        id: 'left-set',
+        sessionId: prior.id,
+        exerciseId: 'dead-bug' as const,
+        setNumber: 1,
+        side: 'left' as const,
+        amount: 12,
+        loadIndex: 0,
+        weightKg: 0,
+        variantId: right.variantId,
+        loggedAt: prior.startedAt,
+      },
+    ];
+    const routines = { general: { A: [right] } };
+    const restored = defaultPlan(
+      general('new'),
+      'A',
+      [prior],
+      logs,
+      undefined,
+      false,
+      routines,
+    );
+    expect(restored[0]?.sides).toEqual(['right']);
+    expect(restored[0]?.target).toBe(right.target);
+    const shortSymptom: Session = {
+      ...prior,
+      id: 'short-later',
+      workoutMode: 'short',
+      startedAt: '2026-01-03T10:00:00Z',
+      checkins: {
+        before: {
+          recordedAt: '2026-01-03T10:00:00Z',
+          feeling: 'tired',
+          symptoms: { area: 'Knä', side: 'left', score: 2 },
+        },
+      },
+    };
+    expect(
+      defaultPlan(
+        general('new'),
+        'A',
+        [shortSymptom, prior],
+        logs,
+        undefined,
+        false,
+        routines,
+      )[0]?.explanation,
+    ).toMatch(/Besvär/);
+    const matching = defaultPlan(
+      general('new'),
+      'A',
+      [{ ...prior, plan: [right] }],
+      logs.map((log) => ({ ...log, side: 'right' as const })),
+      undefined,
+      false,
+      routines,
+    );
+    expect(matching[0]?.target).toBe(12);
+  });
   it('is re-exported from the preview', () => {
     expect(reExported).toBe(defaultPlan);
   });

@@ -66,6 +66,76 @@ afterEach(async () => {
 });
 
 describe('programme persistence and safety boundaries', () => {
+  it('stores a short plan with its original full plan and rejects an unsafe short preparation', async () => {
+    const full = [
+      { ...plan, sets: 3 },
+      {
+        ...plan,
+        exerciseId: 'dead-bug' as const,
+        variantId: 'bodyweight',
+        loadIndex: 0,
+        weightKg: 0,
+        sides: ['right', 'left'] as ('right' | 'left')[],
+      },
+    ];
+    const short = [{ ...plan, sets: 2 }];
+    const saved = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      short,
+      now,
+      undefined,
+      { workoutMode: 'short', fullPlan: full },
+    );
+    expect(saved.workoutMode).toBe('short');
+    expect(saved.fullPlan).toEqual(full);
+    if (full[0]) full[0].sets = 9;
+    expect(saved.fullPlan?.[0]?.sets).toBe(3);
+    expect(
+      parseBackup(serializeBackup(await exportAll(db))).sessions[0]
+        ?.fullPlan?.[0]?.sets,
+    ).toBe(3);
+    const invalidBackup = await exportAll(db);
+    const shortSession = invalidBackup.sessions[0];
+    if (!shortSession?.fullPlan)
+      throw new Error('Missing short session fixture');
+    shortSession.plan = structuredClone(shortSession.fullPlan);
+    expect(() => parseBackup(serializeBackup(invalidBackup))).toThrow();
+    await expect(
+      startTrainingSession(db, preferences, 'A', [plan], now, undefined, {
+        workoutMode: 'short',
+        fullPlan: [plan],
+      }),
+    ).rejects.toThrow();
+    await expect(
+      startTrainingSession(db, preferences, 'A', short, now, undefined, {
+        workoutMode: 'short',
+      }),
+    ).rejects.toThrow();
+    await expect(
+      startTrainingSession(
+        db,
+        { ...preferences, programId: 'rehab' },
+        'A',
+        short,
+        now,
+        undefined,
+        { workoutMode: 'short', fullPlan: full },
+      ),
+    ).rejects.toThrow();
+    await expect(
+      startTrainingSession(
+        db,
+        preferences,
+        'A',
+        short,
+        now,
+        { id: 'custom', name: 'Custom' },
+        { workoutMode: 'short', fullPlan: full },
+      ),
+    ).rejects.toThrow();
+  });
   it('allows changing preferences during preparation without recording an aborted workout', async () => {
     await saveTrainingPreferences(db, preferences);
     const prepared = await startTrainingSession(

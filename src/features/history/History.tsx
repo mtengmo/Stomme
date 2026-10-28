@@ -287,7 +287,8 @@ export function History() {
                     >
                       <span className="flex flex-col">
                         <span className="count text-3xl leading-none">
-                          {s.customWorkoutName ?? `Pass ${s.templateId}`}
+                          {s.customWorkoutName ??
+                            `${s.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.templateId}`}
                         </span>
                         <span className="mt-1 text-base font-bold">
                           {trainingName(s)}

@@ -35,8 +35,9 @@ export function HistorySummary({
           href={`/historik/${s.last.id}`}
           className="inline-flex min-h-12 items-center font-bold text-ink underline"
         >
-          {s.last.customWorkoutName ?? `Pass ${s.last.templateId}`} ·{' '}
-          {formatWeekday(s.last.date)} {formatShortDate(s.last.date)}
+          {s.last.customWorkoutName ??
+            `${s.last.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.last.templateId}`}{' '}
+          · {formatWeekday(s.last.date)} {formatShortDate(s.last.date)}
         </Link>
       ),
     });

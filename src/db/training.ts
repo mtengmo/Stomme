@@ -139,16 +139,43 @@ export async function startTrainingSession(
 
   now = new Date(),
   customWorkout?: { id: string; name: string },
+  options: { workoutMode?: 'short'; fullPlan?: PlannedExercise[] } = {},
 ): Promise<Session> {
+  const fullPlan = options.fullPlan;
+  const invalidShort =
+    options.workoutMode === 'short'
+      ? preferences.programId === 'rehab' ||
+        !!customWorkout ||
+        !fullPlan ||
+        !validateTrainingPlan(fullPlan) ||
+        (plan.length >= fullPlan.length &&
+          plan.every(
+            (item, index) => item.sets >= (fullPlan[index]?.sets ?? 0),
+          )) ||
+        plan.some((item) => {
+          const full = fullPlan.find((p) => p.exerciseId === item.exerciseId);
+          return (
+            !full ||
+            item.sets > full.sets ||
+            item.target > full.target ||
+            item.restSec < full.restSec ||
+            item.weightKg > full.weightKg ||
+            item.loadIndex !== full.loadIndex ||
+            item.variantId !== full.variantId ||
+            JSON.stringify(item.sides) !== JSON.stringify(full.sides)
+          );
+        })
+      : fullPlan !== undefined;
   if (
     !isTrainingPreferences(preferences) ||
     !validateTrainingPlan(plan) ||
+    invalidShort ||
     (preferences.programId === 'rehab' &&
       rehabGroup(preferences) === 'aaos' &&
       plan.some(
         (p) => !kneeRehabExercises.some((ex) => ex.id === p.exerciseId),
       )) ||
-    plan.some((item) => {
+    [...plan, ...(fullPlan ?? [])].some((item) => {
       const variant = exerciseMetadata[item.exerciseId].variants.find(
         (value) => value.id === item.variantId,
       );
@@ -182,6 +209,13 @@ export async function startTrainingSession(
             }
           : {}),
 
+        ...(options.workoutMode === 'short'
+          ? {
+              workoutMode: 'short' as const,
+              fullPlan: structuredClone(fullPlan),
+            }
+          : {}),
+
         programId: preferences.programId,
         experience: preferences.experience,
 
@@ -201,7 +235,7 @@ export async function startTrainingSession(
 
         programWeek: 1,
 
-        plan,
+        plan: structuredClone(plan),
 
         feedback: {},
       };

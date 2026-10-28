@@ -14,9 +14,11 @@ import type {
 import { isRealDate, toLocalDate } from '../lib/dates';
 import { type ShareResult, shareOrDownload } from '../lib/share';
 import { validateCheckin } from '../rules/training';
+import { isWeeklySchedule } from '../rules/weeklySchedule';
 import type { StommeDB } from './db';
 import { setMeta } from './repo';
 import { validateTrainingPlan } from './training';
+import { isTrainingRoutines } from './trainingRoutines';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
 export const BACKUP_SCHEMA_VERSION = 2;
@@ -180,6 +182,8 @@ const sessionSchema = z
     templateId: z.enum(['A', 'B']),
     customWorkoutId: z.string().min(1).max(100).optional(),
     customWorkoutName: z.string().min(1).max(60).optional(),
+    workoutMode: z.literal('short').optional(),
+    fullPlan: z.array(plannedExercise).min(1).max(12).optional(),
     programId: z.enum(['general', 'running', 'rehab']).optional(),
     experience: z.enum(['new', 'some', 'regular']).optional(),
     policyVersion: z.literal(1).optional(),
@@ -209,6 +213,35 @@ const sessionSchema = z
     note: z.string().max(5000).optional(),
   })
   .superRefine((session, ctx) => {
+    if (
+      (session.workoutMode === 'short' &&
+        (session.programId === 'rehab' ||
+          !session.programId ||
+          !!session.customWorkoutId ||
+          !session.fullPlan ||
+          !validateTrainingPlan(session.fullPlan) ||
+          (session.plan.length >= session.fullPlan.length &&
+            session.plan.every(
+              (item, index) =>
+                item.sets >= (session.fullPlan?.[index]?.sets ?? 0),
+            )) ||
+          session.plan.some(
+            (item) =>
+              !session.fullPlan?.some(
+                (full) =>
+                  full.exerciseId === item.exerciseId &&
+                  item.sets <= full.sets &&
+                  item.target <= full.target &&
+                  item.restSec >= full.restSec &&
+                  item.weightKg <= full.weightKg &&
+                  item.loadIndex === full.loadIndex &&
+                  item.variantId === full.variantId &&
+                  JSON.stringify(item.sides) === JSON.stringify(full.sides),
+              ),
+          ))) ||
+      (session.workoutMode !== 'short' && session.fullPlan)
+    )
+      ctx.addIssue({ code: 'custom', message: 'Invalid short workout' });
     if (session.rehabFocus && session.programId !== 'rehab')
       ctx.addIssue({
         code: 'custom',
@@ -285,7 +318,29 @@ const savedRehabPlan = z
   .min(1)
   .max(12)
   .refine(validateTrainingPlan);
+const routinePlans = z.strictObject({
+  A: savedRehabPlan.optional(),
+  B: savedRehabPlan.optional(),
+});
 const metaSchema = z.discriminatedUnion('key', [
+  z.strictObject({
+    key: z.literal('trainingRoutines'),
+    value: z
+      .strictObject({
+        general: routinePlans.optional(),
+        running: routinePlans.optional(),
+      })
+      .refine(isTrainingRoutines),
+  }),
+  z.strictObject({
+    key: z.literal('weeklySchedule'),
+    value: z
+      .strictObject({
+        days: z.array(z.number().int().min(1).max(7)).min(1).max(3),
+        moved: z.strictObject({ from: localDate, to: localDate }).optional(),
+      })
+      .refine(isWeeklySchedule),
+  }),
   z.strictObject({
     key: z.literal('favourites'),
     value: z
