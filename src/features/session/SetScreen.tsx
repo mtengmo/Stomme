@@ -108,6 +108,10 @@ export function SetScreen({
       presentation.equipment === 'kettlebell'
         ? weightKg <= 0
         : weightKg !== 0));
+  // Only dumbbell and kettlebell loads take a typed weight; the rest is body weight.
+  const takesWeight =
+    presentation.equipment === 'dumbbell' ||
+    presentation.equipment === 'kettlebell';
   const movingTimed =
     exercise.id === 'heel-slide' || exercise.id === 'mountain-climber';
   const hold = useTimedHold({
@@ -522,6 +526,7 @@ export function SetScreen({
                   max="500"
                   step="0.5"
                   value={weightKg}
+                  disabled={!takesWeight}
                   onChange={(event) => setWeightKg(Number(event.target.value))}
                   className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-xl text-ink"
                 />
@@ -529,6 +534,9 @@ export function SetScreen({
                   {presentation.variant.label} · samma redskap som i passplanen
                   {' · '}
                   {describeWeight(weightKg, presentation.variant)}
+                  {takesWeight
+                    ? ''
+                    : ' · ingen extra vikt kan anges för kroppsvikt'}
                 </span>
               </label>
             ) : loadLadder.length > 1 && load ? (

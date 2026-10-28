@@ -189,3 +189,33 @@ describe('pace buttons', () => {
     expect(screen.queryByRole('button', { name: 'Snabbare' })).toBeNull();
   });
 });
+
+describe('body weight exercises', () => {
+  it('lock the total weight at zero so a set can always be saved', () => {
+    const onDone = vi.fn();
+    render(
+      <SetScreen
+        frame={frame}
+        exercise={exercises['push-up']}
+        step={{
+          kind: 'set',
+          exerciseId: 'push-up',
+          planIndex: 0,
+          setNumber: 1,
+          side: 'both',
+        }}
+        totalSets={2}
+        initialAmount={3}
+        initialLoadIndex={0}
+        initialWeightKg={0}
+        busy={false}
+        onDone={onDone}
+        onSkip={() => {}}
+      />,
+    );
+    act(() => screen.getByText('Ändra set').click());
+    const input = screen.getByRole('spinbutton', { name: /Total vikt/ });
+    expect((input as HTMLInputElement).disabled).toBe(true);
+    expect(screen.getByText(/ingen extra vikt kan anges/)).toBeTruthy();
+  });
+});
