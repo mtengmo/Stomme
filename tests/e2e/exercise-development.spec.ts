@@ -249,7 +249,7 @@ test('new catalogue animations render without overflow', async ({ page }) => {
     await expect(
       page.getByRole('heading', { name: new RegExp(`^E${n} · `) }),
     ).toBeVisible();
-    await page.clock.runFor(2400);
+    await page.clock.fastForward(2400);
     await page
       .getByRole('button', { name: 'Pausa rörelsen', exact: true })
       .click();

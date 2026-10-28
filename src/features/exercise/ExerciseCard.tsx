@@ -13,10 +13,10 @@ import { loadPresentation } from '../../content/loadPresentation';
 import { templates } from '../../content/templates';
 import type { Exercise, ExerciseId } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
-import type { Equipment } from '../../figures/Figure';
+import type { Equipment, FigureAngle } from '../../figures/Figure';
 import {
   Figure,
-  supportedFrontViews,
+  supportedViewsFor,
   usePrefersReducedMotion,
 } from '../../figures/Figure';
 import { buttonClass } from '../../ui/Button';
@@ -61,11 +61,15 @@ export function ExerciseCardBody({
   );
   const [workingSide, setWorkingSide] = useState(side);
   const [paused, setPaused] = useState(false);
-  const [view, setView] = useState<'side' | 'front'>('side');
+  const [view, setView] = useState<FigureAngle>('side');
+  const availableViews = supportedViewsFor(exercise.id);
+  const activeView = availableViews.includes(view) ? view : 'side';
   const [overlay, setOverlay] = useState(true);
   const reducedMotion = usePrefersReducedMotion();
   const overlayActive =
-    view === 'side' && overlay && MUSCLE_OVERLAY_EXERCISES.has(exercise.id);
+    activeView === 'side' &&
+    overlay &&
+    MUSCLE_OVERLAY_EXERCISES.has(exercise.id);
   const working = exercise.perSide ? workingSide : null;
   const sideCue = working ? exerciseSideCue(exercise.id, working) : undefined;
   const physio = ASK_PHYSIO[exercise.id];
@@ -148,7 +152,7 @@ export function ExerciseCardBody({
     </div>
   );
 
-  const isClock = exercise.id === 'balance-clock' && view === 'side';
+  const isClock = exercise.id === 'balance-clock' && activeView === 'side';
   const pauseControl = !reducedMotion ? (
     <button
       type="button"
@@ -191,18 +195,22 @@ export function ExerciseCardBody({
             aria-label="Rörelsen"
           >
             {!review ? equipmentControls : null}
-            {supportedFrontViews.some((id) => id === exercise.id) ? (
+            {availableViews.length > 1 ? (
               <fieldset className="m-0 flex flex-wrap gap-2 border-0 p-0">
                 <legend className="mb-1 text-base font-bold">Vy</legend>
-                {(['side', 'front'] as const).map((angle) => (
+                {availableViews.map((angle) => (
                   <button
                     key={angle}
                     type="button"
-                    aria-pressed={view === angle}
+                    aria-pressed={activeView === angle}
                     onClick={() => setView(angle)}
                     className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-accent aria-pressed:text-accent"
                   >
-                    {angle === 'side' ? 'Från sidan' : 'Framifrån'}
+                    {angle === 'side'
+                      ? 'Från sidan'
+                      : angle === 'front'
+                        ? 'Framifrån'
+                        : 'Sned vinkel'}
                   </button>
                 ))}
               </fieldset>
@@ -224,7 +232,7 @@ export function ExerciseCardBody({
                 equipment={presentation.equipment}
                 paused={paused || reducedMotion}
                 showMuscles={overlayActive}
-                view={view}
+                view={activeView}
               />
             </div>
             {review ? equipmentControls : null}

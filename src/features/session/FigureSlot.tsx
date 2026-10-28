@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { exercises } from '../../content/exercises';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { ExerciseId } from '../../domain/types';
+import type { FigureAngle } from '../../figures/Figure';
 import {
+  alternateView,
   Figure,
-  supportedFrontViews,
+  supportedViewsFor,
   usePrefersReducedMotion,
 } from '../../figures/Figure';
 
@@ -23,7 +25,10 @@ export function FigureSlot({
   /** Rep counter clock: the figure follows it instead of its own timer. */
   progress?: () => number | undefined;
 }) {
-  const [view, setView] = useState<'side' | 'front'>('side');
+  const [view, setView] = useState<FigureAngle>('side');
+  const availableViews = supportedViewsFor(exerciseId);
+  const alternate = alternateView(exerciseId);
+  const activeView = availableViews.includes(view) ? view : 'side';
   const reduced = usePrefersReducedMotion();
   return (
     <section
@@ -39,19 +44,27 @@ export function FigureSlot({
         working={side === 'both' ? null : side}
         paused={reduced}
         stillOnly
-        view={view}
+        view={activeView}
         progress={progress}
       />
-      {supportedFrontViews.some((id) => id === exerciseId) ? (
+      {availableViews.length > 1 ? (
         <button
           type="button"
           onClick={() =>
-            setView((angle) => (angle === 'side' ? 'front' : 'side'))
+            setView(activeView === 'side' ? (alternate ?? 'side') : 'side')
           }
           className="absolute top-0 left-0 min-h-12 bg-paper px-2 text-base font-bold underline"
-          aria-label={view === 'side' ? 'Visa framifrån' : 'Visa från sidan'}
+          aria-label={
+            activeView === 'side'
+              ? `Visa ${alternate === 'front' ? 'framifrån' : 'från sned vinkel'}`
+              : 'Visa från sidan'
+          }
         >
-          {view === 'side' ? 'Framifrån' : 'Från sidan'}
+          {activeView === 'side'
+            ? alternate === 'front'
+              ? 'Framifrån'
+              : 'Sned vinkel'
+            : 'Från sidan'}
         </button>
       ) : null}
       {reduced ? (

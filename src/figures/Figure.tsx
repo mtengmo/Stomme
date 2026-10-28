@@ -9,7 +9,12 @@ import {
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
-import { FrontFigureFrame, supportsFrontView } from './frontViews';
+import type { FigureAngle } from './frontViews';
+import {
+  FrontFigureFrame,
+  supportsFrontView,
+  supportsObliqueView,
+} from './frontViews';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt, TWEEN_MS } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { physioMovementPose } from './physioPoses';
@@ -23,7 +28,13 @@ import {
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
 
-export { supportedFrontViews } from './frontViews';
+export type { FigureAngle } from './frontViews';
+export {
+  alternateView,
+  supportedFrontViews,
+  supportedObliqueViews,
+  supportedViewsFor,
+} from './frontViews';
 
 export type Equipment = 'dumbbell' | 'kettlebell' | 'band' | null;
 
@@ -90,6 +101,16 @@ export function demonstrationTiming(id: ExerciseId) {
     endHoldMs: (metadata.holdSeconds ?? 0.8) * 1000,
     startHoldMs: (metadata.relaxSeconds ?? 0.8) * 1000,
   };
+}
+
+export function stillFramePhase(
+  exerciseId: ExerciseId,
+  view: FigureAngle,
+  label: string,
+): number {
+  if (exerciseId === 'farmer-carry' && view === 'front')
+    return label === 'Slut' ? 0.75 : 0.25;
+  return label === 'Slut' ? 1 : 0;
 }
 
 const nudge = (pt: Pt, by: Pt | undefined): Pt =>
@@ -194,12 +215,15 @@ export function FigureFrame({
   showMuscles?: boolean;
   equipment?: Equipment;
   viewBox?: string;
-  view?: 'side' | 'front';
+  view?: FigureAngle;
   /** Current animation progress, used by the authored front geometry. */
   phase?: number;
 }) {
   const viewBox = viewBoxProp ?? FRAMING[exerciseId] ?? '14 20 164 168';
-  if (view === 'front' && supportsFrontView(exerciseId))
+  if (
+    (view === 'front' && supportsFrontView(exerciseId)) ||
+    (view === 'oblique' && supportsObliqueView(exerciseId))
+  )
     return (
       <FrontFigureFrame
         exerciseId={exerciseId}
@@ -207,6 +231,7 @@ export function FigureFrame({
         equipment={equipment}
         phase={phase}
         viewBox={viewBox}
+        angle={view as 'front' | 'oblique'}
       />
     );
   const spec = figures[exerciseId];
@@ -460,7 +485,7 @@ export function Figure({
   /** Segment-attached anatomy hint, available for the reviewed prototypes. */
   showMuscles?: boolean;
   equipment?: Equipment;
-  view?: 'side' | 'front';
+  view?: FigureAngle;
 }) {
   const forced = forcedPhase();
   const reduced = usePrefersReducedMotion() && forced === undefined;
@@ -536,7 +561,7 @@ export function Figure({
               equipment={equipment}
               showMuscles={showMuscles}
               view={view}
-              phase={label === 'Slut' ? 1 : 0}
+              phase={stillFramePhase(exerciseId, view, label)}
             />
             <figcaption className="text-center text-base font-bold">
               {label}
