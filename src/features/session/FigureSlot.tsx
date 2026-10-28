@@ -14,11 +14,14 @@ export function FigureSlot({
   side,
   loadIndex,
   variantId,
+  progress,
 }: {
   exerciseId: ExerciseId;
   side: 'right' | 'left' | 'both';
   loadIndex: number;
   variantId?: string;
+  /** Rep counter clock: the figure follows it instead of its own timer. */
+  progress?: () => number | undefined;
 }) {
   const [paused, setPaused] = useState(false);
   const [view, setView] = useState<'side' | 'front'>('side');
@@ -38,6 +41,7 @@ export function FigureSlot({
         paused={paused || reduced}
         stillOnly
         view={view}
+        progress={progress}
       />
       {supportedFrontViews.some((id) => id === exerciseId) ? (
         <button

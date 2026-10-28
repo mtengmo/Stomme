@@ -16,14 +16,14 @@ export function cycleProgress(
   ms: number,
   endHoldMs = HOLD_MS,
   startHoldMs = HOLD_MS,
+  tweenMs = TWEEN_MS,
 ): number {
-  const cycleMs = startHoldMs + 2 * TWEEN_MS + endHoldMs;
+  const cycleMs = startHoldMs + 2 * tweenMs + endHoldMs;
   const m = ((ms % cycleMs) + cycleMs) % cycleMs;
   if (m < startHoldMs) return 0;
-  if (m < startHoldMs + TWEEN_MS)
-    return easeInOut((m - startHoldMs) / TWEEN_MS);
-  if (m < startHoldMs + TWEEN_MS + endHoldMs) return 1;
-  return 1 - easeInOut((m - startHoldMs - TWEEN_MS - endHoldMs) / TWEEN_MS);
+  if (m < startHoldMs + tweenMs) return easeInOut((m - startHoldMs) / tweenMs);
+  if (m < startHoldMs + tweenMs + endHoldMs) return 1;
+  return 1 - easeInOut((m - startHoldMs - tweenMs - endHoldMs) / tweenMs);
 }
 
 export type Pt = readonly [number, number];

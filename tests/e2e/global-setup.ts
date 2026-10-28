@@ -1,5 +1,5 @@
 import { chromium, expect, type FullConfig } from '@playwright/test';
-import { ONBOARDED_STATE } from './state';
+import { ONBOARDED_STATE, REP_COUNT_MANUAL_KEY } from './state';
 
 /**
  * Accepts the onboarding disclaimer once and saves the browser storage
@@ -24,6 +24,10 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
     await expect(
       page.getByRole('button', { name: 'Bli starkare', exact: true }),
     ).toBeVisible();
+    await page.evaluate(
+      (key) => localStorage.setItem(key, '1'),
+      REP_COUNT_MANUAL_KEY,
+    );
     await context.storageState({ path: ONBOARDED_STATE, indexedDB: true });
   } finally {
     await browser.close();

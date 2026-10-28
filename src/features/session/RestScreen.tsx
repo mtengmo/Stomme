@@ -176,7 +176,9 @@ export function RestScreen({
         {paused
           ? 'Vilan är pausad. Fortsätt när du är redo.'
           : autoContinue
-            ? 'Nästa hållning börjar automatiskt efter vilan och 5 sekunders förberedelse.'
+            ? nextExercise?.unit === 'reps'
+              ? 'Nästa set börjar automatiskt efter vilan och 5 sekunders förberedelse.'
+              : 'Nästa hållning börjar automatiskt efter vilan och 5 sekunders förberedelse.'
             : over
               ? 'Vilan är klar. Tryck Nästa set när du är redo.'
               : 'Detta är vilotid. Nästa set börjar när du trycker på knappen.'}

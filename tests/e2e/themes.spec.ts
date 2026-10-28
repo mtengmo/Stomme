@@ -21,6 +21,7 @@ async function noOverflow(page: Page) {
 
 async function seedDone(page: Page) {
   await page.evaluate(async () => {
+    const today = new Date().toLocaleDateString('sv-SE');
     const db = await new Promise<IDBDatabase>((res, rej) => {
       const r = indexedDB.open('stomme');
       r.onsuccess = () => res(r.result);
@@ -29,9 +30,9 @@ async function seedDone(page: Page) {
     const tx = db.transaction(['sessions'], 'readwrite');
     tx.objectStore('sessions').put({
       id: 's-done',
-      date: '2026-10-20',
-      startedAt: '2026-10-20T09:00:00.000Z',
-      finishedAt: '2026-10-20T09:40:00.000Z',
+      date: today,
+      startedAt: `${today}T09:00:00.000Z`,
+      finishedAt: `${today}T09:40:00.000Z`,
       programWeek: 1,
       plan: [],
       feedback: {},
@@ -56,11 +57,13 @@ test.describe('@themes every registered theme and scheme', () => {
         page,
       }) => {
         await page.addInitScript(
-          ([id, mode]) =>
+          ([id, mode]) => {
             localStorage.setItem(
               'stomme.appearance',
               JSON.stringify({ theme: id, scheme: mode }),
-            ),
+            );
+            localStorage.setItem('stomme.repCount.manual', '1');
+          },
           [theme.id, scheme],
         );
         await page.goto('/');

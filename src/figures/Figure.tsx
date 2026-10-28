@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { ExerciseId } from '../domain/types';
+import { repTempo } from '../rules/repTempo';
 import {
   hamstringCurlPose,
   kettlebellFloorPressPose,
@@ -9,7 +10,7 @@ import {
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
 import { FrontFigureFrame, supportsFrontView } from './frontViews';
-import { CYCLE_MS, cycleProgress, lerpPt, type Pt } from './lerp';
+import { CYCLE_MS, cycleProgress, lerpPt, type Pt, TWEEN_MS } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { physioMovementPose } from './physioPoses';
 import {
@@ -77,8 +78,16 @@ export function usePrefersReducedMotion(): boolean {
 /** Demonstration timing follows the same explicit repetition cues as the guide. */
 export function demonstrationTiming(id: ExerciseId) {
   const metadata = exerciseMetadata[id];
+  const tempo = repTempo(id);
+  if (tempo)
+    return {
+      endHoldMs: tempo.holdMs,
+      startHoldMs: tempo.relaxMs,
+      tweenMs: tempo.upMs,
+    };
   return {
-    endHoldMs: (metadata.holdSeconds ?? (id === 'quad-set' ? 3 : 0.8)) * 1000,
+    tweenMs: TWEEN_MS,
+    endHoldMs: (metadata.holdSeconds ?? 0.8) * 1000,
     startHoldMs: (metadata.relaxSeconds ?? 0.8) * 1000,
   };
 }
@@ -437,8 +446,11 @@ export function Figure({
   showMuscles = false,
   equipment,
   view = 'side',
+  progress,
 }: {
   exerciseId: ExerciseId;
+  /** Drives the movement from an outside clock (0 start, 1 end); undefined falls back to the free-running demo. */
+  progress?: () => number | undefined;
   working?: Working | null;
   /** Show only the start frame (small slots under reduced motion). */
   stillOnly?: boolean;
@@ -453,6 +465,8 @@ export function Figure({
   const spec = figures[exerciseId];
   const [t, setT] = useState(0);
   const elapsedMs = useRef(0);
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
 
   useEffect(() => {
     if (reduced || paused || forced !== undefined) return;
@@ -460,17 +474,22 @@ export function Figure({
     const t0 = performance.now() - elapsedMs.current;
     const tick = (now: number) => {
       elapsedMs.current = now - t0;
+      const driven = progressRef.current?.();
       setT(
-        spec.motion === 'sequence'
-          ? (elapsedMs.current % (exerciseId === 'squat-jump' ? 4500 : 12000)) /
+        driven !== undefined
+          ? driven
+          : spec.motion === 'sequence'
+            ? (elapsedMs.current %
+                (exerciseId === 'squat-jump' ? 4500 : 12000)) /
               (exerciseId === 'squat-jump' ? 4500 : 12000)
-          : spec.motion === 'ballistic'
-            ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
-            : cycleProgress(
-                elapsedMs.current,
-                demonstrationTiming(exerciseId).endHoldMs,
-                demonstrationTiming(exerciseId).startHoldMs,
-              ),
+            : spec.motion === 'ballistic'
+              ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
+              : cycleProgress(
+                  elapsedMs.current,
+                  demonstrationTiming(exerciseId).endHoldMs,
+                  demonstrationTiming(exerciseId).startHoldMs,
+                  demonstrationTiming(exerciseId).tweenMs,
+                ),
       );
       raf = requestAnimationFrame(tick);
     };

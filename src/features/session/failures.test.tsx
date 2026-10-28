@@ -17,6 +17,7 @@ import { WeekView } from '../week/WeekView';
 const none = { sharp: false, swelling: false, locking: false };
 
 beforeEach(async () => {
+  window.localStorage.setItem('stomme.repCount.manual', '1');
   window.location.hash = '#/';
   await getDb().delete();
   await getDb().open();

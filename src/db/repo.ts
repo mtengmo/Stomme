@@ -68,6 +68,8 @@ export interface NewSetLog {
   amount: number;
   loadIndex: number;
   weightKg?: number;
+  counting?: SetLog['counting'];
+  endedEarly?: boolean;
 }
 
 /** The in-progress session, if any (newest if there are several). */

@@ -164,6 +164,28 @@ describe('backup', () => {
     expect(await snapshot()).toEqual(before);
   });
 
+  it('round-trips the rep counting fields and accepts logs without them', async () => {
+    const b = await valid();
+    await db.setLogs.add(
+      setLog('l2', 's1', {
+        setNumber: 2,
+        counting: 'auto',
+        endedEarly: true,
+        amount: 5,
+      }),
+    );
+    const full = await exportAll(db);
+    await db.sessions.clear();
+    await db.setLogs.clear();
+    await importAll(db, serializeBackup(full));
+    const logs = await db.setLogs.toArray();
+    expect(logs.find((l) => l.id === 'l2')).toMatchObject({
+      counting: 'auto',
+      endedEarly: true,
+    });
+    expect(logs.find((l) => l.id === 'l1')?.counting).toBeUndefined();
+  });
+
   it('returns the previous data as a safety backup and replaces everything', async () => {
     const b = await valid();
     await db.sessions.add(session('old'));

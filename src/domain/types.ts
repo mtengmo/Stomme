@@ -170,6 +170,7 @@ export type ReasonCode =
   | 'increase_amount'
   | 'next_load'
   | 'hold_incomplete'
+  | 'hold_no_effort'
   | 'hold_hard'
   | 'hold_not_easy_at_max'
   | 'hold_waiting_for_3_sets'
@@ -235,6 +236,10 @@ export interface SetLog {
   loadIndex: number;
   weightKg: number;
   variantId?: string;
+  /** How reps were counted; absent on older logs. */
+  counting?: 'auto' | 'manual';
+  /** True when the user ended an auto-counted set before the last rep. */
+  endedEarly?: boolean;
   loggedAt: string;
 }
 

@@ -182,6 +182,11 @@ export function suggestNext(
   ) {
     return make(ex, sets, target, baseLoad, 'hold_incomplete');
   }
+  // Auto-counted sets always reach the target, so a skipped effort answer
+  // must not be enough to raise the amount.
+  if (!last.feedback?.effort && logs.some((l) => l.counting === 'auto')) {
+    return make(ex, sets, target, baseLoad, 'hold_no_effort');
+  }
   if (last.feedback?.effort === 'hard') {
     return make(ex, sets, target, baseLoad, 'hold_hard');
   }

@@ -56,6 +56,8 @@ export const REASON_TEXT: Record<ReasonCode, string> = {
   next_load: 'Alla set på högsta mängden kändes lätta. Nästa vikt föreslås.',
   hold_incomplete:
     'Du slutförde inte alla set sist. Samma mängd och vikt föreslås.',
+  hold_no_effort:
+    'Du svarade inte på hur ansträngande övningen var. Samma mängd och vikt föreslås.',
   hold_hard: 'Övningen kändes tung. Samma mängd och vikt föreslås.',
   hold_not_easy_at_max:
     'Högsta mängden kändes inte lätt. Samma mängd och vikt föreslås.',

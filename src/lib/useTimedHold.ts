@@ -106,7 +106,8 @@ export function useTimedHold({
     return () => {
       window.clearInterval(id);
       document.removeEventListener('visibilitychange', onVisibility);
-      if (current.current !== 'done') stopTimerVoice();
+      if (current.current !== 'done' && current.current !== 'idle')
+        stopTimerVoice();
     };
   }, [pause, show, moving]);
 

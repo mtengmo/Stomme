@@ -118,6 +118,7 @@ const reasonCodes = [
   'increase_amount',
   'next_load',
   'hold_incomplete',
+  'hold_no_effort',
   'hold_hard',
   'hold_not_easy_at_max',
   'hold_waiting_for_3_sets',
@@ -252,6 +253,8 @@ const setLogSchema = z
     loadIndex: count,
     weightKg: z.number().min(0).max(1000),
     variantId: z.string().min(1).max(100).optional(),
+    counting: z.enum(['auto', 'manual']).optional(),
+    endedEarly: z.boolean().optional(),
     loggedAt: instant,
   })
   .superRefine((l, ctx) => {

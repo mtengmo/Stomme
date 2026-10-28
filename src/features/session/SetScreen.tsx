@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AMOUNT_LABEL, sideLabel, UNIT_WORD } from '../../content/copy';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import { formatClock } from '../../lib/format';
+import { useRepCounter } from '../../lib/useRepCounter';
 import { useTimedHold } from '../../lib/useTimedHold';
+import { repSeconds, repTempo } from '../../rules/repTempo';
 import type { SetStep } from '../../rules/sessionPlan';
 import { weightLabel as describeWeight } from '../../rules/weightInventory';
 import { Button } from '../../ui/Button';
@@ -15,6 +17,31 @@ import { ExerciseMuscles } from '../exercise/ExerciseMuscles';
 import { KettlebellRackGrip } from '../exercise/KettlebellRackGrip';
 import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
+
+const MANUAL_KEY = 'stomme.repCount.manual';
+const SEEN_KEY = 'stomme.repCount.seen';
+
+function readFlag(key: string): boolean {
+  try {
+    return window.localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+function writeFlag(key: string, on: boolean): void {
+  try {
+    if (on) window.localStorage.setItem(key, '1');
+    else window.localStorage.removeItem(key);
+  } catch {
+    // The choice still applies for this screen.
+  }
+}
+
+/** Extra facts about how the reps were counted, saved with the set. */
+export interface CountInfo {
+  counting?: 'auto' | 'manual';
+  endedEarly?: boolean;
+}
 
 interface SetScreenProps {
   frame: Omit<SessionFrameProps, 'children' | 'actions'>;
@@ -28,10 +55,16 @@ interface SetScreenProps {
   singleSide?: boolean;
   autoStartTimer?: boolean;
   onStartTimer?(): void;
+  onCancelTimer?(): void;
   onReportSymptoms?(): void;
   symptomReported?: boolean;
   busy: boolean;
-  onDone(amount: number, loadIndex: number, weightKg?: number): void;
+  onDone(
+    amount: number,
+    loadIndex: number,
+    weightKg?: number,
+    info?: CountInfo,
+  ): void;
   onSkip(): void;
 }
 /** One set: name, side, big steppers prefilled, and a single "Klar set". */
@@ -47,6 +80,7 @@ export function SetScreen({
   singleSide,
   autoStartTimer = false,
   onStartTimer,
+  onCancelTimer,
   onReportSymptoms,
   symptomReported,
   busy,
@@ -80,6 +114,52 @@ export function SetScreen({
       if (!busy && !invalidWeight) onDone(amount, loadIndex, weightKg);
     },
   });
+  const tempo = unit === 'reps' ? repTempo(exercise.id) : null;
+  const [manual, setManual] = useState(() => readFlag(MANUAL_KEY));
+  const [seenIntro] = useState(() => readFlag(SEEN_KEY));
+  const autoCount = tempo !== null && !manual;
+  const unsaved = useRef<{ count: number; early: boolean } | null>(null);
+  const counter = useRepCounter({
+    reps: amount,
+    tempo,
+    side,
+    autoStart: autoCount && autoStartTimer,
+    onCancel: onCancelTimer,
+    onDone: (count, early) => {
+      unsaved.current = { count, early };
+      if (!busy && !invalidWeight)
+        onDone(count, loadIndex, weightKg, {
+          counting: 'auto',
+          endedEarly: early,
+        });
+    },
+  });
+  const counterRunning =
+    counter.phase === 'prepare' ||
+    counter.phase === 'active' ||
+    counter.phase === 'resuming';
+  const counterLive = counterRunning || counter.phase === 'paused';
+  const toggleCounter = () => {
+    if (counterRunning) counter.pause();
+    else if (counter.phase === 'paused') counter.resume();
+  };
+  const toggleRef = useRef(toggleCounter);
+  toggleRef.current = toggleCounter;
+  const liveRef = useRef(counterLive);
+  liveRef.current = counterLive;
+  useEffect(() => {
+    if (!autoCount) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code !== 'Space' || event.repeat || !liveRef.current) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('input, button, summary, select, textarea, a'))
+        return;
+      event.preventDefault();
+      toggleRef.current();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [autoCount]);
   const timerActive = hold.phase === 'prepare' || hold.phase === 'hold';
   const nextCue =
     step.side === 'right' && !singleSide
@@ -96,6 +176,7 @@ export function SetScreen({
         : load?.label;
   const changeAmount = (value: number) => {
     hold.reset();
+    counter.reset();
     setAmount(value);
   };
   const remaining = hold.phase === 'idle' ? amount : hold.remaining;
@@ -107,8 +188,25 @@ export function SetScreen({
           <Button
             disabled={busy || invalidWeight}
             onClick={() => {
-              if (unit !== 'seconds' || hold.phase === 'done')
-                onDone(amount, loadIndex, weightKg);
+              if (autoCount) {
+                if (counter.phase === 'idle') {
+                  writeFlag(SEEN_KEY, true);
+                  onStartTimer?.();
+                  counter.start();
+                } else if (counter.phase === 'done') {
+                  const last = unsaved.current;
+                  onDone(last?.count ?? amount, loadIndex, weightKg, {
+                    counting: 'auto',
+                    endedEarly: last?.early ?? false,
+                  });
+                } else toggleCounter();
+              } else if (unit !== 'seconds' || hold.phase === 'done')
+                onDone(
+                  amount,
+                  loadIndex,
+                  weightKg,
+                  tempo ? { counting: 'manual' } : undefined,
+                );
               else if (timerActive) hold.pause();
               else if (hold.phase === 'paused') hold.resume();
               else {
@@ -117,15 +215,23 @@ export function SetScreen({
               }
             }}
           >
-            {unit !== 'seconds'
-              ? 'Klar set'
-              : timerActive
-                ? 'Pausa timer'
-                : hold.phase === 'paused'
-                  ? 'Fortsätt timer'
-                  : hold.phase === 'done'
+            {autoCount
+              ? counter.phase === 'idle'
+                ? 'Starta – 5 s förberedelse'
+                : counter.phase === 'paused'
+                  ? 'Fortsätt'
+                  : counter.phase === 'done'
                     ? 'Spara set igen'
-                    : 'Starta – 5 s förberedelse'}
+                    : 'Pausa'
+              : unit !== 'seconds'
+                ? 'Klar set'
+                : timerActive
+                  ? 'Pausa timer'
+                  : hold.phase === 'paused'
+                    ? 'Fortsätt timer'
+                    : hold.phase === 'done'
+                      ? 'Spara set igen'
+                      : 'Starta – 5 s förberedelse'}
           </Button>
           <button
             type="button"
@@ -216,6 +322,73 @@ export function SetScreen({
             </button>
           ) : null}
         </section>
+      ) : autoCount && tempo ? (
+        <section
+          aria-label="Repetitionsräknare"
+          className="rounded-md bg-accent px-3 py-2 text-paper"
+        >
+          <p className="m-0 text-base font-bold">
+            {counter.phase === 'prepare'
+              ? 'Gör dig redo'
+              : counter.phase === 'paused'
+                ? 'Pausad'
+                : counter.phase === 'resuming'
+                  ? 'Fortsätter'
+                  : counter.phase === 'done'
+                    ? 'Klart'
+                    : counter.phase === 'active'
+                      ? 'Pågår'
+                      : 'Redo'}
+            {side ? ` · ${side}` : ''}
+            {weightLabel ? ` · ${weightLabel}` : ''}
+          </p>
+          <button
+            type="button"
+            disabled={!counterLive}
+            onClick={toggleCounter}
+            aria-label={
+              counter.phase === 'paused'
+                ? 'Fortsätt räkningen'
+                : 'Pausa räkningen'
+            }
+            className="block min-h-12 w-full text-left text-paper disabled:opacity-100"
+          >
+            <span
+              aria-hidden="true"
+              className="count block text-[clamp(4.5rem,24vw,6rem)] leading-none"
+            >
+              {counter.phase === 'prepare' || counter.phase === 'resuming'
+                ? counter.leadSeconds
+                : `${counter.completed} / ${amount}`}
+            </span>
+          </button>
+          <p role="status" className="m-0 text-base font-bold">
+            {counter.phase === 'prepare'
+              ? `Ta position${side ? ` · ${side}` : ''}. Räkningen börjar automatiskt.`
+              : counter.phase === 'active'
+                ? 'Räkningen pågår. Setet sparas automatiskt vid sista repetitionen.'
+                : counter.phase === 'paused'
+                  ? 'Pausad. Fortsätt när du är redo.'
+                  : counter.phase === 'resuming'
+                    ? 'Fortsätter strax.'
+                    : counter.phase === 'done'
+                      ? 'Setet är klart och sparas automatiskt.'
+                      : `${amount} repetitioner${exercise.perSide ? ' på denna sida' : ''}. 5 s förberedelse, sedan räknar appen.`}
+          </p>
+          <p className="m-0 text-sm">
+            Takt: ca {repSeconds(tempo)} s per repetition. Förslag på takt,
+            anpassa efter dig.
+          </p>
+          {counterLive && counter.phase !== 'prepare' ? (
+            <button
+              type="button"
+              onClick={counter.endEarly}
+              className="min-h-12 text-base font-bold underline"
+            >
+              Avsluta setet
+            </button>
+          ) : null}
+        </section>
       ) : (
         <div>
           <p className="m-0 text-xl font-bold">
@@ -234,11 +407,36 @@ export function SetScreen({
           </p>
         </div>
       )}
+      {tempo ? (
+        <div>
+          {!seenIntro && counter.phase === 'idle' && autoCount ? (
+            <p className="m-0 text-base">
+              Nytt: appen räknar repetitionerna åt dig. Välj Räkna själv om du
+              hellre räknar och trycker Klar set.
+            </p>
+          ) : null}
+          {counter.phase === 'idle' || !autoCount ? (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={manual}
+              onClick={() => {
+                writeFlag(MANUAL_KEY, !manual);
+                setManual(!manual);
+              }}
+              className="min-h-12 text-base font-bold underline"
+            >
+              Räkna själv: {manual ? 'på' : 'av'}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <FigureSlot
         exerciseId={exercise.id}
         side={step.side}
         loadIndex={loadIndex}
         variantId={variantId}
+        progress={autoCount && counterLive ? counter.progress : undefined}
       />
       <div>
         <p className="m-0 text-base font-bold">{presentation.cue}</p>
@@ -248,7 +446,9 @@ export function SetScreen({
             {metadata.relaxSeconds
               ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
               : ''}{' '}
-            Följ tiderna i texten. Animationen visar rörelsen i förenklat tempo.
+            {autoCount
+              ? 'Animationen följer samma takt som räkningen.'
+              : 'Följ tiderna i texten. Animationen visar rörelsen i förenklat tempo.'}
           </p>
         ) : null}
         <p className="m-0 text-base text-ink-soft" aria-live="polite">

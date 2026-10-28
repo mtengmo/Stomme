@@ -8,6 +8,7 @@ import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
 
 beforeEach(async () => {
+  window.localStorage.setItem('stomme.repCount.manual', '1');
   sessionStorage.clear();
   window.location.hash = '#/';
   await getDb().delete();

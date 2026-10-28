@@ -11,6 +11,7 @@ const CONFIRM =
   'Jag har jämfört övningar, sida och antal med mitt papper från fysioterapeuten (krävs för att börja).';
 
 beforeEach(async () => {
+  window.localStorage.setItem('stomme.repCount.manual', '1');
   sessionStorage.clear();
   window.location.hash = '#/';
   await getDb().delete();

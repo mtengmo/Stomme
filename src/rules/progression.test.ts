@@ -699,3 +699,47 @@ describe('knee-loaded exercise with no history and pain (S3)', () => {
     expectS(suggestNext(goblet, 2, 3), 3, 10, 1, 'first_time');
   });
 });
+
+describe('auto-counted sets', () => {
+  const autoLogs = (l: LastResult, early = false) => {
+    l.logs = l.logs.map((x) => ({
+      ...x,
+      counting: 'auto' as const,
+      ...(early ? { endedEarly: true, amount: x.amount - 1 } : {}),
+    }));
+    return l;
+  };
+  it('a skipped effort answer does not raise the amount for auto logs', () => {
+    const manual = last('goblet-chair-squat', { sets: 2, target: 8, load: 1 });
+    expect(next('goblet-chair-squat', 2, 2, manual).reason).toBe(
+      'increase_amount',
+    );
+    const auto = next('goblet-chair-squat', 2, 2, autoLogs(manual));
+    expect(auto.reason).toBe('hold_no_effort');
+    expect(auto.target).toBe(8);
+  });
+  it('treats auto logs like manual logs', () => {
+    const base = last('goblet-chair-squat', {
+      sets: 2,
+      target: 8,
+      load: 1,
+      effort: 'easy',
+    });
+    const manual = next('goblet-chair-squat', 2, 2, base);
+    expect(next('goblet-chair-squat', 2, 2, autoLogs(base))).toEqual(manual);
+  });
+  it('an early stop blocks an increase', () => {
+    const l = autoLogs(
+      last('goblet-chair-squat', {
+        sets: 2,
+        target: 8,
+        load: 1,
+        effort: 'easy',
+      }),
+      true,
+    );
+    const s = next('goblet-chair-squat', 2, 2, l);
+    expect(s.loadIndex).toBe(1);
+    expect(s.target).toBeLessThanOrEqual(8);
+  });
+});

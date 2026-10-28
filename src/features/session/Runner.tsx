@@ -18,6 +18,7 @@ import { formatClock } from '../../lib/format';
 import { tapFeedback } from '../../lib/haptics';
 import { useElapsed } from '../../lib/useElapsed';
 import { createWakeLock } from '../../lib/wakeLock';
+import { prefillAmount } from '../../rules/repTempo';
 import {
   buildSteps,
   nextIndex,
@@ -30,7 +31,7 @@ import type { TallyItem } from '../../ui/Tally';
 import { ExerciseSymptoms } from '../training/Checkin';
 import { EffortScreen } from './EffortScreen';
 import { RestScreen } from './RestScreen';
-import { SetScreen } from './SetScreen';
+import { type CountInfo, SetScreen } from './SetScreen';
 import { Summary } from './Summary';
 
 interface RunnerProps {
@@ -298,7 +299,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         exercise={ex}
         step={step}
         totalSets={total(step.planIndex)}
-        initialAmount={prior?.amount ?? plan?.target ?? ex.range.start}
+        initialAmount={prefillAmount(prior, plan?.target ?? ex.range.start)}
         initialLoadIndex={prior?.loadIndex ?? plan?.loadIndex ?? 0}
         initialWeightKg={
           session.programId ? (prior?.weightKg ?? plan?.weightKg) : undefined
@@ -307,6 +308,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         singleSide={plan?.sides?.length === 1}
         autoStartTimer={timedExercise === ex.id}
         onStartTimer={() => setTimedExercise(ex.id)}
+        onCancelTimer={() => setTimedExercise(null)}
         onReportSymptoms={
           session.programId
             ? () => {
@@ -333,8 +335,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
             );
           })
         }
-        onDone={(amount, loadIndex, weightKg) =>
+        onDone={(amount, loadIndex, weightKg, info?: CountInfo) =>
           run(async () => {
+            // An early stop must not roll on into an automatic rest and next set.
+            if (info?.endedEarly) setTimedExercise(null);
             const db = getDb();
             await logSet(
               db,
@@ -346,6 +350,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
                 amount,
                 loadIndex,
                 weightKg,
+                ...info,
               },
               new Date(),
             );

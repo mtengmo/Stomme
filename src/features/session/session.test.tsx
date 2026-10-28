@@ -9,6 +9,7 @@ import { getActiveSession, setMeta } from '../../db/repo';
 import { answerPain } from '../pain/testHelpers';
 
 beforeEach(async () => {
+  window.localStorage.setItem('stomme.repCount.manual', '1');
   window.location.hash = '#/';
   await getDb().delete();
   await getDb().open();
