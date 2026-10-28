@@ -1,5 +1,8 @@
 import type { Exercise, ExerciseId, Load } from '../domain/types';
-import { additionalExercises } from './additionalExercises';
+import {
+  additionalExercises,
+  lateAdditionalExercises,
+} from './additionalExercises';
 import { bodyweightExercises } from './bodyweightExercises';
 import { preferredExerciseNames } from './exerciseAliases';
 import { rehabAdditions } from './rehabAdditions';
@@ -244,6 +247,7 @@ export const exerciseList: readonly Exercise[] = [
   ...additionalExercises,
   ...rehabAdditions,
   ...bodyweightExercises,
+  ...lateAdditionalExercises,
 ].map((exercise) => ({
   ...exercise,
   name: preferredExerciseNames[exercise.id] ?? exercise.name,

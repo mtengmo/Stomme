@@ -102,6 +102,7 @@ const aceSources: Partial<Record<ExerciseId, string>> = {
   'triceps-kickback': '55/triceps-kickback/',
   'single-leg-rdl': '127/single-arm-single-leg-romanian-dead-lift/',
   'biceps-curl': '44/seated-biceps-curl/',
+  'squat-curl': '362/goblet-squat/',
   'lateral-raise': '26/lateral-raise/',
   'glute-bridge': '49/glute-bridge/',
   'forward-lunge': '94/forward-lunge/',
@@ -291,6 +292,9 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'farmer-carry': [
     ['dumbbell', 2, [0], 'Håll en hantel i varje hand.'],
     ['kettlebell', 2, [1], 'Håll en kettlebell i varje hand.'],
+  ],
+  'squat-curl': [
+    ['dumbbell', 2, [0, 1], 'En hantel i varje hand, armarna hängande.'],
   ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
@@ -607,6 +611,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Bäckenet hålls rakt med ett stödben.',
   ],
+  'squat-curl': ['practiced', 'Knäböj och armböjning samordnas i en rörelse.'],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -975,6 +980,7 @@ export const exerciseMetadata = Object.fromEntries(
         'wall-push-up',
         'calf-raise',
         'crunch',
+        'squat-curl',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1005,6 +1011,8 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'push-up';
     if (id === 'calf-raise')
       metadata.harderExerciseId = 'single-leg-calf-raise';
+    if (id === 'squat-curl') metadata.easierExerciseId = 'goblet-squat';
+    if (id === 'goblet-squat') metadata.harderExerciseId = 'squat-curl';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

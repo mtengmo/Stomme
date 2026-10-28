@@ -69,7 +69,8 @@ export type ExerciseId =
   | 'knee-push-up'
   | 'wall-push-up'
   | 'calf-raise'
-  | 'crunch';
+  | 'crunch'
+  | 'squat-curl';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

@@ -62,6 +62,23 @@ function entry(
   };
 }
 
+/** Added after the bodyweight set so the permanent E-order stays unchanged. */
+export const lateAdditionalExercises: Exercise[] = [
+  entry(
+    'squat-curl',
+    'Knäböj med bicepscurl',
+    ['Framsida lår', 'Säte', 'Biceps'],
+    [
+      'Stå med fötterna ungefär axelbrett och en hantel i varje hand med armarna hängande.',
+      'Böj höfter och knän och sänk dig med armarna hängande. Res dig och böj samtidigt armbågarna så att hantlarna kommer mot axlarna.',
+      'Sänk hantlarna när du står. Ned och upp är en repetition.',
+    ],
+    'Du svingar hantlarna eller trycker fram armbågarna.',
+    'Gör knäböj och bicepscurl var för sig med lättare hantlar.',
+    [pair(1), pair(2)],
+  ),
+];
+
 export const additionalExercises: Exercise[] = [
   entry(
     'goblet-squat',

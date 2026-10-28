@@ -73,6 +73,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'wall-push-up': 'E66',
   'calf-raise': 'E67',
   crunch: 'E68',
+  'squat-curl': 'E72',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

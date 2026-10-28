@@ -447,6 +447,18 @@ export const additionalFigures = {
     props: [],
     held: twoDumbbells,
   },
+  'squat-curl': {
+    start: {
+      ...squatBottom,
+      eR: [111, 128],
+      hR: [114, 152],
+      eL: [96, 128],
+      hL: [100, 152],
+    },
+    end: { ...stand, eR: [111, 97], hR: [125, 79], eL: [85, 97], hL: [99, 79] },
+    props: [],
+    held: twoDumbbells,
+  },
   'biceps-curl': {
     start: {
       ...stand,
