@@ -183,9 +183,29 @@ async function theme(scheme: 'light' | 'dark') {
     await page.waitForTimeout(300);
     await audit(page, tag(name));
   }
+  await page.goto(`${base}/#/historik/rapport`);
+  await page
+    .getByRole('heading', { name: 'Till fysioterapeuten', exact: true })
+    .waitFor();
+  await audit(page, tag('physiotherapist report'));
   await page.goto(`${base}/#/ovningar?muskel=core`);
   await page.getByRole('heading', { name: 'Övningar', exact: true }).waitFor();
   await audit(page, tag('filtered exercise library'));
+  await page.goto(`${base}/#/ovning/step-up`);
+  await page
+    .getByRole('heading', { name: 'Step-up (20–30 cm)', exact: true })
+    .waitFor();
+  await page.getByRole('button', { name: 'Framifrån', exact: true }).click();
+  await audit(page, tag('front figure angle controls'));
+  await page.goto(`${base}/#/ovning/bench-side-plank-leg-lift`);
+  await page
+    .getByRole('heading', {
+      name: 'Sidoplanka på bänk med benlyft',
+      exact: true,
+    })
+    .waitFor();
+  await page.getByRole('button', { name: 'Sned vinkel', exact: true }).click();
+  await audit(page, tag('oblique figure angle controls'));
   await page.goto(`${base}/#/ovning/dead-bug`);
   await page.getByRole('heading', { name: 'Dead bug', exact: true }).waitFor();
   await audit(page, tag('muscle movement overlay'));
@@ -231,7 +251,7 @@ async function theme(scheme: 'light' | 'dark') {
     .getByRole('button', { name: 'Byt övning', exact: true })
     .first()
     .click();
-  await audit(page, tag('exercise choices'));
+  await audit(page, tag('exercise chooser'));
   await page
     .getByRole('button', { name: 'Stäng övningsval', exact: true })
     .click();
@@ -432,9 +452,25 @@ async function theme(scheme: 'light' | 'dark') {
     .waitFor();
   await audit(training, tag('ready workout overview'));
   await training
+    .locator('summary')
+    .filter({ hasText: 'Annan utrustning för detta pass' })
+    .click();
+  await training.getByLabel('Justerbara hantlar').check();
+  await training.getByLabel('Hantelvikter (kg)').fill('2,5; 5');
+  await audit(training, tag('temporary and adjustable weight controls'));
+  await training
+    .locator('summary')
+    .filter({ hasText: 'Annan utrustning för detta pass' })
+    .click();
+  await training
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
   await audit(training, tag('optional workout editor'));
+  await training
+    .getByRole('button', { name: 'Lägg till övning', exact: true })
+    .click();
+  await audit(training, tag('training searchable exercise chooser'));
+  await training.getByRole('button', { name: 'Avbryt', exact: true }).click();
   const trainingRows = training.locator('ol > li > button[aria-expanded]');
   while ((await trainingRows.count()) > 1) {
     if (!(await training.getByRole('button', { name: /^Ta bort / }).count()))

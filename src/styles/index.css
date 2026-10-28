@@ -264,6 +264,95 @@ h2 {
 .session-content {
   overflow-wrap: anywhere;
 }
+
+/* The report follows the browser's native print/PDF flow. Keep the paper
+   readable regardless of the selected screen theme, without printing controls. */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+
+  html:has([data-print-report]),
+  body:has([data-print-report]) {
+    background: white;
+    color: black;
+    color-scheme: light;
+  }
+
+  body:has([data-print-report]) {
+    min-height: 0;
+  }
+
+  body:has([data-print-report]) > #root > :not(main),
+  body:has([data-print-report]) nav,
+  [data-print-report] .report-controls {
+    display: none;
+  }
+
+  [data-print-report].physio-report {
+    display: block;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  [data-print-report] *,
+  [data-print-report] *::before,
+  [data-print-report] *::after {
+    color: black;
+    background: transparent;
+    border-color: currentColor;
+    box-shadow: none;
+  }
+
+  [data-print-report] h1 {
+    font-size: 28pt;
+  }
+
+  [data-print-report] h2 {
+    font-size: 21pt;
+  }
+
+  [data-print-report] h3 {
+    font-size: 17pt;
+  }
+
+  [data-print-report] > section,
+  [data-print-report] > header {
+    margin-bottom: 6mm;
+  }
+
+  [data-print-report] .report-session {
+    display: block;
+    padding-top: 5mm;
+    margin-top: 7mm;
+  }
+
+  [data-print-report] .report-session-heading,
+  [data-print-report] h3,
+  [data-print-report] h4 {
+    break-after: avoid;
+  }
+
+  [data-print-report] .report-checkins,
+  [data-print-report] .report-set {
+    break-inside: avoid;
+  }
+
+  [data-print-report] .report-checkins,
+  [data-print-report] .report-exercise {
+    margin-top: 4mm;
+  }
+
+  [data-print-report] p,
+  [data-print-report] li,
+  [data-print-report] dd {
+    orphans: 3;
+    widows: 3;
+  }
+}
 /* Text zoom and narrow screens retain readable actions through reflow. */
 @container (max-width: 18rem) {
   .session-set-actions {

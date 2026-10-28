@@ -58,6 +58,11 @@ const FigureDev = import.meta.env.DEV
   : null;
 const isTiming = (value: string): value is 'before' | 'after' | 'dayAfter' =>
   ['before', 'after', 'dayAfter'].includes(value);
+const PhysioReport = lazy(() =>
+  import('./features/history/PhysioReport').then((m) => ({
+    default: m.PhysioReport,
+  })),
+);
 const History = lazy(() =>
   import('./features/history/History').then((m) => ({ default: m.History })),
 );
@@ -217,6 +222,7 @@ function Shell() {
             <Route path="/historik/ovning/:id">
               {(params) => <ExerciseHistory key={params.id} id={params.id} />}
             </Route>
+            <Route path="/historik/rapport">{() => <PhysioReport />}</Route>
             <Route path="/historik/:id">
               {(params) => <SessionDetail id={params.id} />}
             </Route>

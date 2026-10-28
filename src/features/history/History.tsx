@@ -93,6 +93,9 @@ export function History() {
     return (
       <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
         <h1 className="m-0 text-5xl font-extrabold">Historik</h1>
+        <Link href="/historik/rapport" className={buttonClass('secondary')}>
+          Sammanställning till fysioterapeuten
+        </Link>
         <p className="m-0 text-xl">
           Sidan är blank än. Det första passet skrivs upp här, set för set, så
           fort du har kört det.
@@ -180,6 +183,9 @@ export function History() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-6 pb-28">
       <h1 className="m-0 text-5xl font-extrabold">Historik</h1>
+      <Link href="/historik/rapport" className={buttonClass('secondary')}>
+        Sammanställning till fysioterapeuten
+      </Link>
       <HistorySummary sessions={sessions} painLogs={painLogs} today={today} />
       <div className="flex flex-col gap-1">
         <details open={activeFilters > 0}>
