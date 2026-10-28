@@ -165,7 +165,7 @@ describe('backup', () => {
   });
 
   it('round-trips the rep counting fields and accepts logs without them', async () => {
-    const b = await valid();
+    await valid();
     await db.setLogs.add(
       setLog('l2', 's1', {
         setNumber: 2,
