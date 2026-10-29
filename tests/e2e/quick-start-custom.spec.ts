@@ -55,3 +55,35 @@ for (const width of [320, 360, 412]) {
     });
   }
 }
+
+for (const width of [320, 412]) {
+  test(`/nytt-pass picks from Home without overflow (${width})`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/');
+    await page.getByRole('button', { name: /Jag förstår/ }).click();
+    await quickStart(page, { goal: 'general' });
+    await page.goto('/');
+    await expect(page.getByText('Inga egna pass än.')).toBeVisible();
+    await page.getByRole('link', { name: 'Skapa eget pass' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Skapa eget pass' }),
+    ).toBeVisible();
+    await expect(page.getByText(/^Utrustning: .*Träningsvana/)).toBeVisible();
+    await page
+      .getByRole('button', { name: /^Välj: / })
+      .first()
+      .click();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: test.info().outputPath(`new-${width}.png`),
+    });
+    await page.getByRole('button', { name: 'Skapa pass' }).click();
+    await expect(page.getByLabel('Namn på passet')).toHaveValue(/^Eget pass /);
+  });
+}

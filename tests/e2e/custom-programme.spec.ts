@@ -202,9 +202,7 @@ for (const width of [320, 360, 412]) {
         .getByRole('group', { name: 'Ta bort Mitt nya pass' })
         .getByRole('button', { name: 'Ta bort passet' })
         .click();
-      await expect(page.getByRole('region', { name: 'Mina pass' })).toHaveCount(
-        0,
-      );
+      await expect(page.getByText('Inga egna pass än.')).toBeVisible();
       await page.goto('/#/historik');
       await expect(page.getByText('Mitt nya pass').first()).toBeVisible();
     });

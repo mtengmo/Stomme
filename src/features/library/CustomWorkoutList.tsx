@@ -119,9 +119,16 @@ function useData() {
   }, []);
 }
 
-export function CustomWorkoutList({ headingId }: { headingId: string }) {
+export function CustomWorkoutList({
+  headingId,
+  alwaysShow = false,
+}: {
+  headingId: string;
+  /** Home: heading, empty text and the link to create one, even without passes. */
+  alwaysShow?: boolean;
+}) {
   const data = useData();
-  if (!data?.saved.length) return null;
+  if (!data || (!data.saved.length && !alwaysShow)) return null;
   const preferences = isTrainingPreferences(data.training)
     ? data.training
     : undefined;
@@ -136,6 +143,9 @@ export function CustomWorkoutList({ headingId }: { headingId: string }) {
       >
         Mina pass
       </h2>
+      {data.saved.length ? null : (
+        <p className="m-0 mt-2 text-base">Inga egna pass än.</p>
+      )}
       <ul className="m-0 mt-2 flex list-none flex-col p-0">
         {data.saved.map((workout) => {
           const minutes = minutesFor(workout, preferences, data);
@@ -165,6 +175,14 @@ export function CustomWorkoutList({ headingId }: { headingId: string }) {
           );
         })}
       </ul>
+      {alwaysShow ? (
+        <Link
+          href="/nytt-pass"
+          className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
+        >
+          Skapa eget pass
+        </Link>
+      ) : null}
     </section>
   );
 }

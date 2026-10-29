@@ -71,6 +71,11 @@ const Settings = lazy(() =>
     default: m.Settings,
   })),
 );
+const NewWorkout = lazy(() =>
+  import('./features/training/NewWorkout').then((m) => ({
+    default: m.NewWorkout,
+  })),
+);
 const ExerciseLibrary = lazy(() =>
   import('./features/library/ExerciseLibrary').then((m) => ({
     default: m.ExerciseLibrary,
@@ -204,6 +209,7 @@ function Shell() {
             <Route path="/ovning/:id">
               {(params) => <ExerciseCardPage id={params.id} />}
             </Route>
+            <Route path="/nytt-pass">{() => <NewWorkout />}</Route>
             <Route path="/ovningar">{() => <ExerciseLibrary />}</Route>
             {FigureDev ? (
               <Route path="/dev/figurer">{() => <FigureDev />}</Route>

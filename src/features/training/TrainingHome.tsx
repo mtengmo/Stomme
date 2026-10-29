@@ -289,8 +289,11 @@ export function TrainingHome() {
   }, []);
   const [, navigate] = useLocation();
   // "/?andra=utrustning" opens the setup directly (used by the physio overview).
-  const wantsSetup =
-    new URLSearchParams(useHashSearch()).get('andra') === 'utrustning';
+  const homeSearch = new URLSearchParams(useHashSearch());
+  const wantsSetup = homeSearch.get('andra') === 'utrustning';
+  // Only a known page may be returned to after the setup.
+  const backTo =
+    homeSearch.get('tillbaka') === 'nytt-pass' ? '/nytt-pass' : '/traning/A';
   const [editing, setEditing] = useState(wantsSetup);
   if (!data) return null;
   const preferences = isTrainingPreferences(data.preferences)
@@ -314,11 +317,11 @@ export function TrainingHome() {
           current={preferences}
           onSaved={() => {
             setEditing(false);
-            if (wantsSetup) navigate('/traning/A');
+            if (wantsSetup) navigate(backTo);
           }}
           onCancel={() => {
             setEditing(false);
-            if (wantsSetup) navigate('/traning/A');
+            if (wantsSetup) navigate(backTo);
           }}
         />
       </div>
@@ -385,7 +388,7 @@ export function TrainingHome() {
       {!active ? (
         <>
           <WeeklyPlan preferences={preferences} sessions={data.sessions} />
-          <CustomWorkoutList headingId="home-own-workouts" />
+          <CustomWorkoutList headingId="home-own-workouts" alwaysShow />
         </>
       ) : null}
       {due.map((session) => (

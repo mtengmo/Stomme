@@ -106,6 +106,7 @@ for (const width of [360, 1280]) {
     await page.getByRole('button', { name: /^Ta bort: Eget pass/ }).click();
     await page.getByRole('button', { name: 'Ta bort passet' }).click();
     await expect(page.getByRole('link', { name: /^Eget pass/ })).toHaveCount(0);
+    // The library shows no empty list; Home does, but hides it during a session.
     await expect(page.getByRole('region', { name: 'Mina pass' })).toHaveCount(
       0,
     );
