@@ -23,6 +23,8 @@ export interface ExerciseFilterControlsProps {
   idPrefix: string;
   /** Adds "Mitt program" to the purpose list. */
   showMine?: boolean;
+  /** Adds the "fits my level" checkbox under "Fler filter". */
+  showLevelFit?: boolean;
 }
 
 const selectClass =
@@ -66,6 +68,7 @@ export function ExerciseFilterControls({
   defaultEquipment,
   idPrefix,
   showMine = false,
+  showLevelFit = false,
 }: ExerciseFilterControlsProps) {
   const [moreOpen, setMoreOpen] = useState(() => Boolean(value.muscle));
   const advanced = advancedFilterCount(value, defaultEquipment);
@@ -245,6 +248,19 @@ export function ExerciseFilterControls({
             <option value="reps">Repetitioner</option>
             <option value="time">På tid</option>
           </select>
+          {showLevelFit ? (
+            <label className="flex min-h-12 items-center gap-3 text-base font-bold">
+              <input
+                type="checkbox"
+                checked={value.levelFit}
+                onChange={(event) =>
+                  onChange({ levelFit: event.target.checked })
+                }
+                className="h-6 w-6"
+              />
+              Bara övningar som passar min vana
+            </label>
+          ) : null}
           <label className="flex min-h-12 items-center gap-3 text-base font-bold">
             <input
               type="checkbox"

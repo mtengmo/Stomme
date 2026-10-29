@@ -8,9 +8,12 @@ import {
   type ExerciseFilters,
   emptyExerciseFilters,
   filterExercises,
+  filtersFromParams,
+  filtersToParams,
   type LibraryFilters,
   matchesLibraryFilters,
   missingEquipment,
+  requiresGoodTechnique,
 } from './libraryFilters';
 
 const empty: LibraryFilters = {
@@ -191,5 +194,58 @@ describe('filterExercises', () => {
       missingEquipment('kettlebell-halo', ['bodyweight']).length,
     ).toBeGreaterThan(0);
     expect(missingEquipment('dead-bug', ['bodyweight'])).toEqual([]);
+  });
+});
+
+describe('filter params and level fit', () => {
+  it('round-trips filters through query parameters and ignores invalid values', () => {
+    const patch: Partial<ExerciseFilters> = {
+      term: 'knä',
+      region: 'legs',
+      kind: 'strength',
+      oneSide: true,
+      levelFit: true,
+      equipment: 'available',
+    };
+    const params = filtersToParams(patch);
+    expect(filtersFromParams(params)).toEqual({
+      ...emptyExerciseFilters,
+      aaos: false,
+      ...patch,
+    });
+    expect(
+      filtersFromParams('omrade=nonsense&muskel=x&niva=y&typ=z&sida=0'),
+    ).toEqual({ ...emptyExerciseFilters, aaos: false });
+    expect(filtersToParams({ term: '' }, 'sok=a&omrade=legs').toString()).toBe(
+      'omrade=legs',
+    );
+  });
+
+  it('hides exercises with no variant at the experience level only when levelFit is on', () => {
+    const hard = exerciseList.find((exercise) =>
+      requiresGoodTechnique(exercise.id, 'new'),
+    );
+    expect(hard).toBeDefined();
+    const context = { inventory: [], experience: 'new' as const };
+    const on = filterExercises(
+      exerciseList,
+      { ...emptyExerciseFilters, levelFit: true },
+      context,
+    ).primary;
+    const off = filterExercises(
+      exerciseList,
+      emptyExerciseFilters,
+      context,
+    ).primary;
+    expect(on.length).toBeLessThan(off.length);
+    expect(on.some((exercise) => exercise.id === hard?.id)).toBe(false);
+    expect(off.some((exercise) => exercise.id === hard?.id)).toBe(true);
+    expect(
+      filterExercises(
+        exerciseList,
+        { ...emptyExerciseFilters, levelFit: true },
+        { inventory: [] },
+      ).primary,
+    ).toHaveLength(off.length);
   });
 });

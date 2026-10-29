@@ -24,15 +24,18 @@ import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import { getMeta } from '../../db/repo';
 import type {
-  BodyRegionId,
   EquipmentChoice,
   Exercise,
+  TrainingPreferences,
 } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import {
   type ExerciseFilters,
   filterExercises,
+  filtersFromParams,
+  filtersToParams,
   missingEquipment,
+  requiresGoodTechnique,
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
@@ -56,9 +59,11 @@ function equipment(exercise: Exercise): string {
 function ExerciseRow({
   exercise,
   inventory,
+  experience,
 }: {
   exercise: Exercise;
   inventory: EquipmentChoice[];
+  experience?: TrainingPreferences['experience'];
 }) {
   const missing = missingEquipment(exercise.id, inventory);
   const membership = Object.values(templates).filter((template) =>
@@ -91,6 +96,11 @@ function ExerciseRow({
         {missing.length ? (
           <p className="m-0 mt-1 text-base font-bold">
             Saknar utrustning: {missing.join(', ')}
+          </p>
+        ) : null}
+        {experience && requiresGoodTechnique(exercise.id, experience) ? (
+          <p className="m-0 mt-1 text-base font-bold">
+            Kräver god teknik. Börja med lätt vikt.
           </p>
         ) : null}
         <SelectionNote exercise={exercise} />
@@ -131,11 +141,13 @@ function ResultList({
   items,
   id,
   inventory,
+  experience,
 }: {
   title: string;
   items: readonly Exercise[];
   id: string;
   inventory: EquipmentChoice[];
+  experience?: TrainingPreferences['experience'];
 }) {
   if (!items.length) return null;
   return (
@@ -149,6 +161,7 @@ function ResultList({
             key={exercise.id}
             exercise={exercise}
             inventory={inventory}
+            experience={experience}
           />
         ))}
       </ul>
@@ -163,41 +176,8 @@ export function ExerciseLibrary() {
   const query = new URLSearchParams(search);
   const training = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
-  const favouritesOnly = query.get('favoriter') === '1';
   const preferences = isTrainingPreferences(training) ? training : undefined;
-  const filters: ExerciseFilters = {
-    aaos: query.get('kalla') === 'aaos',
-    purpose:
-      query.get('syfte') === 'mine'
-        ? 'mine'
-        : Object.hasOwn(purposeLabels, query.get('syfte') ?? '')
-          ? (query.get('syfte') as ExerciseFilters['purpose'])
-          : '',
-    equipment:
-      query.get('redskap') === 'available'
-        ? 'available'
-        : Object.hasOwn(equipmentLabels, query.get('redskap') ?? '')
-          ? (query.get('redskap') as ExerciseFilters['equipment'])
-          : '',
-    level: Object.hasOwn(technicalLevelLabels, query.get('niva') ?? '')
-      ? (query.get('niva') as ExerciseFilters['level'])
-      : '',
-    term: query.get('sok') ?? '',
-    region: bodyRegions.some((item) => item.id === query.get('omrade'))
-      ? (query.get('omrade') as BodyRegionId)
-      : '',
-    muscle: selected ?? '',
-    kind:
-      query.get('typ') === 'strength' || query.get('typ') === 'mobility'
-        ? (query.get('typ') as ExerciseFilters['kind'])
-        : '',
-    unit:
-      query.get('utforande') === 'reps' || query.get('utforande') === 'time'
-        ? (query.get('utforande') as ExerciseFilters['unit'])
-        : '',
-    oneSide: query.get('sida') === '1',
-    favouritesOnly,
-  };
+  const filters = filtersFromParams(query);
   const inventory = preferences?.equipment ?? defaultEquipment;
   const roster = useLiveQuery(async () => {
     const sessions = (await getDb().sessions.toArray())
@@ -232,26 +212,8 @@ export function ExerciseLibrary() {
     filters,
     { inventory, mine, favourites },
   );
-  const paramNames: Record<keyof ExerciseFilters, string> = {
-    aaos: 'kalla',
-    term: 'sok',
-    region: 'omrade',
-    muscle: 'muskel',
-    purpose: 'syfte',
-    level: 'niva',
-    equipment: 'redskap',
-    kind: 'typ',
-    unit: 'utforande',
-    oneSide: 'sida',
-    favouritesOnly: 'favoriter',
-  };
   const changeFilters = (patch: Partial<ExerciseFilters>) => {
-    const next = new URLSearchParams(search);
-    for (const [name, value] of Object.entries(patch)) {
-      const param = paramNames[name as keyof ExerciseFilters];
-      if (value) next.set(param, value === true ? '1' : String(value));
-      else next.delete(param);
-    }
+    const next = filtersToParams(patch, search);
     navigate(`/ovningar${next.size ? `?${next}` : ''}`, {
       replace: 'term' in patch,
     });
@@ -347,12 +309,14 @@ export function ExerciseLibrary() {
             items={primary}
             id="primary-results"
             inventory={inventory}
+            experience={preferences?.experience}
           />
           <ResultList
             title="Hjälper till"
             items={secondary}
             id="secondary-results"
             inventory={inventory}
+            experience={preferences?.experience}
           />
         </WorkoutBuilder>
       </div>

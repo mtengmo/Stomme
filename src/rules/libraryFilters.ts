@@ -4,21 +4,26 @@ import {
   equipmentLabels,
   exerciseMetadata,
   type Purpose,
+  purposeLabels,
   type TechnicalLevel,
+  technicalLevelLabels,
 } from '../content/exerciseMetadata';
 import { exerciseReferences } from '../content/exerciseReferences';
 import {
   bodyRegions,
   exerciseMuscles,
   type MuscleGroupId,
+  muscleGroups,
 } from '../content/muscles';
 import type {
   BodyRegionId,
   EquipmentChoice,
   Exercise,
   ExerciseId,
+  TrainingPreferences,
 } from '../domain/types';
 import { equipmentFits } from './equipment';
+import { allowedLevels } from './levelPolicy';
 
 export interface LibraryFilters {
   aaos?: boolean;
@@ -75,6 +80,8 @@ export interface ExerciseFilters extends LibraryFilters {
   /** Only exercises done one side at a time. */
   oneSide: boolean;
   favouritesOnly: boolean;
+  /** Only exercises with a variant that fits the user's experience. */
+  levelFit: boolean;
 }
 
 export const emptyExerciseFilters: ExerciseFilters = {
@@ -88,6 +95,7 @@ export const emptyExerciseFilters: ExerciseFilters = {
   unit: '',
   oneSide: false,
   favouritesOnly: false,
+  levelFit: false,
 };
 
 export interface ExerciseFilterContext {
@@ -95,6 +103,19 @@ export interface ExerciseFilterContext {
   mine?: Set<string>;
   /** Undefined while favourites are loading: "only favourites" then shows nothing. */
   favourites?: readonly ExerciseId[];
+  /** Needed for the levelFit filter; without it that filter is ignored. */
+  experience?: TrainingPreferences['experience'];
+}
+
+/** True when no variant of the exercise is within the experience level. */
+export function requiresGoodTechnique(
+  id: ExerciseId,
+  experience: TrainingPreferences['experience'],
+): boolean {
+  const levels = allowedLevels(experience);
+  return !exerciseMetadata[id].variants.some((variant) =>
+    levels.includes(variant.technicalLevel),
+  );
 }
 
 export interface FilteredExercises {
@@ -131,6 +152,12 @@ export function filterExercises(
     )
       continue;
     if (filters.oneSide && !exercise.perSide) continue;
+    if (
+      filters.levelFit &&
+      context.experience &&
+      requiresGoodTechnique(exercise.id, context.experience)
+    )
+      continue;
     if (!matchesLibraryFilters(exercise, filters, context.inventory, mine))
       continue;
     if (!muscles) {
@@ -160,4 +187,76 @@ export function missingEquipment(
     if (!best || missing.length < best.length) best = missing;
   }
   return best ?? [];
+}
+
+/** Hash/query parameter names, shared by the library and the start flow. */
+export const filterParamNames: Record<keyof ExerciseFilters, string> = {
+  aaos: 'kalla',
+  term: 'sok',
+  region: 'omrade',
+  muscle: 'muskel',
+  purpose: 'syfte',
+  level: 'niva',
+  equipment: 'redskap',
+  kind: 'typ',
+  unit: 'utforande',
+  oneSide: 'sida',
+  favouritesOnly: 'favoriter',
+  levelFit: 'vana',
+};
+
+/** Parses filters from a query string; unknown or invalid values are ignored. */
+export function filtersFromParams(
+  search: string | URLSearchParams,
+): ExerciseFilters {
+  const query =
+    typeof search === 'string' ? new URLSearchParams(search) : search;
+  const get = (key: keyof ExerciseFilters) =>
+    query.get(filterParamNames[key]) ?? '';
+  const muscle = get('muscle');
+  const region = get('region');
+  const purpose = get('purpose');
+  const equipment = get('equipment');
+  const kind = get('kind');
+  const unit = get('unit');
+  return {
+    aaos: get('aaos') === 'aaos',
+    purpose:
+      purpose === 'mine' || Object.hasOwn(purposeLabels, purpose)
+        ? (purpose as ExerciseFilters['purpose'])
+        : '',
+    equipment:
+      equipment === 'available' || Object.hasOwn(equipmentLabels, equipment)
+        ? (equipment as ExerciseFilters['equipment'])
+        : '',
+    level: Object.hasOwn(technicalLevelLabels, get('level'))
+      ? (get('level') as ExerciseFilters['level'])
+      : '',
+    term: get('term'),
+    region: bodyRegions.some((item) => item.id === region)
+      ? (region as BodyRegionId)
+      : '',
+    muscle: Object.hasOwn(muscleGroups, muscle)
+      ? (muscle as MuscleGroupId)
+      : '',
+    kind: kind === 'strength' || kind === 'mobility' ? kind : '',
+    unit: unit === 'reps' || unit === 'time' ? unit : '',
+    oneSide: get('oneSide') === '1',
+    favouritesOnly: get('favouritesOnly') === '1',
+    levelFit: get('levelFit') === '1',
+  };
+}
+
+/** Applies a patch onto existing params; empty values remove the parameter. */
+export function filtersToParams(
+  patch: Partial<ExerciseFilters>,
+  base: string | URLSearchParams = '',
+): URLSearchParams {
+  const next = new URLSearchParams(base);
+  for (const [name, value] of Object.entries(patch)) {
+    const param = filterParamNames[name as keyof ExerciseFilters];
+    if (value) next.set(param, value === true ? '1' : String(value));
+    else next.delete(param);
+  }
+  return next;
 }
