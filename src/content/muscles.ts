@@ -184,6 +184,16 @@ export const exerciseMuscles: Record<
     secondary: ['shoulders', 'back'],
     qualities: ['grip'],
   },
+  thruster: {
+    primary: ['quads', 'glutes', 'shoulders'],
+    secondary: ['core', 'triceps'],
+    qualities: [],
+  },
+  'single-arm-thruster': {
+    primary: ['quads', 'glutes', 'shoulders'],
+    secondary: ['core', 'triceps'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

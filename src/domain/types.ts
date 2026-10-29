@@ -70,7 +70,9 @@ export type ExerciseId =
   | 'wall-push-up'
   | 'calf-raise'
   | 'crunch'
-  | 'squat-curl';
+  | 'squat-curl'
+  | 'thruster'
+  | 'single-arm-thruster';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

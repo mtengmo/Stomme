@@ -56,6 +56,12 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   'shoulder-press': ['Axelpress', 'Hantelpress över huvudet'],
   'farmer-carry': ['Farmarbärning', 'Farmer carry', 'Bära hantlar'],
   'squat-curl': ['Knäböj med bicepscurl', 'Squat curl'],
+  thruster: ['Knäböj med axelpress', 'Thruster', 'Thrusters'],
+  'single-arm-thruster': [
+    'Enarms knäböj med axelpress',
+    'Single arm thruster',
+    'Enarmsthruster',
+  ],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],
   'hammer-curl': ['Hammercurl', 'Hammer curl'],
   'lateral-raise': ['Sidolyft', 'Hantellyft åt sidan'],

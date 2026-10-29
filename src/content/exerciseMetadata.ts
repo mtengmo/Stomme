@@ -103,6 +103,8 @@ const aceSources: Partial<Record<ExerciseId, string>> = {
   'single-leg-rdl': '127/single-arm-single-leg-romanian-dead-lift/',
   'biceps-curl': '44/seated-biceps-curl/',
   'squat-curl': '362/goblet-squat/',
+  thruster: '362/goblet-squat/',
+  'single-arm-thruster': '362/goblet-squat/',
   'lateral-raise': '26/lateral-raise/',
   'glute-bridge': '49/glute-bridge/',
   'forward-lunge': '94/forward-lunge/',
@@ -295,6 +297,10 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   ],
   'squat-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, armarna hängande.'],
+  ],
+  thruster: [['dumbbell', 2, [0, 1], 'En hantel i varje hand, vid axlarna.']],
+  'single-arm-thruster': [
+    ['dumbbell', 1, [0, 1], 'En hantel i vald hand, vid axeln.'],
   ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
@@ -612,6 +618,11 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'Bäckenet hålls rakt med ett stödben.',
   ],
   'squat-curl': ['practiced', 'Knäböj och armböjning samordnas i en rörelse.'],
+  thruster: ['practiced', 'Knäböj och axelpress samordnas i en rörelse.'],
+  'single-arm-thruster': [
+    'technical',
+    'Ensidig last över huvudet kräver kontroll av bålen under hela rörelsen.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -712,6 +723,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'thruster' || id === 'single-arm-thruster')
+    return [
+      {
+        title: 'The Thruster',
+        publisher: 'CrossFit',
+        url: 'https://www.crossfit.com/essentials/the-thruster',
+        note: 'Beskriver även hantel- och enarmsvarianter. Appens dos och tekniska nivå är redaktionella val.',
+      },
+    ];
   const editorial: ExerciseSource = {
     title: 'Fysioterapeutens knäprogram (Stommes egen beskrivning)',
     publisher: 'Stomme',
@@ -981,6 +1001,8 @@ export const exerciseMetadata = Object.fromEntries(
         'calf-raise',
         'crunch',
         'squat-curl',
+        'thruster',
+        'single-arm-thruster',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1013,6 +1035,11 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.harderExerciseId = 'single-leg-calf-raise';
     if (id === 'squat-curl') metadata.easierExerciseId = 'goblet-squat';
     if (id === 'goblet-squat') metadata.harderExerciseId = 'squat-curl';
+    if (id === 'thruster') {
+      metadata.easierExerciseId = 'goblet-squat';
+      metadata.harderExerciseId = 'single-arm-thruster';
+    }
+    if (id === 'single-arm-thruster') metadata.easierExerciseId = 'thruster';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

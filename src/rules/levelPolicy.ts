@@ -36,6 +36,8 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'split-squat': 'split-leg',
   'biceps-curl': 'curl',
   'squat-curl': 'squat',
+  thruster: 'squat',
+  'single-arm-thruster': 'squat',
   'hammer-curl': 'curl',
   'glute-bridge': 'bridge',
   'single-leg-floor-bridge': 'bridge',
@@ -65,7 +67,12 @@ export function levelRankOf(level: TechnicalLevel): number {
 /** Two-footed squat, hinge, row and floor press may start on the heaviest owned weight. */
 const heavySlots = new Set(['squat', 'hinge', 'row', 'horizontal-press']);
 /** One-sided or overhead work stays below the heaviest weight even in a heavy slot. */
-const limitedExercises = new Set<ExerciseId>(['single-leg-rdl', 'squat-curl']);
+const limitedExercises = new Set<ExerciseId>([
+  'single-leg-rdl',
+  'squat-curl',
+  'thruster',
+  'single-arm-thruster',
+]);
 export function heavyStartAllowed(id: ExerciseId): boolean {
   const slot = movementSlots[id];
   return !!slot && heavySlots.has(slot) && !limitedExercises.has(id);

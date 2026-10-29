@@ -459,6 +459,41 @@ export const additionalFigures = {
     props: [],
     held: twoDumbbells,
   },
+  thruster: {
+    start: {
+      ...squatBottom,
+      eR: [120, 122],
+      hR: [118, 104],
+      eL: [104, 122],
+      hL: [106, 104],
+    },
+    // A thruster finishes the squat and returns to the shoulder rack before
+    // the overhead press starts. This waypoint also makes the lowering path
+    // return overhead -> rack -> squat.
+    middle: {
+      ...stand,
+      eR: [113, 93],
+      hR: [111, 72],
+      eL: [83, 93],
+      hL: [85, 72],
+    },
+    end: {
+      ...stand,
+      eR: [112, 59],
+      hR: [108, 34],
+      eL: [84, 59],
+      hL: [88, 34],
+    },
+    props: [],
+    held: twoDumbbells,
+  },
+  'single-arm-thruster': {
+    start: { ...squatBottom, eR: [120, 122], hR: [118, 104] },
+    middle: { ...stand, eR: [113, 93], hR: [111, 72] },
+    end: { ...stand, eR: [112, 59], hR: [108, 34] },
+    props: [],
+    held: oneDumbbell,
+  },
   'biceps-curl': {
     start: {
       ...stand,

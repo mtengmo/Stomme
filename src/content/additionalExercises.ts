@@ -40,6 +40,7 @@ function entry(
                     'supported-row',
                     'triceps-kickback',
                     'kettlebell-press',
+                    'single-arm-thruster',
                     'kettlebell-floor-press',
                     'kettlebell-rack-carry',
                   ].includes(id)
@@ -76,6 +77,33 @@ export const lateAdditionalExercises: Exercise[] = [
     'Du svingar hantlarna eller trycker fram armbågarna.',
     'Gör knäböj och bicepscurl var för sig med lättare hantlar.',
     [pair(1), pair(2)],
+  ),
+  entry(
+    'thruster',
+    'Knäböj med axelpress',
+    ['Framsida lår', 'Säte', 'Axlar'],
+    [
+      'Stå med fötterna ungefär axelbrett och en hantel i varje hand vid axlarna.',
+      'Böj höfter och knän med hantlarna kvar vid axlarna. Res dig kraftfullt. När höfter och knän sträcks, pressa hantlarna rakt upp över huvudet.',
+      'Sänk hantlarna till axlarna. Ned och upp är en repetition.',
+    ],
+    'Du lutar bakåt eller trycker med svank när armarna går upp.',
+    'Gör knäböj och axelpress var för sig med lättare hantlar.',
+    [pair(1), pair(2)],
+  ),
+  entry(
+    'single-arm-thruster',
+    'Enarms knäböj med axelpress',
+    ['Framsida lår', 'Säte', 'Axlar', 'Bål'],
+    [
+      'Stå med fötterna ungefär axelbrett och en hantel i vald hand vid axeln.',
+      'Böj höfter och knän med hanteln kvar vid axeln. Res dig kraftfullt. När höfter och knän sträcks, pressa hanteln rakt upp över huvudet.',
+      'Sänk hanteln till axeln. Ned och upp är en repetition. Gör alla repetitioner på en sida, byt sedan.',
+    ],
+    'Du lutar överkroppen åt sidan för att få upp hanteln.',
+    'Gör rörelsen med två hantlar eller en lättare hantel.',
+    [single(2), single(4)],
+    true,
   ),
 ];
 
