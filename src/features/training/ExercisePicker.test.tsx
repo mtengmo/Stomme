@@ -210,4 +210,22 @@ describe('ExercisePicker', () => {
       ).toBe('true'),
     );
   });
+
+  it('filters by type and one side, and clears from the empty state', async () => {
+    const user = userEvent.setup();
+    render(
+      <PickerRoutes allowedIds={['reverse-lunge', 'goblet-chair-squat']} />,
+    );
+    await user.click(screen.getByLabelText('Bara övningar en sida i taget'));
+    expect(screen.getByRole('status').textContent).toBe('1 övning');
+    await user.selectOptions(
+      screen.getByLabelText('Typ av övning'),
+      'mobility',
+    );
+    expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
+    await user.click(
+      screen.getAllByRole('button', { name: 'Rensa filter' })[1] as HTMLElement,
+    );
+    expect(screen.getByRole('status').textContent).toBe('2 övningar');
+  });
 });

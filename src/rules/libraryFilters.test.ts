@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { exercises } from '../content/exercises';
+import { exerciseMetadata } from '../content/exerciseMetadata';
+import { exerciseList, exercises } from '../content/exercises';
+import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import type { EquipmentChoice } from '../domain/types';
 import { equipmentFits } from './equipment';
-import { type LibraryFilters, matchesLibraryFilters } from './libraryFilters';
+import {
+  type ExerciseFilters,
+  emptyExerciseFilters,
+  filterExercises,
+  type LibraryFilters,
+  matchesLibraryFilters,
+  missingEquipment,
+} from './libraryFilters';
 
 const empty: LibraryFilters = {
   purpose: '',
@@ -97,5 +106,90 @@ describe('source and search filters', () => {
   });
   it('rejects an exercise whose text does not contain the search term', () => {
     expect(fits('half-squat', { term: 'qqqqzzzz' })).toBe(false);
+  });
+});
+
+describe('filterExercises', () => {
+  const run = (patch: Partial<ExerciseFilters>, favourites?: string[]) =>
+    filterExercises(
+      exerciseList,
+      { ...emptyExerciseFilters, ...patch },
+      {
+        inventory: ['bodyweight'],
+        favourites: favourites as never,
+      },
+    );
+  const ids = (list: readonly { id: string }[]) => list.map((item) => item.id);
+
+  it('returns everything as primary without filters', () => {
+    const result = run({});
+    expect(result.primary).toHaveLength(exerciseList.length);
+    expect(result.supporting).toHaveLength(0);
+  });
+  it('splits a region into primary and supporting muscles', () => {
+    const legs =
+      bodyRegions.find((region) => region.id === 'legs')?.muscles ?? [];
+    const result = run({ region: 'legs' });
+    expect(result.primary.length).toBeGreaterThan(0);
+    for (const item of result.primary)
+      expect(
+        exerciseMuscles[item.id].primary.some((m) => legs.includes(m)),
+      ).toBe(true);
+    for (const item of result.supporting) {
+      const tags = exerciseMuscles[item.id];
+      expect(tags.primary.some((m) => legs.includes(m))).toBe(false);
+      expect(tags.secondary.some((m) => legs.includes(m))).toBe(true);
+    }
+  });
+  it('filters on one muscle and ignores the region then', () => {
+    const result = run({ muscle: 'calves', region: 'arms' });
+    expect(ids(result.primary)).toContain('single-leg-calf-raise');
+    for (const item of [...result.primary, ...result.supporting]) {
+      const tags = exerciseMuscles[item.id];
+      expect([...tags.primary, ...tags.secondary].includes('calves')).toBe(
+        true,
+      );
+    }
+  });
+  it('filters on strength and mobility', () => {
+    const mobility = run({ kind: 'mobility' }).primary;
+    const strength = run({ kind: 'strength' }).primary;
+    expect(mobility.length).toBeGreaterThan(0);
+    expect(mobility.length + strength.length).toBe(exerciseList.length);
+    expect(
+      mobility.every((item) => exerciseMetadata[item.id].kind === 'mobility'),
+    ).toBe(true);
+  });
+  it('filters on reps and time', () => {
+    const time = run({ unit: 'time' }).primary;
+    const reps = run({ unit: 'reps' }).primary;
+    expect(time.length).toBeGreaterThan(0);
+    expect(time.every((item) => item.unit === 'seconds')).toBe(true);
+    expect(reps.every((item) => item.unit === 'reps')).toBe(true);
+  });
+  it('filters on one side at a time', () => {
+    const result = run({ oneSide: true }).primary;
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((item) => item.perSide)).toBe(true);
+    expect(ids(result)).toContain('reverse-lunge');
+  });
+  it('combines filters', () => {
+    const result = run({ oneSide: true, region: 'legs', unit: 'reps' });
+    for (const item of [...result.primary, ...result.supporting]) {
+      expect(item.perSide).toBe(true);
+      expect(item.unit).toBe('reps');
+    }
+  });
+  it('shows no favourites while they load and the listed ones after', () => {
+    expect(run({ favouritesOnly: true }).primary).toHaveLength(0);
+    expect(ids(run({ favouritesOnly: true }, ['dead-bug']).primary)).toEqual([
+      'dead-bug',
+    ]);
+  });
+  it('names the equipment a row lacks', () => {
+    expect(
+      missingEquipment('kettlebell-halo', ['bodyweight']).length,
+    ).toBeGreaterThan(0);
+    expect(missingEquipment('dead-bug', ['bodyweight'])).toEqual([]);
   });
 });

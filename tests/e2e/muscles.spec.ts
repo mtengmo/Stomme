@@ -14,6 +14,9 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   page,
 }) => {
   await page.goto('/#/ovningar');
+  await page.getByRole('button', { name: 'Ben & säte', exact: true }).click();
+  await expect(page).toHaveURL(/#\/ovningar\?omrade=legs$/);
+  await page.getByText('Mer specifikt', { exact: false }).click();
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
   await expect(page.getByRole('status')).toHaveText(

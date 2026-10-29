@@ -10,8 +10,7 @@ import {
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList } from '../../content/exercises';
 import {
-  exerciseMuscles,
-  type MuscleGroupId,
+  bodyRegions,
   muscleGroups,
   parseMuscleFilter,
   primaryMuscleLabel,
@@ -24,14 +23,20 @@ import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import { getMeta } from '../../db/repo';
-import type { Exercise } from '../../domain/types';
+import type {
+  BodyRegionId,
+  EquipmentChoice,
+  Exercise,
+} from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import {
-  type LibraryFilters,
-  matchesLibraryFilters,
+  type ExerciseFilters,
+  filterExercises,
+  missingEquipment,
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
+import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
 import {
   FavouriteButton,
   FavouritesProvider,
@@ -44,7 +49,14 @@ function equipment(exercise: Exercise): string {
     .join(' / ');
 }
 
-function ExerciseRow({ exercise }: { exercise: Exercise }) {
+function ExerciseRow({
+  exercise,
+  inventory,
+}: {
+  exercise: Exercise;
+  inventory: EquipmentChoice[];
+}) {
+  const missing = missingEquipment(exercise.id, inventory);
   const membership = Object.values(templates).filter((template) =>
     template.items.some((item) => item.exerciseId === exercise.id),
   );
@@ -56,7 +68,7 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
           href={`/ovning/${exercise.id}`}
           className="flex min-h-12 items-center justify-between gap-3 text-ink underline decoration-2 underline-offset-4"
         >
-          <h3 className="m-0 font-sans text-xl leading-snug font-bold">
+          <h3 className="m-0 min-w-0 break-words font-sans text-xl leading-snug font-bold">
             {exercise.name}
           </h3>
           <Icon name="back" className="shrink-0 rotate-180" />
@@ -72,6 +84,11 @@ function ExerciseRow({ exercise }: { exercise: Exercise }) {
         <p className="m-0 mt-1 text-base text-ink-soft">
           Utrustning: {equipment(exercise)}
         </p>
+        {missing.length ? (
+          <p className="m-0 mt-1 text-base font-bold">
+            Saknar utrustning: {missing.join(', ')}
+          </p>
+        ) : null}
         <p className="m-0 mt-1 text-base text-ink-soft">
           Teknisk svårighetsgrad:{' '}
           {[
@@ -108,10 +125,12 @@ function ResultList({
   title,
   items,
   id,
+  inventory,
 }: {
   title: string;
   items: readonly Exercise[];
   id: string;
+  inventory: EquipmentChoice[];
 }) {
   if (!items.length) return null;
   return (
@@ -121,7 +140,11 @@ function ResultList({
       </h2>
       <ul className="m-0 list-none p-0">
         {items.map((exercise) => (
-          <ExerciseRow key={exercise.id} exercise={exercise} />
+          <ExerciseRow
+            key={exercise.id}
+            exercise={exercise}
+            inventory={inventory}
+          />
         ))}
       </ul>
     </section>
@@ -137,24 +160,38 @@ export function ExerciseLibrary() {
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
   const favouritesOnly = query.get('favoriter') === '1';
   const preferences = isTrainingPreferences(training) ? training : undefined;
-  const filters: LibraryFilters = {
+  const filters: ExerciseFilters = {
     aaos: query.get('kalla') === 'aaos',
     purpose:
       query.get('syfte') === 'mine'
         ? 'mine'
         : Object.hasOwn(purposeLabels, query.get('syfte') ?? '')
-          ? (query.get('syfte') as LibraryFilters['purpose'])
+          ? (query.get('syfte') as ExerciseFilters['purpose'])
           : '',
     equipment:
       query.get('redskap') === 'available'
         ? 'available'
         : Object.hasOwn(equipmentLabels, query.get('redskap') ?? '')
-          ? (query.get('redskap') as LibraryFilters['equipment'])
+          ? (query.get('redskap') as ExerciseFilters['equipment'])
           : '',
     level: Object.hasOwn(technicalLevelLabels, query.get('niva') ?? '')
-      ? (query.get('niva') as LibraryFilters['level'])
+      ? (query.get('niva') as ExerciseFilters['level'])
       : '',
     term: query.get('sok') ?? '',
+    region: bodyRegions.some((item) => item.id === query.get('omrade'))
+      ? (query.get('omrade') as BodyRegionId)
+      : '',
+    muscle: selected ?? '',
+    kind:
+      query.get('typ') === 'strength' || query.get('typ') === 'mobility'
+        ? (query.get('typ') as ExerciseFilters['kind'])
+        : '',
+    unit:
+      query.get('utforande') === 'reps' || query.get('utforande') === 'time'
+        ? (query.get('utforande') as ExerciseFilters['unit'])
+        : '',
+    oneSide: query.get('sida') === '1',
+    favouritesOnly,
   };
   const inventory = preferences?.equipment ?? defaultEquipment;
   const roster = useLiveQuery(async () => {
@@ -185,18 +222,38 @@ export function ExerciseLibrary() {
             template.items.map((item) => item.exerciseId),
           )),
   );
-  const eligible = exerciseList.filter(
-    (exercise) =>
-      (!favouritesOnly || favourites?.includes(exercise.id)) &&
-      matchesLibraryFilters(exercise, filters, inventory, mine),
+  const { primary, supporting: secondary } = filterExercises(
+    exerciseList,
+    filters,
+    { inventory, mine, favourites },
   );
-  const changeFilter = (name: string, value: string) => {
+  const paramNames: Record<keyof ExerciseFilters, string> = {
+    aaos: 'kalla',
+    term: 'sok',
+    region: 'omrade',
+    muscle: 'muskel',
+    purpose: 'syfte',
+    level: 'niva',
+    equipment: 'redskap',
+    kind: 'typ',
+    unit: 'utforande',
+    oneSide: 'sida',
+    favouritesOnly: 'favoriter',
+  };
+  const changeFilters = (patch: Partial<ExerciseFilters>) => {
     const next = new URLSearchParams(search);
-    if (value) next.set(name, value);
-    else next.delete(name);
+    for (const [name, value] of Object.entries(patch)) {
+      const param = paramNames[name as keyof ExerciseFilters];
+      if (value) next.set(param, value === true ? '1' : String(value));
+      else next.delete(param);
+    }
     navigate(`/ovningar${next.size ? `?${next}` : ''}`, {
-      replace: name === 'sok',
+      replace: 'term' in patch,
     });
+  };
+  const clearFilters = () => {
+    navigate('/ovningar');
+    document.getElementById('library-search')?.focus();
   };
   const invalid = query.has('muskel') && selected === null;
 
@@ -204,21 +261,15 @@ export function ExerciseLibrary() {
     if (invalid) navigate('/ovningar', { replace: true });
   }, [invalid, navigate]);
 
-  const primary = selected
-    ? eligible.filter((exercise) =>
-        exerciseMuscles[exercise.id].primary.includes(selected),
-      )
-    : eligible;
-  const secondary = selected
-    ? eligible.filter((exercise) =>
-        exerciseMuscles[exercise.id].secondary.includes(selected),
-      )
-    : [];
   const count = primary.length + secondary.length;
-  const muscleFilters: (MuscleGroupId | null)[] = [
-    null,
-    ...(Object.keys(muscleGroups) as MuscleGroupId[]),
-  ];
+  const area = filters.muscle
+    ? muscleGroups[filters.muscle].label
+    : filters.region
+      ? bodyRegions.find((item) => item.id === filters.region)?.label
+      : undefined;
+  const onlyBodyweight = preferences?.equipment.every(
+    (item) => item === 'bodyweight',
+  );
 
   return (
     <FavouritesProvider>
@@ -232,8 +283,7 @@ export function ExerciseLibrary() {
         </Link>
         <header>
           <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
-          <p className="m-0 mt-3 text-xl">Vad vill du träna?</p>
-          <p className="m-0 mt-2 text-base text-ink-soft">
+          <p className="m-0 mt-3 text-base text-ink-soft">
             Hela kroppen, knäfokus och löpstyrka. Välj efter syfte, muskler och
             utrustning.
           </p>
@@ -250,131 +300,58 @@ export function ExerciseLibrary() {
         >
           Granska alla övningar
         </Link>
-        <label className="flex flex-col gap-2 text-lg font-bold">
-          Träningssyfte
-          <select
-            value={filters.purpose}
-            onChange={(event) => changeFilter('syfte', event.target.value)}
-            className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-          >
-            <option value="">Alla syften</option>
-            {Object.entries(purposeLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-            <option value="mine">Mitt program</option>
-          </select>
-        </label>
-        <label className="flex flex-col gap-2 text-lg font-bold">
-          Sök efter namn eller nummer
-          <input
-            type="search"
-            value={filters.term}
-            onChange={(event) => changeFilter('sok', event.target.value)}
-            className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-          />
-        </label>
-        <label className="flex min-h-12 items-center gap-3 text-base font-bold">
-          <input
-            type="checkbox"
-            checked={favouritesOnly}
-            onChange={(event) =>
-              changeFilter('favoriter', event.target.checked ? '1' : '')
-            }
-            className="h-6 w-6"
-          />
-          Bara mina favoriter
-        </label>
-        <details>
-          <summary className="flex min-h-12 cursor-pointer items-center text-lg font-bold underline">
-            Fler filter{filters.equipment || filters.level ? ' · aktiva' : ''}
-          </summary>
-          <div className="flex flex-col gap-3 py-3">
-            <label className="flex flex-col gap-2 text-base font-bold">
-              Utrustning
-              <select
-                value={filters.equipment}
-                onChange={(event) =>
-                  changeFilter('redskap', event.target.value)
-                }
-                className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-              >
-                <option value="">Alla redskap</option>
-                <option value="available">Min tillgängliga utrustning</option>
-                {Object.entries(equipmentLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-2 text-base font-bold">
-              Teknisk svårighetsgrad
-              <select
-                value={filters.level}
-                onChange={(event) => changeFilter('niva', event.target.value)}
-                className="min-h-12 rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-              >
-                <option value="">Alla nivåer</option>
-                {Object.entries(technicalLevelLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </details>
-        {search ? (
-          <button
-            type="button"
-            onClick={() => navigate('/ovningar')}
-            className="min-h-12 self-start text-base font-bold underline"
-          >
-            Rensa alla filter
-          </button>
+        {filters.aaos ? (
+          <p className="m-0 text-base font-bold">
+            Visar bara källbaserade AAOS knäövningar.
+          </p>
         ) : null}
-        <fieldset
-          className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0"
-          aria-label="Filtrera på muskelgrupp"
-        >
-          {muscleFilters.map((group) => {
-            const active = group === selected;
-            return (
-              <button
-                key={group ?? 'all'}
-                type="button"
-                aria-pressed={active}
-                onClick={() => changeFilter('muskel', group ?? '')}
-                className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-surface px-3 py-2 text-base font-bold ${active ? 'border-accent text-accent' : 'border-edge text-ink'}`}
-              >
-                {active ? <Icon name="check" size={18} /> : null}
-                {group ? muscleGroups[group].label : 'Alla'}
-              </button>
-            );
-          })}
-        </fieldset>
+        <ExerciseFilterControls
+          value={filters}
+          onChange={changeFilters}
+          onClear={clearFilters}
+          defaultEquipment=""
+          idPrefix="library"
+          showMine
+        />
+        {onlyBodyweight ? (
+          <p className="m-0 text-base text-ink-soft">
+            Du har bara kroppsvikt registrerad.{' '}
+            <Link
+              href="/installningar"
+              className="font-bold text-accent underline underline-offset-4"
+            >
+              Lägg till utrustning i Inställningar
+            </Link>
+          </p>
+        ) : null}
         <p role="status" className="m-0 text-base text-ink-soft">
           {count} {count === 1 ? 'övning' : 'övningar'}
-          {selected ? ` för ${muscleGroups[selected].label.toLowerCase()}` : ''}
+          {area ? ` för ${area.toLowerCase()}` : ''}
         </p>
         {count === 0 ? (
           <p className="m-0 text-xl">
-            Inga övningar matchar dina filter. Rensa filtren eller välj andra
-            alternativ.
+            Inga övningar passar filtren.{' '}
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="min-h-12 text-base font-bold text-accent underline underline-offset-4"
+            >
+              Rensa filter
+            </button>
           </p>
         ) : null}
         <WorkoutBuilder>
           <ResultList
-            title={selected ? 'Tränar främst' : 'Alla övningar'}
+            title={area ? 'Tränar främst' : 'Alla övningar'}
             items={primary}
             id="primary-results"
+            inventory={inventory}
           />
           <ResultList
             title="Hjälper till"
             items={secondary}
             id="secondary-results"
+            inventory={inventory}
           />
         </WorkoutBuilder>
       </div>

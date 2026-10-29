@@ -133,4 +133,52 @@ describe('exercise library', () => {
     expect(screen.getByRole('status').textContent).toBe('86 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
+
+  it('filters on a body region from the URL and keeps old muscle links working', () => {
+    window.history.replaceState(null, '', '/#/ovningar?omrade=legs');
+    render(<TestRoutes />);
+    expect(screen.getByRole('status').textContent).toMatch(/för ben & säte$/);
+    expect(
+      screen
+        .getByRole('button', { name: 'Ben & säte' })
+        .getAttribute('aria-pressed'),
+    ).toBe('true');
+    cleanup();
+    window.history.replaceState(null, '', '/#/ovningar?muskel=calves');
+    render(<TestRoutes />);
+    expect(
+      screen
+        .getByRole('button', { name: 'Vader' })
+        .getAttribute('aria-pressed'),
+    ).toBe('true');
+  });
+
+  it('writes type, execution and one-side filters to the URL', async () => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    await user.selectOptions(
+      screen.getByLabelText('Typ av övning'),
+      'mobility',
+    );
+    expect(window.location.hash).toBe('#/ovningar?typ=mobility');
+    await user.selectOptions(screen.getByLabelText('Utförande'), 'time');
+    await user.click(screen.getByLabelText('Bara övningar en sida i taget'));
+    expect(window.location.hash).toContain('utforande=time');
+    expect(window.location.hash).toContain('sida=1');
+  });
+
+  it('labels rows that lack equipment and offers to clear an empty result', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState(null, '', '/#/ovningar?redskap=band');
+    render(<TestRoutes />);
+    expect(screen.getAllByText(/Saknar utrustning:/).length).toBeGreaterThan(0);
+    await user.type(screen.getByLabelText('Sök övning'), 'qqqqzzzz');
+    expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
+    await user.click(
+      screen.getAllByRole('button', { name: 'Rensa filter' })[1] as HTMLElement,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe('86 övningar'),
+    );
+  });
 });

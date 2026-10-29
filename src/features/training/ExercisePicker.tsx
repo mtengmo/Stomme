@@ -12,70 +12,61 @@ import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
   exerciseMuscles,
-  type MuscleGroupId,
   muscleGroups,
   primaryMuscleLabel,
 } from '../../content/muscles';
 import { getDb } from '../../db/db';
 import { readFavourites, toggleFavourite } from '../../db/favourites';
-import type {
-  BodyRegionId,
-  ExerciseId,
-  TrainingPreferences,
-} from '../../domain/types';
+import type { ExerciseId, TrainingPreferences } from '../../domain/types';
 import { FigureFrame, movementPose } from '../../figures/Figure';
 import { equipmentFits } from '../../rules/equipment';
 import { movementSlots } from '../../rules/levelPolicy';
 import {
-  type LibraryFilters,
-  matchesLibraryFilters,
+  type ExerciseFilters,
+  emptyExerciseFilters,
+  filterExercises,
 } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
+import {
+  activeFilterCount,
+  ExerciseFilterControls,
+} from '../exercise/ExerciseFilterControls';
 
 interface PickerState {
-  term: string;
-  region: BodyRegionId | null;
-  muscle: MuscleGroupId | null;
-  purpose: LibraryFilters['purpose'];
-  level: LibraryFilters['level'];
-  equipment: LibraryFilters['equipment'];
-  favouritesOnly: boolean;
+  filters: ExerciseFilters;
   broadened: boolean;
 }
 
-const defaultState: PickerState = {
-  term: '',
-  region: null,
-  muscle: null,
-  purpose: '',
-  level: '',
+const pickerDefaultFilters: ExerciseFilters = {
+  ...emptyExerciseFilters,
   equipment: 'available',
-  favouritesOnly: false,
+};
+const defaultState: PickerState = {
+  filters: pickerDefaultFilters,
   broadened: false,
 };
+
+function oneOf(value: unknown, allowed: readonly string[]): boolean {
+  return typeof value === 'string' && allowed.includes(value);
+}
 
 function isPickerState(value: unknown): value is PickerState {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const state = value as Record<string, unknown>;
+  const f = state.filters as Record<string, unknown> | undefined;
   return (
-    typeof state.term === 'string' &&
-    (state.region === null ||
-      (typeof state.region === 'string' &&
-        bodyRegions.some((region) => region.id === state.region))) &&
-    (state.muscle === null ||
-      (typeof state.muscle === 'string' &&
-        Object.hasOwn(muscleGroups, state.muscle))) &&
-    (state.purpose === '' ||
-      (typeof state.purpose === 'string' &&
-        Object.hasOwn(purposeLabels, state.purpose))) &&
-    (state.level === '' ||
-      (typeof state.level === 'string' &&
-        Object.hasOwn(technicalLevelLabels, state.level))) &&
-    (state.equipment === '' ||
-      state.equipment === 'available' ||
-      (typeof state.equipment === 'string' &&
-        Object.hasOwn(equipmentLabels, state.equipment))) &&
-    typeof state.favouritesOnly === 'boolean' &&
+    !!f &&
+    typeof f === 'object' &&
+    typeof f.term === 'string' &&
+    oneOf(f.region, ['', ...bodyRegions.map((region) => region.id)]) &&
+    oneOf(f.muscle, ['', ...Object.keys(muscleGroups)]) &&
+    oneOf(f.purpose, ['', ...Object.keys(purposeLabels)]) &&
+    oneOf(f.level, ['', ...Object.keys(technicalLevelLabels)]) &&
+    oneOf(f.equipment, ['', 'available', ...Object.keys(equipmentLabels)]) &&
+    oneOf(f.kind, ['', 'strength', 'mobility']) &&
+    oneOf(f.unit, ['', 'reps', 'time']) &&
+    typeof f.oneSide === 'boolean' &&
+    typeof f.favouritesOnly === 'boolean' &&
     typeof state.broadened === 'boolean'
   );
 }
@@ -96,16 +87,6 @@ function writePickerState(key: string, state: PickerState) {
   } catch {
     // The picker remains usable when session storage is unavailable.
   }
-}
-
-function matchesRegion(
-  id: ExerciseId,
-  muscles: readonly MuscleGroupId[],
-): boolean {
-  const entry = exerciseMuscles[id];
-  return [...entry.primary, ...entry.secondary].some((muscle) =>
-    muscles.includes(muscle),
-  );
 }
 
 function hasAvailableEquipment(
@@ -162,17 +143,13 @@ export function ExercisePicker({
     setState(next);
     writePickerState(storageKey, next);
   }
+  function updateFilters(patch: Partial<ExerciseFilters>) {
+    updateState({ filters: { ...state.filters, ...patch } });
+  }
 
-  const filters: LibraryFilters = {
-    aaos: false,
-    purpose: state.purpose,
-    equipment: state.equipment,
-    level: state.level,
-    term: state.term,
-  };
+  const filters = state.filters;
   const slot = replacingId ? movementSlots[replacingId] : undefined;
   const allowed = allowedIds ? new Set(allowedIds) : undefined;
-  const mine = new Set<string>();
   const candidates = useMemo(() => {
     if (replacingId && !state.broadened) {
       if (!slot) return [];
@@ -190,49 +167,14 @@ export function ExercisePicker({
   const availableCandidates = scopedCandidates.filter((exercise) =>
     hasAvailableEquipment(exercise.id, preferences),
   );
-  const eligible = availableCandidates.filter(
-    (exercise) =>
-      (!state.favouritesOnly || favourites?.includes(exercise.id)) &&
-      matchesLibraryFilters(exercise, filters, preferences.equipment, mine),
+  const { primary, supporting } = filterExercises(
+    availableCandidates,
+    filters,
+    { inventory: preferences.equipment, favourites },
   );
-  const filtered = state.muscle
-    ? eligible.filter((exercise) =>
-        matchesRegion(exercise.id, [state.muscle as MuscleGroupId]),
-      )
-    : state.region
-      ? eligible.filter((exercise) =>
-          matchesRegion(
-            exercise.id,
-            bodyRegions.find((region) => region.id === state.region)?.muscles ??
-              [],
-          ),
-        )
-      : eligible;
-
-  const primary = filtered.filter((exercise) => {
-    if (!state.region && !state.muscle) return true;
-    const muscles = state.muscle
-      ? [state.muscle]
-      : (bodyRegions.find((region) => region.id === state.region)?.muscles ??
-        []);
-    return exerciseMuscles[exercise.id].primary.some((muscle) =>
-      muscles.includes(muscle),
-    );
-  });
-  const supporting =
-    state.region || state.muscle
-      ? filtered.filter((exercise) => !primary.includes(exercise))
-      : [];
-  const advancedCount =
-    Number(Boolean(state.purpose)) +
-    Number(Boolean(state.level)) +
-    Number(state.equipment !== 'available') +
-    Number(state.favouritesOnly);
-  const activeFilterCount =
-    advancedCount +
-    Number(Boolean(state.term.trim())) +
-    Number(Boolean(state.region)) +
-    Number(Boolean(state.muscle));
+  const filtered = [...primary, ...supporting];
+  const areaActive = Boolean(filters.region || filters.muscle);
+  const activeCount = activeFilterCount(filters, 'available');
   const noCompatibleAlternatives = Boolean(
     replacingId && !state.broadened && candidates.length === 0,
   );
@@ -250,7 +192,8 @@ export function ExercisePicker({
   }
 
   function resetFilters() {
-    updateState(defaultState);
+    updateState({ filters: pickerDefaultFilters });
+    document.getElementById('exercise-picker-search')?.focus();
   }
 
   function renderRow(exercise: (typeof exerciseList)[number]) {
@@ -371,167 +314,13 @@ export function ExercisePicker({
         </button>
       </div>
 
-      <label
-        className="block text-base font-bold"
-        htmlFor="exercise-picker-search"
-      >
-        Sök övning
-      </label>
-      <input
-        id="exercise-picker-search"
-        type="search"
-        value={state.term}
-        onChange={(event) => updateState({ term: event.target.value })}
-        placeholder="Namn, E-nummer eller alias"
-        className="-mt-3 min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink placeholder:text-ink-soft"
+      <ExerciseFilterControls
+        value={filters}
+        onChange={updateFilters}
+        onClear={() => updateState({ filters: pickerDefaultFilters })}
+        defaultEquipment="available"
+        idPrefix="exercise-picker"
       />
-
-      <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
-        <legend className="mb-2 text-base font-bold">Vad vill du träna?</legend>
-        <button
-          type="button"
-          aria-pressed={!state.region && !state.muscle}
-          onClick={() => updateState({ region: null, muscle: null })}
-          className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-surface px-3 text-base font-bold ${!state.region && !state.muscle ? 'border-accent text-accent' : 'border-edge text-ink'}`}
-        >
-          {!state.region && !state.muscle ? (
-            <Icon name="check" size={18} />
-          ) : null}
-          Alla
-        </button>
-        {bodyRegions.map((region) => (
-          <button
-            key={region.id}
-            type="button"
-            aria-pressed={state.region === region.id && !state.muscle}
-            onClick={() => updateState({ region: region.id, muscle: null })}
-            className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-surface px-3 text-base font-bold ${state.region === region.id && !state.muscle ? 'border-accent text-accent' : 'border-edge text-ink'}`}
-          >
-            {state.region === region.id && !state.muscle ? (
-              <Icon name="check" size={18} />
-            ) : null}
-            {region.label}
-          </button>
-        ))}
-      </fieldset>
-
-      <details>
-        <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
-          Mer specifikt
-          {state.muscle ? ` · ${muscleGroups[state.muscle].label}` : ''}
-        </summary>
-        <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0 pt-2">
-          <legend className="sr-only">Välj enskild muskelgrupp</legend>
-          {(Object.keys(muscleGroups) as MuscleGroupId[]).map((muscle) => (
-            <button
-              key={muscle}
-              type="button"
-              aria-pressed={state.muscle === muscle}
-              onClick={() => updateState({ muscle, region: null })}
-              className={`inline-flex min-h-12 items-center gap-1.5 rounded-sm border-2 bg-surface px-3 text-base font-bold ${state.muscle === muscle ? 'border-accent text-accent' : 'border-edge text-ink'}`}
-            >
-              {state.muscle === muscle ? <Icon name="check" size={18} /> : null}
-              {muscleGroups[muscle].label}
-            </button>
-          ))}
-        </fieldset>
-      </details>
-
-      <details>
-        <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
-          Fler filter{activeFilterCount ? ` · ${activeFilterCount} aktiva` : ''}
-        </summary>
-        <div className="space-y-3 py-2">
-          <label
-            className="block text-base font-bold"
-            htmlFor="exercise-picker-purpose"
-          >
-            Träningssyfte
-          </label>
-          <select
-            id="exercise-picker-purpose"
-            value={state.purpose}
-            onChange={(event) =>
-              updateState({
-                purpose: event.target.value as PickerState['purpose'],
-              })
-            }
-            className="-mt-2 min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-          >
-            <option value="">Alla syften</option>
-            {Object.entries(purposeLabels).map(([id, label]) => (
-              <option key={id} value={id}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <label
-            className="block text-base font-bold"
-            htmlFor="exercise-picker-level"
-          >
-            Teknisk svårighetsgrad
-          </label>
-          <select
-            id="exercise-picker-level"
-            value={state.level}
-            onChange={(event) =>
-              updateState({ level: event.target.value as PickerState['level'] })
-            }
-            className="-mt-2 min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-          >
-            <option value="">Alla nivåer</option>
-            {Object.entries(technicalLevelLabels).map(([id, label]) => (
-              <option key={id} value={id}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <label
-            className="block text-base font-bold"
-            htmlFor="exercise-picker-equipment"
-          >
-            Utrustning
-          </label>
-          <select
-            id="exercise-picker-equipment"
-            value={state.equipment}
-            onChange={(event) =>
-              updateState({
-                equipment: event.target.value as PickerState['equipment'],
-              })
-            }
-            className="-mt-2 min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-          >
-            <option value="available">Min tillgängliga utrustning</option>
-            <option value="">All tillgänglig utrustning</option>
-            {Object.entries(equipmentLabels).map(([id, label]) => (
-              <option key={id} value={id}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <label className="flex min-h-12 items-center gap-3 text-base font-bold">
-            <input
-              type="checkbox"
-              checked={state.favouritesOnly}
-              onChange={(event) =>
-                updateState({ favouritesOnly: event.target.checked })
-              }
-              className="h-6 w-6"
-            />
-            Bara mina favoriter
-          </label>
-          {activeFilterCount > 0 ? (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="min-h-12 text-base font-bold text-accent underline underline-offset-4"
-            >
-              Rensa filter
-            </button>
-          ) : null}
-        </div>
-      </details>
 
       {replacingId ? (
         <div className="space-y-2">
@@ -579,18 +368,25 @@ export function ExercisePicker({
               ? 'Inga övningar ingår i den tillåtna samlingen.'
               : noEquipmentMatches
                 ? 'Inga övningar i samlingen passar den registrerade utrustningen.'
-                : state.favouritesOnly && favourites === undefined
+                : filters.favouritesOnly && favourites === undefined
                   ? 'Läser in dina favoriter…'
-                  : eligible.length === 0
-                    ? 'Inga övningar matchar dina filter. Rensa filtren eller välj andra alternativ.'
-                    : 'Inga övningar matchar dina kropps- och muskelfilter. Välj Alla eller ett annat område.'}
+                  : 'Inga övningar passar filtren.'}
+          {activeCount > 0 && !noCompatibleAlternatives ? (
+            <>
+              {' '}
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="min-h-12 font-bold text-accent underline underline-offset-4"
+              >
+                Rensa filter
+              </button>
+            </>
+          ) : null}
         </p>
       ) : (
         <div className="space-y-4">
-          {renderGroup(
-            primary,
-            state.region || state.muscle ? 'Tränar främst' : undefined,
-          )}
+          {renderGroup(primary, areaActive ? 'Tränar främst' : undefined)}
           {renderGroup(supporting, 'Stödjer')}
         </div>
       )}
