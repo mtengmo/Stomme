@@ -11,9 +11,16 @@ The exercise library shows a static SVG thumbnail for each exercise. A tap plays
 
 Up to 30 named workouts are stored in IndexedDB and included in JSON backup/restore. No data-model change: a workout is `{ id, name, exerciseIds, plan? }`.
 
+## Skapa eget pass (start flow and `/nytt-pass`)
+
+- First run: goal **Skapa eget pass** (`'build'`), steps goal, equipment, level, **pick** ("Steg 4 av 4"). Knee, physio and custom rehab never reach the pick step.
+- The pick step reuses the library filters and builder (`CustomPicker`): equipment "available" from the draft, "Bara övningar som passar min vana" on by default, body-region chips as a filter, a live summary at the top (count, per region, "ca X min" from the draft setup) and the builder bar with **Skapa pass**. Filters live in the draft as a query string (`pickFilters`), the picks under `stomme.quickstart.selection`; both are cleared when the setup is saved or another goal is chosen.
+- Nothing is written before **Skapa pass**; then setup and one workout are saved in one transaction (`saveStartWithCustomWorkout`) and the preview opens in edit mode with the name field ("Eget pass <d mmm>") at the top. No session is created.
+- Returning users: Home "Mina pass" is always shown ("Inga egna pass än." when empty) with the link **Skapa eget pass** to `/nytt-pass`. It uses the saved setup unchanged and shows "Utrustning: ... · Träningsvana: ..." with **Ändra utrustning eller vana** (`/?andra=utrustning&tillbaka=nytt-pass`; only `nytt-pass` is accepted as return target). Rehab setups keep 0/0 dose, "Ingår inte i knäprogrammet" and no time estimate.
+
 ## Mina pass
 
-`CustomWorkoutList` shows name, number of exercises, "ca X min" (not for rehab), a link to the preview and **Ta bort**. It appears on Home after the weekly plan and at the top of the library. Deleting asks "Ta bort passet? Sparade pass i historiken finns kvar." and is also available in the preview ("Ta bort passet"). Recorded sessions keep their name snapshots.
+`CustomWorkoutList` shows name, number of exercises, "ca X min" (not for rehab), a link to the preview and **Ta bort**. It appears on Home after the weekly plan (always, with an empty text) and at the top of the library (only when there are passes). Deleting asks "Ta bort passet? Sparade pass i historiken finns kvar." and is also available in the preview ("Ta bort passet"). Recorded sessions keep their name snapshots.
 
 ## Safety and limits
 

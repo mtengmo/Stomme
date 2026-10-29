@@ -92,3 +92,7 @@ Review M0 (safety) and M4 (backup) with the reviewer agent. One owner for `Train
 7. Limits: 12 exercises per workout, 30 saved workouts.
 8. Saved workouts can be deleted (with a confirmation) from Home, from the library list and from the preview.
 9. Backups: there are no users with older backups, so no migration or old-client compatibility work is needed. Prefer simple schema changes over versioned ones; M4 can add its field without a version bump if it is ever built.
+
+## Update 2026-10-29: start flow and Home
+
+The builder is also reachable without a library visit: first-run goal "Skapa eget pass" (pick step in `QuickStart.tsx`) and `/nytt-pass` from Home "Mina pass". Both use `CustomPicker`; see `docs/custom-workouts.md` and `docs/start-custom-plan.md`. Global preferences change only through the explicit "Ändra utrustning eller vana" link.
