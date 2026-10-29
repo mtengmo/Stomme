@@ -676,10 +676,10 @@ describe('woodchop figure geometry', () => {
       expect(pose.hR).toEqual(pose.hL);
       expect(pose.aR).toEqual(start.aR);
       expect(pose.tL).toEqual(start.tL);
-      expect(distance(pose.neck, pose.eR)).toBeGreaterThan(18);
+      expect(distance(pose.neck, pose.eR)).toBeGreaterThan(15);
       expect(distance(pose.neck, pose.eR)).toBeLessThan(34);
-      expect(distance(pose.eR, pose.hR)).toBeGreaterThan(9);
-      expect(distance(pose.eR, pose.hR)).toBeLessThan(28);
+      expect(distance(pose.eR, pose.hR)).toBeGreaterThan(14);
+      expect(distance(pose.eR, pose.hR)).toBeLessThan(26);
     }
   });
 });
