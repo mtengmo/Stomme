@@ -25,6 +25,10 @@ export interface ExerciseFilterControlsProps {
   showMine?: boolean;
   /** Adds the "fits my level" checkbox under "Fler filter". */
   showLevelFit?: boolean;
+  /** The levelFit setting the host starts from; only a change counts as active. */
+  defaultLevelFit?: boolean;
+  /** Legend of the body-region chips. */
+  regionLegend?: string;
 }
 
 const selectClass =
@@ -36,8 +40,10 @@ const chipClass = (active: boolean) =>
 export function advancedFilterCount(
   value: ExerciseFilters,
   defaultEquipment: ExerciseFilters['equipment'],
+  levelFit?: { default: boolean },
 ): number {
   return (
+    Number(Boolean(levelFit && value.levelFit !== levelFit.default)) +
     Number(Boolean(value.purpose)) +
     Number(Boolean(value.level)) +
     Number(value.equipment !== defaultEquipment) +
@@ -52,9 +58,10 @@ export function advancedFilterCount(
 export function activeFilterCount(
   value: ExerciseFilters,
   defaultEquipment: ExerciseFilters['equipment'],
+  levelFit?: { default: boolean },
 ): number {
   return (
-    advancedFilterCount(value, defaultEquipment) +
+    advancedFilterCount(value, defaultEquipment, levelFit) +
     Number(Boolean(value.term.trim())) +
     Number(Boolean(value.region)) +
     Number(Boolean(value.muscle))
@@ -69,10 +76,13 @@ export function ExerciseFilterControls({
   idPrefix,
   showMine = false,
   showLevelFit = false,
+  defaultLevelFit = false,
+  regionLegend = 'Vad vill du träna?',
 }: ExerciseFilterControlsProps) {
   const [moreOpen, setMoreOpen] = useState(() => Boolean(value.muscle));
-  const advanced = advancedFilterCount(value, defaultEquipment);
-  const total = activeFilterCount(value, defaultEquipment);
+  const levelFit = showLevelFit ? { default: defaultLevelFit } : undefined;
+  const advanced = advancedFilterCount(value, defaultEquipment, levelFit);
+  const total = activeFilterCount(value, defaultEquipment, levelFit);
   const noArea = !value.region && !value.muscle;
   const field = (name: string) => `${idPrefix}-${name}`;
 
@@ -93,7 +103,7 @@ export function ExerciseFilterControls({
       </div>
 
       <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
-        <legend className="mb-2 text-base font-bold">Vad vill du träna?</legend>
+        <legend className="mb-2 text-base font-bold">{regionLegend}</legend>
         <button
           type="button"
           aria-pressed={noArea}

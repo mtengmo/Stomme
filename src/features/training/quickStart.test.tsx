@@ -223,3 +223,82 @@ it('keeps first-use answers when leaving through the nav and coming back', async
   const box = await screen.findByRole('checkbox', { name: 'Hantlar' });
   expect((box as HTMLInputElement).checked).toBe(true);
 });
+
+it('builds your own first workout: nothing is saved until Skapa pass', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole('button', { name: 'Skapa eget pass' }),
+  );
+  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
+  await user.click(
+    screen.getByRole('checkbox', { name: 'Stabil stol eller bänk' }),
+  );
+  await next(user);
+  await user.click(screen.getByRole('radio', { name: /Viss vana/ }));
+  expect(screen.getByText('Steg 3 av 4')).toBeTruthy();
+  await next(user);
+  const heading = screen.getByRole('heading', { name: 'Välj dina övningar' });
+  expect(document.activeElement).toBe(heading);
+  expect(screen.getByText('Steg 4 av 4')).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Nästa' })).toBeNull();
+  const create = screen.getByRole('button', {
+    name: 'Skapa pass',
+  }) as HTMLButtonElement;
+  expect(create.disabled).toBe(true);
+  expect(screen.getByText('Välj minst en övning.')).toBeTruthy();
+  expect(screen.getByText('Inga övningar valda än.')).toBeTruthy();
+
+  const rows = screen.getAllByRole('button', { name: /^Välj: / });
+  await user.click(rows[0] as HTMLElement);
+  await user.click(rows[1] as HTMLElement);
+  expect(screen.getByText(/2 av 12 övningar/)).toBeTruthy();
+  expect(screen.getByText(/ca \d+ min/)).toBeTruthy();
+  expect(create.disabled).toBe(false);
+  expect(await getDb().meta.get('training')).toBeUndefined();
+  expect(await getDb().meta.get('customWorkouts')).toBeUndefined();
+
+  // Back keeps the picks.
+  await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
+  await next(user);
+  expect(screen.getByText(/2 av 12 övningar/)).toBeTruthy();
+
+  await user.click(screen.getByRole('button', { name: 'Skapa pass' }));
+  await screen.findByRole('button', { name: 'Börja passet' });
+  expect((await getDb().meta.get('training'))?.value).toMatchObject({
+    programId: 'general',
+    experience: 'some',
+    equipment: ['bodyweight', 'chair'],
+  });
+  const workouts = (await getDb().meta.get('customWorkouts'))?.value as {
+    name: string;
+    exerciseIds: string[];
+  }[];
+  expect(workouts).toHaveLength(1);
+  expect(workouts[0]?.exerciseIds).toHaveLength(2);
+  expect(workouts[0]?.name).toMatch(/^Eget pass /);
+  expect(await getDb().sessions.count()).toBe(0);
+  expect(sessionStorage.getItem('stomme.quickstart.draft')).toBeNull();
+  expect(sessionStorage.getItem('stomme.quickstart.selection')).toBeNull();
+  expect(screen.getByLabelText('Namn på passet')).toBeTruthy();
+});
+
+it('forgets the picks when another goal is chosen', async () => {
+  sessionStorage.setItem('stomme.quickstart.selection', JSON.stringify(['E1']));
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  expect(sessionStorage.getItem('stomme.quickstart.selection')).toBeNull();
+});
+
+it('never reaches the pick step for knee rehab', async () => {
+  sessionStorage.setItem(
+    'stomme.quickstart.draft',
+    JSON.stringify({ goal: 'knee', step: 'pick' }),
+  );
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Egenvikt eller utrustning?' });
+  expect(
+    screen.queryByRole('heading', { name: 'Välj dina övningar' }),
+  ).toBeNull();
+});

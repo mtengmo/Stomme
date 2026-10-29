@@ -160,4 +160,55 @@ describe('quick start model', () => {
       expect(prefs.adjustableWeights).toBeUndefined();
     }
   });
+
+  it('adds a pick step only for building your own workout', () => {
+    expect(stepsFor('build')).toEqual(['goal', 'equipment', 'level', 'pick']);
+    for (const goal of [
+      'general',
+      'running',
+      'knee',
+      'physio',
+      'custom',
+    ] as const)
+      expect(stepsFor(goal)).not.toContain('pick');
+  });
+
+  it('accepts a stored pick step only for build', () => {
+    expect(
+      readDraft(JSON.stringify({ goal: 'build', step: 'pick' })).step,
+    ).toBe('pick');
+    for (const goal of ['general', 'running', 'knee', 'physio', 'custom'])
+      expect(readDraft(JSON.stringify({ goal, step: 'pick' })).step).not.toBe(
+        'pick',
+      );
+    expect(readDraft(JSON.stringify({ step: 'pick' })).step).toBe('goal');
+  });
+
+  it('keeps pick filters as a short string only', () => {
+    expect(
+      readDraft(JSON.stringify({ goal: 'build', pickFilters: 'sok=x' }))
+        .pickFilters,
+    ).toBe('sok=x');
+    expect(
+      readDraft(JSON.stringify({ pickFilters: 'a'.repeat(501) })).pickFilters,
+    ).toBe('');
+    expect(readDraft(JSON.stringify({ pickFilters: 5 })).pickFilters).toBe('');
+  });
+
+  it('turns a build draft into general preferences without focus or rehab fields', () => {
+    const prefs = preferencesFromDraft({
+      ...emptyDraft,
+      goal: 'build',
+      mode: 'equipment',
+      equipment: ['dumbbell-2', 'band', 'laser' as never],
+      experience: 'regular',
+      focus: 'select',
+      bodyParts: ['legs'],
+    });
+    expect(prefs).toEqual({
+      programId: 'general',
+      equipment: ['bodyweight', 'dumbbell-2', 'band'],
+      experience: 'regular',
+    });
+  });
 });

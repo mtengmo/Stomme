@@ -2,12 +2,19 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { bodyRegions } from '../../content/muscles';
 import { experienceLabels } from '../../content/programmes';
+import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
-import type { EquipmentChoice, TrainingPreferences } from '../../domain/types';
+import type {
+  EquipmentChoice,
+  ExerciseId,
+  TrainingPreferences,
+} from '../../domain/types';
 import { regionsAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
 import { AdjustableWeightFields } from './AdjustableWeightFields';
+import { CustomPicker } from './CustomPicker';
+import { customWorkoutPlan } from './defaultPlan';
 import {
   allowedEquipment,
   type Draft,
@@ -28,6 +35,7 @@ const optionClass =
 const goals: { id: Goal; label: string }[] = [
   { id: 'general', label: 'Bli starkare' },
   { id: 'running', label: 'Styrka för löpning' },
+  { id: 'build', label: 'Skapa eget pass' },
   { id: 'knee', label: 'Knärehab' },
 ];
 
@@ -40,7 +48,17 @@ function loadDraft(): Draft {
     return readDraft(null);
   }
 }
+/** Picks of the pick step; own key so the builder and the draft never fight over one. */
+const SELECTION_KEY = 'stomme.quickstart.selection';
+function clearSelection(): void {
+  try {
+    sessionStorage.removeItem(SELECTION_KEY);
+  } catch {
+    /* No picks to clear. */
+  }
+}
 function clearDraft(): void {
+  clearSelection();
   try {
     sessionStorage.removeItem(DRAFT_KEY);
   } catch {
@@ -53,6 +71,7 @@ const headings: Record<Step, string> = {
   equipment: 'Egenvikt eller utrustning?',
   level: 'Hur van är du vid styrketräning?',
   focus: 'Vad vill du träna först?',
+  pick: 'Välj dina övningar',
 };
 
 export function QuickStart() {
@@ -126,7 +145,10 @@ export function QuickStart() {
     setError('');
     update({ step: next });
   };
-  const choose = (next: Goal) => update({ goal: next, step: 'equipment' });
+  const choose = (next: Goal) => {
+    if (next !== goal) clearSelection();
+    update({ goal: next, step: 'equipment' });
+  };
   const hasTools = equipment.some(
     (item) => item.startsWith('dumbbell') || item.startsWith('kettlebell'),
   );
@@ -183,6 +205,17 @@ export function QuickStart() {
     }
   }
 
+  const draftPrefs = useMemo(() => preferencesFromDraft(draft), [draft]);
+  async function createPass(ids: ExerciseId[]) {
+    const id = await saveStartWithCustomWorkout(
+      draftPrefs,
+      ids,
+      customWorkoutPlan(ids, draftPrefs, [], [], false),
+    );
+    clearDraft();
+    navigate(`/traning/A?workout=${id}`);
+  }
+
   return (
     <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[var(--app-nav-height)]">
       {step !== 'goal' ? (
@@ -204,7 +237,10 @@ export function QuickStart() {
       </h1>
       {step === 'goal' ? (
         <>
-          <p className="m-0 text-lg">Välj ett fokus. Vi gör ett pass åt dig.</p>
+          <p className="m-0 text-lg">
+            Välj ett fokus så gör vi ett pass åt dig, eller välj övningarna
+            själv.
+          </p>
           <div className="flex flex-col gap-3">
             {goals.map((item) => (
               <Button
@@ -287,7 +323,9 @@ export function QuickStart() {
                   <p className="m-0 text-lg">
                     {goal === 'physio'
                       ? 'Välj det du har hemma. Övningar som kräver annat än det du väljer lämnas bort. Utan val blir det bara övningar med kroppsvikt.'
-                      : 'Välj det du vill använda. Utan val blir det ett pass med kroppsvikt.'}
+                      : goal === 'build'
+                        ? 'Välj det du vill använda. Vi visar övningar som passar.'
+                        : 'Välj det du vill använda. Utan val blir det ett pass med kroppsvikt.'}
                   </p>
                   <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
                     <legend className="sr-only">Utrustning</legend>
@@ -461,7 +499,9 @@ export function QuickStart() {
                 </label>
               ))}
               <p className="m-0 text-base text-ink-soft">
-                Gäller styrketräning. Din löpvana kan vara en annan.
+                {goal === 'build'
+                  ? 'Styr vilka övningar vi visar, antal set och startvikt.'
+                  : 'Gäller styrketräning. Din löpvana kan vara en annan.'}
               </p>
             </fieldset>
           ) : null}
@@ -544,37 +584,62 @@ export function QuickStart() {
               ) : null}
             </>
           ) : null}
-          <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
-            {error ? (
-              <p role="alert" className="m-0 text-base font-bold">
-                {error}
+          {step === 'pick' ? (
+            <>
+              <p className="m-0 text-lg">
+                Välj upp till 12. Ordning, set och vikt ändrar du sedan.
               </p>
-            ) : null}
-            {last && needsParts ? (
-              <p id="focus-blocked" className="m-0 text-base font-bold">
-                Välj minst en kroppsdel, eller välj Hela kroppen.
-              </p>
-            ) : null}
-            <Button
-              disabled={busy || (last && needsParts)}
-              aria-describedby={
-                last && needsParts ? 'focus-blocked' : undefined
-              }
-              onClick={() => {
-                const next = steps[position + 1];
-                if (next && !last) goTo(next);
-                else void save();
-              }}
-            >
-              {!last
-                ? 'Nästa'
-                : goal === 'custom'
-                  ? 'Öppna mitt rehabprogram'
-                  : goal === 'physio'
-                    ? 'Visa mitt program'
-                    : 'Visa mitt pass'}
-            </Button>
-          </div>
+              {error ? (
+                <p role="alert" className="m-0 text-base font-bold">
+                  {error}
+                </p>
+              ) : null}
+              <CustomPicker
+                preferences={draftPrefs}
+                storageKey={SELECTION_KEY}
+                filters={draft.pickFilters}
+                onFiltersChange={(next) => update({ pickFilters: next })}
+                onCreate={createPass}
+                idPrefix="pick"
+              />
+            </>
+          ) : (
+            <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
+              {error ? (
+                <p role="alert" className="m-0 text-base font-bold">
+                  {error}
+                </p>
+              ) : null}
+              {last && needsParts ? (
+                <p id="focus-blocked" className="m-0 text-base font-bold">
+                  Välj minst en kroppsdel, eller välj Hela kroppen.
+                </p>
+              ) : null}
+              <Button
+                disabled={busy || (last && needsParts)}
+                aria-describedby={
+                  last && needsParts ? 'focus-blocked' : undefined
+                }
+                onClick={() => {
+                  const next = steps[position + 1];
+                  if (next === 'pick' && hasTools && !adjustableValid)
+                    setError(
+                      'Kontrollera de justerbara vikterna innan du fortsätter.',
+                    );
+                  else if (next && !last) goTo(next);
+                  else void save();
+                }}
+              >
+                {!last
+                  ? 'Nästa'
+                  : goal === 'custom'
+                    ? 'Öppna mitt rehabprogram'
+                    : goal === 'physio'
+                      ? 'Visa mitt program'
+                      : 'Visa mitt pass'}
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>

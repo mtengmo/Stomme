@@ -122,3 +122,21 @@ test('preview edits and the Besvär choice survive leaving via the nav; starting
   );
   expect(stored).toEqual([]);
 });
+
+test('picks and filters in the pick step survive leaving and coming back', async ({
+  page,
+}) => {
+  await accept(page);
+  await quickStart(page, { goal: 'build', finish: false });
+  await page
+    .getByRole('button', { name: /^Välj: / })
+    .first()
+    .click();
+  await expect(page.getByRole('status')).toContainText('1 av 12 övningar');
+  await page.getByRole('link', { name: 'Inställningar' }).click();
+  await page.getByRole('link', { name: 'Träning' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Välj dina övningar' }),
+  ).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('1 av 12 övningar');
+});

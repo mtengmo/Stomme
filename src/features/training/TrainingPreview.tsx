@@ -747,6 +747,20 @@ function PreviewEditor({
                   />
                 </details>
               ) : null}
+              {!equipmentOverride && customWorkout ? (
+                <label className="flex flex-col gap-2 text-base font-bold">
+                  Namn på passet
+                  <input
+                    value={workoutName}
+                    maxLength={60}
+                    onChange={(event) => {
+                      setWorkoutName(event.target.value);
+                      setSaved(false);
+                    }}
+                    className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-surface px-3 font-normal text-ink"
+                  />
+                </label>
+              ) : null}
               <h2 className="m-0 text-2xl font-bold">Övningar i passet</h2>
               {plan.length === 0 ? (
                 <p className="m-0 text-base">
@@ -1395,18 +1409,6 @@ function PreviewEditor({
 
           {!equipmentOverride && editing && customWorkout ? (
             <>
-              <label className="flex flex-col gap-2 text-base font-bold">
-                Namn på passet
-                <input
-                  value={workoutName}
-                  maxLength={60}
-                  onChange={(event) => {
-                    setWorkoutName(event.target.value);
-                    setSaved(false);
-                  }}
-                  className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-surface px-3 font-normal text-ink"
-                />
-              </label>
               <Button
                 variant="secondary"
                 disabled={busy || !ready || !workoutName.trim()}

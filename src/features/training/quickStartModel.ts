@@ -10,8 +10,14 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 
-export type Goal = 'general' | 'running' | 'knee' | 'physio' | 'custom';
-export type Step = 'goal' | 'equipment' | 'level' | 'focus';
+export type Goal =
+  | 'general'
+  | 'running'
+  | 'build'
+  | 'knee'
+  | 'physio'
+  | 'custom';
+export type Step = 'goal' | 'equipment' | 'level' | 'focus' | 'pick';
 export type Mode = 'bodyweight' | 'equipment';
 export type Focus = 'all' | 'select';
 export type Side = 'both' | 'right' | 'left';
@@ -30,11 +36,19 @@ export const levelHints: Record<Experience, string> = {
   regular: 'Alla övningar, 3–4 set, tyngre startvikter.',
 };
 
-const goals: Goal[] = ['general', 'running', 'knee', 'physio', 'custom'];
+const goals: Goal[] = [
+  'general',
+  'running',
+  'build',
+  'knee',
+  'physio',
+  'custom',
+];
 
 export function stepsFor(goal: Goal | null): Step[] {
   if (goal === 'general') return ['goal', 'equipment', 'level', 'focus'];
   if (goal === 'running') return ['goal', 'equipment', 'level'];
+  if (goal === 'build') return ['goal', 'equipment', 'level', 'pick'];
   return goal ? ['goal', 'equipment'] : ['goal'];
 }
 
@@ -45,7 +59,7 @@ export function isRehabGoal(goal: Goal | null): boolean {
 /** Equipment the checklist may offer for a goal; anything else is dropped on save. */
 export function allowedEquipment(goal: Goal | null): EquipmentChoice[] {
   const base: EquipmentChoice[] = ['chair', 'support'];
-  if (goal === 'general' || goal === 'running')
+  if (goal === 'general' || goal === 'running' || goal === 'build')
     return [
       'dumbbell-1',
       'dumbbell-2',
@@ -85,6 +99,8 @@ export interface Draft {
   side: Side;
   focus: Focus;
   bodyParts: BodyRegionId[];
+  /** Filters of the pick step as a query string (see rules/libraryFilters). */
+  pickFilters: string;
 }
 
 export const emptyDraft: Draft = {
@@ -98,6 +114,7 @@ export const emptyDraft: Draft = {
   side: 'both',
   focus: 'all',
   bodyParts: [],
+  pickFilters: '',
 };
 
 const regionIds = bodyRegions.map((region) => region.id);
@@ -166,6 +183,10 @@ export function readDraft(raw: string | null): Draft {
     side: value.side === 'right' || value.side === 'left' ? value.side : 'both',
     focus: value.focus === 'select' ? 'select' : 'all',
     bodyParts,
+    pickFilters:
+      typeof value.pickFilters === 'string' && value.pickFilters.length <= 500
+        ? value.pickFilters
+        : '',
   };
 }
 
@@ -192,7 +213,11 @@ export function preferencesFromDraft(
       ? draft.bodyParts.filter((part) => regions.includes(part))
       : [];
   return {
-    programId: rehab ? 'rehab' : (goal as 'general' | 'running'),
+    programId: rehab
+      ? 'rehab'
+      : goal === 'build'
+        ? 'general'
+        : (goal as 'general' | 'running'),
     equipment: [...new Set(equipment)],
     // Rehab never uses the strength level.
     experience: rehab ? 'new' : draft.experience,
