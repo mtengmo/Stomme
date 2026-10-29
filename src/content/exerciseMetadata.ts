@@ -347,6 +347,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Grip kettlebellens horn med båda händerna nära bröstet.',
     ],
   ],
+  'one-arm-kettlebell-swing': [
+    [
+      'kettlebell',
+      1,
+      [0, 1],
+      'Greppa handtaget med en hand; kraften kommer från höften.',
+    ],
+  ],
   woodchop: [
     ['dumbbell', 1, [0, 1], 'Håll en lätt hantel med båda händerna.'],
     [
@@ -724,6 +732,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'basic',
     'Båda händerna håller vikten nära bröstet under en kontrollerad knäböj.',
   ],
+  'one-arm-kettlebell-swing': [
+    'technical',
+    'Snabb höftfällning med ensidig, svängande last som bålen ska stå emot.',
+  ],
   woodchop: [
     'practiced',
     'Diagonal rotation från höft till axel med vriden fot och kontrollerad bål.',
@@ -1097,7 +1109,11 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
             : 'Egen svensk sammanfattning av rörelsen. Val av övning, sida och dos görs med behandlare. Biblioteket lägger inte till ankelvikter eller kopierar källans träningsdos.',
       },
     ];
-  if (id === 'kettlebell-swing' || id === 'kettlebell-deadlift')
+  if (
+    id === 'kettlebell-swing' ||
+    id === 'one-arm-kettlebell-swing' ||
+    id === 'kettlebell-deadlift'
+  )
     return [
       {
         title: 'How to Get Started With Kettlebells',
@@ -1209,6 +1225,7 @@ export const exerciseMetadata = Object.fromEntries(
         'kettlebell-goblet-squat',
         'russian-twist',
         'woodchop',
+        'one-arm-kettlebell-swing',
       ].includes(id)
         ? '2026-10-29'
         : [
@@ -1239,8 +1256,12 @@ export const exerciseMetadata = Object.fromEntries(
       ].includes(id)
     )
       metadata.relaxSeconds = 2;
-    if (id === 'kettlebell-swing')
+    if (id === 'kettlebell-swing') {
       metadata.easierExerciseId = 'kettlebell-deadlift';
+      metadata.harderExerciseId = 'one-arm-kettlebell-swing';
+    }
+    if (id === 'one-arm-kettlebell-swing')
+      metadata.easierExerciseId = 'kettlebell-swing';
     if (id === 'single-leg-hip-thrust')
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;

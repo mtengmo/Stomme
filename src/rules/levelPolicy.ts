@@ -89,6 +89,7 @@ const limitedExercises = new Set<ExerciseId>([
   'walking-lunge',
   'russian-twist',
   'woodchop',
+  'one-arm-kettlebell-swing',
 ]);
 export function heavyStartAllowed(id: ExerciseId): boolean {
   const slot = movementSlots[id];

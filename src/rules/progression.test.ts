@@ -436,6 +436,7 @@ describe('knee-loaded additional exercises', () => {
     'side-lunge',
     'walking-lunge',
     'kettlebell-goblet-squat',
+    'one-arm-kettlebell-swing',
   ] as const;
 
   it.each(kneeLoadedIds)(

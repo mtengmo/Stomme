@@ -94,6 +94,11 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Kettlebellknäböj med hornfattning',
     'Kettlebell goblet squat',
   ],
+  'one-arm-kettlebell-swing': [
+    'Enarms kettlebellsving',
+    'Enarmssving',
+    'Sving med en hand',
+  ],
   woodchop: ['Woodchop', 'Vedhuggning', 'Diagonal bålrotation'],
   'russian-twist': ['Russian twist', 'Sittande bålrotation', 'Rysk twist'],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],

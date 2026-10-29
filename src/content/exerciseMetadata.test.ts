@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E82, E87 and E88 references and original load indices', () => {
+  it('preserves permanent E01–E83, E87 and E88 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual([
       ...Array.from(
-        { length: 82 },
+        { length: 83 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
       'E87',
@@ -197,6 +197,19 @@ describe('expanded library integrity', () => {
     expect(exercises['russian-twist'].tips[2]).toContain(
       'Avbryt om ryggen gör ont',
     );
+    expect(exerciseMetadata['one-arm-kettlebell-swing'].sidePolicy).toBe(
+      'choose-side',
+    );
+    expect(exerciseMetadata['one-arm-kettlebell-swing'].easierExerciseId).toBe(
+      'kettlebell-swing',
+    );
+    expect(exerciseMetadata['kettlebell-swing'].harderExerciseId).toBe(
+      'one-arm-kettlebell-swing',
+    );
+    expect(exercises['one-arm-kettlebell-swing'].kneeLoaded).toBe(true);
+    expect(
+      exerciseMetadata['one-arm-kettlebell-swing'].variants[0]?.technicalLevel,
+    ).toBe('technical');
     expect(exerciseMetadata.woodchop.sidePolicy).toBe('choose-side');
     expect(exercises.woodchop.perSide).toBe(true);
     expect(exercises.woodchop.kneeLoaded).toBe(false);

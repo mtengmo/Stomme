@@ -234,6 +234,11 @@ export const exerciseMuscles: Record<
     secondary: ['core', 'back'],
     qualities: [],
   },
+  'one-arm-kettlebell-swing': {
+    primary: ['glutes', 'hamstrings'],
+    secondary: ['core', 'back', 'forearms'],
+    qualities: ['grip', 'power'],
+  },
   woodchop: {
     primary: ['core'],
     secondary: ['shoulders', 'glutes'],

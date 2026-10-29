@@ -31,6 +31,7 @@ const kneeLoadedAdditional = new Set<ExerciseId>([
   'side-lunge',
   'walking-lunge',
   'kettlebell-goblet-squat',
+  'one-arm-kettlebell-swing',
 ]);
 
 /** Library defaults are editable starting points, not an AAOS prescription. */
@@ -65,6 +66,7 @@ function entry(
                     'kettlebell-press',
                     'single-arm-thruster',
                     'woodchop',
+                    'one-arm-kettlebell-swing',
                     'kettlebell-floor-press',
                     'kettlebell-rack-carry',
                   ].includes(id)
@@ -233,6 +235,20 @@ export const lateAdditionalExercises: Exercise[] = [
     'Hälarna lyfter eller kettlebellen glider bort från bröstet.',
     'Välj gobletknäböj utan extra vikt eller en lättare kettlebell.',
     [single(4, 'kettlebell'), single(8, 'kettlebell')],
+  ),
+  entry(
+    'one-arm-kettlebell-swing',
+    'Enarms kettlebellsving',
+    ['Säte', 'Baksida lår', 'Bål'],
+    [
+      'Ställ kettlebellen på golvet framför dig. Stå med fötterna lite bredare än höftbrett, för höften bakåt och grip handtaget med vald hand.',
+      'För vikten bakåt mellan benen och sträck sedan höften snabbt så att den svänger fram, högst till ungefär brösthöjd. Armen följer med utan att lyfta vikten. Håll bålen rak och låt den fria armen hänga.',
+      'När vikten svänger tillbaka, för höften bakåt igen. En fram- och tillbakasving är en repetition. Gör alla repetitioner på en sida, byt sedan. Sätt ned vikten framför dig när du avslutar.',
+    ],
+    'Du lyfter vikten med armen eller låter bålen vridas när vikten svänger.',
+    'Öva kettlebellsving med två händer och en lätt vikt först.',
+    [single(4, 'kettlebell'), single(8, 'kettlebell')],
+    true,
   ),
   entry(
     'russian-twist',

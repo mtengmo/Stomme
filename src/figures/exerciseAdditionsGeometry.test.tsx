@@ -683,3 +683,22 @@ describe('woodchop figure geometry', () => {
     }
   });
 });
+
+describe('one-arm kettlebell swing figure geometry', () => {
+  it('swings one bell with the free arm hanging clear of it', () => {
+    expect(figures['one-arm-kettlebell-swing'].held).toEqual({
+      kind: 'kettlebell',
+      hands: ['hR'],
+    });
+    expect(figures['one-arm-kettlebell-swing'].motion).toBe('ballistic');
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('one-arm-kettlebell-swing', frame / 20);
+      expect(distance(pose.neck, pose.eL)).toBeLessThan(36);
+      expect(distance(pose.eL, pose.hL)).toBeLessThan(28);
+      expect(distance(pose.eL, pose.hL)).toBeGreaterThan(12);
+    }
+    const end = movementPose('one-arm-kettlebell-swing', 1);
+    expect(end.hR[0]).toBeGreaterThan(end.hip[0] + 40);
+    expect(end.hL[0]).toBeLessThan(end.hR[0] - 30);
+  });
+});

@@ -105,6 +105,7 @@ describe('ballistic beats', () => {
     ['squat-jump', 3000],
     ['jumping-lunge', 3000],
     ['kettlebell-swing', 2000],
+    ['one-arm-kettlebell-swing', 2000],
     ['burpee', 6000],
   ] as const)('%s has a fixed %i ms beat without holds', (id, ms) => {
     expect(repTempo(id)).toMatchObject({

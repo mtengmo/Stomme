@@ -23,6 +23,7 @@ const FIXED_REP_MS: Partial<Record<ExerciseId, number>> = {
   'squat-jump': 3_000,
   'jumping-lunge': 3_000,
   'kettlebell-swing': 2_000,
+  'one-arm-kettlebell-swing': 2_000,
   burpee: 6_000,
 };
 /** Figures whose animation is one whole repetition per cycle, not up and down. */
