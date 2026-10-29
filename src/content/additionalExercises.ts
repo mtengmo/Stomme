@@ -21,6 +21,7 @@ function entry(
   loads: Load[],
   perSide = false,
   unit: Exercise['unit'] = 'reps',
+  kneeLoaded = false,
 ): Exercise {
   return {
     id,
@@ -59,7 +60,7 @@ function entry(
     loadLadder: loads,
     startLoadIndex: 0,
     week1LoadIndex: 0,
-    kneeLoaded: false,
+    kneeLoaded,
   };
 }
 
@@ -169,6 +170,22 @@ export const lateAdditionalExercises: Exercise[] = [
     'Du svankar eller släpper ned vikten för långt bakom huvudet.',
     'Välj lättare hantel och kortare rörelse bakåt.',
     [single(1), single(2)],
+  ),
+  entry(
+    'side-lunge',
+    'Sidoutfall',
+    ['Framsida lår', 'Säte', 'Insida lår'],
+    [
+      'Stå höftbrett. Välj ett ben och kliv lugnt åt sidan. Arbeta utan vikt eller håll en hantel med båda händerna nära bröstet.',
+      'Böj höft och knä på benet du klev ut med medan det andra benet är mer rakt. Håll hela foten i golvet och låt knät följa tårnas riktning.',
+      'Pressa genom foten du klev ut med och återgå till mitten. Ut och tillbaka är en repetition för det valda benet.',
+    ],
+    'Knät faller inåt eller du sätter ned foten utan att bromsa steget.',
+    'Gör ett grundare bakåtutfall utan extra vikt.',
+    [bw, single(2), single(4)],
+    true,
+    'reps',
+    true,
   ),
 ];
 

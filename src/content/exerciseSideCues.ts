@@ -80,6 +80,10 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     label: `${sideWord(side)} ben fram`,
     explanation: `Kliv fram med det ${sideAdjective(side)} benet och pressa genom den foten tillbaka.`,
   }),
+  'side-lunge': (side) => ({
+    label: `Kliv åt ${sideWord(side)}`,
+    explanation: `Kliv ut med det ${sideAdjective(side)} benet, böj det knät och pressa tillbaka till mitten.`,
+  }),
   'single-arm-thruster': (side) => ({
     label: `Vikt i ${sideWord(side)} hand`,
     explanation: `Pressa vikten med ${sideWord(side)} arm; den andra armen vilar.`,

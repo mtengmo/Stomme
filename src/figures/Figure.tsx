@@ -12,6 +12,7 @@ import { bodyweightMovementPose } from './bodyweightPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
 import type { FigureAngle } from './frontViews';
 import {
+  defaultViewFor,
   FrontFigureFrame,
   supportsFrontView,
   supportsObliqueView,
@@ -32,6 +33,7 @@ import { heelSlidePose, rehabMovementPose } from './rehabPoses';
 export type { FigureAngle } from './frontViews';
 export {
   alternateView,
+  defaultViewFor,
   supportedFrontViews,
   supportedObliqueViews,
   supportedViewsFor,
@@ -488,7 +490,7 @@ export function Figure({
   paused = false,
   showMuscles = false,
   equipment,
-  view = 'side',
+  view,
   progress,
 }: {
   exerciseId: ExerciseId;
@@ -503,6 +505,7 @@ export function Figure({
   equipment?: Equipment;
   view?: FigureAngle;
 }) {
+  const activeView = view ?? defaultViewFor(exerciseId);
   const forced = forcedPhase();
   const reduced = usePrefersReducedMotion() && forced === undefined;
   const spec = figures[exerciseId];
@@ -576,8 +579,8 @@ export function Figure({
               working={working}
               equipment={equipment}
               showMuscles={showMuscles}
-              view={view}
-              phase={stillFramePhase(exerciseId, view, label)}
+              view={activeView}
+              phase={stillFramePhase(exerciseId, activeView, label)}
             />
             <figcaption className="text-center text-base font-bold">
               {label}
@@ -608,7 +611,7 @@ export function Figure({
       working={working}
       equipment={equipment}
       showMuscles={showMuscles}
-      view={view}
+      view={activeView}
       phase={forced ?? (reduced ? 0 : spec.motion === 'hold' ? 1 : t)}
     />
   );

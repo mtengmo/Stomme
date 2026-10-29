@@ -51,6 +51,10 @@ describe('exerciseSideCue', () => {
     expect(exerciseSideCue('balance-clock', 'right')?.label).toBe(
       'höger fot rör sig · stå på vänster ben',
     );
+    expect(exerciseSideCue('side-lunge', 'right')?.label).toBe('Kliv åt höger');
+    expect(exerciseSideCue('side-lunge', 'left')?.explanation).toContain(
+      'vänstra benet',
+    );
   });
 
   it('returns no cue for both sides', () => {

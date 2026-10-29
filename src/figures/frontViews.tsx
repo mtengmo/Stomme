@@ -16,6 +16,7 @@ export const supportedFrontViews = [
   'forward-lunge',
   'half-squat',
   'single-leg-chair-squat',
+  'side-lunge',
   'farmer-carry',
 ] as const satisfies readonly ExerciseId[];
 
@@ -25,6 +26,11 @@ export const supportedObliqueViews = [
 ] as const satisfies readonly ExerciseId[];
 
 export type FigureAngle = 'side' | 'front' | 'oblique';
+
+/** Start with the angle that explains each movement most clearly. */
+export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
+  return exerciseId === 'side-lunge' ? 'front' : 'side';
+}
 
 export function supportsObliqueView(
   exerciseId: ExerciseId,
@@ -164,6 +170,61 @@ export function frontMovementPose(
       point(118, 141 - 5 * liftL),
       point(120, 174 - 8 * liftL),
       point(130, 177 - 8 * liftL),
+    );
+  }
+  if (exerciseId === 'side-lunge') {
+    const side = working === 'left' ? 1 : -1;
+    // First step the selected foot out; then sit the hips toward that side
+    // while the selected knee bends and the opposite leg stays long.
+    const step = clamp(t * 2);
+    const depth = clamp((t - 0.5) * 2);
+    const selectedAnkleStartX = 100 + side * 10;
+    const selectedAnkleEndX = 100 + side * 30;
+    const selectedAnkleX = mix(selectedAnkleStartX, selectedAnkleEndX, step);
+    const otherAnkleX = 100 - side * 30;
+    const hipX = mix(100, 100 + side * 18, depth);
+    const hipY = mix(116, 136, depth);
+    const neckX = mix(100, 100 + side * 10, depth);
+    const neckY = hipY - 44;
+    const selectedStraightRatio = (148 - hipY) / (174 - hipY);
+    const selected = {
+      knee: point(
+        mix(
+          hipX + (selectedAnkleX - hipX) * selectedStraightRatio,
+          selectedAnkleX + side * 2,
+          depth,
+        ),
+        mix(148, 153, depth),
+      ),
+      ankle: point(selectedAnkleX, 174),
+      toe: point(selectedAnkleX + side * 10, 177),
+    };
+    const otherKneeY = mix(148, 151, depth);
+    const other = {
+      knee: point(
+        hipX + (otherAnkleX - hipX) * ((otherKneeY - hipY) / (174 - hipY)),
+        otherKneeY,
+      ),
+      ankle: point(otherAnkleX, 174),
+      toe: point(otherAnkleX - side * 10, 177),
+    };
+    const right = working === 'left' ? other : selected;
+    const left = working === 'left' ? selected : other;
+    const hands = point(neckX, neckY + 27);
+    return skeleton(
+      point(neckX, neckY - 14),
+      point(neckX, neckY),
+      point(hipX, hipY),
+      point(neckX - 18, neckY + 19),
+      hands,
+      point(neckX + 18, neckY + 19),
+      hands,
+      right.knee,
+      right.ankle,
+      right.toe,
+      left.knee,
+      left.ankle,
+      left.toe,
     );
   }
   if (exerciseId === 'reverse-lunge' || exerciseId === 'forward-lunge') {
@@ -483,12 +544,14 @@ export function FrontFigureFrame({
         ? [[100, pose.neck[1] + 11]]
         : exerciseId === 'farmer-carry'
           ? [pose.hR, pose.hL]
-          : exerciseId === 'kettlebell-rack-carry' ||
-              exerciseId === 'suitcase-carry'
-            ? [rackSide === 'R' ? pose.hR : pose.hL]
-            : kind === 'kettlebell' && exerciseId !== 'step-up'
-              ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
-              : [pose.hR, pose.hL];
+          : exerciseId === 'side-lunge'
+            ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
+            : exerciseId === 'kettlebell-rack-carry' ||
+                exerciseId === 'suitcase-carry'
+              ? [rackSide === 'R' ? pose.hR : pose.hL]
+              : kind === 'kettlebell' && exerciseId !== 'step-up'
+                ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
+                : [pose.hR, pose.hL];
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
   const color = (side: 'R' | 'L') =>
     working === null || (working === 'right' ? side === 'R' : side === 'L')

@@ -688,6 +688,35 @@ export const additionalFigures = {
     props: mat,
     held: oneDumbbell,
   },
+  'side-lunge': {
+    start: {
+      ...stand,
+      eR: [116, 96],
+      hR: [98, 117],
+      eL: [80, 96],
+      hL: [98, 117],
+    },
+    // Side angle shows the controlled lowering and upright braced trunk;
+    // the front angle carries the lateral weight shift and wide stance.
+    end: {
+      ...stand,
+      head: [91, 79],
+      neck: [92, 93],
+      hip: [88, 136],
+      eR: [109, 111],
+      hR: [91, 120],
+      eL: [74, 111],
+      hL: [91, 120],
+      kR: [117, 151],
+      aR: [108, 174],
+      tR: [119, 177],
+      kL: [79, 147],
+      aL: [86, 174],
+      tL: [97, 177],
+    },
+    props: [],
+    held: oneDumbbell,
+  },
   'reverse-lunge': {
     start: p(
       [130, 60],

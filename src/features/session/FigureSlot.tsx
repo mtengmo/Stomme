@@ -5,6 +5,7 @@ import type { ExerciseId } from '../../domain/types';
 import type { FigureAngle } from '../../figures/Figure';
 import {
   alternateView,
+  defaultViewFor,
   Figure,
   supportedViewsFor,
   usePrefersReducedMotion,
@@ -25,10 +26,18 @@ export function FigureSlot({
   /** Rep counter clock: the figure follows it instead of its own timer. */
   progress?: () => number | undefined;
 }) {
-  const [view, setView] = useState<FigureAngle>('side');
+  const [selectedView, setSelectedView] = useState<{
+    exerciseId: ExerciseId;
+    view: FigureAngle;
+  }>(() => ({ exerciseId, view: defaultViewFor(exerciseId) }));
+  const view =
+    selectedView.exerciseId === exerciseId
+      ? selectedView.view
+      : defaultViewFor(exerciseId);
   const availableViews = supportedViewsFor(exerciseId);
   const alternate = alternateView(exerciseId);
-  const activeView = availableViews.includes(view) ? view : 'side';
+  const defaultView = defaultViewFor(exerciseId);
+  const activeView = availableViews.includes(view) ? view : defaultView;
   const reduced = usePrefersReducedMotion();
   return (
     <section
@@ -50,9 +59,12 @@ export function FigureSlot({
       {availableViews.length > 1 ? (
         <button
           type="button"
-          onClick={() =>
-            setView(activeView === 'side' ? (alternate ?? 'side') : 'side')
-          }
+          onClick={() => {
+            const nextView =
+              availableViews.find((candidate) => candidate !== activeView) ??
+              defaultView;
+            setSelectedView({ exerciseId, view: nextView });
+          }}
           className="absolute top-0 left-0 min-h-12 bg-paper px-2 text-base font-bold underline"
           aria-label={
             activeView === 'side'

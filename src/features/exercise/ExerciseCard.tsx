@@ -15,6 +15,7 @@ import type { Exercise, ExerciseId } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import type { Equipment, FigureAngle } from '../../figures/Figure';
 import {
+  defaultViewFor,
   Figure,
   supportedViewsFor,
   usePrefersReducedMotion,
@@ -61,9 +62,17 @@ export function ExerciseCardBody({
   );
   const [workingSide, setWorkingSide] = useState(side);
   const [paused, setPaused] = useState(false);
-  const [view, setView] = useState<FigureAngle>('side');
+  const [selectedView, setSelectedView] = useState<{
+    exerciseId: ExerciseId;
+    view: FigureAngle;
+  }>(() => ({ exerciseId: exercise.id, view: defaultViewFor(exercise.id) }));
+  const view =
+    selectedView.exerciseId === exercise.id
+      ? selectedView.view
+      : defaultViewFor(exercise.id);
   const availableViews = supportedViewsFor(exercise.id);
-  const activeView = availableViews.includes(view) ? view : 'side';
+  const defaultView = defaultViewFor(exercise.id);
+  const activeView = availableViews.includes(view) ? view : defaultView;
   const [overlay, setOverlay] = useState(true);
   const reducedMotion = usePrefersReducedMotion();
   const overlayActive =
@@ -203,7 +212,9 @@ export function ExerciseCardBody({
                     key={angle}
                     type="button"
                     aria-pressed={activeView === angle}
-                    onClick={() => setView(angle)}
+                    onClick={() =>
+                      setSelectedView({ exerciseId: exercise.id, view: angle })
+                    }
                     className="min-h-12 rounded-sm border-2 border-edge px-3 text-base font-bold aria-pressed:border-accent aria-pressed:text-accent"
                   >
                     {angle === 'side'

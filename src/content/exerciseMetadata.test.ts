@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E79 references and original load indices', () => {
+  it('preserves permanent E01–E80 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 79 },
+        { length: 80 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -135,6 +135,19 @@ describe('expanded library integrity', () => {
     expect(exerciseMetadata['bent-over-row'].reviewedAt).toBe('2026-10-29');
     expect(exerciseMetadata['dumbbell-pullover'].reviewedAt).toBe('2026-10-29');
     expect(exerciseMuscles['dumbbell-pullover'].secondary).toContain('triceps');
+    expect(
+      exerciseMetadata['side-lunge'].variants.map(
+        (variant) => variant.equipment,
+      ),
+    ).toEqual([
+      [{ type: 'bodyweight', count: 1 }],
+      [{ type: 'dumbbell', count: 1 }],
+    ]);
+    expect(exerciseMetadata['side-lunge'].sidePolicy).toBe('choose-side');
+    expect(exerciseMetadata['side-lunge'].easierExerciseId).toBe(
+      'reverse-lunge',
+    );
+    expect(exercises['side-lunge'].kneeLoaded).toBe(true);
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

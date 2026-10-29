@@ -219,6 +219,11 @@ export const exerciseMuscles: Record<
     secondary: ['triceps', 'shoulders', 'core'],
     qualities: [],
   },
+  'side-lunge': {
+    primary: ['quads', 'glutes'],
+    secondary: ['hip-adductors', 'hip-abductors', 'core'],
+    qualities: ['balance'],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

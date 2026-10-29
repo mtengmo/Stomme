@@ -332,6 +332,10 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Håll en hantel med båda händerna ovanför bröstet.',
     ],
   ],
+  'side-lunge': [
+    ['bodyweight', 1, [0], 'Kliv åt vald sida utan extra vikt.'],
+    ['dumbbell', 1, [1, 2], 'Håll en hantel med båda händerna nära bröstet.'],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -673,6 +677,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'En sammanhållen vikt förs långsamt över huvudet utan svank.',
   ],
+  'side-lunge': [
+    'practiced',
+    'Ett sidosteg bromsas med kontroll över knä och höft.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -773,6 +781,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'side-lunge')
+    return [
+      {
+        title: 'Lateral Lunge',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/364/lateral-lunge/',
+        note: 'Källan visar sidoutfall med två hantlar. Appen börjar utan vikt och erbjuder en valfri hantel nära bröstet; dosen är ett redaktionellt förslag.',
+      },
+    ];
   if (id === 'dumbbell-pullover')
     return [
       {
@@ -1099,6 +1116,7 @@ export const exerciseMetadata = Object.fromEntries(
         'weighted-glute-bridge',
         'overhead-triceps-extension',
         'dumbbell-pullover',
+        'side-lunge',
       ].includes(id)
         ? '2026-10-29'
         : [
@@ -1160,6 +1178,7 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'triceps-kickback';
     if (id === 'triceps-kickback')
       metadata.harderExerciseId = 'overhead-triceps-extension';
+    if (id === 'side-lunge') metadata.easierExerciseId = 'reverse-lunge';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

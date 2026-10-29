@@ -8,6 +8,7 @@ import {
 } from './Figure';
 import {
   alternateView,
+  defaultViewFor,
   frontMovementPose,
   obliqueMovementPose,
   supportedObliqueViews,
@@ -26,6 +27,7 @@ describe('authored frontal demonstrations', () => {
       'forward-lunge',
       'half-squat',
       'single-leg-chair-squat',
+      'side-lunge',
       'farmer-carry',
     ]);
     expect(supportedObliqueViews).toEqual([
@@ -36,6 +38,8 @@ describe('authored frontal demonstrations', () => {
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');
     expect(alternateView('reverse-lunge')).toBe('front');
     expect(alternateView('push-up')).toBeUndefined();
+    expect(defaultViewFor('side-lunge')).toBe('front');
+    expect(defaultViewFor('reverse-lunge')).toBe('side');
   });
 
   it('marks anatomical H/V sides without mirroring the frontal figure', () => {

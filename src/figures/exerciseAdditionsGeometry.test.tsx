@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { FigureFrame, movementPose } from './Figure';
+import { Figure, FigureFrame, movementPose } from './Figure';
+import { defaultViewFor, frontMovementPose } from './frontViews';
 import { figures } from './poses';
 
 const distance = (a: readonly [number, number], b: readonly [number, number]) =>
@@ -295,4 +296,77 @@ describe('dumbbell pullover figure geometry', () => {
     );
     expect(otherExerciseMarkup).not.toContain('data-figure-head-mask');
   });
+});
+
+describe('side lunge front geometry', () => {
+  it.each(['right', 'left'] as const)(
+    'steps the selected %s foot outward, bends that leg, and keeps the other long',
+    (working) => {
+      const start = frontMovementPose('side-lunge', 0, working);
+      const planted = frontMovementPose('side-lunge', 0.5, working);
+      const bottom = frontMovementPose('side-lunge', 1, working);
+      const selected = working === 'right' ? 'R' : 'L';
+      const other = working === 'right' ? 'L' : 'R';
+      const ankleKey = selected === 'R' ? 'aR' : 'aL';
+      const toeKey = selected === 'R' ? 'tR' : 'tL';
+      const kneeKey = selected === 'R' ? 'kR' : 'kL';
+      const otherAnkleKey = other === 'R' ? 'aR' : 'aL';
+      const otherKneeKey = other === 'R' ? 'kR' : 'kL';
+
+      expect(defaultViewFor('side-lunge')).toBe('front');
+      expect(defaultViewFor('reverse-lunge')).toBe('side');
+      expect(start[ankleKey][0]).not.toBe(planted[ankleKey][0]);
+      expect(planted[ankleKey]).toEqual(bottom[ankleKey]);
+      expect(planted[otherAnkleKey]).toEqual(bottom[otherAnkleKey]);
+      expect(start[otherAnkleKey]).toEqual(bottom[otherAnkleKey]);
+      if (working === 'left') expect(bottom.hip[0]).toBeGreaterThan(100);
+      else expect(bottom.hip[0]).toBeLessThan(100);
+      if (working === 'right')
+        expect(bottom[toeKey][0]).toBeLessThan(bottom[ankleKey][0]);
+      else expect(bottom[toeKey][0]).toBeGreaterThan(bottom[ankleKey][0]);
+
+      const otherLegLengthViaKnee =
+        distance(bottom.hip, bottom[otherKneeKey]) +
+        distance(bottom[otherKneeKey], bottom[otherAnkleKey]);
+      expect(otherLegLengthViaKnee).toBeCloseTo(
+        distance(bottom.hip, bottom[otherAnkleKey]),
+        4,
+      );
+      expect(
+        distance(bottom.hip, bottom[kneeKey]) +
+          distance(bottom[kneeKey], bottom[ankleKey]),
+      ).toBeGreaterThan(distance(bottom.hip, bottom[ankleKey]) + 2);
+
+      expect(start.hR).toEqual(start.hL);
+      expect(bottom.hR).toEqual(bottom.hL);
+      expect(figures['side-lunge'].held?.hands).toEqual(['hR']);
+      for (const side of ['right', 'left'] as const) {
+        const loaded = renderToStaticMarkup(
+          <FigureFrame
+            exerciseId="side-lunge"
+            pose={frontMovementPose('side-lunge', 1, side)}
+            working={side}
+            view="front"
+            equipment="dumbbell"
+          />,
+        );
+        expect(loaded.match(/data-equipment="dumbbell"/g)).toHaveLength(1);
+        const unloaded = renderToStaticMarkup(
+          <FigureFrame
+            exerciseId="side-lunge"
+            pose={frontMovementPose('side-lunge', 1, side)}
+            working={side}
+            view="front"
+            equipment={null}
+          />,
+        );
+        expect(unloaded).not.toContain('data-equipment="dumbbell"');
+      }
+
+      const defaultFigure = renderToStaticMarkup(
+        <Figure exerciseId="side-lunge" stillOnly paused working={working} />,
+      );
+      expect(defaultFigure).toContain('data-view="front"');
+    },
+  );
 });

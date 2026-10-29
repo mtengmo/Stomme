@@ -77,7 +77,8 @@ export type ExerciseId =
   | 'sumo-squat'
   | 'weighted-glute-bridge'
   | 'overhead-triceps-extension'
-  | 'dumbbell-pullover';
+  | 'dumbbell-pullover'
+  | 'side-lunge';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
