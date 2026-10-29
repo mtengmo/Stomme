@@ -3,17 +3,22 @@ import { answerPain } from './flow';
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
 
-async function toSettings(page: import('@playwright/test').Page) {
-  await page.goto('/#/installningar');
-  await expect(
-    page.getByRole('heading', { name: 'Inställningar' }),
-  ).toBeVisible();
+async function toSettings(
+  page: import('@playwright/test').Page,
+  sub = '',
+  heading = 'Inställningar',
+) {
+  await page.goto(`/#/installningar${sub}`);
+  await expect(page.getByRole('heading', { name: heading })).toBeVisible();
 }
+
+const toBackup = (page: import('@playwright/test').Page) =>
+  toSettings(page, '/sakerhetskopia', 'Säkerhetskopia');
 
 test('export produces a downloaded backup file', { tag: '@smoke' }, async ({
   page,
 }) => {
-  await toSettings(page);
+  await toBackup(page);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Exportera' }).click(),
@@ -27,7 +32,7 @@ test('export produces a downloaded backup file', { tag: '@smoke' }, async ({
 test('import round trip: keep, then replace with a safety backup', {
   tag: '@smoke',
 }, async ({ page }) => {
-  await toSettings(page);
+  await toBackup(page);
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Exportera' }).click(),
@@ -41,7 +46,7 @@ test('import round trip: keep, then replace with a safety backup', {
   ).toBeVisible();
   await page.getByRole('button', { name: 'Behåll min data' }).click();
   await expect(
-    page.getByRole('heading', { name: 'Inställningar' }),
+    page.getByRole('heading', { name: 'Säkerhetskopia' }),
   ).toBeVisible();
 
   await input.setInputFiles(path);

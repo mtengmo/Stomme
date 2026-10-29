@@ -36,7 +36,9 @@ test('Inställningar is one tap from a fresh start (after accepting)', async ({
   await expect(
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Exportera' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: /^Säkerhetskopia/ }),
+  ).toBeVisible();
 });
 
 test('nav tabs are keyboard reachable and the answers survive leaving', async ({

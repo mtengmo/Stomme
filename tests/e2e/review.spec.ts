@@ -24,9 +24,7 @@ for (const mode of [
       await page.setViewportSize(mode.viewport);
       await page.emulateMedia({ colorScheme: mode.colorScheme });
       await page.goto('/#/installningar');
-      await page
-        .getByRole('link', { name: 'Granska alla övningar', exact: true })
-        .click();
+      await page.getByRole('link', { name: /^Övningar/ }).click();
       await expect(
         page.getByRole('heading', { name: 'Granska övningar', exact: true }),
       ).toBeVisible();

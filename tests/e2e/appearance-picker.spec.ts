@@ -7,7 +7,7 @@ test('@themes picking a theme in Settings applies at once and survives reload', 
   page,
 }) => {
   await page.goto('/');
-  await page.goto('/#/installningar');
+  await page.goto('/#/installningar/utseende');
   await expect(page.getByRole('heading', { name: 'Utseende' })).toBeVisible();
   await page.getByText('Lagun', { exact: false }).first().click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'hav');
@@ -21,7 +21,7 @@ test('@themes the picker rows are at least 56 px and 16 px text, keyboard operab
   page,
 }) => {
   await page.goto('/');
-  await page.goto('/#/installningar');
+  await page.goto('/#/installningar/utseende');
   const radios = page
     .getByRole('group', { name: 'Färgtema' })
     .getByRole('radio');
@@ -93,7 +93,7 @@ test('@themes "Följ telefonen" follows the emulated colour scheme, a fixed choi
 }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
-  await page.goto('/#/installningar');
+  await page.goto('/#/installningar/utseende');
   await expect(
     page.getByRole('radio', { name: 'Följ telefonen' }),
   ).toBeChecked();
@@ -118,13 +118,13 @@ test('@themes the focus ring is not clipped and uses the double ring in Hög kon
     ),
   );
   await page.goto('/');
-  await page.goto('/#/installningar');
+  await page.goto('/#/installningar/utseende');
   const target = page.getByRole('radio', { name: 'Följ telefonen' });
   await target.focus();
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   const style = await page
-    .getByRole('link', { name: 'Granska alla övningar' })
+    .getByRole('link', { name: 'Tillbaka till inställningar' })
     .evaluate((el) => {
       (el as HTMLElement).focus();
       const s = getComputedStyle(el);
