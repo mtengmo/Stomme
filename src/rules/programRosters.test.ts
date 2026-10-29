@@ -4,7 +4,6 @@ import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import { rehabAdditionIds } from '../content/rosterSlots';
 import type {
   BodyRegionId,
-  EquipmentChoice,
   TemplateId,
   TrainingPreferences,
 } from '../domain/types';

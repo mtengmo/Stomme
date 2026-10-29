@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
-import { inventory } from '../test/inventory';
 import {
   allowedLevels,
   chooseStartingWeight,

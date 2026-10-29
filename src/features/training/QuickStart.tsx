@@ -5,11 +5,7 @@ import { experienceLabels } from '../../content/programmes';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
-import type {
-  EquipmentChoice,
-  ExerciseId,
-  TrainingPreferences,
-} from '../../domain/types';
+import type { ExerciseId, TrainingPreferences } from '../../domain/types';
 import { regionsAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
 import { CustomPicker } from './CustomPicker';
