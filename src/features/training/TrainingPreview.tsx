@@ -32,7 +32,10 @@ import {
 } from '../../content/programmes';
 import {
   type CustomWorkout,
+  createNamedCustomWorkout,
   readCustomWorkouts,
+  renameCustomWorkout,
+  WorkoutNameClashError,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
@@ -602,32 +605,13 @@ function PreviewEditor({
                       setBusy(true);
                       setError('');
                       try {
-                        const workoutId = crypto.randomUUID();
-                        await getDb().transaction(
-                          'rw',
-                          getDb().meta,
-                          async () => {
-                            const current = readCustomWorkouts(
-                              await getMeta(getDb(), 'customWorkouts'),
-                            );
-                            if (current.length >= 30)
-                              throw new Error('Du har redan 30 egna pass.');
-                            await getDb().meta.put({
-                              key: 'customWorkouts',
-                              value: [
-                                ...current,
-                                {
-                                  id: workoutId,
-                                  name: 'Ländrygg – personligt rehabprogram',
-                                  exerciseIds: [
-                                    'kneeling-hip-flexor-stretch',
-                                    'prone-on-forearms',
-                                    'heel-slide',
-                                  ],
-                                },
-                              ],
-                            });
-                          },
+                        const workoutId = await createNamedCustomWorkout(
+                          'Ländrygg – personligt rehabprogram',
+                          [
+                            'kneeling-hip-flexor-stretch',
+                            'prone-on-forearms',
+                            'heel-slide',
+                          ],
                         );
                         navigate(`/traning/${id}?workout=${workoutId}`);
                       } catch {
@@ -1413,35 +1397,19 @@ function PreviewEditor({
                   setBusy(true);
                   setError('');
                   try {
-                    await getDb().transaction('rw', getDb().meta, async () => {
-                      const current = readCustomWorkouts(
-                        (await getDb().meta.get('customWorkouts'))?.value,
-                      );
-                      if (
-                        !current.some(
-                          (workout) => workout.id === customWorkout.id,
-                        )
-                      )
-                        throw new Error('Passet finns inte kvar.');
-                      await getDb().meta.put({
-                        key: 'customWorkouts',
-                        value: current.map((workout) =>
-                          workout.id === customWorkout.id
-                            ? {
-                                ...workout,
-                                name: workoutName.trim(),
-                                exerciseIds: plan.map(
-                                  (item) => item.exerciseId,
-                                ),
-                                plan,
-                              }
-                            : workout,
-                        ),
-                      });
-                    });
+                    await renameCustomWorkout(
+                      customWorkout.id,
+                      workoutName,
+                      plan.map((item) => item.exerciseId),
+                      plan,
+                    );
                     setSaved(true);
-                  } catch {
-                    setError('Kunde inte spara passet. Försök igen.');
+                  } catch (caught) {
+                    setError(
+                      caught instanceof WorkoutNameClashError
+                        ? caught.message
+                        : 'Kunde inte spara passet. Försök igen.',
+                    );
                   } finally {
                     setBusy(false);
                   }
