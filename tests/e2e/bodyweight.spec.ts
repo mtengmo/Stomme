@@ -44,7 +44,7 @@ for (const width of [360, 1280]) {
       }
     }
     const bar = page.getByRole('region', { name: 'Valda övningar' });
-    await expect(bar.getByRole('status')).toContainText('3 valda');
+    await expect(page.getByRole('status')).toContainText('3 av 12 övningar');
     await bar.getByRole('button', { name: 'Skapa pass', exact: true }).click();
     await expect(
       page.getByRole('heading', { name: /^Eget pass \d+ \S+$/ }),

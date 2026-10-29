@@ -45,8 +45,8 @@ for (const width of [320, 360, 412]) {
         .click();
       await pickers.filter({ hasNotText: 'Vald' }).first().click();
       const bar = page.getByRole('region', { name: 'Valda övningar' });
-      await expect(bar.getByRole('status')).toContainText('3 valda');
-      await expect(bar.getByRole('status')).toContainText('ca ');
+      await expect(page.getByRole('status')).toContainText('3 av 12 övningar');
+      await expect(page.getByRole('status')).toContainText('ca ');
       await expect(
         page.getByRole('button', {
           name: 'Välj: Gång med kettlebell vid axeln',
@@ -81,7 +81,7 @@ for (const width of [320, 360, 412]) {
           name: 'Flytta ned: Gång med kettlebell vid axeln',
         })
         .click();
-      await expect(bar.getByRole('status')).toContainText(
+      await expect(page.getByRole('status')).toContainText(
         'flyttad till plats 2',
       );
       await expect(bar.getByRole('listitem').nth(1)).toContainText(

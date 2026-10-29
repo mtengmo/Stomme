@@ -26,6 +26,9 @@ for (const width of [360, 1280]) {
         .getByRole('combobox', { name: 'Antal hantlar', exact: true })
         .getByRole('option', { name: '1', exact: true }),
     ).toHaveAttribute('translate', 'no');
+    await page.evaluate(() =>
+      localStorage.setItem('stomme.library-view', 'detailed'),
+    );
     await page.goto('/#/ovningar?sok=Bakåtutfall');
     await expect(page.getByRole('status')).toHaveText('1 övning');
     await page.getByRole('button', { name: 'Favorit', exact: true }).click();
@@ -214,6 +217,9 @@ test('a favourite can replace a similar movement without growing the workout', a
   await expect(
     page.getByRole('heading', { name: 'Pass A', exact: true }),
   ).toBeVisible();
+  await page.evaluate(() =>
+    localStorage.setItem('stomme.library-view', 'detailed'),
+  );
   await page.goto('/#/ovningar?sok=E39');
   await page.getByRole('button', { name: 'Favorit', exact: true }).click();
   await expect(
