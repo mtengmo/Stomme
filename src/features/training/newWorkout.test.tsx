@@ -54,7 +54,8 @@ it('creates one workout and leaves the setup and sessions alone', async () => {
   await screen.findByLabelText('Namn på passet');
   expect((await getDb().meta.get('training'))?.value).toEqual(prefs);
   expect(
-    ((await getDb().meta.get('customWorkouts'))?.value as unknown[]).length,
+    ((await getDb().meta.get('customWorkouts'))?.value as unknown[] | undefined)
+      ?.length,
   ).toBe(1);
   expect(await getDb().sessions.count()).toBe(0);
 });

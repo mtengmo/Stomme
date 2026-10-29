@@ -219,6 +219,28 @@ describe('programme persistence and safety boundaries', () => {
       experience: 'regular',
     });
   });
+  it('starting a workout replaces a preparation, leaving one session', async () => {
+    await saveTrainingPreferences(db, preferences);
+    const prepared = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    const started = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+      { id: 'w1', name: 'Eget' },
+    );
+    const all = await db.sessions.toArray();
+    expect(all.map((s) => s.id)).toEqual([started.id]);
+    expect(started.id).not.toBe(prepared.id);
+    expect(all[0]?.customWorkoutId).toBe('w1');
+  });
   it('restores the prepared plan if saving new preferences fails', async () => {
     await saveTrainingPreferences(db, preferences);
     const prepared = await startTrainingSession(

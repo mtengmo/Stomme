@@ -10,6 +10,7 @@ import {
   rehabGroupOf,
   trainingName,
 } from '../../content/programmes';
+import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import {
@@ -285,7 +286,16 @@ export function TrainingHome() {
       active && (await canReplaceTrainingPreparation(getDb(), active))
         ? active.id
         : undefined;
-    return { preferences, sessions, legacyProgramme, preparationId };
+    const savedWorkouts = readCustomWorkouts(
+      await getMeta(getDb(), 'customWorkouts'),
+    );
+    return {
+      preferences,
+      sessions,
+      legacyProgramme,
+      preparationId,
+      savedWorkouts,
+    };
   }, []);
   const [, navigate] = useLocation();
   // "/?andra=utrustning" opens the setup directly (used by the physio overview).
@@ -336,6 +346,20 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
+  // The two most recently used saved workouts, else the newest saved ones.
+  const quickWorkouts = locked
+    ? []
+    : [
+        ...new Set([
+          ...data.sessions
+            .map((session) => session.customWorkoutId)
+            .filter((id): id is string => !!id),
+          ...[...data.savedWorkouts].reverse().map((workout) => workout.id),
+        ]),
+      ]
+        .map((id) => data.savedWorkouts.find((workout) => workout.id === id))
+        .filter((workout) => !!workout)
+        .slice(0, 2);
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
     return (
@@ -385,12 +409,28 @@ export function TrainingHome() {
             ? 'Fortsätt passet'
             : 'Visa nästa pass'}
       </Link>
-      {!active ? (
-        <>
-          <WeeklyPlan preferences={preferences} sessions={data.sessions} />
-          <CustomWorkoutList headingId="home-own-workouts" alwaysShow />
-        </>
+      {quickWorkouts.length ? (
+        <div className="-mt-2 flex flex-col">
+          <p className="m-0 text-base text-ink-soft">
+            Eller kör ett eget pass:
+          </p>
+          {quickWorkouts.map((workout) => (
+            <Link
+              key={workout.id}
+              href={`/traning/A?workout=${workout.id}`}
+              className="flex min-h-12 items-center break-words text-base font-bold text-accent underline underline-offset-4"
+            >
+              {workout.name}
+            </Link>
+          ))}
+        </div>
       ) : null}
+      <WeeklyPlan preferences={preferences} sessions={data.sessions} />
+      <CustomWorkoutList
+        headingId="home-own-workouts"
+        alwaysShow
+        disabled={locked}
+      />
       {due.map((session) => (
         <Link
           key={session.id}
