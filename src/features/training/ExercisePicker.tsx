@@ -174,7 +174,6 @@ export function ExercisePicker({
   );
   const filtered = [...primary, ...supporting];
   const areaActive = Boolean(filters.region || filters.muscle);
-  const activeCount = activeFilterCount(filters, 'available');
   const noCompatibleAlternatives = Boolean(
     replacingId && !state.broadened && candidates.length === 0,
   );
@@ -189,11 +188,6 @@ export function ExercisePicker({
     } catch {
       // The list remains available; its live query will continue showing stored state.
     }
-  }
-
-  function resetFilters() {
-    updateState({ filters: pickerDefaultFilters });
-    document.getElementById('exercise-picker-search')?.focus();
   }
 
   function renderRow(exercise: (typeof exerciseList)[number]) {
@@ -371,18 +365,6 @@ export function ExercisePicker({
                 : filters.favouritesOnly && favourites === undefined
                   ? 'Läser in dina favoriter…'
                   : 'Inga övningar passar filtren.'}
-          {activeCount > 0 && !noCompatibleAlternatives ? (
-            <>
-              {' '}
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="min-h-12 font-bold text-accent underline underline-offset-4"
-              >
-                Rensa filter
-              </button>
-            </>
-          ) : null}
         </p>
       ) : (
         <div className="space-y-4">

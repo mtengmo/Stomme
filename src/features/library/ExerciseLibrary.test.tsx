@@ -174,9 +174,7 @@ describe('exercise library', () => {
     expect(screen.getAllByText(/Saknar utrustning:/).length).toBeGreaterThan(0);
     await user.type(screen.getByLabelText('Sök övning'), 'qqqqzzzz');
     expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
-    await user.click(
-      screen.getAllByRole('button', { name: 'Rensa filter' })[1] as HTMLElement,
-    );
+    await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
     await waitFor(() =>
       expect(screen.getByRole('status').textContent).toBe('86 övningar'),
     );

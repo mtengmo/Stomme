@@ -223,9 +223,7 @@ describe('ExercisePicker', () => {
       'mobility',
     );
     expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
-    await user.click(
-      screen.getAllByRole('button', { name: 'Rensa filter' })[1] as HTMLElement,
-    );
+    await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
     expect(screen.getByRole('status').textContent).toBe('2 övningar');
   });
 });

@@ -34,7 +34,7 @@ for (const width of [360, 1280]) {
         exact: true,
       }),
     });
-    await expect(first.locator('svg')).toHaveCount(3); // figure, link arrow and favourite heart
+    await expect(first.locator('svg')).toHaveCount(4); // figure, link arrow, select toggle and favourite heart
     await first.getByRole('button', { name: /^Visa rörelsen:/ }).click();
     await expect(
       first.getByRole('button', { name: /^Pausa rörelsen:/ }),
@@ -43,12 +43,11 @@ for (const width of [360, 1280]) {
     await expect(
       first.getByRole('button', { name: /^Visa rörelsen:/ }),
     ).toHaveAttribute('aria-pressed', 'false');
-    await second.getByRole('button', { name: /^Välj till eget pass/ }).click();
-    await first.getByRole('button', { name: /^Välj till eget pass/ }).click();
+    await second.getByRole('button', { name: /^Välj: / }).click();
+    await first.getByRole('button', { name: /^Välj: / }).click();
     await page.getByLabel('Sök övning').fill('E39');
-    await expect(
-      page.getByRole('heading', { name: 'Valda övningar · 2 av 12' }),
-    ).toBeVisible();
+    const bar = page.getByRole('region', { name: 'Valda övningar' });
+    await expect(bar.getByRole('status')).toContainText('2 valda');
     await page
       .getByRole('link', {
         name: 'Enarms golvpress med kettlebell',
@@ -56,11 +55,7 @@ for (const width of [360, 1280]) {
       })
       .click();
     await page.goBack();
-    await expect(
-      page.getByRole('heading', { name: 'Valda övningar · 2 av 12' }),
-    ).toBeVisible();
-    await page.getByLabel('Namn på passet').fill('Mitt kettlebellpass');
-    await first.scrollIntoViewIfNeeded();
+    await expect(bar.getByRole('status')).toContainText('2 valda');
     await page.screenshot({
       path: test.info().outputPath(`library-${width}.png`),
       fullPage: false,
@@ -70,19 +65,12 @@ for (const width of [360, 1280]) {
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    await page
-      .getByRole('button', { name: 'Spara eget pass', exact: true })
-      .click();
-    // Wait for the write to show up before reloading; a reload can abort it.
-    const saved = page.getByRole('link', {
-      name: 'Mitt kettlebellpass · 2 övningar',
-    });
-    await expect(saved).toBeVisible();
-    await page.reload();
-    await saved.click();
+    await bar.getByRole('button', { name: 'Skapa pass', exact: true }).click();
+    await expect(page).toHaveURL(/#\/traning\/A\?workout=/);
     await expect(
-      page.getByRole('heading', { name: 'Mitt kettlebellpass', exact: true }),
+      page.getByRole('heading', { name: /^Eget pass \d+ \S+$/ }),
     ).toBeVisible();
+    await page.reload();
     const rows = page.locator('ol > li > button[aria-expanded]');
     await expect(rows).toHaveCount(2);
     await expect(page.getByLabel('Set', { exact: true })).toHaveCount(0);
@@ -110,11 +98,10 @@ for (const width of [360, 1280]) {
     ).toBeVisible();
     await page.goto('/#/ovningar');
     await page
-      .getByRole('button', { name: 'Ta bort Mitt kettlebellpass', exact: true })
+      .getByRole('button', { name: /^Ta bort Eget pass/ })
+      .first()
       .click();
-    await expect(
-      page.getByRole('link', { name: 'Mitt kettlebellpass · 2 övningar' }),
-    ).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Eget pass/ })).toHaveCount(0);
   });
 }
 

@@ -35,27 +35,19 @@ for (const width of [360, 1280]) {
     ]) {
       await search.fill(number);
       const row = page.getByRole('listitem').filter({
-        has: page.getByRole('button', { name: /^Välj till eget pass/ }),
+        has: page.getByRole('button', { name: /^Välj: / }),
       });
       await expect(row).toHaveCount(1);
       await expect(row.locator('svg').first()).toBeVisible();
       if (['E54', 'E61', 'E64'].includes(number)) {
-        await row.getByRole('button', { name: /^Välj till eget pass/ }).click();
+        await row.getByRole('button', { name: /^Välj: / }).click();
       }
     }
+    const bar = page.getByRole('region', { name: 'Valda övningar' });
+    await expect(bar.getByRole('status')).toContainText('3 valda');
+    await bar.getByRole('button', { name: 'Skapa pass', exact: true }).click();
     await expect(
-      page.getByRole('heading', { name: 'Valda övningar · 3 av 12' }),
-    ).toBeVisible();
-    await page.getByLabel('Namn på passet').fill('Kroppsvikt');
-    await page
-      .getByRole('button', { name: 'Spara eget pass', exact: true })
-      .click();
-    const saved = page.getByRole('link', { name: 'Kroppsvikt · 3 övningar' });
-    await expect(saved).toBeVisible();
-    await page.reload();
-    await saved.click();
-    await expect(
-      page.getByRole('heading', { name: 'Kroppsvikt', exact: true }),
+      page.getByRole('heading', { name: /^Eget pass \d+ \S+$/ }),
     ).toBeVisible();
     expect(
       await page.evaluate(

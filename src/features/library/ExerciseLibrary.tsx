@@ -41,7 +41,11 @@ import {
   FavouriteButton,
   FavouritesProvider,
 } from '../exercise/FavouriteButton';
-import { ExerciseChoice, WorkoutBuilder } from './WorkoutBuilder';
+import {
+  ExerciseChoice,
+  SelectionNote,
+  WorkoutBuilder,
+} from './WorkoutBuilder';
 
 function equipment(exercise: Exercise): string {
   return exerciseMetadata[exercise.id].variants
@@ -89,6 +93,7 @@ function ExerciseRow({
             Saknar utrustning: {missing.join(', ')}
           </p>
         ) : null}
+        <SelectionNote exercise={exercise} />
         <p className="m-0 mt-1 text-base text-ink-soft">
           Teknisk svårighetsgrad:{' '}
           {[
@@ -273,7 +278,7 @@ export function ExerciseLibrary() {
 
   return (
     <FavouritesProvider>
-      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-28">
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-[var(--app-nav-height)]">
         <Link
           href="/"
           className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
@@ -329,16 +334,7 @@ export function ExerciseLibrary() {
           {area ? ` för ${area.toLowerCase()}` : ''}
         </p>
         {count === 0 ? (
-          <p className="m-0 text-xl">
-            Inga övningar passar filtren.{' '}
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="min-h-12 text-base font-bold text-accent underline underline-offset-4"
-            >
-              Rensa filter
-            </button>
-          </p>
+          <p className="m-0 text-xl">Inga övningar passar filtren.</p>
         ) : null}
         <WorkoutBuilder>
           <ResultList

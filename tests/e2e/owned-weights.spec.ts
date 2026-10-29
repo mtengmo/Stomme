@@ -39,12 +39,8 @@ for (const width of [360, 1280]) {
     ).toBeVisible();
     await page.goto('/#/ovningar');
     await page.getByLabel('Sök övning').fill('E12');
-    await page.getByRole('button', { name: /^Välj till eget pass/ }).click();
-    await page.getByLabel('Namn på passet').fill('Viktprov');
-    await page
-      .getByRole('button', { name: 'Spara eget pass', exact: true })
-      .click();
-    await page.getByRole('link', { name: 'Viktprov · 1 övningar' }).click();
+    await page.getByRole('button', { name: /^Välj: / }).click();
+    await page.getByRole('button', { name: 'Skapa pass', exact: true }).click();
     await page.locator('ol > li > button[aria-expanded]').first().click();
     const variant = page.getByRole('combobox', {
       name: 'Utrustningsvariant',

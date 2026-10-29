@@ -7,25 +7,59 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { exercises } from '../../content/exercises';
-import { readCustomWorkouts } from '../../db/customWorkouts';
+import { kneeRehabExercises } from '../../content/kneeRehab';
+import { isTrainingPreferences, rehabGroup } from '../../content/programmes';
+import {
+  appendToCustomWorkout,
+  createCustomWorkout,
+  deleteCustomWorkout,
+  maxCustomWorkouts,
+  maxWorkoutExercises,
+  readCustomWorkouts,
+} from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { getMeta, listSessions } from '../../db/repo';
 import type { Exercise, ExerciseId } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
-import { Button, buttonClass } from '../../ui/Button';
+import { useHashSearch } from '../../lib/hashLocation';
+import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
+import { Button } from '../../ui/Button';
+import { Icon } from '../../ui/Icon';
+import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
 
-const Selection = createContext<{
+interface SelectionValue {
   ids: ExerciseId[];
   toggle(id: ExerciseId): void;
+  /** Why an exercise cannot be picked, if it cannot. */
+  reason(id: ExerciseId): string | undefined;
+  max: number;
   playing: ExerciseId | null;
   play(id: ExerciseId | null): void;
-}>({ ids: [], toggle: () => {}, playing: null, play: () => {} });
+}
+
+const Selection = createContext<SelectionValue>({
+  ids: [],
+  toggle: () => {},
+  reason: () => undefined,
+  max: maxWorkoutExercises,
+  playing: null,
+  play: () => {},
+});
+
+export function SelectionNote({ exercise }: { exercise: Exercise }) {
+  const { reason, ids } = useContext(Selection);
+  const text = reason(exercise.id);
+  if (!text || ids.includes(exercise.id)) return null;
+  return <p className="m-0 mt-1 text-base font-bold">{text}</p>;
+}
 
 export function ExerciseChoice({ exercise }: { exercise: Exercise }) {
-  const { ids, toggle, playing, play } = useContext(Selection);
+  const { ids, toggle, reason, max, playing, play } = useContext(Selection);
   const ref = useRef<HTMLDivElement>(null);
   const active = playing === exercise.id;
+  const picked = ids.includes(exercise.id);
   useEffect(() => {
     if (!active || !ref.current || !window.IntersectionObserver) return;
     const observer = new IntersectionObserver(([entry]) => {
@@ -62,21 +96,24 @@ export function ExerciseChoice({ exercise }: { exercise: Exercise }) {
       </button>
       <button
         type="button"
-        aria-pressed={ids.includes(exercise.id)}
-        disabled={!ids.includes(exercise.id) && ids.length >= 12}
+        aria-label={`Välj: ${exercise.name}`}
+        aria-pressed={picked}
+        disabled={
+          !picked && (ids.length >= max || Boolean(reason(exercise.id)))
+        }
         onClick={() => toggle(exercise.id)}
-        className="min-h-12 text-left text-base font-bold underline"
+        className={`flex min-h-12 w-28 items-center justify-center gap-2 rounded-md border-[3px] px-3 text-base font-bold disabled:opacity-50 ${picked ? 'border-accent bg-surface-tint text-accent' : 'border-edge bg-surface text-ink'}`}
       >
-        {ids.includes(exercise.id)
-          ? 'Ta bort ur eget pass'
-          : 'Välj till eget pass'}
-        <span className="sr-only">: {exercise.name}</span>
+        <Icon name={picked ? 'check' : 'plus'} size={18} className="shrink-0" />
+        {picked ? 'Vald' : 'Välj'}
       </button>
     </div>
   );
 }
 
 export function WorkoutBuilder({ children }: { children: ReactNode }) {
+  const [, navigate] = useLocation();
+  const till = new URLSearchParams(useHashSearch()).get('till');
   const [ids, setIds] = useState<ExerciseId[]>(() => {
     try {
       const value = JSON.parse(
@@ -87,31 +124,28 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
             ...new Set<ExerciseId>(
               value.filter((id) => Object.hasOwn(exercises, id)),
             ),
-          ].slice(0, 12)
+          ].slice(0, maxWorkoutExercises)
         : [];
     } catch {
       return [];
     }
   });
   const [playing, play] = useState<ExerciseId | null>(null);
-  const [name, setName] = useState('');
-  const builderRef = useRef<HTMLElement>(null);
-  const [showShortcut, setShowShortcut] = useState(false);
-  useEffect(() => {
-    if (!builderRef.current || !window.IntersectionObserver) return;
-    const observer = new IntersectionObserver(([entry]) =>
-      setShowShortcut(!entry?.isIntersecting),
-    );
-    observer.observe(builderRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const [open, setOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const saved = useLiveQuery(
-    async () =>
-      readCustomWorkouts((await getDb().meta.get('customWorkouts'))?.value),
-    [],
-  );
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const data = useLiveQuery(async () => {
+    const db = getDb();
+    return {
+      training: await getMeta(db, 'training'),
+      saved: readCustomWorkouts(await getMeta(db, 'customWorkouts')),
+      sessions: await listSessions(db),
+      logs: await db.setLogs.toArray(),
+      painReported: painLogsShowPain(await db.painLogs.toArray()),
+    };
+  }, []);
   useEffect(() => {
     try {
       sessionStorage.setItem('stomme.library-selection', JSON.stringify(ids));
@@ -119,164 +153,246 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
       /* Selection still works in memory. */
     }
   }, [ids]);
+
+  const preferences = isTrainingPreferences(data?.training)
+    ? data.training
+    : undefined;
+  const saved = data?.saved ?? [];
+  const target = till ? saved.find((item) => item.id === till) : undefined;
+  const existing = target?.exerciseIds ?? [];
+  const max = maxWorkoutExercises - existing.length;
+  const rehab = preferences?.programId === 'rehab';
+  const kneeOnly = rehab && preferences && rehabGroup(preferences) === 'aaos';
+  const reason = (id: ExerciseId) =>
+    existing.includes(id)
+      ? 'Redan i passet'
+      : kneeOnly && !kneeRehabExercises.some((knee) => knee.id === id)
+        ? 'Ingår inte i knäprogrammet'
+        : undefined;
+  const full = saved.length >= maxCustomWorkouts && !target;
+
+  const planFor = (list: ExerciseId[]) =>
+    preferences && data
+      ? customWorkoutPlan(
+          list,
+          preferences,
+          data.sessions,
+          data.logs,
+          data.painReported,
+        )
+      : undefined;
+  const minutes =
+    !rehab && ids.length
+      ? (() => {
+          const plan = planFor(ids);
+          return plan ? estimateWorkoutMinutes(plan) : undefined;
+        })()
+      : undefined;
+
+  const move = (index: number, delta: -1 | 1) => {
+    const to = index + delta;
+    if (to < 0 || to >= ids.length) return;
+    const next = [...ids];
+    const [item] = next.splice(index, 1);
+    if (!item) return;
+    next.splice(to, 0, item);
+    setIds(next);
+    setAnnouncement(`${exercises[item].name} flyttad till plats ${to + 1}.`);
+  };
+
+  const submit = async () => {
+    if (!preferences || !ids.length) return;
+    setBusy(true);
+    setError('');
+    try {
+      const plan = planFor(ids);
+      const finish = () => {
+        setIds([]);
+        try {
+          sessionStorage.setItem('stomme.library-selection', '[]');
+        } catch {
+          /* Selection still clears in memory. */
+        }
+      };
+      if (target) {
+        await appendToCustomWorkout(target.id, ids, plan);
+        finish();
+        navigate(`/traning/A?workout=${target.id}`);
+      } else {
+        const id = await createCustomWorkout(ids, plan);
+        finish();
+        navigate(`/traning/A?workout=${id}`);
+      }
+    } catch {
+      setError('Kunde inte spara passet. Försök igen.');
+      setBusy(false);
+    }
+  };
+
   return (
     <Selection.Provider
       value={{
         ids,
-        toggle: (id) =>
-          setIds((current) =>
-            current.includes(id)
-              ? current.filter((item) => item !== id)
-              : current.length < 12
-                ? [...current, id]
-                : current,
-          ),
+        reason,
+        max,
+        toggle: (id) => {
+          const name = exercises[id].name;
+          setIds((current) => {
+            if (current.includes(id)) return current.filter((i) => i !== id);
+            return current.length < max ? [...current, id] : current;
+          });
+          setAnnouncement(
+            ids.includes(id)
+              ? `${name} borttagen.`
+              : ids.length + 1 >= max
+                ? `Högst ${maxWorkoutExercises} övningar.`
+                : '',
+          );
+        },
         playing,
         play,
       }}
     >
-      <section
-        ref={builderRef}
-        aria-labelledby="own-workout"
-        className="flex flex-col gap-3 border-y-2 border-ink py-4"
-      >
-        <h2 id="own-workout" tabIndex={-1} className="m-0 text-3xl font-bold">
-          Mina egna pass
-        </h2>
-        <p className="m-0 text-base">
-          Välj upp till 12 övningar i listan. De sparas i den ordning du väljer
-          dem. Anpassa antal, vikt och vila innan du börjar.
+      {saved.length && !till ? (
+        <section
+          aria-labelledby="own-workout"
+          className="flex flex-col gap-1 border-y-2 border-ink py-3"
+        >
+          <h2 id="own-workout" className="m-0 text-3xl font-bold">
+            Mina egna pass
+          </h2>
+          {saved.map((workout) => (
+            <div
+              key={workout.id}
+              className="flex items-center justify-between gap-3 border-t-2 border-edge pt-1"
+            >
+              <Link
+                href={`/traning/A?workout=${workout.id}`}
+                className="flex min-h-12 min-w-0 items-center break-words text-lg font-bold underline"
+              >
+                {workout.name} · {workout.exerciseIds.length} övningar
+              </Link>
+              <button
+                type="button"
+                className="min-h-12 px-2 text-base underline"
+                onClick={async () => {
+                  try {
+                    await deleteCustomWorkout(workout.id);
+                  } catch {
+                    setError('Kunde inte ta bort passet. Försök igen.');
+                  }
+                }}
+              >
+                Ta bort<span className="sr-only"> {workout.name}</span>
+              </button>
+            </div>
+          ))}
+        </section>
+      ) : null}
+      {till && target ? (
+        <p className="m-0 text-base font-bold">
+          Du lägger till övningar i {target.name}.
         </p>
-        {saved?.map((workout) => (
-          <div
-            key={workout.id}
-            className="flex items-center justify-between gap-3 border-t-2 border-edge pt-2"
-          >
-            <Link
-              href={`/traning/A?workout=${workout.id}`}
-              className="flex min-h-12 min-w-0 items-center break-words text-lg font-bold underline"
-            >
-              {workout.name} · {workout.exerciseIds.length} övningar
-            </Link>
-            <button
-              type="button"
-              className="min-h-12 px-2 text-base underline"
-              onClick={async () => {
-                try {
-                  await getDb().transaction('rw', getDb().meta, async () => {
-                    const current = readCustomWorkouts(
-                      (await getDb().meta.get('customWorkouts'))?.value,
-                    );
-                    await getDb().meta.put({
-                      key: 'customWorkouts',
-                      value: current.filter((item) => item.id !== workout.id),
-                    });
-                  });
-                } catch {
-                  setError('Kunde inte ta bort passet. Försök igen.');
-                }
-              }}
-            >
-              Ta bort<span className="sr-only"> {workout.name}</span>
-            </button>
-          </div>
-        ))}
-        {ids.length ? (
-          <>
-            <h3 className="m-0 text-xl font-bold">
-              Valda övningar · {ids.length} av 12
-            </h3>
-            <ol className="m-0 pl-6 text-base">
-              {ids.map((id) => (
-                <li key={id}>
-                  <button
-                    type="button"
-                    className="min-h-12 text-left underline"
-                    onClick={() =>
-                      setIds((current) => current.filter((item) => item !== id))
-                    }
-                  >
-                    {exercises[id].name} · ta bort
-                  </button>
+      ) : null}
+      {error ? (
+        <p role="alert" className="m-0 text-base font-bold">
+          {error}
+        </p>
+      ) : null}
+      {children}
+      {ids.length ? (
+        <section
+          aria-label="Valda övningar"
+          className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3"
+        >
+          {open ? (
+            <ol className="m-0 flex max-h-[40dvh] list-none flex-col overflow-y-auto p-0">
+              {ids.map((id, index) => (
+                <li
+                  key={id}
+                  className="border-t-2 border-edge first:border-t-0"
+                >
+                  <p className="m-0 break-words pt-2 text-base font-bold">
+                    {index + 1}. {exercises[id].name}
+                  </p>
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      aria-label={`Flytta upp: ${exercises[id].name}`}
+                      aria-disabled={index === 0}
+                      onClick={() => move(index, -1)}
+                      className="flex h-12 w-12 items-center justify-center aria-disabled:opacity-40"
+                    >
+                      <Icon name="back" className="rotate-90" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Flytta ned: ${exercises[id].name}`}
+                      aria-disabled={index === ids.length - 1}
+                      onClick={() => move(index, 1)}
+                      className="flex h-12 w-12 items-center justify-center aria-disabled:opacity-40"
+                    >
+                      <Icon name="back" className="-rotate-90" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Ta bort: ${exercises[id].name}`}
+                      onClick={() => {
+                        setIds(ids.filter((item) => item !== id));
+                        setAnnouncement(`${exercises[id].name} borttagen.`);
+                        toggleRef.current?.focus();
+                      }}
+                      className="min-h-12 px-3 text-base underline"
+                    >
+                      Ta bort
+                    </button>
+                  </div>
                 </li>
               ))}
             </ol>
-            <label className="flex flex-col gap-2 text-base font-bold">
-              Namn på passet
-              <input
-                value={name}
-                maxLength={60}
-                onChange={(event) => setName(event.target.value)}
-                className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-surface px-3 text-ink"
-              />
-            </label>
-            <Button
-              disabled={busy || !name.trim() || (saved?.length ?? 0) >= 30}
-              onClick={async () => {
-                setBusy(true);
-                setError('');
-                try {
-                  await getDb().transaction('rw', getDb().meta, async () => {
-                    const current = readCustomWorkouts(
-                      (await getDb().meta.get('customWorkouts'))?.value,
-                    );
-                    if (current.length >= 30) throw new Error();
-                    await getDb().meta.put({
-                      key: 'customWorkouts',
-                      value: [
-                        ...current,
-                        {
-                          id: crypto.randomUUID(),
-                          name: name.trim(),
-                          exerciseIds: ids,
-                        },
-                      ],
-                    });
-                  });
-                  setIds([]);
-                  setName('');
-                } catch {
-                  setError('Kunde inte spara passet. Försök igen.');
-                } finally {
-                  setBusy(false);
-                }
-              }}
+          ) : null}
+          <div className="flex items-center justify-between gap-3">
+            <p role="status" className="m-0 min-w-0 text-base font-bold">
+              {ids.length} valda
+              {minutes !== undefined ? ` · ca ${minutes} min` : ''}
+              {announcement ? (
+                <span className="sr-only">. {announcement}</span>
+              ) : null}
+            </p>
+            <button
+              type="button"
+              ref={toggleRef}
+              aria-expanded={open}
+              onClick={() => setOpen(!open)}
+              className="min-h-12 shrink-0 px-2 text-base font-bold text-accent underline underline-offset-4"
             >
-              Spara eget pass
+              {open ? 'Dölj valda' : 'Visa valda'}
+            </button>
+          </div>
+          {ids.length >= max ? (
+            <p className="m-0 text-base">
+              Högst {maxWorkoutExercises} övningar.
+            </p>
+          ) : null}
+          {!preferences && data ? (
+            <Link
+              href="/"
+              className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+            >
+              Välj träningsinriktning för att skapa pass
+            </Link>
+          ) : (
+            <Button disabled={busy || full || !preferences} onClick={submit}>
+              {target ? 'Lägg till i passet' : 'Skapa pass'}
             </Button>
-            {(saved?.length ?? 0) >= 30 ? (
-              <p className="m-0 text-base">
-                Du kan spara 30 pass. Ta bort ett för att skapa ett nytt.
-              </p>
-            ) : null}
-          </>
-        ) : null}
-        <p className="m-0 text-base text-ink-soft">
-          Sparas på den här enheten och ingår i säkerhetskopian.
-        </p>
-        {error ? (
-          <p role="alert" className="m-0 text-base font-bold">
-            {error}
-          </p>
-        ) : null}
-      </section>
-      {children}
-      {ids.length && showShortcut ? (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.preventDefault();
-            document
-              .getElementById('own-workout')
-              ?.scrollIntoView({ block: 'start' });
-            document
-              .getElementById('own-workout')
-              ?.focus({ preventScroll: true });
-          }}
-          className={`${buttonClass('primary')} fixed inset-x-5 bottom-24 z-10 mx-auto max-w-sm`}
-        >
-          Visa eget pass · {ids.length} valda
-        </button>
+          )}
+          {full ? (
+            <p className="m-0 text-base">
+              Du kan spara {maxCustomWorkouts} pass. Ta bort ett för att skapa
+              ett nytt.
+            </p>
+          ) : null}
+        </section>
       ) : null}
     </Selection.Provider>
   );
