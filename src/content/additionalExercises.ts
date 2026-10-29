@@ -30,6 +30,7 @@ const kneeLoadedAdditional = new Set<ExerciseId>([
   'weighted-glute-bridge',
   'side-lunge',
   'walking-lunge',
+  'kettlebell-goblet-squat',
 ]);
 
 /** Library defaults are editable starting points, not an AAOS prescription. */
@@ -218,6 +219,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Du tappar balansen, låter knät falla inåt eller tar steg utan att bromsa.',
     'Gör framåtutfall på plats utan extra vikt innan du går vidare.',
     [pair(2), pair(4)],
+  ),
+  entry(
+    'kettlebell-goblet-squat',
+    'Gobletknäböj med kettlebell',
+    ['Framsida lår', 'Säte', 'Bål'],
+    [
+      'Stå ungefär axelbrett och håll kettlebellen i hornen med båda händerna nära bröstet.',
+      'Böj höfter och knän och sänk dig i ett djup du kan kontrollera. Låt knäna följa tårnas riktning och behåll vikten nära kroppen.',
+      'Pressa genom fötterna och res dig upprätt. Ned och upp är en repetition.',
+    ],
+    'Hälarna lyfter eller kettlebellen glider bort från bröstet.',
+    'Välj gobletknäböj utan extra vikt eller en lättare kettlebell.',
+    [single(4, 'kettlebell'), single(8, 'kettlebell')],
   ),
 ];
 

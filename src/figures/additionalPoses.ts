@@ -439,6 +439,28 @@ export const additionalFigures = {
     props: [],
     held: oneDumbbell,
   },
+  'kettlebell-goblet-squat': {
+    start: {
+      ...stand,
+      kR: [103.36, 148],
+      kL: [91.57, 148],
+      eR: [116, 100],
+      hR: [110, 83],
+      eL: [116, 100],
+      hL: [110, 83],
+    },
+    end: {
+      ...squatBottom,
+      eR: [124, 123],
+      hR: [116, 107],
+      eL: [124, 123],
+      hL: [116, 107],
+    },
+    props: [],
+    // In the side projection both hands overlap around the horns; render the
+    // single bell at their shared grip point, with its mass below the palms.
+    held: oneBell,
+  },
   'kettlebell-deadlift': {
     start: p(
       [134, 106],

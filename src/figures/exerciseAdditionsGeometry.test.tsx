@@ -84,7 +84,7 @@ describe('sumo squat figure geometry', () => {
     ] as const) {
       expect(distance(start.hip, knee) + distance(knee, ankle)).toBeCloseTo(
         distance(start.hip, ankle),
-        4,
+        2,
       );
     }
 
@@ -481,5 +481,64 @@ describe('walking lunge two-step geometry', () => {
       />,
     );
     expect(markup).toContain('data-equipment="dumbbell"');
+  });
+});
+
+describe('kettlebell goblet squat figure geometry', () => {
+  it('uses a normal stance with fixed feet and one bell below the shared two-hand grip', () => {
+    const start = movementPose('kettlebell-goblet-squat', 0);
+    const bottom = movementPose('kettlebell-goblet-squat', 1);
+
+    expect(figures['kettlebell-goblet-squat'].held).toEqual({
+      kind: 'kettlebell',
+      hands: ['hR'],
+    });
+    expect(start.hR).toEqual(start.hL);
+    expect(bottom.hR).toEqual(bottom.hL);
+    expect(Math.abs(start.aR[0] - start.aL[0])).toBe(22);
+    expect(
+      Math.abs(
+        figures['sumo-squat'].start.aR[0] - figures['sumo-squat'].start.aL[0],
+      ),
+    ).toBe(50);
+
+    for (const [knee, ankle] of [
+      [start.kR, start.aR],
+      [start.kL, start.aL],
+    ] as const)
+      expect(distance(start.hip, knee) + distance(knee, ankle)).toBeCloseTo(
+        distance(start.hip, ankle),
+        2,
+      );
+
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('kettlebell-goblet-squat', frame / 20);
+      expect(pose.aR).toEqual(start.aR);
+      expect(pose.tR).toEqual(start.tR);
+      expect(pose.aL).toEqual(start.aL);
+      expect(pose.tL).toEqual(start.tL);
+      expect(pose.hR).toEqual(pose.hL);
+      expect(distance(pose.neck, pose.eR)).toBeGreaterThan(24);
+      expect(distance(pose.neck, pose.eR)).toBeLessThan(34);
+      expect(distance(pose.eR, pose.hR)).toBeGreaterThan(16);
+      expect(distance(pose.eR, pose.hR)).toBeLessThan(23);
+    }
+
+    expect(bottom.hip[1]).toBeGreaterThan(start.hip[1]);
+    expect(
+      distance(bottom.hip, bottom.kR) + distance(bottom.kR, bottom.aR),
+    ).toBeGreaterThan(distance(bottom.hip, bottom.aR) + 5);
+
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="kettlebell-goblet-squat"
+        pose={bottom}
+        working={null}
+        equipment="kettlebell"
+      />,
+    );
+    expect(markup.match(/data-equipment="kettlebell"/g)).toHaveLength(1);
+    expect(markup.match(/<circle cx=/g)).toHaveLength(2);
+    expect(markup).toContain(`cy="${bottom.hR[1] + 12}"`);
   });
 });

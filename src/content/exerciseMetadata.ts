@@ -339,6 +339,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'walking-lunge': [
     ['dumbbell', 2, [0, 1], 'Håll en hantel i varje hand längs sidorna.'],
   ],
+  'kettlebell-goblet-squat': [
+    [
+      'kettlebell',
+      1,
+      [0, 1],
+      'Grip kettlebellens horn med båda händerna nära bröstet.',
+    ],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -688,6 +696,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Varje framåtsteg bromsas och följs av nästa ben utan att stanna på plats.',
   ],
+  'kettlebell-goblet-squat': [
+    'basic',
+    'Båda händerna håller vikten nära bröstet under en kontrollerad knäböj.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -788,6 +800,16 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'kettlebell-goblet-squat')
+    return [
+      {
+        title:
+          '5 Exercises Every Runner Should Be Doing · Kettlebell Goblet Squats',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/pros/expert-articles/4848/5-exercises-every-runner-should-be-doing/',
+        note: 'Beskriver kettlebell gripen i hornen mot bröstet under knäböj. Appens startdos och tekniska nivå är redaktionella förslag.',
+      },
+    ];
   if (id === 'walking-lunge')
     return [
       {
@@ -1134,6 +1156,7 @@ export const exerciseMetadata = Object.fromEntries(
         'dumbbell-pullover',
         'side-lunge',
         'walking-lunge',
+        'kettlebell-goblet-squat',
       ].includes(id)
         ? '2026-10-29'
         : [
@@ -1201,6 +1224,8 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.sidePolicy = 'alternating';
     }
     if (id === 'forward-lunge') metadata.harderExerciseId = 'walking-lunge';
+    if (id === 'kettlebell-goblet-squat')
+      metadata.easierExerciseId = 'goblet-squat';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

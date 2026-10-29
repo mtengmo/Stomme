@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E81 references and original load indices', () => {
+  it('preserves permanent E01–E82 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 81 },
+        { length: 82 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -161,6 +161,19 @@ describe('expanded library integrity', () => {
     );
     expect(exercises['walking-lunge'].kneeLoaded).toBe(true);
     expect(exercises['walking-lunge'].tips[2]).toContain('Varje framåtsteg');
+    expect(
+      exerciseMetadata['kettlebell-goblet-squat'].variants[0]?.equipment,
+    ).toEqual([{ type: 'kettlebell', count: 1 }]);
+    expect(
+      exerciseMetadata['kettlebell-goblet-squat'].variants[0]?.technicalLevel,
+    ).toBe('basic');
+    expect(exerciseMetadata['kettlebell-goblet-squat'].easierExerciseId).toBe(
+      'goblet-squat',
+    );
+    expect(exerciseMetadata['goblet-squat'].harderExerciseId).toBe(
+      'squat-curl',
+    );
+    expect(exercises['kettlebell-goblet-squat'].kneeLoaded).toBe(true);
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

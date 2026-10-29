@@ -20,6 +20,7 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'supported-row': 'row',
   'bent-over-row': 'row',
   'sumo-squat': 'squat',
+  'kettlebell-goblet-squat': 'squat',
   'floor-press': 'horizontal-press',
   'kettlebell-floor-press': 'horizontal-press',
   'push-up': 'horizontal-press',

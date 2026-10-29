@@ -83,6 +83,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'dumbbell-pullover': 'E79',
   'side-lunge': 'E80',
   'walking-lunge': 'E81',
+  'kettlebell-goblet-squat': 'E82',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

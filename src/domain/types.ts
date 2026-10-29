@@ -79,7 +79,8 @@ export type ExerciseId =
   | 'overhead-triceps-extension'
   | 'dumbbell-pullover'
   | 'side-lunge'
-  | 'walking-lunge';
+  | 'walking-lunge'
+  | 'kettlebell-goblet-squat';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

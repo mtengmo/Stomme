@@ -229,6 +229,11 @@ export const exerciseMuscles: Record<
     secondary: ['hamstrings', 'core'],
     qualities: ['balance'],
   },
+  'kettlebell-goblet-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core', 'back'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],
