@@ -78,7 +78,8 @@ export type ExerciseId =
   | 'weighted-glute-bridge'
   | 'overhead-triceps-extension'
   | 'dumbbell-pullover'
-  | 'side-lunge';
+  | 'side-lunge'
+  | 'walking-lunge';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

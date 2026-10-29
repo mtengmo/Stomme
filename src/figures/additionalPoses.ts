@@ -229,6 +229,63 @@ const lungeEnd = p(
     [62, 177],
   ],
 );
+
+function forwardBendingKnee(hip: P, ankle: P): P {
+  const upper = 34;
+  const lower = 32;
+  const dx = ankle[0] - hip[0];
+  const dy = ankle[1] - hip[1];
+  const reach = Math.hypot(dx, dy);
+  const along = (upper * upper - lower * lower + reach * reach) / (2 * reach);
+  const height = Math.sqrt(Math.max(0, upper * upper - along * along));
+  const base: P = [
+    hip[0] + (dx / reach) * along,
+    hip[1] + (dy / reach) * along,
+  ];
+  const offset: P = [(-dy / reach) * height, (dx / reach) * height];
+  const first: P = [base[0] + offset[0], base[1] + offset[1]];
+  const second: P = [base[0] - offset[0], base[1] - offset[1]];
+  // In this right-facing profile the forward bend is the knee farther right.
+  return first[0] >= second[0] ? first : second;
+}
+
+/** One camera-following two-step cycle; t=1 returns to the right lead pose. */
+export function walkingLungePose(progress: number): Pose {
+  const t = Math.max(0, Math.min(1, progress));
+  const cycleT = t === 1 ? 0 : t;
+  const rightIsLead = cycleT < 0.5;
+  const phase = rightIsLead ? cycleT * 2 : (cycleT - 0.5) * 2;
+  const stanceX = 132 - 59 * phase;
+  const swingX = 73 + 59 * phase;
+  const lift = Math.sin(Math.PI * phase);
+  const hip: P = [100, 128 - 18 * lift];
+  const neck: P = [100, hip[1] - 44];
+  const head: P = [100, neck[1] - 14];
+  const stanceAnkle: P = [stanceX, 174];
+  const swingAnkle: P = [swingX, 174 - 24 * lift];
+  const rightAnkle = rightIsLead ? stanceAnkle : swingAnkle;
+  const leftAnkle = rightIsLead ? swingAnkle : stanceAnkle;
+  const ankleToe = (ankle: P): P => [ankle[0] + 12, ankle[1] + 3];
+  const eR: P = [neck[0] + 13, neck[1] + 22];
+  const hR: P = [neck[0] + 16, neck[1] + 47];
+  const eL: P = [neck[0] - 13, neck[1] + 22];
+  const hL: P = [neck[0] - 16, neck[1] + 47];
+  return p(
+    head,
+    neck,
+    hip,
+    [eR, hR, eL, hL],
+    [
+      forwardBendingKnee(hip, rightAnkle),
+      rightAnkle,
+      ankleToe(rightAnkle),
+      forwardBendingKnee(hip, leftAnkle),
+      leftAnkle,
+      ankleToe(leftAnkle),
+    ],
+  );
+}
+
 const supportedStand = p(
   [99, 60],
   [98, 74],
@@ -716,6 +773,14 @@ export const additionalFigures = {
     },
     props: [],
     held: oneDumbbell,
+  },
+  'walking-lunge': {
+    start: walkingLungePose(0),
+    // Reduced-motion start/end show the alternating lead legs.
+    end: walkingLungePose(0.5),
+    props: [],
+    held: twoDumbbells,
+    motion: 'sequence',
   },
   'reverse-lunge': {
     start: p(

@@ -30,13 +30,19 @@ for (const width of [320, 390]) {
           .first()
           .locator('path')
           .evaluateAll((paths) =>
-            paths.map((path) => path.getAttribute('d')).join('|'),
+            paths
+              .map((path) => path.getAttribute('d'))
+              .sort()
+              .join('|'),
           );
         const last = await frames
           .last()
           .locator('path')
           .evaluateAll((paths) =>
-            paths.map((path) => path.getAttribute('d')).join('|'),
+            paths
+              .map((path) => path.getAttribute('d'))
+              .sort()
+              .join('|'),
           );
         expect(
           last,

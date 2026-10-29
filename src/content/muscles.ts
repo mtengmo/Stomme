@@ -224,6 +224,11 @@ export const exerciseMuscles: Record<
     secondary: ['hip-adductors', 'hip-abductors', 'core'],
     qualities: ['balance'],
   },
+  'walking-lunge': {
+    primary: ['quads', 'glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: ['balance'],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

@@ -336,6 +336,9 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
     ['bodyweight', 1, [0], 'Kliv åt vald sida utan extra vikt.'],
     ['dumbbell', 1, [1, 2], 'Håll en hantel med båda händerna nära bröstet.'],
   ],
+  'walking-lunge': [
+    ['dumbbell', 2, [0, 1], 'Håll en hantel i varje hand längs sidorna.'],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -681,6 +684,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Ett sidosteg bromsas med kontroll över knä och höft.',
   ],
+  'walking-lunge': [
+    'practiced',
+    'Varje framåtsteg bromsas och följs av nästa ben utan att stanna på plats.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -781,6 +788,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'walking-lunge')
+    return [
+      {
+        title: 'Strength Training Workout for Beginners · Lunge',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/pros/expert-articles/5047/strength-training-workout-for-beginners/',
+        note: 'Källan nämner fortsatt gående utfall och hantlar som belastning. Appens variant använder två hantlar och räknar varje framåtsteg som en repetition.',
+      },
+    ];
   if (id === 'side-lunge')
     return [
       {
@@ -1117,6 +1133,7 @@ export const exerciseMetadata = Object.fromEntries(
         'overhead-triceps-extension',
         'dumbbell-pullover',
         'side-lunge',
+        'walking-lunge',
       ].includes(id)
         ? '2026-10-29'
         : [
@@ -1179,6 +1196,11 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'triceps-kickback')
       metadata.harderExerciseId = 'overhead-triceps-extension';
     if (id === 'side-lunge') metadata.easierExerciseId = 'reverse-lunge';
+    if (id === 'walking-lunge') {
+      metadata.easierExerciseId = 'forward-lunge';
+      metadata.sidePolicy = 'alternating';
+    }
+    if (id === 'forward-lunge') metadata.harderExerciseId = 'walking-lunge';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

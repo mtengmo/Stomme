@@ -28,6 +28,7 @@ describe('repTempo', () => {
     for (const id of [
       'mountain-climber',
       'plank-arm-lift',
+      'walking-lunge',
       'pull-up',
       'chin-up',
       'parallel-dip',

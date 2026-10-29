@@ -1,6 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { Figure, FigureFrame, movementPose } from './Figure';
+import {
+  Figure,
+  FigureFrame,
+  movementPose,
+  walkingLungeReducedFrames,
+} from './Figure';
 import { defaultViewFor, frontMovementPose } from './frontViews';
 import { figures } from './poses';
 
@@ -369,4 +374,112 @@ describe('side lunge front geometry', () => {
       expect(defaultFigure).toContain('data-view="front"');
     },
   );
+});
+
+describe('walking lunge two-step geometry', () => {
+  it('alternates lead legs while planted feet stay at ground and camera-relative world positions', () => {
+    const rightLead = movementPose('walking-lunge', 0);
+    const firstRise = movementPose('walking-lunge', 0.25);
+    const leftLead = movementPose('walking-lunge', 0.5);
+    const secondRise = movementPose('walking-lunge', 0.75);
+    const cycleEnd = movementPose('walking-lunge', 1);
+
+    expect(figures['walking-lunge'].motion).toBe('sequence');
+    expect(figures['walking-lunge'].start).toEqual(rightLead);
+    expect(figures['walking-lunge'].end).toEqual(leftLead);
+    expect(leftLead.kR).toEqual(rightLead.kL);
+    expect(leftLead.aR).toEqual(rightLead.aL);
+    expect(leftLead.kL).toEqual(rightLead.kR);
+    expect(leftLead.aL).toEqual(rightLead.aR);
+    expect(cycleEnd).toEqual(rightLead);
+
+    expect(rightLead.aR[0]).toBe(132);
+    expect(rightLead.aL[0]).toBe(73);
+    expect(leftLead.aR[0]).toBe(73);
+    expect(leftLead.aL[0]).toBe(132);
+    expect(firstRise.aR[0]).toBeCloseTo(102.5, 4);
+    expect(firstRise.aL[0]).toBeCloseTo(102.5, 4);
+    expect(firstRise.aR[1]).toBe(174);
+    expect(firstRise.aL[1]).toBe(150);
+    expect(secondRise.aL[1]).toBe(174);
+    expect(secondRise.aR[1]).toBe(150);
+    expect(firstRise.hip[1]).toBe(110);
+    expect(secondRise.hip[1]).toBe(110);
+    expect(rightLead.hip[1]).toBe(128);
+    expect(leftLead.hip[1]).toBe(128);
+
+    let previous: ReturnType<typeof movementPose> | undefined;
+    for (let frame = 0; frame <= 100; frame++) {
+      const t = frame / 100;
+      const pose = movementPose('walking-lunge', t);
+      const cameraAdvance = 118 * t;
+      expect(pose.hR[1] - pose.hip[1]).toBeCloseTo(3, 8);
+      expect(pose.hL[1] - pose.hip[1]).toBeCloseTo(3, 8);
+      expect(pose.aR[1]).toBeGreaterThanOrEqual(150);
+      expect(pose.aR[1]).toBeLessThanOrEqual(174);
+      expect(pose.aL[1]).toBeGreaterThanOrEqual(150);
+      expect(pose.aL[1]).toBeLessThanOrEqual(174);
+      if (t <= 0.5) expect(pose.aR[1]).toBe(174);
+      if (t >= 0.5) expect(pose.aL[1]).toBe(174);
+      expect(pose.tR[1]).toBe(pose.aR[1] + 3);
+      expect(pose.tL[1]).toBe(pose.aL[1] + 3);
+      expect(distance(pose.hip, pose.kR)).toBeCloseTo(34, 5);
+      expect(distance(pose.kR, pose.aR)).toBeCloseTo(32, 5);
+      expect(distance(pose.hip, pose.kL)).toBeCloseTo(34, 5);
+      expect(distance(pose.kL, pose.aL)).toBeCloseTo(32, 5);
+      expect(cross(pose.hip, pose.aR, pose.kR)).toBeLessThan(0);
+      expect(cross(pose.hip, pose.aL, pose.kL)).toBeLessThan(0);
+      if (t <= 0.5) expect(pose.aR[0] + cameraAdvance).toBeCloseTo(132, 4);
+      if (t >= 0.5) expect(pose.aL[0] + cameraAdvance).toBeCloseTo(191, 4);
+      if (previous) {
+        for (const key of ['head', 'hip', 'aR', 'aL', 'kR', 'kL'] as const)
+          expect(distance(pose[key], previous[key])).toBeLessThan(10);
+      }
+      previous = pose;
+    }
+
+    expect(figures['walking-lunge'].held?.hands).toEqual(['hR', 'hL']);
+    expect(rightLead.hR).not.toEqual(rightLead.hL);
+    const staticFrames = walkingLungeReducedFrames();
+    expect(staticFrames.map(([label]) => label)).toEqual([
+      'Utfall',
+      'Steg framåt',
+    ]);
+    const bottomStill = staticFrames[0][1];
+    const stepStill = staticFrames[1][1];
+    expect(bottomStill.hip[1]).toBe(128);
+    expect(stepStill.hip[1]).toBe(110);
+    expect(bottomStill.aR[0]).toBe(132);
+    expect(stepStill.aR[0]).toBeCloseTo(102.5, 4);
+    expect(stepStill.aL[1]).toBe(150);
+    expect(bottomStill).not.toEqual(stepStill);
+
+    const bottomMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="walking-lunge"
+        pose={bottomStill}
+        working={null}
+        equipment="dumbbell"
+      />,
+    );
+    const stepMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="walking-lunge"
+        pose={stepStill}
+        working={null}
+        equipment="dumbbell"
+      />,
+    );
+    expect(bottomMarkup).not.toBe(stepMarkup);
+
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="walking-lunge"
+        pose={firstRise}
+        working={null}
+        equipment="dumbbell"
+      />,
+    );
+    expect(markup).toContain('data-equipment="dumbbell"');
+  });
 });

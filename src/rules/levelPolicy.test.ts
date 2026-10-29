@@ -102,6 +102,7 @@ describe('level policy', () => {
     expect(heavyStartAllowed('overhead-triceps-extension')).toBe(false);
     expect(heavyStartAllowed('dumbbell-pullover')).toBe(false);
     expect(heavyStartAllowed('side-lunge')).toBe(false);
+    expect(heavyStartAllowed('walking-lunge')).toBe(false);
     expect(heavyStartAllowed('shoulder-press')).toBe(false);
     expect(heavyStartAllowed('single-leg-rdl')).toBe(false);
     expect(heavyStartAllowed('split-squat')).toBe(false);

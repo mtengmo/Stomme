@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E80 references and original load indices', () => {
+  it('preserves permanent E01–E81 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 80 },
+        { length: 81 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -148,6 +148,19 @@ describe('expanded library integrity', () => {
       'reverse-lunge',
     );
     expect(exercises['side-lunge'].kneeLoaded).toBe(true);
+    expect(exerciseMetadata['walking-lunge'].variants[0]?.equipment).toEqual([
+      { type: 'dumbbell', count: 2 },
+    ]);
+    expect(exercises['walking-lunge'].perSide).toBe(false);
+    expect(exerciseMetadata['walking-lunge'].sidePolicy).toBe('alternating');
+    expect(exerciseMetadata['walking-lunge'].easierExerciseId).toBe(
+      'forward-lunge',
+    );
+    expect(exerciseMetadata['forward-lunge'].harderExerciseId).toBe(
+      'walking-lunge',
+    );
+    expect(exercises['walking-lunge'].kneeLoaded).toBe(true);
+    expect(exercises['walking-lunge'].tips[2]).toContain('Varje framåtsteg');
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

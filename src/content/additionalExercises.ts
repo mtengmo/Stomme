@@ -29,6 +29,7 @@ const kneeLoadedAdditional = new Set<ExerciseId>([
   'sumo-squat',
   'weighted-glute-bridge',
   'side-lunge',
+  'walking-lunge',
 ]);
 
 /** Library defaults are editable starting points, not an AAOS prescription. */
@@ -204,6 +205,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Gör ett grundare bakåtutfall utan extra vikt.',
     [bw, single(2), single(4)],
     true,
+  ),
+  entry(
+    'walking-lunge',
+    'Utfallsgång med hantlar',
+    ['Framsida lår', 'Säte', 'Baksida lår'],
+    [
+      'Stå i början av en fri gångsträcka med en hantel i varje hand längs sidorna.',
+      'Kliv fram med ett ben och böj båda knäna lugnt. Håll överkroppen upprätt och låt främre knät följa fotens riktning.',
+      'Pressa genom främre foten, res dig och kliv vidare med andra benet. Varje framåtsteg med landning är en repetition; växla ben.',
+    ],
+    'Du tappar balansen, låter knät falla inåt eller tar steg utan att bromsa.',
+    'Gör framåtutfall på plats utan extra vikt innan du går vidare.',
+    [pair(2), pair(4)],
   ),
 ];
 

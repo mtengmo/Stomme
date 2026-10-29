@@ -7,6 +7,7 @@ import {
   hamstringCurlPose,
   kettlebellFloorPressPose,
   seatedKneeExtensionPose,
+  walkingLungePose,
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
@@ -61,6 +62,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'kettlebell-floor-press')
     return kettlebellFloorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
+  if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   const spec = figures[exerciseId];
   const interpolated = !spec.middle
     ? lerpPose(spec.start, spec.end, t)
@@ -72,6 +74,17 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
     interpolated,
     spec.middle ? [spec.start, spec.middle, spec.end] : [spec.start, spec.end],
   );
+}
+
+/** A still view should show the lunge and a distinct forward step. */
+export function walkingLungeReducedFrames(): readonly [
+  readonly [string, Pose],
+  readonly [string, Pose],
+] {
+  return [
+    ['Utfall', movementPose('walking-lunge', 0)],
+    ['Steg framåt', movementPose('walking-lunge', 0.25)],
+  ];
 }
 
 export function usePrefersReducedMotion(): boolean {
@@ -552,23 +565,25 @@ export function Figure({
             ['Armhävning', movementPose(exerciseId, 0.375)],
             ['Hopp och landning', movementPose(exerciseId, 0.875)],
           ]
-        : exerciseId === 'squat-jump' ||
-            exerciseId === 'mountain-climber' ||
-            exerciseId === 'plank-arm-lift'
-          ? [
-              ['Start', movementPose(exerciseId, 0)],
-              [
-                'Rörelse',
-                movementPose(
-                  exerciseId,
-                  exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                ),
-              ],
-            ]
-          : [
-              ['Start', spec.start],
-              ['Slut', spec.end],
-            ];
+        : exerciseId === 'walking-lunge'
+          ? walkingLungeReducedFrames()
+          : exerciseId === 'squat-jump' ||
+              exerciseId === 'mountain-climber' ||
+              exerciseId === 'plank-arm-lift'
+            ? [
+                ['Start', movementPose(exerciseId, 0)],
+                [
+                  'Rörelse',
+                  movementPose(
+                    exerciseId,
+                    exerciseId === 'squat-jump' ? 0.575 : 0.25,
+                  ),
+                ],
+              ]
+            : [
+                ['Start', spec.start],
+                ['Slut', spec.end],
+              ];
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (

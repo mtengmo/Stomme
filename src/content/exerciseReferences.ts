@@ -82,6 +82,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'overhead-triceps-extension': 'E78',
   'dumbbell-pullover': 'E79',
   'side-lunge': 'E80',
+  'walking-lunge': 'E81',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

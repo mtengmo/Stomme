@@ -8,6 +8,8 @@ const MANUAL_REPS: readonly ExerciseId[] = [
   'mountain-climber',
   // Each alternating arm lift counts once; the demo cycle shows both arms.
   'plank-arm-lift',
+  // One forward landing is one rep; the demo cycle shows two alternating steps.
+  'walking-lunge',
   // Often taken to failure, so a fixed beat would be wrong.
   'pull-up',
   'chin-up',
