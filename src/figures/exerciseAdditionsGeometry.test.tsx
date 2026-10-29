@@ -5,6 +5,13 @@ import { figures } from './poses';
 
 const distance = (a: readonly [number, number], b: readonly [number, number]) =>
   Math.hypot(a[0] - b[0], a[1] - b[1]);
+const cross = (
+  origin: readonly [number, number],
+  elbow: readonly [number, number],
+  hand: readonly [number, number],
+) =>
+  (elbow[0] - origin[0]) * (hand[1] - elbow[1]) -
+  (elbow[1] - origin[1]) * (hand[0] - elbow[0]);
 
 describe('bent-over row figure geometry', () => {
   it('keeps the hinge and feet fixed while both dumbbells row toward the hips', () => {
@@ -153,5 +160,65 @@ describe('weighted glute bridge figure geometry', () => {
     );
     expect(markup).toContain('data-equipment="dumbbell"');
     expect(markup).toContain('height="5"');
+  });
+});
+
+describe('overhead triceps extension figure geometry', () => {
+  it('keeps upper arms still and arcs one shared dumbbell behind and over the head', () => {
+    const start = movementPose('overhead-triceps-extension', 0);
+    const middle = movementPose('overhead-triceps-extension', 0.5);
+    const end = movementPose('overhead-triceps-extension', 1);
+
+    expect(figures['overhead-triceps-extension'].held).toEqual({
+      kind: 'dumbbell',
+      hands: ['hR'],
+    });
+    expect(start.eR).toEqual(middle.eR);
+    expect(start.eR).toEqual(end.eR);
+    expect(start.eL).toEqual(middle.eL);
+    expect(start.eL).toEqual(end.eL);
+    expect(start.hR).toEqual(start.hL);
+    expect(middle.hR).toEqual(middle.hL);
+    expect(end.hR).toEqual(end.hL);
+    expect(start.hR[1]).toBeGreaterThan(start.head[1]);
+    expect(middle.hR[0]).toBeGreaterThan(start.hR[0]);
+    expect(end.hR[1]).toBeLessThan(end.head[1]);
+
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('overhead-triceps-extension', frame / 20);
+      expect(pose.head).toEqual(start.head);
+      expect(pose.neck).toEqual(start.neck);
+      expect(pose.hip).toEqual(start.hip);
+      expect(pose.kR).toEqual(start.kR);
+      expect(pose.aR).toEqual(start.aR);
+      expect(pose.kL).toEqual(start.kL);
+      expect(pose.aL).toEqual(start.aL);
+      expect(pose.eR).toEqual(start.eR);
+      expect(pose.eL).toEqual(start.eL);
+      expect(pose.hR).toEqual(pose.hL);
+      expect(distance(pose.hR, pose.head)).toBeGreaterThan(30);
+      for (const elbow of [pose.eR, pose.eL]) {
+        const upperLength = distance(pose.neck, elbow);
+        const forearmLength = distance(elbow, pose.hR);
+        expect(forearmLength).toBeGreaterThan(18);
+        expect(forearmLength).toBeLessThan(36);
+        expect(cross(pose.neck, elbow, pose.hR)).toBeGreaterThanOrEqual(-1);
+        if (frame === 20)
+          expect(
+            Math.abs(cross(pose.neck, elbow, pose.hR)) /
+              (upperLength * forearmLength),
+          ).toBeLessThan(0.02);
+      }
+    }
+
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="overhead-triceps-extension"
+        pose={end}
+        working="right"
+        equipment="dumbbell"
+      />,
+    );
+    expect(markup.match(/data-equipment="dumbbell"/g)).toHaveLength(1);
   });
 });

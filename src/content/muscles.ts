@@ -209,6 +209,11 @@ export const exerciseMuscles: Record<
     secondary: ['hamstrings', 'core'],
     qualities: [],
   },
+  'overhead-triceps-extension': {
+    primary: ['triceps'],
+    secondary: ['shoulders', 'core'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

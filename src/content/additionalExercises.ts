@@ -144,6 +144,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Gör bäckenlyft utan extra vikt och med ett lägre lyft.',
     [single(2), single(4)],
   ),
+  entry(
+    'overhead-triceps-extension',
+    'Triceps över huvudet',
+    ['Triceps', 'Axlar'],
+    [
+      'Stå stadigt och håll en lätt hantel med båda händerna ovanför huvudet. Håll överarmarna nära huvudet.',
+      'Böj armbågarna lugnt och sänk hanteln bakom huvudet så långt du kan utan att flytta överarmarna eller svanka.',
+      'Sträck armbågarna och för hanteln tillbaka upp. Ned och upp är en repetition.',
+    ],
+    'Överarmarna faller ut åt sidorna eller ryggen svankar för att lyfta vikten.',
+    'Välj lättare hantel eller gör triceps kickback med stöd.',
+    [single(1), single(2)],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [

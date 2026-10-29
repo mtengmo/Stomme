@@ -29,6 +29,8 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'knee-push-up': 'horizontal-press',
   'wall-push-up': 'horizontal-press',
   'shoulder-press': 'overhead-press',
+  'overhead-triceps-extension': 'arm-extension',
+  'triceps-kickback': 'arm-extension',
   'kettlebell-press': 'overhead-press',
   'farmer-carry': 'carry',
   'suitcase-carry': 'carry',
@@ -75,6 +77,7 @@ const limitedExercises = new Set<ExerciseId>([
   'squat-curl',
   'thruster',
   'single-arm-thruster',
+  'overhead-triceps-extension',
 ]);
 export function heavyStartAllowed(id: ExerciseId): boolean {
   const slot = movementSlots[id];

@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E77 references and original load indices', () => {
+  it('preserves permanent E01–E78 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 77 },
+        { length: 78 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -106,6 +106,19 @@ describe('expanded library integrity', () => {
     );
     expect(exerciseMetadata['glute-bridge'].harderExerciseId).toBe(
       'weighted-glute-bridge',
+    );
+    expect(
+      exerciseMetadata['overhead-triceps-extension'].variants[0]?.equipment,
+    ).toEqual([{ type: 'dumbbell', count: 1 }]);
+    expect(
+      exerciseMetadata['overhead-triceps-extension'].variants[0]
+        ?.technicalLevel,
+    ).toBe('practiced');
+    expect(
+      exerciseMetadata['overhead-triceps-extension'].easierExerciseId,
+    ).toBe('triceps-kickback');
+    expect(exerciseMetadata['triceps-kickback'].harderExerciseId).toBe(
+      'overhead-triceps-extension',
     );
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },

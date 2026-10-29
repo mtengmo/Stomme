@@ -73,6 +73,11 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Viktat bäckenlyft',
     'Weighted glute bridge',
   ],
+  'overhead-triceps-extension': [
+    'Triceps över huvudet',
+    'Tricepssträck över huvudet',
+    'Overhead triceps extension',
+  ],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],
   'hammer-curl': ['Hammercurl', 'Hammer curl'],
   'lateral-raise': ['Sidolyft', 'Hantellyft åt sidan'],

@@ -629,6 +629,32 @@ export const additionalFigures = {
     // Both hands meet at the same center; render one dumbbell there.
     held: oneDumbbell,
   },
+  'overhead-triceps-extension': {
+    start: {
+      ...stand,
+      eR: [124, 52],
+      hR: [136, 74],
+      eL: [125, 51],
+      hL: [136, 74],
+    },
+    middle: {
+      ...stand,
+      eR: [124, 52],
+      hR: [152, 41],
+      eL: [125, 51],
+      hL: [152, 41],
+    },
+    end: {
+      ...stand,
+      eR: [124, 52],
+      hR: [150, 30],
+      eL: [125, 51],
+      hL: [150, 30],
+    },
+    props: [],
+    // Hands meet at one logical point so the shared dumbbell renders once.
+    held: oneDumbbell,
+  },
   'reverse-lunge': {
     start: p(
       [130, 60],

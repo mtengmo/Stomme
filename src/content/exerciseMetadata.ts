@@ -316,6 +316,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'weighted-glute-bridge': [
     ['dumbbell', 1, [0, 1], 'Håll en hantel stilla tvärs över höfterna.'],
   ],
+  'overhead-triceps-extension': [
+    [
+      'dumbbell',
+      1,
+      [0, 1],
+      'Håll en lätt hantel med båda händerna ovanför huvudet.',
+    ],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -649,6 +657,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'basic',
     'Båda fötterna ger stöd medan hanteln hålls stilla på höfterna.',
   ],
+  'overhead-triceps-extension': [
+    'practiced',
+    'Hantel över huvudet kräver stilla överarmar och bål.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -749,6 +761,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'overhead-triceps-extension')
+    return [
+      {
+        title: 'Triceps Extension',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/74/triceps-extension/',
+        note: 'Källan visar en hantel i båda händerna och kontrollerad armbågssträckning. Appens dos och viktval är redaktionella förslag.',
+      },
+    ];
   if (id === 'weighted-glute-bridge')
     return [
       {
@@ -1059,6 +1080,7 @@ export const exerciseMetadata = Object.fromEntries(
         'bent-over-row',
         'sumo-squat',
         'weighted-glute-bridge',
+        'overhead-triceps-extension',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1103,6 +1125,10 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'glute-bridge')
       metadata.harderExerciseId = 'weighted-glute-bridge';
+    if (id === 'overhead-triceps-extension')
+      metadata.easierExerciseId = 'triceps-kickback';
+    if (id === 'triceps-kickback')
+      metadata.harderExerciseId = 'overhead-triceps-extension';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';
