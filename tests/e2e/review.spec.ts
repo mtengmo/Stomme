@@ -30,13 +30,17 @@ for (const mode of [
       await expect(
         page.getByRole('heading', { name: 'Granska övningar', exact: true }),
       ).toBeVisible();
-      const codes = Array.from(
-        { length: 71 },
-        (_, i) => `E${String(i + 1).padStart(2, '0')}`,
-      );
+      const codes = [
+        ...Array.from(
+          { length: 84 },
+          (_, i) => `E${String(i + 1).padStart(2, '0')}`,
+        ),
+        'E87',
+        'E88',
+      ];
       if (mode.viewport.width < 1024) {
         const picker = page.getByLabel('Välj övning att granska');
-        await expect(picker.getByRole('option')).toHaveCount(71);
+        await expect(picker.getByRole('option')).toHaveCount(codes.length);
         for (const code of codes)
           await expect(
             picker.getByRole('option', { name: new RegExp(`^${code} · `) }),
