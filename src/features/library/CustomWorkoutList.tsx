@@ -5,11 +5,13 @@ import { isTrainingPreferences } from '../../content/programmes';
 import {
   type CustomWorkout,
   deleteCustomWorkout,
+  orderByRecentUse,
   readCustomWorkouts,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import type { TrainingPreferences } from '../../domain/types';
+import { formatShortDate } from '../../lib/dates';
 import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
 import { buttonClass } from '../../ui/Button';
 import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
@@ -120,8 +122,82 @@ function useData() {
   }, []);
 }
 
+type ListData = NonNullable<ReturnType<typeof useData>>;
+
+const homeRowLimit = 3;
+
+function homeMeta(
+  workout: CustomWorkout,
+  minutes: number | undefined,
+  lastUsed: string | undefined,
+): string {
+  const count = workout.exerciseIds.length;
+  return [
+    `${count} ${count === 1 ? 'övning' : 'övningar'}`,
+    minutes !== undefined ? `ca ${minutes} min` : '',
+    lastUsed ? `senast ${formatShortDate(lastUsed).replace(/\.$/, '')}` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/** Home: the whole row is one link; no per-row actions. */
+function HomeRows({
+  rows,
+  data,
+  preferences,
+  disabled,
+  lastUsed,
+}: {
+  rows: CustomWorkout[];
+  data: ListData;
+  preferences: TrainingPreferences | undefined;
+  disabled: boolean;
+  lastUsed: Map<string, string>;
+}) {
+  return (
+    <ul className="m-0 flex list-none flex-col p-0">
+      {rows.map((workout) => {
+        const content = (
+          <>
+            <span className="break-words text-lg font-bold">
+              {workout.name}
+            </span>
+            <span className="text-base text-ink-soft">
+              {homeMeta(
+                workout,
+                minutesFor(workout, preferences, data),
+                lastUsed.get(workout.id),
+              )}
+            </span>
+          </>
+        );
+        const rowClass =
+          'flex min-h-16 flex-col justify-center gap-0.5 border-t-2 border-edge py-2';
+        return (
+          <li key={workout.id} className="first:[&>*]:border-t-0">
+            {disabled ? (
+              <div aria-disabled="true" className={`${rowClass} opacity-50`}>
+                {content}
+              </div>
+            ) : (
+              <Link
+                href={`/traning/A?workout=${workout.id}`}
+                className={`${rowClass} text-ink no-underline`}
+              >
+                {content}
+              </Link>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function CustomWorkoutList({
   headingId,
+  variant = 'setup',
   alwaysShow = false,
   title = 'Mina pass',
   primaryCreate = false,
@@ -134,6 +210,8 @@ export function CustomWorkoutList({
   primaryCreate?: boolean;
   /** Home: heading, empty text and the link to create one, even without passes. */
   alwaysShow?: boolean;
+  /** Home: one-link rows, most recently used first, three shown. */
+  variant?: 'setup' | 'home';
   /** A session is running: the list stays visible but cannot start anything. */
   disabled?: boolean;
 }) {
@@ -142,6 +220,53 @@ export function CustomWorkoutList({
   const preferences = isTrainingPreferences(data.training)
     ? data.training
     : undefined;
+  if (variant === 'home') {
+    const ordered = orderByRecentUse(data.saved, data.sessions);
+    const lastUsed = new Map<string, string>();
+    for (const session of data.sessions) {
+      if (!session.customWorkoutId) continue;
+      const prev = lastUsed.get(session.customWorkoutId);
+      if (prev === undefined || session.date > prev)
+        lastUsed.set(session.customWorkoutId, session.date);
+    }
+    const shared = { data, preferences, disabled, lastUsed };
+    return (
+      <section
+        aria-labelledby={headingId}
+        className="flex flex-col gap-1 border-t-[3px] border-ink pt-4"
+      >
+        <h2
+          id={headingId}
+          className="m-0 font-display text-3xl font-bold leading-none"
+        >
+          {title}
+        </h2>
+        {disabled ? (
+          <p className="m-0 mt-2 text-base font-bold">Avsluta passet först.</p>
+        ) : null}
+        {ordered.length ? null : (
+          <p className="m-0 mt-2 text-base">Inga egna pass än.</p>
+        )}
+        <div className="mt-2 flex flex-col">
+          <HomeRows rows={ordered.slice(0, homeRowLimit)} {...shared} />
+          {ordered.length > homeRowLimit ? (
+            <details>
+              <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+                Visa alla {ordered.length} pass
+              </summary>
+              <HomeRows rows={ordered.slice(homeRowLimit)} {...shared} />
+            </details>
+          ) : null}
+        </div>
+        <Link
+          href="/nytt-pass"
+          className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
+        >
+          Skapa eget pass
+        </Link>
+      </section>
+    );
+  }
   return (
     <section
       aria-labelledby={headingId}
