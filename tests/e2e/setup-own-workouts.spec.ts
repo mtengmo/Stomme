@@ -19,9 +19,7 @@ for (const [width, scheme] of [
     const openSetup = async () => {
       await page.goto('/#/');
       await page.getByText('Ändra', { exact: true }).click();
-      await page
-        .getByRole('button', { name: 'Byt inriktning eller utrustning' })
-        .click();
+      await page.getByRole('button', { name: 'Byt inriktning' }).click();
     };
     await openSetup();
     await page.getByRole('radio', { name: 'Egna pass' }).check();

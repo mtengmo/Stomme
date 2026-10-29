@@ -61,7 +61,7 @@ for (const width of [360, 1280]) {
     ).toBeVisible();
     await page.getByText('Ändra', { exact: true }).click();
     await expect(
-      page.getByRole('button', { name: 'Byt inriktning eller utrustning' }),
+      page.getByRole('button', { name: 'Byt inriktning' }),
     ).toBeEnabled();
     await page
       .getByRole('link', { name: 'Visa pass B i stället', exact: true })
@@ -77,9 +77,7 @@ for (const width of [360, 1280]) {
     await expect(
       page.getByRole('link', { name: 'Visa pass A i stället', exact: true }),
     ).toBeVisible();
-    await page
-      .getByRole('button', { name: 'Byt inriktning eller utrustning' })
-      .click();
+    await page.getByRole('button', { name: 'Byt inriktning' }).click();
     await page
       .getByRole('radio', { name: 'Allmän styrka', exact: true })
       .check();
@@ -136,7 +134,7 @@ for (const width of [360, 1280]) {
     await page.goto('/#/');
     await page.getByText('Ändra', { exact: true }).click();
     await expect(
-      page.getByRole('button', { name: 'Byt inriktning eller utrustning' }),
+      page.getByRole('button', { name: 'Byt inriktning' }),
     ).toBeDisabled();
   });
 }

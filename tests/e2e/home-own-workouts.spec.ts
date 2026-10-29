@@ -20,7 +20,6 @@ for (const { width, scheme } of cases) {
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await quickStart(page, {
       goal: 'general',
-      equipment: ['Kettlebell'],
       onEquipment: (p) => addWeight(p, { type: 'kettlebell', count: 1, kg: 8 }),
     });
     // Save one own workout from the library.

@@ -22,7 +22,6 @@ for (const width of [320, 360, 412]) {
       ).toBeVisible();
       await quickStart(page, {
         goal: 'general',
-        equipment: ['Kettlebell'],
         onEquipment: (p) =>
           addWeight(p, { type: 'kettlebell', count: 1, kg: 8 }),
       });

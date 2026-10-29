@@ -24,12 +24,11 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
     page.getByRole('navigation', { name: 'Huvudmeny' }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
-  await expect(page.getByRole('checkbox')).toHaveCount(0);
-  await expect(page.getByRole('combobox')).toHaveCount(0);
   await expect(
-    page.getByRole('radio', {
-      name: /Egenvikt – kroppen, en stol och en vägg/,
-    }),
+    page.getByRole('heading', { name: 'Vilka vikter har du?' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('checkbox', { name: 'Stabil stol' }),
   ).toBeChecked();
   await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await expect(
@@ -97,7 +96,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
     page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
   ).toHaveAttribute('href', '#/traning/B');
   await expect(
-    page.getByRole('button', { name: 'Byt inriktning eller utrustning' }),
+    page.getByRole('button', { name: 'Byt inriktning' }),
   ).toBeHidden();
 });
 

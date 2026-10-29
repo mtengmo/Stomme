@@ -1,5 +1,5 @@
 import { devices, expect, test } from '@playwright/test';
-import { quickStart } from './flow';
+import { addWeight, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({
@@ -47,7 +47,7 @@ test('nav tabs are keyboard reachable and the answers survive leaving', async ({
   await accept(page);
   await quickStart(page, {
     goal: 'general',
-    equipment: ['Hantlar'],
+    onEquipment: (p) => addWeight(p, { type: 'dumbbell', count: 2, kg: 5 }),
     finish: 'equipment',
   });
   const tab = page.getByRole('link', { name: 'Historik' });
@@ -60,9 +60,7 @@ test('nav tabs are keyboard reachable and the answers survive leaving', async ({
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Träning' }).click();
-  await expect(
-    page.getByRole('checkbox', { name: 'Hantlar', exact: true }),
-  ).toBeChecked();
+  await expect(page.getByText('Hantel 5 kg · par')).toBeVisible();
 });
 
 test('workout preview shows the nav above the start bar; the session hides it', async ({

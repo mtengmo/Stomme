@@ -11,10 +11,8 @@ async function openProgramme(
   withBand = true,
 ) {
   await page.goto('/');
-  // The band needs the Utrustning choice; chair and wall are ticked there by default.
   await quickStart(page, {
     goal: 'physio',
-    mode: 'equipment',
     equipment: withBand ? ['Träningsband'] : [],
     side: 'left',
   });
@@ -79,7 +77,7 @@ test('physio programme: seven items without a band, fixing it, saved plan wins, 
   ).toBeVisible();
   await page.getByRole('link', { name: 'Ändra utrustning' }).click();
   await page.getByRole('checkbox', { name: 'Träningsband' }).check();
-  await page.getByRole('button', { name: 'Spara träningsinriktning' }).click();
+  await page.getByRole('button', { name: 'Spara min utrustning' }).click();
   await expect(page.locator('#ready-workout ~ ol > li')).toHaveCount(9);
   await expect(
     page.getByText(/9 av 9 övningar passar din utrustning/),

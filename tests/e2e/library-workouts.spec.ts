@@ -15,7 +15,6 @@ for (const width of [360, 1280]) {
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await quickStart(page, {
       goal: 'general',
-      equipment: ['Kettlebell'],
       onEquipment: (p) => addWeight(p, { type: 'kettlebell', count: 1, kg: 8 }),
     });
     await expect(

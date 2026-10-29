@@ -18,14 +18,9 @@ for (const width of [360, 1280]) {
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await quickStart(page, {
       goal: 'general',
-      equipment: ['Hantlar'],
+      onEquipment: (p) => addWeight(p, { type: 'dumbbell', count: 2, kg: 5 }),
       finish: 'equipment',
     });
-    await expect(
-      page
-        .getByRole('combobox', { name: 'Antal hantlar', exact: true })
-        .getByRole('option', { name: '1', exact: true }),
-    ).toHaveAttribute('translate', 'no');
     await page.evaluate(() =>
       localStorage.setItem('stomme.library-view', 'detailed'),
     );
@@ -204,11 +199,7 @@ test('a favourite can replace a similar movement without growing the workout', a
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await quickStart(page, {
     goal: 'general',
-    equipment: ['Hantlar', 'Kettlebell'],
     onEquipment: async (p) => {
-      await p
-        .getByRole('combobox', { name: 'Antal hantlar', exact: true })
-        .selectOption('2');
       await addWeight(p, { type: 'dumbbell', count: 2, kg: 8 });
       await addWeight(p, { type: 'kettlebell', count: 1, kg: 12 });
     },

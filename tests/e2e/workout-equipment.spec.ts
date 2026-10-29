@@ -21,8 +21,8 @@ for (const width of [320, 360, 412]) {
         name: 'Utrustning för detta pass',
       });
       await controls
-        .getByRole('combobox', { name: 'Kettlebells för passet', exact: true })
-        .selectOption('1');
+        .locator('summary', { hasText: 'Justerbara vikter' })
+        .click();
       await controls
         .getByRole('checkbox', { name: 'Justerbara kettlebells', exact: true })
         .check();
@@ -76,12 +76,9 @@ for (const width of [320, 360, 412]) {
       await page
         .getByText('Annan utrustning för detta pass', { exact: true })
         .click();
-      await expect(
-        controls.getByRole('combobox', {
-          name: 'Kettlebells för passet',
-          exact: true,
-        }),
-      ).toHaveValue('0');
+      await controls
+        .locator('summary', { hasText: 'Justerbara vikter' })
+        .click();
       await expect(
         controls.getByRole('checkbox', {
           name: 'Justerbara kettlebells',
@@ -89,9 +86,6 @@ for (const width of [320, 360, 412]) {
         }),
       ).not.toBeChecked();
       // A new override uses its own draft; the home workout remains separate.
-      await controls
-        .getByRole('combobox', { name: 'Kettlebells för passet', exact: true })
-        .selectOption('1');
       await controls
         .getByRole('checkbox', { name: 'Justerbara kettlebells', exact: true })
         .check();
@@ -129,7 +123,7 @@ for (const width of [320, 360, 412]) {
           home: home.value,
         };
       });
-      expect(stored.home.equipment).not.toContain('kettlebell-1');
+      expect(stored.home.adjustableWeights ?? []).toEqual([]);
       expect(stored.home.adjustableWeights ?? []).toEqual([]);
       expect(
         stored.session.equipmentOverride.adjustableWeights[0].settingsKg,

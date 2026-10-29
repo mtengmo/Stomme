@@ -288,16 +288,17 @@ const FINISH: Record<QuickStartGoal, string> = {
 };
 
 /**
- * Walks the one-question-per-screen first-use flow. Egenvikt is the default;
- * `equipment` lists checkbox labels to tick under Utrustning, and `onEquipment`
- * runs on that screen (counts, weights). `finish: false` stops before the last button.
+ * Walks the one-question-per-screen first-use flow. The equipment step starts with
+ * chair and wall ticked; `equipment` lists extra checkbox labels to tick, `without`
+ * labels to untick, and `onEquipment` runs on that screen (weights). `finish: false`
+ * stops before the last button.
  */
 export async function quickStart(
   page: Page,
   options: {
     goal: QuickStartGoal;
-    mode?: 'bodyweight' | 'equipment';
     equipment?: string[];
+    without?: string[];
     onEquipment?: (page: Page) => Promise<void>;
     level?: keyof typeof LEVEL_LABEL;
     focus?: string[];
@@ -306,16 +307,15 @@ export async function quickStart(
     finish?: boolean | 'equipment';
   },
 ): Promise<void> {
-  const { goal, equipment = [], level, focus, side, finish = true } = options;
-  const mode = options.mode ?? (equipment.length ? 'equipment' : 'bodyweight');
+  const { goal, equipment = [], without = [], level, focus, side } = options;
+  const finish = options.finish ?? true;
   await page
     .getByRole('button', { name: GOAL_BUTTON[goal], exact: true })
     .click();
-  if (mode === 'equipment') {
-    await page.getByRole('radio', { name: 'Utrustning', exact: true }).check();
-    for (const label of equipment)
-      await page.getByRole('checkbox', { name: label, exact: true }).check();
-  }
+  for (const label of equipment)
+    await page.getByRole('checkbox', { name: label, exact: true }).check();
+  for (const label of without)
+    await page.getByRole('checkbox', { name: label, exact: true }).uncheck();
   await options.onEquipment?.(page);
   if (finish === 'equipment') return;
   if (side)
@@ -348,24 +348,20 @@ export async function quickStart(
     await page.getByRole('button', { name: FINISH[goal], exact: true }).click();
 }
 
-/** Registers one owned weight on the equipment screen (the weights panel is open by itself). */
+/** Registers one owned weight on the equipment step through the inline add form. */
 export async function addWeight(
   page: Page,
   weight: { type: 'dumbbell' | 'kettlebell'; count: 1 | 2; kg: number },
 ): Promise<void> {
+  const noun = weight.type === 'dumbbell' ? 'hantel' : 'kettlebell';
   await page
-    .getByRole('button', { name: 'Lägg till vikt', exact: true })
+    .getByRole('button', { name: `Lägg till ${noun}`, exact: true })
     .click();
   await page
-    .getByRole('combobox', { name: 'Redskap', exact: true })
-    .last()
-    .selectOption(weight.type);
+    .getByLabel(new RegExp(`^Vikt per ${noun}`))
+    .fill(String(weight.kg).replace('.', ','));
   await page
-    .getByRole('combobox', { name: 'Antal', exact: true })
-    .last()
-    .selectOption(String(weight.count));
-  await page
-    .getByLabel('Kg per redskap', { exact: true })
-    .last()
-    .fill(String(weight.kg));
+    .getByRole('radio', { name: weight.count === 2 ? 'Par' : `1 ${noun}` })
+    .check();
+  await page.getByRole('button', { name: 'Lägg till', exact: true }).click();
 }

@@ -71,7 +71,6 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await quickStart(page, {
     goal: 'general',
-    equipment: ['Kettlebell'],
     onEquipment: async (p) => {
       await addWeight(p, { type: 'kettlebell', count: 1, kg: 4 });
       await addWeight(p, { type: 'kettlebell', count: 1, kg: 16 });
