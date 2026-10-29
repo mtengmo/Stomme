@@ -123,17 +123,18 @@ test('@themes the focus ring is not clipped and uses the double ring in Hög kon
   await target.focus();
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
-  const style = await page
-    .getByRole('link', { name: 'Tillbaka till inställningar' })
-    .evaluate((el) => {
-      (el as HTMLElement).focus();
-      const s = getComputedStyle(el);
-      return {
-        outline: s.outlineColor,
-        shadow: s.boxShadow,
-        width: s.outlineWidth,
-      };
-    });
+  const back = page.getByRole('link', { name: 'Tillbaka till inställningar' });
+  await back.focus();
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Tab');
+  const style = await back.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return {
+      outline: s.outlineColor,
+      shadow: s.boxShadow,
+      width: s.outlineWidth,
+    };
+  });
   expect(style.outline).toBe('rgb(11, 11, 11)');
   expect(style.shadow).toContain('rgb(255, 213, 0)');
   expect(style.width).toBe('3px');
