@@ -125,6 +125,7 @@ export function CustomWorkoutList({
   alwaysShow = false,
   title = 'Mina pass',
   primaryCreate = false,
+  disabled = false,
 }: {
   headingId: string;
   /** Heading text. */
@@ -133,6 +134,8 @@ export function CustomWorkoutList({
   primaryCreate?: boolean;
   /** Home: heading, empty text and the link to create one, even without passes. */
   alwaysShow?: boolean;
+  /** A session is running: the list stays visible but cannot start anything. */
+  disabled?: boolean;
 }) {
   const data = useData();
   if (!data || (!data.saved.length && !alwaysShow)) return null;
@@ -150,6 +153,9 @@ export function CustomWorkoutList({
       >
         {title}
       </h2>
+      {disabled ? (
+        <p className="m-0 mt-2 text-base font-bold">Avsluta passet först.</p>
+      ) : null}
       {data.saved.length ? null : (
         <p className="m-0 mt-2 text-base">Inga egna pass än.</p>
       )}
@@ -169,14 +175,25 @@ export function CustomWorkoutList({
                 {minutes !== undefined ? ` · ca ${minutes} min` : ''}
               </p>
               <div className="flex flex-wrap items-center gap-x-4">
-                <Link
-                  href={`/traning/A?workout=${workout.id}`}
-                  aria-label={`Visa och starta: ${workout.name}`}
-                  className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
-                >
-                  Visa och starta
-                </Link>
-                <DeleteWorkoutButton workout={workout} />
+                {disabled ? (
+                  <span
+                    aria-disabled="true"
+                    className="flex min-h-12 items-center text-base font-bold opacity-50"
+                  >
+                    Visa och starta
+                  </span>
+                ) : (
+                  <>
+                    <Link
+                      href={`/traning/A?workout=${workout.id}`}
+                      aria-label={`Visa och starta: ${workout.name}`}
+                      className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+                    >
+                      Visa och starta
+                    </Link>
+                    <DeleteWorkoutButton workout={workout} />
+                  </>
+                )}
               </div>
             </li>
           );
