@@ -157,6 +157,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Välj lättare hantel eller gör triceps kickback med stöd.',
     [single(1), single(2)],
   ),
+  entry(
+    'dumbbell-pullover',
+    'Hantel-pullover',
+    ['Bröst', 'Rygg', 'Axlar'],
+    [
+      'Ligg på rygg på golvet med böjda knän och fötterna i golvet. Håll en lätt hantel med båda händerna ovanför bröstet och armbågarna lätt böjda.',
+      'För armarna långsamt bakåt bara så långt axlarna tillåter utan att ryggen svankar. Behåll greppet med båda händerna.',
+      'För hanteln lugnt tillbaka ovanför bröstet. Bakåt och tillbaka är en repetition. Lägg ned vikten innan du sätter dig upp.',
+    ],
+    'Du svankar eller släpper ned vikten för långt bakom huvudet.',
+    'Välj lättare hantel och kortare rörelse bakåt.',
+    [single(1), single(2)],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [

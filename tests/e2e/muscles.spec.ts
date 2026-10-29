@@ -1,5 +1,12 @@
 import { devices, expect, test } from '@playwright/test';
+import { exerciseList } from '../../src/content/exercises';
+import { exerciseMuscles } from '../../src/content/muscles';
 import { answerPain, openPreview } from './flow';
+
+const calfCount = Object.values(exerciseMuscles).filter(
+  (tags) =>
+    tags.primary.includes('calves') || tags.secondary.includes('calves'),
+).length;
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 360, height: 800 } });
 
@@ -9,7 +16,9 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.goto('/#/ovningar');
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
-  await expect(page.getByRole('status')).toHaveText('6 övningar för vader');
+  await expect(page.getByRole('status')).toHaveText(
+    `${calfCount} övningar för vader`,
+  );
   await page
     .getByRole('link', { name: 'Enbens tåhävning', exact: true })
     .click();
@@ -25,7 +34,9 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   ).toHaveAttribute('aria-pressed', 'true');
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
-  await expect(page.getByRole('status')).toHaveText('71 övningar');
+  await expect(page.getByRole('status')).toHaveText(
+    `${exerciseList.length} övningar`,
+  );
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,
   );

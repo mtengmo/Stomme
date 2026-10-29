@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E78 references and original load indices', () => {
+  it('preserves permanent E01–E79 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
       Array.from(
-        { length: 78 },
+        { length: 79 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
     );
@@ -72,9 +72,12 @@ describe('expanded library integrity', () => {
       const spec = figures[exercise.id];
       for (const pose of [spec.start, spec.middle ?? spec.start, spec.end])
         for (const key of POSE_KEYS)
-          for (const value of pose[key]) {
+          for (const [axis, value] of pose[key].entries()) {
             expect(Number.isFinite(value)).toBe(true);
-            expect(value).toBeGreaterThanOrEqual(14);
+            // The floor pullover has an explicitly wider frame for its overhead arc.
+            expect(value).toBeGreaterThanOrEqual(
+              exercise.id === 'dumbbell-pullover' && axis === 0 ? -4 : 14,
+            );
             expect(value).toBeLessThanOrEqual(188);
           }
     },
@@ -120,6 +123,18 @@ describe('expanded library integrity', () => {
     expect(exerciseMetadata['triceps-kickback'].harderExerciseId).toBe(
       'overhead-triceps-extension',
     );
+    expect(
+      exerciseMetadata['dumbbell-pullover'].variants[0]?.equipment,
+    ).toEqual([{ type: 'dumbbell', count: 1 }]);
+    expect(
+      exerciseMetadata['dumbbell-pullover'].variants[0]?.technicalLevel,
+    ).toBe('practiced');
+    expect(exerciseMetadata['dumbbell-pullover'].sources[0]?.note).toMatch(
+      /golv/,
+    );
+    expect(exerciseMetadata['bent-over-row'].reviewedAt).toBe('2026-10-29');
+    expect(exerciseMetadata['dumbbell-pullover'].reviewedAt).toBe('2026-10-29');
+    expect(exerciseMuscles['dumbbell-pullover'].secondary).toContain('triceps');
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

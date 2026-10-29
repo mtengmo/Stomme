@@ -214,6 +214,11 @@ export const exerciseMuscles: Record<
     secondary: ['shoulders', 'core'],
     qualities: [],
   },
+  'dumbbell-pullover': {
+    primary: ['chest', 'back'],
+    secondary: ['triceps', 'shoulders', 'core'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

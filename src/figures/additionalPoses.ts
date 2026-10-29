@@ -146,6 +146,32 @@ export function kettlebellFloorPressPose(progress: number): Pose {
     hL: [98, 174],
   };
 }
+
+/** Fixed-length, softly bent arm arc for a floor-limited pullover. */
+export function dumbbellPulloverPose(progress: number): Pose {
+  const t = Math.max(0, Math.min(1, progress));
+  const upperArm = 24;
+  const forearm = 23;
+  const softBend = (15 * Math.PI) / 180;
+  const shoulderAngle = ((-90 - 94 * t) * Math.PI) / 180;
+  const elbow: P = [
+    floorBase.neck[0] + upperArm * Math.cos(shoulderAngle),
+    floorBase.neck[1] + upperArm * Math.sin(shoulderAngle),
+  ];
+  const handAngle = shoulderAngle + softBend;
+  const hand: P = [
+    elbow[0] + forearm * Math.cos(handAngle),
+    elbow[1] + forearm * Math.sin(handAngle),
+  ];
+  return {
+    ...floorBase,
+    eR: elbow,
+    hR: hand,
+    eL: elbow,
+    hL: hand,
+  };
+}
+
 const shoulderStart = p(
   [99, 69],
   [98, 83],
@@ -653,6 +679,13 @@ export const additionalFigures = {
     },
     props: [],
     // Hands meet at one logical point so the shared dumbbell renders once.
+    held: oneDumbbell,
+  },
+  'dumbbell-pullover': {
+    start: dumbbellPulloverPose(0),
+    middle: dumbbellPulloverPose(0.5),
+    end: dumbbellPulloverPose(1),
+    props: mat,
     held: oneDumbbell,
   },
   'reverse-lunge': {

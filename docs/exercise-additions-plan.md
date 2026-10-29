@@ -65,3 +65,4 @@ Order of work: first four, then E79–E82, then E87–E88, then E83–E86 and E8
 - E85 needs an explicit unloaded practice option. E85/E86/E89 must pass a genuine multi-stage motion feasibility check; do not substitute a misleading simple interpolation.
 - The owner approved Astra in place of unavailable Opus for independent animation and muscle review.
 - Hard stop: 07:10 Europe/Stockholm. Freeze new exercise work by 07:04 for checks and a handoff. Do not deploy an incomplete or unreviewed set.
+- The owner explicitly resumed work at 12:54 Europe/Stockholm on 2026-10-29, after the earlier stop. Continue from E79 with the same commit and review boundaries; no new stop time was specified.

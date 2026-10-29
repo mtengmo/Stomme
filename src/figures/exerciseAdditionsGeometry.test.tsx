@@ -222,3 +222,77 @@ describe('overhead triceps extension figure geometry', () => {
     expect(markup.match(/data-equipment="dumbbell"/g)).toHaveLength(1);
   });
 });
+
+describe('dumbbell pullover figure geometry', () => {
+  it('keeps the floor setup fixed through a constant-length, softly bent shoulder arc', () => {
+    const start = movementPose('dumbbell-pullover', 0);
+    const middle = movementPose('dumbbell-pullover', 0.5);
+    const end = movementPose('dumbbell-pullover', 1);
+
+    expect(figures['dumbbell-pullover'].held).toEqual({
+      kind: 'dumbbell',
+      hands: ['hR'],
+    });
+    expect(start.hR[0]).toBeGreaterThan(start.head[0]);
+    expect(middle.hR[0]).toBeLessThan(start.hR[0]);
+    expect(end.hR[0]).toBeLessThan(end.head[0]);
+    expect(end.hR[1] + 5).toBeGreaterThan(168);
+    expect(end.hR[1] + 5).toBeLessThan(178);
+
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('dumbbell-pullover', frame / 20);
+      expect(pose.head).toEqual(start.head);
+      expect(pose.neck).toEqual(start.neck);
+      expect(pose.hip).toEqual(start.hip);
+      expect(pose.kR).toEqual(start.kR);
+      expect(pose.aR).toEqual(start.aR);
+      expect(pose.tR).toEqual(start.tR);
+      expect(pose.kL).toEqual(start.kL);
+      expect(pose.aL).toEqual(start.aL);
+      expect(pose.tL).toEqual(start.tL);
+      expect(pose.hR).toEqual(pose.hL);
+      expect(distance(pose.hR, pose.head)).toBeGreaterThan(30);
+      expect(pose.hR[1] + 5).toBeLessThan(178);
+      expect(distance(pose.neck, pose.eR)).toBeCloseTo(24, 5);
+      expect(distance(pose.eR, pose.hR)).toBeCloseTo(23, 5);
+      const shoulderToElbow: readonly [number, number] = [
+        pose.neck[0] - pose.eR[0],
+        pose.neck[1] - pose.eR[1],
+      ];
+      const elbowToHand: readonly [number, number] = [
+        pose.hR[0] - pose.eR[0],
+        pose.hR[1] - pose.eR[1],
+      ];
+      const cosine =
+        (shoulderToElbow[0] * elbowToHand[0] +
+          shoulderToElbow[1] * elbowToHand[1]) /
+        (distance(pose.neck, pose.eR) * distance(pose.eR, pose.hR));
+      const elbowAngle = (Math.acos(cosine) * 180) / Math.PI;
+      expect(elbowAngle).toBeCloseTo(165, 5);
+    }
+
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="dumbbell-pullover"
+        pose={end}
+        working="right"
+        equipment="dumbbell"
+      />,
+    );
+    expect(markup.match(/data-equipment="dumbbell"/g)).toHaveLength(1);
+    expect(markup).toContain('height="5"');
+    expect(markup.indexOf('data-figure-head-mask="pullover"')).toBeGreaterThan(
+      markup.indexOf('data-body-side="near"'),
+    );
+
+    const otherExerciseMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="floor-press"
+        pose={movementPose('floor-press', 1)}
+        working="right"
+        equipment="dumbbell"
+      />,
+    );
+    expect(otherExerciseMarkup).not.toContain('data-figure-head-mask');
+  });
+});

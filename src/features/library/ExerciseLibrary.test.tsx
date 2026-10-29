@@ -10,8 +10,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Link, Route, Router, Switch } from 'wouter';
 import { exercises } from '../../content/exercises';
+import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
 import { useAppHashLocation } from '../../lib/hashLocation';
 import { ExerciseLibrary } from './ExerciseLibrary';
+
+const muscleCount = (group: MuscleGroupId) =>
+  Object.values(exerciseMuscles).filter(
+    (tags) => tags.primary.includes(group) || tags.secondary.includes(group),
+  ).length;
 
 function TestRoutes() {
   return (
@@ -39,7 +45,7 @@ afterEach(cleanup);
 describe('exercise library', () => {
   it('shows all exercises, equipment, template links and optional status', () => {
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('78 övningar');
+    expect(screen.getByRole('status').textContent).toBe('79 övningar');
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
@@ -72,7 +78,7 @@ describe('exercise library', () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=hamstrings');
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe(
-      '17 övningar för baksida lår',
+      `${muscleCount('hamstrings')} övningar för baksida lår`,
     );
     const primary = screen.getByRole('region', { name: 'Tränar främst' });
     const supporting = screen.getByRole('region', { name: 'Hjälper till' });
@@ -95,7 +101,9 @@ describe('exercise library', () => {
     await user.click(screen.getByRole('button', { name: 'Vader' }));
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     expect(window.location.search).toBe('');
-    expect(screen.getByRole('status').textContent).toBe('6 övningar för vader');
+    expect(screen.getByRole('status').textContent).toBe(
+      `${muscleCount('calves')} övningar för vader`,
+    );
     await user.click(
       screen.getByRole('link', {
         name: exercises['single-leg-calf-raise'].name,
@@ -106,13 +114,13 @@ describe('exercise library', () => {
     );
     await waitFor(() =>
       expect(screen.getByRole('status').textContent).toBe(
-        '6 övningar för vader',
+        `${muscleCount('calves')} övningar för vader`,
       ),
     );
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     window.history.back();
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('78 övningar'),
+      expect(screen.getByRole('status').textContent).toBe('79 övningar'),
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -122,7 +130,7 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('78 övningar');
+    expect(screen.getByRole('status').textContent).toBe('79 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
 });

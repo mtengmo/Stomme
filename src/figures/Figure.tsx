@@ -3,6 +3,7 @@ import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { ExerciseId } from '../domain/types';
 import { repTempo } from '../rules/repTempo';
 import {
+  dumbbellPulloverPose,
   hamstringCurlPose,
   kettlebellFloorPressPose,
   seatedKneeExtensionPose,
@@ -57,6 +58,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
     return kettlebellFloorPressPose(t);
+  if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
   const spec = figures[exerciseId];
   const interpolated = !spec.middle
     ? lerpPose(spec.start, spec.end, t)
@@ -173,6 +175,7 @@ const FRAMING: Partial<Record<ExerciseId, string>> = {
   burpee: '0 -30 200 218',
   'squat-jump': '0 0 200 188',
   'quad-set': '24 128 160 52',
+  'dumbbell-pullover': '-4 20 180 168',
 };
 
 /**
@@ -403,6 +406,19 @@ export function FigureFrame({
             stroke={crossBody ? 'var(--edge)' : undefined}
           />
         </g>
+        {exerciseId === 'dumbbell-pullover' ? (
+          // The hand travels behind the skull in this side projection. Mask
+          // the near arm where it passes behind the head silhouette.
+          <circle
+            data-figure-head-mask="pullover"
+            cx={p.head[0]}
+            cy={p.head[1]}
+            r="9"
+            fill="var(--paper)"
+            stroke="var(--ink)"
+            strokeWidth={W}
+          />
+        ) : null}
         {rack || pressGrip ? (
           <g
             data-rack-hand="true"

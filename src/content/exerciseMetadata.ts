@@ -324,6 +324,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Håll en lätt hantel med båda händerna ovanför huvudet.',
     ],
   ],
+  'dumbbell-pullover': [
+    [
+      'dumbbell',
+      1,
+      [0, 1],
+      'Håll en hantel med båda händerna ovanför bröstet.',
+    ],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -661,6 +669,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Hantel över huvudet kräver stilla överarmar och bål.',
   ],
+  'dumbbell-pullover': [
+    'practiced',
+    'En sammanhållen vikt förs långsamt över huvudet utan svank.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -761,6 +773,21 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'dumbbell-pullover')
+    return [
+      {
+        title: 'Lying Pullovers',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/37/lying-pullovers/',
+        note: 'Källan visar två hantlar på bänk. Appen använder en hantel i båda händerna på golv och ett kortare, bekvämt rörelseomfång.',
+      },
+      {
+        title: '5 Benefits of Dumbbell Training · Pullover to Trunk Curl',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/pros/expert-articles/5675/5-benefits-of-dumbbell-training/',
+        note: 'Visar pulloverrörelsen på golv; appen utelämnar bålcurl och ger egen dos.',
+      },
+    ];
   if (id === 'overhead-triceps-extension')
     return [
       {
@@ -1067,25 +1094,29 @@ export const exerciseMetadata = Object.fromEntries(
           ]
         : sourceFor(id),
       reviewedAt: [
-        'decline-push-up',
-        'diamond-push-up',
-        'plank-arm-lift',
-        'knee-push-up',
-        'wall-push-up',
-        'calf-raise',
-        'crunch',
-        'squat-curl',
-        'thruster',
-        'single-arm-thruster',
         'bent-over-row',
         'sumo-squat',
         'weighted-glute-bridge',
         'overhead-triceps-extension',
+        'dumbbell-pullover',
       ].includes(id)
-        ? '2026-10-28'
-        : added
-          ? '2026-10-24'
-          : '2026-10-20',
+        ? '2026-10-29'
+        : [
+              'decline-push-up',
+              'diamond-push-up',
+              'plank-arm-lift',
+              'knee-push-up',
+              'wall-push-up',
+              'calf-raise',
+              'crunch',
+              'squat-curl',
+              'thruster',
+              'single-arm-thruster',
+            ].includes(id)
+          ? '2026-10-28'
+          : added
+            ? '2026-10-24'
+            : '2026-10-20',
       sidePolicy: exercise.perSide ? 'choose-side' : 'both',
     };
     if (page && exercise.unit === 'reps' && id !== 'single-leg-calf-raise')

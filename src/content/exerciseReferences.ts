@@ -80,6 +80,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'sumo-squat': 'E76',
   'weighted-glute-bridge': 'E77',
   'overhead-triceps-extension': 'E78',
+  'dumbbell-pullover': 'E79',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

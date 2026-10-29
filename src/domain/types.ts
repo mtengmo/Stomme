@@ -76,7 +76,8 @@ export type ExerciseId =
   | 'bent-over-row'
   | 'sumo-squat'
   | 'weighted-glute-bridge'
-  | 'overhead-triceps-extension';
+  | 'overhead-triceps-extension'
+  | 'dumbbell-pullover';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

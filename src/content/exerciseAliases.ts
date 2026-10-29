@@ -78,6 +78,11 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Tricepssträck över huvudet',
     'Overhead triceps extension',
   ],
+  'dumbbell-pullover': [
+    'Hantel-pullover',
+    'Pullover på golv',
+    'Dumbbell pullover',
+  ],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],
   'hammer-curl': ['Hammercurl', 'Hammer curl'],
   'lateral-raise': ['Sidolyft', 'Hantellyft åt sidan'],
