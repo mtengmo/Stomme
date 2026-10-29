@@ -106,6 +106,7 @@ describe('level policy', () => {
     expect(heavyStartAllowed('kettlebell-goblet-squat')).toBe(true);
     expect(heavyStartAllowed('russian-twist')).toBe(false);
     expect(heavyStartAllowed('woodchop')).toBe(false);
+    expect(heavyStartAllowed('kettlebell-halo')).toBe(false);
     expect(heavyStartAllowed('one-arm-kettlebell-swing')).toBe(false);
     expect(heavyStartAllowed('shoulder-press')).toBe(false);
     expect(heavyStartAllowed('single-leg-rdl')).toBe(false);

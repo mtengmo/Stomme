@@ -82,6 +82,7 @@ export type ExerciseId =
   | 'walking-lunge'
   | 'kettlebell-goblet-squat'
   | 'one-arm-kettlebell-swing'
+  | 'kettlebell-halo'
   | 'russian-twist'
   | 'woodchop';
 

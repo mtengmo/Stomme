@@ -355,6 +355,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Greppa handtaget med en hand; kraften kommer från höften.',
     ],
   ],
+  'kettlebell-halo': [
+    [
+      'kettlebell',
+      1,
+      [0, 1],
+      'Håll kettlebellen upp och ned i hornen med båda händerna.',
+    ],
+  ],
   woodchop: [
     ['dumbbell', 1, [0, 1], 'Håll en lätt hantel med båda händerna.'],
     [
@@ -736,6 +744,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'technical',
     'Snabb höftfällning med ensidig, svängande last som bålen ska stå emot.',
   ],
+  'kettlebell-halo': [
+    'practiced',
+    'Vikten förs runt huvudet med stilla bål och kontroll i axlarna.',
+  ],
   woodchop: [
     'practiced',
     'Diagonal rotation från höft till axel med vriden fot och kontrollerad bål.',
@@ -1112,6 +1124,7 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
   if (
     id === 'kettlebell-swing' ||
     id === 'one-arm-kettlebell-swing' ||
+    id === 'kettlebell-halo' ||
     id === 'kettlebell-deadlift'
   )
     return [
@@ -1225,6 +1238,7 @@ export const exerciseMetadata = Object.fromEntries(
         'kettlebell-goblet-squat',
         'russian-twist',
         'woodchop',
+        'kettlebell-halo',
         'one-arm-kettlebell-swing',
       ].includes(id)
         ? '2026-10-29'

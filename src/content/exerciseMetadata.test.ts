@@ -7,10 +7,10 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E83, E87 and E88 references and original load indices', () => {
+  it('preserves permanent E01–E84, E87 and E88 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual([
       ...Array.from(
-        { length: 83 },
+        { length: 84 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
       'E87',
@@ -210,6 +210,13 @@ describe('expanded library integrity', () => {
     expect(
       exerciseMetadata['one-arm-kettlebell-swing'].variants[0]?.technicalLevel,
     ).toBe('technical');
+    expect(exerciseMetadata['kettlebell-halo'].sidePolicy).toBe('both');
+    expect(exercises['kettlebell-halo'].perSide).toBe(false);
+    expect(exercises['kettlebell-halo'].kneeLoaded).toBe(false);
+    expect(exerciseMetadata['kettlebell-halo'].variants[0]?.equipment).toEqual([
+      { type: 'kettlebell', count: 1 },
+    ]);
+    expect(exercises['kettlebell-halo'].tips[2]).toContain('åt andra hållet');
     expect(exerciseMetadata.woodchop.sidePolicy).toBe('choose-side');
     expect(exercises.woodchop.perSide).toBe(true);
     expect(exercises.woodchop.kneeLoaded).toBe(false);

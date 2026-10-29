@@ -702,3 +702,24 @@ describe('one-arm kettlebell swing figure geometry', () => {
     expect(end.hL[0]).toBeLessThan(end.hR[0] - 30);
   });
 });
+
+describe('kettlebell halo figure geometry', () => {
+  it('moves one shared-grip bell from in front of the face to behind the head', () => {
+    const start = movementPose('kettlebell-halo', 0);
+    const end = movementPose('kettlebell-halo', 1);
+    expect(figures['kettlebell-halo'].held).toEqual({
+      kind: 'kettlebell',
+      hands: ['hR'],
+    });
+    expect(start.hR[0]).toBeGreaterThan(start.head[0] + 10);
+    expect(end.hR[0]).toBeLessThan(end.head[0] - 10);
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('kettlebell-halo', frame / 20);
+      expect(pose.hR).toEqual(pose.hL);
+      expect(pose.hip).toEqual(start.hip);
+      expect(distance(pose.neck, pose.eR)).toBeLessThan(30);
+      expect(distance(pose.eR, pose.hR)).toBeGreaterThan(14);
+      expect(distance(pose.eR, pose.hR)).toBeLessThan(28);
+    }
+  });
+});

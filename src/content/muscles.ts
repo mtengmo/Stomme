@@ -239,6 +239,11 @@ export const exerciseMuscles: Record<
     secondary: ['core', 'back', 'forearms'],
     qualities: ['grip', 'power'],
   },
+  'kettlebell-halo': {
+    primary: ['shoulders', 'core'],
+    secondary: ['back', 'triceps', 'forearms'],
+    qualities: [],
+  },
   woodchop: {
     primary: ['core'],
     secondary: ['shoulders', 'glutes'],

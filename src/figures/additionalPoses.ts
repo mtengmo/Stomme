@@ -847,6 +847,33 @@ export const additionalFigures = {
     held: { kind: 'dumbbell', hands: ['hR', 'hL'] },
     motion: 'sequence',
   },
+  'kettlebell-halo': {
+    // Side projection of a circle round the head: front of the face, beside
+    // the ear, then behind the head. Both hands share one grip on the horns.
+    start: {
+      ...stand,
+      eR: [112, 88],
+      hR: [116, 70],
+      eL: [112, 88],
+      hL: [116, 70],
+    },
+    middle: {
+      ...stand,
+      eR: [102, 90],
+      hR: [100, 66],
+      eL: [102, 90],
+      hL: [100, 66],
+    },
+    end: {
+      ...stand,
+      eR: [90, 88],
+      hR: [84, 68],
+      eL: [90, 88],
+      hL: [84, 68],
+    },
+    props: [],
+    held: oneBell,
+  },
   woodchop: {
     // Low-to-high diagonal: both hands share one grip on the single weight,
     // starting beside the working hip and finishing high over the far shoulder.

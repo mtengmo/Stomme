@@ -85,6 +85,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'walking-lunge': 'E81',
   'kettlebell-goblet-squat': 'E82',
   'one-arm-kettlebell-swing': 'E83',
+  'kettlebell-halo': 'E84',
   'russian-twist': 'E87',
   woodchop: 'E88',
 };

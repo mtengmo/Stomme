@@ -251,6 +251,19 @@ export const lateAdditionalExercises: Exercise[] = [
     true,
   ),
   entry(
+    'kettlebell-halo',
+    'Kettlebell halo',
+    ['Axlar', 'Bål', 'Övre rygg'],
+    [
+      'Stå med fötterna ungefär axelbrett och håll kettlebellen upp och ned i hornen med båda händerna framför bröstet. Stå upprätt med lätt böjda knän.',
+      'För vikten i en liten, lugn cirkel runt huvudet. Håll armbågarna nära kroppen, bålen stilla och blicken framåt. Håll vikten nära huvudet utan att slå i det.',
+      'Ett helt varv runt huvudet är en repetition. Gör halva antalet åt ena hållet och resten åt andra hållet. Avbryt om det drar i nacken eller axeln.',
+    ],
+    'Du lutar dig bakåt eller lyfter axlarna när vikten passerar bakom huvudet.',
+    'Gör rörelsen med en lättare kettlebell eller en lätt hantel hållen med båda händerna.',
+    [single(4, 'kettlebell'), single(8, 'kettlebell')],
+  ),
+  entry(
     'russian-twist',
     'Russian twist',
     ['Bål'],
