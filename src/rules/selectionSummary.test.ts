@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseList } from '../content/exercises';
+import { exerciseMuscles } from '../content/muscles';
 import type {
   ExerciseId,
   PlannedExercise,
@@ -57,5 +58,34 @@ describe('selectionSummary', () => {
       selectionSummary(ids, { ...prefs, programId: 'rehab' }, planFor(prefs))
         .minutes,
     ).toBeUndefined();
+  });
+});
+
+describe('selectionSummary without a plan source', () => {
+  const prefs: TrainingPreferences = {
+    programId: 'general',
+    experience: 'some',
+    ...inventory({ dumbbells: [[5, 2]] }),
+  };
+  const ids = exerciseList.slice(0, 2).map((exercise) => exercise.id);
+  it('has no estimate when planFor is missing or returns nothing', () => {
+    expect(selectionSummary(ids, prefs).minutes).toBeUndefined();
+    expect(
+      selectionSummary(ids, prefs, () => undefined).minutes,
+    ).toBeUndefined();
+  });
+});
+
+describe('selectionSummary for an exercise without primary muscles', () => {
+  it('counts the pick but gives it no region', () => {
+    const id = exerciseList[0]?.id as ExerciseId;
+    const original = exerciseMuscles[id].primary;
+    exerciseMuscles[id].primary = [];
+    try {
+      expect(regionOfExercise(id)).toBeUndefined();
+      expect(selectionSummary([id])).toEqual({ count: 1, regions: [] });
+    } finally {
+      exerciseMuscles[id].primary = original;
+    }
   });
 });

@@ -34,13 +34,10 @@ export function selectionSummary(
     const region = regionOfExercise(id);
     if (region) counts.set(region, (counts.get(region) ?? 0) + 1);
   }
-  const regions = bodyRegions
-    .filter((region) => counts.has(region.id))
-    .map((region) => ({
-      id: region.id,
-      label: region.label,
-      count: counts.get(region.id) ?? 0,
-    }));
+  const regions = bodyRegions.flatMap((region) => {
+    const count = counts.get(region.id);
+    return count ? [{ id: region.id, label: region.label, count }] : [];
+  });
   const plan =
     preferences && preferences.programId !== 'rehab' && ids.length
       ? planFor?.(ids)

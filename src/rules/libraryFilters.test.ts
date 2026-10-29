@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { exerciseMetadata } from '../content/exerciseMetadata';
+import {
+  equipmentLabels,
+  exerciseMetadata,
+  purposeLabels,
+  technicalLevelLabels,
+} from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
+import type { ExerciseId } from '../domain/types';
 import { inventory as owned } from '../test/inventory';
 import { equipmentFits, type Inventory } from './equipment';
 import {
   type ExerciseFilters,
   emptyExerciseFilters,
   filterExercises,
+  filterParamNames,
   filtersFromParams,
   filtersToParams,
   type LibraryFilters,
@@ -292,5 +299,47 @@ describe('filter params and level fit', () => {
         { inventory: { equipment: [] } },
       ).primary,
     ).toHaveLength(off.length);
+  });
+});
+
+describe('remaining filter branches', () => {
+  it('parses purpose, equipment and level params and drops invalid ones', () => {
+    const purpose = Object.keys(purposeLabels)[0];
+    const equipment = Object.keys(equipmentLabels)[0];
+    const level = Object.keys(technicalLevelLabels)[0];
+    const p = filterParamNames;
+    const parsed = filtersFromParams(
+      `${p.purpose}=${purpose}&${p.equipment}=${equipment}&${p.level}=${level}`,
+    );
+    expect([parsed.purpose, parsed.equipment, parsed.level]).toEqual([
+      purpose,
+      equipment,
+      level,
+    ]);
+    expect(filtersFromParams(`${p.purpose}=mine`).purpose).toBe('mine');
+    expect(filtersFromParams(`${p.purpose}=zzz`).purpose).toBe('');
+  });
+
+  it('treats an unknown region as no muscles and an unfittable row as missing nothing', () => {
+    const result = filterExercises(
+      exerciseList,
+      { ...emptyExerciseFilters, region: 'nope' as never },
+      { inventory: { equipment: [] } },
+    );
+    expect(result.primary).toHaveLength(0);
+    expect(result.supporting).toHaveLength(0);
+  });
+});
+
+describe('missingEquipment without variants', () => {
+  it('reports nothing missing for an exercise with no variants', () => {
+    const id = exerciseList[0]?.id as ExerciseId;
+    const original = exerciseMetadata[id].variants;
+    exerciseMetadata[id].variants = [];
+    try {
+      expect(missingEquipment(id, { equipment: [] })).toEqual([]);
+    } finally {
+      exerciseMetadata[id].variants = original;
+    }
   });
 });

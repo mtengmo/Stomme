@@ -104,3 +104,53 @@ describe('inventorySummary', () => {
     );
   });
 });
+
+describe('inventorySummary branches', () => {
+  it('words single, paired, mixed and adjustable weights and support items', () => {
+    expect(inventorySummary(inventory({ dumbbells: [[10, 1]] }))).toBe(
+      'hantel 10 kg',
+    );
+    expect(
+      inventorySummary(
+        inventory({
+          dumbbells: [
+            [5, 1],
+            [10, 1],
+          ],
+        }),
+      ),
+    ).toBe('hantlar 5 och 10 kg');
+    expect(
+      inventorySummary(
+        inventory({
+          kettlebells: [
+            [8, 2],
+            [12, 1],
+          ],
+        }),
+      ),
+    ).toBe('kettlebells 8 och 12 kg (en del par)');
+    expect(inventorySummary(inventory({ kettlebells: [[8, 2]] }))).toBe(
+      'kettlebells 8 kg (par)',
+    );
+    const base = inventory({ support: ['chair'] });
+    expect(
+      inventorySummary({
+        ...base,
+        adjustableWeights: [
+          { type: 'dumbbell', count: 2, settingsKg: [5, 10] },
+          { type: 'kettlebell', count: 1, settingsKg: [] },
+        ],
+      }),
+    ).toContain('justerbar hantel');
+    expect(
+      inventorySummary({
+        equipment: ['bodyweight'],
+        adjustableWeights: [{ type: 'kettlebell', count: 1, settingsKg: [8] }],
+      }),
+    ).toBe('justerbar kettlebell');
+    expect(inventorySummary({ equipment: ['bodyweight'] })).toBe(
+      'Bara kroppsvikt',
+    );
+  });
+});
