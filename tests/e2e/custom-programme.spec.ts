@@ -184,22 +184,19 @@ for (const width of [320, 360, 412]) {
       await page.screenshot({
         path: test.info().outputPath(`home-${width}-${scheme}.png`),
       });
-      await list
-        .getByRole('button', { name: 'Ta bort: Mitt nya pass' })
-        .click();
+      // Home rows are one link each; deleting lives in the preview.
+      await list.getByRole('link', { name: /^Mitt nya pass/ }).click();
+      const remove = () =>
+        page.getByRole('button', { name: 'Ta bort passet: Mitt nya pass' });
+      await remove().click();
       await expect(
         page.getByText('Ta bort passet? Sparade pass i historiken finns kvar.'),
       ).toBeVisible();
       await page.getByRole('button', { name: 'Behåll passet' }).click();
-      await expect(
-        list.getByText('Mitt nya pass', { exact: true }),
-      ).toBeVisible();
-      await list
-        .getByRole('button', { name: 'Ta bort: Mitt nya pass' })
-        .click();
+      await remove().click();
       await page
         .getByRole('group', { name: 'Ta bort Mitt nya pass' })
-        .getByRole('button', { name: 'Ta bort passet' })
+        .getByRole('button', { name: 'Ta bort passet', exact: true })
         .click();
       await expect(page.getByText('Inga egna pass än.')).toBeVisible();
       await page.goto('/#/historik');
