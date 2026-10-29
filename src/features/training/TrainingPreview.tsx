@@ -1307,7 +1307,7 @@ function PreviewEditor({
 
               {preferences.programId !== 'rehab' ? (
                 <Link
-                  href="/installningar"
+                  href="/installningar/utrustning?tillbaka=traning"
                   className="flex min-h-12 items-center self-start text-base font-bold underline"
                 >
                   Min utrustning

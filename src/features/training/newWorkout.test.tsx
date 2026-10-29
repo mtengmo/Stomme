@@ -34,10 +34,8 @@ it('Home shows an empty Mina pass with a link to the picker', async () => {
     screen.getByText('Utrustning: stol, vägg · Träningsvana: Viss vana'),
   ).toBeTruthy();
   expect(
-    screen
-      .getByRole('link', { name: 'Ändra utrustning eller vana' })
-      .getAttribute('href'),
-  ).toBe('#/?andra=utrustning&tillbaka=nytt-pass');
+    screen.getByRole('link', { name: 'Ändra utrustning' }).getAttribute('href'),
+  ).toBe('#/installningar/utrustning?tillbaka=nytt-pass');
 });
 
 it('creates one workout and leaves the setup and sessions alone', async () => {

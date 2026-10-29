@@ -99,9 +99,10 @@ export function ExerciseLibrary() {
     : filters.region
       ? bodyRegions.find((item) => item.id === filters.region)?.label
       : undefined;
-  const onlyBodyweight = preferences?.equipment.every(
-    (item) => item === 'bodyweight',
-  );
+  const onlyBodyweight =
+    preferences &&
+    !preferences.weights?.length &&
+    !preferences.adjustableWeights?.length;
 
   return (
     <FavouritesProvider>
@@ -147,12 +148,12 @@ export function ExerciseLibrary() {
         />
         {onlyBodyweight ? (
           <p className="m-0 text-base text-ink-soft">
-            Du har bara kroppsvikt registrerad.{' '}
+            Du har inga vikter registrerade.{' '}
             <Link
-              href="/installningar"
+              href="/installningar/utrustning"
               className="font-bold text-accent underline underline-offset-4"
             >
-              Lägg till utrustning i Inställningar
+              Lägg till vikter i Min utrustning
             </Link>
           </p>
         ) : null}

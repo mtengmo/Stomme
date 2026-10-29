@@ -304,7 +304,7 @@ export function TrainingHome() {
     };
   }, []);
   const [, navigate] = useLocation();
-  // "/?andra=utrustning" opens the setup directly (used by the physio overview).
+  // "/?andra=utrustning" still opens the direction setup directly (equipment lives in Settings now).
   const homeSearch = new URLSearchParams(useHashSearch());
   const wantsSetup = homeSearch.get('andra') === 'utrustning';
   // Only a known page may be returned to after the setup.

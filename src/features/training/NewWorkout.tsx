@@ -71,10 +71,10 @@ export function NewWorkout() {
       </h1>
       <p className="m-0 text-base text-ink-soft">{summary}</p>
       <Link
-        href="/?andra=utrustning&tillbaka=nytt-pass"
+        href="/installningar/utrustning?tillbaka=nytt-pass"
         className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
       >
-        Ändra utrustning eller vana
+        Ändra utrustning
       </Link>
       <p className="m-0 text-lg">
         Välj upp till 12. Ordning, set och vikt ändrar du sedan.

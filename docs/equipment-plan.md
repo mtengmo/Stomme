@@ -38,3 +38,7 @@ Prerequisite: merge `feature/settings-drilldown` first (shared `Settings.tsx`).
 ## Decisions (recommended defaults)
 
 1. No quick-add chips (plain kg field). 2. Same type and kg again merges into a pair. 3. Weights section stays visible in Settings for rehab users. 4. No cleanup of old local prefs (delete data if the dev browser breaks). 5. Home: "Byt inriktning" + separate "Min utrustning". 6. Backup version stays 2.
+
+## Status
+
+Implemented on branch feature/equipment-step (M1 model and rules, M2 EquipmentInventory and start step, M3 links and docs, M4 e2e). `?tillbaka=traning` returns to `/traning/A`.

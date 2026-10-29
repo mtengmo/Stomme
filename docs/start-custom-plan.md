@@ -72,4 +72,4 @@ Tests: unit (`quickStartModel.test.ts`: steps per goal, knee never `pick`, `pick
 2. Home still leads with A/B "Nästa pass"; the workout shows under "Mina pass".
 3. Name edited in the preview (field moved to top), not in the flow.
 4. `levelFit` on by default only in the start flow and `/nytt-pass`, not in the plain library.
-5. Returning users change global prefs only via the explicit "Ändra utrustning eller vana" link.
+5. Returning users change global prefs only via "Ändra utrustning" (Inställningar › Min utrustning, `?tillbaka=nytt-pass`) and Home "Byt inriktning".

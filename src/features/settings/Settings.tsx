@@ -158,6 +158,7 @@ function EquipmentInventorySettings() {
 }
 
 export function Settings({ page }: { page?: string } = {}) {
+  const backTarget = returnTarget(useHashSearch());
   const installed = useInstall().installed;
   const appearance = useSyncExternalStore(
     subscribeAppearance,
@@ -399,11 +400,17 @@ export function Settings({ page }: { page?: string } = {}) {
       return (
         <section aria-labelledby={def.sectionId} className={shell}>
           <Link
-            href="/installningar"
+            href={
+              page === 'utrustning' && backTarget
+                ? backTarget
+                : '/installningar'
+            }
             className="inline-flex min-h-12 items-center gap-1 self-start text-base font-bold text-ink underline"
           >
             <Icon name="back" />
-            Tillbaka till inställningar
+            {page === 'utrustning' && backTarget
+              ? 'Tillbaka utan att spara'
+              : 'Tillbaka till inställningar'}
           </Link>
           <h1 id={def.sectionId} ref={heading} tabIndex={-1} className={h1}>
             {def.title}
