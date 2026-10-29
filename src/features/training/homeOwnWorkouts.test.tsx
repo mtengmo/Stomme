@@ -45,22 +45,29 @@ const open = (note?: string) =>
     ...(note ? { note } : {}),
   } as never);
 
-const quickNames = () =>
+const rowNames = () =>
   screen
     .getAllByRole('link')
     .filter((a) => a.textContent?.startsWith('Pass nummer'))
-    .map((a) => a.textContent);
+    .map((a) => a.querySelector('span')?.textContent);
 
-it('without a session shows the list and the two newest quick links', async () => {
-  await setMeta(getDb(), 'customWorkouts', saved(3));
+it('shows the newest three rows, the rest behind "Visa alla", no quick row', async () => {
+  await setMeta(getDb(), 'customWorkouts', saved(5));
   render(<App />);
-  expect(await screen.findByText('Eller kör ett eget pass:')).toBeTruthy();
   await screen.findByRole('region', { name: 'Mina pass' });
-  expect(quickNames()).toEqual(['Pass nummer 3', 'Pass nummer 2']);
-  expect(await screen.findByRole('region', { name: 'Mina pass' })).toBeTruthy();
+  expect(rowNames().slice(0, 3)).toEqual([
+    'Pass nummer 5',
+    'Pass nummer 4',
+    'Pass nummer 3',
+  ]);
+  expect(screen.getByText('Visa alla 5 pass')).toBeTruthy();
+  expect(screen.queryByText('Eller kör ett eget pass:')).toBeNull();
+  expect(screen.queryByText(/Visa och starta/)).toBeNull();
+  expect(screen.queryByRole('button', { name: /Ta bort/ })).toBeNull();
+  expect(screen.getAllByText(/^1 övning · ca \d+ min$/)).toHaveLength(5);
 });
 
-it('prefers the most recently used workouts', async () => {
+it('puts the most recently used first with a "senast" date', async () => {
   await setMeta(getDb(), 'customWorkouts', saved(3));
   await createSession(getDb(), {
     templateId: 'A',
@@ -74,12 +81,16 @@ it('prefers the most recently used workouts', async () => {
     customWorkoutId: 'w1',
   } as never);
   render(<App />);
-  await screen.findByText('Eller kör ett eget pass:');
   await screen.findByRole('region', { name: 'Mina pass' });
-  expect(quickNames()).toEqual(['Pass nummer 1', 'Pass nummer 3']);
+  expect(rowNames()).toEqual([
+    'Pass nummer 1',
+    'Pass nummer 3',
+    'Pass nummer 2',
+  ]);
+  expect(screen.getByText(/senast 19 okt$/)).toBeTruthy();
 });
 
-it('keeps the list usable while only a preparation exists', async () => {
+it('keeps the rows usable while only a preparation exists', async () => {
   await setMeta(getDb(), 'customWorkouts', saved(1));
   await open();
   render(<App />);
@@ -87,22 +98,23 @@ it('keeps the list usable while only a preparation exists', async () => {
   expect(await screen.findByRole('region', { name: 'Mina pass' })).toBeTruthy();
   expect(screen.queryByText('Avsluta passet först.')).toBeNull();
   expect(
-    screen.getByRole('link', { name: 'Visa och starta: Pass nummer 1' }),
+    screen.getByRole('link', { name: /^Pass nummer 1 1 övning/ }),
   ).toBeTruthy();
-  expect(screen.getByText('Eller kör ett eget pass:')).toBeTruthy();
 });
 
-it('disables the list and hides quick links while a session runs', async () => {
+it('makes the rows non-links while a session runs', async () => {
   await setMeta(getDb(), 'customWorkouts', saved(1));
   await open('Pågår');
   render(<App />);
   await screen.findByRole('heading', { name: 'Fortsätt ditt pass' });
   expect(await screen.findByText('Avsluta passet först.')).toBeTruthy();
-  expect(screen.queryByRole('link', { name: /Visa och starta/ })).toBeNull();
-  expect(screen.queryByText('Eller kör ett eget pass:')).toBeNull();
+  expect(screen.queryByRole('link', { name: /^Pass nummer 1/ })).toBeNull();
+  expect(
+    screen.getByText('Pass nummer 1').closest('[aria-disabled]'),
+  ).toBeTruthy();
 });
 
-it('hides quick links when nothing is saved', async () => {
+it('shows the empty text when nothing is saved', async () => {
   render(<App />);
   await screen.findByText('Inga egna pass än.');
   expect(screen.queryByText('Eller kör ett eget pass:')).toBeNull();

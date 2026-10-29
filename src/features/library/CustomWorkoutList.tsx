@@ -162,7 +162,7 @@ function HomeRows({
           <>
             <span className="break-words text-lg font-bold">
               {workout.name}
-            </span>
+            </span>{' '}
             <span className="text-base text-ink-soft">
               {homeMeta(
                 workout,

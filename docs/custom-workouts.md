@@ -20,7 +20,7 @@ Up to 30 named workouts are stored in IndexedDB and included in JSON backup/rest
 
 ## Mina pass
 
-`CustomWorkoutList` shows name, number of exercises, "ca X min" (not for rehab), a link to the preview and **Ta bort**. It appears on Home after the weekly plan (always, with an empty text) and at the top of the library (only when there are passes). Deleting asks "Ta bort passet? Sparade pass i historiken finns kvar." and is also available in the preview ("Ta bort passet"). Recorded sessions keep their name snapshots.
+`CustomWorkoutList` has two variants. The setup/library variant shows name, number of exercises, "ca X min" (not for rehab), a link to the preview and **Ta bort**. The `variant="home"` list on Home is ordered by `orderByRecentUse` (most recently used first, then newest saved); every row is ONE link (name plus "4 övningar · ca 20 min · senast 28 okt"), with no per-row actions; three rows show and the rest sit behind "Visa alla N pass"; while a session runs the rows are non-links (`aria-disabled`) under "Avsluta passet först.". Home order: lead (heading, programme, vana, rest note without a weekly plan, primary button), day-after prompts, Mina pass, Veckoplan, Plan framåt, Ändra, Senaste pass (own passes are labelled by name). The list appears on Home (always, with an empty text) and at the top of the library (only when there are passes). Deleting asks "Ta bort passet? Sparade pass i historiken finns kvar." and is also available in the preview ("Ta bort passet"). Recorded sessions keep their name snapshots.
 
 ## Safety and limits
 
@@ -33,3 +33,7 @@ Up to 30 named workouts are stored in IndexedDB and included in JSON backup/rest
 ## Weekly plan
 
 A completed custom workout counts as that day's training in the weekly plan (so the planned day is not shown as missed and the next planned date moves on). It does not advance the A/B sequence or progression: `nextTemplateId` and `completedTrainingDates` in `src/rules` lock this with unit tests. Short workouts do not count.
+
+## Names
+
+Automatic names ("Eget pass 29 okt") are made unique with " (2)", " (3)" by `uniqueWorkoutName` (trimmed, case-insensitive sv-SE, whole name at most 60 characters). Typed names are checked inside the write transaction by `renameCustomWorkout` / `createNamedCustomWorkout`; a clash with another pass shows "Du har redan ett pass som heter {namn}. Välj ett annat namn." The rehab pass "Ländrygg – personligt rehabprogram" is created idempotently.

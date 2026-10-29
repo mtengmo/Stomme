@@ -54,7 +54,6 @@ for (const { width, scheme } of cases) {
     await expect(
       page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
     ).toBeVisible();
-    await expect(page.getByText('Eller kör ett eget pass:')).toBeVisible();
     const list = page.getByRole('region', { name: 'Mina pass' });
     await expect(list).toBeVisible();
     await expect(page.getByText('Avsluta passet först.')).toHaveCount(0);
@@ -68,7 +67,7 @@ for (const { width, scheme } of cases) {
       fullPage: true,
     });
 
-    await list.getByRole('link', { name: /^Visa och starta:/ }).click();
+    await list.getByRole('link').first().click();
     await expect(page).toHaveURL(/#\/traning\/A\?workout=/);
     await page
       .getByRole('button', { name: 'Börja passet', exact: true })
@@ -106,6 +105,10 @@ for (const { width, scheme } of cases) {
     await page.getByRole('button', { name: 'Klar set', exact: true }).click();
     await page.goto('/#/');
     await expect(page.getByText('Avsluta passet först.')).toBeVisible();
-    await expect(page.getByText('Eller kör ett eget pass:')).toHaveCount(0);
+    await expect(
+      page
+        .getByRole('region', { name: 'Mina pass' })
+        .getByRole('link', { name: /övning/ }),
+    ).toHaveCount(0);
   });
 }
