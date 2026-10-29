@@ -77,6 +77,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   thruster: 'E73',
   'single-arm-thruster': 'E74',
   'bent-over-row': 'E75',
+  'sumo-squat': 'E76',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

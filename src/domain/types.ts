@@ -73,7 +73,8 @@ export type ExerciseId =
   | 'squat-curl'
   | 'thruster'
   | 'single-arm-thruster'
-  | 'bent-over-row';
+  | 'bent-over-row'
+  | 'sumo-squat';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

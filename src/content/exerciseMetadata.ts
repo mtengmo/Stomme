@@ -305,6 +305,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'bent-over-row': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, dra båda mot höfterna.'],
   ],
+  'sumo-squat': [
+    [
+      'dumbbell',
+      1,
+      [0, 1],
+      'Håll en hantel med båda händerna framför kroppen.',
+    ],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -630,6 +638,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Höftfällningen hålls stilla medan båda vikterna dras mot höfterna.',
   ],
+  'sumo-squat': [
+    'basic',
+    'Bred fotställning med knän som följer tårnas riktning.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -730,6 +742,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'sumo-squat')
+    return [
+      {
+        title: '5 Variations of the Body-weight Squat · Dumbbell Sumo Squat',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/pros/expert-articles/5875/5-variations-of-the-body-weight-squat/',
+        note: 'Beskriver bred fotställning och en hantel i båda händerna. Appens dos och viktval är redaktionella förslag.',
+      },
+    ];
   if (id === 'bent-over-row')
     return [
       {
@@ -1020,6 +1041,7 @@ export const exerciseMetadata = Object.fromEntries(
         'thruster',
         'single-arm-thruster',
         'bent-over-row',
+        'sumo-squat',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1059,6 +1081,7 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'single-arm-thruster') metadata.easierExerciseId = 'thruster';
     if (id === 'bent-over-row') metadata.easierExerciseId = 'supported-row';
     if (id === 'supported-row') metadata.harderExerciseId = 'bent-over-row';
+    if (id === 'sumo-squat') metadata.easierExerciseId = 'goblet-squat';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

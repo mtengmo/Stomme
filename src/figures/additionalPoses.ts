@@ -413,6 +413,50 @@ export const additionalFigures = {
     props: [],
     held: twoDumbbells,
   },
+  'sumo-squat': {
+    start: p(
+      [99, 60],
+      [98, 74],
+      [98, 118],
+      [
+        [113, 108],
+        [98, 143],
+        [83, 108],
+        [98, 143],
+      ],
+      [
+        [110.5, 146],
+        [123, 174],
+        [140, 177],
+        [85.5, 146],
+        [73, 174],
+        [56, 177],
+      ],
+    ),
+    end: p(
+      [99, 81],
+      [98, 95],
+      [98, 137],
+      [
+        [119, 130],
+        [98, 158],
+        [77, 130],
+        [98, 158],
+      ],
+      [
+        [130, 151],
+        [123, 174],
+        [140, 177],
+        [66, 151],
+        [73, 174],
+        [56, 177],
+      ],
+    ),
+    props: [],
+    // Both hands meet at one logical handle. Hold the dumbbell once at that
+    // shared point rather than drawing a second copy for the far hand.
+    held: oneDumbbell,
+  },
   'floor-press': {
     start: floorBase,
     end: {

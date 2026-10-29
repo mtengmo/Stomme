@@ -118,6 +118,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Välj enarmsrodd med stöd eller lättare hantlar.',
     [pair(2), pair(4)],
   ),
+  entry(
+    'sumo-squat',
+    'Sumoknäböj med hantel',
+    ['Framsida lår', 'Säte', 'Insida lår'],
+    [
+      'Stå bredare än höftbrett med tårna lätt utåt. Håll en hantel med båda händerna framför kroppen.',
+      'Böj höfter och knän och sänk hanteln mellan benen så långt du kan med fötterna kvar i golvet. Låt knäna följa tårnas riktning.',
+      'Pressa genom fötterna och res dig upprätt. Ned och upp är en repetition.',
+    ],
+    'Knäna faller inåt eller ryggen rundas för att sänka hanteln längre.',
+    'Välj gobletknäböj med grundare djup och lättare vikt.',
+    [single(4), single(8)],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [
