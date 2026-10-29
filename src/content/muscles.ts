@@ -234,6 +234,11 @@ export const exerciseMuscles: Record<
     secondary: ['core', 'back'],
     qualities: [],
   },
+  woodchop: {
+    primary: ['core'],
+    secondary: ['shoulders', 'glutes'],
+    qualities: [],
+  },
   'russian-twist': {
     primary: ['core'],
     secondary: ['hip-flexors'],

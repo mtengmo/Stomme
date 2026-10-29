@@ -81,7 +81,8 @@ export type ExerciseId =
   | 'side-lunge'
   | 'walking-lunge'
   | 'kettlebell-goblet-squat'
-  | 'russian-twist';
+  | 'russian-twist'
+  | 'woodchop';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

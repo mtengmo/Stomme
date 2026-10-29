@@ -64,6 +64,7 @@ function entry(
                     'triceps-kickback',
                     'kettlebell-press',
                     'single-arm-thruster',
+                    'woodchop',
                     'kettlebell-floor-press',
                     'kettlebell-rack-carry',
                   ].includes(id)
@@ -251,6 +252,20 @@ export const lateAdditionalExercises: Exercise[] = [
       single(4, 'kettlebell'),
       single(8, 'kettlebell'),
     ],
+  ),
+  entry(
+    'woodchop',
+    'Woodchop',
+    ['Bål', 'Axlar', 'Säte'],
+    [
+      'Stå med fötterna ungefär axelbrett och håll vikten med båda händerna vid vald höft, med lätt böjda knän.',
+      'Vrid dig lugnt och för vikten diagonalt uppåt över motsatt axel. Vrid den bakre foten med så att knät följer med och inte vrids.',
+      'Sänk vikten med kontroll tillbaka till höften. Upp och ner är en repetition. Gör alla repetitioner på en sida, byt sedan. Avbryt om ryggen gör ont.',
+    ],
+    'Du svingar vikten med armarna eller vrider ryggen utan att vrida foten med.',
+    'Gör rörelsen utan vikt eller med en lättare vikt och lägre lyft.',
+    [single(2), single(4), single(4, 'kettlebell'), single(8, 'kettlebell')],
+    true,
   ),
 ];
 

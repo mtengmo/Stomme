@@ -347,6 +347,15 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Grip kettlebellens horn med båda händerna nära bröstet.',
     ],
   ],
+  woodchop: [
+    ['dumbbell', 1, [0, 1], 'Håll en lätt hantel med båda händerna.'],
+    [
+      'kettlebell',
+      1,
+      [2, 3],
+      'Håll en lätt kettlebell i handtaget med båda händerna.',
+    ],
+  ],
   'russian-twist': [
     ['bodyweight', 1, [0], 'Håll händerna nära bröstet utan extra vikt.'],
     [
@@ -715,6 +724,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'basic',
     'Båda händerna håller vikten nära bröstet under en kontrollerad knäböj.',
   ],
+  woodchop: [
+    'practiced',
+    'Diagonal rotation från höft till axel med vriden fot och kontrollerad bål.',
+  ],
   'russian-twist': [
     'practiced',
     'Sittande vridning kräver liten kontrollerad rörelse utan armarnas fart.',
@@ -819,6 +832,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'woodchop')
+    return [
+      {
+        title: 'Seated Medicine Ball Trunk Rotations',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/47/seated-medicine-ball-trunk-rotations/',
+        note: 'Källan visar bålrotation med boll; woodchop med hantel eller kettlebell är en stående, diagonal variant. Appens rörelseomfång och dos är redaktionella förslag.',
+      },
+    ];
   if (id === 'russian-twist')
     return [
       {
@@ -1186,6 +1208,7 @@ export const exerciseMetadata = Object.fromEntries(
         'walking-lunge',
         'kettlebell-goblet-squat',
         'russian-twist',
+        'woodchop',
       ].includes(id)
         ? '2026-10-29'
         : [

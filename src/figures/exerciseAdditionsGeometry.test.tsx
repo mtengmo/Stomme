@@ -663,3 +663,23 @@ describe('russian twist oblique geometry', () => {
     expect(defaultFigure).toContain('data-view="oblique"');
   });
 });
+
+describe('woodchop figure geometry', () => {
+  it('moves one shared-grip weight diagonally up with fixed feet and attached arms', () => {
+    const start = movementPose('woodchop', 0);
+    const end = movementPose('woodchop', 1);
+    expect(figures.woodchop.held).toEqual({ kind: 'dumbbell', hands: ['hR'] });
+    expect(end.hR[1]).toBeLessThan(start.hR[1] - 80);
+    expect(end.hR[0]).toBeGreaterThan(start.hR[0]);
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('woodchop', frame / 20);
+      expect(pose.hR).toEqual(pose.hL);
+      expect(pose.aR).toEqual(start.aR);
+      expect(pose.tL).toEqual(start.tL);
+      expect(distance(pose.neck, pose.eR)).toBeGreaterThan(18);
+      expect(distance(pose.neck, pose.eR)).toBeLessThan(34);
+      expect(distance(pose.eR, pose.hR)).toBeGreaterThan(9);
+      expect(distance(pose.eR, pose.hR)).toBeLessThan(28);
+    }
+  });
+});

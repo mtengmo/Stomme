@@ -7,13 +7,14 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E82 and E87 references and original load indices', () => {
+  it('preserves permanent E01–E82, E87 and E88 references and original load indices', () => {
     expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual([
       ...Array.from(
         { length: 82 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
       'E87',
+      'E88',
     ]);
     expect(
       exercises['goblet-chair-squat'].loadLadder.map((load) => load.kg),
@@ -196,6 +197,13 @@ describe('expanded library integrity', () => {
     expect(exercises['russian-twist'].tips[2]).toContain(
       'Avbryt om ryggen gör ont',
     );
+    expect(exerciseMetadata.woodchop.sidePolicy).toBe('choose-side');
+    expect(exercises.woodchop.perSide).toBe(true);
+    expect(exercises.woodchop.kneeLoaded).toBe(false);
+    expect(exerciseMetadata.woodchop.variants[0]?.technicalLevel).toBe(
+      'practiced',
+    );
+    expect(exercises.woodchop.tips[1]).toContain('bakre foten');
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

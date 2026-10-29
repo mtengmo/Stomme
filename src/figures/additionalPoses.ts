@@ -847,6 +847,38 @@ export const additionalFigures = {
     held: { kind: 'dumbbell', hands: ['hR', 'hL'] },
     motion: 'sequence',
   },
+  woodchop: {
+    // Low-to-high diagonal: both hands share one grip on the single weight,
+    // starting beside the working hip and finishing high over the far shoulder.
+    start: {
+      ...stand,
+      head: [101, 62],
+      neck: [99, 76],
+      kR: [105, 148],
+      kL: [91, 148],
+      eR: [97, 100],
+      hR: [101, 126],
+      eL: [97, 100],
+      hL: [101, 126],
+    },
+    middle: {
+      ...stand,
+      eR: [111, 94],
+      hR: [115, 78],
+      eL: [111, 94],
+      hL: [115, 78],
+    },
+    end: {
+      ...stand,
+      head: [97, 60],
+      eR: [108, 52],
+      hR: [112, 31],
+      eL: [108, 52],
+      hL: [112, 31],
+    },
+    props: [],
+    held: oneDumbbell,
+  },
   'reverse-lunge': {
     start: p(
       [130, 60],
