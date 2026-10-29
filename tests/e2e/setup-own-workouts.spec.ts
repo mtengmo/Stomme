@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { quickStart } from './flow';
+import { FRESH_STATE } from './state';
+
+test.use({ storageState: FRESH_STATE });
 
 for (const [width, scheme] of [
   [360, 'light'],
