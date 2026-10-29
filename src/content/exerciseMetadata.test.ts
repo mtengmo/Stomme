@@ -100,9 +100,7 @@ describe('expanded library integrity', () => {
     expect(exerciseMetadata['sumo-squat'].easierExerciseId).toBe(
       'goblet-squat',
     );
-    expect(exerciseMetadata['goblet-squat'].harderExerciseId).toBe(
-      'squat-curl',
-    );
+    expect(exerciseMetadata['goblet-squat'].harderExerciseId).toBe('thruster');
     expect(
       exerciseMetadata['weighted-glute-bridge'].variants[0]?.equipment,
     ).toEqual([{ type: 'dumbbell', count: 1 }]);
@@ -168,13 +166,11 @@ describe('expanded library integrity', () => {
     ).toEqual([{ type: 'kettlebell', count: 1 }]);
     expect(
       exerciseMetadata['kettlebell-goblet-squat'].variants[0]?.technicalLevel,
-    ).toBe('basic');
+    ).toBe('practiced');
     expect(exerciseMetadata['kettlebell-goblet-squat'].easierExerciseId).toBe(
       'goblet-squat',
     );
-    expect(exerciseMetadata['goblet-squat'].harderExerciseId).toBe(
-      'squat-curl',
-    );
+    expect(exerciseMetadata['goblet-squat'].harderExerciseId).toBe('thruster');
     expect(exercises['kettlebell-goblet-squat'].kneeLoaded).toBe(true);
     expect(
       exerciseMetadata['russian-twist'].variants.map(
@@ -216,14 +212,16 @@ describe('expanded library integrity', () => {
     expect(exerciseMetadata['kettlebell-halo'].variants[0]?.equipment).toEqual([
       { type: 'kettlebell', count: 1 },
     ]);
-    expect(exercises['kettlebell-halo'].tips[2]).toContain('åt andra hållet');
+    expect(exercises['kettlebell-halo'].tips[2]).toContain(
+      'Byt håll efter halva antalet',
+    );
     expect(exerciseMetadata.woodchop.sidePolicy).toBe('choose-side');
     expect(exercises.woodchop.perSide).toBe(true);
     expect(exercises.woodchop.kneeLoaded).toBe(false);
     expect(exerciseMetadata.woodchop.variants[0]?.technicalLevel).toBe(
       'practiced',
     );
-    expect(exercises.woodchop.tips[1]).toContain('bakre foten');
+    expect(exercises.woodchop.tips[1]).toContain('foten på startsidan');
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

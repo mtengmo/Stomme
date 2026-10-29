@@ -14,7 +14,7 @@ function required<T>(value: T | undefined): T {
 
 const preferences: TrainingPreferences = {
   programId: 'general',
-  experience: 'some',
+  experience: 'regular',
   equipment: ['bodyweight', 'chair', 'support'],
 };
 const symptom = { area: 'shoulder', side: 'right' as const, score: 2 };
@@ -98,6 +98,21 @@ describe('optional harder exercises', () => {
     };
     expect(
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
+    ).toEqual([]);
+  });
+  it('only suggests harder exercises allowed for the experience level', () => {
+    const equipment: TrainingPreferences['equipment'] = [
+      'bodyweight',
+      'chair',
+      'support',
+      'dumbbell-1',
+      'dumbbell-2',
+    ];
+    const data = fixture('goblet-squat');
+    const some = { ...preferences, experience: 'some' as const, equipment };
+    expect(suggest(data, 'goblet-squat', some)).toEqual(['thruster']);
+    expect(
+      suggest(data, 'goblet-squat', { ...some, experience: 'new' }),
     ).toEqual([]);
   });
   it('does not count borrowed equipment as home progression evidence', () => {

@@ -253,11 +253,11 @@ export const lateAdditionalExercises: Exercise[] = [
   entry(
     'kettlebell-halo',
     'Kettlebell halo',
-    ['Axlar', 'Bål', 'Övre rygg'],
+    ['Axlar', 'Bål', 'Rygg'],
     [
       'Stå med fötterna ungefär axelbrett och håll kettlebellen upp och ned i hornen med båda händerna framför bröstet. Stå upprätt med lätt böjda knän.',
-      'För vikten i en liten, lugn cirkel runt huvudet. Håll armbågarna nära kroppen, bålen stilla och blicken framåt. Håll vikten nära huvudet utan att slå i det.',
-      'Ett helt varv runt huvudet är en repetition. Gör halva antalet åt ena hållet och resten åt andra hållet. Avbryt om det drar i nacken eller axeln.',
+      'För vikten i en liten, lugn cirkel runt huvudet. Håll armbågarna nära huvudet, bålen stilla och blicken framåt. Håll vikten nära huvudet utan att slå i det.',
+      'Ett helt varv runt huvudet är en repetition. Byt håll efter halva antalet. Avbryt om det drar i nacken eller axeln.',
     ],
     'Du lutar dig bakåt eller lyfter axlarna när vikten passerar bakom huvudet.',
     'Gör rörelsen med en lättare kettlebell eller en lätt hantel hållen med båda händerna.',
@@ -288,7 +288,7 @@ export const lateAdditionalExercises: Exercise[] = [
     ['Bål', 'Axlar', 'Säte'],
     [
       'Stå med fötterna ungefär axelbrett och håll vikten med båda händerna vid vald höft, med lätt böjda knän.',
-      'Vrid dig lugnt och för vikten diagonalt uppåt över motsatt axel. Vrid den bakre foten med så att knät följer med och inte vrids.',
+      'Vrid dig lugnt och för vikten diagonalt uppåt över motsatt axel. Vrid foten på startsidan med, så att knät följer foten.',
       'Sänk vikten med kontroll tillbaka till höften. Upp och ner är en repetition. Gör alla repetitioner på en sida, byt sedan. Avbryt om ryggen gör ont.',
     ],
     'Du svingar vikten med armarna eller vrider ryggen utan att vrida foten med.',

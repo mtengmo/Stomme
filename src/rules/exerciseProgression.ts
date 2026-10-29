@@ -7,6 +7,7 @@ import type {
   TrainingPreferences,
 } from '../domain/types';
 import { equipmentFits } from './equipment';
+import { allowedLevels } from './levelPolicy';
 
 /** Optional exercise changes only: never mutates a plan or progresses rehab. */
 export function harderExerciseSuggestions(
@@ -79,9 +80,12 @@ export function harderExerciseSuggestions(
   if (!qualifies) return [];
   const candidates: ExerciseId[] =
     id === 'push-up' ? [next, 'diamond-push-up'] : [next];
+  const levels = allowedLevels(preferences.experience);
   return candidates.filter((candidate) =>
-    exerciseMetadata[candidate].variants.some((variant) =>
-      equipmentFits(variant.equipment, preferences.equipment),
+    exerciseMetadata[candidate].variants.some(
+      (variant) =>
+        equipmentFits(variant.equipment, preferences.equipment) &&
+        levels.includes(variant.technicalLevel),
     ),
   );
 }

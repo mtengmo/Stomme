@@ -713,7 +713,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'Höftfällningen hålls stilla medan båda vikterna dras mot höfterna.',
   ],
   'sumo-squat': [
-    'basic',
+    'practiced',
     'Bred fotställning med knän som följer tårnas riktning.',
   ],
   'weighted-glute-bridge': [
@@ -737,7 +737,7 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'Varje framåtsteg bromsas och följs av nästa ben utan att stanna på plats.',
   ],
   'kettlebell-goblet-squat': [
-    'basic',
+    'practiced',
     'Båda händerna håller vikten nära bröstet under en kontrollerad knäböj.',
   ],
   'one-arm-kettlebell-swing': [
@@ -1132,7 +1132,7 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
         title: 'How to Get Started With Kettlebells',
         publisher: 'American Council on Exercise',
         url: 'https://www.acefitness.org/resources/pros/expert-articles/5269/how-to-get-started-with-kettlebells/',
-        note: 'Rörelseprinciper; appens startvikter och träningsdos är egna val. Pressen utförs strikt från axeln utan benhjälp.',
+        note: 'Rörelseprinciper; appens startvikter och träningsdos är egna val.',
       },
     ];
   return [
@@ -1288,7 +1288,7 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'calf-raise')
       metadata.harderExerciseId = 'single-leg-calf-raise';
     if (id === 'squat-curl') metadata.easierExerciseId = 'goblet-squat';
-    if (id === 'goblet-squat') metadata.harderExerciseId = 'squat-curl';
+    if (id === 'goblet-squat') metadata.harderExerciseId = 'thruster';
     if (id === 'thruster') {
       metadata.easierExerciseId = 'goblet-squat';
       metadata.harderExerciseId = 'single-arm-thruster';
