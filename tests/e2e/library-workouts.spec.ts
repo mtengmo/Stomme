@@ -45,7 +45,7 @@ for (const width of [360, 1280]) {
     ).toHaveAttribute('aria-pressed', 'false');
     await second.getByRole('button', { name: /^Välj till eget pass/ }).click();
     await first.getByRole('button', { name: /^Välj till eget pass/ }).click();
-    await page.getByLabel('Sök efter namn eller nummer').fill('E39');
+    await page.getByLabel('Sök övning').fill('E39');
     await expect(
       page.getByRole('heading', { name: 'Valda övningar · 2 av 12' }),
     ).toBeVisible();

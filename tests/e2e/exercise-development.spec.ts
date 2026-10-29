@@ -29,7 +29,11 @@ for (const width of [360, 1280]) {
     await page.goto('/#/ovningar?sok=Bakåtutfall');
     await expect(page.getByRole('status')).toHaveText('1 övning');
     await page.getByRole('button', { name: 'Favorit', exact: true }).click();
-    await page.getByLabel('Sök efter namn eller nummer').fill('');
+    await page.getByLabel('Sök övning').fill('');
+    await page
+      .locator('summary')
+      .filter({ hasText: /^Fler filter/ })
+      .click();
     await page.getByLabel('Bara mina favoriter').check();
     await expect(page.getByRole('status')).toHaveText('1 övning');
     await page.reload();

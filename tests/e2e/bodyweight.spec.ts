@@ -12,7 +12,7 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
-    const search = page.getByLabel('Sök efter namn eller nummer');
+    const search = page.getByLabel('Sök övning');
     for (const number of [
       'E54',
       'E55',

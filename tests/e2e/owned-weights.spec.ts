@@ -38,7 +38,7 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
-    await page.getByLabel('Sök efter namn eller nummer').fill('E12');
+    await page.getByLabel('Sök övning').fill('E12');
     await page.getByRole('button', { name: /^Välj till eget pass/ }).click();
     await page.getByLabel('Namn på passet').fill('Viktprov');
     await page
