@@ -10,6 +10,27 @@ const pair = (kg: number, tool = 'hantlar'): Load => ({
   label: `2 × ${kg} kg ${tool} · totalt ${kg * 2} kg`,
 });
 
+/** Active knee flexion/extension or loaded leg drive: knee symptoms must hold progression. */
+const kneeLoadedAdditional = new Set<ExerciseId>([
+  'goblet-squat',
+  'kettlebell-deadlift',
+  'dumbbell-rdl',
+  'glute-bridge',
+  'reverse-lunge',
+  'forward-lunge',
+  'kettlebell-swing',
+  'half-squat',
+  'hamstring-curl',
+  'seated-knee-extension',
+  'band-leg-press',
+  'squat-curl',
+  'thruster',
+  'single-arm-thruster',
+  'sumo-squat',
+  'weighted-glute-bridge',
+  'side-lunge',
+]);
+
 /** Library defaults are editable starting points, not an AAOS prescription. */
 function entry(
   id: ExerciseId,
@@ -21,7 +42,6 @@ function entry(
   loads: Load[],
   perSide = false,
   unit: Exercise['unit'] = 'reps',
-  kneeLoaded = false,
 ): Exercise {
   return {
     id,
@@ -60,7 +80,7 @@ function entry(
     loadLadder: loads,
     startLoadIndex: 0,
     week1LoadIndex: 0,
-    kneeLoaded,
+    kneeLoaded: kneeLoadedAdditional.has(id),
   };
 }
 
@@ -183,8 +203,6 @@ export const lateAdditionalExercises: Exercise[] = [
     'Knät faller inåt eller du sätter ned foten utan att bromsa steget.',
     'Gör ett grundare bakåtutfall utan extra vikt.',
     [bw, single(2), single(4)],
-    true,
-    'reps',
     true,
   ),
 ];

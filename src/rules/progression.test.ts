@@ -415,6 +415,74 @@ describe('pain gate', () => {
   });
 });
 
+describe('knee-loaded additional exercises', () => {
+  const kneeLoadedIds = [
+    'goblet-squat',
+    'kettlebell-deadlift',
+    'dumbbell-rdl',
+    'glute-bridge',
+    'reverse-lunge',
+    'forward-lunge',
+    'kettlebell-swing',
+    'half-squat',
+    'hamstring-curl',
+    'seated-knee-extension',
+    'band-leg-press',
+    'squat-curl',
+    'thruster',
+    'single-arm-thruster',
+    'sumo-squat',
+    'weighted-glute-bridge',
+    'side-lunge',
+  ] as const;
+
+  it.each(kneeLoadedIds)(
+    '%s repeats a completed dose after new knee symptoms',
+    (id) => {
+      const exercise = exercises[id];
+      const previous = last(id, {
+        sets: 2,
+        target: exercise.range.start,
+        load: 0,
+        effort: 'easy',
+      });
+      expect(exercise.kneeLoaded).toBe(true);
+      expect(suggestNext(exercise, 2, 2, previous, 'warn')).toMatchObject({
+        sets: 2,
+        target: exercise.range.start,
+        loadIndex: 0,
+        reason: 'pain_hold',
+        seePhysio: false,
+      });
+      expect(suggestNext(exercise, 2, 2, previous, 'stop')).toMatchObject({
+        sets: 2,
+        target: exercise.range.start,
+        loadIndex: 0,
+        reason: 'pain_stop_hold',
+        seePhysio: true,
+      });
+    },
+  );
+
+  it.each([
+    'bent-over-row',
+    'overhead-triceps-extension',
+    'dumbbell-pullover',
+  ] as const)('%s stays outside the knee pain gate', (id) => {
+    const exercise = exercises[id];
+    const previous = last(id, {
+      sets: 2,
+      target: exercise.range.start,
+      load: 0,
+      effort: 'easy',
+    });
+    expect(exercise.kneeLoaded).toBe(false);
+    expect(suggestNext(exercise, 2, 2, previous, 'warn').reason).toBe(
+      'increase_amount',
+    );
+  });
+});
+
 describe('logged load is the base', () => {
   it('logged load differs from the suggestion', () => {
     const l = last('goblet-chair-squat', {
