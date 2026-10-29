@@ -313,6 +313,9 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Håll en hantel med båda händerna framför kroppen.',
     ],
   ],
+  'weighted-glute-bridge': [
+    ['dumbbell', 1, [0, 1], 'Håll en hantel stilla tvärs över höfterna.'],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -642,6 +645,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'basic',
     'Bred fotställning med knän som följer tårnas riktning.',
   ],
+  'weighted-glute-bridge': [
+    'basic',
+    'Båda fötterna ger stöd medan hanteln hålls stilla på höfterna.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -742,6 +749,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'weighted-glute-bridge')
+    return [
+      {
+        title: '5 Benefits of Dumbbell Training · Dumbbell Hip Thrusters',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/pros/expert-articles/5675/5-benefits-of-dumbbell-training/',
+        note: 'Källan visar bäckenlyft på golv med två hantlar på höfterna. Appen använder en hantel som hålls stilla med båda händerna; dosen är ett redaktionellt förslag.',
+      },
+    ];
   if (id === 'sumo-squat')
     return [
       {
@@ -1042,6 +1058,7 @@ export const exerciseMetadata = Object.fromEntries(
         'single-arm-thruster',
         'bent-over-row',
         'sumo-squat',
+        'weighted-glute-bridge',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1082,6 +1099,10 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'bent-over-row') metadata.easierExerciseId = 'supported-row';
     if (id === 'supported-row') metadata.harderExerciseId = 'bent-over-row';
     if (id === 'sumo-squat') metadata.easierExerciseId = 'goblet-squat';
+    if (id === 'weighted-glute-bridge')
+      metadata.easierExerciseId = 'glute-bridge';
+    if (id === 'glute-bridge')
+      metadata.harderExerciseId = 'weighted-glute-bridge';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

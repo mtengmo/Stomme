@@ -204,6 +204,11 @@ export const exerciseMuscles: Record<
     secondary: ['hip-adductors', 'core'],
     qualities: [],
   },
+  'weighted-glute-bridge': {
+    primary: ['glutes'],
+    secondary: ['hamstrings', 'core'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

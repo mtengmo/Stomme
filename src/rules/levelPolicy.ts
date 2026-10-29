@@ -42,6 +42,7 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'single-arm-thruster': 'squat',
   'hammer-curl': 'curl',
   'glute-bridge': 'bridge',
+  'weighted-glute-bridge': 'bridge',
   'single-leg-floor-bridge': 'bridge',
   'dead-bug': 'core',
   'bird-dog': 'core',

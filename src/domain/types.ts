@@ -74,7 +74,8 @@ export type ExerciseId =
   | 'thruster'
   | 'single-arm-thruster'
   | 'bent-over-row'
-  | 'sumo-squat';
+  | 'sumo-squat'
+  | 'weighted-glute-bridge';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

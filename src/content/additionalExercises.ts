@@ -131,6 +131,19 @@ export const lateAdditionalExercises: Exercise[] = [
     'Välj gobletknäböj med grundare djup och lättare vikt.',
     [single(4), single(8)],
   ),
+  entry(
+    'weighted-glute-bridge',
+    'Bäckenlyft med hantel',
+    ['Säte', 'Baksida lår', 'Bål'],
+    [
+      'Ligg på rygg med böjda knän och båda fötterna i golvet. Lägg en hantel tvärs över höfterna och håll den stilla med båda händerna.',
+      'Pressa genom fötterna och lyft bäckenet tills höft och bål bildar en linje. Låt hanteln följa höfterna.',
+      'Sänk bäckenet lugnt till golvet. Upp och ned är en repetition.',
+    ],
+    'Du tappar kontrollen över hanteln eller svankar för att lyfta högre.',
+    'Gör bäckenlyft utan extra vikt och med ett lägre lyft.',
+    [single(2), single(4)],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [

@@ -605,6 +605,30 @@ export const additionalFigures = {
     end: { ...bridgeStart, hip: [99, 146], kR: [124, 144], kL: [116, 142] },
     props: mat,
   },
+  'weighted-glute-bridge': {
+    start: {
+      ...bridgeStart,
+      hR: [99, 167],
+      hL: [99, 167],
+      eR: [77, 169],
+      eL: [78, 173],
+    },
+    // The pelvis, hands, and single dumbbell rise as one unit. The top is
+    // aligned from shoulders through hips toward knees rather than arched.
+    end: {
+      ...bridgeStart,
+      hip: [99, 153],
+      kR: [124, 144],
+      kL: [116, 142],
+      hR: [99, 149],
+      hL: [99, 149],
+      eR: [77, 155],
+      eL: [78, 161],
+    },
+    props: mat,
+    // Both hands meet at the same center; render one dumbbell there.
+    held: oneDumbbell,
+  },
   'reverse-lunge': {
     start: p(
       [130, 60],

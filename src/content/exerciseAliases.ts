@@ -68,6 +68,11 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Bent-over row',
   ],
   'sumo-squat': ['Sumoknäböj med hantel', 'Sumoknäböj', 'Sumo squat'],
+  'weighted-glute-bridge': [
+    'Bäckenlyft med hantel',
+    'Viktat bäckenlyft',
+    'Weighted glute bridge',
+  ],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],
   'hammer-curl': ['Hammercurl', 'Hammer curl'],
   'lateral-raise': ['Sidolyft', 'Hantellyft åt sidan'],
