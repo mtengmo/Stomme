@@ -194,6 +194,11 @@ export const exerciseMuscles: Record<
     secondary: ['core', 'triceps'],
     qualities: [],
   },
+  'bent-over-row': {
+    primary: ['back'],
+    secondary: ['biceps', 'shoulders', 'core'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

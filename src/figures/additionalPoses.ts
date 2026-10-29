@@ -393,6 +393,26 @@ export const additionalFigures = {
     props: [{ type: 'step', x: 140, y: 125, w: 31 }],
     held: oneDumbbell,
   },
+  'bent-over-row': {
+    // Keep the hinge and stance fixed; row both dumbbells from a dead hang
+    // toward the hip line without changing the back angle.
+    start: {
+      ...hinge,
+      eR: [126, 134],
+      hR: [122, 155],
+      eL: [112, 136],
+      hL: [98, 155],
+    },
+    end: {
+      ...hinge,
+      eR: [114, 117],
+      hR: [105, 137],
+      eL: [105, 118],
+      hL: [85, 137],
+    },
+    props: [],
+    held: twoDumbbells,
+  },
   'floor-press': {
     start: floorBase,
     end: {

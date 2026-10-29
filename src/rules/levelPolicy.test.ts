@@ -96,6 +96,7 @@ describe('level policy', () => {
     ).toBe(4);
     expect(heavyStartAllowed('goblet-squat')).toBe(true);
     expect(heavyStartAllowed('floor-press')).toBe(true);
+    expect(heavyStartAllowed('bent-over-row')).toBe(true);
     expect(heavyStartAllowed('shoulder-press')).toBe(false);
     expect(heavyStartAllowed('single-leg-rdl')).toBe(false);
     expect(heavyStartAllowed('split-squat')).toBe(false);

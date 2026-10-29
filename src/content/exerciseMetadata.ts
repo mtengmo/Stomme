@@ -302,6 +302,9 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
   'single-arm-thruster': [
     ['dumbbell', 1, [0, 1], 'En hantel i vald hand, vid axeln.'],
   ],
+  'bent-over-row': [
+    ['dumbbell', 2, [0, 1], 'En hantel i varje hand, dra båda mot höfterna.'],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -623,6 +626,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'technical',
     'Ensidig last över huvudet kräver kontroll av bålen under hela rörelsen.',
   ],
+  'bent-over-row': [
+    'practiced',
+    'Höftfällningen hålls stilla medan båda vikterna dras mot höfterna.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -723,6 +730,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'bent-over-row')
+    return [
+      {
+        title: 'Bent-over Row · Strength Training for Fat Loss',
+        publisher: 'American Council on Exercise / Human Kinetics',
+        url: 'https://www.acefitness.org/continuing-education/prosource/november-2014/5082/book-review-strength-training-for-fat-loss/',
+        note: 'Beskriver rodd med två hantlar i höftfällt läge. Appens dos och viktval är redaktionella förslag.',
+      },
+    ];
   if (id === 'thruster' || id === 'single-arm-thruster')
     return [
       {
@@ -1003,6 +1019,7 @@ export const exerciseMetadata = Object.fromEntries(
         'squat-curl',
         'thruster',
         'single-arm-thruster',
+        'bent-over-row',
       ].includes(id)
         ? '2026-10-28'
         : added
@@ -1040,6 +1057,8 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.harderExerciseId = 'single-arm-thruster';
     }
     if (id === 'single-arm-thruster') metadata.easierExerciseId = 'thruster';
+    if (id === 'bent-over-row') metadata.easierExerciseId = 'supported-row';
+    if (id === 'supported-row') metadata.harderExerciseId = 'bent-over-row';
     if (id === 'plank-arm-lift') {
       metadata.easierExerciseId = 'plank';
       metadata.sidePolicy = 'alternating';

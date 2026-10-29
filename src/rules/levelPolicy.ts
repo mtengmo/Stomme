@@ -18,6 +18,7 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'kettlebell-deadlift': 'hinge',
   'single-leg-rdl': 'hinge',
   'supported-row': 'row',
+  'bent-over-row': 'row',
   'floor-press': 'horizontal-press',
   'kettlebell-floor-press': 'horizontal-press',
   'push-up': 'horizontal-press',

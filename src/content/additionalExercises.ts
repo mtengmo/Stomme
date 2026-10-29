@@ -105,6 +105,19 @@ export const lateAdditionalExercises: Exercise[] = [
     [single(2), single(4)],
     true,
   ),
+  entry(
+    'bent-over-row',
+    'Hantelrodd, böjd framåt',
+    ['Rygg', 'Biceps', 'Baksida axlar'],
+    [
+      'Stå höftbrett med en hantel i varje hand. Böj lätt på knäna och fäll i höften med ryggen i sin naturliga form.',
+      'Dra båda hantlarna mot höfterna med armbågarna nära kroppen. Håll överkroppen stilla.',
+      'Sänk hantlarna lugnt tills armarna är nästan raka. Upp och ned är en repetition.',
+    ],
+    'Du rycker vikterna uppåt eller rundar ryggen för att nå längre ned.',
+    'Välj enarmsrodd med stöd eller lättare hantlar.',
+    [pair(2), pair(4)],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [
