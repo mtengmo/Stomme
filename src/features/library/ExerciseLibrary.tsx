@@ -15,7 +15,18 @@ import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import { getMeta } from '../../db/repo';
+import type { ExerciseId } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
+import {
+  defaultSortMode,
+  latestLogByExercise,
+  parseSortMode,
+  type SortContext,
+  type SortMode,
+  sortExercises,
+  sortParamName,
+  sortReason,
+} from '../../rules/exerciseSort';
 import {
   type ExerciseFilters,
   filterExercises,
@@ -24,7 +35,10 @@ import {
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
-import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
+import {
+  ExerciseFilterControls,
+  SortSelect,
+} from '../exercise/ExerciseFilterControls';
 import { FavouritesProvider } from '../exercise/FavouriteButton';
 import { ResultList, ResultViewSwitch } from './ExerciseResults';
 import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
@@ -67,11 +81,39 @@ export function ExerciseLibrary() {
             template.items.map((item) => item.exerciseId),
           )),
   );
-  const { primary, supporting: secondary } = filterExercises(
-    exerciseList,
-    filters,
-    { inventory, mine, favourites },
+  const logged = useLiveQuery(
+    async () =>
+      [...latestLogByExercise(await getDb().setLogs.toArray())] as [
+        ExerciseId,
+        string,
+      ][],
+    [],
   );
+  const mode = parseSortMode(query.get(sortParamName));
+  const filtered = filterExercises(exerciseList, filters, {
+    inventory,
+    mine,
+    favourites,
+  });
+  const sortContext: SortContext = {
+    mode,
+    term: filters.term,
+    inventory,
+    experience: preferences?.experience,
+    favourites,
+    mine,
+    lastLogged: new Map(logged),
+  };
+  const primary = sortExercises(filtered.primary, sortContext);
+  const secondary = sortExercises(filtered.supporting, sortContext);
+  const reasonOf = (id: ExerciseId) => sortReason(id, sortContext);
+  const noHistory = mode === 'recent' && logged !== undefined && !logged.length;
+  const changeSort = (next: SortMode) => {
+    const params = new URLSearchParams(search);
+    if (next === defaultSortMode) params.delete(sortParamName);
+    else params.set(sortParamName, next);
+    navigate(`/ovningar${params.size ? `?${params}` : ''}`);
+  };
   const changeFilters = (patch: Partial<ExerciseFilters>) => {
     const next = filtersToParams(patch, search);
     navigate(`/ovningar${next.size ? `?${next}` : ''}`, {
@@ -80,7 +122,10 @@ export function ExerciseLibrary() {
   };
   const till = query.get('till');
   const clearFilters = () => {
-    navigate(till ? `/ovningar?till=${encodeURIComponent(till)}` : '/ovningar');
+    const keep = new URLSearchParams();
+    if (till) keep.set('till', till);
+    if (mode !== defaultSortMode) keep.set(sortParamName, mode);
+    navigate(keep.size ? `/ovningar?${keep}` : '/ovningar');
     document.getElementById('library-search')?.focus();
   };
   const invalid = query.has('muskel') && selected === null;
@@ -161,6 +206,13 @@ export function ExerciseLibrary() {
           <SelectionStatus
             resultText={`${count} ${count === 1 ? 'övning' : 'övningar'}${area ? ` för ${area.toLowerCase()}` : ''}`}
           />
+          <SortSelect value={mode} onChange={changeSort} idPrefix="library" />
+          {noHistory ? (
+            <p className="m-0 text-base text-ink-soft">
+              Du har inte tränat något än, så övningarna visas i alfabetisk
+              ordning.
+            </p>
+          ) : null}
           <ResultViewSwitch />
           {count === 0 ? (
             <p className="m-0 text-xl">Inga övningar passar filtren.</p>
@@ -172,6 +224,7 @@ export function ExerciseLibrary() {
             inventory={inventory}
             groupByRegion={!filters.term.trim() && !area}
             experience={preferences?.experience}
+            reasonOf={reasonOf}
           />
           <ResultList
             title="Hjälper till"
@@ -179,6 +232,7 @@ export function ExerciseLibrary() {
             id="secondary-results"
             inventory={inventory}
             experience={preferences?.experience}
+            reasonOf={reasonOf}
           />
         </WorkoutBuilder>
       </div>

@@ -9,6 +9,7 @@ import {
   type MuscleGroupId,
   muscleGroups,
 } from '../../content/muscles';
+import { type SortMode, sortLabels } from '../../rules/exerciseSort';
 import type { ExerciseFilters } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
 
@@ -65,6 +66,38 @@ export function activeFilterCount(
     Number(Boolean(value.term.trim())) +
     Number(Boolean(value.region)) +
     Number(Boolean(value.muscle))
+  );
+}
+
+/** Labelled native select for the result order. */
+export function SortSelect({
+  value,
+  onChange,
+  idPrefix,
+}: {
+  value: SortMode;
+  onChange(mode: SortMode): void;
+  idPrefix: string;
+}) {
+  const id = `${idPrefix}-sort`;
+  return (
+    <div className="space-y-2">
+      <label className="block text-base font-bold" htmlFor={id}>
+        Sortera
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value as SortMode)}
+        className={selectClass}
+      >
+        {(Object.keys(sortLabels) as SortMode[]).map((mode) => (
+          <option key={mode} value={mode}>
+            {sortLabels[mode]}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 

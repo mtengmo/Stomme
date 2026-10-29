@@ -190,11 +190,20 @@ interface RowProps {
   exercise: Exercise;
   inventory: Inventory;
   experience?: TrainingPreferences['experience'];
+  /** Plain reason for the row's place in the order, e.g. "Favorit". */
+  reason?: string;
 }
 
-function CompactRow({ exercise, inventory, experience, hideRegion }: RowProps) {
+function CompactRow({
+  exercise,
+  inventory,
+  experience,
+  hideRegion,
+  reason,
+}: RowProps) {
   const missing = missingEquipment(exercise.id, inventory);
   const meta = [
+    reason ?? '',
     hideRegion ? '' : regionLabel(exercise),
     missing.length
       ? `Saknar ${missing.join(', ').toLowerCase()}`
@@ -233,7 +242,7 @@ function CompactRow({ exercise, inventory, experience, hideRegion }: RowProps) {
   );
 }
 
-function DetailedRow({ exercise, inventory, experience }: RowProps) {
+function DetailedRow({ exercise, inventory, experience, reason }: RowProps) {
   const missing = missingEquipment(exercise.id, inventory);
   const membership = Object.values(templates).filter((template) =>
     template.items.some((item) => item.exerciseId === exercise.id),
@@ -262,6 +271,9 @@ function DetailedRow({ exercise, inventory, experience }: RowProps) {
             'Rörlighet och position'
           )}
         </p>
+        {reason ? (
+          <p className="m-0 mt-1 text-base font-bold">{reason}</p>
+        ) : null}
         <p className="m-0 mt-1 text-base text-ink-soft">
           Utrustning: {equipment(exercise)}
         </p>
@@ -307,6 +319,7 @@ export function ResultList({
   inventory,
   experience,
   groupByRegion = false,
+  reasonOf,
 }: {
   title: string;
   items: readonly Exercise[];
@@ -315,6 +328,8 @@ export function ResultList({
   experience?: TrainingPreferences['experience'];
   /** Region headers between the rows (compact view, no search text). */
   groupByRegion?: boolean;
+  /** Plain reason per row, shown only when the host gives one. */
+  reasonOf?: (id: Exercise['id']) => string | undefined;
 }) {
   const [view] = useResultView();
   if (!items.length) return null;
@@ -327,6 +342,7 @@ export function ResultList({
       exercise={exercise}
       inventory={inventory}
       experience={experience}
+      reason={reasonOf?.(exercise.id)}
     />
   );
   let body: ReactNode;

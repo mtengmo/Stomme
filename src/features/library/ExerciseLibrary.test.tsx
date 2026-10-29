@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import 'fake-indexeddb/auto';
 import {
   cleanup,
   render,
@@ -11,6 +12,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Link, Route, Router, Switch } from 'wouter';
 import { exercises } from '../../content/exercises';
 import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
+import { getDb } from '../../db/db';
+import { toggleFavourite } from '../../db/favourites';
 import { useAppHashLocation } from '../../lib/hashLocation';
 import { ExerciseLibrary } from './ExerciseLibrary';
 
@@ -39,7 +42,9 @@ function TestRoutes() {
 
 const detailed = () => localStorage.setItem('stomme.library-view', 'detailed');
 
-beforeEach(() => {
+beforeEach(async () => {
+  await getDb().delete();
+  await getDb().open();
   localStorage.clear();
   window.history.replaceState(null, '', '/#/ovningar');
 });
@@ -217,5 +222,132 @@ describe('exercise library', () => {
     await waitFor(() =>
       expect(screen.getByRole('status').textContent).toBe('86 övningar'),
     );
+  });
+
+  describe('sort selector', () => {
+    const firstRowName = () =>
+      screen
+        .getAllByRole('link', { name: /.+/ })
+        .map((link) => link.getAttribute('aria-describedby'))
+        .find(Boolean);
+    const rowNames = () =>
+      screen
+        .getAllByRole('listitem')
+        .filter((item) => item.querySelector('[id^="meta-"]'))
+        .map((item) => item.querySelector('a')?.getAttribute('aria-label'));
+
+    it('is a labelled native select that defaults to "Passar mig"', () => {
+      render(<TestRoutes />);
+      const select = screen.getByLabelText('Sortera') as HTMLSelectElement;
+      expect(select.tagName).toBe('SELECT');
+      expect(select.value).toBe('fit');
+      expect([...select.options].map((option) => option.text)).toEqual([
+        'Passar mig',
+        'Gillade först',
+        'Namn A–Ö',
+        'Senast tränade',
+      ]);
+      expect(firstRowName()).toBeTruthy();
+    });
+
+    it('writes the choice to the URL, drops it for the default and restores it on Back', async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(null, '', '/#/ovningar?sok=utfall');
+      render(<TestRoutes />);
+      await user.selectOptions(screen.getByLabelText('Sortera'), 'name');
+      expect(window.location.hash).toBe('#/ovningar?sok=utfall&sort=name');
+      const names = rowNames();
+      expect(names).toEqual(
+        [...names].sort((a, b) => (a ?? '').localeCompare(b ?? '', 'sv')),
+      );
+      await user.click(
+        screen.getAllByRole('link', { name: /.+/ })[3] as HTMLElement,
+      );
+      await user.click(
+        await screen.findByRole('button', { name: 'Tillbaka från övning' }),
+      );
+      await waitFor(() =>
+        expect(
+          (screen.getByLabelText('Sortera') as HTMLSelectElement).value,
+        ).toBe('name'),
+      );
+      await user.selectOptions(screen.getByLabelText('Sortera'), 'fit');
+      expect(window.location.hash).toBe('#/ovningar?sok=utfall');
+    });
+
+    it('keeps the sort when other filters change and when filters are cleared', async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(
+        null,
+        '',
+        '/#/ovningar?sort=liked&typ=mobility',
+      );
+      render(<TestRoutes />);
+      await user.click(screen.getByLabelText('Bara övningar en sida i taget'));
+      expect(window.location.hash).toContain('sort=liked');
+      await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
+      expect(window.location.hash).toBe('#/ovningar?sort=liked');
+    });
+
+    it('puts liked exercises first and follows a changed like', async () => {
+      const user = userEvent.setup();
+      window.history.replaceState(
+        null,
+        '',
+        '/#/ovningar?sok=utfall&sort=liked',
+      );
+      render(<TestRoutes />);
+      await screen.findAllByRole('link', { name: /utfall/i });
+      const before = rowNames();
+      const last = before[before.length - 1] as string;
+      const id = Object.values(exercises).find((e) => e.name === last)?.id;
+      await toggleFavourite(getDb(), id as 'step-up');
+      await waitFor(() => expect(rowNames()[0]).toBe(last));
+      expect(rowNames()).toHaveLength(before.length);
+      await user.selectOptions(screen.getByLabelText('Sortera'), 'name');
+      await waitFor(() => expect(rowNames()[0]).not.toBe(last));
+    });
+
+    it('orders by the latest real set log and keeps unlogged exercises last', async () => {
+      window.history.replaceState(
+        null,
+        '',
+        '/#/ovningar?sok=utfall&sort=recent',
+      );
+      render(<TestRoutes />);
+      await screen.findByText(/Du har inte tränat något än/);
+      const before = rowNames();
+      const last = before[before.length - 1] as string;
+      const id = Object.values(exercises).find((e) => e.name === last)?.id;
+      await getDb().setLogs.add({
+        id: 'log-1',
+        sessionId: 's1',
+        exerciseId: id as 'step-up',
+        setNumber: 1,
+        side: 'both',
+        amount: 8,
+        loadIndex: 0,
+        weightKg: 0,
+        loggedAt: '2026-10-01T10:00:00.000Z',
+      });
+      await waitFor(() => expect(rowNames()[0]).toBe(last));
+      expect(screen.queryByText(/Du har inte tränat något än/)).toBeNull();
+    });
+
+    it('treats an unknown value as the default', () => {
+      window.history.replaceState(null, '', '/#/ovningar?sort=popular');
+      render(<TestRoutes />);
+      expect(
+        (screen.getByLabelText('Sortera') as HTMLSelectElement).value,
+      ).toBe('fit');
+    });
+
+    it('explains an alphabetical list when there is no training history', async () => {
+      window.history.replaceState(null, '', '/#/ovningar?sort=recent');
+      render(<TestRoutes />);
+      expect(
+        await screen.findByText(/Du har inte tränat något än/),
+      ).toBeTruthy();
+    });
   });
 });
