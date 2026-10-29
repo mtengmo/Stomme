@@ -21,7 +21,7 @@ for (const width of WIDTHS) {
               document.documentElement.scrollWidth <=
               document.documentElement.clientWidth,
           );
-        expect(await noOverflow()).toBe(true);
+        await expect.poll(noOverflow).toBe(true);
 
         const rows = page.locator('main ul').first().getByRole('link');
         expect(await rows.count()).toBeGreaterThanOrEqual(7);
@@ -37,7 +37,7 @@ for (const width of WIDTHS) {
         await expect(
           page.getByRole('heading', { level: 1, name: 'Min utrustning' }),
         ).toBeFocused();
-        expect(await noOverflow()).toBe(true);
+        await expect.poll(noOverflow).toBe(true);
         await page.goBack();
         await expect(
           page.getByRole('heading', { level: 1, name: 'Inställningar' }),
@@ -55,7 +55,7 @@ for (const width of WIDTHS) {
         await expect(
           page.getByRole('heading', { level: 1, name: 'Utseende' }),
         ).toBeVisible();
-        expect(await noOverflow()).toBe(true);
+        await expect.poll(noOverflow).toBe(true);
         await page.getByRole('radio', { name: /Lagun/ }).check({ force: true });
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'hav');
         await page.reload();
