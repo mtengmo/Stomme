@@ -55,7 +55,7 @@ async function backupWithOneSession(): Promise<string> {
 
 describe('Settings', () => {
   it('explains manual mobile installation when a native prompt is unavailable', async () => {
-    render(<Settings />);
+    render(<Settings page="installera" />);
     await userEvent.click(screen.getByText('Så installerar du på mobilen'));
     expect(screen.getByText('iPhone och iPad:')).toBeTruthy();
     expect(screen.getByText('Android:')).toBeTruthy();
@@ -69,7 +69,7 @@ describe('Settings', () => {
     });
     window.dispatchEvent(event);
     try {
-      render(<Settings />);
+      render(<Settings page="installera" />);
       await userEvent.click(
         screen.getByRole('button', { name: 'Installera appen' }),
       );
@@ -83,22 +83,44 @@ describe('Settings', () => {
     }
   });
 
-  it('shows every section', async () => {
+  it('shows a menu with a link to every sub-page and a separate delete button', async () => {
     render(<Settings />);
-    for (const name of [
-      'Säkerhetskopia',
-      'Lagring',
-      'Installera',
-      'Version',
-      'Om och säkerhet',
-      'Radera all data',
-    ]) {
-      expect(await screen.findByRole('heading', { name })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { name: 'Inställningar' }),
+    ).toBeTruthy();
+    for (const [name, href] of [
+      ['Utseende', '/installningar/utseende'],
+      ['Min utrustning', '/installningar/utrustning'],
+      ['Säkerhetskopia', '/installningar/sakerhetskopia'],
+      ['Integritet', '/installningar/integritet'],
+      ['Lagring', '/installningar/lagring'],
+      ['Installera', '/installningar/installera'],
+      ['Om och säkerhet', '/installningar/om'],
+      ['Version', '/installningar/version'],
+      ['Övningar', '/granska'],
+    ] as const) {
+      const link = screen.getByRole('link', { name: new RegExp(`^${name}`) });
+      expect(link.getAttribute('href')).toBe(href);
     }
+    expect(
+      screen.getByRole('button', { name: 'Radera all data' }),
+    ).toBeTruthy();
+  });
+
+  it('a sub-page has a back link and its own h1', async () => {
+    render(<Settings page="lagring" />);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Lagring' }),
+    ).toBeTruthy();
+    expect(
+      screen
+        .getByRole('link', { name: /Tillbaka till inställningar/ })
+        .getAttribute('href'),
+    ).toBe('/installningar');
   });
 
   it('exports and reports the result', async () => {
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.click(screen.getByRole('button', { name: 'Exportera' }));
     expect((await screen.findByRole('status')).textContent).toMatch(
       /laddades ner/,
@@ -111,7 +133,7 @@ describe('Settings', () => {
     ['{"schemaVersion":99}', /annan version/],
     ['{"schemaVersion":1}', /stämmer inte/],
   ])('rejects %s with a Swedish message', async (text, msg) => {
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file(text),
@@ -120,7 +142,7 @@ describe('Settings', () => {
   });
 
   it('rejects an oversized file without reading it', async () => {
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     const big = file('x');
     Object.defineProperty(big, 'size', { value: 6 * 1024 * 1024 });
     const spy = vi.spyOn(big, 'text');
@@ -135,7 +157,7 @@ describe('Settings', () => {
   it('keeping data leaves everything untouched', async () => {
     const text = await backupWithOneSession();
     await getDb().sessions.clear();
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file(text),
@@ -153,7 +175,7 @@ describe('Settings', () => {
   it('confirming saves a safety backup first, then replaces the data', async () => {
     const text = await backupWithOneSession();
     await getDb().sessions.clear();
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file(text),
@@ -172,7 +194,7 @@ describe('Settings', () => {
     const text = await backupWithOneSession();
     await getDb().sessions.clear();
     shareMock.mockResolvedValue('cancelled');
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file(text),
@@ -350,7 +372,7 @@ describe('M6 review fixes', () => {
 
   it('import confirm shows current and file counts and the share note', async () => {
     const text = await backupWithOneSession();
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file(text),
@@ -360,7 +382,7 @@ describe('M6 review fixes', () => {
   });
 
   it('import errors say what to do and that nothing changed', async () => {
-    render(<Settings />);
+    render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(
       screen.getByLabelText('Välj säkerhetskopia att importera'),
       file('{"schemaVersion":99}'),
@@ -375,7 +397,11 @@ describe('M6 review fixes', () => {
     render(<App />);
     window.location.hash = '#/installningar';
     await screen.findByText('Appen laddas om. Sparade pass finns kvar.');
-    expect(screen.getByRole('heading', { name: 'Version' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Inställningar' })).toBeTruthy();
+    await userEvent.click(screen.getByRole('link', { name: /^Version/ }));
+    expect(
+      await screen.findByRole('heading', { name: 'Version' }),
+    ).toBeTruthy();
     expect(screen.getByText(/^Version /)).toBeTruthy();
     expect(screen.getByText(/^Bygge /)).toBeTruthy();
     expect(

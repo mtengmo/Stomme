@@ -175,7 +175,7 @@ describe('robustness', () => {
       value: { lastExportAt: 'garbage' },
     });
     await getDb().meta.put({ key: 'program', value: { startDate: 5 } });
-    window.location.hash = '#/installningar';
+    window.location.hash = '#/installningar/sakerhetskopia';
     render(<App />);
     expect(await screen.findByText(/Senast sparad: aldrig/)).toBeTruthy();
     window.location.hash = '#/';

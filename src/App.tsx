@@ -233,6 +233,9 @@ function Shell() {
               {(params) => <SessionDetail id={params.id} />}
             </Route>
             <Route path="/installningar">{() => <Settings />}</Route>
+            <Route path="/installningar/:page">
+              {(params) => <Settings key={params.page} page={params.page} />}
+            </Route>
             <Route>{() => <TrainingHome />}</Route>
           </Switch>
         </Suspense>

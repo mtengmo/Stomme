@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'wouter';
 import { isTrainingPreferences } from '../../content/programmes';
 import {
@@ -18,13 +18,19 @@ import type {
   AdjustableWeightItem,
   WeightInventoryItem,
 } from '../../domain/types';
+import {
+  appearanceSnapshot,
+  type SchemePreference,
+  subscribe as subscribeAppearance,
+  themeName,
+} from '../../lib/appearance';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
 import { useInstall } from '../../lib/install';
 import { restoreRepPrefs } from '../../lib/repPrefs';
 import { shareOrDownload } from '../../lib/share';
 import { type StorageStatus, storageStatus } from '../../lib/storage';
 import { APP_COMMIT, APP_VERSION } from '../../lib/version';
-import { Button, buttonClass } from '../../ui/Button';
+import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
@@ -63,26 +69,9 @@ function megabytes(bytes: number): string {
   return `${mb < 10 ? mb.toFixed(1) : Math.round(mb)} MB`;
 }
 
-function Section({
-  id,
-  title,
-  children,
-}: {
-  id: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section
-      aria-labelledby={id}
-      className="flex flex-col gap-3 border-t-[3px] border-ink pt-4"
-    >
-      <h2 id={id} className="m-0 text-3xl leading-none font-bold">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
+/** Body of a sub-page. The page's h1 (in Settings) carries the id. */
+function Block({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-col gap-3">{children}</div>;
 }
 
 const note = 'm-0 text-base text-ink-soft';
@@ -154,7 +143,14 @@ function EquipmentInventorySettings() {
   );
 }
 
-export function Settings() {
+export function Settings({ page }: { page?: string } = {}) {
+  const installed = useInstall().installed;
+  const appearance = useSyncExternalStore(
+    subscribeAppearance,
+    appearanceSnapshot,
+    appearanceSnapshot,
+  );
+  const storedTraining = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const [view, setView] = useState<View>({ name: 'main' });
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -170,7 +166,7 @@ export function Settings() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: view.name is the trigger
   useEffect(() => {
     heading.current?.focus();
-  }, [view.name]);
+  }, [view.name, page]);
 
   // Confirmation views are history entries: Android Back (popstate) returns
   // to the main view, exactly like "Behåll min data".
@@ -383,102 +379,140 @@ export function Settings() {
     );
   }
 
+  if (page) {
+    const def = PAGES.find((p) => p.id === page);
+    if (def) {
+      return (
+        <section aria-labelledby={def.sectionId} className={shell}>
+          <Link
+            href="/installningar"
+            className="inline-flex min-h-12 items-center gap-1 self-start text-base font-bold text-ink underline"
+          >
+            <Icon name="back" />
+            Tillbaka till inställningar
+          </Link>
+          <h1 id={def.sectionId} ref={heading} tabIndex={-1} className={h1}>
+            {def.title}
+          </h1>
+          {page === 'utseende' ? (
+            <AppearancePicker />
+          ) : page === 'utrustning' ? (
+            <Block>
+              <p className={note}>
+                Spara vilka fasta vikter du har hemma. Vikten gäller per hantel
+                eller kettlebell.
+              </p>
+              <EquipmentInventorySettings />
+            </Block>
+          ) : page === 'sakerhetskopia' ? (
+            <Block>
+              <p className={note}>
+                Senast sparad:{' '}
+                {lastExportAt
+                  ? formatShortDate(toLocalDate(new Date(lastExportAt)))
+                  : 'aldrig'}
+              </p>
+              <Button
+                variant="secondary"
+                disabled={busy}
+                onClick={() => void onExport()}
+              >
+                Exportera
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={busy}
+                onClick={() => fileInput.current?.click()}
+              >
+                Importera
+              </Button>
+              <input
+                ref={fileInput}
+                type="file"
+                accept="application/json,.json"
+                aria-label="Välj säkerhetskopia att importera"
+                tabIndex={-1}
+                className="sr-only"
+                onChange={(e) => void onFile(e.target.files?.[0])}
+              />
+              {status ? (
+                <p
+                  role="status"
+                  className="m-0 flex items-start gap-2 text-base font-bold"
+                >
+                  <Icon name="check" className="mt-0.5 shrink-0" />
+                  {status}
+                </p>
+              ) : null}
+              {error ? (
+                <p
+                  role="alert"
+                  className="m-0 flex items-start gap-2 text-base font-bold"
+                >
+                  <Icon name="warning" className="mt-0.5 shrink-0" />
+                  {error}
+                </p>
+              ) : null}
+            </Block>
+          ) : page === 'integritet' ? (
+            <PrivacyNotice />
+          ) : page === 'lagring' ? (
+            <StorageSection />
+          ) : page === 'installera' ? (
+            <InstallSection />
+          ) : page === 'om' ? (
+            <Block>
+              <DisclaimerText className="m-0 text-base" />
+              <p className="m-0 text-base">
+                Avbryt direkt vid {STOP.slice(0, -1).join(', ')} eller{' '}
+                {STOP[STOP.length - 1]}.
+              </p>
+            </Block>
+          ) : (
+            <VersionSection />
+          )}
+        </section>
+      );
+    }
+  }
+
   return (
     <div className={shell}>
       <h1 ref={heading} tabIndex={-1} className={h1}>
         Inställningar
       </h1>
-
-      <Section id="equipment" title="Min utrustning">
-        <p className={note}>
-          Spara vilka fasta vikter du har hemma. Vikten gäller per hantel eller
-          kettlebell.
-        </p>
-        <EquipmentInventorySettings />
-      </Section>
-
-      <Section id="set-appearance" title="Utseende">
-        <AppearancePicker />
-      </Section>
-
-      <Section id="set-backup" title="Säkerhetskopia">
-        <p className={note}>
-          Senast sparad:{' '}
-          {lastExportAt
-            ? formatShortDate(toLocalDate(new Date(lastExportAt)))
-            : 'aldrig'}
-        </p>
-        <Button
-          variant="secondary"
-          disabled={busy}
-          onClick={() => void onExport()}
-        >
-          Exportera
-        </Button>
-        <Button
-          variant="secondary"
-          disabled={busy}
-          onClick={() => fileInput.current?.click()}
-        >
-          Importera
-        </Button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="application/json,.json"
-          aria-label="Välj säkerhetskopia att importera"
-          tabIndex={-1}
-          className="sr-only"
-          onChange={(e) => void onFile(e.target.files?.[0])}
+      <ul className="m-0 flex list-none flex-col p-0">
+        <MenuRow
+          to="utseende"
+          label="Utseende"
+          value={appearanceValue(appearance)}
         />
-        {status ? (
-          <p
-            role="status"
-            className="m-0 flex items-start gap-2 text-base font-bold"
-          >
-            <Icon name="check" className="mt-0.5 shrink-0" />
-            {status}
-          </p>
-        ) : null}
-        {error ? (
-          <p
-            role="alert"
-            className="m-0 flex items-start gap-2 text-base font-bold"
-          >
-            <Icon name="warning" className="mt-0.5 shrink-0" />
-            {error}
-          </p>
-        ) : null}
-      </Section>
-
-      <Section id="set-privacy" title="Integritet">
-        <PrivacyNotice />
-      </Section>
-      <StorageSection />
-      <InstallSection />
-      <VersionSection />
-      <Section id="set-exercises" title="Övningar">
-        <p className={note}>
-          Granska namn, referensnummer, muskelområden och rörelsens lägen för
-          alla övningar.
-        </p>
-        <Link href="/granska" className={buttonClass('secondary')}>
-          Granska alla övningar
-        </Link>
-      </Section>
-
-      <Section id="set-about" title="Om och säkerhet">
-        <DisclaimerText className="m-0 text-base" />
-        <p className="m-0 text-base">
-          Avbryt direkt vid {STOP.slice(0, -1).join(', ')} eller{' '}
-          {STOP[STOP.length - 1]}.
-        </p>
-      </Section>
-
-      <Section id="set-delete" title="Radera all data">
-        <p className={note}>
-          Tar bort allt som är sparat i appen i den här webbläsaren.
-        </p>
+        <MenuRow
+          to="utrustning"
+          label="Min utrustning"
+          value={equipmentValue(storedTraining)}
+        />
+        <MenuRow
+          to="sakerhetskopia"
+          label="Säkerhetskopia"
+          value={
+            lastExportAt
+              ? `Senast ${formatShortDate(toLocalDate(new Date(lastExportAt)))}`
+              : 'Aldrig sparad'
+          }
+        />
+        <MenuRow to="integritet" label="Integritet" />
+        <MenuRow to="lagring" label="Lagring" />
+        {!installed ? <MenuRow to="installera" label="Installera" /> : null}
+        <MenuRow
+          href="/granska"
+          label="Övningar"
+          value="Granska alla övningar"
+        />
+        <MenuRow to="om" label="Om och säkerhet" />
+        <MenuRow to="version" label="Version" value={APP_VERSION} />
+      </ul>
+      <div className="mt-4 border-t-[3px] border-ink pt-4">
         <Button
           variant="secondary"
           disabled={busy}
@@ -490,8 +524,78 @@ export function Settings() {
         >
           Radera all data
         </Button>
-      </Section>
+      </div>
     </div>
+  );
+}
+
+export type SettingsPage =
+  | 'utseende'
+  | 'utrustning'
+  | 'sakerhetskopia'
+  | 'integritet'
+  | 'lagring'
+  | 'installera'
+  | 'om'
+  | 'version';
+
+const PAGES: { id: SettingsPage; title: string; sectionId: string }[] = [
+  { id: 'utseende', title: 'Utseende', sectionId: 'set-appearance' },
+  { id: 'utrustning', title: 'Min utrustning', sectionId: 'equipment' },
+  { id: 'sakerhetskopia', title: 'Säkerhetskopia', sectionId: 'set-backup' },
+  { id: 'integritet', title: 'Integritet', sectionId: 'set-privacy' },
+  { id: 'lagring', title: 'Lagring', sectionId: 'set-storage' },
+  { id: 'installera', title: 'Installera', sectionId: 'set-install' },
+  { id: 'om', title: 'Om och säkerhet', sectionId: 'set-about' },
+  { id: 'version', title: 'Version', sectionId: 'set-version' },
+];
+
+const SCHEME_LABEL: Record<SchemePreference, string> = {
+  light: 'Ljust',
+  dark: 'Mörkt',
+  system: 'Följ telefonen',
+};
+
+function appearanceValue(snapshot: string): string {
+  const [theme = '', scheme = 'system'] = snapshot.split('|');
+  return `${SCHEME_LABEL[scheme as SchemePreference] ?? ''} · ${themeName(theme)}`;
+}
+
+function equipmentValue(stored: unknown): string | undefined {
+  if (!isTrainingPreferences(stored)) return undefined;
+  const n = stored.weights?.length ?? 0;
+  const m = stored.adjustableWeights?.length ?? 0;
+  const parts = [`${n} ${n === 1 ? 'vikt' : 'vikter'}`];
+  if (m > 0) parts.push(`${m} justerbar${m === 1 ? '' : 'a'}`);
+  return parts.join(' · ');
+}
+
+function MenuRow({
+  to,
+  href,
+  label,
+  value,
+}: {
+  to?: string;
+  href?: string;
+  label: string;
+  value?: string;
+}) {
+  return (
+    <li className="border-b-2 border-edge">
+      <Link
+        href={href ?? `/installningar/${to}`}
+        className="flex min-h-14 items-center gap-3 py-2 text-ink no-underline focus-visible:outline-offset-[-4px]"
+      >
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="text-lg leading-tight font-bold">{label}</span>
+          {value ? (
+            <span className="text-base text-ink-soft">{value}</span>
+          ) : null}
+        </span>
+        <Icon name="back" className="shrink-0 rotate-180" />
+      </Link>
+    </li>
   );
 }
 
@@ -513,7 +617,7 @@ function StorageSection() {
           ? 'Lagring: kan rensas av webbläsaren'
           : 'Lagring: går inte att kontrollera i den här webbläsaren';
   return (
-    <Section id="set-storage" title="Lagring">
+    <Block>
       <p className="m-0 flex items-start gap-2 text-base font-bold">
         <Icon
           name={s?.state === 'persisted' ? 'check' : 'info'}
@@ -531,7 +635,7 @@ function StorageSection() {
         Din data finns bara i den här webbläsaren. En säkerhetskopia skyddar om
         webbläsaren rensar den eller om du byter webbläsare eller enhet.
       </p>
-    </Section>
+    </Block>
   );
 }
 
@@ -551,7 +655,7 @@ function InstallSection() {
     }
   };
   return (
-    <Section id="set-install" title="Installera">
+    <Block>
       <div className="flex items-center gap-3">
         <img
           src={`${import.meta.env.BASE_URL}pwa-192x192.png`}
@@ -603,7 +707,7 @@ function InstallSection() {
           </div>
         </details>
       ) : null}
-    </Section>
+    </Block>
   );
 }
 
@@ -625,7 +729,7 @@ function VersionSection() {
     applying: 'Öppnar den nya versionen …',
   }[status];
   return (
-    <Section id="set-version" title="Version">
+    <Block>
       <p className="m-0 text-base font-bold">Version {APP_VERSION}</p>
       <p className={note}>Bygge {APP_COMMIT}</p>
       <p aria-live="polite" className="m-0 flex items-start gap-2 text-base">
@@ -656,6 +760,6 @@ function VersionSection() {
           Uppdatera nu
         </Button>
       ) : null}
-    </Section>
+    </Block>
   );
 }

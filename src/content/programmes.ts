@@ -27,13 +27,13 @@ export const programmeNames: Record<ProgramId, string> = {
 export const equipmentChoices: Record<EquipmentChoice, string> = {
   bodyweight: 'Kroppsvikt',
 
-  'dumbbell-1': 'En hantel',
+  'dumbbell-1': '1 hantel',
 
-  'dumbbell-2': 'Två hantlar',
+  'dumbbell-2': '2 hantlar',
 
-  'kettlebell-1': 'En kettlebell',
+  'kettlebell-1': '1 kettlebell',
 
-  'kettlebell-2': 'Två kettlebells',
+  'kettlebell-2': '2 kettlebells',
 
   chair: 'Stabil stol',
 
