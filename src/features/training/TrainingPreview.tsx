@@ -93,7 +93,7 @@ export { defaultPlan };
 function available(preferences: TrainingPreferences) {
   return exerciseList.filter((exercise) =>
     exerciseMetadata[exercise.id].variants.some((variant) =>
-      equipmentFits(variant.equipment, preferences.equipment),
+      equipmentFits(variant.equipment, preferences),
     ),
   );
 }
@@ -940,10 +940,7 @@ function PreviewEditor({
                           {!exerciseMetadata[exercise.id].variants.some(
                             (variant) =>
                               variant.id === item.variantId &&
-                              equipmentFits(
-                                variant.equipment,
-                                preferences.equipment,
-                              ),
+                              equipmentFits(variant.equipment, preferences),
                           ) ? (
                             <p role="alert" className="m-0 text-base font-bold">
                               Den tidigare utrustningen är inte tillgänglig.
@@ -1156,7 +1153,7 @@ function PreviewEditor({
                                   equipmentFits(
                                     variant.equipment,
 
-                                    preferences.equipment,
+                                    preferences,
                                   ),
                               ) ? (
                                 <option value={item.variantId ?? ''}>
@@ -1170,7 +1167,7 @@ function PreviewEditor({
                                   equipmentFits(
                                     variant.equipment,
 
-                                    preferences.equipment,
+                                    preferences,
                                   ),
                                 )
 

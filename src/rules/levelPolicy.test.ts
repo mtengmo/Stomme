@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
+import { inventory } from '../test/inventory';
 import {
   allowedLevels,
   chooseStartingWeight,
@@ -20,7 +21,7 @@ const prefs = (
 ): TrainingPreferences => ({
   programId: 'general',
   experience,
-  equipment: ['bodyweight', 'dumbbell-2', 'chair', 'support'],
+  equipment: ['bodyweight', 'chair', 'support'],
   ...(withWeights ? { weights } : {}),
 });
 
@@ -127,13 +128,7 @@ describe('level policy', () => {
   it('never gives the heaviest weight outside the heavy slots, for two or one weight', () => {
     const two: TrainingPreferences = {
       ...prefs('regular'),
-      equipment: [
-        'bodyweight',
-        'dumbbell-2',
-        'kettlebell-1',
-        'chair',
-        'support',
-      ],
+      equipment: ['bodyweight', 'chair', 'support'],
       weights: [
         { type: 'dumbbell', kg: 4, count: 2 },
         { type: 'dumbbell', kg: 8, count: 2 },

@@ -15,13 +15,14 @@ import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import type { TrainingPreferences } from '../../domain/types';
 import { useAppHashLocation } from '../../lib/hashLocation';
+import { inventory } from '../../test/inventory';
 import { ExerciseLibrary } from './ExerciseLibrary';
 import { ResultList } from './ExerciseResults';
 import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
 
 const general: TrainingPreferences = {
   programId: 'general',
-  equipment: ['bodyweight', 'dumbbell-2', 'chair', 'support'],
+  ...inventory({ dumbbells: [[5, 2]], support: ['chair', 'support'] }),
   experience: 'some',
 };
 
@@ -217,7 +218,7 @@ describe('live summary and host props', () => {
           title="Alla"
           items={[exercises['goblet-squat'], exercises['dead-bug']]}
           id="r"
-          inventory={general.equipment}
+          inventory={general}
         />
       </WorkoutBuilder>,
     );

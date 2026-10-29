@@ -7,12 +7,9 @@ import {
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { bodyRegions, primaryMuscleLabel } from '../../content/muscles';
 import { templates } from '../../content/templates';
-import type {
-  EquipmentChoice,
-  Exercise,
-  TrainingPreferences,
-} from '../../domain/types';
+import type { Exercise, TrainingPreferences } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
+import type { Inventory } from '../../rules/equipment';
 import {
   missingEquipment,
   requiresGoodTechnique,
@@ -191,7 +188,7 @@ interface RowProps {
   /** Under a region header the region is not repeated in the meta line. */
   hideRegion?: boolean;
   exercise: Exercise;
-  inventory: EquipmentChoice[];
+  inventory: Inventory;
   experience?: TrainingPreferences['experience'];
 }
 
@@ -314,7 +311,7 @@ export function ResultList({
   title: string;
   items: readonly Exercise[];
   id: string;
-  inventory: EquipmentChoice[];
+  inventory: Inventory;
   experience?: TrainingPreferences['experience'];
   /** Region headers between the rows (compact view, no search text). */
   groupByRegion?: boolean;

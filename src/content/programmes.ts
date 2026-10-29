@@ -27,14 +27,6 @@ export const programmeNames: Record<ProgramId, string> = {
 export const equipmentChoices: Record<EquipmentChoice, string> = {
   bodyweight: 'Kroppsvikt',
 
-  'dumbbell-1': '1 hantel',
-
-  'dumbbell-2': '2 hantlar',
-
-  'kettlebell-1': '1 kettlebell',
-
-  'kettlebell-2': '2 kettlebells',
-
   chair: 'Stabil stol',
 
   support: 'Vägg eller stabilt stöd',
@@ -48,10 +40,6 @@ export const equipmentChoices: Record<EquipmentChoice, string> = {
 
 export const defaultEquipment: EquipmentChoice[] = [
   'bodyweight',
-
-  'dumbbell-2',
-
-  'kettlebell-1',
 
   'chair',
 
@@ -137,7 +125,7 @@ export function isWorkoutEquipment(value: unknown): value is WorkoutEquipment {
       adjustableWeights: item.adjustableWeights,
     }) &&
     Array.isArray(item.equipment) &&
-    item.equipment.length <= 11 &&
+    item.equipment.length <= 7 &&
     new Set(item.equipment).size === item.equipment.length
   );
 }

@@ -4,6 +4,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import { getDb } from '../../db/db';
+import { inventory } from '../../test/inventory';
 import { TrainingSetup } from './TrainingHome';
 
 afterEach(cleanup);
@@ -43,7 +44,7 @@ it('keeps owned weights and the body-part focus when setup is saved', async () =
     <TrainingSetup
       current={{
         programId: 'general',
-        equipment: ['bodyweight', 'dumbbell-2'],
+        ...inventory({ dumbbells: [[5, 2]] }),
         experience: 'some',
         weights,
         bodyParts: ['legs'],

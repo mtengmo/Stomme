@@ -120,7 +120,7 @@ export function variantsThatFit(
   preferences: TrainingPreferences,
 ): ExerciseVariant[] {
   return exerciseMetadata[id].variants.filter((variant) =>
-    equipmentFits(variant.equipment, preferences.equipment),
+    equipmentFits(variant.equipment, preferences),
   );
 }
 

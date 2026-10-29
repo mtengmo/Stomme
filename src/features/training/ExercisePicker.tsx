@@ -91,7 +91,7 @@ function hasAvailableEquipment(
   preferences: TrainingPreferences,
 ): boolean {
   return exerciseMetadata[id].variants.some((variant) =>
-    equipmentFits(variant.equipment, preferences.equipment),
+    equipmentFits(variant.equipment, preferences),
   );
 }
 
@@ -167,7 +167,7 @@ export function ExercisePicker({
   const { primary, supporting } = filterExercises(
     availableCandidates,
     filters,
-    { inventory: preferences.equipment, favourites },
+    { inventory: preferences, favourites },
   );
   const filtered = [...primary, ...supporting];
   const areaActive = Boolean(filters.region || filters.muscle);

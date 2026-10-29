@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { initialTrainingRoster } from '../rules/programRosters';
+import { inventory } from '../test/inventory';
 import { exerciseMetadata } from './exerciseMetadata';
 import { exerciseReferences } from './exerciseReferences';
 import { exerciseList, exercises } from './exercises';
@@ -43,15 +44,12 @@ describe('new rehab-source catalogue additions', () => {
           {
             programId,
             experience: 'regular',
-            equipment: [
-              'bodyweight',
-              'dumbbell-2',
-              'kettlebell-2',
-              'chair',
-              'support',
-              'step',
-              'band',
-            ],
+            ...inventory({
+              dumbbells: [[5, 2]],
+              kettlebells: [[8, 2]],
+              support: ['chair', 'support', 'step', 'band'],
+            }),
+            equipment: ['bodyweight', 'chair', 'support', 'step', 'band'],
           },
           template,
         );

@@ -141,7 +141,7 @@ function fitsItem(item: PhysioKneeItem, preferences: TrainingPreferences) {
   const variant = exerciseMetadata[item.exerciseId].variants.find(
     (v) => v.id === item.variantId,
   );
-  return variant && equipmentFits(variant.equipment, preferences.equipment)
+  return variant && equipmentFits(variant.equipment, preferences)
     ? variant
     : undefined;
 }
@@ -168,7 +168,7 @@ export function physioKneeMissing(
       (v) => v.id === item.variantId,
     );
     const needs = (variant?.equipment ?? [])
-      .filter((req) => !equipmentFits([req], preferences.equipment))
+      .filter((req) => !equipmentFits([req], preferences))
       .map((req) => needLabel[req.type] ?? req.type);
     return [{ item, needs }];
   });

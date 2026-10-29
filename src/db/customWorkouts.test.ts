@@ -1,6 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
+import { inventory } from '../test/inventory';
 import {
   maxCustomWorkouts,
   readCustomWorkouts,
@@ -11,7 +12,7 @@ import { getDb } from './db';
 const prefs: TrainingPreferences = {
   programId: 'general',
   experience: 'some',
-  equipment: ['bodyweight', 'dumbbell-2'],
+  ...inventory({ dumbbells: [[5, 2]] }),
 };
 
 beforeEach(async () => {

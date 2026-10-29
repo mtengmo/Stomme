@@ -60,7 +60,7 @@ export async function saveTrainingPreferences(
   if (
     !isTrainingPreferences(preferences) ||
     new Set(preferences.equipment).size !== preferences.equipment.length ||
-    preferences.equipment.length > 11
+    preferences.equipment.length > 7
   )
     throw new Error(
       'Ogiltiga träningsval. Kontrollera utrustningen och försök igen.',
@@ -195,7 +195,7 @@ export async function startTrainingSession(
         (value) => value.id === item.variantId,
       );
 
-      return !variant || !equipmentFits(variant.equipment, effective.equipment);
+      return !variant || !equipmentFits(variant.equipment, effective);
     })
   )
     throw new Error('Kontrollera övningar, antal, vikt och sidor.');
@@ -397,7 +397,7 @@ export async function saveRehabPlan(
           );
           return (
             !variant ||
-            !equipmentFits(variant.equipment, preferences.equipment) ||
+            !equipmentFits(variant.equipment, preferences) ||
             (rehabGroupOf(focus) === 'aaos' &&
               !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
           );

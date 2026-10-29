@@ -4,7 +4,7 @@ import { kneeRehabExercises } from '../../content/kneeRehab';
 import { rehabGroup } from '../../content/programmes';
 import { validateTrainingPlan } from '../../db/training';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
-import { equipmentFits } from '../../rules/equipment';
+import { missingRequirements } from '../../rules/equipment';
 
 /** Why the plan cannot be started yet, in the order the user should fix it. Empty means ready. */
 export function startProblems(
@@ -29,8 +29,13 @@ export function startProblems(
     const variant = exerciseMetadata[item.exerciseId]?.variants.find(
       (value) => value.id === item.variantId,
     );
-    if (!variant || !equipmentFits(variant.equipment, preferences.equipment))
-      problems.push(`${name}: välj en variant som passar din utrustning.`);
+    const lacking = variant
+      ? missingRequirements(variant.equipment, preferences)
+      : [];
+    if (!variant || lacking.length)
+      problems.push(
+        `${name}: välj en variant som passar din utrustning${lacking.length ? ` (saknas: ${lacking.join(', ')})` : ''}.`,
+      );
     if (!Number.isInteger(item.sets) || item.sets < 1 || item.sets > 10)
       problems.push(`Ange set för ${name}.`);
     if (!Number.isFinite(item.target) || item.target < 1 || item.target > 600)

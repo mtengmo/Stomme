@@ -31,9 +31,7 @@ it('Home shows an empty Mina pass with a link to the picker', async () => {
   await user.click(screen.getByRole('link', { name: 'Skapa eget pass' }));
   await screen.findByRole('heading', { name: 'Skapa eget pass' });
   expect(
-    screen.getByText(
-      'Utrustning: stabil stol, vägg eller stabilt stöd · Träningsvana: Viss vana',
-    ),
+    screen.getByText('Utrustning: stol, vägg · Träningsvana: Viss vana'),
   ).toBeTruthy();
   expect(
     screen
@@ -72,9 +70,7 @@ it('blocks exercises outside the AAOS knee programme and keeps rehab prefs', asy
   window.location.hash = '#/nytt-pass';
   render(<App />);
   await screen.findByRole('heading', { name: 'Skapa eget pass' });
-  expect(
-    screen.getByText('Utrustning: stabil stol, vägg eller stabilt stöd'),
-  ).toBeTruthy();
+  expect(screen.getByText('Utrustning: stol, vägg')).toBeTruthy();
   expect(
     (await screen.findAllByText('Ingår inte i knäprogrammet')).length,
   ).toBeGreaterThan(0);

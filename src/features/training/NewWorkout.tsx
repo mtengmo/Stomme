@@ -2,7 +2,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
-  equipmentChoices,
   experienceLabels,
   isTrainingPreferences,
 } from '../../content/programmes';
@@ -10,6 +9,7 @@ import { createCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
+import { inventorySummary } from '../../rules/equipment';
 import { Icon } from '../../ui/Icon';
 import { CustomPicker } from './CustomPicker';
 
@@ -39,11 +39,8 @@ export function NewWorkout() {
         </Link>
       </div>
     );
-  const equipment = preferences.equipment
-    .filter((item) => item !== 'bodyweight')
-    .map((item) => equipmentChoices[item].toLocaleLowerCase('sv'));
   const summary = [
-    `Utrustning: ${equipment.length ? equipment.join(', ') : 'kroppsvikt'}`,
+    `Utrustning: ${inventorySummary(preferences).toLocaleLowerCase('sv')}`,
     ...(preferences.programId === 'rehab'
       ? []
       : [`Träningsvana: ${experienceLabels[preferences.experience]}`]),

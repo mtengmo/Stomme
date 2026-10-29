@@ -43,7 +43,7 @@ export function CustomPicker({
   const rehab = preferences.programId === 'rehab';
   const filters = pickFiltersFrom(query, !rehab);
   const { primary, supporting } = filterExercises(exerciseList, filters, {
-    inventory: preferences.equipment,
+    inventory: preferences,
     favourites,
     experience: preferences.experience,
   });
@@ -83,7 +83,7 @@ export function CustomPicker({
           title={area ? 'Tränar främst' : 'Alla övningar'}
           items={primary}
           id={`${idPrefix}-primary`}
-          inventory={preferences.equipment}
+          inventory={preferences}
           groupByRegion={!filters.term.trim() && !area}
           experience={preferences.experience}
         />
@@ -91,7 +91,7 @@ export function CustomPicker({
           title="Hjälper till"
           items={supporting}
           id={`${idPrefix}-secondary`}
-          inventory={preferences.equipment}
+          inventory={preferences}
           experience={preferences.experience}
         />
       </WorkoutBuilder>

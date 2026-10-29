@@ -10,7 +10,7 @@ afterEach(cleanup);
 const preferences: TrainingPreferences = {
   programId: 'general',
   experience: 'regular',
-  equipment: ['bodyweight', 'dumbbell-2', 'chair', 'support'],
+  equipment: ['bodyweight', 'chair', 'support'],
   weights: [
     { type: 'dumbbell', kg: 4, count: 2 },
     { type: 'dumbbell', kg: 8, count: 2 },

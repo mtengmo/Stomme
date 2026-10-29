@@ -121,12 +121,9 @@ export type TemplateId = 'A' | 'B';
 
 export type RehabFocus = 'custom' | 'knee' | 'knee-physio';
 export type ProgramId = 'general' | 'running' | 'rehab';
+/** Support items only; dumbbells and kettlebells live in the weights. */
 export type EquipmentChoice =
   | 'bodyweight'
-  | 'dumbbell-1'
-  | 'dumbbell-2'
-  | 'kettlebell-1'
-  | 'kettlebell-2'
   | 'chair'
   | 'support'
   | 'step'

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { bodyRegions } from '../../content/muscles';
-import { experienceLabels } from '../../content/programmes';
+import { equipmentChoices, experienceLabels } from '../../content/programmes';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
@@ -24,6 +24,7 @@ import {
   preferencesFromDraft,
   readDraft,
   type Step,
+  showsWeights,
   stepsFor,
 } from './quickStartModel';
 import { WeightInventoryFields } from './WeightInventoryFields';
@@ -68,7 +69,7 @@ function clearDraft(): void {
 
 const headings: Record<Step, string> = {
   goal: 'Vad vill du träna?',
-  equipment: 'Egenvikt eller utrustning?',
+  equipment: 'Vilka vikter har du?',
   level: 'Hur van är du vid styrketräning?',
   focus: 'Vad vill du träna först?',
   pick: 'Välj dina övningar',
@@ -80,7 +81,6 @@ export function QuickStart() {
   const {
     goal,
     step,
-    mode,
     equipment,
     experience,
     weights,
@@ -133,14 +133,6 @@ export function QuickStart() {
         ? [...new Set([...equipment, item])]
         : equipment.filter((value) => value !== item),
     });
-  function family(type: 'dumbbell' | 'kettlebell', count: '0' | '1' | '2') {
-    update({
-      equipment: [
-        ...equipment.filter((value) => !value.startsWith(type)),
-        ...(count === '0' ? [] : [`${type}-${count}` as EquipmentChoice]),
-      ],
-    });
-  }
   const goTo = (next: Step) => {
     setError('');
     update({ step: next });
@@ -149,16 +141,10 @@ export function QuickStart() {
     if (next !== goal) clearSelection();
     update({ goal: next, step: 'equipment' });
   };
-  const hasTools = equipment.some(
-    (item) => item.startsWith('dumbbell') || item.startsWith('kettlebell'),
-  );
+  const hasTools = showsWeights(goal);
   const allowed = allowedEquipment(goal);
-  const tools = allowed.includes('dumbbell-1')
-    ? (['dumbbell', 'kettlebell'] as const)
-    : [];
-  // The physio's band has its own checkbox above.
   const extras = (['step', 'band', 'pull-up-bar', 'dip-bars'] as const).filter(
-    (item) => allowed.includes(item) && !(goal === 'physio' && item === 'band'),
+    (item) => allowed.includes(item),
   );
   const sideField = (
     <label className="flex flex-col gap-2 text-base font-bold">
@@ -277,188 +263,39 @@ export function QuickStart() {
           {step === 'equipment' ? (
             <>
               <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-                <legend className="sr-only">Vad tränar du med?</legend>
-                <label
-                  className={`${optionClass} ${mode === 'bodyweight' ? 'border-accent' : 'border-edge'}`}
-                >
-                  <input
-                    className="size-6 shrink-0"
-                    type="radio"
-                    name="mode"
-                    checked={mode === 'bodyweight'}
-                    onChange={() => update({ mode: 'bodyweight' })}
-                  />
-                  Egenvikt – kroppen, en stol och en vägg
-                </label>
-                <label
-                  className={`${optionClass} ${mode === 'equipment' ? 'border-accent' : 'border-edge'}`}
-                >
-                  <input
-                    className="size-6 shrink-0"
-                    type="radio"
-                    name="mode"
-                    checked={mode === 'equipment'}
-                    onChange={() =>
-                      update({
-                        mode: 'equipment',
-                        // Everyone has a chair and a wall: the physio's programme starts with them ticked.
-                        equipment:
-                          goal === 'physio' && !equipment.length
-                            ? ['chair', 'support']
-                            : equipment,
-                      })
-                    }
-                  />
-                  Utrustning
-                </label>
+                <legend className="sr-only">Utrustning</legend>
+                {(
+                  [
+                    ['chair', 'Stabil stol eller bänk'],
+                    ['support', 'Vägg eller stabilt stöd'],
+                    ...extras.map((item) => [item, equipmentChoices[item]]),
+                  ] as [EquipmentChoice, string][]
+                ).map(([value, label]) => (
+                  <label
+                    key={value}
+                    className="flex min-h-12 items-center gap-3 text-lg"
+                  >
+                    <input
+                      className="size-6"
+                      type="checkbox"
+                      checked={equipment.includes(value)}
+                      onChange={(event) => toggle(value, event.target.checked)}
+                    />
+                    {label}
+                  </label>
+                ))}
               </fieldset>
-              {mode === 'bodyweight' && goal === 'physio' ? (
-                <p className="m-0 text-base text-ink-soft">
-                  Träningsband ingår inte i Egenvikt. Välj Utrustning om du har
-                  band; det behövs för övning 5 och 7.
-                </p>
-              ) : null}
-              {mode === 'equipment' ? (
+              {hasTools ? (
                 <>
-                  <p className="m-0 text-lg">
-                    {goal === 'physio'
-                      ? 'Välj det du har hemma. Övningar som kräver annat än det du väljer lämnas bort. Utan val blir det bara övningar med kroppsvikt.'
-                      : goal === 'build'
-                        ? 'Välj det du vill använda. Vi visar övningar som passar.'
-                        : 'Välj det du vill använda. Utan val blir det ett pass med kroppsvikt.'}
-                  </p>
-                  <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-                    <legend className="sr-only">Utrustning</legend>
-                    {tools.map((type) => {
-                      const count = equipment.includes(`${type}-2`)
-                        ? '2'
-                        : equipment.includes(`${type}-1`)
-                          ? '1'
-                          : '0';
-                      const label =
-                        type === 'dumbbell' ? 'Hantlar' : 'Kettlebell';
-                      return (
-                        <div key={type}>
-                          <label className="flex min-h-12 items-center gap-3 text-lg">
-                            <input
-                              className="size-6"
-                              type="checkbox"
-                              checked={count !== '0'}
-                              onChange={(event) =>
-                                family(type, event.target.checked ? '1' : '0')
-                              }
-                            />
-                            {label}
-                          </label>
-                          {count !== '0' ? (
-                            <label className="mt-1 flex flex-col gap-2 text-base font-bold">
-                              {type === 'dumbbell'
-                                ? 'Antal hantlar'
-                                : 'Antal kettlebells'}
-                              <select
-                                className={fieldClass}
-                                value={count}
-                                onChange={(event) =>
-                                  family(type, event.target.value as '1' | '2')
-                                }
-                              >
-                                <option value="1" translate="no">
-                                  1
-                                </option>
-                                <option value="2">Två</option>
-                              </select>
-                            </label>
-                          ) : null}
-                        </div>
-                      );
-                    })}
-                    {(
-                      [
-                        ['chair', 'Stabil stol eller bänk'],
-                        ['support', 'Vägg eller stabilt stöd'],
-                        ...(goal === 'physio'
-                          ? ([['band', 'Träningsband']] as const)
-                          : []),
-                      ] as const
-                    ).map(([value, label]) => (
-                      <div key={value}>
-                        <label className="flex min-h-12 items-center gap-3 text-lg">
-                          <input
-                            className="size-6"
-                            type="checkbox"
-                            checked={equipment.includes(value)}
-                            onChange={(event) =>
-                              toggle(value, event.target.checked)
-                            }
-                          />
-                          {label}
-                        </label>
-                        {value === 'band' ? (
-                          <p className="m-0 pl-9 text-base text-ink-soft">
-                            Träningsband behövs för övning 5 och 7.
-                          </p>
-                        ) : null}
-                      </div>
-                    ))}
-                  </fieldset>
-                  {hasTools ? (
-                    <details open>
-                      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                        Ange vikterna du äger
-                      </summary>
-                      <WeightInventoryFields
-                        value={weights}
-                        onChange={(next) => update({ weights: next })}
-                      />
-                      <div className="mt-4 border-t-2 border-edge pt-4">
-                        <AdjustableWeightFields
-                          value={adjustableWeights}
-                          onChange={(next) =>
-                            update({ adjustableWeights: next })
-                          }
-                          onValidityChange={setAdjustableValid}
-                        />
-                      </div>
-                      {weights.length === 0 &&
-                      adjustableWeights.length === 0 ? (
-                        <p className="m-0 pt-2 text-base font-bold">
-                          Ange fasta vikter eller de justerbara vikter du kan
-                          ställa in för att få övningar med hantel/kettlebell.
-                        </p>
-                      ) : null}
-                    </details>
-                  ) : null}
-                  {extras.length ? (
-                    <details>
-                      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                        Fler inställningar
-                      </summary>
-                      <div className="flex flex-col gap-3 pt-2">
-                        {extras.map((value) => (
-                          <label
-                            key={value}
-                            className="flex min-h-12 items-center gap-3 text-base"
-                          >
-                            <input
-                              className="size-6"
-                              type="checkbox"
-                              checked={equipment.includes(value)}
-                              onChange={(event) =>
-                                toggle(value, event.target.checked)
-                              }
-                            />
-                            {value === 'step'
-                              ? 'Träningssteg'
-                              : value === 'band'
-                                ? 'Träningsband'
-                                : value === 'pull-up-bar'
-                                  ? 'Fast monterad chinsstång'
-                                  : 'Stabil dipsställning'}
-                          </label>
-                        ))}
-                      </div>
-                    </details>
-                  ) : null}
+                  <WeightInventoryFields
+                    value={weights}
+                    onChange={(next) => update({ weights: next })}
+                  />
+                  <AdjustableWeightFields
+                    value={adjustableWeights}
+                    onChange={(next) => update({ adjustableWeights: next })}
+                    onValidityChange={setAdjustableValid}
+                  />
                 </>
               ) : null}
               {rehab ? sideField : null}

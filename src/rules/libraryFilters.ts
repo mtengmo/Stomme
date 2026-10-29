@@ -17,12 +17,15 @@ import {
 } from '../content/muscles';
 import type {
   BodyRegionId,
-  EquipmentChoice,
   Exercise,
   ExerciseId,
   TrainingPreferences,
 } from '../domain/types';
-import { equipmentFits } from './equipment';
+import {
+  equipmentFits,
+  type Inventory,
+  missingRequirements,
+} from './equipment';
 import { allowedLevels } from './levelPolicy';
 
 export interface LibraryFilters {
@@ -35,7 +38,7 @@ export interface LibraryFilters {
 export function matchesLibraryFilters(
   exercise: Exercise,
   filters: LibraryFilters,
-  inventory: EquipmentChoice[],
+  inventory: Inventory,
   mine: Set<string>,
 ) {
   const meta = exerciseMetadata[exercise.id];
@@ -99,7 +102,7 @@ export const emptyExerciseFilters: ExerciseFilters = {
 };
 
 export interface ExerciseFilterContext {
-  inventory: EquipmentChoice[];
+  inventory: Inventory;
   mine?: Set<string>;
   /** Undefined while favourites are loading: "only favourites" then shows nothing. */
   favourites?: readonly ExerciseId[];
@@ -176,13 +179,11 @@ export function filterExercises(
 /** Labels of the equipment a row lacks, for its closest-fitting variant. */
 export function missingEquipment(
   id: ExerciseId,
-  inventory: EquipmentChoice[],
+  inventory: Inventory,
 ): string[] {
   let best: string[] | undefined;
   for (const variant of exerciseMetadata[id].variants) {
-    const missing = variant.equipment
-      .filter((item) => !equipmentFits([item], inventory))
-      .map((item) => equipmentLabels[item.type]);
+    const missing = missingRequirements(variant.equipment, inventory);
     if (!missing.length) return [];
     if (!best || missing.length < best.length) best = missing;
   }

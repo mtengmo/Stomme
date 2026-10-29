@@ -30,9 +30,7 @@ export function kneeConditioningPlan(
   return starterDose.flatMap(([exerciseId, sets, target]) => {
     const exercise = kneeRehabExercises.find((ex) => ex.id === exerciseId);
     const variant = exerciseMetadata[exerciseId].variants.find(
-      (v) =>
-        v.id === 'bodyweight' &&
-        equipmentFits(v.equipment, preferences.equipment),
+      (v) => v.id === 'bodyweight' && equipmentFits(v.equipment, preferences),
     );
     if (!exercise || !variant) return [];
     return [

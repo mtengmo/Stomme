@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
+import { inventory } from '../test/inventory';
 import { favouriteAlternatives } from './favouriteSuggestions';
 
 const preferences = (
@@ -7,7 +8,7 @@ const preferences = (
 ): TrainingPreferences => ({
   programId: 'general',
   experience: 'regular',
-  equipment: ['bodyweight', 'dumbbell-1', 'chair', 'support', 'step'],
+  ...inventory({ dumbbells: [[5, 1]], support: ['chair', 'support', 'step'] }),
   ...patch,
 });
 

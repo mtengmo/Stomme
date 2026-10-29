@@ -38,7 +38,7 @@ export function ExerciseLibrary() {
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
   const preferences = isTrainingPreferences(training) ? training : undefined;
   const filters = filtersFromParams(query);
-  const inventory = preferences?.equipment ?? defaultEquipment;
+  const inventory = preferences ?? { equipment: defaultEquipment };
   const roster = useLiveQuery(async () => {
     const sessions = (await getDb().sessions.toArray())
       .filter((session) =>

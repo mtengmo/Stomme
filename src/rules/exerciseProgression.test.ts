@@ -5,6 +5,7 @@ import type {
   SetLog,
   TrainingPreferences,
 } from '../domain/types';
+import { inventory } from '../test/inventory';
 import { harderExerciseSuggestions } from './exerciseProgression';
 
 function required<T>(value: T | undefined): T {
@@ -101,15 +102,12 @@ describe('optional harder exercises', () => {
     ).toEqual([]);
   });
   it('only suggests harder exercises allowed for the experience level', () => {
-    const equipment: TrainingPreferences['equipment'] = [
-      'bodyweight',
-      'chair',
-      'support',
-      'dumbbell-1',
-      'dumbbell-2',
-    ];
     const data = fixture('goblet-squat');
-    const some = { ...preferences, experience: 'some' as const, equipment };
+    const some = {
+      ...preferences,
+      experience: 'some' as const,
+      ...inventory({ dumbbells: [[5, 2]], support: ['chair', 'support'] }),
+    };
     expect(suggest(data, 'goblet-squat', some)).toEqual(['thruster']);
     expect(
       suggest(data, 'goblet-squat', { ...some, experience: 'new' }),

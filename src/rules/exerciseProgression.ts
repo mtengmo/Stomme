@@ -84,7 +84,7 @@ export function harderExerciseSuggestions(
   return candidates.filter((candidate) =>
     exerciseMetadata[candidate].variants.some(
       (variant) =>
-        equipmentFits(variant.equipment, preferences.equipment) &&
+        equipmentFits(variant.equipment, preferences) &&
         levels.includes(variant.technicalLevel),
     ),
   );

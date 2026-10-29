@@ -84,7 +84,7 @@ export function RehabCollection({
             const variant = exerciseMetadata[item.exerciseId].variants.find(
               (v) =>
                 v.id === item.variantId &&
-                equipmentFits(v.equipment, preferences.equipment),
+                equipmentFits(v.equipment, preferences),
             );
             const added = plan.some((p) => p.exerciseId === ex.id);
             if (added)
@@ -150,7 +150,7 @@ export function RehabCollection({
                   const meta = exerciseMetadata[ex.id];
 
                   const variant = meta.variants.find((v) =>
-                    equipmentFits(v.equipment, preferences.equipment),
+                    equipmentFits(v.equipment, preferences),
                   );
 
                   const added = plan.some((p) => p.exerciseId === ex.id);

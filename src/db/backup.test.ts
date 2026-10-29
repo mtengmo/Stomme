@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
 import type { PainLog, Session, SetLog } from '../domain/types';
+import { inventory } from '../test/inventory';
 import {
   BACKUP_SCHEMA_VERSION,
   BackupError,
@@ -100,7 +101,7 @@ it('round-trips explicit adjustable settings and rejects malformed settings', as
   const training = {
     programId: 'general',
     experience: 'new',
-    equipment: ['bodyweight', 'dumbbell-2'],
+    ...inventory({ dumbbells: [[5, 2]] }),
     weights: [{ type: 'dumbbell', kg: 8, count: 2 }],
     adjustableWeights: [{ type: 'dumbbell', count: 2, settingsKg: [5, 10] }],
   };

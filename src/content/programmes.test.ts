@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
+import { inventory } from '../test/inventory';
 import {
   isTrainingPreferences,
   isWorkoutEquipment,
@@ -85,7 +86,7 @@ describe('adjustable and workout equipment', () => {
 
   it('validates a full workout snapshot and detaches it from home preferences', () => {
     const equipment = {
-      equipment: ['bodyweight' as const, 'dumbbell-2' as const],
+      ...inventory({ dumbbells: [[5, 2]] }),
       weights: [{ type: 'dumbbell' as const, kg: 8, count: 2 as const }],
       adjustableWeights: [
         { type: 'dumbbell' as const, count: 2 as const, settingsKg: [5, 10] },

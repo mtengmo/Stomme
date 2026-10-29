@@ -7,12 +7,13 @@ import { Route, Router, Switch } from 'wouter';
 import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { useAppHashLocation } from '../../lib/hashLocation';
+import { inventory } from '../../test/inventory';
 import { CustomWorkoutList } from './CustomWorkoutList';
 import { ExerciseLibrary } from './ExerciseLibrary';
 
 const prefs = {
   programId: 'general',
-  equipment: ['bodyweight', 'dumbbell-2', 'chair', 'support'],
+  ...inventory({ dumbbells: [[5, 2]], support: ['chair', 'support'] }),
   experience: 'some',
 };
 

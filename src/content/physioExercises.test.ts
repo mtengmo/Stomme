@@ -76,11 +76,13 @@ describe('catalogue entries E49-E53', () => {
     });
     const variant = exerciseMetadata['band-knee-extension'].variants[0];
     expect(
-      equipmentFits(variant?.equipment ?? [], ['bodyweight', 'chair']),
+      equipmentFits(variant?.equipment ?? [], {
+        equipment: ['bodyweight', 'chair'],
+      }),
     ).toBe(false);
-    expect(equipmentFits(variant?.equipment ?? [], ['band', 'chair'])).toBe(
-      true,
-    );
+    expect(
+      equipmentFits(variant?.equipment ?? [], { equipment: ['band', 'chair'] }),
+    ).toBe(true);
     for (const id of ids)
       expect(kneeRehabExercises.some((e) => e.id === id)).toBe(false);
   });

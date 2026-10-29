@@ -19,7 +19,7 @@ export function favouriteAlternatives(
       exerciseMetadata[candidate]?.variants.some(
         (variant) =>
           levels.includes(variant.technicalLevel) &&
-          equipmentFits(variant.equipment, preferences.equipment),
+          equipmentFits(variant.equipment, preferences),
       ),
   );
 }

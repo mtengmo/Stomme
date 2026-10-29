@@ -6,6 +6,7 @@ import { rehabGroup } from '../../content/programmes';
 import { validateTrainingPlan } from '../../db/training';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
 import { equipmentFits } from '../../rules/equipment';
+import { inventory } from '../../test/inventory';
 import { basePlan } from './defaultPlan';
 import { startProblems } from './startReadiness';
 
@@ -31,9 +32,7 @@ function oldReady(plan: PlannedExercise[], preferences: TrainingPreferences) {
       const variant = exerciseMetadata[item.exerciseId].variants.find(
         (v) => v.id === item.variantId,
       );
-      return (
-        !!variant && equipmentFits(variant.equipment, preferences.equipment)
-      );
+      return !!variant && equipmentFits(variant.equipment, preferences);
     })
   );
 }
@@ -55,9 +54,9 @@ describe('startProblems', () => {
   it('asks for a weight on a weighted variant', () => {
     const weighted: TrainingPreferences = {
       ...prefs,
-      equipment: ['bodyweight', 'dumbbell-2'],
+      ...inventory({ dumbbells: [[5, 2]] }),
     };
-    const plan = [basePlan('floor-press', weighted)];
+    const plan = [{ ...basePlan('floor-press', weighted), weightKg: 0 }];
     expect(startProblems(plan, weighted)).toEqual([
       'Ange vikt för Hantelpress på golv.',
     ]);

@@ -8,7 +8,7 @@ import type {
   TemplateId,
   TrainingPreferences,
 } from '../domain/types';
-import { equipmentFits } from './equipment';
+import { equipmentFits, type Inventory } from './equipment';
 import { allowedLevels, chooseVariant } from './levelPolicy';
 import {
   buildRoster,
@@ -23,25 +23,26 @@ const weights: TrainingPreferences['weights'] = [
   { type: 'kettlebell', kg: 8, count: 1 },
   { type: 'kettlebell', kg: 12, count: 1 },
 ];
-const bodyweight: EquipmentChoice[] = ['bodyweight', 'chair', 'support'];
-const dumbbells: EquipmentChoice[] = [
-  'bodyweight',
-  'dumbbell-2',
-  'chair',
-  'support',
-];
-const everything: EquipmentChoice[] = [
-  'bodyweight',
-  'dumbbell-2',
-  'kettlebell-1',
-  'chair',
-  'support',
-  'step',
-  'band',
-  'pull-up-bar',
-  'dip-bars',
-];
-const equipmentSets: [string, EquipmentChoice[]][] = [
+const bodyweight: Inventory = {
+  equipment: ['bodyweight', 'chair', 'support'],
+};
+const dumbbells: Inventory = {
+  equipment: ['bodyweight', 'chair', 'support'],
+  weights: weights.filter((item) => item.type === 'dumbbell'),
+};
+const everything: Inventory = {
+  weights,
+  equipment: [
+    'bodyweight',
+    'chair',
+    'support',
+    'step',
+    'band',
+    'pull-up-bar',
+    'dip-bars',
+  ],
+};
+const equipmentSets: [string, Inventory][] = [
   ['bodyweight', bodyweight],
   ['dumbbells', dumbbells],
   ['everything', everything],
@@ -78,14 +79,13 @@ describe('initial training roster', () => {
 
   for (const programId of ['general', 'running'] as const)
     for (const experience of ['new', 'some', 'regular'] as const)
-      for (const [name, equipment] of equipmentSets)
+      for (const [name, owned] of equipmentSets)
         for (const template of ['A', 'B'] as TemplateId[])
           it(`${programId} ${experience} ${name} ${template}: 3-6 unique exercises that fit`, () => {
             const preferences: TrainingPreferences = {
               programId,
               experience,
-              equipment,
-              weights,
+              ...owned,
             };
             const ids = initialTrainingRoster(preferences, template);
             expect(new Set(ids).size).toBe(ids.length);
@@ -95,9 +95,7 @@ describe('initial training roster', () => {
               expect(rehabAdditionIds.has(id)).toBe(false);
               const variant = chooseVariant(id, preferences);
               expect(variant).toBeDefined();
-              expect(equipmentFits(variant?.equipment ?? [], equipment)).toBe(
-                true,
-              );
+              expect(equipmentFits(variant?.equipment ?? [], owned)).toBe(true);
               // Running only swaps to allowed levels; general may use a flagged easiest fallback.
               if (programId === 'running')
                 expect(allowedLevels(experience)).toContain(
@@ -111,7 +109,7 @@ describe('initial training roster', () => {
       {
         programId: 'running',
         experience: 'new',
-        equipment: everything,
+        equipment: everything.equipment,
         weights,
       },
       'A',
@@ -126,7 +124,7 @@ describe('initial training roster', () => {
       {
         programId: 'running',
         experience: 'regular',
-        equipment: everything,
+        equipment: everything.equipment,
         weights,
       },
       'A',
@@ -140,7 +138,7 @@ describe('initial training roster', () => {
       {
         programId: 'general',
         experience: 'some',
-        equipment: dumbbells,
+        equipment: dumbbells.equipment,
         weights,
       },
       'A',
@@ -150,7 +148,7 @@ describe('initial training roster', () => {
 
   it('gives a regular bodyweight user at least one technical exercise', () => {
     const ids = initialTrainingRoster(
-      { programId: 'general', experience: 'regular', equipment: bodyweight },
+      { programId: 'general', experience: 'regular', ...bodyweight },
       'A',
     );
     expect(
@@ -164,7 +162,7 @@ describe('initial training roster', () => {
 
   it('leaves impact exercises out once symptoms are on record', () => {
     const ids = initialTrainingRoster(
-      { programId: 'general', experience: 'regular', equipment: bodyweight },
+      { programId: 'general', experience: 'regular', ...bodyweight },
       'A',
       { painOnRecord: true },
     );
@@ -174,7 +172,7 @@ describe('initial training roster', () => {
 
   it('falls back to bodyweight when a weighted exercise has no registered weight', () => {
     const ids = initialTrainingRoster(
-      { programId: 'general', experience: 'some', equipment: dumbbells },
+      { programId: 'general', experience: 'some', ...bodyweight },
       'A',
     );
     expect(ids).not.toContain('floor-press');
@@ -185,14 +183,14 @@ describe('initial training roster', () => {
     const base: TrainingPreferences = {
       programId: 'general',
       experience: 'some',
-      equipment: everything,
+      equipment: everything.equipment,
       weights,
       bodyParts: ['legs'],
     };
     const thin: TrainingPreferences = {
       ...base,
       experience: 'new',
-      equipment: bodyweight,
+      ...bodyweight,
       weights: undefined,
     };
     it('picks exercises that train the region and the two passes differ as sets (tiny pools may match)', () => {
@@ -229,10 +227,7 @@ describe('basic push-ups and calf raise in the rosters', () => {
     experience: TrainingPreferences['experience'],
     template: TemplateId = 'A',
   ) =>
-    buildRoster(
-      { programId: 'general', experience, equipment: bodyweight },
-      template,
-    );
+    buildRoster({ programId: 'general', experience, ...bodyweight }, template);
 
   it('gives new users knee push-ups without the easiest-only note', () => {
     const roster = rosterFor('new');
@@ -242,7 +237,11 @@ describe('basic push-ups and calf raise in the rosters', () => {
 
   it('gives regular users an advanced push-up with a same-slot fallback', () => {
     const ids = buildRoster(
-      { programId: 'general', experience: 'regular', equipment: everything },
+      {
+        programId: 'general',
+        experience: 'regular',
+        equipment: everything.equipment,
+      },
       'A',
     ).ids;
     expect(ids).not.toContain('knee-push-up');
@@ -270,7 +269,7 @@ describe('basic push-ups and calf raise in the rosters', () => {
       for (const template of ['A', 'B'] as const)
         for (const programId of ['general', 'running'] as const) {
           const ids = buildRoster(
-            { programId, experience, equipment: everything },
+            { programId, experience, equipment: everything.equipment },
             template,
           ).ids;
           expect(ids).not.toContain('wall-push-up');
@@ -280,7 +279,7 @@ describe('basic push-ups and calf raise in the rosters', () => {
 
   it('gives a new runner calf raise in place of the single-leg version', () => {
     const ids = buildRoster(
-      { programId: 'running', experience: 'new', equipment: bodyweight },
+      { programId: 'running', experience: 'new', ...bodyweight },
       'B',
     ).ids;
     expect(ids).not.toContain('single-leg-calf-raise');

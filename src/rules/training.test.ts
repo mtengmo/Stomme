@@ -6,6 +6,7 @@ import type {
   SetLog,
   TrainingPreferences,
 } from '../domain/types';
+import { inventory } from '../test/inventory';
 import { buildPlan } from './nextPlan';
 import {
   trainingDayAfterDue,
@@ -28,7 +29,12 @@ const plan: PlannedExercise = {
 const preferences: TrainingPreferences = {
   programId: 'general',
   experience: 'some',
-  equipment: ['bodyweight', 'dumbbell-1'],
+  ...inventory({
+    dumbbells: [
+      [7.5, 1],
+      [10, 1],
+    ],
+  }),
 };
 function session(patch: Partial<Session> = {}): Session {
   return {
@@ -99,7 +105,7 @@ describe('programme-specific progression', () => {
     expect(
       trainingPlanSuggestion(
         bilateral,
-        { ...preferences, equipment: ['bodyweight'] },
+        { ...preferences, equipment: ['bodyweight'], weights: [] },
         [session({ plan: [bilateral], feedback: {} })],
         [],
         bilateral.variantId,
@@ -199,7 +205,7 @@ describe('programme-specific progression', () => {
   it('keeps borrowed workouts out of home progression evidence while retaining their symptom signal', () => {
     const borrowed = session({
       equipmentOverride: {
-        equipment: ['bodyweight', 'dumbbell-1'],
+        equipment: ['bodyweight'],
         weights: [],
       },
     });
@@ -214,7 +220,7 @@ describe('programme-specific progression', () => {
       id: 'borrowed-later',
       startedAt: '2026-10-21T08:00:00.000Z',
       equipmentOverride: {
-        equipment: ['bodyweight', 'dumbbell-1'],
+        equipment: ['bodyweight'],
         weights: [],
       },
       feedback: {
@@ -557,7 +563,7 @@ describe('programme-specific progression', () => {
     });
     const withoutWeights = trainingPlanSuggestion(
       base,
-      { ...preferences, equipment: ['bodyweight'] },
+      { ...preferences, equipment: ['bodyweight'], weights: [] },
       [session()],
       logs(),
     );

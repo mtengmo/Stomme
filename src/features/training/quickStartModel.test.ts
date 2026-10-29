@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { isTrainingPreferences } from '../../content/programmes';
 import {
-  BODYWEIGHT_EQUIPMENT,
+  DEFAULT_SUPPORT,
   emptyDraft,
   preferencesFromDraft,
   readDraft,
+  showsWeights,
   stepsFor,
 } from './quickStartModel';
 
@@ -33,16 +34,14 @@ describe('quick start model', () => {
         equipment: ['laser'],
         experience: 9,
         bodyParts: ['legs', 'legs'],
-        mode: 'x',
       }),
     );
     expect(draft).toMatchObject({
       goal: 'running',
       step: 'equipment',
-      equipment: [],
+      equipment: DEFAULT_SUPPORT,
       experience: 'new',
       bodyParts: [],
-      mode: 'bodyweight',
     });
   });
 
@@ -57,8 +56,7 @@ describe('quick start model', () => {
       ...emptyDraft,
       goal: 'general' as const,
       step: 'focus' as const,
-      mode: 'equipment' as const,
-      equipment: ['dumbbell-2' as const],
+      equipment: ['chair' as const, 'band' as const],
       experience: 'regular' as const,
       focus: 'select' as const,
       bodyParts: ['legs' as const],
@@ -86,17 +84,21 @@ describe('quick start model', () => {
     ).toEqual([]);
   });
 
-  it('maps Egenvikt to body, chair and wall without weights', () => {
-    const prefs = preferencesFromDraft({
-      ...emptyDraft,
-      goal: 'general',
-      equipment: ['dumbbell-2'],
-      weights: [{ type: 'dumbbell', kg: 8, count: 2 }],
-    });
-    expect(prefs.equipment).toEqual(BODYWEIGHT_EQUIPMENT);
+  it('starts with chair and wall and no weights', () => {
+    expect(emptyDraft.equipment).toEqual(DEFAULT_SUPPORT);
+    const prefs = preferencesFromDraft({ ...emptyDraft, goal: 'general' });
+    expect(prefs.equipment).toEqual(['bodyweight', 'chair', 'support']);
     expect(prefs.weights).toBeUndefined();
     expect(prefs.adjustableWeights).toBeUndefined();
     expect(isTrainingPreferences(prefs)).toBe(true);
+  });
+
+  it('drops an old draft that stored dumbbell counts in the equipment list', () => {
+    expect(
+      readDraft(
+        JSON.stringify({ goal: 'general', equipment: ['dumbbell-2', 'chair'] }),
+      ).equipment,
+    ).toEqual(DEFAULT_SUPPORT);
   });
 
   it('keeps only focus for general and only with Välj kroppsdelar', () => {
@@ -119,9 +121,8 @@ describe('quick start model', () => {
     const prefs = preferencesFromDraft({
       ...emptyDraft,
       goal: 'physio',
-      mode: 'equipment',
       experience: 'regular',
-      equipment: ['chair', 'band', 'dumbbell-2'],
+      equipment: ['chair', 'band', 'step'],
       side: 'left',
     });
     expect(prefs).toMatchObject({
@@ -144,18 +145,16 @@ describe('quick start model', () => {
     ];
     const draft = {
       ...emptyDraft,
-      mode: 'equipment' as const,
-      equipment: ['dumbbell-2' as const],
       weights,
       adjustableWeights,
     };
     const custom = preferencesFromDraft({ ...draft, goal: 'custom' });
-    expect(custom.equipment).toContain('dumbbell-2');
+    expect(showsWeights('custom')).toBe(true);
+    expect(showsWeights('knee')).toBe(false);
     expect(custom.weights).toEqual(weights);
     expect(custom.adjustableWeights).toEqual(adjustableWeights);
     for (const goal of ['knee', 'physio'] as const) {
       const prefs = preferencesFromDraft({ ...draft, goal });
-      expect(prefs.equipment).not.toContain('dumbbell-2');
       expect(prefs.weights).toBeUndefined();
       expect(prefs.adjustableWeights).toBeUndefined();
     }
@@ -199,15 +198,14 @@ describe('quick start model', () => {
     const prefs = preferencesFromDraft({
       ...emptyDraft,
       goal: 'build',
-      mode: 'equipment',
-      equipment: ['dumbbell-2', 'band', 'laser' as never],
+      equipment: ['chair', 'band', 'laser' as never],
       experience: 'regular',
       focus: 'select',
       bodyParts: ['legs'],
     });
     expect(prefs).toEqual({
       programId: 'general',
-      equipment: ['bodyweight', 'dumbbell-2', 'band'],
+      equipment: ['bodyweight', 'chair', 'band'],
       experience: 'regular',
     });
   });

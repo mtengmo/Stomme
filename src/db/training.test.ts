@@ -10,6 +10,7 @@ import type {
 } from '../domain/types';
 import { basePlan } from '../features/training/defaultPlan';
 import { buildSteps } from '../rules/sessionPlan';
+import { inventory } from '../test/inventory';
 import { exportAll, importAll, parseBackup, serializeBackup } from './backup';
 import { StommeDB } from './db';
 import { logSet, setFeedback } from './repo';
@@ -26,7 +27,7 @@ const now = new Date('2026-10-20T08:00:00.000Z');
 const preferences: TrainingPreferences = {
   programId: 'general',
   experience: 'some',
-  equipment: ['bodyweight', 'dumbbell-1'],
+  ...inventory({ dumbbells: [[5, 1]] }),
 };
 const plan: PlannedExercise = {
   exerciseId: 'single-leg-rdl',
@@ -74,7 +75,7 @@ describe('programme persistence and safety boundaries', () => {
       weights: [],
     };
     const override = {
-      equipment: ['bodyweight' as const, 'dumbbell-2' as const],
+      equipment: ['bodyweight' as const],
       adjustableWeights: [
         { type: 'dumbbell' as const, count: 2 as const, settingsKg: [5, 8] },
       ],
@@ -119,7 +120,7 @@ describe('programme persistence and safety boundaries', () => {
     expect(() => parseBackup(serializeBackup(invalidBackup))).toThrow();
     await expect(
       startTrainingSession(db, home, 'A', [borrowedPlan], now, undefined, {
-        equipmentOverride: { ...override, equipment: ['bodyweight'] },
+        equipmentOverride: { equipment: ['bodyweight'] },
       }),
     ).rejects.toThrow();
     await expect(

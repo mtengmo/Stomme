@@ -6,6 +6,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { limitedExercises } from '../../rules/levelPolicy';
+import { inventory } from '../../test/inventory';
 import {
   basePlan,
   customWorkoutPlan,
@@ -89,7 +90,7 @@ const general = (
 ): TrainingPreferences => ({
   programId: 'general',
   experience,
-  equipment: ['bodyweight', 'dumbbell-2', 'chair', 'support'],
+  ...inventory({ dumbbells: [[5, 2]], support: ['chair', 'support'] }),
   weights,
 });
 

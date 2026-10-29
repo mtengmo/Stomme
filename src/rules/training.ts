@@ -64,7 +64,7 @@ export function trainingPlanSuggestion(
     const variant = exerciseMetadata[plan.exerciseId].variants.find(
       (item) => item.id === previousPlan.variantId,
     );
-    if (!variant || !equipmentFits(variant.equipment, preferences.equipment))
+    if (!variant || !equipmentFits(variant.equipment, preferences))
       return {
         ...plan,
         explanation:

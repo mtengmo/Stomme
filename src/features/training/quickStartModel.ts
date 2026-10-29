@@ -18,17 +18,12 @@ export type Goal =
   | 'physio'
   | 'custom';
 export type Step = 'goal' | 'equipment' | 'level' | 'focus' | 'pick';
-export type Mode = 'bodyweight' | 'equipment';
 export type Focus = 'all' | 'select';
 export type Side = 'both' | 'right' | 'left';
 type Experience = TrainingPreferences['experience'];
 
-/** Egenvikt: the body, a chair and a wall. */
-export const BODYWEIGHT_EQUIPMENT: EquipmentChoice[] = [
-  'bodyweight',
-  'chair',
-  'support',
-];
+/** Everyone has a chair and a wall, so the step starts with them ticked. */
+export const DEFAULT_SUPPORT: EquipmentChoice[] = ['chair', 'support'];
 
 export const levelHints: Record<Experience, string> = {
   new: 'Grundövningar, 2 set, lättaste vikterna.',
@@ -56,42 +51,29 @@ export function isRehabGoal(goal: Goal | null): boolean {
   return goal === 'knee' || goal === 'physio' || goal === 'custom';
 }
 
-/** Equipment the checklist may offer for a goal; anything else is dropped on save. */
+/** Support items the checklist may offer for a goal; anything else is dropped on save. */
 export function allowedEquipment(goal: Goal | null): EquipmentChoice[] {
   const base: EquipmentChoice[] = ['chair', 'support'];
-  if (goal === 'general' || goal === 'running' || goal === 'build')
-    return [
-      'dumbbell-1',
-      'dumbbell-2',
-      'kettlebell-1',
-      'kettlebell-2',
-      ...base,
-      'step',
-      'band',
-      'pull-up-bar',
-      'dip-bars',
-    ];
-  if (goal === 'custom')
-    return [
-      'dumbbell-1',
-      'dumbbell-2',
-      'kettlebell-1',
-      'kettlebell-2',
-      ...base,
-      'step',
-      'band',
-      'pull-up-bar',
-      'dip-bars',
-    ];
+  if (
+    goal === 'general' ||
+    goal === 'running' ||
+    goal === 'build' ||
+    goal === 'custom'
+  )
+    return [...base, 'step', 'band', 'pull-up-bar', 'dip-bars'];
   if (goal === 'physio') return [...base, 'band'];
   return base;
+}
+
+/** Knee and the physio's programme never use dumbbells or kettlebells. */
+export function showsWeights(goal: Goal | null): boolean {
+  return !(goal === 'knee' || goal === 'physio');
 }
 
 export interface Draft {
   goal: Goal | null;
   step: Step;
-  mode: Mode;
-  /** Ticked under Utrustning; Egenvikt ignores it. */
+  /** Ticked support items (bodyweight is implied). */
   equipment: EquipmentChoice[];
   experience: Experience;
   weights: NonNullable<TrainingPreferences['weights']>;
@@ -106,8 +88,7 @@ export interface Draft {
 export const emptyDraft: Draft = {
   goal: null,
   step: 'goal',
-  mode: 'bodyweight',
-  equipment: [],
+  equipment: [...DEFAULT_SUPPORT],
   experience: 'new',
   weights: [],
   adjustableWeights: [],
@@ -134,14 +115,14 @@ export function readDraft(raw: string | null): Draft {
   const step = steps.find((item) => item === value.step);
   const equipment =
     Array.isArray(value.equipment) &&
-    value.equipment.length <= 11 &&
+    value.equipment.length <= 7 &&
     new Set(value.equipment).size === value.equipment.length &&
     value.equipment.every(
       (item) =>
         typeof item === 'string' && Object.hasOwn(equipmentChoices, item),
     )
       ? (value.equipment as EquipmentChoice[])
-      : [];
+      : [...DEFAULT_SUPPORT];
   const weights = Array.isArray(value.weights)
     ? (value.weights as Draft['weights'])
     : [];
@@ -158,7 +139,6 @@ export function readDraft(raw: string | null): Draft {
     goal,
     // Drafts from before the steps existed only knew the equipment screen.
     step: step ?? (goal ? 'equipment' : 'goal'),
-    mode: value.mode === 'equipment' ? 'equipment' : 'bodyweight',
     equipment,
     experience:
       value.experience === 'some' || value.experience === 'regular'
@@ -198,16 +178,11 @@ export function preferencesFromDraft(
   const goal = draft.goal ?? 'general';
   const rehab = isRehabGoal(draft.goal);
   const allowed = allowedEquipment(goal);
-  const equipment: EquipmentChoice[] =
-    draft.mode === 'bodyweight'
-      ? [...BODYWEIGHT_EQUIPMENT]
-      : [
-          'bodyweight',
-          ...draft.equipment.filter((item) => allowed.includes(item)),
-        ];
-  const tools = equipment.some(
-    (item) => item.startsWith('dumbbell') || item.startsWith('kettlebell'),
-  );
+  const equipment: EquipmentChoice[] = [
+    'bodyweight',
+    ...draft.equipment.filter((item) => allowed.includes(item)),
+  ];
+  const tools = showsWeights(draft.goal);
   const bodyParts =
     goal === 'general' && draft.focus === 'select'
       ? draft.bodyParts.filter((part) => regions.includes(part))
@@ -221,10 +196,8 @@ export function preferencesFromDraft(
     equipment: [...new Set(equipment)],
     // Rehab never uses the strength level.
     experience: rehab ? 'new' : draft.experience,
-    ...((!rehab || goal === 'custom') && tools && draft.weights.length
-      ? { weights: draft.weights }
-      : {}),
-    ...((!rehab || goal === 'custom') && tools && draft.adjustableWeights.length
+    ...(tools && draft.weights.length ? { weights: draft.weights } : {}),
+    ...(tools && draft.adjustableWeights.length
       ? { adjustableWeights: draft.adjustableWeights }
       : {}),
     ...(bodyParts.length ? { bodyParts } : {}),

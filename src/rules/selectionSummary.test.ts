@@ -5,6 +5,7 @@ import type {
   PlannedExercise,
   TrainingPreferences,
 } from '../domain/types';
+import { inventory } from '../test/inventory';
 import { regionOfExercise, selectionSummary } from './selectionSummary';
 
 const planFor =
@@ -24,7 +25,7 @@ describe('selectionSummary', () => {
   const prefs: TrainingPreferences = {
     programId: 'general',
     experience: 'some',
-    equipment: ['bodyweight', 'dumbbell-2'],
+    ...inventory({ dumbbells: [[5, 2]] }),
   };
   const byRegion = (region: string, n: number) =>
     exerciseList

@@ -57,15 +57,11 @@ it('validates body parts in the preferences guard and when saving', async () => 
         bodyParts: ['feet' as 'legs'],
       }),
     ).rejects.toThrow('Ogiltiga träningsval');
-    // All eleven equipment choices are accepted, matching the backup schema.
+    // All seven equipment choices are accepted, matching the backup schema.
     await saveTrainingPreferences(db, {
       ...base,
       equipment: [
         'bodyweight',
-        'dumbbell-1',
-        'dumbbell-2',
-        'kettlebell-1',
-        'kettlebell-2',
         'chair',
         'support',
         'step',

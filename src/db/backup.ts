@@ -164,10 +164,6 @@ const equipmentChoicesSchema = z
   .array(
     z.enum([
       'bodyweight',
-      'dumbbell-1',
-      'dumbbell-2',
-      'kettlebell-1',
-      'kettlebell-2',
       'chair',
       'support',
       'step',
@@ -176,7 +172,7 @@ const equipmentChoicesSchema = z
       'dip-bars',
     ]),
   )
-  .max(11);
+  .max(7);
 const fixedWeightsSchema = z
   .array(
     z.strictObject({
@@ -283,7 +279,7 @@ const sessionSchema = z
             !variant ||
             !equipmentFits(
               variant.equipment,
-              session.equipmentOverride?.equipment ?? [],
+              session.equipmentOverride ?? { equipment: [] },
             )
           );
         }))

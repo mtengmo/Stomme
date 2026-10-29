@@ -54,7 +54,7 @@ export function basePlan(
     options.roster && !rehab
       ? chooseVariant(id, preferences)
       : exerciseMetadata[id].variants.find((item) =>
-          equipmentFits(item.equipment, preferences.equipment),
+          equipmentFits(item.equipment, preferences),
         );
   const start =
     variant && options.roster && !rehab
@@ -156,7 +156,7 @@ export function defaultPlan(
       const variant = exerciseMetadata[item.exerciseId].variants.find(
         (candidate) => candidate.id === item.variantId,
       );
-      if (!variant || !equipmentFits(variant.equipment, preferences.equipment))
+      if (!variant || !equipmentFits(variant.equipment, preferences))
         return {
           ...structuredClone(item),
           explanation:

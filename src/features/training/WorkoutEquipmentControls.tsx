@@ -29,7 +29,6 @@ export function WorkoutEquipmentControls({
   );
   const [error, setError] = useState('');
   const [adjustableValid, setAdjustableValid] = useState(true);
-  const families = ['dumbbell', 'kettlebell'] as const;
   return (
     <section
       aria-label="Utrustning för detta pass"
@@ -54,69 +53,30 @@ export function WorkoutEquipmentControls({
             <legend className="mb-2 text-lg font-bold">
               Tillgänglig utrustning
             </legend>
-            {families.map((type) => (
+            {(
+              Object.entries(equipmentChoices) as [EquipmentChoice, string][]
+            ).map(([key, label]) => (
               <label
-                key={type}
-                className="flex flex-col gap-2 text-base font-bold"
+                key={key}
+                className="flex min-h-12 items-center gap-3 text-base"
               >
-                {type === 'dumbbell'
-                  ? 'Hantlar för passet'
-                  : 'Kettlebells för passet'}
-                <select
-                  className="min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink"
-                  value={
-                    draft.equipment.includes(`${type}-2`)
-                      ? '2'
-                      : draft.equipment.includes(`${type}-1`)
-                        ? '1'
-                        : '0'
-                  }
+                <input
+                  type="checkbox"
+                  className="size-6 shrink-0"
+                  checked={draft.equipment.includes(key)}
+                  disabled={key === 'bodyweight'}
                   onChange={(event) =>
                     setDraft((current) => ({
                       ...current,
-                      equipment: [
-                        ...current.equipment.filter(
-                          (item) => !item.startsWith(type),
-                        ),
-                        ...(event.target.value === '0'
-                          ? []
-                          : [
-                              `${type}-${event.target.value}` as EquipmentChoice,
-                            ]),
-                      ],
+                      equipment: event.target.checked
+                        ? [...current.equipment, key]
+                        : current.equipment.filter((item) => item !== key),
                     }))
                   }
-                >
-                  <option value="0">Inga</option>
-                  <option value="1">Ett redskap</option>
-                  <option value="2">Två redskap</option>
-                </select>
+                />
+                {label}
               </label>
             ))}
-            {(Object.entries(equipmentChoices) as [EquipmentChoice, string][])
-              .filter(([key]) => !families.some((type) => key.startsWith(type)))
-              .map(([key, label]) => (
-                <label
-                  key={key}
-                  className="flex min-h-12 items-center gap-3 text-base"
-                >
-                  <input
-                    type="checkbox"
-                    className="size-6 shrink-0"
-                    checked={draft.equipment.includes(key)}
-                    disabled={key === 'bodyweight'}
-                    onChange={(event) =>
-                      setDraft((current) => ({
-                        ...current,
-                        equipment: event.target.checked
-                          ? [...current.equipment, key]
-                          : current.equipment.filter((item) => item !== key),
-                      }))
-                    }
-                  />
-                  {label}
-                </label>
-              ))}
           </fieldset>
           <WeightInventoryFields
             value={draft.weights ?? []}

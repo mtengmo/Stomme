@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { TrainingPreferences } from '../domain/types';
+import { inventory } from '../test/inventory';
 import {
   availableWeights,
   startingWeight,
@@ -10,7 +11,7 @@ import {
 const preferences: TrainingPreferences = {
   programId: 'running',
   experience: 'some',
-  equipment: ['bodyweight', 'dumbbell-2', 'kettlebell-1'],
+  ...inventory({ dumbbells: [[5, 2]], kettlebells: [[8, 1]] }),
   weights: [
     { type: 'dumbbell', kg: 5, count: 2 },
     { type: 'dumbbell', kg: 10, count: 2 },

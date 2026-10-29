@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
-import type { EquipmentChoice } from '../domain/types';
-import { equipmentFits } from './equipment';
+import { inventory as owned } from '../test/inventory';
+import { equipmentFits, type Inventory } from './equipment';
 import {
   type ExerciseFilters,
   emptyExerciseFilters,
@@ -25,7 +25,7 @@ const empty: LibraryFilters = {
 const fits = (
   id: keyof typeof exercises,
   patch: Partial<LibraryFilters>,
-  inventory: EquipmentChoice[] = [],
+  inventory: Inventory = { equipment: [] },
   mine = new Set<string>(),
 ) =>
   matchesLibraryFilters(exercises[id], { ...empty, ...patch }, inventory, mine);
@@ -33,47 +33,87 @@ const fits = (
 describe('equipment and library filter contracts', () => {
   it('counts the chosen implements and does not let one dumbbell stand in for a pair or a kettlebell', () => {
     expect(
-      equipmentFits([{ type: 'dumbbell', count: 2 }], ['dumbbell-1']),
+      equipmentFits(
+        [{ type: 'dumbbell', count: 2 }],
+        owned({ dumbbells: [[5, 1]] }),
+      ),
     ).toBe(false);
     expect(
-      equipmentFits([{ type: 'dumbbell', count: 2 }], ['dumbbell-2']),
+      equipmentFits(
+        [{ type: 'dumbbell', count: 2 }],
+        owned({ dumbbells: [[5, 2]] }),
+      ),
     ).toBe(true);
     expect(
-      equipmentFits([{ type: 'dumbbell', count: 1 }], ['dumbbell-2']),
+      equipmentFits(
+        [{ type: 'dumbbell', count: 1 }],
+        owned({ dumbbells: [[5, 2]] }),
+      ),
     ).toBe(true);
     expect(
-      equipmentFits([{ type: 'kettlebell', count: 1 }], ['dumbbell-2']),
+      equipmentFits(
+        [{ type: 'kettlebell', count: 1 }],
+        owned({ dumbbells: [[5, 2]] }),
+      ),
     ).toBe(false);
-    expect(equipmentFits([{ type: 'band', count: 1 }], ['bodyweight'])).toBe(
-      false,
-    );
-    expect(equipmentFits([{ type: 'support', count: 1 }], ['chair'])).toBe(
-      true,
-    );
+    expect(
+      equipmentFits([{ type: 'band', count: 1 }], {
+        equipment: ['bodyweight'],
+      }),
+    ).toBe(false);
+    expect(
+      equipmentFits([{ type: 'support', count: 1 }], { equipment: ['chair'] }),
+    ).toBe(true);
   });
 
   it('requires support and the implement together and allows genuine bodyweight entries', () => {
-    expect(fits('step-up', { equipment: 'available' }, ['bodyweight'])).toBe(
-      false,
-    );
-    expect(fits('step-up', { equipment: 'available' }, ['step'])).toBe(true);
     expect(
-      fits('floor-press', { equipment: 'available' }, ['dumbbell-1']),
+      fits(
+        'step-up',
+        { equipment: 'available' },
+        { equipment: ['bodyweight'] },
+      ),
     ).toBe(false);
     expect(
-      fits('floor-press', { equipment: 'available' }, ['dumbbell-2']),
+      fits('step-up', { equipment: 'available' }, { equipment: ['step'] }),
     ).toBe(true);
-    expect(fits('dead-bug', { equipment: 'available' }, [])).toBe(true);
+    expect(
+      fits(
+        'floor-press',
+        { equipment: 'available' },
+        owned({ dumbbells: [[5, 1]] }),
+      ),
+    ).toBe(false);
+    expect(
+      fits(
+        'floor-press',
+        { equipment: 'available' },
+        owned({ dumbbells: [[5, 2]] }),
+      ),
+    ).toBe(true);
+    expect(
+      fits('dead-bug', { equipment: 'available' }, { equipment: [] }),
+    ).toBe(true);
   });
 
   it('keeps knee-source membership, running purpose and my programme independent', () => {
     expect(fits('half-squat', { purpose: 'knee' })).toBe(true);
     expect(fits('half-squat', { purpose: 'running' })).toBe(false);
     expect(
-      fits('half-squat', { purpose: 'mine' }, [], new Set(['half-squat'])),
+      fits(
+        'half-squat',
+        { purpose: 'mine' },
+        { equipment: [] },
+        new Set(['half-squat']),
+      ),
     ).toBe(true);
     expect(
-      fits('half-squat', { purpose: 'mine' }, [], new Set(['step-up'])),
+      fits(
+        'half-squat',
+        { purpose: 'mine' },
+        { equipment: [] },
+        new Set(['step-up']),
+      ),
     ).toBe(false);
   });
 
@@ -118,7 +158,7 @@ describe('filterExercises', () => {
       exerciseList,
       { ...emptyExerciseFilters, ...patch },
       {
-        inventory: ['bodyweight'],
+        inventory: { equipment: ['bodyweight'] },
         favourites: favourites as never,
       },
     );
@@ -191,9 +231,11 @@ describe('filterExercises', () => {
   });
   it('names the equipment a row lacks', () => {
     expect(
-      missingEquipment('kettlebell-halo', ['bodyweight']).length,
+      missingEquipment('kettlebell-halo', { equipment: ['bodyweight'] }).length,
     ).toBeGreaterThan(0);
-    expect(missingEquipment('dead-bug', ['bodyweight'])).toEqual([]);
+    expect(missingEquipment('dead-bug', { equipment: ['bodyweight'] })).toEqual(
+      [],
+    );
   });
 });
 
@@ -226,7 +268,10 @@ describe('filter params and level fit', () => {
       requiresGoodTechnique(exercise.id, 'new'),
     );
     expect(hard).toBeDefined();
-    const context = { inventory: [], experience: 'new' as const };
+    const context = {
+      inventory: { equipment: [] },
+      experience: 'new' as const,
+    };
     const on = filterExercises(
       exerciseList,
       { ...emptyExerciseFilters, levelFit: true },
@@ -244,7 +289,7 @@ describe('filter params and level fit', () => {
       filterExercises(
         exerciseList,
         { ...emptyExerciseFilters, levelFit: true },
-        { inventory: [] },
+        { inventory: { equipment: [] } },
       ).primary,
     ).toHaveLength(off.length);
   });

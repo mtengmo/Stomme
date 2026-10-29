@@ -1,3 +1,4 @@
+import { inventory } from '../../test/inventory';
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
 import {
@@ -18,14 +19,11 @@ import { ExercisePicker } from './ExercisePicker';
 
 const preferences: TrainingPreferences = {
   programId: 'general',
-  equipment: [
-    'bodyweight',
-    'dumbbell-2',
-    'kettlebell-1',
-    'chair',
-    'support',
-    'step',
-  ],
+  ...inventory({
+    dumbbells: [[5, 2]],
+    kettlebells: [[8, 1]],
+    support: ['chair', 'support', 'step'],
+  }),
   experience: 'some',
 };
 
