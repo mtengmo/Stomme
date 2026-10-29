@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { exercises } from '../../content/exercises';
 import type {
   PlannedExercise,
   Session,
   TrainingPreferences,
 } from '../../domain/types';
-import { basePlan, defaultPlan, painLogsShowPain } from './defaultPlan';
+import { limitedExercises } from '../../rules/levelPolicy';
+import {
+  basePlan,
+  customWorkoutPlan,
+  defaultPlan,
+  painLogsShowPain,
+} from './defaultPlan';
 import { defaultPlan as reExported } from './TrainingPreview';
 
 const prefs: TrainingPreferences = {
@@ -298,5 +305,56 @@ describe('level-driven general start plan', () => {
     expect(painLogsShowPain([log(0)])).toBe(false);
     expect(painLogsShowPain([log(2)])).toBe(true);
     expect(painLogsShowPain([log(0, true)])).toBe(true);
+  });
+});
+
+describe('customWorkoutPlan', () => {
+  const heavyNote = (item: PlannedExercise) =>
+    /Tung startvikt/.test(item.explanation ?? '');
+  const stopped: Session = {
+    ...session('knee', 2),
+    programId: 'general',
+    status: 'aborted',
+    abortReason: 'pain_stop',
+  };
+  it('follows experience for sets and starting weight', () => {
+    const ids = ['floor-press'] as const;
+    const at = (e: TrainingPreferences['experience']) =>
+      customWorkoutPlan(ids, general(e), [], [])[0];
+    expect([at('new')?.sets, at('new')?.weightKg]).toEqual([2, 8]);
+    expect([at('some')?.sets, at('some')?.weightKg]).toEqual([3, 16]);
+    expect([at('regular')?.sets, at('regular')?.weightKg]).toEqual([4, 24]);
+    expect(heavyNote(at('regular') as PlannedExercise)).toBe(true);
+    expect(at('regular')?.target).toBe(exercises['floor-press'].range.start);
+  });
+  it('never starts a limited exercise on the heaviest weight', () => {
+    for (const id of limitedExercises) {
+      const [item] = customWorkoutPlan([id], general('regular'), [], []);
+      expect(item?.weightKg, id).toBeLessThan(24);
+      expect(heavyNote(item as PlannedExercise), id).toBe(false);
+    }
+  });
+  it('starts lightest when pain is on record', () => {
+    const [stoppedPlan] = customWorkoutPlan(
+      ['floor-press'],
+      general('regular'),
+      [stopped],
+      [],
+    );
+    expect(stoppedPlan?.weightKg).toBe(8);
+    const [reported] = customWorkoutPlan(
+      ['floor-press'],
+      general('regular'),
+      [],
+      [],
+      true,
+    );
+    expect(reported?.weightKg).toBe(8);
+  });
+  it('starts rehab at zero sets and target', () => {
+    const [item] = customWorkoutPlan(['quad-set'], prefs, [], []);
+    expect(item?.sets).toBe(0);
+    expect(item?.target).toBe(0);
+    expect(item?.weightKg).toBe(0);
   });
 });

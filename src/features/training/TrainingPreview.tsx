@@ -71,7 +71,12 @@ import {
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
-import { basePlan, defaultPlan, painLogsShowPain } from './defaultPlan';
+import {
+  basePlan,
+  customWorkoutPlan,
+  defaultPlan,
+  painLogsShowPain,
+} from './defaultPlan';
 import { ExercisePicker } from './ExercisePicker';
 import { NextLevelSuggestions } from './NextLevelSuggestions';
 import { clearFlags, readFlags, writeFlags } from './previewDraft';
@@ -175,13 +180,12 @@ function PreviewEditor({
     )
       return structuredClone(customWorkout.plan);
     if (customWorkout)
-      return customWorkout.exerciseIds.map((exerciseId) =>
-        trainingPlanSuggestion(
-          basePlan(exerciseId, preferences),
-          preferences,
-          sessions,
-          logs,
-        ),
+      return customWorkoutPlan(
+        customWorkout.exerciseIds,
+        preferences,
+        sessions,
+        logs,
+        painReported,
       );
     return defaultPlan(
       preferences,

@@ -204,3 +204,34 @@ export function defaultPlan(
       : suggestion;
   });
 }
+
+/**
+ * Dose for a custom workout: the roster rule picks variant, sets and starting
+ * weight from experience (heavy start only for heavy-slot exercises that are
+ * not limited; pain on record starts lightest; rehab starts at 0/0). History
+ * then adds at most what trainingPlanSuggestion allows.
+ */
+export function customWorkoutPlan(
+  ids: readonly ExerciseId[],
+  preferences: TrainingPreferences,
+  sessions: Session[],
+  logs: SetLog[],
+  painReported = false,
+): PlannedExercise[] {
+  const painOnRecord = symptomsOnRecord(sessions, painReported);
+  return ids.map((exerciseId, index) => {
+    const plan = basePlan(exerciseId, preferences, {
+      index,
+      roster: { painOnRecord },
+    });
+    const suggestion = trainingPlanSuggestion(
+      plan,
+      preferences,
+      sessions,
+      logs,
+    );
+    return suggestion.explanation === NO_HISTORY_NOTE
+      ? { ...suggestion, explanation: plan.explanation }
+      : suggestion;
+  });
+}

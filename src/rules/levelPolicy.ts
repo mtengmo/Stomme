@@ -79,7 +79,7 @@ export function levelRankOf(level: TechnicalLevel): number {
 /** Two-footed squat, hinge, row and floor press may start on the heaviest owned weight. */
 const heavySlots = new Set(['squat', 'hinge', 'row', 'horizontal-press']);
 /** One-sided or overhead work stays below the heaviest weight even in a heavy slot. */
-const limitedExercises = new Set<ExerciseId>([
+export const limitedExercises = new Set<ExerciseId>([
   'single-leg-rdl',
   'bent-over-row',
   'squat-curl',
