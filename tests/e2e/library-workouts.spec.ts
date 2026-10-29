@@ -168,7 +168,7 @@ for (const width of [320, 360, 412]) {
         ),
       ).toBe(true);
       await page.screenshot({
-        path: `C:/Users/MAGNUS~1/AppData/Local/Temp/claude/shots/lib-${width}-${scheme}.png`,
+        path: test.info().outputPath(`lib-${width}-${scheme}.png`),
       });
     });
   }
