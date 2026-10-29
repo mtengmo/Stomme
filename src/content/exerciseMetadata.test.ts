@@ -7,13 +7,14 @@ import { loadPresentation } from './loadPresentation';
 import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
-  it('preserves permanent E01–E82 references and original load indices', () => {
-    expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual(
-      Array.from(
+  it('preserves permanent E01–E82 and E87 references and original load indices', () => {
+    expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual([
+      ...Array.from(
         { length: 82 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
       ),
-    );
+      'E87',
+    ]);
     expect(
       exercises['goblet-chair-squat'].loadLadder.map((load) => load.kg),
     ).toEqual([0, 10, 16]);
@@ -174,6 +175,27 @@ describe('expanded library integrity', () => {
       'squat-curl',
     );
     expect(exercises['kettlebell-goblet-squat'].kneeLoaded).toBe(true);
+    expect(
+      exerciseMetadata['russian-twist'].variants.map(
+        (variant) => variant.equipment,
+      ),
+    ).toEqual([
+      [{ type: 'bodyweight', count: 1 }],
+      [{ type: 'dumbbell', count: 1 }],
+      [{ type: 'kettlebell', count: 1 }],
+    ]);
+    expect(exerciseMetadata['russian-twist'].variants[0]?.technicalLevel).toBe(
+      'practiced',
+    );
+    expect(exerciseMetadata['russian-twist'].sidePolicy).toBe('both');
+    expect(exercises['russian-twist'].perSide).toBe(false);
+    expect(exercises['russian-twist'].kneeLoaded).toBe(false);
+    expect(exercises['russian-twist'].tips[0]).toContain(
+      'båda hälarna i golvet',
+    );
+    expect(exercises['russian-twist'].tips[2]).toContain(
+      'Avbryt om ryggen gör ont',
+    );
     expect(exerciseMetadata['floor-press'].variants[0]?.equipment).toEqual([
       { type: 'dumbbell', count: 2 },
     ]);

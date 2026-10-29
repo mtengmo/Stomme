@@ -23,13 +23,16 @@ export const supportedFrontViews = [
 export const supportedObliqueViews = [
   'split-squat',
   'bench-side-plank-leg-lift',
+  'russian-twist',
 ] as const satisfies readonly ExerciseId[];
 
 export type FigureAngle = 'side' | 'front' | 'oblique';
 
 /** Start with the angle that explains each movement most clearly. */
 export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
-  return exerciseId === 'side-lunge' ? 'front' : 'side';
+  if (exerciseId === 'side-lunge') return 'front';
+  if (exerciseId === 'russian-twist') return 'oblique';
+  return 'side';
 }
 
 export function supportsObliqueView(
@@ -406,6 +409,54 @@ export function frontMovementPose(
   );
 }
 
+function russianTwistProjection(progress: number): {
+  pose: Pose;
+  yaw: number;
+  shoulderR: Pt;
+  shoulderL: Pt;
+  chestCenter: Pt;
+  noseDirection: Pt;
+} {
+  const t = clamp(progress);
+  const yaw = -Math.sin(2 * Math.PI * t);
+  const angle = (yaw * 25 * Math.PI) / 180;
+  const sin = Math.sin(angle);
+  const cos = Math.cos(angle);
+  const chestX = 87 + 15 * sin;
+  const chestY = 126;
+  const halfWidth = 20 * cos;
+  const shoulderR = point(chestX - halfWidth, chestY + 5 * sin);
+  const shoulderL = point(chestX + halfWidth, chestY - 5 * sin);
+  const chestCenter = point(chestX, chestY);
+  const weightCenter = point(chestX, chestY + 12);
+  const hR = point(weightCenter[0] - 4, weightCenter[1]);
+  const hL = point(weightCenter[0] + 4, weightCenter[1]);
+  const eR = point(shoulderR[0] + 14, chestY + 7 + 3 * sin);
+  const eL = point(shoulderL[0] - 14, chestY + 7 - 3 * sin);
+  return {
+    yaw,
+    shoulderR,
+    shoulderL,
+    chestCenter,
+    noseDirection: point(88 + 9 * sin, 111),
+    pose: skeleton(
+      point(80, 113),
+      point(84, 127),
+      point(100, 171),
+      eR,
+      hR,
+      eL,
+      hL,
+      point(80, 146),
+      point(79, 173),
+      point(68, 176),
+      point(120, 146),
+      point(121, 173),
+      point(132, 176),
+    ),
+  };
+}
+
 /** Three-quarter projections expose front/back support relationships. */
 export function obliqueMovementPose(
   exerciseId: ObliqueViewExercise,
@@ -413,6 +464,7 @@ export function obliqueMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'russian-twist') return russianTwistProjection(t).pose;
   if (exerciseId === 'split-squat') {
     const depth = t;
     const rightFront = working !== 'left';
@@ -530,6 +582,8 @@ export function FrontFigureFrame({
     angle === 'oblique'
       ? obliqueMovementPose(exerciseId as ObliqueViewExercise, phase, working)
       : frontMovementPose(exerciseId as FrontViewExercise, phase, working);
+  const twist =
+    exerciseId === 'russian-twist' ? russianTwistProjection(phase) : undefined;
   const kind: 'dumbbell' | 'kettlebell' | null =
     equipment === 'band'
       ? null
@@ -546,18 +600,21 @@ export function FrontFigureFrame({
           ? [pose.hR, pose.hL]
           : exerciseId === 'side-lunge'
             ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
-            : exerciseId === 'kettlebell-rack-carry' ||
-                exerciseId === 'suitcase-carry'
-              ? [rackSide === 'R' ? pose.hR : pose.hL]
-              : kind === 'kettlebell' && exerciseId !== 'step-up'
-                ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
-                : [pose.hR, pose.hL];
+            : exerciseId === 'russian-twist'
+              ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
+              : exerciseId === 'kettlebell-rack-carry' ||
+                  exerciseId === 'suitcase-carry'
+                ? [rackSide === 'R' ? pose.hR : pose.hL]
+                : kind === 'kettlebell' && exerciseId !== 'step-up'
+                  ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
+                  : [pose.hR, pose.hL];
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
   const color = (side: 'R' | 'L') =>
     working === null || (working === 'right' ? side === 'R' : side === 'L')
       ? 'var(--accent)'
       : 'var(--edge)';
-  const arm = (elbow: Pt, hand: Pt) => line([pose.neck, elbow, hand]);
+  const arm = (elbow: Pt, hand: Pt, origin?: Pt) =>
+    line([origin ?? pose.neck, elbow, hand]);
   const leg = (knee: Pt, ankle: Pt, toe: Pt) =>
     line([pose.hip, knee, ankle, toe]);
 
@@ -640,21 +697,53 @@ export function FrontFigureFrame({
           <path d="M150 125h34M154 128v45M180 128v45" />
         </g>
       ) : null}
+      {exerciseId === 'russian-twist' ? (
+        <path
+          data-contact-plane="seated-base"
+          d="M89 175h22"
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      ) : null}
       {heldIsRack && kind === 'kettlebell' ? (
         <g data-equipment="kettlebell" data-grip="rack">
           <Held kind="kettlebell" at={heldAt[0] ?? pose.hR} rack />
         </g>
       ) : null}
       <g data-body-side="left" stroke={color('L')} {...limb}>
-        <path d={arm(pose.eL, pose.hL)} />
+        <path d={arm(pose.eL, pose.hL, twist?.shoulderL)} />
         <path d={leg(pose.kL, pose.aL, pose.tL)} />
       </g>
       <g stroke="var(--ink)" {...limb}>
         <path d={line([pose.neck, pose.hip])} />
         <circle cx={pose.head[0]} cy={pose.head[1]} r="9" fill="var(--paper)" />
       </g>
+      {twist ? (
+        <g
+          data-torso-yaw={twist.yaw.toFixed(2)}
+          fill="none"
+          stroke="var(--ink)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        >
+          <path d={line([twist.shoulderR, twist.shoulderL])} />
+          <path
+            d={line([
+              twist.chestCenter,
+              point(
+                twist.chestCenter[0] + twist.yaw * 8,
+                twist.chestCenter[1] + 14,
+              ),
+            ])}
+            strokeWidth="3"
+          />
+          <path d={line([pose.head, twist.noseDirection])} strokeWidth="3" />
+        </g>
+      ) : null}
       <g data-body-side="right" stroke={color('R')} {...limb}>
-        <path d={arm(pose.eR, pose.hR)} />
+        <path d={arm(pose.eR, pose.hR, twist?.shoulderR)} />
         <path d={leg(pose.kR, pose.aR, pose.tR)} />
       </g>
       {heldIsRack && kind === 'kettlebell' ? (

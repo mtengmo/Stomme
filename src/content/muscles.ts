@@ -234,6 +234,11 @@ export const exerciseMuscles: Record<
     secondary: ['core', 'back'],
     qualities: [],
   },
+  'russian-twist': {
+    primary: ['core'],
+    secondary: ['hip-flexors'],
+    qualities: [],
+  },
   'squat-curl': {
     primary: ['quads', 'glutes', 'biceps'],
     secondary: ['core', 'forearms'],

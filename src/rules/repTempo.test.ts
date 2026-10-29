@@ -29,6 +29,7 @@ describe('repTempo', () => {
       'mountain-climber',
       'plank-arm-lift',
       'walking-lunge',
+      'russian-twist',
       'pull-up',
       'chin-up',
       'parallel-dip',

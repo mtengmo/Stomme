@@ -80,7 +80,8 @@ export type ExerciseId =
   | 'dumbbell-pullover'
   | 'side-lunge'
   | 'walking-lunge'
-  | 'kettlebell-goblet-squat';
+  | 'kettlebell-goblet-squat'
+  | 'russian-twist';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

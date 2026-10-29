@@ -10,6 +10,8 @@ const MANUAL_REPS: readonly ExerciseId[] = [
   'plank-arm-lift',
   // One forward landing is one rep; the demo cycle shows two alternating steps.
   'walking-lunge',
+  // One controlled left-right-return cycle is one rep, at the user's pace.
+  'russian-twist',
   // Often taken to failure, so a fixed beat would be wrong.
   'pull-up',
   'chin-up',

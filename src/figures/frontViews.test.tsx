@@ -33,6 +33,7 @@ describe('authored frontal demonstrations', () => {
     expect(supportedObliqueViews).toEqual([
       'split-squat',
       'bench-side-plank-leg-lift',
+      'russian-twist',
     ]);
     expect(alternateView('split-squat')).toBe('oblique');
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');
@@ -40,6 +41,7 @@ describe('authored frontal demonstrations', () => {
     expect(alternateView('push-up')).toBeUndefined();
     expect(defaultViewFor('side-lunge')).toBe('front');
     expect(defaultViewFor('reverse-lunge')).toBe('side');
+    expect(defaultViewFor('russian-twist')).toBe('oblique');
   });
 
   it('marks anatomical H/V sides without mirroring the frontal figure', () => {

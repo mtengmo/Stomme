@@ -347,6 +347,21 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Grip kettlebellens horn med båda händerna nära bröstet.',
     ],
   ],
+  'russian-twist': [
+    ['bodyweight', 1, [0], 'Håll händerna nära bröstet utan extra vikt.'],
+    [
+      'dumbbell',
+      1,
+      [1, 2],
+      'Håll en lätt hantel med båda händerna nära bröstet.',
+    ],
+    [
+      'kettlebell',
+      1,
+      [3, 4],
+      'Håll en lätt kettlebell med båda händerna nära bröstet.',
+    ],
+  ],
   'biceps-curl': [
     ['dumbbell', 2, [0, 1], 'En hantel i varje hand, handflatorna framåt.'],
   ],
@@ -700,6 +715,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'basic',
     'Båda händerna håller vikten nära bröstet under en kontrollerad knäböj.',
   ],
+  'russian-twist': [
+    'practiced',
+    'Sittande vridning kräver liten kontrollerad rörelse utan armarnas fart.',
+  ],
   'goblet-squat': ['practiced', 'Självvalt djup och kontroll utan stol.'],
   'kettlebell-deadlift': [
     'practiced',
@@ -800,6 +819,15 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
 };
 
 function sourceFor(id: ExerciseId): ExerciseSource[] {
+  if (id === 'russian-twist')
+    return [
+      {
+        title: 'Seated Medicine Ball Trunk Rotations',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/47/seated-medicine-ball-trunk-rotations/',
+        note: 'Källan visar sittande bålrotation med medicinboll, först med hälarna i golvet. Appen använder valfri lätt hantel eller kettlebell nära bröstet och ett litet rörelseomfång; dosen är ett redaktionellt förslag.',
+      },
+    ];
   if (id === 'kettlebell-goblet-squat')
     return [
       {
@@ -1157,6 +1185,7 @@ export const exerciseMetadata = Object.fromEntries(
         'side-lunge',
         'walking-lunge',
         'kettlebell-goblet-squat',
+        'russian-twist',
       ].includes(id)
         ? '2026-10-29'
         : [

@@ -4,9 +4,15 @@ import {
   Figure,
   FigureFrame,
   movementPose,
+  russianTwistReducedFrames,
+  stillFramePhase,
   walkingLungeReducedFrames,
 } from './Figure';
-import { defaultViewFor, frontMovementPose } from './frontViews';
+import {
+  defaultViewFor,
+  frontMovementPose,
+  obliqueMovementPose,
+} from './frontViews';
 import { figures } from './poses';
 
 const distance = (a: readonly [number, number], b: readonly [number, number]) =>
@@ -540,5 +546,120 @@ describe('kettlebell goblet squat figure geometry', () => {
     expect(markup.match(/data-equipment="kettlebell"/g)).toHaveLength(1);
     expect(markup.match(/<circle cx=/g)).toHaveLength(2);
     expect(markup).toContain(`cy="${bottom.hR[1] + 12}"`);
+  });
+});
+
+describe('russian twist oblique geometry', () => {
+  it('rotates the chest and shared weight while pelvis, trunk axis, and feet stay fixed', () => {
+    const centerStart = obliqueMovementPose('russian-twist', 0, null);
+    const leftTurn = obliqueMovementPose('russian-twist', 0.25, null);
+    const centerReturn = obliqueMovementPose('russian-twist', 0.5, null);
+    const rightTurn = obliqueMovementPose('russian-twist', 0.75, null);
+    const centerEnd = obliqueMovementPose('russian-twist', 1, null);
+
+    expect(defaultViewFor('russian-twist')).toBe('oblique');
+    expect(stillFramePhase('russian-twist', 'oblique', 'Vrid åt vänster')).toBe(
+      0.25,
+    );
+    expect(stillFramePhase('russian-twist', 'oblique', 'Vrid åt höger')).toBe(
+      0.75,
+    );
+    expect(centerEnd).toEqual(centerStart);
+    expect(centerReturn.head).toEqual(centerStart.head);
+    expect(leftTurn.head).toEqual(centerStart.head);
+    expect(rightTurn.head).toEqual(centerStart.head);
+    for (const key of [
+      'neck',
+      'hip',
+      'kR',
+      'aR',
+      'tR',
+      'kL',
+      'aL',
+      'tL',
+    ] as const) {
+      expect(leftTurn[key]).toEqual(centerStart[key]);
+      expect(rightTurn[key]).toEqual(centerStart[key]);
+    }
+    expect(centerStart.hip[1]).toBeGreaterThanOrEqual(165);
+    expect(centerStart.hip[1]).toBeLessThanOrEqual(174);
+    expect(centerStart.kR[1]).toBeLessThan(centerStart.hip[1]);
+    expect(centerStart.kL[1]).toBeLessThan(centerStart.hip[1]);
+    expect(centerStart.aR[1]).toBeGreaterThanOrEqual(170);
+    expect(centerStart.aL[1]).toBeGreaterThanOrEqual(170);
+    expect((centerStart.hR[1] + centerStart.hL[1]) / 2 + 21).toBeLessThan(175);
+
+    const handCenterX = (pose: typeof centerStart) =>
+      (pose.hR[0] + pose.hL[0]) / 2;
+    expect(handCenterX(leftTurn)).toBeLessThan(handCenterX(centerStart));
+    expect(handCenterX(rightTurn)).toBeGreaterThan(handCenterX(centerStart));
+    expect(handCenterX(centerEnd)).toBeCloseTo(handCenterX(centerStart), 8);
+    expect(leftTurn.hR[1]).toBe(centerStart.hR[1]);
+    expect(rightTurn.hR[1]).toBe(centerStart.hR[1]);
+    expect(figures['russian-twist'].held?.hands).toEqual(['hR', 'hL']);
+
+    const leftMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="russian-twist"
+        pose={leftTurn}
+        working={null}
+        view="oblique"
+        phase={0.25}
+        equipment="dumbbell"
+      />,
+    );
+    const rightMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="russian-twist"
+        pose={rightTurn}
+        working={null}
+        view="oblique"
+        phase={0.75}
+        equipment="dumbbell"
+      />,
+    );
+    expect(leftMarkup).toContain('data-torso-yaw="-1.00"');
+    expect(leftMarkup).toContain('data-contact-plane="seated-base"');
+    expect(rightMarkup).toContain('data-torso-yaw="1.00"');
+    expect(leftMarkup).not.toBe(rightMarkup);
+    expect(leftMarkup.match(/data-equipment="dumbbell"/g)).toHaveLength(1);
+    expect(leftMarkup.match(/<circle cx=/g)).toHaveLength(1);
+
+    const bellMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="russian-twist"
+        pose={leftTurn}
+        working={null}
+        view="oblique"
+        phase={0.25}
+        equipment="kettlebell"
+      />,
+    );
+    expect(bellMarkup.match(/data-equipment="kettlebell"/g)).toHaveLength(1);
+    expect(bellMarkup.match(/<circle cx=/g)).toHaveLength(2);
+    expect(bellMarkup.indexOf('data-equipment="kettlebell"')).toBeGreaterThan(
+      bellMarkup.indexOf('data-body-side="right"'),
+    );
+    const bodyweightMarkup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="russian-twist"
+        pose={leftTurn}
+        working={null}
+        view="oblique"
+        phase={0.25}
+        equipment={null}
+      />,
+    );
+    expect(bodyweightMarkup).not.toContain('data-equipment="dumbbell"');
+
+    const stills = russianTwistReducedFrames();
+    expect(stills.map(([label]) => label)).toEqual([
+      'Vrid åt vänster',
+      'Vrid åt höger',
+    ]);
+    const defaultFigure = renderToStaticMarkup(
+      <Figure exerciseId="russian-twist" stillOnly paused working={null} />,
+    );
+    expect(defaultFigure).toContain('data-view="oblique"');
   });
 });

@@ -233,6 +233,25 @@ export const lateAdditionalExercises: Exercise[] = [
     'Välj gobletknäböj utan extra vikt eller en lättare kettlebell.',
     [single(4, 'kettlebell'), single(8, 'kettlebell')],
   ),
+  entry(
+    'russian-twist',
+    'Russian twist',
+    ['Bål'],
+    [
+      'Sitt med böjda knän och båda hälarna i golvet. Håll händerna eller en lätt vikt nära bröstet och sitt så upprätt du behöver.',
+      'Vrid bröstkorgen en liten bit åt vänster och sedan åt höger i lugnt tempo. Låt armarna följa bålen utan att svinga vikten.',
+      'Återgå till mitten. Vänster, höger och tillbaka till mitten är en repetition. Avbryt om ryggen gör ont.',
+    ],
+    'Du svingar vikten med armarna eller vrider längre än ryggen känns bekväm med.',
+    'Sitt mer upprätt och öva utan vikt med båda hälarna kvar i golvet.',
+    [
+      bw,
+      single(2),
+      single(4),
+      single(4, 'kettlebell'),
+      single(8, 'kettlebell'),
+    ],
+  ),
 ];
 
 export const additionalExercises: Exercise[] = [

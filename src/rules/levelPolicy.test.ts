@@ -104,6 +104,7 @@ describe('level policy', () => {
     expect(heavyStartAllowed('side-lunge')).toBe(false);
     expect(heavyStartAllowed('walking-lunge')).toBe(false);
     expect(heavyStartAllowed('kettlebell-goblet-squat')).toBe(true);
+    expect(heavyStartAllowed('russian-twist')).toBe(false);
     expect(heavyStartAllowed('shoulder-press')).toBe(false);
     expect(heavyStartAllowed('single-leg-rdl')).toBe(false);
     expect(heavyStartAllowed('split-squat')).toBe(false);

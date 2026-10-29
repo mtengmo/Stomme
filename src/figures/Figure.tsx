@@ -87,6 +87,17 @@ export function walkingLungeReducedFrames(): readonly [
   ];
 }
 
+/** Opposite rotations make the seated trunk turn visible without motion. */
+export function russianTwistReducedFrames(): readonly [
+  readonly [string, Pose],
+  readonly [string, Pose],
+] {
+  return [
+    ['Vrid åt vänster', movementPose('russian-twist', 0.25)],
+    ['Vrid åt höger', movementPose('russian-twist', 0.75)],
+  ];
+}
+
 export function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia
@@ -125,6 +136,8 @@ export function stillFramePhase(
   view: FigureAngle,
   label: string,
 ): number {
+  if (exerciseId === 'russian-twist' && view === 'oblique')
+    return label === 'Vrid åt höger' ? 0.75 : 0.25;
   if (exerciseId === 'farmer-carry' && view === 'front')
     return label === 'Slut' ? 0.75 : 0.25;
   return label === 'Slut' ? 1 : 0;
@@ -321,14 +334,16 @@ export function FigureFrame({
   }
   const anchors: Pt[] = twoHandedBell
     ? [p.hR]
-    : exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
-      ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
-      : (
-          spec.held?.hands ??
-          (exerciseId === 'split-squat'
-            ? (['hR', 'hL'] as const)
-            : (['hR'] as const))
-        ).map((hand) => p[hand]);
+    : exerciseId === 'russian-twist'
+      ? [[(p.hR[0] + p.hL[0]) / 2, (p.hR[1] + p.hL[1]) / 2]]
+      : exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
+        ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
+        : (
+            spec.held?.hands ??
+            (exerciseId === 'split-squat'
+              ? (['hR', 'hL'] as const)
+              : (['hR'] as const))
+          ).map((hand) => p[hand]);
   if (equipment === null && exerciseId === 'goblet-squat')
     p = {
       ...p,
@@ -567,23 +582,25 @@ export function Figure({
           ]
         : exerciseId === 'walking-lunge'
           ? walkingLungeReducedFrames()
-          : exerciseId === 'squat-jump' ||
-              exerciseId === 'mountain-climber' ||
-              exerciseId === 'plank-arm-lift'
-            ? [
-                ['Start', movementPose(exerciseId, 0)],
-                [
-                  'Rörelse',
-                  movementPose(
-                    exerciseId,
-                    exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                  ),
-                ],
-              ]
-            : [
-                ['Start', spec.start],
-                ['Slut', spec.end],
-              ];
+          : exerciseId === 'russian-twist'
+            ? russianTwistReducedFrames()
+            : exerciseId === 'squat-jump' ||
+                exerciseId === 'mountain-climber' ||
+                exerciseId === 'plank-arm-lift'
+              ? [
+                  ['Start', movementPose(exerciseId, 0)],
+                  [
+                    'Rörelse',
+                    movementPose(
+                      exerciseId,
+                      exerciseId === 'squat-jump' ? 0.575 : 0.25,
+                    ),
+                  ],
+                ]
+              : [
+                  ['Start', spec.start],
+                  ['Slut', spec.end],
+                ];
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (
