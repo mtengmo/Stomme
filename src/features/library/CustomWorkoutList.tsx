@@ -11,6 +11,7 @@ import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import type { TrainingPreferences } from '../../domain/types';
 import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
+import { buttonClass } from '../../ui/Button';
 import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
 
 /** Delete with an inline confirmation; focus goes to the safe choice first. */
@@ -122,8 +123,14 @@ function useData() {
 export function CustomWorkoutList({
   headingId,
   alwaysShow = false,
+  title = 'Mina pass',
+  primaryCreate = false,
 }: {
   headingId: string;
+  /** Heading text. */
+  title?: string;
+  /** Setup panel: "Skapa nytt pass" as a full primary button link. */
+  primaryCreate?: boolean;
   /** Home: heading, empty text and the link to create one, even without passes. */
   alwaysShow?: boolean;
 }) {
@@ -141,7 +148,7 @@ export function CustomWorkoutList({
         id={headingId}
         className="m-0 font-display text-3xl font-bold leading-none"
       >
-        Mina pass
+        {title}
       </h2>
       {data.saved.length ? null : (
         <p className="m-0 mt-2 text-base">Inga egna pass än.</p>
@@ -178,9 +185,13 @@ export function CustomWorkoutList({
       {alwaysShow ? (
         <Link
           href="/nytt-pass"
-          className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
+          className={
+            primaryCreate
+              ? `${buttonClass('primary')} mt-3`
+              : 'flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4'
+          }
         >
-          Skapa eget pass
+          {primaryCreate ? 'Skapa nytt pass' : 'Skapa eget pass'}
         </Link>
       ) : null}
     </section>

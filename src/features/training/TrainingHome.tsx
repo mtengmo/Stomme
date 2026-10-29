@@ -66,6 +66,7 @@ export function TrainingSetup({
   const [rehabSide, setRehabSide] = useState<'right' | 'left' | 'both'>(
     current?.rehabSide ?? 'both',
   );
+  const [own, setOwn] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   return (
@@ -87,183 +88,215 @@ export function TrainingSetup({
               type="radio"
               name="programId"
               value={id}
-              checked={programId === id}
-              onChange={() => setProgramId(id)}
+              checked={!own && programId === id}
+              onChange={() => {
+                setOwn(false);
+                setProgramId(id);
+              }}
               className="size-6"
             />
             {programmeNames[id]}
           </label>
         ))}
-      </fieldset>
-      <fieldset className="m-0 grid grid-cols-1 gap-1 border-0 p-0 sm:grid-cols-2">
-        <legend className="mb-2 text-xl font-bold">
-          Vilken utrustning har du?
-        </legend>
-        {(Object.entries(equipmentChoices) as [EquipmentChoice, string][])
-          .filter(([key]) => key !== 'bodyweight')
-          .map(([key, label]) => (
-            <label
-              key={key}
-              className="flex min-h-12 items-center gap-3 text-base"
-            >
-              <input
-                type="checkbox"
-                checked={equipment.includes(key)}
-                onChange={(event) =>
-                  setEquipment((values) =>
-                    event.target.checked
-                      ? [...values, key]
-                      : values.filter((value) => value !== key),
-                  )
-                }
-                className="size-6"
-              />
-              {label}
-            </label>
-          ))}
-      </fieldset>
-      {programId !== 'rehab' ? (
-        <label className="flex flex-col gap-2 text-lg font-bold">
-          Hur van är du vid styrketräning?
-          <select
-            value={experience}
-            onChange={(event) =>
-              setExperience(
-                event.target.value as TrainingPreferences['experience'],
-              )
-            }
-            className={inputClass}
+        {current ? (
+          <label
+            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${own ? 'border-accent' : 'border-edge'}`}
           >
-            <option value="new">Ny eller på väg tillbaka</option>
-            <option value="some">Viss vana</option>
-            <option value="regular">Tränar regelbundet</option>
-          </select>
-        </label>
-      ) : null}
-      {programId === 'general' ? (
-        <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
-          <legend className="mb-1 text-xl font-bold">Fokus</legend>
-          <p className="m-0 text-base text-ink-soft">
-            Välj kroppsdelar att fokusera på. Ingen vald betyder hela kroppen.
-          </p>
-          {bodyRegions.map((region) => (
-            <label
-              key={region.id}
-              className="flex min-h-12 items-center gap-3 text-base"
-            >
-              <input
-                type="checkbox"
-                checked={bodyParts.includes(region.id)}
+            <input
+              type="radio"
+              name="programId"
+              value="own"
+              checked={own}
+              onChange={() => setOwn(true)}
+              className="size-6"
+            />
+            Egna pass
+          </label>
+        ) : null}
+      </fieldset>
+      {own ? (
+        <CustomWorkoutList
+          headingId="setup-own-workouts"
+          title="Dina egna pass"
+          alwaysShow
+          primaryCreate
+        />
+      ) : (
+        <>
+          <fieldset className="m-0 grid grid-cols-1 gap-1 border-0 p-0 sm:grid-cols-2">
+            <legend className="mb-2 text-xl font-bold">
+              Vilken utrustning har du?
+            </legend>
+            {(Object.entries(equipmentChoices) as [EquipmentChoice, string][])
+              .filter(([key]) => key !== 'bodyweight')
+              .map(([key, label]) => (
+                <label
+                  key={key}
+                  className="flex min-h-12 items-center gap-3 text-base"
+                >
+                  <input
+                    type="checkbox"
+                    checked={equipment.includes(key)}
+                    onChange={(event) =>
+                      setEquipment((values) =>
+                        event.target.checked
+                          ? [...values, key]
+                          : values.filter((value) => value !== key),
+                      )
+                    }
+                    className="size-6"
+                  />
+                  {label}
+                </label>
+              ))}
+          </fieldset>
+          {programId !== 'rehab' ? (
+            <label className="flex flex-col gap-2 text-lg font-bold">
+              Hur van är du vid styrketräning?
+              <select
+                value={experience}
                 onChange={(event) =>
-                  setBodyParts((values) =>
-                    event.target.checked
-                      ? [...new Set([...values, region.id])]
-                      : values.filter((value) => value !== region.id),
+                  setExperience(
+                    event.target.value as TrainingPreferences['experience'],
                   )
                 }
-                className="size-6"
-              />
-              {region.label}
+                className={inputClass}
+              >
+                <option value="new">Ny eller på väg tillbaka</option>
+                <option value="some">Viss vana</option>
+                <option value="regular">Tränar regelbundet</option>
+              </select>
             </label>
-          ))}
-        </fieldset>
-      ) : null}
-      {programId === 'rehab' ? (
-        <>
-          <label className="flex flex-col gap-2 text-lg font-bold">
-            Rehabinriktning
-            <select
-              className={inputClass}
-              value={rehabFocus}
-              onChange={(e) => {
-                const focus = e.target.value as RehabFocus;
-                setRehabFocus(focus);
-                // Everyone has a chair and a wall; start with them unless the user chose.
-                if (
-                  rehabGroupOf(focus) === 'physio' &&
-                  !equipment.includes('chair') &&
-                  !equipment.includes('support')
-                )
-                  setEquipment((values) => [...values, 'chair', 'support']);
-              }}
-            >
-              <option value="custom">Mitt eget rehabprogram</option>
-              <option value="knee">
-                Allmän knäträning – färdigt AAOS-baserat pass
-              </option>
-              <option value="knee-physio">
-                Fysioterapeutens knäprogram (9 övningar)
-              </option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-2 text-lg font-bold">
-            Vilket knä eller vilken sida?
-            <select
-              className={inputClass}
-              value={rehabSide}
-              onChange={(e) =>
-                setRehabSide(e.target.value as 'right' | 'left' | 'both')
-              }
-            >
-              <option value="both">Höger och vänster</option>
-              <option value="right">Höger</option>
-              <option value="left">Vänster</option>
-            </select>
-          </label>
-          {rehabGroupOf(rehabFocus) === 'physio' ? (
-            <p className="m-0 text-base text-ink-soft">
-              För balansklockan är det foten som rör sig; benet du står på
-              tränar balansen.
+          ) : null}
+          {programId === 'general' ? (
+            <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
+              <legend className="mb-1 text-xl font-bold">Fokus</legend>
+              <p className="m-0 text-base text-ink-soft">
+                Välj kroppsdelar att fokusera på. Ingen vald betyder hela
+                kroppen.
+              </p>
+              {bodyRegions.map((region) => (
+                <label
+                  key={region.id}
+                  className="flex min-h-12 items-center gap-3 text-base"
+                >
+                  <input
+                    type="checkbox"
+                    checked={bodyParts.includes(region.id)}
+                    onChange={(event) =>
+                      setBodyParts((values) =>
+                        event.target.checked
+                          ? [...new Set([...values, region.id])]
+                          : values.filter((value) => value !== region.id),
+                      )
+                    }
+                    className="size-6"
+                  />
+                  {region.label}
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
+          {programId === 'rehab' ? (
+            <>
+              <label className="flex flex-col gap-2 text-lg font-bold">
+                Rehabinriktning
+                <select
+                  className={inputClass}
+                  value={rehabFocus}
+                  onChange={(e) => {
+                    const focus = e.target.value as RehabFocus;
+                    setRehabFocus(focus);
+                    // Everyone has a chair and a wall; start with them unless the user chose.
+                    if (
+                      rehabGroupOf(focus) === 'physio' &&
+                      !equipment.includes('chair') &&
+                      !equipment.includes('support')
+                    )
+                      setEquipment((values) => [...values, 'chair', 'support']);
+                  }}
+                >
+                  <option value="custom">Mitt eget rehabprogram</option>
+                  <option value="knee">
+                    Allmän knäträning – färdigt AAOS-baserat pass
+                  </option>
+                  <option value="knee-physio">
+                    Fysioterapeutens knäprogram (9 övningar)
+                  </option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-2 text-lg font-bold">
+                Vilket knä eller vilken sida?
+                <select
+                  className={inputClass}
+                  value={rehabSide}
+                  onChange={(e) =>
+                    setRehabSide(e.target.value as 'right' | 'left' | 'both')
+                  }
+                >
+                  <option value="both">Höger och vänster</option>
+                  <option value="right">Höger</option>
+                  <option value="left">Vänster</option>
+                </select>
+              </label>
+              {rehabGroupOf(rehabFocus) === 'physio' ? (
+                <p className="m-0 text-base text-ink-soft">
+                  För balansklockan är det foten som rör sig; benet du står på
+                  tränar balansen.
+                </p>
+              ) : null}
+              <p className="m-0 text-base">
+                {rehabGroupOf(rehabFocus) === 'aaos'
+                  ? 'Du får ett färdigt, redigerbart startpass för allmän knäträning. Övningsurval och startdos bygger på AAOS-programmet. Passet anpassas till din utrustning och valda sida.'
+                  : rehabGroupOf(rehabFocus) === 'physio'
+                    ? 'Kontrollera övningar, sida och antal mot ditt papper från fysioterapeuten.'
+                    : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
+              </p>
+            </>
+          ) : null}
+          {error ? (
+            <p role="alert" className="m-0 text-base font-bold">
+              {error}
             </p>
           ) : null}
-          <p className="m-0 text-base">
-            {rehabGroupOf(rehabFocus) === 'aaos'
-              ? 'Du får ett färdigt, redigerbart startpass för allmän knäträning. Övningsurval och startdos bygger på AAOS-programmet. Passet anpassas till din utrustning och valda sida.'
-              : rehabGroupOf(rehabFocus) === 'physio'
-                ? 'Kontrollera övningar, sida och antal mot ditt papper från fysioterapeuten.'
-                : 'Välj sedan övningar, sida och dosering som du kommit överens om med din fysioterapeut.'}
-          </p>
+          <Button
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setError('');
+              try {
+                await saveTrainingPreferences(getDb(), {
+                  programId,
+                  equipment: [
+                    ...new Set(['bodyweight' as const, ...equipment]),
+                  ],
+                  experience: programId === 'rehab' ? 'new' : experience,
+                  // Weights and focus are kept; setup only changes what it shows.
+                  ...(current?.weights ? { weights: current.weights } : {}),
+                  ...(current?.adjustableWeights
+                    ? { adjustableWeights: current.adjustableWeights }
+                    : {}),
+                  ...(programId === 'general' && bodyParts.length
+                    ? { bodyParts }
+                    : {}),
+                  ...(programId === 'rehab' ? { rehabFocus, rehabSide } : {}),
+                });
+                onSaved();
+              } catch (err) {
+                setError(
+                  err instanceof Error
+                    ? err.message
+                    : 'Kunde inte spara. Försök igen.',
+                );
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Spara träningsinriktning
+          </Button>
         </>
-      ) : null}
-      {error ? (
-        <p role="alert" className="m-0 text-base font-bold">
-          {error}
-        </p>
-      ) : null}
-      <Button
-        disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          setError('');
-          try {
-            await saveTrainingPreferences(getDb(), {
-              programId,
-              equipment: [...new Set(['bodyweight' as const, ...equipment])],
-              experience: programId === 'rehab' ? 'new' : experience,
-              // Weights and focus are kept; setup only changes what it shows.
-              ...(current?.weights ? { weights: current.weights } : {}),
-              ...(current?.adjustableWeights
-                ? { adjustableWeights: current.adjustableWeights }
-                : {}),
-              ...(programId === 'general' && bodyParts.length
-                ? { bodyParts }
-                : {}),
-              ...(programId === 'rehab' ? { rehabFocus, rehabSide } : {}),
-            });
-            onSaved();
-          } catch (err) {
-            setError(
-              err instanceof Error
-                ? err.message
-                : 'Kunde inte spara. Försök igen.',
-            );
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        Spara träningsinriktning
-      </Button>
+      )}
       {onCancel ? (
         <Button variant="secondary" onClick={onCancel}>
           Avbryt ändring
