@@ -15,6 +15,7 @@ import {
 } from '../../lib/dates';
 import { restStatus } from '../../rules/schedule';
 import {
+  completedTrainingDates,
   isWeeklySchedule,
   nextPlannedDate,
   readWeeklySchedule,
@@ -95,14 +96,10 @@ export function WeeklyPlan({
       session.date >= weekBeginning &&
       session.date <= weekEnding,
   ).length;
-  const completedStandardDates = programmeSessions
-    .filter(
-      (session) =>
-        session.status === 'completed' &&
-        session.workoutMode !== 'short' &&
-        !session.customWorkoutId,
-    )
-    .map((session) => session.date);
+  const completedStandardDates = completedTrainingDates(
+    programmeSessions,
+    preferences.programId,
+  );
   const plannedDate = nextPlannedDate(schedule, today, completedStandardDates);
   const rest = restStatus(programmeSessions, now);
   const regularDate = schedule

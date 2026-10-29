@@ -3,6 +3,7 @@ import type { Session, SessionStatus, TemplateId } from '../domain/types';
 import {
   earliestNext,
   nextTemplate,
+  nextTemplateId,
   programWeek,
   restStatus,
   weekDays,
@@ -164,5 +165,23 @@ describe('weekDays / weekSummary', () => {
     expect(s.count).toBe(1);
     expect(s.completedTemplates).toEqual(['A']);
     expect(s.days).toHaveLength(7);
+  });
+});
+
+describe('nextTemplateId', () => {
+  it('ignores completed custom and short workouts', () => {
+    const standard = session('A', 'completed', '2026-10-20T08:00:00Z');
+    const custom = {
+      ...session('A', 'completed', '2026-10-27T08:00:00Z'),
+      customWorkoutId: 'c1',
+    };
+    const short = {
+      ...session('B', 'completed', '2026-10-28T08:00:00Z'),
+      workoutMode: 'short' as const,
+    };
+    // Newest first, as the home page passes them.
+    expect(nextTemplateId([short, custom, standard], 'general')).toBe('B');
+    expect(nextTemplateId([custom], 'general')).toBe('A');
+    expect(nextTemplateId([standard], 'rehab')).toBe('A');
   });
 });

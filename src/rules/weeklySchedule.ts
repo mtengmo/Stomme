@@ -1,4 +1,4 @@
-import type { WeeklySchedule } from '../domain/types';
+import type { Session, WeeklySchedule } from '../domain/types';
 import { addDays, isRealDate, weekdayIndex } from '../lib/dates';
 
 /** Strict runtime check shared by the UI and backup validation. */
@@ -42,6 +42,26 @@ export function readWeeklySchedule(value: unknown): WeeklySchedule | null {
   return value.moved
     ? { days: [...value.days], moved: { ...value.moved } }
     : { days: [...value.days] };
+}
+
+/**
+ * Dates that count as that day's training for the weekly plan. A completed
+ * custom workout counts, so the planned day is not shown as missed; it still
+ * never advances the A/B sequence or progression (see TrainingHome). Short
+ * workouts are not counted.
+ */
+export function completedTrainingDates(
+  sessions: readonly Session[],
+  programId: Session['programId'],
+): string[] {
+  return sessions
+    .filter(
+      (session) =>
+        session.programId === programId &&
+        session.status === 'completed' &&
+        session.workoutMode !== 'short',
+    )
+    .map((session) => session.date);
 }
 
 /** First planned local date on or after today, applying one valid future move. */

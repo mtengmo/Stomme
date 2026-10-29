@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import type { Session } from '../domain/types';
 import { addDays } from '../lib/dates';
 import {
+  completedTrainingDates,
   isWeeklySchedule,
   nextOccurrence,
   nextPlannedDate,
@@ -131,5 +133,48 @@ describe('weekly schedule dates', () => {
       addDays('2026-01-01', index),
     );
     expect(nextPlannedDate({ days: [1] }, '2026-01-01', completed)).toBeNull();
+  });
+});
+
+describe('completed custom workouts in the weekly plan', () => {
+  const session = (extra: Partial<Session>): Session =>
+    ({
+      id: 'x',
+      templateId: 'A',
+      date: '2026-10-26',
+      startedAt: '2026-10-26T08:00:00Z',
+      status: 'completed',
+      programId: 'general',
+      programWeek: 1,
+      ...extra,
+    }) as Session;
+
+  it('counts a completed custom workout as that day, not a short one or another programme', () => {
+    expect(
+      completedTrainingDates(
+        [
+          session({ customWorkoutId: 'c1', date: '2026-10-26' }),
+          session({ workoutMode: 'short', date: '2026-10-27' }),
+          session({ programId: 'rehab', date: '2026-10-28' }),
+          session({ status: 'aborted', date: '2026-10-29' }),
+        ],
+        'general',
+      ),
+    ).toEqual(['2026-10-26']);
+  });
+
+  it('moves the planned date past the day of a custom workout', () => {
+    const schedule = { days: [1, 3] }; // 2026-10-26 is a Monday
+    expect(nextPlannedDate(schedule, '2026-10-26', [])).toBe('2026-10-26');
+    expect(
+      nextPlannedDate(
+        schedule,
+        '2026-10-26',
+        completedTrainingDates(
+          [session({ customWorkoutId: 'c1', date: '2026-10-26' })],
+          'general',
+        ),
+      ),
+    ).toBe('2026-10-28');
   });
 });

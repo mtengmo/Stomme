@@ -256,15 +256,20 @@ export function ExerciseLibrary() {
       replace: 'term' in patch,
     });
   };
+  const till = query.get('till');
   const clearFilters = () => {
-    navigate('/ovningar');
+    navigate(till ? `/ovningar?till=${encodeURIComponent(till)}` : '/ovningar');
     document.getElementById('library-search')?.focus();
   };
   const invalid = query.has('muskel') && selected === null;
 
   useEffect(() => {
-    if (invalid) navigate('/ovningar', { replace: true });
-  }, [invalid, navigate]);
+    if (invalid) {
+      const next = new URLSearchParams(search);
+      next.delete('muskel');
+      navigate(`/ovningar${next.size ? `?${next}` : ''}`, { replace: true });
+    }
+  }, [invalid, navigate, search]);
 
   const count = primary.length + secondary.length;
   const area = filters.muscle

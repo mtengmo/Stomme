@@ -14,20 +14,51 @@ import { isTrainingPreferences, rehabGroup } from '../../content/programmes';
 import {
   appendToCustomWorkout,
   createCustomWorkout,
-  deleteCustomWorkout,
   maxCustomWorkouts,
   maxWorkoutExercises,
   readCustomWorkouts,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
-import type { Exercise, ExerciseId } from '../../domain/types';
+import type { Exercise, ExerciseId, PlannedExercise } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
 import { useHashSearch } from '../../lib/hashLocation';
 import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
+import { CustomWorkoutList } from './CustomWorkoutList';
+
+/**
+ * The preview keeps an unsaved draft per tab and prefers it over the saved
+ * workout. Added exercises must reach that draft too, or they would not show.
+ */
+function addToPreviewDraft(workoutId: string, added: PlannedExercise[]) {
+  try {
+    for (let i = 0; i < sessionStorage.length; i += 1) {
+      const key = sessionStorage.key(i);
+      if (
+        !key?.startsWith('stomme.training-draft.') ||
+        !key.endsWith(`.${workoutId}`)
+      )
+        continue;
+      const draft: unknown = JSON.parse(sessionStorage.getItem(key) ?? 'null');
+      if (!Array.isArray(draft)) continue;
+      const present = new Set(draft.map((item) => item?.exerciseId));
+      sessionStorage.setItem(
+        key,
+        JSON.stringify(
+          [
+            ...draft,
+            ...added.filter((item) => !present.has(item.exerciseId)),
+          ].slice(0, maxWorkoutExercises),
+        ),
+      );
+    }
+  } catch {
+    /* Without the draft the saved workout is shown. */
+  }
+}
 
 interface SelectionValue {
   ids: ExerciseId[];
@@ -216,6 +247,7 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
       };
       if (target) {
         await appendToCustomWorkout(target.id, ids, plan);
+        if (plan) addToPreviewDraft(target.id, plan);
         finish();
         navigate(`/traning/A?workout=${target.id}`);
       } else {
@@ -253,42 +285,7 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
         play,
       }}
     >
-      {saved.length && !till ? (
-        <section
-          aria-labelledby="own-workout"
-          className="flex flex-col gap-1 border-y-2 border-ink py-3"
-        >
-          <h2 id="own-workout" className="m-0 text-3xl font-bold">
-            Mina egna pass
-          </h2>
-          {saved.map((workout) => (
-            <div
-              key={workout.id}
-              className="flex items-center justify-between gap-3 border-t-2 border-edge pt-1"
-            >
-              <Link
-                href={`/traning/A?workout=${workout.id}`}
-                className="flex min-h-12 min-w-0 items-center break-words text-lg font-bold underline"
-              >
-                {workout.name} · {workout.exerciseIds.length} övningar
-              </Link>
-              <button
-                type="button"
-                className="min-h-12 px-2 text-base underline"
-                onClick={async () => {
-                  try {
-                    await deleteCustomWorkout(workout.id);
-                  } catch {
-                    setError('Kunde inte ta bort passet. Försök igen.');
-                  }
-                }}
-              >
-                Ta bort<span className="sr-only"> {workout.name}</span>
-              </button>
-            </div>
-          ))}
-        </section>
-      ) : null}
+      {till ? null : <CustomWorkoutList headingId="own-workout" />}
       {till && target ? (
         <p className="m-0 text-base font-bold">
           Du lägger till övningar i {target.name}.
@@ -306,7 +303,7 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
           className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3"
         >
           {open ? (
-            <ol className="m-0 flex max-h-[40dvh] list-none flex-col overflow-y-auto p-0">
+            <ol className="m-0 flex max-h-[28dvh] list-none flex-col overflow-y-auto p-0">
               {ids.map((id, index) => (
                 <li
                   key={id}
@@ -382,7 +379,11 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
               Välj träningsinriktning för att skapa pass
             </Link>
           ) : (
-            <Button disabled={busy || full || !preferences} onClick={submit}>
+            <Button
+              className="min-h-14"
+              disabled={busy || full || !preferences}
+              onClick={submit}
+            >
               {target ? 'Lägg till i passet' : 'Skapa pass'}
             </Button>
           )}

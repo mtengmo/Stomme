@@ -71,6 +71,7 @@ import {
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
+import { DeleteWorkoutButton } from '../library/CustomWorkoutList';
 import {
   basePlan,
   customWorkoutPlan,
@@ -270,6 +271,7 @@ function PreviewEditor({
   const [error, setError] = useState('');
 
   const [saved, setSaved] = useState(false);
+  const [workoutName, setWorkoutName] = useState(customWorkout?.name ?? '');
 
   function updatePlan(value: SetStateAction<PlannedExercise[]>) {
     setShortSelected(false);
@@ -1393,9 +1395,21 @@ function PreviewEditor({
 
           {!equipmentOverride && editing && customWorkout ? (
             <>
+              <label className="flex flex-col gap-2 text-base font-bold">
+                Namn på passet
+                <input
+                  value={workoutName}
+                  maxLength={60}
+                  onChange={(event) => {
+                    setWorkoutName(event.target.value);
+                    setSaved(false);
+                  }}
+                  className="min-h-12 min-w-0 rounded-sm border-2 border-edge bg-surface px-3 font-normal text-ink"
+                />
+              </label>
               <Button
                 variant="secondary"
-                disabled={busy || !ready}
+                disabled={busy || !ready || !workoutName.trim()}
                 onClick={async () => {
                   setBusy(true);
                   setError('');
@@ -1416,6 +1430,7 @@ function PreviewEditor({
                           workout.id === customWorkout.id
                             ? {
                                 ...workout,
+                                name: workoutName.trim(),
                                 exerciseIds: plan.map(
                                   (item) => item.exerciseId,
                                 ),
@@ -1440,6 +1455,17 @@ function PreviewEditor({
                   ? 'Ändringarna är sparade.'
                   : 'Spara för att återanvända övningar, antal, vikt och vila.'}
               </p>
+              <Link
+                href={`/ovningar?till=${customWorkout.id}`}
+                className="flex min-h-12 items-center font-bold underline"
+              >
+                Lägg till fler från biblioteket
+              </Link>
+              <DeleteWorkoutButton
+                workout={{ id: customWorkout.id, name: customWorkout.name }}
+                label="Ta bort passet"
+                onDeleted={() => navigate('/')}
+              />
               <Link
                 href="/ovningar"
                 className="flex min-h-12 items-center font-bold underline"

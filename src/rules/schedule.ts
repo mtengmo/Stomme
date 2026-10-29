@@ -78,3 +78,21 @@ export function weekSummary(
     count: completed.length,
   };
 }
+
+/**
+ * The A/B sequence only follows full standard workouts. Custom workouts and
+ * short workouts never advance it. `recentNewestFirst` is already filtered to
+ * the current programme.
+ */
+export function nextTemplateId(
+  recentNewestFirst: readonly Session[],
+  programId: Session['programId'],
+): TemplateId {
+  const last = recentNewestFirst.find(
+    (session) =>
+      session.status === 'completed' &&
+      session.workoutMode !== 'short' &&
+      !session.customWorkoutId,
+  );
+  return programId === 'rehab' || last?.templateId !== 'A' ? 'A' : 'B';
+}

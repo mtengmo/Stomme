@@ -97,11 +97,12 @@ for (const width of [360, 1280]) {
       page.getByRole('button', { name: 'Klar set', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
-    await page
-      .getByRole('button', { name: /^Ta bort Eget pass/ })
-      .first()
-      .click();
+    await page.getByRole('button', { name: /^Ta bort: Eget pass/ }).click();
+    await page.getByRole('button', { name: 'Ta bort passet' }).click();
     await expect(page.getByRole('link', { name: /^Eget pass/ })).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Mina pass' })).toHaveCount(
+      0,
+    );
   });
 }
 

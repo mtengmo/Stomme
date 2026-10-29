@@ -27,10 +27,7 @@ import {
   filterExercises,
 } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
-import {
-  activeFilterCount,
-  ExerciseFilterControls,
-} from '../exercise/ExerciseFilterControls';
+import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
 
 interface PickerState {
   filters: ExerciseFilters;

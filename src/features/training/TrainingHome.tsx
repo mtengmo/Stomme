@@ -25,8 +25,10 @@ import type {
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
 import { useHashSearch } from '../../lib/hashLocation';
+import { nextTemplateId } from '../../rules/schedule';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
+import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
 import { WeeklyPlan } from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
@@ -329,16 +331,8 @@ export function TrainingHome() {
           (preferences?.rehabFocus ?? 'custom')) &&
       session.status !== 'in_progress',
   );
-  const lastCompleted = recent.find(
-    (session) =>
-      session.status === 'completed' &&
-      session.workoutMode !== 'short' &&
-      !session.customWorkoutId,
-  );
-  const nextId =
-    preferences?.programId === 'rehab' || lastCompleted?.templateId !== 'A'
-      ? 'A'
-      : 'B';
+  // Custom workouts count in the weekly plan but never move the A/B sequence.
+  const nextId = nextTemplateId(recent, preferences?.programId);
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
     return (
@@ -389,7 +383,10 @@ export function TrainingHome() {
             : 'Visa nästa pass'}
       </Link>
       {!active ? (
-        <WeeklyPlan preferences={preferences} sessions={data.sessions} />
+        <>
+          <WeeklyPlan preferences={preferences} sessions={data.sessions} />
+          <CustomWorkoutList headingId="home-own-workouts" />
+        </>
       ) : null}
       {due.map((session) => (
         <Link
