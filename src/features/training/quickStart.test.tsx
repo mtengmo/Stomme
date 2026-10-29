@@ -17,6 +17,11 @@ beforeEach(async () => {
   await setMeta(getDb(), 'onboarding', { acceptedAt: '2026-10-20T08:00:00Z' });
 });
 afterEach(cleanup);
+async function addDumbbell(user: ReturnType<typeof userEvent.setup>, kg = '5') {
+  await user.click(screen.getByRole('button', { name: 'Lägg till hantel' }));
+  await user.type(screen.getByLabelText(/Vikt per hantel/), kg);
+  await user.click(screen.getByRole('button', { name: 'Lägg till' }));
+}
 const next = (user: ReturnType<typeof userEvent.setup>) =>
   user.click(screen.getByRole('button', { name: 'Nästa' }));
 
@@ -31,27 +36,19 @@ it('asks one question per screen and keeps answers through Back', async () => {
   expect(screen.queryByRole('button', { name: 'Träna knäna' })).toBeNull();
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
   const heading = screen.getByRole('heading', {
-    name: 'Egenvikt eller utrustning?',
+    name: 'Vilka vikter har du?',
   });
   expect(document.activeElement).toBe(heading);
   expect(
-    (
-      screen.getByRole('radio', {
-        name: 'Egenvikt – kroppen, en stol och en vägg',
-      }) as HTMLInputElement
-    ).checked,
-  ).toBe(true);
-  expect(screen.queryByRole('checkbox', { name: 'Hantlar' })).toBeNull();
-  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
-  await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
-  await user.selectOptions(
-    screen.getByRole('combobox', { name: 'Antal hantlar' }),
-    '2',
-  );
-  // Owning dumbbells opens the weights panel by itself.
+    screen.getByText(/Bara kroppsvikt – passet byggs utan vikter/),
+  ).toBeTruthy();
+  expect(screen.queryByRole('radio', { name: 'Utrustning' })).toBeNull();
   expect(
-    screen.getByText('Ange vikterna du äger').closest('details')?.open,
+    (screen.getByRole('checkbox', { name: 'Stabil stol' }) as HTMLInputElement)
+      .checked,
   ).toBe(true);
+  await addDumbbell(user);
+  expect(screen.getByText('Hantel 5 kg · par')).toBeTruthy();
   await next(user);
   expect(screen.getByRole('group', { name: 'Träningsvana' })).toBeTruthy();
   expect(screen.queryByText(/rekommenderad/i)).toBeNull();
@@ -59,13 +56,7 @@ it('asks one question per screen and keeps answers through Back', async () => {
   await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
-  expect(
-    (
-      screen.getByRole('combobox', {
-        name: 'Antal hantlar',
-      }) as HTMLSelectElement
-    ).value,
-  ).toBe('2');
+  expect(screen.getByText('Hantel 5 kg · par')).toBeTruthy();
   await next(user);
   expect(
     (screen.getByRole('radio', { name: /Viss vana/ }) as HTMLInputElement)
@@ -76,7 +67,8 @@ it('asks one question per screen and keeps answers through Back', async () => {
   await screen.findByRole('button', { name: 'Börja passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
-    equipment: ['bodyweight', 'dumbbell-2'],
+    equipment: ['bodyweight', 'chair', 'support'],
+    weights: [{ type: 'dumbbell', kg: 5, count: 2 }],
     experience: 'some',
   });
   expect(await getDb().sessions.count()).toBe(0);
@@ -137,13 +129,10 @@ it('falls back to defaults for an old or damaged draft', async () => {
     JSON.stringify({ goal: 'general', equipment: ['laser'], experience: 7 }),
   );
   render(<App />);
-  await screen.findByRole('heading', { name: 'Egenvikt eller utrustning?' });
+  await screen.findByRole('heading', { name: 'Vilka vikter har du?' });
   expect(
-    (
-      screen.getByRole('radio', {
-        name: 'Egenvikt – kroppen, en stol och en vägg',
-      }) as HTMLInputElement
-    ).checked,
+    (screen.getByRole('checkbox', { name: 'Stabil stol' }) as HTMLInputElement)
+      .checked,
   ).toBe(true);
 });
 
@@ -183,7 +172,7 @@ it('preserves a returning user’s active session and makes resuming the primary
   expect(
     (
       screen.getByRole('button', {
-        name: 'Byt inriktning eller utrustning',
+        name: 'Byt inriktning',
       }) as HTMLButtonElement
     ).disabled,
   ).toBe(true);
@@ -214,14 +203,12 @@ it('keeps first-use answers when leaving through the nav and coming back', async
   const user = userEvent.setup();
   render(<App />);
   await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
-  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
-  await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+  await addDumbbell(user);
   await user.click(screen.getByRole('link', { name: 'Inställningar' }));
   await screen.findByRole('heading', { name: 'Inställningar' });
-  expect(screen.queryByRole('checkbox', { name: 'Hantlar' })).toBeNull();
+  expect(screen.queryByText('Hantel 5 kg · par')).toBeNull();
   await user.click(screen.getByRole('link', { name: 'Träning' }));
-  const box = await screen.findByRole('checkbox', { name: 'Hantlar' });
-  expect((box as HTMLInputElement).checked).toBe(true);
+  await screen.findByText('Hantel 5 kg · par');
 });
 
 it('builds your own first workout: nothing is saved until Skapa pass', async () => {
@@ -229,10 +216,6 @@ it('builds your own first workout: nothing is saved until Skapa pass', async () 
   render(<App />);
   await user.click(
     await screen.findByRole('button', { name: 'Skapa eget pass' }),
-  );
-  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
-  await user.click(
-    screen.getByRole('checkbox', { name: 'Stabil stol eller bänk' }),
   );
   await next(user);
   await user.click(screen.getByRole('radio', { name: /Viss vana/ }));
@@ -268,7 +251,7 @@ it('builds your own first workout: nothing is saved until Skapa pass', async () 
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
     experience: 'some',
-    equipment: ['bodyweight', 'chair'],
+    equipment: ['bodyweight', 'chair', 'support'],
   });
   const workouts = (await getDb().meta.get('customWorkouts'))?.value as {
     name: string;
@@ -297,7 +280,7 @@ it('never reaches the pick step for knee rehab', async () => {
     JSON.stringify({ goal: 'knee', step: 'pick' }),
   );
   render(<App />);
-  await screen.findByRole('heading', { name: 'Egenvikt eller utrustning?' });
+  await screen.findByRole('heading', { name: 'Vad har du hemma?' });
   expect(
     screen.queryByRole('heading', { name: 'Välj dina övningar' }),
   ).toBeNull();

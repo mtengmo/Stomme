@@ -1,13 +1,21 @@
 import { useState } from 'react';
-import { equipmentChoices, isWorkoutEquipment } from '../../content/programmes';
+import { isWorkoutEquipment } from '../../content/programmes';
 import type {
   EquipmentChoice,
   TrainingPreferences,
   WorkoutEquipment,
 } from '../../domain/types';
 import { Button } from '../../ui/Button';
-import { AdjustableWeightFields } from './AdjustableWeightFields';
-import { WeightInventoryFields } from './WeightInventoryFields';
+import { EquipmentInventory } from './EquipmentInventory';
+
+const SUPPORT_ITEMS: EquipmentChoice[] = [
+  'chair',
+  'support',
+  'step',
+  'band',
+  'pull-up-bar',
+  'dip-bars',
+];
 
 export function WorkoutEquipmentControls({
   home,
@@ -49,47 +57,12 @@ export function WorkoutEquipmentControls({
             passförslag. Dina anpassningar med hemutrustningen finns kvar när du
             återgår till den.
           </p>
-          <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-            <legend className="mb-2 text-lg font-bold">
-              Tillgänglig utrustning
-            </legend>
-            {(
-              Object.entries(equipmentChoices) as [EquipmentChoice, string][]
-            ).map(([key, label]) => (
-              <label
-                key={key}
-                className="flex min-h-12 items-center gap-3 text-base"
-              >
-                <input
-                  type="checkbox"
-                  className="size-6 shrink-0"
-                  checked={draft.equipment.includes(key)}
-                  disabled={key === 'bodyweight'}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      equipment: event.target.checked
-                        ? [...current.equipment, key]
-                        : current.equipment.filter((item) => item !== key),
-                    }))
-                  }
-                />
-                {label}
-              </label>
-            ))}
-          </fieldset>
-          <WeightInventoryFields
-            value={draft.weights ?? []}
-            onChange={(weights) =>
-              setDraft((current) => ({ ...current, weights }))
-            }
-          />
-          <AdjustableWeightFields
+          <EquipmentInventory
+            idPrefix="override"
+            value={draft}
+            supportItems={SUPPORT_ITEMS}
             onValidityChange={setAdjustableValid}
-            value={draft.adjustableWeights ?? []}
-            onChange={(adjustableWeights) =>
-              setDraft((current) => ({ ...current, adjustableWeights }))
-            }
+            onChange={setDraft}
           />
           {error ? (
             <p role="alert" className="m-0 text-base font-bold">

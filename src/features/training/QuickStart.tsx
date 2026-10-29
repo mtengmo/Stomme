@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { bodyRegions } from '../../content/muscles';
-import { equipmentChoices, experienceLabels } from '../../content/programmes';
+import { experienceLabels } from '../../content/programmes';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
@@ -12,9 +12,9 @@ import type {
 } from '../../domain/types';
 import { regionsAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
-import { AdjustableWeightFields } from './AdjustableWeightFields';
 import { CustomPicker } from './CustomPicker';
 import { customWorkoutPlan } from './defaultPlan';
+import { EquipmentInventory } from './EquipmentInventory';
 import {
   allowedEquipment,
   type Draft,
@@ -27,7 +27,6 @@ import {
   showsWeights,
   stepsFor,
 } from './quickStartModel';
-import { WeightInventoryFields } from './WeightInventoryFields';
 
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
@@ -127,12 +126,6 @@ export function QuickStart() {
   const needsParts =
     goal === 'general' && focus === 'select' && !chosenParts.length;
 
-  const toggle = (item: EquipmentChoice, checked: boolean) =>
-    update({
-      equipment: checked
-        ? [...new Set([...equipment, item])]
-        : equipment.filter((value) => value !== item),
-    });
   const goTo = (next: Step) => {
     setError('');
     update({ step: next });
@@ -143,9 +136,6 @@ export function QuickStart() {
   };
   const hasTools = showsWeights(goal);
   const allowed = allowedEquipment(goal);
-  const extras = (['step', 'band', 'pull-up-bar', 'dip-bars'] as const).filter(
-    (item) => allowed.includes(item),
-  );
   const sideField = (
     <label className="flex flex-col gap-2 text-base font-bold">
       Arbetande sida
@@ -219,7 +209,9 @@ export function QuickStart() {
         </p>
       ) : null}
       <h1 ref={heading} tabIndex={-1} className="m-0 text-5xl font-extrabold">
-        {headings[step]}
+        {step === 'equipment' && !hasTools
+          ? 'Vad har du hemma?'
+          : headings[step]}
       </h1>
       {step === 'goal' ? (
         <>
@@ -262,45 +254,23 @@ export function QuickStart() {
         <>
           {step === 'equipment' ? (
             <>
-              <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-                <legend className="sr-only">Utrustning</legend>
-                {(
-                  [
-                    ['chair', 'Stabil stol eller bänk'],
-                    ['support', 'Vägg eller stabilt stöd'],
-                    ...extras.map((item) => [item, equipmentChoices[item]]),
-                  ] as [EquipmentChoice, string][]
-                ).map(([value, label]) => (
-                  <label
-                    key={value}
-                    className="flex min-h-12 items-center gap-3 text-lg"
-                  >
-                    <input
-                      className="size-6"
-                      type="checkbox"
-                      checked={equipment.includes(value)}
-                      onChange={(event) => toggle(value, event.target.checked)}
-                    />
-                    {label}
-                  </label>
-                ))}
-              </fieldset>
-              {hasTools ? (
-                <>
-                  <WeightInventoryFields
-                    value={weights}
-                    onChange={(next) => update({ weights: next })}
-                  />
-                  <AdjustableWeightFields
-                    value={adjustableWeights}
-                    onChange={(next) => update({ adjustableWeights: next })}
-                    onValidityChange={setAdjustableValid}
-                  />
-                </>
-              ) : null}
+              <EquipmentInventory
+                idPrefix="start"
+                value={{ equipment, weights, adjustableWeights }}
+                onChange={(next) =>
+                  update({
+                    equipment: next.equipment,
+                    weights: next.weights ?? [],
+                    adjustableWeights: next.adjustableWeights ?? [],
+                  })
+                }
+                onValidityChange={setAdjustableValid}
+                supportItems={allowed}
+                showWeights={hasTools}
+              />
               {rehab ? sideField : null}
               <p className="m-0 text-base text-ink-soft">
-                Du kan ändra det här senare.
+                Du kan ändra det här senare i Inställningar › Min utrustning.
               </p>
             </>
           ) : null}

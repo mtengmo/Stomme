@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { bodyRegions } from '../../content/muscles';
 import {
-  equipmentChoices,
   experienceLabels,
   isTrainingPreferences,
   programmeNames,
@@ -52,6 +51,7 @@ export function TrainingSetup({
   const [programId, setProgramId] = useState<ProgramId>(
     current?.programId ?? 'general',
   );
+  // Equipment is edited in Inställningar › Min utrustning; setup keeps what is saved.
   const [equipment, setEquipment] = useState<EquipmentChoice[]>(
     current?.equipment ?? ['bodyweight'],
   );
@@ -124,33 +124,6 @@ export function TrainingSetup({
         />
       ) : (
         <>
-          <fieldset className="m-0 grid grid-cols-1 gap-1 border-0 p-0 sm:grid-cols-2">
-            <legend className="mb-2 text-xl font-bold">
-              Vilken utrustning har du?
-            </legend>
-            {(Object.entries(equipmentChoices) as [EquipmentChoice, string][])
-              .filter(([key]) => key !== 'bodyweight')
-              .map(([key, label]) => (
-                <label
-                  key={key}
-                  className="flex min-h-12 items-center gap-3 text-base"
-                >
-                  <input
-                    type="checkbox"
-                    checked={equipment.includes(key)}
-                    onChange={(event) =>
-                      setEquipment((values) =>
-                        event.target.checked
-                          ? [...values, key]
-                          : values.filter((value) => value !== key),
-                      )
-                    }
-                    className="size-6"
-                  />
-                  {label}
-                </label>
-              ))}
-          </fieldset>
           {programId !== 'rehab' ? (
             <label className="flex flex-col gap-2 text-lg font-bold">
               Hur van är du vid styrketräning?
@@ -507,8 +480,14 @@ export function TrainingHome() {
             onClick={() => setEditing(true)}
             className="min-h-12 self-start text-base font-bold underline disabled:opacity-50"
           >
-            Byt inriktning eller utrustning
+            Byt inriktning
           </button>
+          <Link
+            href="/installningar/utrustning?tillbaka=traning"
+            className="flex min-h-12 items-center text-base font-bold underline"
+          >
+            Min utrustning
+          </Link>
           {locked ? (
             <p className="m-0 text-base text-ink-soft">
               Avsluta eller avbryt passet innan du byter inriktning.

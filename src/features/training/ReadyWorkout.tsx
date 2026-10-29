@@ -93,7 +93,7 @@ export function ReadyWorkout({
           <p className="m-0 font-bold">
             {physioKneeMissingText(preferences)}{' '}
             <Link
-              href="/?andra=utrustning"
+              href="/installningar/utrustning?tillbaka=traning"
               className="inline-flex min-h-12 items-center underline"
             >
               Ändra utrustning

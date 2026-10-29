@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ComponentPropsWithRef } from 'react';
 
 type Variant = 'primary' | 'secondary';
 
@@ -15,7 +15,7 @@ export function buttonClass(variant: Variant = 'primary'): string {
   return `${base} ${variants[variant]}`;
 }
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ComponentPropsWithRef<'button'> {
   variant?: Variant;
 }
 

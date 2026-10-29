@@ -30,12 +30,11 @@ async function openPhysio(
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     }),
   );
-  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   // Chair and support are ticked by default; the band is the user's choice.
   expect(
     (
       screen.getByRole('checkbox', {
-        name: 'Stabil stol eller bänk',
+        name: 'Stabil stol',
       }) as HTMLInputElement
     ).checked,
   ).toBe(true);
@@ -388,7 +387,7 @@ it('lists what a missing band left out and lets the user fix it', async () => {
     await screen.findByRole('checkbox', { name: 'Träningsband' }),
   );
   await user.click(
-    screen.getByRole('button', { name: 'Spara träningsinriktning' }),
+    screen.getByRole('button', { name: 'Spara min utrustning' }),
   );
   await screen.findByRole('button', { name: 'Börja passet' });
   expect(rows()).toHaveLength(9);
@@ -403,13 +402,11 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
       name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
     }),
   );
-  expect(screen.getByText(/Träningsband ingår inte i Egenvikt/)).toBeTruthy();
-  await user.click(screen.getByRole('radio', { name: 'Utrustning' }));
   expect(
     screen.getByText('Träningsband behövs för övning 5 och 7.'),
   ).toBeTruthy();
   const chair = screen.getByRole('checkbox', {
-    name: 'Stabil stol eller bänk',
+    name: 'Stabil stol',
   }) as HTMLInputElement;
   expect(chair.checked).toBe(true);
   expect(
@@ -426,7 +423,7 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
   expect(
     (
       screen.getByRole('checkbox', {
-        name: 'Stabil stol eller bänk',
+        name: 'Stabil stol',
       }) as HTMLInputElement
     ).checked,
   ).toBe(false);

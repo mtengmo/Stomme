@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { isTrainingPreferences } from '../../content/programmes';
 import {
   BackupError,
@@ -14,10 +14,7 @@ import {
 import { getDb } from '../../db/db';
 import { getMeta, setMeta } from '../../db/repo';
 import { deleteAllData } from '../../db/wipe';
-import type {
-  AdjustableWeightItem,
-  WeightInventoryItem,
-} from '../../domain/types';
+import type { EquipmentChoice, WorkoutEquipment } from '../../domain/types';
 import {
   appearanceSnapshot,
   type SchemePreference,
@@ -25,17 +22,18 @@ import {
   themeName,
 } from '../../lib/appearance';
 import { formatShortDate, toLocalDate } from '../../lib/dates';
+import { useHashSearch } from '../../lib/hashLocation';
 import { useInstall } from '../../lib/install';
 import { restoreRepPrefs } from '../../lib/repPrefs';
 import { shareOrDownload } from '../../lib/share';
 import { type StorageStatus, storageStatus } from '../../lib/storage';
 import { APP_COMMIT, APP_VERSION } from '../../lib/version';
+import { inventorySummary } from '../../rules/equipment';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
-import { AdjustableWeightFields } from '../training/AdjustableWeightFields';
-import { WeightInventoryFields } from '../training/WeightInventoryFields';
+import { EquipmentInventory } from '../training/EquipmentInventory';
 import { readBackupMeta } from '../week/BackupReminder';
 import { AppearancePicker } from './AppearancePicker';
 import { useUpdate } from './updateContext';
@@ -76,20 +74,42 @@ function Block({ children }: { children: React.ReactNode }) {
 
 const note = 'm-0 text-base text-ink-soft';
 
+const SUPPORT_ITEMS: EquipmentChoice[] = [
+  'chair',
+  'support',
+  'step',
+  'band',
+  'pull-up-bar',
+  'dip-bars',
+];
+
+/** Only known pages may be returned to after saving. */
+export function returnTarget(search: string): string | undefined {
+  const value = new URLSearchParams(search).get('tillbaka');
+  return value === 'nytt-pass'
+    ? '/nytt-pass'
+    : value === 'traning'
+      ? '/traning/A'
+      : undefined;
+}
+
 function EquipmentInventorySettings() {
   const stored = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const preferences = isTrainingPreferences(stored) ? stored : undefined;
-  const [items, setItems] = useState<WeightInventoryItem[]>([]);
-  const [adjustableItems, setAdjustableItems] = useState<
-    AdjustableWeightItem[]
-  >([]);
+  const [, navigate] = useLocation();
+  const back = returnTarget(useHashSearch());
+  const [draft, setDraft] = useState<WorkoutEquipment>({ equipment: [] });
   const [adjustableValid, setAdjustableValid] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState('');
   useEffect(() => {
     if (stored === undefined || loaded) return;
-    setItems(preferences?.weights ?? []);
-    setAdjustableItems(preferences?.adjustableWeights ?? []);
+    if (preferences)
+      setDraft({
+        equipment: preferences.equipment,
+        weights: preferences.weights ?? [],
+        adjustableWeights: preferences.adjustableWeights ?? [],
+      });
     setLoaded(true);
   }, [stored, preferences, loaded]);
   if (stored === undefined) return null;
@@ -97,39 +117,33 @@ function EquipmentInventorySettings() {
     return <p className={note}>Välj träningsinriktning först.</p>;
   return (
     <>
-      <WeightInventoryFields
-        value={items}
-        onChange={(next) => {
-          setItems(next);
-          setMessage('');
-        }}
-      />
-      <AdjustableWeightFields
-        value={adjustableItems}
-        onChange={(next) => {
-          setAdjustableItems(next);
-          setMessage('');
-        }}
+      <EquipmentInventory
+        idPrefix="settings"
+        value={draft}
+        supportItems={SUPPORT_ITEMS}
         onValidityChange={setAdjustableValid}
+        onChange={(next) => {
+          setDraft(next);
+          setMessage('');
+        }}
       />
       <Button
-        variant="secondary"
         onClick={async () => {
-          const valid = items.every((item) => item.kg > 0 && item.kg <= 100);
-          if (!valid) return setMessage('Kontrollera vikterna.');
           if (!adjustableValid)
             return setMessage('Kontrollera de justerbara vikterna.');
           const next = {
             ...preferences,
-            weights: items,
-            adjustableWeights: adjustableItems,
+            equipment: [
+              ...new Set(['bodyweight' as const, ...draft.equipment]),
+            ],
+            weights: draft.weights ?? [],
+            adjustableWeights: draft.adjustableWeights ?? [],
           };
           if (!isTrainingPreferences(next))
-            return setMessage(
-              'Kontrollera vikterna. Varje fast vikt och justerbart redskap får bara finnas en gång.',
-            );
+            return setMessage('Kontrollera vikterna och försök igen.');
           await setMeta(getDb(), 'training', next);
-          setMessage('Utrustningen är sparad.');
+          if (back) navigate(back);
+          else setMessage('Utrustningen är sparad.');
         }}
       >
         Spara min utrustning
@@ -399,8 +413,8 @@ export function Settings({ page }: { page?: string } = {}) {
           ) : page === 'utrustning' ? (
             <Block>
               <p className={note}>
-                Spara vilka fasta vikter du har hemma. Vikten gäller per hantel
-                eller kettlebell.
+                Säg vad du har hemma. Appen väljer övningar och startvikter
+                efter det. Vikten gäller per hantel eller kettlebell.
               </p>
               <EquipmentInventorySettings />
             </Block>
@@ -563,11 +577,7 @@ function appearanceValue(snapshot: string): string {
 
 function equipmentValue(stored: unknown): string | undefined {
   if (!isTrainingPreferences(stored)) return undefined;
-  const n = stored.weights?.length ?? 0;
-  const m = stored.adjustableWeights?.length ?? 0;
-  const parts = [`${n} ${n === 1 ? 'vikt' : 'vikter'}`];
-  if (m > 0) parts.push(`${m} justerbar${m === 1 ? '' : 'a'}`);
-  return parts.join(' · ');
+  return inventorySummary(stored);
 }
 
 function MenuRow({
