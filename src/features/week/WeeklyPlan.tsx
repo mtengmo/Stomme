@@ -63,6 +63,15 @@ function sessionBelongsToProgramme(
   return session.programId === programId;
 }
 
+/** Swedish rest advice line for a restStatus result. */
+export function restAdviceText(rest: ReturnType<typeof restStatus>): string {
+  return rest.earliestNext === null
+    ? 'Råd om vila: inget tidigare pass i det här programmet.'
+    : rest.ok
+      ? 'Råd om vila: 48 timmar har gått sedan senaste passet.'
+      : `Råd om vila: 48 timmar efter senaste passet är ${formatLongDate(toLocalDate(rest.earliestNext))} kl. ${rest.earliestNext.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}.`;
+}
+
 export interface WeeklyPlanProps {
   preferences: TrainingPreferences;
   sessions: Session[];
@@ -185,7 +194,7 @@ export function WeeklyPlan({
       >
         Veckoplan
       </h2>
-      {stored === undefined ? null : (
+      {stored === undefined ? null : schedule ? (
         <div className="space-y-3">
           <p className="m-0 text-base">
             Nästa planerade pass:{' '}
@@ -198,15 +207,13 @@ export function WeeklyPlan({
           <p className="m-0 text-base">
             Klart den här veckan: <strong>{completedThisWeek}</strong>
           </p>
-          <p className="m-0 text-base text-ink-soft">
-            {rest.earliestNext === null
-              ? 'Råd om vila: inget tidigare pass i det här programmet.'
-              : rest.ok
-                ? 'Råd om vila: 48 timmar har gått sedan senaste passet.'
-                : `Råd om vila: 48 timmar efter senaste passet är ${formatLongDate(toLocalDate(rest.earliestNext))} kl. ${rest.earliestNext.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}.`}
-          </p>
+          <p className="m-0 text-base text-ink-soft">{restAdviceText(rest)}</p>
         </div>
-      )}
+      ) : completedThisWeek >= 1 ? (
+        <p className="m-0 text-base">
+          Klart den här veckan: <strong>{completedThisWeek}</strong>
+        </p>
+      ) : null}
       {stored !== undefined && (
         <details className="border-t-2 border-edge pt-2">
           <summary className="flex min-h-12 cursor-pointer items-center font-bold text-accent underline underline-offset-4">

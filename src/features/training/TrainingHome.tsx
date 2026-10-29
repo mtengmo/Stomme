@@ -25,12 +25,16 @@ import type {
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
 import { useHashSearch } from '../../lib/hashLocation';
-import { nextTemplateId } from '../../rules/schedule';
+import { nextTemplateId, restStatus } from '../../rules/schedule';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
-import { WeeklyPlan } from '../week/WeeklyPlan';
+import {
+  loadWeeklySchedule,
+  restAdviceText,
+  WeeklyPlan,
+} from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
 import { QuickStart } from './QuickStart';
 
@@ -296,6 +300,7 @@ export function TrainingHome() {
       await getMeta(getDb(), 'customWorkouts'),
     );
     return {
+      schedule: await loadWeeklySchedule(),
       preferences,
       sessions,
       legacyProgramme,
@@ -352,20 +357,21 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
-  // The two most recently used saved workouts, else the newest saved ones.
-  const quickWorkouts = locked
-    ? []
-    : [
-        ...new Set([
-          ...data.sessions
-            .map((session) => session.customWorkoutId)
-            .filter((id): id is string => !!id),
-          ...[...data.savedWorkouts].reverse().map((workout) => workout.id),
-        ]),
-      ]
-        .map((id) => data.savedWorkouts.find((workout) => workout.id === id))
-        .filter((workout) => !!workout)
-        .slice(0, 2);
+  // Without a weekly plan the rest advice lives in the lead; with one it stays
+  // in the weekly plan.
+  const rest = restStatus(
+    data.sessions.filter(
+      (session) => session.programId === preferences?.programId,
+    ),
+    new Date(),
+  );
+  const restNote =
+    preferences &&
+    preferences.programId !== 'rehab' &&
+    !data.schedule &&
+    !rest.ok
+      ? restAdviceText(rest)
+      : '';
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
     return (
@@ -404,6 +410,9 @@ export function TrainingHome() {
           Träningsvana: {experienceLabels[preferences.experience]}
         </p>
       ) : null}
+      {restNote ? (
+        <p className="m-0 -mt-3 text-base text-ink-soft">{restNote}</p>
+      ) : null}
       <TimeoutNotice />
       <Link
         href={active ? `/session/${active.id}` : `/traning/${nextId}`}
@@ -415,28 +424,6 @@ export function TrainingHome() {
             ? 'Fortsätt passet'
             : 'Visa nästa pass'}
       </Link>
-      {quickWorkouts.length ? (
-        <div className="-mt-2 flex flex-col">
-          <p className="m-0 text-base text-ink-soft">
-            Eller kör ett eget pass:
-          </p>
-          {quickWorkouts.map((workout) => (
-            <Link
-              key={workout.id}
-              href={`/traning/A?workout=${workout.id}`}
-              className="flex min-h-12 items-center break-words text-base font-bold text-accent underline underline-offset-4"
-            >
-              {workout.name}
-            </Link>
-          ))}
-        </div>
-      ) : null}
-      <WeeklyPlan preferences={preferences} sessions={data.sessions} />
-      <CustomWorkoutList
-        headingId="home-own-workouts"
-        alwaysShow
-        disabled={locked}
-      />
       {due.map((session) => (
         <Link
           key={session.id}
@@ -446,6 +433,13 @@ export function TrainingHome() {
           Hur känns det dagen efter {trainingName(session)}?
         </Link>
       ))}
+      <CustomWorkoutList
+        headingId="home-own-workouts"
+        variant="home"
+        alwaysShow
+        disabled={locked}
+      />
+      <WeeklyPlan preferences={preferences} sessions={data.sessions} />
       {preferences.programId !== 'rehab' ? (
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
@@ -523,9 +517,10 @@ export function TrainingHome() {
               className="flex min-h-12 items-center border-b-2 border-edge text-base underline"
             >
               {session.date} ·{' '}
-              {session.workoutMode === 'short' ? 'Kortpass' : 'Pass'}{' '}
-              {session.templateId} ·{' '}
-              {session.status === 'completed' ? 'klart' : 'avbrutet'}
+              {session.customWorkoutId
+                ? (session.customWorkoutName ?? 'Eget pass')
+                : `${session.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${session.templateId}`}{' '}
+              · {session.status === 'completed' ? 'klart' : 'avbrutet'}
             </Link>
           ))}
         </section>
