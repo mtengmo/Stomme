@@ -54,6 +54,8 @@ export async function saveTrainingPreferences(
   db: StommeDB,
 
   preferences: TrainingPreferences,
+  /** Runs in the same transaction, so both writes happen or neither does. */
+  alsoWrite?: () => Promise<void>,
 ) {
   if (
     !isTrainingPreferences(preferences) ||
@@ -78,6 +80,7 @@ export async function saveTrainingPreferences(
       }
 
       await db.meta.put({ key: 'training', value: preferences });
+      await alsoWrite?.();
     },
   );
 }

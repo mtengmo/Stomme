@@ -20,10 +20,17 @@ import {
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
-import type { Exercise, ExerciseId, PlannedExercise } from '../../domain/types';
-import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
+import type {
+  ExerciseId,
+  PlannedExercise,
+  TrainingPreferences,
+} from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
-import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
+import {
+  type SelectionSummary,
+  selectionSummary,
+  selectionSummaryText,
+} from '../../rules/selectionSummary';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
@@ -68,6 +75,9 @@ interface SelectionValue {
   max: number;
   playing: ExerciseId | null;
   play(id: ExerciseId | null): void;
+  summary: SelectionSummary;
+  announcement: string;
+  alwaysShowBar: boolean;
 }
 
 const Selection = createContext<SelectionValue>({
@@ -77,79 +87,80 @@ const Selection = createContext<SelectionValue>({
   max: maxWorkoutExercises,
   playing: null,
   play: () => {},
+  summary: { count: 0, regions: [] },
+  announcement: '',
+  alwaysShowBar: false,
 });
 
-export function SelectionNote({ exercise }: { exercise: Exercise }) {
-  const { reason, ids } = useContext(Selection);
-  const text = reason(exercise.id);
-  if (!text || ids.includes(exercise.id)) return null;
-  return <p className="m-0 mt-1 text-base font-bold">{text}</p>;
+export function useSelection(): SelectionValue {
+  return useContext(Selection);
 }
 
-export function ExerciseChoice({ exercise }: { exercise: Exercise }) {
-  const { ids, toggle, reason, max, playing, play } = useContext(Selection);
-  const ref = useRef<HTMLDivElement>(null);
-  const active = playing === exercise.id;
-  const picked = ids.includes(exercise.id);
-  useEffect(() => {
-    if (!active || !ref.current || !window.IntersectionObserver) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) play(null);
-    });
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [active, play]);
+/**
+ * The one live status region: count, split per region and time estimate while
+ * picking, otherwise the host's result text.
+ */
+export function SelectionStatus({ resultText }: { resultText: string }) {
+  const { summary, max, announcement, alwaysShowBar, ids } =
+    useContext(Selection);
+  if (!ids.length && !alwaysShowBar)
+    return (
+      <p role="status" className="m-0 text-base text-ink-soft">
+        {resultText}
+      </p>
+    );
+  const text = selectionSummaryText(summary, max);
   return (
-    <div className="flex flex-col items-start gap-2" ref={ref}>
-      <button
-        type="button"
-        aria-label={`${active ? 'Pausa' : 'Visa'} rörelsen: ${exercise.name}`}
-        aria-pressed={active}
-        onClick={() => play(active ? null : exercise.id)}
-        className="flex w-28 shrink-0 flex-col items-center rounded-sm border-2 border-edge p-1 text-base font-bold"
-      >
-        <span className="block h-24 w-full" aria-hidden="true">
-          {active ? (
-            <Figure
-              exerciseId={exercise.id}
-              working={exercise.perSide ? 'right' : null}
-              stillOnly
-            />
-          ) : (
-            <FigureFrame
-              exerciseId={exercise.id}
-              pose={movementPose(exercise.id, 0.5)}
-              working={exercise.perSide ? 'right' : null}
-            />
-          )}
-        </span>
-        {active ? 'Pausa' : 'Visa rörelse'}
-      </button>
-      <button
-        type="button"
-        aria-label={`Välj: ${exercise.name}`}
-        aria-pressed={picked}
-        disabled={
-          !picked && (ids.length >= max || Boolean(reason(exercise.id)))
-        }
-        onClick={() => toggle(exercise.id)}
-        className={`flex min-h-12 w-28 items-center justify-center gap-2 rounded-md border-[3px] px-3 text-base font-bold disabled:opacity-50 ${picked ? 'border-accent bg-surface-tint text-accent' : 'border-edge bg-surface text-ink'}`}
-      >
-        <Icon name={picked ? 'check' : 'plus'} size={18} className="shrink-0" />
-        {picked ? 'Vald' : 'Välj'}
-      </button>
+    <div
+      role="status"
+      className="m-0 flex flex-col gap-1 border-t-[3px] border-ink pt-2 text-base"
+    >
+      <p className="m-0 text-xl font-bold">
+        <span>{text.head}</span>
+        {text.minutes ? (
+          <>
+            {' · '}
+            <span className="count">{text.minutes}</span>
+          </>
+        ) : null}
+      </p>
+      {text.regions ? <p className="m-0 count">{text.regions}</p> : null}
+      <p className="m-0 text-ink-soft">{resultText}</p>
+      {announcement ? <span className="sr-only">{announcement}</span> : null}
     </div>
   );
 }
 
-export function WorkoutBuilder({ children }: { children: ReactNode }) {
+export interface WorkoutBuilderProps {
+  children: ReactNode;
+  /** Used instead of the saved setup (start flow, before anything is saved). */
+  preferences?: TrainingPreferences;
+  /** sessionStorage key for the picks; one per host. */
+  storageKey?: string;
+  /** Show the saved passes above the list. Default true. */
+  showSaved?: boolean;
+  /** Keep the bar visible with a disabled "Skapa pass" when nothing is picked. */
+  alwaysShowBar?: boolean;
+  /** Replaces the default "create a custom workout" action. */
+  onCreate?(
+    ids: ExerciseId[],
+    plan: PlannedExercise[] | undefined,
+  ): Promise<void> | void;
+}
+
+export function WorkoutBuilder({
+  children,
+  preferences: preferencesProp,
+  storageKey = 'stomme.library-selection',
+  showSaved = true,
+  alwaysShowBar = false,
+  onCreate,
+}: WorkoutBuilderProps) {
   const [, navigate] = useLocation();
   const till = new URLSearchParams(useHashSearch()).get('till');
   const [ids, setIds] = useState<ExerciseId[]>(() => {
     try {
-      const value = JSON.parse(
-        sessionStorage.getItem('stomme.library-selection') ?? '[]',
-      );
+      const value = JSON.parse(sessionStorage.getItem(storageKey) ?? '[]');
       return Array.isArray(value)
         ? [
             ...new Set<ExerciseId>(
@@ -179,15 +190,15 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     try {
-      sessionStorage.setItem('stomme.library-selection', JSON.stringify(ids));
+      sessionStorage.setItem(storageKey, JSON.stringify(ids));
     } catch {
       /* Selection still works in memory. */
     }
-  }, [ids]);
+  }, [ids, storageKey]);
 
-  const preferences = isTrainingPreferences(data?.training)
-    ? data.training
-    : undefined;
+  const preferences =
+    preferencesProp ??
+    (isTrainingPreferences(data?.training) ? data.training : undefined);
   const saved = data?.saved ?? [];
   const target = till ? saved.find((item) => item.id === till) : undefined;
   const existing = target?.exerciseIds ?? [];
@@ -202,23 +213,17 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
         : undefined;
   const full = saved.length >= maxCustomWorkouts && !target;
 
-  const planFor = (list: ExerciseId[]) =>
-    preferences && data
+  const planFor = (list: readonly ExerciseId[]) =>
+    preferences && (data || preferencesProp)
       ? customWorkoutPlan(
           list,
           preferences,
-          data.sessions,
-          data.logs,
-          data.painReported,
+          data?.sessions ?? [],
+          data?.logs ?? [],
+          data?.painReported ?? false,
         )
       : undefined;
-  const minutes =
-    !rehab && ids.length
-      ? (() => {
-          const plan = planFor(ids);
-          return plan ? estimateWorkoutMinutes(plan) : undefined;
-        })()
-      : undefined;
+  const summary = selectionSummary(ids, preferences, planFor);
 
   const move = (index: number, delta: -1 | 1) => {
     const to = index + delta;
@@ -240,12 +245,14 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
       const finish = () => {
         setIds([]);
         try {
-          sessionStorage.setItem('stomme.library-selection', '[]');
+          sessionStorage.setItem(storageKey, '[]');
         } catch {
           /* Selection still clears in memory. */
         }
       };
-      if (target) {
+      if (onCreate) {
+        await onCreate(ids, plan);
+      } else if (target) {
         await appendToCustomWorkout(target.id, ids, plan);
         if (plan) addToPreviewDraft(target.id, plan);
         finish();
@@ -283,9 +290,14 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
         },
         playing,
         play,
+        summary,
+        announcement,
+        alwaysShowBar,
       }}
     >
-      {till ? null : <CustomWorkoutList headingId="own-workout" />}
+      {till || !showSaved ? null : (
+        <CustomWorkoutList headingId="own-workout" />
+      )}
       {till && target ? (
         <p className="m-0 text-base font-bold">
           Du lägger till övningar i {target.name}.
@@ -297,7 +309,7 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
         </p>
       ) : null}
       {children}
-      {ids.length ? (
+      {ids.length || alwaysShowBar ? (
         <section
           aria-label="Valda övningar"
           className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3"
@@ -348,20 +360,14 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
               ))}
             </ol>
           ) : null}
-          <div className="flex items-center justify-between gap-3">
-            <p role="status" className="m-0 min-w-0 text-base font-bold">
-              {ids.length} valda
-              {minutes !== undefined ? ` · ca ${minutes} min` : ''}
-              {announcement ? (
-                <span className="sr-only">. {announcement}</span>
-              ) : null}
-            </p>
+          <div className="flex items-center justify-end gap-3">
             <button
               type="button"
               ref={toggleRef}
               aria-expanded={open}
               onClick={() => setOpen(!open)}
-              className="min-h-12 shrink-0 px-2 text-base font-bold text-accent underline underline-offset-4"
+              disabled={!ids.length}
+              className="min-h-12 shrink-0 px-2 text-base font-bold text-accent underline underline-offset-4 disabled:opacity-50"
             >
               {open ? 'Dölj valda' : 'Visa valda'}
             </button>
@@ -381,11 +387,17 @@ export function WorkoutBuilder({ children }: { children: ReactNode }) {
           ) : (
             <Button
               className="min-h-14"
-              disabled={busy || full || !preferences}
+              disabled={busy || full || !preferences || !ids.length}
+              aria-describedby={ids.length ? undefined : 'builder-empty-hint'}
               onClick={submit}
             >
               {target ? 'Lägg till i passet' : 'Skapa pass'}
             </Button>
+          )}
+          {ids.length ? null : (
+            <p id="builder-empty-hint" className="m-0 text-base">
+              Välj minst en övning.
+            </p>
           )}
           {full ? (
             <p className="m-0 text-base">

@@ -1,7 +1,12 @@
 import { exercises } from '../content/exercises';
-import type { ExerciseId, PlannedExercise } from '../domain/types';
+import type {
+  ExerciseId,
+  PlannedExercise,
+  TrainingPreferences,
+} from '../domain/types';
 import { formatShortDate, toLocalDate } from '../lib/dates';
 import { getDb } from './db';
+import { saveTrainingPreferences } from './training';
 
 export interface CustomWorkout {
   id: string;
@@ -34,16 +39,49 @@ export function autoWorkoutName(date: string): string {
   return `Eget pass ${formatShortDate(date).replace(/\.$/, '')}`;
 }
 
+async function writeWorkouts(
+  change: (current: CustomWorkout[]) => CustomWorkout[],
+): Promise<void> {
+  const db = getDb();
+  const current = readCustomWorkouts(
+    (await db.meta.get('customWorkouts'))?.value,
+  );
+  await db.meta.put({ key: 'customWorkouts', value: change(current) });
+}
+
 async function updateWorkouts(
   change: (current: CustomWorkout[]) => CustomWorkout[],
 ): Promise<void> {
   const db = getDb();
-  await db.transaction('rw', db.meta, async () => {
-    const current = readCustomWorkouts(
-      (await db.meta.get('customWorkouts'))?.value,
-    );
-    await db.meta.put({ key: 'customWorkouts', value: change(current) });
-  });
+  await db.transaction('rw', db.meta, () => writeWorkouts(change));
+}
+
+/**
+ * First-run start flow: saves the chosen setup and one custom workout in ONE
+ * transaction, so preferences without a workout can never be left behind.
+ */
+export async function saveStartWithCustomWorkout(
+  preferences: TrainingPreferences,
+  exerciseIds: ExerciseId[],
+  plan: PlannedExercise[] | undefined,
+  date = toLocalDate(new Date()),
+): Promise<string> {
+  const id = crypto.randomUUID();
+  await saveTrainingPreferences(getDb(), preferences, () =>
+    writeWorkouts((current) => {
+      if (current.length >= maxCustomWorkouts) throw new Error('limit');
+      return [
+        ...current,
+        {
+          id,
+          name: autoWorkoutName(date),
+          exerciseIds,
+          ...(plan ? { plan } : {}),
+        },
+      ];
+    }),
+  );
+  return id;
 }
 
 export async function createCustomWorkout(

@@ -1,19 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import {
-  equipmentLabels,
-  exerciseMetadata,
-  purposeLabels,
-  technicalLevelLabels,
-} from '../../content/exerciseMetadata';
-import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
   muscleGroups,
   parseMuscleFilter,
-  primaryMuscleLabel,
 } from '../../content/muscles';
 import {
   defaultEquipment,
@@ -23,151 +15,19 @@ import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import { getMeta } from '../../db/repo';
-import type {
-  EquipmentChoice,
-  Exercise,
-  TrainingPreferences,
-} from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import {
   type ExerciseFilters,
   filterExercises,
   filtersFromParams,
   filtersToParams,
-  missingEquipment,
-  requiresGoodTechnique,
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
 import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
-import {
-  FavouriteButton,
-  FavouritesProvider,
-} from '../exercise/FavouriteButton';
-import {
-  ExerciseChoice,
-  SelectionNote,
-  WorkoutBuilder,
-} from './WorkoutBuilder';
-
-function equipment(exercise: Exercise): string {
-  return exerciseMetadata[exercise.id].variants
-    .map((variant) => variant.label)
-    .join(' / ');
-}
-
-function ExerciseRow({
-  exercise,
-  inventory,
-  experience,
-}: {
-  exercise: Exercise;
-  inventory: EquipmentChoice[];
-  experience?: TrainingPreferences['experience'];
-}) {
-  const missing = missingEquipment(exercise.id, inventory);
-  const membership = Object.values(templates).filter((template) =>
-    template.items.some((item) => item.exerciseId === exercise.id),
-  );
-  return (
-    <li className="grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-4 border-t-2 border-edge py-4">
-      <ExerciseChoice exercise={exercise} />
-      <div className="min-w-0">
-        <Link
-          href={`/ovning/${exercise.id}`}
-          className="flex min-h-12 items-center justify-between gap-3 text-ink underline decoration-2 underline-offset-4"
-        >
-          <h3 className="m-0 min-w-0 break-words font-sans text-xl leading-snug font-bold">
-            {exercise.name}
-          </h3>
-          <Icon name="back" className="shrink-0 rotate-180" />
-        </Link>
-        <p className="m-0 mt-2 text-base">
-          {exerciseReferences[exercise.id]} ·{' '}
-          {primaryMuscleLabel(exercise.id) ? (
-            <>Tränar främst: {primaryMuscleLabel(exercise.id)}</>
-          ) : (
-            'Rörlighet och position'
-          )}
-        </p>
-        <p className="m-0 mt-1 text-base text-ink-soft">
-          Utrustning: {equipment(exercise)}
-        </p>
-        {missing.length ? (
-          <p className="m-0 mt-1 text-base font-bold">
-            Saknar utrustning: {missing.join(', ')}
-          </p>
-        ) : null}
-        {experience && requiresGoodTechnique(exercise.id, experience) ? (
-          <p className="m-0 mt-1 text-base font-bold">
-            Kräver god teknik. Börja med lätt vikt.
-          </p>
-        ) : null}
-        <SelectionNote exercise={exercise} />
-        <p className="m-0 mt-1 text-base text-ink-soft">
-          Teknisk svårighetsgrad:{' '}
-          {[
-            ...new Set(
-              exerciseMetadata[exercise.id].variants.map(
-                (variant) => technicalLevelLabels[variant.technicalLevel],
-              ),
-            ),
-          ].join(' / ')}{' '}
-          ·{' '}
-          {exerciseMetadata[exercise.id].kind === 'mobility'
-            ? 'Rörlighet'
-            : 'Styrka'}
-        </p>
-        <FavouriteButton id={exercise.id} />
-        {exercise.optional ? (
-          <p className="m-0 mt-2 text-base font-bold">Valfri övning</p>
-        ) : null}
-        {membership.map((template) => (
-          <Link
-            key={template.id}
-            href={`/pass/${template.id}`}
-            className="inline-flex min-h-12 items-center text-base font-bold underline decoration-2 underline-offset-4"
-          >
-            Ingår i {template.name}
-          </Link>
-        ))}
-      </div>
-    </li>
-  );
-}
-
-function ResultList({
-  title,
-  items,
-  id,
-  inventory,
-  experience,
-}: {
-  title: string;
-  items: readonly Exercise[];
-  id: string;
-  inventory: EquipmentChoice[];
-  experience?: TrainingPreferences['experience'];
-}) {
-  if (!items.length) return null;
-  return (
-    <section aria-labelledby={id}>
-      <h2 id={id} className="m-0 mb-3 text-3xl font-bold">
-        {title}
-      </h2>
-      <ul className="m-0 list-none p-0">
-        {items.map((exercise) => (
-          <ExerciseRow
-            key={exercise.id}
-            exercise={exercise}
-            inventory={inventory}
-            experience={experience}
-          />
-        ))}
-      </ul>
-    </section>
-  );
-}
+import { FavouritesProvider } from '../exercise/FavouriteButton';
+import { ResultList, ResultViewSwitch } from './ExerciseResults';
+import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
 
 export function ExerciseLibrary() {
   const search = useHashSearch();
@@ -296,19 +156,20 @@ export function ExerciseLibrary() {
             </Link>
           </p>
         ) : null}
-        <p role="status" className="m-0 text-base text-ink-soft">
-          {count} {count === 1 ? 'övning' : 'övningar'}
-          {area ? ` för ${area.toLowerCase()}` : ''}
-        </p>
-        {count === 0 ? (
-          <p className="m-0 text-xl">Inga övningar passar filtren.</p>
-        ) : null}
         <WorkoutBuilder>
+          <SelectionStatus
+            resultText={`${count} ${count === 1 ? 'övning' : 'övningar'}${area ? ` för ${area.toLowerCase()}` : ''}`}
+          />
+          <ResultViewSwitch />
+          {count === 0 ? (
+            <p className="m-0 text-xl">Inga övningar passar filtren.</p>
+          ) : null}
           <ResultList
             title={area ? 'Tränar främst' : 'Alla övningar'}
             items={primary}
             id="primary-results"
             inventory={inventory}
+            groupByRegion={!filters.term.trim() && !area}
             experience={preferences?.experience}
           />
           <ResultList

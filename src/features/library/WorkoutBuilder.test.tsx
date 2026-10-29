@@ -10,11 +10,14 @@ import {
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Route, Router, Switch } from 'wouter';
+import { exercises } from '../../content/exercises';
 import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import type { TrainingPreferences } from '../../domain/types';
 import { useAppHashLocation } from '../../lib/hashLocation';
 import { ExerciseLibrary } from './ExerciseLibrary';
+import { ResultList } from './ExerciseResults';
+import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
 
 const general: TrainingPreferences = {
   programId: 'general',
@@ -65,8 +68,8 @@ describe('selection bar', () => {
     expect(document.activeElement).toBe(pick(names[2] as string));
     const bar = screen.getByRole('region', { name: 'Valda övningar' });
     await waitFor(() =>
-      expect(within(bar).getByRole('status').textContent).toMatch(
-        /^3 valda · ca \d+ min/,
+      expect(screen.getByRole('status').textContent).toMatch(
+        /^3 av 12 övningar · ca \d+ min/,
       ),
     );
     await user.click(within(bar).getByRole('button', { name: 'Visa valda' }));
@@ -75,13 +78,14 @@ describe('selection bar', () => {
     );
     const items = within(bar).getAllByRole('listitem');
     expect(items[1]?.textContent).toContain(names[0]);
-    expect(within(bar).getByRole('status').textContent).toContain(
+    expect(screen.getByRole('status').textContent).toContain(
       'flyttad till plats 2',
     );
+    expect(within(bar).queryByRole('status')).toBeNull();
     await user.click(
       within(bar).getByRole('button', { name: `Ta bort: ${names[2]}` }),
     );
-    expect(within(bar).getByRole('status').textContent).toMatch(/^2 valda/);
+    expect(screen.getByRole('status').textContent).toMatch(/^2 av 12 övningar/);
   });
 
   it('stops at 12 and disables the other rows', async () => {
@@ -137,8 +141,8 @@ describe('selection bar', () => {
       .getAllByRole('button', { name: /^Välj: / })
       .find((button) => !button.hasAttribute('disabled'));
     await user.click(open as HTMLElement);
-    const bar = screen.getByRole('region', { name: 'Valda övningar' });
-    expect(within(bar).getByRole('status').textContent).toBe('1 valda');
+    expect(screen.getByRole('status').textContent).toMatch(/^1 av 12 övningar/);
+    expect(screen.getByRole('status').textContent).not.toContain('ca ');
   });
 
   it('links to the home page when there is no training setup', async () => {
@@ -174,5 +178,65 @@ describe('selection bar', () => {
         .getByRole('button', { name: 'Skapa pass' })
         .hasAttribute('disabled'),
     ).toBe(true);
+  });
+});
+
+describe('live summary and host props', () => {
+  it('updates one status region on tick and untick with a region split', async () => {
+    await seed(general);
+    const user = userEvent.setup();
+    render(<Routes />);
+    const rows = await screen.findAllByRole('button', { name: /^Välj: / });
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    await user.click(rows[0] as HTMLElement);
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toMatch(
+        /^1 av 12 övningar · ca \d+ min/,
+      ),
+    );
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    await user.click(rows[0] as HTMLElement);
+    expect(screen.getByRole('status').textContent).toMatch(/^\d+ övningar/);
+  });
+
+  it('works with host preferences, own storage key, no saved list and onCreate', async () => {
+    const user = userEvent.setup();
+    const created: string[][] = [];
+    render(
+      <WorkoutBuilder
+        preferences={general}
+        storageKey="test.pick"
+        showSaved={false}
+        alwaysShowBar
+        onCreate={(ids) => {
+          created.push(ids);
+        }}
+      >
+        <SelectionStatus resultText="2 övningar" />
+        <ResultList
+          title="Alla"
+          items={[exercises['goblet-squat'], exercises['dead-bug']]}
+          id="r"
+          inventory={general.equipment}
+        />
+      </WorkoutBuilder>,
+    );
+    expect(screen.getByRole('status').textContent).toContain(
+      'Inga övningar valda än.',
+    );
+    const create = screen.getByRole('button', { name: 'Skapa pass' });
+    expect(create.hasAttribute('disabled')).toBe(true);
+    expect(create.getAttribute('aria-describedby')).toBe('builder-empty-hint');
+    expect(screen.getByText('Välj minst en övning.')).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Mina pass' })).toBeNull();
+    await user.click(pick(exercises['goblet-squat'].name));
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toMatch(
+        /^1 av 12 övningar · ca \d+ min.*Ben & säte 1/,
+      ),
+    );
+    expect(sessionStorage.getItem('test.pick')).toBe('["goblet-squat"]');
+    await user.click(screen.getByRole('button', { name: 'Skapa pass' }));
+    await waitFor(() => expect(created).toEqual([['goblet-squat']]));
   });
 });

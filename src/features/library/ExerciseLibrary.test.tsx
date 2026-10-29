@@ -37,13 +37,51 @@ function TestRoutes() {
   );
 }
 
+const detailed = () => localStorage.setItem('stomme.library-view', 'detailed');
+
 beforeEach(() => {
+  localStorage.clear();
   window.history.replaceState(null, '', '/#/ovningar');
 });
 afterEach(cleanup);
 
 describe('exercise library', () => {
+  it('shows compact rows by default: name, one meta line and a 48 px toggle, no extras', () => {
+    render(<TestRoutes />);
+    const row = screen
+      .getByRole('link', { name: exercises['wall-sit'].name })
+      .closest('li') as HTMLElement;
+    expect(row.textContent).toContain('Kroppsvikt + stabilt stöd');
+    expect(row.textContent).not.toContain('Utrustning:');
+    expect(row.textContent).not.toContain('Favorit');
+    expect(row.textContent).not.toContain('Ingår i Pass');
+    expect(
+      within(row).getByRole('button', {
+        name: `Välj: ${exercises['wall-sit'].name}`,
+      }).textContent,
+    ).toBe('Välj');
+    expect(screen.getAllByRole('heading', { level: 3 }).length).toBeGreaterThan(
+      1,
+    );
+  });
+
+  it('switches to detailed rows and remembers it', async () => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    await user.click(screen.getByRole('button', { name: 'Detaljerad' }));
+    expect(localStorage.getItem('stomme.library-view')).toBe('detailed');
+    expect(screen.getAllByText('Valfri övning').length).toBeGreaterThan(0);
+    cleanup();
+    render(<TestRoutes />);
+    expect(
+      screen
+        .getByRole('button', { name: 'Detaljerad' })
+        .getAttribute('aria-pressed'),
+    ).toBe('true');
+  });
+
   it('shows all exercises, equipment, template links and optional status', () => {
+    detailed();
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe('86 övningar');
     expect(
@@ -168,6 +206,7 @@ describe('exercise library', () => {
   });
 
   it('labels rows that lack equipment and offers to clear an empty result', async () => {
+    detailed();
     const user = userEvent.setup();
     window.history.replaceState(null, '', '/#/ovningar?redskap=band');
     render(<TestRoutes />);

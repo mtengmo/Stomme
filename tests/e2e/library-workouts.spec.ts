@@ -22,19 +22,25 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
-    const first = page.getByRole('listitem').filter({
-      has: page.getByRole('link', {
-        name: 'Enarms golvpress med kettlebell',
-        exact: true,
-      }),
-    });
-    const second = page.getByRole('listitem').filter({
-      has: page.getByRole('link', {
-        name: 'Gång med kettlebell vid axeln',
-        exact: true,
-      }),
-    });
-    await expect(first.locator('svg')).toHaveCount(4); // figure, link arrow, select toggle and favourite heart
+    const first = page
+      .getByRole('listitem')
+      .filter({
+        has: page.getByRole('link', {
+          name: 'Enarms golvpress med kettlebell',
+          exact: true,
+        }),
+      })
+      .filter({ hasNot: page.locator('ul') });
+    const second = page
+      .getByRole('listitem')
+      .filter({
+        has: page.getByRole('link', {
+          name: 'Gång med kettlebell vid axeln',
+          exact: true,
+        }),
+      })
+      .filter({ hasNot: page.locator('ul') });
+    await expect(first.locator('svg')).toHaveCount(2); // figure and select toggle (compact row)
     await first.getByRole('button', { name: /^Visa rörelsen:/ }).click();
     await expect(
       first.getByRole('button', { name: /^Pausa rörelsen:/ }),
@@ -47,7 +53,7 @@ for (const width of [360, 1280]) {
     await first.getByRole('button', { name: /^Välj: / }).click();
     await page.getByLabel('Sök övning').fill('E39');
     const bar = page.getByRole('region', { name: 'Valda övningar' });
-    await expect(bar.getByRole('status')).toContainText('2 valda');
+    await expect(page.getByRole('status')).toContainText('2 av 12 övningar');
     await page
       .getByRole('link', {
         name: 'Enarms golvpress med kettlebell',
@@ -55,7 +61,7 @@ for (const width of [360, 1280]) {
       })
       .click();
     await page.goBack();
-    await expect(bar.getByRole('status')).toContainText('2 valda');
+    await expect(page.getByRole('status')).toContainText('2 av 12 övningar');
     await page.screenshot({
       path: test.info().outputPath(`library-${width}.png`),
       fullPage: false,
@@ -126,3 +132,44 @@ test('reduced motion keeps browsing and review still', async ({ page }) => {
     page.getByRole('button', { name: 'Mitt', exact: true }),
   ).toHaveCount(0);
 });
+
+for (const width of [320, 360, 412]) {
+  for (const scheme of ['light', 'dark'] as const) {
+    test(`compact library rows are short and do not overflow (${width}, ${scheme})`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto('/');
+      await page.getByRole('button', { name: /Jag förstår/ }).click();
+      await page.goto('/#/ovningar');
+      const rows = page
+        .getByRole('listitem')
+        .filter({ has: page.getByRole('button', { name: /^Välj: / }) })
+        .filter({ hasNot: page.locator('ul') });
+      await expect(rows.first()).toBeVisible();
+      for (let i = 0; i < 6; i += 1) {
+        const box = await rows.nth(i).boundingBox();
+        expect(box?.height ?? 999).toBeLessThanOrEqual(100);
+        const toggle = await rows
+          .nth(i)
+          .getByRole('button', { name: /^Välj: / })
+          .boundingBox();
+        expect(toggle?.height ?? 0).toBeGreaterThanOrEqual(48);
+      }
+      await rows
+        .first()
+        .getByRole('button', { name: /^Välj: / })
+        .click();
+      await expect(page.getByRole('status')).toContainText('1 av 12 övningar');
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `C:/Users/MAGNUS~1/AppData/Local/Temp/claude/shots/lib-${width}-${scheme}.png`,
+      });
+    });
+  }
+}
