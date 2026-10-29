@@ -82,7 +82,7 @@ export function TrainingSetup({
         {(Object.keys(programmeNames) as ProgramId[]).map((id) => (
           <label
             key={id}
-            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${programId === id ? 'border-accent' : 'border-edge'}`}
+            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${!own && programId === id ? 'border-accent' : 'border-edge'}`}
           >
             <input
               type="radio"
