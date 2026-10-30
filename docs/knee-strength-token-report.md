@@ -24,3 +24,7 @@ One fresh Astra agent performed one pre-implementation source review. One fresh 
 Validation: 266 focused tests passed; after corrections, 101 affected tests passed. Type checking, check and production build passed (five incumbent warnings). Ten mobile cases at 320/390 px had no overflow. Existing wall sit was reused; five exercises were added. Onboarding files were untouched.
 
 [Official CLI documentation](https://learn.chatgpt.com/docs/non-interactive-mode). The numerical evidence above is the observed local counter data, not an account billing export.
+
+## Subsequent final Astra review
+
+One fresh, bounded Astra review after implementation; no app edits or test reruns. Agent-only final observed counters: 230,721 input, including 178,816 cached; 51,905 uncached input; 1,585 output. These are additional to the table above and exclude root coordination for this later request.
