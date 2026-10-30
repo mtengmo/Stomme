@@ -260,6 +260,13 @@ h2 {
   }
 }
 
+/* Set while a session step is mounted: only .session-content scrolls. */
+html.session-locked,
+html.session-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .session-frame {
   container-type: inline-size;
 }

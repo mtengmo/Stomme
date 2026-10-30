@@ -153,3 +153,65 @@ for (const size of SIZES) {
     });
   });
 }
+
+for (const height of [680, 780])
+  for (const scale of [100, 130])
+    test.describe(`session frame is locked 360x${height} ${scale}% dark`, () => {
+      test.use({ viewport: { width: 360, height }, colorScheme: 'dark' });
+
+      test('the document never scrolls and the chrome stays put', async ({
+        page,
+      }) => {
+        const problems: string[] = [];
+        const vh = height;
+        const check = async (stage: Stage) => {
+          if (stage === 'preview') return;
+          await setScale(page, scale);
+          await page.waitForTimeout(250);
+          const frame = page.locator('.session-frame');
+          if ((await frame.count()) === 0) return; // pain / summary are plain pages
+          const inner = page.locator('.session-content');
+          await inner.hover();
+          await page.mouse.wheel(0, 4000);
+          await page.waitForTimeout(250);
+          const m = await page.evaluate(() => {
+            const d = document.scrollingElement ?? document.documentElement;
+            const r = (s: string) =>
+              document.querySelector(s)?.getBoundingClientRect();
+            const bar = document.querySelector(
+              '.session-frame > div:last-child',
+            );
+            const abort = [...document.querySelectorAll('button')].find(
+              (b) => b.textContent?.trim() === 'Avbryt',
+            );
+            return {
+              over: d.scrollHeight - innerHeight,
+              y: scrollY,
+              abort: abort?.getBoundingClientRect().bottom ?? -1,
+              abortTop: abort?.getBoundingClientRect().top ?? -1,
+              barBottom: bar?.getBoundingClientRect().bottom ?? -1,
+              contentTop: r('.session-content')?.top ?? -1,
+              tallyBottom:
+                document
+                  .querySelector('.session-frame > div:nth-child(2)')
+                  ?.getBoundingClientRect().bottom ?? -1,
+            };
+          });
+          if (m.over > 1)
+            problems.push(`${stage}: document overflow ${m.over}`);
+          if (m.y !== 0) problems.push(`${stage}: scrollY ${m.y}`);
+          if (m.abortTop < 0 || m.abort > vh)
+            problems.push(`${stage}: Avbryt out of view`);
+          if (Math.abs(m.barBottom - vh) > 1)
+            problems.push(`${stage}: bar bottom ${m.barBottom} vs ${vh}`);
+          if (m.contentTop < m.tallyBottom - 1)
+            problems.push(`${stage}: content overlaps tally`);
+          await inner.evaluate((el) => el.scrollTo(0, 0));
+          const h1 = await page.locator('h1').first().boundingBox();
+          if (h1 && h1.y < m.tallyBottom - 1)
+            problems.push(`${stage}: title under the tally row`);
+        };
+        await playPassA(page, check);
+        expect(problems).toEqual([]);
+      });
+    });

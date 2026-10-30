@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useLayoutEffect, useRef } from 'react';
 import { Tally, type TallyItem } from '../../ui/Tally';
 
 export interface SessionFrameProps {
@@ -26,10 +26,27 @@ export function SessionFrame({
   snack,
   actions,
 }: SessionFrameProps) {
+  const content = useRef<HTMLDivElement>(null);
+
+  // The frame owns the screen: the document itself must never scroll while a
+  // session step is shown (Android Chrome's dvh can exceed the visible area).
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('session-locked');
+    document.scrollingElement?.scrollTo?.(0, 0);
+    return () => root.classList.remove('session-locked');
+  }, []);
+
+  // A new step starts at the top so the exercise title is never half hidden.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: stepId is the trigger
+  useLayoutEffect(() => {
+    if (content.current) content.current.scrollTop = 0;
+  }, [stepId]);
+
   return (
     <div
       data-step={stepId}
-      className="session-frame mx-auto flex h-dvh max-w-md flex-col px-5"
+      className="session-frame fixed inset-0 mx-auto flex max-w-md flex-col px-5"
     >
       <header className="flex shrink-0 items-center justify-between gap-3 pt-1">
         <p className="m-0 flex min-w-0 flex-wrap items-center gap-x-2 text-base font-bold">
@@ -52,7 +69,10 @@ export function SessionFrame({
           set kvar
         </span>
       </div>
-      <div className="session-content flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto py-2">
+      <div
+        ref={content}
+        className="session-content flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain py-2"
+      >
         {children}
       </div>
       <div className="-mx-5 flex shrink-0 flex-col">
