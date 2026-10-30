@@ -43,8 +43,8 @@ const body = (
 
 export function bosuSquatPose(t: number): Pose {
   const q = clamp(t),
-    hip: Pt = [96 - 15 * q, 96 + 27 * q];
-  const neck = polar(hip, 39, -Math.PI / 2 + 0.4 * q),
+    hip: Pt = [94 - 5 * q, 92 + 9 * q];
+  const neck = polar(hip, 39, -Math.PI / 2 + 0.25 * q),
     head = polar(neck, 16, -1.35);
   const aR: Pt = [102, 148.1],
     tR: Pt = [115, 150.9],
@@ -76,8 +76,8 @@ export function copenhagenHoldPose(t: number): Pose {
     hL: Pt = [84, 174];
   const neck = joint(hip, eL, 46, 43, 1),
     head = polar(neck, 16, -2.8);
-  const aR = polar(kR, 28, -Math.PI / 2),
-    tR = polar(aR, 12, -0.9);
+  const aR = polar(kR, 12, 0.15),
+    tR = polar(aR, 8, 0.35);
   const kL = polar(hip, 36, 0.75),
     aL = polar(kL, 28, 3.2),
     tL = polar(aL, 12, 0.1);
@@ -136,8 +136,8 @@ export function bentKneeCalfHoldPose(t: number): Pose {
   const hand: Pt = [156, 91],
     otherHand: Pt = [156, 104];
   const kL = polar(hip, 32, 1.9),
-    aL = polar(kL, 29, -0.1),
-    tL = polar(aL, 13, 0.1);
+    aL = polar(kL, 29, Math.PI - 0.2),
+    tL = polar(aL, 13, Math.PI - 0.1);
   return body(
     head,
     neck,

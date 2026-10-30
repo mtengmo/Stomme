@@ -86,6 +86,11 @@ describe('contact aware knee figures', () => {
       movementPose('nordic-hamstring-curl', 0),
     );
   });
+  it('caps BOSU squat knee flexion at the bottom', () => {
+    const bottom = movementPose('bosu-squat', 1);
+    expect(distance(bottom.hip, bottom.aR)).toBeGreaterThanOrEqual(47);
+    expect(distance(bottom.hip, bottom.aL)).toBeGreaterThanOrEqual(47);
+  });
   it('renders specialty supports and holds in session stills', () => {
     for (const id of ['copenhagen-hold', 'bent-knee-calf-hold'] as const) {
       const still = renderToStaticMarkup(<Figure exerciseId={id} stillOnly />);

@@ -7,9 +7,9 @@ export const kneeStrengthExercises: Exercise[] = [
     name: 'Knäböj på BOSU',
     muscles: ['Framsida lår', 'Säte'],
     tips: [
-      'Placera BOSU med kupolen uppåt på halkfritt underlag. Kliv på och hitta en stabil fotställning.',
+      'Placera BOSU med kupolen uppåt på halkfritt underlag. Ställ den nära en vägg eller ett stabilt stöd som du kan ta tag i. Kliv på och hitta en stabil fotställning.',
       'Böj höfter och knän i ett grunt, kontrollerat knäböj. Behåll kontakten med kupolen.',
-      'Pressa genom fötterna och res dig lugnt. Ned och upp är en repetition. Börja med 8–12 repetitioner och anpassa dosen.',
+      'Pressa genom fötterna och res dig lugnt. Ned och upp är en repetition.',
     ],
     commonMistake:
       'Du ställer dig på den platta sidan eller tappar balansen i ett för djupt knäböj.',
@@ -27,9 +27,9 @@ export const kneeStrengthExercises: Exercise[] = [
     name: 'Copenhagen-håll med knästöd',
     muscles: ['Insida lår', 'Bål'],
     tips: [
-      'Ligg på sidan med underarmen under axeln och det övre böjda knät på en stadig, vadderad bänk. Vald sida är det övre stödda benet.',
-      'Pressa övre knät ned i bänken och lyft bäckenet. Håll kroppen samlad och det undre benet fritt från golvet.',
-      'Håll stilla under tiden som visas, sänk sedan bäckenet kontrollerat. Börja med 10–20 sekunder per sida och anpassa tiden.',
+      'Ligg på sidan med underarmen under axeln och det övre böjda knät på en stadig, vadderad bänk. Den valda sidan är benet som ligger på bänken.',
+      'Pressa övre knät ned i bänken och lyft bäckenet. Håll kroppen rak från axel till knä och det undre benet fritt från golvet.',
+      'Håll stilla under tiden som visas, sänk sedan bäckenet kontrollerat. Avbryt vid smärta i ljumsken eller på insidan av knät.',
     ],
     commonMistake:
       'Du lyfter det undre benet upprepade gånger i stället för att hålla, eller låter bäckenet sjunka.',
@@ -51,10 +51,10 @@ export const kneeStrengthExercises: Exercise[] = [
     tips: [
       'Stå på knä på en mjuk matta med anklarna säkert fixerade i utrustning avsedd för Nordic. Kontrollera att fixeringen håller innan du lutar dig.',
       'Håll höft och bål sträckta och bromsa långsamt framåt från knäna. Ha händerna redo och ta emot mot golvet innan du tappar kontrollen.',
-      'Tryck ifrån med händerna, böj höften och hjälp dig tillbaka till knästående. Sänkning och assisterad återgång är en repetition; räkna själv. Börja med 3–6 repetitioner och anpassa dosen.',
+      'Tryck ifrån med händerna, böj höften och hjälp dig tillbaka till knästående. Sänkning och assisterad återgång är en repetition; räkna själv. Avbryt vid smärta eller hugg i baksida lår eller knä. Räkna med träningsvärk 1–3 dagar efter de första passen.',
     ],
     commonMistake:
-      'Osäker fotledsfixering, fritt fall eller försök att dra tillbaka kroppen utan handhjälp.',
+      'Du har osäker fotledsfixering, faller fritt eller försöker dra tillbaka kroppen utan handhjälp.',
     easierVariant:
       'Minska lutningen och ta emot tidigare med händerna; välj stående lårcurl om fixering saknas.',
     unit: 'reps',
@@ -71,8 +71,8 @@ export const kneeStrengthExercises: Exercise[] = [
     muscles: ['Vader (soleus)'],
     tips: [
       'Stå på det valda benet och håll i en vägg. Lyft den andra foten och böj stödbenets knä lätt.',
-      'Behåll knäböjen och framfoten i golvet. Lyft hälen till ett läge du kan hålla utan att vackla.',
-      'Håll hälen uppe och knät böjt under tiden som visas, sänk sedan hälen lugnt. Börja med 20–30 sekunder per ben och anpassa tiden.',
+      'Behåll det böjda knät och framfoten i golvet. Lyft hälen till ett läge du kan hålla utan att vackla.',
+      'Håll hälen uppe och knät böjt under tiden som visas, sänk sedan hälen lugnt.',
     ],
     commonMistake: 'Du sträcker knät under hållet eller studsar med hälen.',
     easierVariant:
@@ -93,7 +93,7 @@ export const kneeStrengthExercises: Exercise[] = [
     tips: [
       'Luta ryggen mot en vägg med fötterna en bit framför kroppen och båda hälarna i golvet.',
       'Behåll hälarna på samma plats och lyft framfötter och tår mot smalbenen. Ryggen har kvar kontakten med väggen.',
-      'Sänk framfötterna långsamt. Upp och ned är en repetition. Börja med 15–25 repetitioner och anpassa dosen.',
+      'Sänk framfötterna långsamt. Upp och ned är en repetition.',
     ],
     commonMistake:
       'Du lyfter hälarna som i en tåhävning eller flyttar fötterna mellan repetitionerna.',

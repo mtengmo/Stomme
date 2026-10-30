@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList, exercises } from '../content/exercises';
 import { kneeRehabExercises } from '../content/kneeRehab';
-import { isWorkoutEquipment, rehabGroupOf } from '../content/programmes';
+import {
+  equipmentChoices,
+  isWorkoutEquipment,
+  rehabGroupOf,
+} from '../content/programmes';
 import type {
   ExerciseId,
   MetaEntry,
@@ -175,7 +179,7 @@ const equipmentChoicesSchema = z
       'nordic-anchor',
     ]),
   )
-  .max(10);
+  .max(Object.keys(equipmentChoices).length);
 const fixedWeightsSchema = z
   .array(
     z.strictObject({

@@ -115,7 +115,7 @@ export function readDraft(raw: string | null): Draft {
   const step = steps.find((item) => item === value.step);
   const equipment =
     Array.isArray(value.equipment) &&
-    value.equipment.length <= 7 &&
+    value.equipment.length <= Object.keys(equipmentChoices).length &&
     new Set(value.equipment).size === value.equipment.length &&
     value.equipment.every(
       (item) =>
