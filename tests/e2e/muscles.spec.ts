@@ -16,9 +16,13 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.goto('/#/ovningar');
   await page.getByRole('button', { name: 'Ben & säte', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?omrade=legs$/);
+  await page.getByRole('button', { name: 'Armar', exact: true }).click();
+  await expect(page).toHaveURL(/#\/ovningar\?omrade=legs%2Carms$/);
+  await page.getByRole('button', { name: 'Armar', exact: true }).click();
+  await expect(page).toHaveURL(/#\/ovningar\?omrade=legs$/);
   await page.getByText('Mer specifikt', { exact: false }).click();
   await page.getByRole('button', { name: 'Vader', exact: true }).click();
-  await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
+  await expect(page).toHaveURL(/#\/ovningar\?omrade=legs&muskel=calves$/);
   await expect(page.getByRole('status')).toHaveText(
     `${calfCount} övningar för vader`,
   );
@@ -31,7 +35,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.getByText('Visa muskelkarta', { exact: true }).click();
   await expect(page.getByRole('img', { name: 'Kropp bakifrån' })).toBeVisible();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
-  await expect(page).toHaveURL(/#\/ovningar\?muskel=calves$/);
+  await expect(page).toHaveURL(/#\/ovningar\?omrade=legs&muskel=calves$/);
   await expect(
     page.getByRole('button', { name: 'Vader', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');

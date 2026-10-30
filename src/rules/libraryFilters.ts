@@ -74,7 +74,8 @@ export function matchesLibraryFilters(
 }
 
 export interface ExerciseFilters extends LibraryFilters {
-  region: BodyRegionId | '';
+  /** Selected body regions; empty means no region filter. */
+  regions: BodyRegionId[];
   muscle: MuscleGroupId | '';
   /** Strength or mobility, from the exercise metadata. */
   kind: 'strength' | 'mobility' | '';
@@ -92,7 +93,7 @@ export const emptyExerciseFilters: ExerciseFilters = {
   equipment: '',
   level: '',
   term: '',
-  region: '',
+  regions: [],
   muscle: '',
   kind: '',
   unit: '',
@@ -128,6 +129,15 @@ export interface FilteredExercises {
   supporting: Exercise[];
 }
 
+/** Union of the muscles of the given regions. */
+export function musclesOfRegions(
+  regions: readonly BodyRegionId[],
+): MuscleGroupId[] {
+  return bodyRegions
+    .filter((region) => regions.includes(region.id))
+    .flatMap((region) => [...region.muscles]);
+}
+
 export function filterExercises(
   list: readonly Exercise[],
   filters: ExerciseFilters,
@@ -136,9 +146,8 @@ export function filterExercises(
   const mine = context.mine ?? new Set<string>();
   const muscles: readonly MuscleGroupId[] | null = filters.muscle
     ? [filters.muscle]
-    : filters.region
-      ? (bodyRegions.find((region) => region.id === filters.region)?.muscles ??
-        [])
+    : filters.regions.length
+      ? musclesOfRegions(filters.regions)
       : null;
   const primary: Exercise[] = [];
   const supporting: Exercise[] = [];
@@ -194,7 +203,7 @@ export function missingEquipment(
 export const filterParamNames: Record<keyof ExerciseFilters, string> = {
   aaos: 'kalla',
   term: 'sok',
-  region: 'omrade',
+  regions: 'omrade',
   muscle: 'muskel',
   purpose: 'syfte',
   level: 'niva',
@@ -215,7 +224,9 @@ export function filtersFromParams(
   const get = (key: keyof ExerciseFilters) =>
     query.get(filterParamNames[key]) ?? '';
   const muscle = get('muscle');
-  const region = get('region');
+  const regions = bodyRegions
+    .map((item) => item.id)
+    .filter((id) => get('regions').split(',').includes(id));
   const purpose = get('purpose');
   const equipment = get('equipment');
   const kind = get('kind');
@@ -234,9 +245,7 @@ export function filtersFromParams(
       ? (get('level') as ExerciseFilters['level'])
       : '',
     term: get('term'),
-    region: bodyRegions.some((item) => item.id === region)
-      ? (region as BodyRegionId)
-      : '',
+    regions,
     muscle: Object.hasOwn(muscleGroups, muscle)
       ? (muscle as MuscleGroupId)
       : '',
@@ -256,7 +265,13 @@ export function filtersToParams(
   const next = new URLSearchParams(base);
   for (const [name, value] of Object.entries(patch)) {
     const param = filterParamNames[name as keyof ExerciseFilters];
-    if (value) next.set(param, value === true ? '1' : String(value));
+    if (Array.isArray(value)) {
+      const ids = bodyRegions
+        .map((item) => item.id)
+        .filter((id) => value.includes(id));
+      if (ids.length) next.set(param, ids.join(','));
+      else next.delete(param);
+    } else if (value) next.set(param, value === true ? '1' : String(value));
     else next.delete(param);
   }
   return next;

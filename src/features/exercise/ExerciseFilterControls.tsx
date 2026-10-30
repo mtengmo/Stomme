@@ -9,8 +9,12 @@ import {
   type MuscleGroupId,
   muscleGroups,
 } from '../../content/muscles';
+import type { BodyRegionId } from '../../domain/types';
 import { type SortMode, sortLabels } from '../../rules/exerciseSort';
-import type { ExerciseFilters } from '../../rules/libraryFilters';
+import {
+  type ExerciseFilters,
+  musclesOfRegions,
+} from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
 
 export interface ExerciseFilterControlsProps {
@@ -64,7 +68,7 @@ export function activeFilterCount(
   return (
     advancedFilterCount(value, defaultEquipment, levelFit) +
     Number(Boolean(value.term.trim())) +
-    Number(Boolean(value.region)) +
+    Number(value.regions.length > 0) +
     Number(Boolean(value.muscle))
   );
 }
@@ -116,7 +120,23 @@ export function ExerciseFilterControls({
   const levelFit = showLevelFit ? { default: defaultLevelFit } : undefined;
   const advanced = advancedFilterCount(value, defaultEquipment, levelFit);
   const total = activeFilterCount(value, defaultEquipment, levelFit);
-  const noArea = !value.region && !value.muscle;
+  const noArea = !value.regions.length && !value.muscle;
+  const muscleOptions = (Object.keys(muscleGroups) as MuscleGroupId[]).filter(
+    (muscle) =>
+      !value.regions.length || musclesOfRegions(value.regions).includes(muscle),
+  );
+  const toggleRegion = (id: BodyRegionId) => {
+    const regions = bodyRegions
+      .map((item) => item.id)
+      .filter((item) => (item === id) !== value.regions.includes(item));
+    const allowed = musclesOfRegions(regions);
+    onChange({
+      regions,
+      ...(value.muscle && regions.length && !allowed.includes(value.muscle)
+        ? { muscle: '' as const }
+        : {}),
+    });
+  };
   const field = (name: string) => `${idPrefix}-${name}`;
 
   return (
@@ -136,24 +156,27 @@ export function ExerciseFilterControls({
       </div>
 
       <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
-        <legend className="mb-2 text-base font-bold">{regionLegend}</legend>
+        <legend className="mb-2 text-base font-bold">
+          {regionLegend}
+          {value.regions.length ? ` · ${value.regions.length} valda` : ''}
+        </legend>
         <button
           type="button"
           aria-pressed={noArea}
-          onClick={() => onChange({ region: '', muscle: '' })}
+          onClick={() => onChange({ regions: [], muscle: '' })}
           className={chipClass(noArea)}
         >
           {noArea ? <Icon name="check" size={18} /> : null}
           Alla
         </button>
         {bodyRegions.map((region) => {
-          const active = value.region === region.id && !value.muscle;
+          const active = value.regions.includes(region.id);
           return (
             <button
               key={region.id}
               type="button"
               aria-pressed={active}
-              onClick={() => onChange({ region: region.id, muscle: '' })}
+              onClick={() => toggleRegion(region.id)}
               className={chipClass(active)}
             >
               {active ? <Icon name="check" size={18} /> : null}
@@ -173,12 +196,14 @@ export function ExerciseFilterControls({
         </summary>
         <fieldset className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0 pt-2">
           <legend className="sr-only">Välj enskild muskelgrupp</legend>
-          {(Object.keys(muscleGroups) as MuscleGroupId[]).map((muscle) => (
+          {muscleOptions.map((muscle) => (
             <button
               key={muscle}
               type="button"
               aria-pressed={value.muscle === muscle}
-              onClick={() => onChange({ muscle, region: '' })}
+              onClick={() =>
+                onChange({ muscle: value.muscle === muscle ? '' : muscle })
+              }
               className={chipClass(value.muscle === muscle)}
             >
               {value.muscle === muscle ? <Icon name="check" size={18} /> : null}

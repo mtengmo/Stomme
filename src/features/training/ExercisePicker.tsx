@@ -55,7 +55,13 @@ function isPickerState(value: unknown): value is PickerState {
     !!f &&
     typeof f === 'object' &&
     typeof f.term === 'string' &&
-    oneOf(f.region, ['', ...bodyRegions.map((region) => region.id)]) &&
+    Array.isArray(f.regions) &&
+    f.regions.every((id) =>
+      oneOf(
+        id,
+        bodyRegions.map((region) => region.id),
+      ),
+    ) &&
     oneOf(f.muscle, ['', ...Object.keys(muscleGroups)]) &&
     oneOf(f.purpose, ['', ...Object.keys(purposeLabels)]) &&
     oneOf(f.level, ['', ...Object.keys(technicalLevelLabels)]) &&
@@ -170,7 +176,7 @@ export function ExercisePicker({
     { inventory: preferences, favourites },
   );
   const filtered = [...primary, ...supporting];
-  const areaActive = Boolean(filters.region || filters.muscle);
+  const areaActive = Boolean(filters.regions.length || filters.muscle);
   const noCompatibleAlternatives = Boolean(
     replacingId && !state.broadened && candidates.length === 0,
   );

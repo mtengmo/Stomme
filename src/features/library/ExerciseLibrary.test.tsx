@@ -2,6 +2,7 @@
 import 'fake-indexeddb/auto';
 import {
   cleanup,
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -175,6 +176,23 @@ describe('exercise library', () => {
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe('91 övningar');
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
+  });
+
+  it('selects several body regions and shows their count', async () => {
+    window.history.replaceState(null, '', '/#/ovningar?omrade=arms,legs');
+    render(<TestRoutes />);
+    for (const name of ['Ben & säte', 'Armar'])
+      expect(
+        screen.getByRole('button', { name }).getAttribute('aria-pressed'),
+      ).toBe('true');
+    expect(screen.getByText(/2 valda/)).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toMatch(
+      /för ben & säte och armar$/,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Armar' }));
+    await waitFor(() =>
+      expect(window.location.hash).toBe('#/ovningar?omrade=legs'),
+    );
   });
 
   it('filters on a body region from the URL and keeps old muscle links working', () => {

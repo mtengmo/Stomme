@@ -179,7 +179,7 @@ describe('filterExercises', () => {
   it('splits a region into primary and supporting muscles', () => {
     const legs =
       bodyRegions.find((region) => region.id === 'legs')?.muscles ?? [];
-    const result = run({ region: 'legs' });
+    const result = run({ regions: ['legs'] });
     expect(result.primary.length).toBeGreaterThan(0);
     for (const item of result.primary)
       expect(
@@ -191,8 +191,27 @@ describe('filterExercises', () => {
       expect(tags.secondary.some((m) => legs.includes(m))).toBe(true);
     }
   });
+  it('unions several regions, independent of order', () => {
+    const one = (id: string) =>
+      bodyRegions.find((region) => region.id === id)?.muscles ?? [];
+    const both = [...one('legs'), ...one('arms')];
+    const ab = run({ regions: ['legs', 'arms'] });
+    const ba = run({ regions: ['arms', 'legs'] });
+    expect(ids(ab.primary)).toEqual(ids(ba.primary));
+    expect(ids(ab.supporting)).toEqual(ids(ba.supporting));
+    const legsOnly = run({ regions: ['legs'] });
+    const armsOnly = run({ regions: ['arms'] });
+    for (const item of [...legsOnly.primary, ...armsOnly.primary])
+      expect(ids(ab.primary)).toContain(item.id);
+    for (const item of ab.supporting) {
+      const tags = exerciseMuscles[item.id];
+      expect(tags.primary.some((m) => both.includes(m))).toBe(false);
+      expect(tags.secondary.some((m) => both.includes(m))).toBe(true);
+    }
+    expect(ab.supporting.length).toBeGreaterThan(0);
+  });
   it('filters on one muscle and ignores the region then', () => {
-    const result = run({ muscle: 'calves', region: 'arms' });
+    const result = run({ muscle: 'calves', regions: ['arms'] });
     expect(ids(result.primary)).toContain('single-leg-calf-raise');
     for (const item of [...result.primary, ...result.supporting]) {
       const tags = exerciseMuscles[item.id];
@@ -224,7 +243,7 @@ describe('filterExercises', () => {
     expect(ids(result)).toContain('reverse-lunge');
   });
   it('combines filters', () => {
-    const result = run({ oneSide: true, region: 'legs', unit: 'reps' });
+    const result = run({ oneSide: true, regions: ['legs'], unit: 'reps' });
     for (const item of [...result.primary, ...result.supporting]) {
       expect(item.perSide).toBe(true);
       expect(item.unit).toBe('reps');
@@ -250,7 +269,7 @@ describe('filter params and level fit', () => {
   it('round-trips filters through query parameters and ignores invalid values', () => {
     const patch: Partial<ExerciseFilters> = {
       term: 'knä',
-      region: 'legs',
+      regions: ['legs'],
       kind: 'strength',
       oneSide: true,
       levelFit: true,
@@ -265,6 +284,21 @@ describe('filter params and level fit', () => {
     expect(
       filtersFromParams('omrade=nonsense&muskel=x&niva=y&typ=z&sida=0'),
     ).toEqual({ ...emptyExerciseFilters, aaos: false });
+    expect(filtersFromParams('omrade=legs').regions).toEqual(['legs']);
+    expect(filtersFromParams('omrade=arms,legs,nope,legs').regions).toEqual(
+      filtersFromParams('omrade=legs,arms').regions,
+    );
+    const two = filtersFromParams('omrade=arms,legs').regions;
+    expect(two).toHaveLength(2);
+    expect(two).toEqual(
+      bodyRegions.map((r) => r.id).filter((id) => two.includes(id)),
+    );
+    expect(filtersToParams({ regions: [...two].reverse() }).get('omrade')).toBe(
+      two.join(','),
+    );
+    expect(filtersToParams({ regions: [] }, 'omrade=legs').has('omrade')).toBe(
+      false,
+    );
     expect(filtersToParams({ term: '' }, 'sok=a&omrade=legs').toString()).toBe(
       'omrade=legs',
     );
@@ -323,7 +357,7 @@ describe('remaining filter branches', () => {
   it('treats an unknown region as no muscles and an unfittable row as missing nothing', () => {
     const result = filterExercises(
       exerciseList,
-      { ...emptyExerciseFilters, region: 'nope' as never },
+      { ...emptyExerciseFilters, regions: ['nope' as never] },
       { inventory: { equipment: [] } },
     );
     expect(result.primary).toHaveLength(0);

@@ -141,8 +141,11 @@ export function ExerciseLibrary() {
   const count = primary.length + secondary.length;
   const area = filters.muscle
     ? muscleGroups[filters.muscle].label
-    : filters.region
-      ? bodyRegions.find((item) => item.id === filters.region)?.label
+    : filters.regions.length
+      ? bodyRegions
+          .filter((item) => filters.regions.includes(item.id))
+          .map((item) => item.label)
+          .join(' och ')
       : undefined;
   const onlyBodyweight =
     preferences &&
