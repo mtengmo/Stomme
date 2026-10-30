@@ -333,7 +333,7 @@ export function TrainingHome() {
   if (!preferences && !legacy && !editing) return <QuickStart />;
   if (editing)
     return (
-      <div className="mx-auto max-w-md px-5 pt-5 pb-28">
+      <div className="mx-auto max-w-md px-5 pt-5 pb-[var(--app-nav-clear)]">
         <TrainingSetup
           current={preferences}
           onSaved={() => {
@@ -391,7 +391,7 @@ export function TrainingHome() {
     );
   if (!preferences) return null;
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
+    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
       <h1 className="m-0 text-5xl font-extrabold">
         {prepared
           ? 'Förbered ditt pass'

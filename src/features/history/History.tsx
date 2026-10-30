@@ -91,7 +91,7 @@ export function History() {
 
   if (sessions.length === 0) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
         <h1 className="m-0 text-5xl font-extrabold">Historik</h1>
         <Link href="/historik/rapport" className={buttonClass('secondary')}>
           Sammanställning till fysioterapeuten
@@ -181,7 +181,7 @@ export function History() {
     'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-6 pb-28">
+    <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-6 pb-[var(--app-nav-clear)]">
       <h1 className="m-0 text-5xl font-extrabold">Historik</h1>
       <Link href="/historik/rapport" className={buttonClass('secondary')}>
         Sammanställning till fysioterapeuten

@@ -97,7 +97,7 @@ export function ExerciseHistory({ id }: { id: string }) {
     'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-28">
+    <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-[var(--app-nav-clear)]">
       <Link
         href="/historik"
         className="flex min-h-12 items-center text-base font-bold underline"

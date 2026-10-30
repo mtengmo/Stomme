@@ -61,7 +61,7 @@ export function SessionDetail({ id }: { id: string }) {
 
   if (!session) {
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-28">
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
         <BackLink />
         <h1 className="m-0 text-5xl font-extrabold">Passet finns inte</h1>
         <p className="m-0 text-xl">
@@ -103,7 +103,7 @@ export function SessionDetail({ id }: { id: string }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-4 pb-28">
+    <div className="mx-auto flex max-w-md flex-col gap-6 px-5 pt-4 pb-[var(--app-nav-clear)]">
       <BackLink />
       <header className="flex flex-col gap-2">
         <h1 className="m-0 text-5xl font-extrabold">

@@ -110,7 +110,7 @@ export function RestScreen({
         {afterSet ? <PencilTick size={72} animate variant={1} /> : null}
       </div>
       <div
-        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-40' : 'size-60'}`}
+        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-[min(10rem,24dvh)]' : 'size-[min(15rem,34dvh)]'}`}
       >
         <svg
           viewBox="0 0 280 280"

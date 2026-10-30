@@ -190,9 +190,11 @@ export function QuickStart() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[var(--app-nav-height)]">
-      {step !== 'goal' ? (
-        <div className="sticky top-0 z-10 -mx-5 -mt-8 flex items-center justify-between bg-surface px-5 pt-2">
+    <div
+      className={`mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 pb-[var(--app-nav-height)] ${step === 'pick' ? 'pt-8' : 'pt-5'}`}
+    >
+      {step === 'pick' ? (
+        <div className="sticky top-0 z-10 -mx-5 -mt-8 flex items-center justify-between bg-surface px-5">
           <button
             type="button"
             onClick={() => goTo(steps[position - 1] ?? 'goal')}
@@ -414,7 +416,10 @@ export function QuickStart() {
               />
             </>
           ) : (
-            <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-3">
+            <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-2">
+              <p className="m-0 text-base leading-none text-ink-soft">
+                Steg {position + 1} av {steps.length}
+              </p>
               {error ? (
                 <p role="alert" className="m-0 text-base font-bold">
                   {error}
@@ -430,40 +435,49 @@ export function QuickStart() {
                   Skriv en vikt
                 </p>
               ) : null}
-              <Button
-                disabled={
-                  busy ||
-                  (last && needsParts) ||
-                  (!!pending && !pending.canSubmit)
-                }
-                aria-describedby={
-                  pending && !pending.canSubmit
-                    ? 'weight-hint'
-                    : last && needsParts
-                      ? 'focus-blocked'
-                      : undefined
-                }
-                onClick={() => {
-                  if (pending) return pending.submit();
-                  const next = steps[position + 1];
-                  if (next === 'pick' && hasTools && !adjustableValid)
-                    setError(
-                      'Kontrollera de justerbara vikterna innan du fortsätter.',
-                    );
-                  else if (next && !last) goTo(next);
-                  else void save();
-                }}
-              >
-                {pending
-                  ? pending.label
-                  : !last
-                    ? 'Nästa'
-                    : goal === 'custom'
-                      ? 'Öppna mitt rehabprogram'
-                      : goal === 'physio'
-                        ? 'Visa mitt program'
-                        : 'Visa mitt pass'}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  className="w-auto! shrink-0 px-4!"
+                  onClick={() => goTo(steps[position - 1] ?? 'goal')}
+                >
+                  Tillbaka
+                </Button>
+                <Button
+                  disabled={
+                    busy ||
+                    (last && needsParts) ||
+                    (!!pending && !pending.canSubmit)
+                  }
+                  aria-describedby={
+                    pending && !pending.canSubmit
+                      ? 'weight-hint'
+                      : last && needsParts
+                        ? 'focus-blocked'
+                        : undefined
+                  }
+                  onClick={() => {
+                    if (pending) return pending.submit();
+                    const next = steps[position + 1];
+                    if (next === 'pick' && hasTools && !adjustableValid)
+                      setError(
+                        'Kontrollera de justerbara vikterna innan du fortsätter.',
+                      );
+                    else if (next && !last) goTo(next);
+                    else void save();
+                  }}
+                >
+                  {pending
+                    ? pending.label
+                    : !last
+                      ? 'Nästa'
+                      : goal === 'custom'
+                        ? 'Öppna mitt rehabprogram'
+                        : goal === 'physio'
+                          ? 'Visa mitt program'
+                          : 'Visa mitt pass'}
+                </Button>
+              </div>
             </div>
           )}
         </>

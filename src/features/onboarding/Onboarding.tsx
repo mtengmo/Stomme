@@ -34,17 +34,13 @@ export function DisclaimerText({
 
 export function Onboarding() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 pt-10 pb-8">
-      <h1 className="m-0 text-6xl leading-[0.95] font-extrabold text-balance">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-3 px-5 pt-5">
+      <h1 className="m-0 text-5xl leading-[0.95] font-extrabold text-balance">
         Välkommen till Stomme
       </h1>
       <p className="m-0 text-xl">
         Färdiga pass för styrka, löpning och knäträning. Välj ett fokus så
         hjälper vi dig att komma igång.
-      </p>
-      <p className="m-0 text-base">
-        Ett set är en omgång. 3 × 10 betyder tre omgångar med tio repetitioner.
-        Per sida betyder att du gör antalet för varje vald sida.
       </p>
       <p className="m-0 text-base text-ink-soft">
         Stomme är ett träningsstöd. Vid skada eller efter operation: stäm av
@@ -53,25 +49,37 @@ export function Onboarding() {
       <p className="m-0 text-lg font-bold">
         Avbryt vid skarp smärta, svullnad eller om knät låser sig.
       </p>
-      <details>
-        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-          Integritet – dina uppgifter
-        </summary>
-        <PrivacyNotice />
-        <p className="mt-3 mb-0 text-base">
-          Har du en säkerhetskopia från förut? När du gått vidare importerar du
-          den under Inställningar.
-        </p>
-      </details>
-      <details>
-        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-          Välj färger (kan ändras senare)
-        </summary>
-        <div className="pt-2">
-          <AppearancePicker />
-        </div>
-      </details>
-      <div className="mt-auto pt-2">
+      <div className="flex flex-col">
+        <details>
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+            Så läser du antal
+          </summary>
+          <p className="m-0 pb-2 text-base">
+            Ett set är en omgång. 3 × 10 betyder tre omgångar med tio
+            repetitioner. Per sida betyder att du gör antalet för varje vald
+            sida.
+          </p>
+        </details>
+        <details>
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+            Integritet – dina uppgifter
+          </summary>
+          <PrivacyNotice />
+          <p className="mt-3 mb-0 text-base">
+            Har du en säkerhetskopia från förut? När du gått vidare importerar
+            du den under Inställningar.
+          </p>
+        </details>
+        <details>
+          <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+            Välj färger (kan ändras senare)
+          </summary>
+          <div className="pt-2">
+            <AppearancePicker />
+          </div>
+        </details>
+      </div>
+      <div className="sticky bottom-0 z-10 -mx-5 mt-auto border-t-[3px] border-ink bg-surface-tint px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <Button onClick={() => void acceptOnboarding()}>
           Jag förstår, fortsätt
         </Button>

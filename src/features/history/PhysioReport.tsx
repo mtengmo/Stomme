@@ -151,7 +151,7 @@ export function PhysioReport() {
   return (
     <div
       data-print-report
-      className="physio-report mx-auto flex max-w-3xl flex-col gap-5 px-5 pt-6 pb-28 break-words"
+      className="physio-report mx-auto flex max-w-3xl flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)] break-words"
     >
       <Link
         href="/historik"

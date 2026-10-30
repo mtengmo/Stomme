@@ -321,7 +321,8 @@ export function Settings({ page }: { page?: string } = {}) {
     }
   }
 
-  const shell = 'mx-auto flex max-w-md flex-col gap-5 px-5 pt-5 pb-28';
+  const shell =
+    'mx-auto flex max-w-md flex-col gap-5 px-5 pt-5 pb-[var(--app-nav-clear)]';
   const h1 = 'm-0 text-5xl leading-none font-extrabold outline-offset-4';
 
   if (view.name === 'confirmImport') {

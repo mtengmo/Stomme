@@ -31,7 +31,7 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
 /** DEV only: every start/mid/end pose, right then left, static, for review. */
 export function FigureDev() {
   return (
-    <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-3 pb-28">
+    <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-3 pb-[var(--app-nav-clear)]">
       <h1 className="m-0 text-3xl font-bold">Figurer</h1>
       {exerciseList.map((ex) => {
         const sides = ex.perSide

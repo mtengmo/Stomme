@@ -377,7 +377,7 @@ function PreviewEditor({
 
   if (picker && !active)
     return (
-      <div className="mx-auto flex max-w-xl flex-col gap-4 px-5 pt-4 pb-28">
+      <div className="mx-auto flex max-w-xl flex-col gap-4 px-5 pt-4 pb-[var(--app-nav-clear)]">
         <ExercisePicker
           headingLevel={1}
           preferences={preferences}

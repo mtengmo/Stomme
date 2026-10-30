@@ -29,7 +29,7 @@ export function NewWorkout() {
     : undefined;
   if (!preferences)
     return (
-      <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-6 pb-28">
+      <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-6 pb-[var(--app-nav-clear)]">
         <h1 className="m-0 text-5xl font-extrabold">Skapa eget pass</h1>
         <Link
           href="/"
