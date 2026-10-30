@@ -35,6 +35,11 @@ for (const mode of [
         ),
         'E87',
         'E88',
+        'E90',
+        'E91',
+        'E92',
+        'E93',
+        'E94',
       ];
       if (mode.viewport.width < 1024) {
         const picker = page.getByLabel('Välj övning att granska');
