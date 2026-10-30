@@ -2,6 +2,7 @@ import type { BodyRegionId, ExerciseId } from '../domain/types';
 import { bodyweightDetails } from './bodyweightExercises';
 
 export type MuscleGroupId =
+  | 'tibialis'
   | 'quads'
   | 'hamstrings'
   | 'glutes'
@@ -18,6 +19,7 @@ export type MuscleGroupId =
   | 'hip-flexors';
 
 export const muscleGroups: Record<MuscleGroupId, { label: string }> = {
+  tibialis: { label: 'Framsida underben' },
   quads: { label: 'Framsida lår' },
   hamstrings: { label: 'Baksida lår' },
   glutes: { label: 'Säte' },
@@ -51,6 +53,7 @@ export const bodyRegions: {
       'hamstrings',
       'glutes',
       'calves',
+      'tibialis',
       'hip-abductors',
       'hip-adductors',
       'hip-flexors',
@@ -78,6 +81,27 @@ export const exerciseMuscles: Record<
     qualities: ('balance' | 'grip' | 'power')[];
   }
 > = {
+  'bosu-squat': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core'],
+    qualities: ['balance'],
+  },
+  'copenhagen-hold': {
+    primary: ['hip-adductors'],
+    secondary: ['core'],
+    qualities: [],
+  },
+  'nordic-hamstring-curl': {
+    primary: ['hamstrings'],
+    secondary: [],
+    qualities: [],
+  },
+  'bent-knee-calf-hold': { primary: ['calves'], secondary: [], qualities: [] },
+  'wall-tibialis-raise': {
+    primary: ['tibialis'],
+    secondary: [],
+    qualities: [],
+  },
   'decline-push-up': { ...bodyweightDetails['decline-push-up'], qualities: [] },
   'diamond-push-up': { ...bodyweightDetails['diamond-push-up'], qualities: [] },
   'plank-arm-lift': { ...bodyweightDetails['plank-arm-lift'], qualities: [] },

@@ -18,6 +18,7 @@ import {
   supportsFrontView,
   supportsObliqueView,
 } from './frontViews';
+import { kneeStrengthMovementPose } from './kneeStrengthPoses';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt, TWEEN_MS } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
 import { physioMovementPose } from './physioPoses';
@@ -51,6 +52,8 @@ export function lerpPose(a: Pose, b: Pose, t: number): Pose {
 }
 
 export function movementPose(exerciseId: ExerciseId, t: number): Pose {
+  const kneePose = kneeStrengthMovementPose(exerciseId, t);
+  if (kneePose) return kneePose;
   const bodyweightPose = bodyweightMovementPose(exerciseId, t);
   if (bodyweightPose) return bodyweightPose;
   const rehabPose = rehabMovementPose(exerciseId, t);
@@ -573,34 +576,45 @@ export function Figure({
 
   if (reduced && !stillOnly) {
     const frames: readonly (readonly [string, Pose])[] =
-      exerciseId === 'burpee'
+      exerciseId === 'copenhagen-hold' || exerciseId === 'bent-knee-calf-hold'
         ? [
-            ['Stå', movementPose(exerciseId, 0)],
-            ['Händer i golvet', movementPose(exerciseId, 0.125)],
-            ['Armhävning', movementPose(exerciseId, 0.375)],
-            ['Hopp och landning', movementPose(exerciseId, 0.875)],
+            ['Start', spec.start],
+            ['Håll', spec.end],
           ]
-        : exerciseId === 'walking-lunge'
-          ? walkingLungeReducedFrames()
-          : exerciseId === 'russian-twist'
-            ? russianTwistReducedFrames()
-            : exerciseId === 'squat-jump' ||
-                exerciseId === 'mountain-climber' ||
-                exerciseId === 'plank-arm-lift'
-              ? [
-                  ['Start', movementPose(exerciseId, 0)],
-                  [
-                    'Rörelse',
-                    movementPose(
-                      exerciseId,
-                      exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                    ),
-                  ],
-                ]
-              : [
-                  ['Start', spec.start],
-                  ['Slut', spec.end],
-                ];
+        : exerciseId === 'nordic-hamstring-curl'
+          ? [
+              ['Knästående', movementPose(exerciseId, 0)],
+              ['Ta emot', movementPose(exerciseId, 0.5)],
+              ['Hjälp tillbaka', movementPose(exerciseId, 0.75)],
+            ]
+          : exerciseId === 'burpee'
+            ? [
+                ['Stå', movementPose(exerciseId, 0)],
+                ['Händer i golvet', movementPose(exerciseId, 0.125)],
+                ['Armhävning', movementPose(exerciseId, 0.375)],
+                ['Hopp och landning', movementPose(exerciseId, 0.875)],
+              ]
+            : exerciseId === 'walking-lunge'
+              ? walkingLungeReducedFrames()
+              : exerciseId === 'russian-twist'
+                ? russianTwistReducedFrames()
+                : exerciseId === 'squat-jump' ||
+                    exerciseId === 'mountain-climber' ||
+                    exerciseId === 'plank-arm-lift'
+                  ? [
+                      ['Start', movementPose(exerciseId, 0)],
+                      [
+                        'Rörelse',
+                        movementPose(
+                          exerciseId,
+                          exerciseId === 'squat-jump' ? 0.575 : 0.25,
+                        ),
+                      ],
+                    ]
+                  : [
+                      ['Start', spec.start],
+                      ['Slut', spec.end],
+                    ];
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (
@@ -623,7 +637,9 @@ export function Figure({
     );
   }
   const pose = reduced
-    ? spec.start
+    ? exerciseId === 'copenhagen-hold' || exerciseId === 'bent-knee-calf-hold'
+      ? spec.end
+      : spec.start
     : forced !== undefined
       ? movementPose(exerciseId, forced)
       : spec.motion === 'hold'

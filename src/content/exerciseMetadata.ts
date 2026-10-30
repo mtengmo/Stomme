@@ -1,6 +1,7 @@
 import type { ExerciseId } from '../domain/types';
 import { bodyweightDetails, isBodyweightAddition } from './bodyweightExercises';
 import { exerciseList, exercises } from './exercises';
+import { kneeStrengthMetadata } from './kneeStrengthMetadata';
 
 export type Purpose = 'general' | 'knee' | 'running';
 export type TechnicalLevel = 'basic' | 'practiced' | 'technical';
@@ -13,7 +14,10 @@ export type EquipmentType =
   | 'chair'
   | 'band'
   | 'pull-up-bar'
-  | 'dip-bars';
+  | 'dip-bars'
+  | 'bosu'
+  | 'bench'
+  | 'nordic-anchor';
 export const purposeLabels: Record<Purpose, string> = {
   general: 'Allmän styrka',
   knee: 'Knäfokus',
@@ -36,6 +40,9 @@ export const equipmentLabels: Record<EquipmentType, string> = {
   band: 'Gummiband',
   'pull-up-bar': 'Chinsstång',
   'dip-bars': 'Dipsställning',
+  bosu: 'BOSU (kupolen uppåt)',
+  bench: 'Stadig vadderad bänk',
+  'nordic-anchor': 'Säker Nordic-fotledsfixering',
 };
 export interface EquipmentRequirement {
   type: EquipmentType;
@@ -1151,6 +1158,7 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
 export const exerciseMetadata = Object.fromEntries(
   exerciseList.map((exercise) => {
     const id = exercise.id;
+    if (kneeStrengthMetadata[id]) return [id, kneeStrengthMetadata[id]];
     const added = isBodyweightAddition(id) ? bodyweightDetails[id] : undefined;
     const [technicalLevel, technicalReason] = (added
       ? ([added.level, added.reason] as const)

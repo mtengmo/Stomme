@@ -2,6 +2,19 @@ import type { ExerciseId } from '../domain/types';
 
 /** Searchable names and common terms; stable catalogue IDs stay unchanged. */
 export const exerciseAliases: Record<ExerciseId, string[]> = {
+  'bosu-squat': ['BOSU squat', 'Balansknäböj'],
+  'copenhagen-hold': [
+    'Short Copenhagen isometric',
+    'Copenhagen plank',
+    'Copenhagen adduction',
+  ],
+  'nordic-hamstring-curl': [
+    'Nordic curl',
+    'Nordic hamstring',
+    'Nordiska lårcurl',
+  ],
+  'bent-knee-calf-hold': ['Bent knee calf isometric', 'Soleus-håll'],
+  'wall-tibialis-raise': ['Tibialis raises', 'Tålyft', 'Framfotslyft mot vägg'],
   'decline-push-up': ['Decline push-up', 'Armhävning med fötter på stol'],
   'diamond-push-up': [
     'Diamond push-up',

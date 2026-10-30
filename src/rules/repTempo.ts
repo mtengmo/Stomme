@@ -5,6 +5,7 @@ import { easeInOut } from '../figures/lerp';
 
 /** Counted by hand: the pace is the user's. */
 const MANUAL_REPS: readonly ExerciseId[] = [
+  'nordic-hamstring-curl',
   'mountain-climber',
   // Each alternating arm lift counts once; the demo cycle shows both arms.
   'plank-arm-lift',

@@ -1,6 +1,7 @@
 import type { ExerciseId } from '../domain/types';
 import { additionalFigures } from './additionalPoses';
 import { bodyweightFigures } from './bodyweightPoses';
+import { kneeStrengthFigures } from './kneeStrengthPoses';
 import type { Pt } from './lerp';
 import { type PhysioFigureId, physioFigures } from './physioPoses';
 import { rehabFigures } from './rehabPoses';
@@ -44,6 +45,9 @@ export const POSE_KEYS: readonly PoseKey[] = [
 ];
 
 export type Prop =
+  | { type: 'bosu'; x: number; y: number; rx: number; ry: number }
+  | { type: 'bench'; x: number; y: number; w: number }
+  | { type: 'nordic-anchor'; x: number; y: number }
   | { type: 'chair'; x: number; y: number; w: number }
   | { type: 'step'; x: number; y: number; w: number }
   | { type: 'wall'; x: number }
@@ -104,6 +108,7 @@ function pose(
 
 const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
   ...bodyweightFigures,
+  ...kneeStrengthFigures,
   ...additionalFigures,
   ...rehabFigures,
   'goblet-chair-squat': {

@@ -27,6 +27,39 @@ export function FloorLine() {
 
 export function PropShape({ prop }: { prop: Prop }) {
   switch (prop.type) {
+    case 'bosu':
+      return (
+        <path
+          data-equipment="bosu"
+          d={`M${prop.x - prop.rx} ${prop.y}A${prop.rx} ${prop.ry} 0 0 1 ${prop.x + prop.rx} ${prop.y}Z`}
+          {...PROP}
+          fill="var(--paper)"
+          stroke="var(--equipment)"
+        />
+      );
+    case 'bench':
+      return (
+        <g data-equipment="bench" {...PROP}>
+          <rect
+            x={prop.x}
+            y={prop.y}
+            width={prop.w}
+            height="7"
+            rx="3"
+            fill="var(--paper)"
+          />
+          <path
+            d={`M${prop.x + 5} ${prop.y + 7}V178M${prop.x + prop.w - 5} ${prop.y + 7}V178`}
+          />
+        </g>
+      );
+    case 'nordic-anchor':
+      return (
+        <g data-equipment="nordic-anchor" {...PROP} stroke="var(--equipment)">
+          <path d={`M${prop.x - 14} 178h28M${prop.x - 7} 178v-12h14v12`} />
+          <path d={`M${prop.x - 9} ${prop.y - 4}h18`} strokeWidth="5" />
+        </g>
+      );
     case 'pull-up-bar':
       return (
         <path

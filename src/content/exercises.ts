@@ -5,6 +5,7 @@ import {
 } from './additionalExercises';
 import { bodyweightExercises } from './bodyweightExercises';
 import { preferredExerciseNames } from './exerciseAliases';
+import { kneeStrengthExercises } from './kneeStrengthExercises';
 import { rehabAdditions } from './rehabAdditions';
 
 const BW: Load = { kg: 0, label: 'Kroppsvikt' };
@@ -248,6 +249,7 @@ export const exerciseList: readonly Exercise[] = [
   ...rehabAdditions,
   ...bodyweightExercises,
   ...lateAdditionalExercises,
+  ...kneeStrengthExercises,
 ].map((exercise) => ({
   ...exercise,
   name: preferredExerciseNames[exercise.id] ?? exercise.name,

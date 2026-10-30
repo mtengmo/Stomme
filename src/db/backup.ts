@@ -170,9 +170,12 @@ const equipmentChoicesSchema = z
       'band',
       'pull-up-bar',
       'dip-bars',
+      'bosu',
+      'bench',
+      'nordic-anchor',
     ]),
   )
-  .max(7);
+  .max(10);
 const fixedWeightsSchema = z
   .array(
     z.strictObject({

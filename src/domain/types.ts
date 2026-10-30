@@ -84,7 +84,12 @@ export type ExerciseId =
   | 'one-arm-kettlebell-swing'
   | 'kettlebell-halo'
   | 'russian-twist'
-  | 'woodchop';
+  | 'woodchop'
+  | 'bosu-squat'
+  | 'copenhagen-hold'
+  | 'nordic-hamstring-curl'
+  | 'bent-knee-calf-hold'
+  | 'wall-tibialis-raise';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
@@ -129,7 +134,10 @@ export type EquipmentChoice =
   | 'step'
   | 'band'
   | 'pull-up-bar'
-  | 'dip-bars';
+  | 'dip-bars'
+  | 'bosu'
+  | 'bench'
+  | 'nordic-anchor';
 export interface WeightInventoryItem {
   type: 'dumbbell' | 'kettlebell';
   /** Weight of one implement, in kg. */

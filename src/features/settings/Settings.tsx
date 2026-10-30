@@ -84,6 +84,9 @@ const SUPPORT_ITEMS: EquipmentChoice[] = [
   'band',
   'pull-up-bar',
   'dip-bars',
+  'bosu',
+  'bench',
+  'nordic-anchor',
 ];
 
 /** Only known pages may be returned to after saving. */

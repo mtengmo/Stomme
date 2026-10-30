@@ -73,6 +73,9 @@ const supportLabels: Record<string, string> = {
   band: 'band',
   'pull-up-bar': 'chinsstång',
   'dip-bars': 'dipsställning',
+  bosu: 'BOSU (kupolen uppåt)',
+  bench: 'Stadig vadderad bänk',
+  'nordic-anchor': 'Säker Nordic-fotledsfixering',
 };
 
 function kgText(kg: number): string {

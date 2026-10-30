@@ -10,6 +10,7 @@ import {
 import type { ExerciseId } from '../domain/types';
 
 const ids: MuscleGroupId[] = [
+  'tibialis',
   'quads',
   'hamstrings',
   'glutes',
@@ -30,6 +31,12 @@ const BODY_OUTLINE =
   'M51 30 L43 34 L35 59 L42 64 L44 84 L42 103 L39 137 L36 164 L47 164 L53 137 L60 112 L67 137 L73 164 L84 164 L81 137 L78 103 L76 84 L78 64 L85 59 L77 34 L69 30 Z';
 
 const shapes: Record<MuscleGroupId, { side: 'front' | 'back'; d: string }[]> = {
+  tibialis: [
+    {
+      side: 'front',
+      d: 'M44 137 L49 137 L45 160 L40 160 Z M71 137 L76 137 L80 160 L75 160 Z',
+    },
+  ],
   quads: [
     { side: 'front', d: 'M42 104 Q50 100 58 104 L57 132 Q51 137 46 133 Z' },
     { side: 'front', d: 'M62 104 Q70 100 78 104 L74 133 Q69 137 63 132 Z' },

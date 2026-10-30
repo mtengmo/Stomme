@@ -40,6 +40,14 @@ const stretchLeg: CueFactory = (side) => ({
 });
 
 const cues: Partial<Record<ExerciseId, CueFactory>> = {
+  'copenhagen-hold': (side) => ({
+    label: `${sideWord(side)} knä överst på bänken`,
+    explanation: `Det ${sideAdjective(side)} övre benet pressar mot bänken. Håll bäckenet uppe; det undre benet lyfts inte upprepade gånger.`,
+  }),
+  'bent-knee-calf-hold': (side) => ({
+    label: `Stå på ${sideWord(side)} ben`,
+    explanation: `Håll det ${sideAdjective(side)} knät böjt och hälen uppe. Den andra foten är fri.`,
+  }),
   'step-up': plantedFoot,
   'single-leg-rdl': plantedFoot,
   'dead-bug': (side) => ({

@@ -36,6 +36,9 @@ export const equipmentChoices: Record<EquipmentChoice, string> = {
   band: 'Träningsband',
   'pull-up-bar': 'Fast monterad chinsstång',
   'dip-bars': 'Stabil dipsställning',
+  bosu: 'BOSU (kupolen uppåt)',
+  bench: 'Stadig vadderad bänk',
+  'nordic-anchor': 'Säker Nordic-fotledsfixering',
 };
 
 export const defaultEquipment: EquipmentChoice[] = [
@@ -125,7 +128,7 @@ export function isWorkoutEquipment(value: unknown): value is WorkoutEquipment {
       adjustableWeights: item.adjustableWeights,
     }) &&
     Array.isArray(item.equipment) &&
-    item.equipment.length <= 7 &&
+    item.equipment.length <= Object.keys(equipmentChoices).length &&
     new Set(item.equipment).size === item.equipment.length
   );
 }

@@ -15,6 +15,9 @@ const SUPPORT_ITEMS: EquipmentChoice[] = [
   'band',
   'pull-up-bar',
   'dip-bars',
+  'bosu',
+  'bench',
+  'nordic-anchor',
 ];
 
 export function WorkoutEquipmentControls({

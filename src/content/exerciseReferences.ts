@@ -88,6 +88,11 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'kettlebell-halo': 'E84',
   'russian-twist': 'E87',
   woodchop: 'E88',
+  'bosu-squat': 'E90',
+  'copenhagen-hold': 'E91',
+  'nordic-hamstring-curl': 'E92',
+  'bent-knee-calf-hold': 'E93',
+  'wall-tibialis-raise': 'E94',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {
