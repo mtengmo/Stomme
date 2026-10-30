@@ -21,7 +21,7 @@ export function EffortScreen({ frame, exercise, onPick }: EffortScreenProps) {
         <Button
           key={e}
           variant="secondary"
-          className="min-h-16"
+          className="min-h-14"
           onClick={() => onPick(e)}
         >
           {EFFORT_LABEL[e]}
@@ -30,10 +30,10 @@ export function EffortScreen({ frame, exercise, onPick }: EffortScreenProps) {
     >
       <p className="m-0 text-lg font-bold text-ink-soft">{exercise.name}</p>
       <div className="flex items-center justify-between gap-3">
-        <h1 className="m-0 text-5xl leading-none font-extrabold">
+        <h1 className="m-0 text-[clamp(1.875rem,5.5dvh,3rem)] leading-none font-extrabold">
           Hur ansträngande var övningen?
         </h1>
-        <PencilTick size={88} animate variant={2} className="shrink-0" />
+        <PencilTick size={64} animate variant={2} className="shrink-0" />
       </div>
       <p className="m-0 text-base text-ink-soft">
         Bedöm ansträngningen, inte smärtan. Rapportera besvär separat.

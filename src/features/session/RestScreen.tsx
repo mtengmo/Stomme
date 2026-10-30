@@ -106,11 +106,11 @@ export function RestScreen({
       }
     >
       <div className="flex items-center justify-between">
-        <h1 className="m-0 text-4xl leading-none font-bold">Vila</h1>
-        {afterSet ? <PencilTick size={72} animate variant={1} /> : null}
+        <h1 className="m-0 text-3xl leading-none font-bold">Vila</h1>
+        {afterSet ? <PencilTick size={48} animate variant={1} /> : null}
       </div>
       <div
-        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-[min(10rem,24dvh)]' : 'size-[min(15rem,34dvh)]'}`}
+        className={`relative mx-auto grid place-items-center ${effortExercise && onEffort ? 'size-[clamp(3.75rem,11dvh,10rem)]' : 'size-[clamp(5rem,24dvh,15rem)]'}`}
       >
         <svg
           viewBox="0 0 280 280"
@@ -138,7 +138,7 @@ export function RestScreen({
           />
         </svg>
         <p
-          className={`count m-0 leading-none ${effortExercise && onEffort ? 'text-6xl' : 'text-[6rem]'}`}
+          className={`count m-0 leading-none ${effortExercise && onEffort ? 'text-[clamp(1.5rem,5.5dvh,3.75rem)]' : 'text-[clamp(1.75rem,8.5dvh,6rem)]'}`}
           role="timer"
           aria-label={`${paused ? savedSeconds.current : timer.seconds} sekunder kvar`}
         >
@@ -154,7 +154,7 @@ export function RestScreen({
           <legend className="text-lg font-bold">
             Hur ansträngande var {effortExercise.name}?
           </legend>
-          <p className="m-0 text-base text-ink-soft">
+          <p className="m-0 text-base text-ink-soft [@media(max-height:740px)]:hidden">
             Bedöm ansträngningen, inte smärta. Du kan hoppa över frågan.
           </p>
           <div className="grid grid-cols-3 gap-2">
@@ -172,7 +172,10 @@ export function RestScreen({
           </div>
         </fieldset>
       ) : null}
-      <p role="status" className="m-0 text-base">
+      <p
+        role="status"
+        className="m-0 text-base [@media(max-height:740px)]:text-sm [@media(max-height:740px)]:leading-snug"
+      >
         {paused
           ? 'Vilan är pausad. Fortsätt när du är redo.'
           : autoContinue

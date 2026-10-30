@@ -249,7 +249,7 @@ export function SetScreen({
       }
     >
       <div>
-        <h1 className="m-0 break-words text-3xl leading-tight font-bold">
+        <h1 className="session-title m-0 line-clamp-2 break-words text-3xl leading-tight font-bold">
           {exercise.name}
         </h1>
         <p className="m-0 text-lg font-bold">
@@ -279,7 +279,7 @@ export function SetScreen({
       {unit === 'seconds' ? (
         <section
           aria-label={movingTimed ? 'Övningstid' : 'Hålltid'}
-          className="rounded-md bg-accent px-3 py-2 text-paper"
+          className="session-card rounded-md bg-accent text-paper"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -296,7 +296,7 @@ export function SetScreen({
               <p
                 role="timer"
                 aria-label={`${remaining} sekunder ${hold.phase === 'prepare' ? 'förberedelse ' : hold.phase === 'paused' ? '' : movingTimed ? 'övningstid ' : 'hålltid '}kvar`}
-                className="count m-0 text-[clamp(4.5rem,24vw,6rem)] leading-none"
+                className="count session-count m-0 leading-none"
               >
                 {formatClock(remaining)}
               </p>
@@ -330,7 +330,7 @@ export function SetScreen({
       ) : autoCount && tempo ? (
         <section
           aria-label="Repetitionsräknare"
-          className="rounded-md bg-accent px-3 py-2 text-paper"
+          className="session-card rounded-md bg-accent text-paper"
         >
           <p className="m-0 text-base font-bold">
             {counter.phase === 'prepare'
@@ -356,11 +356,11 @@ export function SetScreen({
                 ? 'Fortsätt räkningen'
                 : 'Pausa räkningen'
             }
-            className="block min-h-12 w-full text-left text-paper disabled:opacity-100"
+            className="flex min-h-12 w-full items-center text-left text-paper disabled:opacity-100"
           >
             <span
               aria-hidden="true"
-              className="count block text-[clamp(4.5rem,24vw,6rem)] leading-none"
+              className="count session-count block leading-none"
             >
               {counter.phase === 'prepare' || counter.phase === 'resuming'
                 ? counter.leadSeconds
@@ -380,8 +380,8 @@ export function SetScreen({
                       ? 'Setet är klart och sparas automatiskt.'
                       : `${amount} repetitioner${exercise.perSide ? ' på denna sida' : ''}. 5 s förberedelse, sedan räknar appen.`}
           </p>
-          <div className="flex flex-wrap items-center gap-x-4">
-            <p className="m-0 w-full text-base font-bold min-[360px]:w-auto">
+          <div className="session-takt flex flex-wrap items-center gap-x-4">
+            <p className="m-0 text-base font-bold">
               Takt: ca {repSeconds(tempo)} s
             </p>
             {canChangePace ? (
@@ -404,16 +404,16 @@ export function SetScreen({
                 </button>
               </>
             ) : null}
+            {counterLive && counter.phase !== 'prepare' ? (
+              <button
+                type="button"
+                onClick={counter.endEarly}
+                className="min-h-12 text-base font-bold underline"
+              >
+                Avsluta setet
+              </button>
+            ) : null}
           </div>
-          {counterLive && counter.phase !== 'prepare' ? (
-            <button
-              type="button"
-              onClick={counter.endEarly}
-              className="min-h-12 text-base font-bold underline"
-            >
-              Avsluta setet
-            </button>
-          ) : null}
         </section>
       ) : (
         <div>

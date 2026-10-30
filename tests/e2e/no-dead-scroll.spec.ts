@@ -1,6 +1,14 @@
 import { devices, expect, type Page, test } from '@playwright/test';
-import { playPassA, quickStart, type Stage } from './flow';
-import { FRESH_STATE } from './state';
+import {
+  addExercise,
+  answerPain,
+  freezeClock,
+  playPassA,
+  quickStart,
+  removeAllExercises,
+  type Stage,
+} from './flow';
+import { FRESH_STATE, REP_COUNT_MANUAL_KEY } from './state';
 
 // A phone-sized viewport (Samsung S23 in Chrome with the address bar visible).
 // Pages whose content fits must not scroll; the primary action must never
@@ -215,3 +223,111 @@ for (const height of [680, 780])
         expect(problems).toEqual([]);
       });
     });
+
+// While exercising, hands are busy: at 100 % text the middle part of the frame
+// must fit without an inner scroll. At 130 % it may scroll, but the numbers are
+// logged so regressions are visible.
+const INNER_SIZES = [
+  { width: 384, height: 693, scale: 100 },
+  { width: 360, height: 640, scale: 100 },
+  { width: 360, height: 780, scale: 100 },
+  { width: 384, height: 780, scale: 130 },
+];
+
+async function innerOverflow(page: Page): Promise<number | null> {
+  return page.evaluate(() => {
+    const el = document.querySelector('.session-content');
+    return el ? el.scrollHeight - el.clientHeight : null;
+  });
+}
+
+for (const size of INNER_SIZES) {
+  const { scale, ...viewport } = size;
+  const tag = `${viewport.width}x${viewport.height} ${scale}%`;
+  test.describe(`no inner scroll while exercising ${tag}`, () => {
+    test.use({ viewport, colorScheme: 'dark' });
+
+    test('every Pass A stage fits in the middle part', async ({ page }) => {
+      const problems: string[] = [];
+      const check = async (stage: Stage) => {
+        if (stage === 'preview') return;
+        await setScale(page, scale);
+        await page.waitForTimeout(250);
+        const over = await innerOverflow(page);
+        if (over === null) return;
+        console.log(`INNER ${tag} ${stage}: ${over}px`);
+        if (scale === 100 && over > 1) problems.push(`${stage}: ${over}px`);
+      };
+      await playPassA(page, check);
+      expect(problems).toEqual([]);
+    });
+
+    test('hands-free counting: ready, preparing and counting fit', async ({
+      page,
+    }) => {
+      await page.addInitScript(
+        (key) => localStorage.removeItem(key),
+        REP_COUNT_MANUAL_KEY,
+      );
+      await page.goto('/');
+      await page.getByRole('button', { name: /Jag förstår/ }).click();
+      await page.goto('/#/pass/A');
+      await page.getByRole('button', { name: 'Starta pass' }).click();
+      await answerPain(page, 0);
+      const start = page.getByRole('button', {
+        name: 'Starta – 5 s förberedelse',
+      });
+      await expect(start).toBeVisible();
+      await setScale(page, scale);
+      const problems: string[] = [];
+      const measure = async (label: string) => {
+        await page.waitForTimeout(250);
+        const over = await innerOverflow(page);
+        console.log(`INNER ${tag} ${label}: ${over}px`);
+        if (scale === 100 && (over ?? 0) > 1)
+          problems.push(`${label}: ${over}px`);
+        await expect(page.getByRole('heading', { level: 1 })).toBeInViewport({
+          ratio: 1,
+        });
+        await expect(page.locator('.session-count').first()).toBeInViewport({
+          ratio: 1,
+        });
+      };
+      await measure('count-ready');
+      await freezeClock(page);
+      await start.click();
+      await measure('count-prepare');
+      await page.clock.fastForward(8_000);
+      await expect(page.getByText(/^Pågår/)).toBeVisible();
+      await measure('count-active');
+      expect(problems).toEqual([]);
+    });
+
+    test('a long title with side labels and the next-side line fits', async ({
+      page,
+    }) => {
+      await page.goto('/');
+      await page.getByRole('button', { name: /Jag förstår/ }).click();
+      await quickStart(page, { goal: 'general', level: 'some' });
+      await page
+        .getByRole('button', { name: 'Anpassa passet', exact: true })
+        .click();
+      await removeAllExercises(page);
+      await addExercise(page, 'split-squat');
+      await page
+        .getByRole('button', { name: 'Börja passet', exact: true })
+        .click();
+      await setScale(page, scale);
+      await expect(page.getByText(/Höger ben fram/).first()).toBeVisible();
+      await expect(page.getByText(/Sedan: Vänster ben fram/)).toBeVisible();
+      await page.waitForTimeout(250);
+      const over = await innerOverflow(page);
+      console.log(`INNER ${tag} split-squat: ${over}px`);
+      if (scale === 100) expect(over).toBeLessThanOrEqual(1);
+      const action = page.getByRole('button', {
+        name: /^(Klar set|Starta – 5 s förberedelse)$/,
+      });
+      await expect(action).toBeInViewport({ ratio: 1 });
+    });
+  });
+}
