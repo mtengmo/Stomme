@@ -1,4 +1,6 @@
 import { devices, expect, type Page, test } from '@playwright/test';
+import { exerciseReferences } from '../../src/content/exerciseReferences';
+import { exerciseList } from '../../src/content/exercises';
 import {
   addExercise,
   answerPain,
@@ -331,3 +333,124 @@ for (const size of INNER_SIZES) {
     });
   });
 }
+
+// Titles that wrap to two lines: the figure and spacing absorb the extra line,
+// the full title stays readable (clamped to two lines, never cut in the DOM)
+// and nothing in the middle part scrolls.
+const REPRESENTATIVE = [
+  'Sittande knästräckning med gummiband',
+  'Sitta ner och resa sig från stol (goblet)',
+  'Enbens bäckenlyft med ryggstöd',
+  'Copenhagen-håll med knästöd',
+  'Statisk tåhävning med böjt knä',
+  'Burpee med armhävning och hopp',
+];
+const CASES = process.env.ALL_TITLES
+  ? exerciseList.map((e) => e.name).filter((n) => n.length >= 24)
+  : REPRESENTATIVE;
+
+for (const size of [
+  { width: 384, height: 693 },
+  { width: 360, height: 640 },
+])
+  for (const manual of [true, false])
+    test.describe(`two-line titles ${size.width}x${size.height} ${manual ? 'manual' : 'hands-free'}`, () => {
+      test.use({ viewport: size, colorScheme: 'dark' });
+
+      for (const name of CASES)
+        test(`fits: ${name}`, async ({ browser }) => {
+          test.setTimeout(90_000);
+          const problems: string[] = [];
+          {
+            const ex = exerciseList.find((e) => e.name === name);
+            if (!ex) throw new Error(`unknown exercise ${name}`);
+            const context = await browser.newContext({
+              storageState: FRESH_STATE,
+              viewport: size,
+              colorScheme: 'dark',
+              reducedMotion: 'reduce',
+            });
+            try {
+              const page = await context.newPage();
+              if (!manual)
+                await page.addInitScript(
+                  (key) => localStorage.removeItem(key),
+                  REP_COUNT_MANUAL_KEY,
+                );
+              await page.goto('/');
+              await page.getByRole('button', { name: /Jag förstår/ }).click();
+              await quickStart(page, {
+                goal: 'general',
+                level: 'some',
+                onEquipment: async (p) => {
+                  for (const box of await p.getByRole('checkbox').all())
+                    if (!(await box.isChecked())) await box.check();
+                },
+              });
+              await page
+                .getByRole('button', { name: 'Anpassa passet', exact: true })
+                .click();
+              await removeAllExercises(page);
+              await page
+                .getByRole('button', { name: 'Lägg till övning', exact: true })
+                .click();
+              await page.getByLabel('Sök övning', { exact: true }).fill(ex.id);
+              const row = page
+                .getByRole('listitem')
+                .filter({ hasText: exerciseReferences[ex.id] });
+              await page.waitForTimeout(1000);
+              // Some exercises need equipment or a partner the picker never offers.
+              test.skip((await row.count()) === 0, `${name} is not selectable`);
+              await row
+                .getByRole('button', {
+                  name: 'Lägg till övningen',
+                  exact: true,
+                })
+                .click();
+              await page
+                .getByRole('button', { name: 'Börja passet', exact: true })
+                .click();
+              await expect(page.locator('.session-content h1')).toHaveText(
+                name,
+              );
+              await page.waitForTimeout(250);
+              const m = await page.evaluate(() => {
+                const h = document.querySelector('h1') as HTMLElement;
+                const c = document.querySelector('.session-content');
+                const lh = Number.parseFloat(getComputedStyle(h).lineHeight);
+                return {
+                  text: h.textContent,
+                  lines: Math.round(h.getBoundingClientRect().height / lh),
+                  over: c ? c.scrollHeight - c.clientHeight : -1,
+                };
+              });
+              console.log(
+                `TITLE ${size.width}x${size.height} ${manual ? 'manual' : 'auto'} lines=${m.lines} over=${m.over} ${name}`,
+              );
+              if (m.text !== name) problems.push(`${name}: DOM title cut`);
+              if (m.lines > 2) problems.push(`${name}: ${m.lines} lines`);
+              if (m.over > 1)
+                problems.push(`${name}: inner scroll ${m.over}px`);
+              for (const label of [
+                'Ändra set',
+                'Hur gör man?',
+                'Rapportera smärta eller besvär',
+              ]) {
+                const el = page
+                  .getByText(label, { exact: true })
+                  .or(page.getByRole('button', { name: label, exact: true }))
+                  .first();
+                const box = await el.boundingBox();
+                if (!box || box.y < 0 || box.y + box.height > size.height)
+                  problems.push(`${name}: ${label} out of view`);
+              }
+            } catch (e) {
+              if (String(e).includes('skipped')) throw e;
+              problems.push(`${name}: ${String(e).slice(0, 80)}`);
+            } finally {
+              await context.close().catch(() => {});
+            }
+          }
+          expect(problems).toEqual([]);
+        });
+    });

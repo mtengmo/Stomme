@@ -440,7 +440,7 @@ export function SetScreen({
         variantId={variantId}
         progress={autoCount && counterLive ? counter.progress : undefined}
       />
-      <div>
+      <div className="session-notes">
         {presentation.cue !== genericBodyweightCue ? (
           <p className="m-0 text-base font-bold">{presentation.cue}</p>
         ) : null}
@@ -450,9 +450,11 @@ export function SetScreen({
             {metadata.relaxSeconds
               ? ` Slappna av i ${metadata.relaxSeconds} sekunder mellan repetitionerna.`
               : ''}{' '}
-            {autoCount
-              ? 'Animationen följer samma takt som räkningen.'
-              : 'Följ tiderna i texten. Animationen visar rörelsen i förenklat tempo.'}
+            <span className="session-aside">
+              {autoCount
+                ? 'Animationen följer samma takt som räkningen.'
+                : 'Följ tiderna i texten. Animationen visar rörelsen i förenklat tempo.'}
+            </span>
           </p>
         ) : null}
         <p className="m-0 text-base text-ink-soft" aria-live="polite">
@@ -593,18 +595,35 @@ export function SetScreen({
             ) : null}
           </section>
         </details>
+        {onReportSymptoms ? (
+          <button
+            type="button"
+            onClick={onReportSymptoms}
+            aria-label={
+              symptomReported
+                ? 'Besvär sparade · ändra rapport'
+                : 'Rapportera smärta eller besvär'
+            }
+            title={
+              symptomReported
+                ? 'Besvär sparade · ändra rapport'
+                : 'Rapportera smärta eller besvär'
+            }
+            className="session-report min-h-12 cursor-pointer py-3 text-base font-bold underline"
+          >
+            {symptomReported ? (
+              'Besvär sparade'
+            ) : (
+              <>
+                <span className="@min-[23rem]:hidden">Besvär</span>
+                <span className="hidden @min-[23rem]:inline">
+                  Rapportera besvär
+                </span>
+              </>
+            )}
+          </button>
+        ) : null}
       </section>
-      {onReportSymptoms ? (
-        <button
-          type="button"
-          onClick={onReportSymptoms}
-          className="min-h-12 self-start text-base font-bold underline"
-        >
-          {symptomReported
-            ? 'Besvär sparade · ändra rapport'
-            : 'Rapportera smärta eller besvär'}
-        </button>
-      ) : null}
     </SessionFrame>
   );
 }

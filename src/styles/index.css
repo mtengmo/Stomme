@@ -248,7 +248,14 @@ h2 {
 .session-card {
   padding: 0.5rem 0.75rem;
 }
-@media (max-height: 680px) {
+@media (max-height: 700px) {
+  .session-notes p {
+    font-size: 0.875rem;
+    line-height: 1.3;
+  }
+  .session-aside {
+    display: none;
+  }
   .session-content {
     gap: 0.25rem;
     padding-block: 0.25rem;
@@ -285,17 +292,31 @@ h2 {
 }
 
 .session-extras {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   column-gap: 1rem;
+  align-items: center;
   align-content: start;
   flex: none;
   min-height: 3rem;
   overflow: visible;
 }
 .session-extras details[open] {
-  grid-column: 1 / -1;
-  grid-row: 1;
+  flex: 1 0 100%;
+  order: -1;
+}
+.session-extras summary,
+.session-report {
+  font-size: 0.9375rem;
+}
+@media (max-height: 740px) {
+  .session-extras {
+    column-gap: 0.75rem;
+  }
+  .session-extras summary,
+  .session-report {
+    font-size: 0.875rem;
+  }
 }
 .session-extra-scroll {
   padding: 0.25rem 0.25rem 0.75rem;
