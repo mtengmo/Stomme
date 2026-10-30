@@ -4,6 +4,8 @@
 
 Verdict: no blocking findings in this bounded review. One small animation improvement below; no app code changed.
 
+Follow-up: Sol corrected the P3 finding after this review. Both hands now keep fixed floor contacts from catch through the assisted push, then lift for the return to kneeling. The catch position also stays within arm reach. The focused figure suite passes all four tests, including fixed hand contacts and constant arm lengths across the cycle. This follow-up was not re-reviewed by Astra.
+
 ## Finding
 
 - **P3 / non-blocking — Nordic hands slide during the loaded reset.** `src/figures/kneeStrengthPoses.ts:103` moves the hands from x=166 to x=142 while keeping them at floor height throughout phase 0.55–0.83. This contradicts the nearby “stay planted” comment and makes the hand-assisted push-off less clear to someone copying the animation. Keep the contact fixed during the push, or depict a visible lift/replant when repositioning. The written cue correctly asks for hand assistance; this does not invalidate the exercise or require blocking delivery.

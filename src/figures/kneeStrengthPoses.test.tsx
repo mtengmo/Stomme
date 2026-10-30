@@ -55,6 +55,22 @@ describe('contact aware knee figures', () => {
     expect(movementPose('bent-knee-calf-hold', 1).aR[1]).toBeLessThan(170);
   });
   it('shows hands on floor and hip flexion during Nordic reset, with matching cycle ends', () => {
+    const catchPose = movementPose('nordic-hamstring-curl', 0.5);
+    for (const phase of [0.55, 0.6, 0.7, 0.8, 0.83]) {
+      const pose = movementPose('nordic-hamstring-curl', phase);
+      expect(pose.hR).toEqual(catchPose.hR);
+      expect(pose.hL).toEqual(catchPose.hL);
+    }
+    for (const phase of phases) {
+      const pose = movementPose('nordic-hamstring-curl', phase);
+      for (const [elbow, hand] of [
+        ['eR', 'hR'],
+        ['eL', 'hL'],
+      ] as const) {
+        expect(distance(pose.neck, pose[elbow])).toBeCloseTo(30, 5);
+        expect(distance(pose[elbow], pose[hand])).toBeCloseTo(30, 5);
+      }
+    }
     const reset = movementPose('nordic-hamstring-curl', 0.7);
     expect(reset.hR[1]).toBe(174);
     const slopeLeg = Math.atan2(

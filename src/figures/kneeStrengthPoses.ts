@@ -94,18 +94,18 @@ export function nordicHamstringPose(t: number): Pose {
     const angle = -Math.PI / 2 + 1.2 * clamp((q - 0.08) / 0.42);
     hip = polar(kR, 35, angle);
     neck = polar(hip, 38, angle);
-    hands = lerpPt([107, 132], [166, 174], clamp((q - 0.32) / 0.18));
+    hands = lerpPt([107, 132], [140, 174], clamp((q - 0.32) / 0.18));
   } else if (q <= 0.83) {
     const reset = (q - 0.55) / 0.28;
     hip = polar(kR, 35, -Math.PI / 2 + 1.2 * (1 - reset));
     // Hands stay planted while the hip folds and the arms push the torso up.
     neck = polar(hip, 38, -0.37 + 0.34 * Math.sin(reset * Math.PI));
-    hands = [166 - 24 * reset, 174];
+    hands = [140, 174];
   } else {
     const reset = (q - 0.83) / 0.17;
     hip = [70, 139];
     neck = polar(hip, 38, -0.37 + (-Math.PI / 2 + 0.37) * reset);
-    hands = lerpPt([142, 174], [107, 132], reset);
+    hands = lerpPt([140, 174], [107, 132], reset);
   }
   const head = polar(neck, 17, Math.atan2(neck[1] - hip[1], neck[0] - hip[0]));
   const farHand: Pt = [hands[0] - 5, hands[1]];
