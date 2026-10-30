@@ -6,7 +6,7 @@ import type {
   WorkoutEquipment,
 } from '../../domain/types';
 import { Button } from '../../ui/Button';
-import { EquipmentInventory } from './EquipmentInventory';
+import { EquipmentInventory, type PendingWeight } from './EquipmentInventory';
 
 const SUPPORT_ITEMS: EquipmentChoice[] = [
   'chair',
@@ -37,6 +37,7 @@ export function WorkoutEquipmentControls({
   );
   const [error, setError] = useState('');
   const [adjustableValid, setAdjustableValid] = useState(true);
+  const [pending, setPending] = useState<PendingWeight | null>(null);
   return (
     <section
       aria-label="Utrustning för detta pass"
@@ -63,6 +64,7 @@ export function WorkoutEquipmentControls({
             supportItems={SUPPORT_ITEMS}
             onValidityChange={setAdjustableValid}
             onChange={setDraft}
+            onPendingChange={setPending}
           />
           {error ? (
             <p role="alert" className="m-0 text-base font-bold">
@@ -73,11 +75,18 @@ export function WorkoutEquipmentControls({
             variant="secondary"
             disabled={!adjustableValid}
             onClick={() => {
-              if (!adjustableValid || !isWorkoutEquipment(draft))
+              let current = draft;
+              if (pending) {
+                const withWeight = pending.withWeight();
+                pending.submit();
+                if (!withWeight) return;
+                current = withWeight;
+              }
+              if (!adjustableValid || !isWorkoutEquipment(current))
                 return setError(
                   'Kontrollera vikterna och de ställbara viktlägena.',
                 );
-              onApply(structuredClone(draft));
+              onApply(structuredClone(current));
             }}
           >
             Använd utrustningen för detta pass

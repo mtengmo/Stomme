@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { equipmentChoices } from '../../content/programmes';
 import type {
   EquipmentChoice,
@@ -11,16 +11,26 @@ import { AdjustableWeightFields } from './AdjustableWeightFields';
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 const MAX_WEIGHTS = 20;
+/** Quick picks; a dumbbell chip adds a pair, a kettlebell chip adds one. */
+const CHIPS = {
+  dumbbell: [2, 3, 4, 5, 6, 8, 10, 12, 15, 20],
+  kettlebell: [8, 12, 16, 20, 24],
+} as const;
 
 type Kind = WeightInventoryItem['type'];
-const names: Record<Kind, { one: string; add: string; many: string }> = {
-  dumbbell: { one: 'hantel', add: 'Lägg till hantel', many: 'hantlar' },
-  kettlebell: {
-    one: 'kettlebell',
-    add: 'Lägg till kettlebell',
-    many: 'kettlebells',
-  },
+const names: Record<Kind, { one: string; many: string }> = {
+  dumbbell: { one: 'hantel', many: 'hantlar' },
+  kettlebell: { one: 'kettlebell', many: 'kettlebells' },
 };
+
+/** What the host's fixed primary button does while the "Annan vikt" form is open. */
+export interface PendingWeight {
+  label: string;
+  canSubmit: boolean;
+  submit(): void;
+  /** The inventory including the typed weight, or null when it is empty or refused. */
+  withWeight(): WorkoutEquipment | null;
+}
 
 /** Accepts "7,5" and "7.5"; 0,5 to 100 kg. */
 export function parseKg(text: string): number | null {
@@ -34,9 +44,13 @@ function kgText(kg: number): string {
   return String(kg).replace('.', ',');
 }
 
+function capital(kind: Kind): string {
+  const name = names[kind].one;
+  return `${name[0]?.toUpperCase()}${name.slice(1)}`;
+}
+
 function lineText(item: WeightInventoryItem): string {
-  const name = names[item.type].one;
-  return `${name[0]?.toUpperCase()}${name.slice(1)} ${kgText(item.kg)} kg · ${item.count === 2 ? 'par' : '1 st'}`;
+  return `${capital(item.type)} ${kgText(item.kg)} kg · ${item.count === 2 ? 'par' : '1 st'}`;
 }
 
 /** Adds a weight; the same kind and kg again merges 1 + 1 into a pair. */
@@ -70,11 +84,15 @@ export function addWeight(
 /**
  * The one place to say what you own: weights (dumbbells, kettlebells) and support items.
  * Used by the start flow, Settings and the per-workout override.
+ * With `onPendingChange` the host owns the add button (see PendingWeight); without it
+ * the open "Annan vikt" form shows its own button.
  */
 export function EquipmentInventory({
   value,
   onChange,
   onValidityChange,
+  onPendingChange,
+  inlineAdd = true,
   supportItems,
   showWeights = true,
   idPrefix,
@@ -82,6 +100,9 @@ export function EquipmentInventory({
   value: WorkoutEquipment;
   onChange(value: WorkoutEquipment): void;
   onValidityChange?(valid: boolean): void;
+  onPendingChange?(pending: PendingWeight | null): void;
+  /** False when the host renders the add button itself from onPendingChange. */
+  inlineAdd?: boolean;
   supportItems: readonly EquipmentChoice[];
   showWeights?: boolean;
   idPrefix: string;
@@ -91,15 +112,28 @@ export function EquipmentInventory({
   const [kgInput, setKgInput] = useState('');
   const [pair, setPair] = useState<'1' | '2'>('2');
   const [error, setError] = useState('');
+  const [ticked, setTicked] = useState<Record<Kind, boolean>>(() => ({
+    dumbbell: weights.some((item) => item.type === 'dumbbell'),
+    kettlebell: weights.some((item) => item.type === 'kettlebell'),
+  }));
   const buttons = useRef<Partial<Record<Kind, HTMLButtonElement | null>>>({});
   const kgField = useRef<HTMLInputElement>(null);
+  const parsed = parseKg(kgInput);
+  const count: 1 | 2 = pair === '2' ? 2 : 1;
+  const pendingLabel =
+    parsed === null
+      ? 'Lägg till vikt'
+      : `Lägg till ${kgText(parsed)} kg (${count === 2 ? 'par' : '1 st'})`;
 
   function open(kind: Kind) {
     setAdding(kind);
     setKgInput('');
-    setPair('2');
+    setPair(kind === 'dumbbell' ? '2' : '1');
     setError('');
-    setTimeout(() => kgField.current?.focus(), 0);
+    setTimeout(() => {
+      kgField.current?.focus();
+      kgField.current?.scrollIntoView?.({ block: 'center' });
+    }, 0);
   }
   function close(kind: Kind) {
     setAdding(null);
@@ -107,17 +141,12 @@ export function EquipmentInventory({
     setTimeout(() => buttons.current[kind]?.focus(), 0);
   }
   function submit(kind: Kind) {
-    const kg = parseKg(kgInput);
-    if (kg === null) {
+    if (parsed === null) {
       setError('Ange en vikt mellan 0,5 och 100 kg, till exempel 7,5.');
       kgField.current?.focus();
       return;
     }
-    const result = addWeight(weights, {
-      type: kind,
-      kg,
-      count: pair === '2' ? 2 : 1,
-    });
+    const result = addWeight(weights, { type: kind, kg: parsed, count });
     if (result.error) {
       setError(result.error);
       return;
@@ -125,8 +154,60 @@ export function EquipmentInventory({
     onChange({ ...value, weights: result.weights });
     close(kind);
   }
-  function remove(index: number) {
-    onChange({ ...value, weights: weights.filter((_, n) => n !== index) });
+  // The host's fixed button follows the open form; closing the form hands it back.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: submit is rebuilt each render from these inputs.
+  useEffect(() => {
+    if (!onPendingChange) return;
+    onPendingChange(
+      adding
+        ? {
+            label: pendingLabel,
+            canSubmit: parsed !== null,
+            submit: () => submit(adding),
+            withWeight: () => {
+              if (parsed === null) return null;
+              const result = addWeight(weights, {
+                type: adding,
+                kg: parsed,
+                count,
+              });
+              return result.error
+                ? null
+                : { ...value, weights: result.weights };
+            },
+          }
+        : null,
+    );
+  }, [adding, pendingLabel, parsed, weights, pair]);
+  useEffect(() => () => onPendingChange?.(null), [onPendingChange]);
+
+  const setWeights = (next: WeightInventoryItem[]) =>
+    onChange({ ...value, weights: next });
+  function chip(kind: Kind, kg: number) {
+    const index = weights.findIndex(
+      (item) => item.type === kind && item.kg === kg,
+    );
+    if (index >= 0) return setWeights(weights.filter((_, n) => n !== index));
+    const result = addWeight(weights, {
+      type: kind,
+      kg,
+      count: kind === 'dumbbell' ? 2 : 1,
+    });
+    if (result.error) return setError(result.error);
+    setError('');
+    setWeights(result.weights);
+  }
+  const remove = (index: number) =>
+    setWeights(weights.filter((_, n) => n !== index));
+  const setCount = (index: number, next: 1 | 2) =>
+    setWeights(
+      weights.map((item, n) => (n === index ? { ...item, count: next } : item)),
+    );
+  function tickKind(kind: Kind, checked: boolean) {
+    setTicked({ ...ticked, [kind]: checked });
+    if (checked) return;
+    if (adding === kind) close(kind);
+    setWeights(weights.filter((item) => item.type !== kind));
   }
   const toggle = (item: EquipmentChoice, checked: boolean) =>
     onChange({
@@ -136,159 +217,197 @@ export function EquipmentInventory({
         : value.equipment.filter((entry) => entry !== item),
     });
   const id = (name: string) => `${idPrefix}-${name}`;
+  const rowClass = 'flex min-h-12 items-center gap-3 text-base';
 
-  return (
-    <div className="flex flex-col gap-5">
-      {showWeights ? (
-        <section
-          aria-labelledby={id('weights')}
-          className="flex flex-col gap-3"
-        >
-          <h2 id={id('weights')} className="m-0 text-xl font-bold">
-            Mina vikter
-          </h2>
-          {weights.length || (value.adjustableWeights ?? []).length ? null : (
-            <p className="m-0 text-base text-ink-soft">
-              Bara kroppsvikt – passet byggs utan vikter.
-            </p>
-          )}
-          {weights.length ? (
-            <ul className="m-0 flex list-none flex-col p-0">
-              {weights.map((item, index) => (
-                <li
-                  key={`${item.type}-${item.kg}`}
-                  className="flex min-h-12 items-center justify-between gap-3 border-b-2 border-edge"
-                >
-                  <span className="text-base">{lineText(item)}</span>
+  function weightBlock(kind: Kind) {
+    const mine = weights
+      .map((item, index) => ({ item, index }))
+      .filter(({ item }) => item.type === kind);
+    return (
+      <div className="flex flex-col gap-2 pb-2 pl-9">
+        <fieldset className="m-0 flex flex-wrap gap-2 border-0 p-0">
+          <legend className="sr-only">Snabbval {names[kind].many}</legend>
+          {CHIPS[kind].map((kg) => {
+            const on = mine.some(({ item }) => item.kg === kg);
+            return (
+              <button
+                key={kg}
+                type="button"
+                aria-pressed={on}
+                aria-label={`${capital(kind)} ${kgText(kg)} kg`}
+                onClick={() => chip(kind, kg)}
+                className={`min-h-12 min-w-14 rounded-sm border-2 px-3 text-base font-bold ${on ? 'border-ink bg-ink text-surface' : 'border-edge bg-surface text-ink'}`}
+              >
+                {kgText(kg)} kg
+              </button>
+            );
+          })}
+        </fieldset>
+        {mine.length ? (
+          <ul className="m-0 flex list-none flex-col p-0">
+            {mine.map(({ item, index }) => (
+              <li
+                key={`${item.type}-${item.kg}`}
+                className="flex flex-wrap items-center gap-x-4 border-b-2 border-edge"
+              >
+                <span className="grow pt-2 text-base">{lineText(item)}</span>
+                <span className="flex items-center gap-4">
                   <button
                     type="button"
-                    className="min-h-12 shrink-0 px-1 text-base font-bold underline"
-                    aria-label={`Ta bort ${names[item.type].one} ${kgText(item.kg)} kg${item.count === 2 ? ' (par)' : ''}`}
+                    className="min-h-12 text-base underline"
+                    aria-label={`Ändra ${names[kind].one} ${kgText(item.kg)} kg till ${item.count === 2 ? '1 st' : 'par'}`}
+                    onClick={() => setCount(index, item.count === 2 ? 1 : 2)}
+                  >
+                    Ändra till {item.count === 2 ? '1 st' : 'par'}
+                  </button>
+                  <button
+                    type="button"
+                    className="min-h-12 shrink-0 text-base font-bold underline"
+                    aria-label={`Ta bort ${names[kind].one} ${kgText(item.kg)} kg${item.count === 2 ? ' (par)' : ''}`}
                     onClick={() => remove(index)}
                   >
                     Ta bort
                   </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {adding ? (
-            <fieldset className="m-0 flex flex-col gap-3 rounded-sm border-2 border-edge p-3">
-              <legend className="px-1 text-base font-bold">
-                Ny {names[adding].one}
-              </legend>
-              <label
-                htmlFor={id('kg')}
-                className="flex flex-col gap-1 text-base font-bold"
-              >
-                Vikt per {names[adding].one} (kg)
-              </label>
-              <input
-                id={id('kg')}
-                ref={kgField}
-                className={fieldClass}
-                type="text"
-                inputMode="decimal"
-                value={kgInput}
-                aria-invalid={!!error}
-                aria-describedby={error ? id('error') : undefined}
-                onChange={(event) => {
-                  setKgInput(event.target.value);
-                  setError('');
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    submit(adding);
-                  }
-                }}
-              />
-              <div
-                role="radiogroup"
-                aria-label="Antal"
-                className="flex flex-col gap-1"
-              >
-                {(
-                  [
-                    ['1', `1 ${names[adding].one}`],
-                    ['2', 'Par'],
-                  ] as const
-                ).map(([count, label]) => (
-                  <label
-                    key={count}
-                    className="flex min-h-12 items-center gap-3 text-base"
-                  >
-                    <input
-                      className="size-6"
-                      type="radio"
-                      name={id('count')}
-                      checked={pair === count}
-                      onChange={() => setPair(count)}
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-              {error ? (
-                <p
-                  id={id('error')}
-                  role="alert"
-                  className="m-0 text-base font-bold"
-                >
-                  {error}
-                </p>
-              ) : null}
-              <div className="flex flex-col gap-2">
-                <Button variant="secondary" onClick={() => submit(adding)}>
-                  Lägg till
-                </Button>
-                <button
-                  type="button"
-                  className="min-h-12 text-base font-bold underline"
-                  onClick={() => close(adding)}
-                >
-                  Avbryt
-                </button>
-              </div>
-            </fieldset>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {(['dumbbell', 'kettlebell'] as const).map((kind) => (
-                <Button
-                  key={kind}
-                  variant="secondary"
-                  onClick={() => open(kind)}
-                  // Focus returns here after an add or a cancel.
-                  ref={(el: HTMLButtonElement | null) => {
-                    buttons.current[kind] = el;
-                  }}
-                >
-                  {names[kind].add}
-                </Button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {adding === kind ? (
+          <fieldset className="m-0 flex flex-col gap-2 rounded-sm border-2 border-edge p-3">
+            <legend className="px-1 text-base font-bold">
+              Annan {names[kind].one}
+            </legend>
+            <label htmlFor={id('kg')} className="text-base font-bold">
+              Vikt (kg)
+            </label>
+            <input
+              id={id('kg')}
+              ref={kgField}
+              className={fieldClass}
+              type="text"
+              inputMode="decimal"
+              value={kgInput}
+              aria-invalid={!!error}
+              aria-describedby={error ? id('error') : undefined}
+              onChange={(event) => {
+                setKgInput(event.target.value);
+                setError('');
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  submit(kind);
+                }
+              }}
+            />
+            <div
+              role="radiogroup"
+              aria-label="Antal"
+              className="flex flex-wrap gap-x-6"
+            >
+              {(
+                [
+                  ['1', '1 st'],
+                  ['2', 'Par'],
+                ] as const
+              ).map(([choice, label]) => (
+                <label key={choice} className={rowClass}>
+                  <input
+                    className="size-6"
+                    type="radio"
+                    name={id('count')}
+                    checked={pair === choice}
+                    onChange={() => setPair(choice)}
+                  />
+                  {label}
+                </label>
               ))}
             </div>
-          )}
-          <details>
-            <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-              Justerbara vikter
-            </summary>
-            <AdjustableWeightFields
-              value={value.adjustableWeights ?? []}
-              onChange={(adjustableWeights) =>
-                onChange({ ...value, adjustableWeights })
-              }
-              onValidityChange={onValidityChange}
-            />
-          </details>
-        </section>
-      ) : null}
+            {error ? (
+              <p
+                id={id('error')}
+                role="alert"
+                className="m-0 text-base font-bold"
+              >
+                {error}
+              </p>
+            ) : null}
+            {inlineAdd ? (
+              <Button
+                variant="secondary"
+                disabled={parsed === null}
+                onClick={() => submit(kind)}
+              >
+                {pendingLabel}
+              </Button>
+            ) : null}
+            <button
+              type="button"
+              className="min-h-12 self-start text-base underline"
+              onClick={() => close(kind)}
+            >
+              Avbryt
+            </button>
+          </fieldset>
+        ) : (
+          <button
+            type="button"
+            className="min-h-12 self-start text-base font-bold underline"
+            aria-label={`Annan vikt, ${names[kind].one}`}
+            onClick={() => open(kind)}
+            ref={(el: HTMLButtonElement | null) => {
+              buttons.current[kind] = el;
+            }}
+          >
+            Annan vikt
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
       <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
         <legend className="mb-1 text-xl font-bold">
-          {showWeights ? 'Annat jag har' : 'Det här har jag'}
+          {showWeights ? 'Jag har' : 'Det här har jag'}
         </legend>
+        {showWeights ? (
+          <label className={rowClass}>
+            <input
+              className="size-6 shrink-0"
+              type="checkbox"
+              checked
+              disabled
+              readOnly
+            />
+            Bara kroppsvikt
+          </label>
+        ) : null}
+        {showWeights
+          ? (['dumbbell', 'kettlebell'] as const).map((kind) => {
+              const on =
+                ticked[kind] || weights.some((item) => item.type === kind);
+              return (
+                <div key={kind}>
+                  <label className={rowClass}>
+                    <input
+                      className="size-6 shrink-0"
+                      type="checkbox"
+                      checked={on}
+                      onChange={(event) => tickKind(kind, event.target.checked)}
+                    />
+                    {kind === 'dumbbell' ? 'Hantlar' : 'Kettlebell'}
+                  </label>
+                  {on ? weightBlock(kind) : null}
+                </div>
+              );
+            })
+          : null}
         {supportItems.map((item) => (
           <div key={item}>
-            <label className="flex min-h-12 items-center gap-3 text-base">
+            <label className={rowClass}>
               <input
                 className="size-6 shrink-0"
                 type="checkbox"
@@ -305,6 +424,32 @@ export function EquipmentInventory({
           </div>
         ))}
       </fieldset>
+      {error && !adding ? (
+        <p role="alert" className="m-0 text-base font-bold">
+          {error}
+        </p>
+      ) : null}
+      {showWeights ? (
+        <>
+          {weights.length || (value.adjustableWeights ?? []).length ? null : (
+            <p className="m-0 text-base text-ink-soft">
+              Inga vikter? Gå vidare, passet byggs med kroppsvikt.
+            </p>
+          )}
+          <details>
+            <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+              Fler alternativ (justerbara vikter)
+            </summary>
+            <AdjustableWeightFields
+              value={value.adjustableWeights ?? []}
+              onChange={(adjustableWeights) =>
+                onChange({ ...value, adjustableWeights })
+              }
+              onValidityChange={onValidityChange}
+            />
+          </details>
+        </>
+      ) : null}
     </div>
   );
 }

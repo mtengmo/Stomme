@@ -42,3 +42,5 @@ Prerequisite: merge `feature/settings-drilldown` first (shared `Settings.tsx`).
 ## Status
 
 Implemented on branch feature/equipment-step (M1 model and rules, M2 EquipmentInventory and start step, M3 links and docs, M4 e2e). `?tillbaka=traning` returns to `/traning/A`.
+
+Update: the start step is now "Vad tränar du med?" with a checklist (Bara kroppsvikt, Hantlar, Kettlebell, support items), kg quick-pick chips (dumbbell chip = pair, kettlebell chip = 1) and an "Annan vikt" form whose add action lives on the fixed bottom button (`onPendingChange`), so Nästa cannot drop an unsaved weight. Decision 1 above (no chips) is superseded.

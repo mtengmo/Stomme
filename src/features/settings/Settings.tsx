@@ -33,7 +33,10 @@ import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { DisclaimerText, STOP } from '../onboarding/Onboarding';
 import { PrivacyNotice } from '../privacy/PrivacyNotice';
-import { EquipmentInventory } from '../training/EquipmentInventory';
+import {
+  EquipmentInventory,
+  type PendingWeight,
+} from '../training/EquipmentInventory';
 import { readBackupMeta } from '../week/BackupReminder';
 import { AppearancePicker } from './AppearancePicker';
 import { useUpdate } from './updateContext';
@@ -100,6 +103,7 @@ function EquipmentInventorySettings() {
   const back = returnTarget(useHashSearch());
   const [draft, setDraft] = useState<WorkoutEquipment>({ equipment: [] });
   const [adjustableValid, setAdjustableValid] = useState(true);
+  const [pending, setPending] = useState<PendingWeight | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState('');
   useEffect(() => {
@@ -122,6 +126,7 @@ function EquipmentInventorySettings() {
         value={draft}
         supportItems={SUPPORT_ITEMS}
         onValidityChange={setAdjustableValid}
+        onPendingChange={setPending}
         onChange={(next) => {
           setDraft(next);
           setMessage('');
@@ -131,13 +136,21 @@ function EquipmentInventorySettings() {
         onClick={async () => {
           if (!adjustableValid)
             return setMessage('Kontrollera de justerbara vikterna.');
+          // A weight typed in "Annan vikt" is added first; an invalid one blocks the save.
+          let current = draft;
+          if (pending) {
+            const withWeight = pending.withWeight();
+            pending.submit();
+            if (!withWeight) return;
+            current = withWeight;
+          }
           const next = {
             ...preferences,
             equipment: [
-              ...new Set(['bodyweight' as const, ...draft.equipment]),
+              ...new Set(['bodyweight' as const, ...current.equipment]),
             ],
-            weights: draft.weights ?? [],
-            adjustableWeights: draft.adjustableWeights ?? [],
+            weights: current.weights ?? [],
+            adjustableWeights: current.adjustableWeights ?? [],
           };
           if (!isTrainingPreferences(next))
             return setMessage('Kontrollera vikterna och försök igen.');

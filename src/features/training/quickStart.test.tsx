@@ -18,12 +18,31 @@ beforeEach(async () => {
 });
 afterEach(cleanup);
 async function addDumbbell(user: ReturnType<typeof userEvent.setup>, kg = '5') {
-  await user.click(screen.getByRole('button', { name: 'Lägg till hantel' }));
-  await user.type(screen.getByLabelText(/Vikt per hantel/), kg);
-  await user.click(screen.getByRole('button', { name: 'Lägg till' }));
+  await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+  await user.click(screen.getByRole('button', { name: 'Annan vikt, hantel' }));
+  await user.type(screen.getByLabelText('Vikt (kg)'), kg);
+  await user.click(screen.getByRole('button', { name: /^Lägg till .* kg/ }));
 }
 const next = (user: ReturnType<typeof userEvent.setup>) =>
   user.click(screen.getByRole('button', { name: 'Nästa' }));
+
+it('Nästa cannot drop an unsaved weight: the fixed button adds it first', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+  await user.click(screen.getByRole('button', { name: 'Annan vikt, hantel' }));
+  expect(screen.queryByRole('button', { name: 'Nästa' })).toBeNull();
+  const fixed = screen.getByRole('button', { name: 'Lägg till vikt' });
+  expect((fixed as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.getByText('Skriv en vikt')).toBeTruthy();
+  await user.type(screen.getByLabelText('Vikt (kg)'), '5');
+  await user.click(
+    screen.getByRole('button', { name: 'Lägg till 5 kg (par)' }),
+  );
+  expect(screen.getByText('Hantel 5 kg · par')).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Nästa' })).toBeTruthy();
+});
 
 it('asks one question per screen and keeps answers through Back', async () => {
   const user = userEvent.setup();
@@ -36,12 +55,10 @@ it('asks one question per screen and keeps answers through Back', async () => {
   expect(screen.queryByRole('button', { name: 'Träna knäna' })).toBeNull();
   await user.click(screen.getByRole('button', { name: 'Bli starkare' }));
   const heading = screen.getByRole('heading', {
-    name: 'Vilka vikter har du?',
+    name: 'Vad tränar du med?',
   });
   expect(document.activeElement).toBe(heading);
-  expect(
-    screen.getByText(/Bara kroppsvikt – passet byggs utan vikter/),
-  ).toBeTruthy();
+  expect(screen.getByText(/Inga vikter\? Gå vidare/)).toBeTruthy();
   expect(screen.queryByRole('radio', { name: 'Utrustning' })).toBeNull();
   expect(
     (screen.getByRole('checkbox', { name: 'Stabil stol' }) as HTMLInputElement)
@@ -129,7 +146,7 @@ it('falls back to defaults for an old or damaged draft', async () => {
     JSON.stringify({ goal: 'general', equipment: ['laser'], experience: 7 }),
   );
   render(<App />);
-  await screen.findByRole('heading', { name: 'Vilka vikter har du?' });
+  await screen.findByRole('heading', { name: 'Vad tränar du med?' });
   expect(
     (screen.getByRole('checkbox', { name: 'Stabil stol' }) as HTMLInputElement)
       .checked,

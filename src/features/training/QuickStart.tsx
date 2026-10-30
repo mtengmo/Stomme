@@ -10,7 +10,7 @@ import { regionsAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
 import { CustomPicker } from './CustomPicker';
 import { customWorkoutPlan } from './defaultPlan';
-import { EquipmentInventory } from './EquipmentInventory';
+import { EquipmentInventory, type PendingWeight } from './EquipmentInventory';
 import {
   allowedEquipment,
   type Draft,
@@ -64,7 +64,7 @@ function clearDraft(): void {
 
 const headings: Record<Step, string> = {
   goal: 'Vad vill du träna?',
-  equipment: 'Vilka vikter har du?',
+  equipment: 'Vad tränar du med?',
   level: 'Hur van är du vid styrketräning?',
   focus: 'Vad vill du träna först?',
   pick: 'Välj dina övningar',
@@ -95,6 +95,7 @@ export function QuickStart() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [adjustableValid, setAdjustableValid] = useState(true);
+  const [pending, setPending] = useState<PendingWeight | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(step !== 'goal');
   useEffect(() => {
@@ -191,20 +192,24 @@ export function QuickStart() {
   return (
     <div className="mx-auto flex min-h-[85dvh] max-w-md flex-col gap-6 px-5 pt-8 pb-[var(--app-nav-height)]">
       {step !== 'goal' ? (
-        <button
-          type="button"
-          onClick={() => goTo(steps[position - 1] ?? 'goal')}
-          className="min-h-12 self-start text-base font-bold underline"
-        >
-          Tillbaka
-        </button>
+        <div className="sticky top-0 z-10 -mx-5 -mt-8 flex items-center justify-between bg-surface px-5 pt-2">
+          <button
+            type="button"
+            onClick={() => goTo(steps[position - 1] ?? 'goal')}
+            className="min-h-12 text-base font-bold underline"
+          >
+            Tillbaka
+          </button>
+          <p className="m-0 text-base text-ink-soft">
+            Steg {position + 1} av {steps.length}
+          </p>
+        </div>
       ) : null}
-      {step !== 'goal' ? (
-        <p className="m-0 text-base text-ink-soft">
-          Steg {position + 1} av {steps.length}
-        </p>
-      ) : null}
-      <h1 ref={heading} tabIndex={-1} className="m-0 text-5xl font-extrabold">
+      <h1
+        ref={heading}
+        tabIndex={-1}
+        className={`m-0 font-extrabold ${step === 'goal' ? 'text-5xl' : 'text-3xl'}`}
+      >
         {step === 'equipment' && !hasTools
           ? 'Vad har du hemma?'
           : headings[step]}
@@ -261,6 +266,8 @@ export function QuickStart() {
                   })
                 }
                 onValidityChange={setAdjustableValid}
+                onPendingChange={setPending}
+                inlineAdd={false}
                 supportItems={allowed}
                 showWeights={hasTools}
               />
@@ -418,12 +425,26 @@ export function QuickStart() {
                   Välj minst en kroppsdel, eller välj Hela kroppen.
                 </p>
               ) : null}
+              {pending && !pending.canSubmit ? (
+                <p id="weight-hint" className="m-0 text-base font-bold">
+                  Skriv en vikt
+                </p>
+              ) : null}
               <Button
-                disabled={busy || (last && needsParts)}
+                disabled={
+                  busy ||
+                  (last && needsParts) ||
+                  (!!pending && !pending.canSubmit)
+                }
                 aria-describedby={
-                  last && needsParts ? 'focus-blocked' : undefined
+                  pending && !pending.canSubmit
+                    ? 'weight-hint'
+                    : last && needsParts
+                      ? 'focus-blocked'
+                      : undefined
                 }
                 onClick={() => {
+                  if (pending) return pending.submit();
                   const next = steps[position + 1];
                   if (next === 'pick' && hasTools && !adjustableValid)
                     setError(
@@ -433,13 +454,15 @@ export function QuickStart() {
                   else void save();
                 }}
               >
-                {!last
-                  ? 'Nästa'
-                  : goal === 'custom'
-                    ? 'Öppna mitt rehabprogram'
-                    : goal === 'physio'
-                      ? 'Visa mitt program'
-                      : 'Visa mitt pass'}
+                {pending
+                  ? pending.label
+                  : !last
+                    ? 'Nästa'
+                    : goal === 'custom'
+                      ? 'Öppna mitt rehabprogram'
+                      : goal === 'physio'
+                        ? 'Visa mitt program'
+                        : 'Visa mitt pass'}
               </Button>
             </div>
           )}

@@ -1,10 +1,15 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WorkoutEquipment } from '../../domain/types';
-import { addWeight, EquipmentInventory, parseKg } from './EquipmentInventory';
+import {
+  addWeight,
+  EquipmentInventory,
+  type PendingWeight,
+  parseKg,
+} from './EquipmentInventory';
 
 afterEach(cleanup);
 
@@ -62,24 +67,86 @@ describe('addWeight', () => {
 });
 
 describe('EquipmentInventory', () => {
-  it('starts empty with a bodyweight message', () => {
+  it('starts with bodyweight only and a help line', () => {
     render(<Harness />);
-    expect(screen.getByText(/Bara kroppsvikt – passet byggs/)).toBeTruthy();
+    expect(screen.getByText(/Inga vikter\? Gå vidare/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /^Hantel / })).toBeNull();
   });
 
-  it('adds a pair, lists it with a labelled remove button and returns focus', async () => {
+  it('a dumbbell chip adds a pair, a kettlebell chip adds one, tapping again removes', async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    await user.click(screen.getByRole('button', { name: 'Lägg till hantel' }));
-    await user.type(screen.getByLabelText(/Vikt per hantel/), '7,5');
-    await user.click(screen.getByRole('button', { name: 'Lägg till' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Kettlebell' }));
+    const five = screen.getByRole('button', { name: 'Hantel 5 kg' });
+    expect(five.getAttribute('aria-pressed')).toBe('false');
+    await user.click(five);
+    await user.click(screen.getByRole('button', { name: 'Kettlebell 16 kg' }));
+    expect(json().weights).toEqual([
+      { type: 'dumbbell', kg: 5, count: 2 },
+      { type: 'kettlebell', kg: 16, count: 1 },
+    ]);
+    expect(five.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByText('Hantel 5 kg · par')).toBeTruthy();
+    await user.click(five);
+    expect(json().weights).toEqual([{ type: 'kettlebell', kg: 16, count: 1 }]);
+  });
+
+  it('switches a selected weight between par and 1 st', async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness
+        start={{
+          equipment: [],
+          weights: [{ type: 'dumbbell', kg: 5, count: 2 }],
+        }}
+      />,
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Ändra hantel 5 kg till 1 st' }),
+    );
+    expect(json().weights[0].count).toBe(1);
+    await user.click(
+      screen.getByRole('button', { name: 'Ändra hantel 5 kg till par' }),
+    );
+    expect(json().weights[0].count).toBe(2);
+  });
+
+  it('unticking a kind clears its weights', async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness
+        start={{
+          equipment: [],
+          weights: [{ type: 'dumbbell', kg: 5, count: 2 }],
+        }}
+      />,
+    );
+    await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+    expect(json().weights).toEqual([]);
+    expect(screen.queryByRole('button', { name: 'Hantel 5 kg' })).toBeNull();
+  });
+
+  it('Annan vikt adds a pair via its own button, lists it and returns focus', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Annan vikt, hantel' }),
+    );
+    const add = screen.getByRole('button', { name: 'Lägg till vikt' });
+    expect((add as HTMLButtonElement).disabled).toBe(true);
+    await user.type(screen.getByLabelText('Vikt (kg)'), '7,5');
+    await user.click(
+      screen.getByRole('button', { name: 'Lägg till 7,5 kg (par)' }),
+    );
     expect(json().weights).toEqual([{ type: 'dumbbell', kg: 7.5, count: 2 }]);
     expect(screen.getByRole('list').textContent).toContain(
       'Hantel 7,5 kg · par',
     );
     await new Promise((r) => setTimeout(r, 5));
     expect(document.activeElement).toBe(
-      screen.getByRole('button', { name: 'Lägg till hantel' }),
+      screen.getByRole('button', { name: 'Annan vikt, hantel' }),
     );
     await user.click(
       screen.getByRole('button', { name: 'Ta bort hantel 7,5 kg (par)' }),
@@ -87,40 +154,83 @@ describe('EquipmentInventory', () => {
     expect(json().weights).toEqual([]);
   });
 
-  it('shows an alert for a bad weight and keeps the form open', async () => {
+  it('Enter adds, 1 st is the kettlebell default and Avbryt closes without adding', async () => {
     const user = userEvent.setup();
     render(<Harness />);
+    await user.click(screen.getByRole('checkbox', { name: 'Kettlebell' }));
     await user.click(
-      screen.getByRole('button', { name: 'Lägg till kettlebell' }),
+      screen.getByRole('button', { name: 'Annan vikt, kettlebell' }),
     );
-    await user.type(screen.getByLabelText(/Vikt per kettlebell/), 'tung');
-    await user.click(screen.getByRole('button', { name: 'Lägg till' }));
-    expect(screen.getByRole('alert').textContent).toMatch(/0,5 och 100/);
-    expect(json().weights).toBeUndefined();
+    await user.type(screen.getByLabelText('Vikt (kg)'), '14{Enter}');
+    expect(json().weights).toEqual([{ type: 'kettlebell', kg: 14, count: 1 }]);
+    await user.click(
+      screen.getByRole('button', { name: 'Annan vikt, kettlebell' }),
+    );
     await user.click(screen.getByRole('button', { name: 'Avbryt' }));
-    expect(screen.queryByRole('group', { name: 'Ny kettlebell' })).toBeNull();
+    expect(screen.queryByLabelText('Vikt (kg)')).toBeNull();
   });
 
-  it('merges one plus one of the same weight into a pair', async () => {
+  it('shows an alert for a bad weight on Enter and for a third of a pair', async () => {
     const user = userEvent.setup();
     render(<Harness />);
-    for (let n = 0; n < 2; n++) {
-      await user.click(
-        screen.getByRole('button', { name: 'Lägg till hantel' }),
+    await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Annan vikt, hantel' }),
+    );
+    await user.type(screen.getByLabelText('Vikt (kg)'), 'tung{Enter}');
+    expect(screen.getByRole('alert').textContent).toMatch(/0,5 och 100/);
+    expect(json().weights).toBeUndefined();
+    await user.clear(screen.getByLabelText('Vikt (kg)'));
+    await user.type(screen.getByLabelText('Vikt (kg)'), '5{Enter}');
+    await user.click(
+      screen.getByRole('button', { name: 'Annan vikt, hantel' }),
+    );
+    await user.type(screen.getByLabelText('Vikt (kg)'), '5{Enter}');
+    expect(screen.getByRole('alert').textContent).toMatch(/redan ett par/);
+  });
+
+  it('hands the add button to the host while the form is open', async () => {
+    const user = userEvent.setup();
+    const seen: (PendingWeight | null)[] = [];
+    function Host() {
+      const [value, setValue] = useState<WorkoutEquipment>({ equipment: [] });
+      return (
+        <EquipmentInventory
+          idPrefix="h"
+          value={value}
+          onChange={setValue}
+          onPendingChange={(p) => seen.push(p)}
+          inlineAdd={false}
+          supportItems={[]}
+        />
       );
-      await user.type(screen.getByLabelText(/Vikt per hantel/), '5');
-      await user.click(screen.getByRole('radio', { name: '1 hantel' }));
-      await user.click(screen.getByRole('button', { name: 'Lägg till' }));
     }
-    expect(json().weights).toEqual([{ type: 'dumbbell', kg: 5, count: 2 }]);
+    render(<Host />);
+    await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Annan vikt, hantel' }),
+    );
+    expect(screen.queryByRole('button', { name: /^Lägg till/ })).toBeNull();
+    expect(seen.at(-1)).toMatchObject({
+      label: 'Lägg till vikt',
+      canSubmit: false,
+    });
+    await user.type(screen.getByLabelText('Vikt (kg)'), '7,5');
+    expect(seen.at(-1)).toMatchObject({
+      label: 'Lägg till 7,5 kg (par)',
+      canSubmit: true,
+    });
+    await user.click(screen.getByRole('radio', { name: '1 st' }));
+    expect(seen.at(-1)?.label).toBe('Lägg till 7,5 kg (1 st)');
+    act(() => seen.at(-1)?.submit());
+    expect(seen.at(-1)).toBeNull();
+    expect(screen.getByText('Hantel 7,5 kg · 1 st')).toBeTruthy();
   });
 
   it('toggles support items and hides weights when asked', async () => {
     const user = userEvent.setup();
     render(<Harness showWeights={false} />);
-    expect(
-      screen.queryByRole('button', { name: 'Lägg till hantel' }),
-    ).toBeNull();
+    expect(screen.queryByRole('checkbox', { name: 'Hantlar' })).toBeNull();
     await user.click(screen.getByRole('checkbox', { name: 'Träningsband' }));
     expect(json().equipment).toContain('band');
     await user.click(screen.getByRole('checkbox', { name: 'Stabil stol' }));

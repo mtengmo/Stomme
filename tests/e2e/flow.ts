@@ -348,20 +348,45 @@ export async function quickStart(
     await page.getByRole('button', { name: FINISH[goal], exact: true }).click();
 }
 
-/** Registers one owned weight on the equipment step through the inline add form. */
+const CHIP_KG = {
+  dumbbell: [2, 3, 4, 5, 6, 8, 10, 12, 15, 20],
+  kettlebell: [8, 12, 16, 20, 24],
+};
+
+/**
+ * Registers one owned weight on the equipment step: a quick-pick chip for listed weights
+ * (a dumbbell chip is a pair, a kettlebell chip is one), the "Annan vikt" form otherwise.
+ * A different count than the chip gives is switched with "Ändra till".
+ */
 export async function addWeight(
   page: Page,
   weight: { type: 'dumbbell' | 'kettlebell'; count: 1 | 2; kg: number },
 ): Promise<void> {
   const noun = weight.type === 'dumbbell' ? 'hantel' : 'kettlebell';
+  const kind = weight.type === 'dumbbell' ? 'Hantlar' : 'Kettlebell';
+  const tick = page.getByRole('checkbox', { name: kind, exact: true });
+  if (!(await tick.isChecked())) await tick.check();
+  const kgLabel = String(weight.kg).replace('.', ',');
+  const name = `${noun[0]?.toUpperCase()}${noun.slice(1)} ${kgLabel} kg`;
+  const chip = page.getByRole('button', { name, exact: true });
+  const listed = CHIP_KG[weight.type].includes(weight.kg);
+  if (listed && (await chip.getAttribute('aria-pressed')) === 'false') {
+    await chip.click();
+    const natural = weight.type === 'dumbbell' ? 2 : 1;
+    if (weight.count !== natural)
+      await page
+        .getByRole('button', {
+          name: `Ändra ${noun} ${kgLabel} kg till ${weight.count === 2 ? 'par' : '1 st'}`,
+        })
+        .click();
+    return;
+  }
   await page
-    .getByRole('button', { name: `Lägg till ${noun}`, exact: true })
+    .getByRole('button', { name: `Annan vikt, ${noun}`, exact: true })
     .click();
+  await page.getByLabel('Vikt (kg)').fill(kgLabel);
   await page
-    .getByLabel(new RegExp(`^Vikt per ${noun}`))
-    .fill(String(weight.kg).replace('.', ','));
-  await page
-    .getByRole('radio', { name: weight.count === 2 ? 'Par' : `1 ${noun}` })
+    .getByRole('radio', { name: weight.count === 2 ? 'Par' : '1 st' })
     .check();
-  await page.getByRole('button', { name: 'Lägg till', exact: true }).click();
+  await page.getByRole('button', { name: /^Lägg till .* kg \(/ }).click();
 }

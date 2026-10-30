@@ -25,7 +25,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   ).toBeVisible();
   await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Vilka vikter har du?' }),
+    page.getByRole('heading', { name: 'Vad tränar du med?' }),
   ).toBeVisible();
   await expect(
     page.getByRole('checkbox', { name: 'Stabil stol' }),
