@@ -278,17 +278,12 @@ describe('optional harder exercises', () => {
       if (where === 'pain_stop') newer.abortReason = 'pain_stop';
       data.sessions.push(newer);
       expect(suggest(data)).toEqual([]);
-<<<<<<< HEAD
       newer.programId = 'rehab';
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
-=======
-      newer.programId = 'running';
       expect(suggest(data)).toEqual([
         'decline-push-up',
         'diamond-push-up',
         'blast-off-push-up',
       ]);
->>>>>>> main
       newer.programId = 'general';
       newer.startedAt = '2026-10-01T08:00:00Z';
       expect(suggest(data)).toEqual([
