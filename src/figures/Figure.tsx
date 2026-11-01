@@ -210,7 +210,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'blast-off-push-up': '0 0 200 188',
   'step-down': '14 0 164 188',
   'quad-set': '8 128 176 52',
-  'dumbbell-pullover': '-4 20 180 168',
+  'dumbbell-pullover': '-2 20 196 168',
 };
 
 /** One whole repetition per cycle for sequence figures, in milliseconds. */
