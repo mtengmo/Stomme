@@ -186,12 +186,56 @@ describe('daily focus rosters', () => {
         equipment: ['bodyweight', 'pull-up-bar'],
       },
     ],
+    [
+      'dumbbells',
+      {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight', 'chair', 'support'],
+        weights: weights.filter((item) => item.type === 'dumbbell'),
+      },
+    ],
   ];
   for (const experience of ['new', 'some'] as const)
     for (const [name, base] of beginnerInventories)
       for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
         for (const template of ['A', 'B'] as const)
-          it(`${preset.id} ${experience} ${name} ${template} avoids impact and above-level work`, () => {
+          for (const painOnRecord of [false, true])
+            it(`${preset.id} ${experience} ${name} ${template} pain=${painOnRecord} takes above-level work only as a last resort`, () => {
+              const preferences = { ...base, experience };
+              const roster = buildRoster(preferences, template, {
+                focus: { id: preset.id },
+                painOnRecord,
+              });
+              const levels = allowedLevels(experience);
+              const aboveLevel = roster.ids.filter(
+                (id) =>
+                  !(levels as readonly string[]).includes(
+                    (
+                      chooseVariant(id, preferences) as {
+                        technicalLevel: string;
+                      }
+                    ).technicalLevel,
+                  ),
+              );
+              // Above-level picks are noted, and appear only when fewer than
+              // three in-level picks exist.
+              expect(Object.keys(roster.notes).sort()).toEqual(
+                aboveLevel.sort(),
+              );
+              if (aboveLevel.length && preset.id !== 'full')
+                expect(roster.ids.length - aboveLevel.length).toBeLessThan(3);
+              if (roster.ids.length) {
+                expect(roster.ids.length).toBeGreaterThanOrEqual(3);
+                expect(roster.ids.length).toBeLessThanOrEqual(6);
+              }
+              expect(new Set(roster.ids).size).toBe(roster.ids.length);
+            });
+  for (const experience of ['new', 'some'] as const)
+    for (const [name, base] of beginnerInventories)
+      for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
+        for (const template of ['A', 'B'] as const)
+          it(`${preset.id} ${experience} ${name} ${template} notes only above-level picks, from slots with nothing in level`, () => {
             const preferences = { ...base, experience };
             const roster = buildRoster(preferences, template, {
               focus: { id: preset.id },

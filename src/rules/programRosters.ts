@@ -191,7 +191,7 @@ function focusRoster(
     for (const slot of slots) {
       if (ids.length >= limit) break;
       const used = new Set(ids);
-      const first = pickFromSlot(slot, preferences, context, used, round === 0);
+      const first = pickFromSlot(slot, preferences, context, used, false);
       if (template === 'B' && round === 0 && first) {
         used.add(first.id);
         // The alternative is taken only when it is an in-level pick.
@@ -207,24 +207,34 @@ function focusRoster(
     }
     if (ids.length === before) break;
   }
-  if (!ids.length || ids.length >= 3) return { ids, notes };
-  // A sparse focus gets core-only whole-body candidates, so the advisory
-  // filler cannot silently introduce leg/press work into a pull day.
-  const filler = [...generalSlots.A, ...generalSlots.B]
-    .flatMap((slot) => slot.candidates)
-    .filter((id) => exerciseMuscles[id].primary.every((m) => m === 'core'));
-  for (const id of filler) {
-    if (ids.length >= 3) break;
-    add(
-      pickFromSlot(
-        { id: 'core-fill', candidates: [id] },
-        preferences,
-        context,
-        new Set(ids),
-      ),
-    );
+  if (ids.length >= 3) return { ids, notes };
+  let toppedUp = false;
+  if (ids.length) {
+    toppedUp = true;
+    // A sparse focus gets core-only whole-body candidates, so the advisory
+    // filler cannot silently introduce leg/press work into a pull day.
+    const filler = [...generalSlots.A, ...generalSlots.B]
+      .flatMap((slot) => slot.candidates)
+      .filter((id) => exerciseMuscles[id].primary.every((m) => m === 'core'));
+    for (const id of filler) {
+      if (ids.length >= 3) break;
+      add(
+        pickFromSlot(
+          { id: 'core-fill', candidates: [id] },
+          preferences,
+          context,
+          new Set(ids),
+        ),
+      );
+    }
   }
-  return { ids, notes, note: TOP_UP_NOTE };
+  // Last resort: only when fewer than three in-level picks exist, the easiest
+  // above-level exercise of a slot is taken (flagged with EASIEST_NOTE).
+  for (const slot of slots) {
+    if (ids.length >= 3) break;
+    add(pickFromSlot(slot, preferences, context, new Set(ids), true));
+  }
+  return toppedUp ? { ids, notes, note: TOP_UP_NOTE } : { ids, notes };
 }
 
 export function buildRoster(

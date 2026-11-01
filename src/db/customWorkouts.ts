@@ -276,20 +276,6 @@ export async function deleteCustomWorkout(id: string): Promise<void> {
   );
 }
 
-/** Explicit automatic selection removes only the override, keeping the workout. */
-export async function setCustomWorkoutGroup(
-  id: string,
-  group: WorkoutGroup | undefined,
-): Promise<void> {
-  await updateWorkouts((current) =>
-    current.map((item) => {
-      if (item.id !== id) return item;
-      const { group: _old, ...rest } = item;
-      return { ...rest, ...(group ? { group } : {}) };
-    }),
-  );
-}
-
 /** Appends exercises; the stored dose is only extended when it exists. */
 export async function appendToCustomWorkout(
   id: string,

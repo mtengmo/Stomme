@@ -12,7 +12,6 @@ import {
   readCustomWorkouts,
   renameCustomWorkout,
   saveStartWithCustomWorkout,
-  setCustomWorkoutGroup,
   uniqueWorkoutName,
   WorkoutNameClashError,
 } from './customWorkouts';
@@ -29,13 +28,17 @@ beforeEach(async () => {
   await getDb().open();
 });
 
-it('keeps a manual group through rename and append, drops invalid group alone, and clears deleted assignments atomically', async () => {
+it('keeps a stored group through rename and append, drops invalid group alone, and clears deleted assignments atomically', async () => {
   const id = await createNamedCustomWorkout('Press', ['push-up']);
-  await setCustomWorkoutGroup(id, 'push');
-  await renameCustomWorkout(id, 'Mitt presspass', ['push-up'], undefined);
-  await appendToCustomWorkout(id, ['dead-bug'], undefined);
   const read = async () =>
     readCustomWorkouts((await getDb().meta.get('customWorkouts'))?.value);
+  const stored = (await getDb().meta.get('customWorkouts'))?.value as object[];
+  await getDb().meta.put({
+    key: 'customWorkouts',
+    value: stored.map((item) => ({ ...item, group: 'push' })),
+  });
+  await renameCustomWorkout(id, 'Mitt presspass', ['push-up'], undefined);
+  await appendToCustomWorkout(id, ['dead-bug'], undefined);
   expect((await read())[0]?.group).toBe('push');
   expect(
     readCustomWorkouts([{ ...(await read())[0], group: 'invalid' }])[0],
