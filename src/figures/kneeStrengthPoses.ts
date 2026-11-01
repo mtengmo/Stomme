@@ -215,19 +215,20 @@ export function wallTibialisRaisePose(t: number): Pose {
     neck: Pt = [65, 74];
   const aR: Pt = [106, 176],
     aL: Pt = [94, 176];
-  // aR/aL are heel pivots: only the forefoot rotates, never the heel.
+  // aR/aL are heel pivots: only the forefoot rotates, never the heel. Arms
+  // hang by the sides with a back lean against the wall (no joint behind it).
   return body(
-    [68, 58],
+    [70, 58],
     neck,
     hip,
-    [77, 96],
-    [79, 121],
-    [57, 96],
-    [59, 121],
+    [69, 97],
+    [73, 121],
+    [67, 97],
+    [70, 121],
     joint(hip, aR, 37, 36, -1),
     aR,
     polar(aR, 16, -0.75 * q),
-    joint(hip, aL, 35, 36, -1),
+    joint(hip, aL, 37, 36, -1),
     aL,
     polar(aL, 16, -0.75 * q),
   );

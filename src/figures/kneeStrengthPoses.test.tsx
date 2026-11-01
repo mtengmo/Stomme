@@ -2,8 +2,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { kneeStrengthExercises } from '../content/kneeStrengthExercises';
 import { Figure, FigureFrame, movementPose } from './Figure';
+import { checkPoseGeometry } from './keyframes';
 import type { Pt } from './lerp';
-import { figures } from './poses';
+import { figures, POSE_KEYS } from './poses';
 
 const phases = Array.from({ length: 41 }, (_, i) => i / 40);
 const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -152,5 +153,30 @@ describe('contact aware knee figures', () => {
     expect(renderToStaticMarkup(<Figure exerciseId="bosu-squat" />)).toContain(
       'data-equipment="bosu"',
     );
+  });
+  it('wall tibialis raise: passes the geometry gate and keeps every joint in front of the wall', () => {
+    const wall = figures['wall-tibialis-raise'].props.find(
+      (p) => p.type === 'wall',
+    );
+    if (wall?.type !== 'wall') throw new Error('missing wall');
+    const frames = Array.from({ length: 101 }, (_, i) =>
+      movementPose('wall-tibialis-raise', i / 100),
+    );
+    expect(
+      checkPoseGeometry(frames, {
+        floorY: 178,
+        viewBox: [14, 20, 164, 168],
+        props: figures['wall-tibialis-raise'].props,
+        minHeadClearance: 9,
+        // A controlled rep ends where it peaks, so the loop is not closed.
+        allowlist: {
+          'loop-mismatch:tR': 'controlled motion',
+          'loop-mismatch:tL': 'controlled motion',
+        },
+      }),
+    ).toEqual([]);
+    for (const f of frames)
+      for (const key of POSE_KEYS)
+        expect(f[key][0]).toBeGreaterThanOrEqual(wall.x + 3);
   });
 });
