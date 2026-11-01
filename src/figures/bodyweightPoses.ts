@@ -369,10 +369,10 @@ function climber(t: number): Pose {
     ];
   return {
     ...p,
-    kR: joint(p.hip, ar, 33, 33, 1),
+    kR: joint(p.hip, ar, 34, 34, 1),
     aR: ar,
     tR: foot(ar),
-    kL: joint(p.hip, al, 33, 33, 1),
+    kL: joint(p.hip, al, 34, 34, 1),
     aL: al,
     tL: foot(al),
   };

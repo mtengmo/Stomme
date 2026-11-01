@@ -15,7 +15,7 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 | E96 step-down | Befordra piloten till katalogfigur (steg 19 cm, räcke, IK, jämförelsesidan visar fryst Tidigare mot ny) | done, väntar på visuell granskning | b35f531 |
 
 
-Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren har nu ett räcke. Texten ändrades inte (rapporterad till ledaren).
+Noter: övningstexten för E96 sa "Håll i väggen för stöd" men figuren har ett räcke. Texten ändrades i d21b054 till "Håll i väggen eller ett räcke för stöd.".
 
 ## Rättningar enligt docs/figure-fix-specs.md
 
@@ -40,10 +40,10 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 |---|---|---|---|
 | M1+M2 | Burpee: fötter låga (ankel y 170) med höften pikad (y 132, lutning 1,9), inga hopp i leder (<8 enheter per 1/400-steg), extra armnyckelrutor 0,8/0,88, reducerad-rörelse-ruta 0,84 | done | (nästa commit) |
 | M3 | E96 frontvy | todo | |
-| L1 | supports med okänd rekvisita ger fel | todo | |
+| L1 | supports med okänd rekvisita ger fel; supports används i produktionstester (wall-tibialis-raise, E42); skipDrift var död och är borttagen | done | (se git log, 'L1') |
 | L3 | E96 djup, text och test | todo | |
 | L4 | E42 ram `4 20 184 168` + rekvisita (ej mattor) kontrolleras på båda sidor i framing-test | done | (nästa commit) |
-| L5 | mountain-climber, statusdokument | todo | |
+| L5 | mountain-climber: båda benen via IK med 34/34 (33/33 räckte inte till vid start och gav 0,6 drift/asymmetri); statusdokumentets E96-notis rättad | done | (nästa commit) |
 | L6 | sumo-test tillbaka | done | (se git log, 'L6 + ratchet') |
 | Ratchet | fail vid förbättring > 0,1 | done | (se git log, 'L6 + ratchet') |
 
