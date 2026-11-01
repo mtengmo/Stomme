@@ -35,9 +35,11 @@ describe('E96 step-down keyframes', () => {
     const top = stepDownKeyframePose(0);
     const low = stepDownKeyframePose(0.54);
     expect(low.hip[1]).toBeGreaterThan(top.hip[1] + 8);
-    // Step top is y = 164 (about 19 cm): 5-8 cm is roughly 4-6 units below it.
-    expect(low.aL[1]).toBeGreaterThan(165);
-    expect(low.aL[1]).toBeLessThan(168);
+    // Step top is y = 164 (about 19 cm, 1.36 cm per unit): the lowest ankle is
+    // at 168.5, 4.5 units or about 6 cm below the top (target 5-8 cm).
+    expect(low.aL[1]).toBeCloseTo(168.5, 1);
+    expect((low.aL[1] - 164) * 1.36).toBeGreaterThanOrEqual(5);
+    expect((low.aL[1] - 164) * 1.36).toBeLessThanOrEqual(8);
     // Floor is y = 178; the lowest foot point keeps at least 6 units of air.
     for (let i = 0; i <= 100; i++) {
       const p = stepDownKeyframePose(i / 100);

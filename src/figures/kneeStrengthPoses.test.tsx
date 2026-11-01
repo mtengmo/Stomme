@@ -132,8 +132,8 @@ describe('contact aware knee figures', () => {
     // Stair height: 14 units (about 19 cm), replacing the old 32-unit step.
     expect(step).toEqual({ type: 'step', x: 84, y: 164, w: 34 });
     expect(end.aL[0]).toBeGreaterThan(118);
-    expect(end.aL[1]).toBeGreaterThan(165);
-    expect(end.aL[1]).toBeLessThan(168);
+    expect(end.aL[1]).toBeGreaterThan(167);
+    expect(end.aL[1]).toBeLessThan(170);
     expect(end.aL[1]).toBeGreaterThan(start.aL[1]);
     expect(178 - Math.max(end.aL[1], end.tL[1])).toBeGreaterThanOrEqual(6);
   });

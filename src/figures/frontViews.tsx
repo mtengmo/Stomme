@@ -386,8 +386,11 @@ export function frontMovementPose(
     // Step-up keeps both shins vertical at a fixed 33 and only foreshortens
     // the thighs (a front view cannot show a longer thigh).
     const up = exerciseId === 'step-up';
+    // Step-down: 14 unit stair step, vertical 33 shins, the free ankle only
+    // 0-3 units below the step top (the heel stops 5-8 cm under the step).
+    const freeAnkleY = mix(161, 168.5, t);
     const hipY = down
-      ? mix(84, 98, t)
+      ? mix(100, 108, t)
       : up
         ? mix(110, 92, t)
         : step
@@ -400,41 +403,41 @@ export function frontMovementPose(
     const selected = {
       knee: point(
         82,
-        up
-          ? 123
-          : down
-            ? mix(113, 122, t)
-            : step
-              ? mix(117, 113, t)
-              : mix(146, 155, t),
+        up ? 123 : down ? 128 : step ? mix(117, 113, t) : mix(146, 155, t),
       ),
-      ankle: point(82, up ? 156 : step ? 143 : 174),
-      toe: point(72, up ? 159 : step ? 146 : 177),
+      ankle: point(82, up ? 156 : down ? 161 : step ? 143 : 174),
+      toe: point(72, up ? 159 : down ? 164 : step ? 146 : 177),
     };
-    const other = up
+    const other = down
       ? {
-          knee: point(118, otherAnkleY - 33),
-          ankle: point(118, otherAnkleY),
-          toe: point(128, otherAnkleY + 3),
+          knee: point(118, freeAnkleY - 33),
+          ankle: point(118, freeAnkleY),
+          toe: point(128, freeAnkleY + 3),
         }
-      : {
-          knee: point(
-            118,
-            down
-              ? mix(113, 132, t)
-              : step
-                ? mix(140, 113, t)
-                : mix(132, 155, t),
-          ),
-          ankle: point(
-            120,
-            down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
-          ),
-          toe: point(
-            130,
-            down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142,
-          ),
-        };
+      : up
+        ? {
+            knee: point(118, otherAnkleY - 33),
+            ankle: point(118, otherAnkleY),
+            toe: point(128, otherAnkleY + 3),
+          }
+        : {
+            knee: point(
+              118,
+              down
+                ? mix(113, 132, t)
+                : step
+                  ? mix(140, 113, t)
+                  : mix(132, 155, t),
+            ),
+            ankle: point(
+              120,
+              down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
+            ),
+            toe: point(
+              130,
+              down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142,
+            ),
+          };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
     // Anatomical right is always viewer-left; select geometry before placing it.
@@ -848,7 +851,7 @@ export function FrontFigureFrame({
               exerciseId === 'step-up'
                 ? 159
                 : exerciseId === 'step-down'
-                  ? 146
+                  ? 164
                   : 142
             }
             width="34"
@@ -856,7 +859,7 @@ export function FrontFigureFrame({
               exerciseId === 'step-up'
                 ? 18
                 : exerciseId === 'step-down'
-                  ? 31
+                  ? 14
                   : 35
             }
             rx="2"

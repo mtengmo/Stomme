@@ -60,10 +60,10 @@ export interface StepDownValues extends Record<string, number> {
 
 const LOWEST = {
   hipX: 98,
-  hipY: 106,
+  hipY: 108,
   lean: 0.15,
   footX: 124,
-  footY: 166,
+  footY: 168.5,
   footAngle: -0.1,
 };
 const STANDING = {

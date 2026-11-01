@@ -243,9 +243,10 @@ export function FigureComparison() {
           golvet, utanför bilden eller inne i steget, huvudets avstånd,
           lemlängder som ändras eller skiljer mellan sidorna, och att sista
           rutan är lika med första. Piloten använder ett steg i trapphöjd (cirka
-          19 cm) och hälen stannar 5 till 8 cm under steget, utan att nå golvet.
-          Tidigare E96 hade ett steg på cirka 43 cm och går cirka 20 cm under
-          det, vilket är djupare än källan säger.
+          19 cm) och hälen stannar cirka 6 cm under steget (4,5 enheter), utan
+          att nå golvet (minst 6 enheter luft). Tidigare E96 hade ett steg på
+          cirka 43 cm och går cirka 20 cm under det, vilket är djupare än källan
+          säger.
         </p>
       </section>
     </div>

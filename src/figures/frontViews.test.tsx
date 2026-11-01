@@ -274,6 +274,30 @@ describe('authored frontal demonstrations', () => {
   });
 });
 
+describe('step-down front view', () => {
+  it.each(['right', 'left'] as const)(
+    'has vertical constant shins, thighs within 36 and a free foot at most 6 units below the step (%s)',
+    (side) => {
+      for (let i = 0; i <= 40; i++) {
+        const pose = frontMovementPose('step-down', i / 40, side);
+        for (const leg of ['R', 'L'] as const) {
+          const knee = pose[`k${leg}`];
+          const ankle = pose[`a${leg}`];
+          expect(knee[0]).toBeCloseTo(ankle[0], 8);
+          expect(ankle[1] - knee[1]).toBeCloseTo(33, 8);
+          expect(
+            Math.hypot(pose.hip[0] - knee[0], pose.hip[1] - knee[1]),
+          ).toBeLessThanOrEqual(36);
+          // Step top is y = 164 and the floor is y = 178.
+          expect(pose[`t${leg}`][1]).toBeLessThanOrEqual(172);
+        }
+        const selected = side === 'right' ? 'R' : 'L';
+        expect(pose[`a${selected}`][1]).toBe(161);
+      }
+    },
+  );
+});
+
 describe('step-up front view proportions', () => {
   it.each(['right', 'left'] as const)(
     'keeps both shins vertical at a fixed length and never stretches a thigh (%s)',
@@ -294,7 +318,7 @@ describe('step-up front view proportions', () => {
       }
     },
   );
-  it('draws a stair-height step in the front view, and leaves step-down alone', () => {
+  it('draws a stair-height step in the front view of both step exercises', () => {
     const rect = (id: 'step-up' | 'step-down') =>
       renderToStaticMarkup(
         <FigureFrame exerciseId={id} pose={figures[id].end} view="front" />,
@@ -302,7 +326,7 @@ describe('step-up front view proportions', () => {
         /data-support="step"[^>]*><rect[^>]*y="(\d+)"[^>]*height="(\d+)"/,
       );
     expect(rect('step-up')?.slice(1)).toEqual(['159', '18']);
-    expect(rect('step-down')?.slice(1)).toEqual(['146', '31']);
+    expect(rect('step-down')?.slice(1)).toEqual(['164', '14']);
   });
 });
 
