@@ -3,19 +3,45 @@ import type { Session } from '../domain/types';
 import { addDays } from '../lib/dates';
 import {
   completedTrainingDates,
+  isWeeklyDayPlan,
   isWeeklySchedule,
   nextOccurrence,
   nextPlannedDate,
+  planForDate,
   readWeeklySchedule,
 } from './weeklySchedule';
 
 describe('weekly schedule validation', () => {
-  it('accepts one to three unique ISO weekdays and a valid move', () => {
-    expect(isWeeklySchedule({ days: [1] })).toBe(true);
-    expect(isWeeklySchedule({ days: [1, 3, 6] })).toBe(true);
+  it('accepts one to five unique ISO weekdays and a valid move', () => {
+    for (const count of [4, 5])
+      expect(
+        isWeeklySchedule({
+          days: Array.from({ length: count }, (_, index) => ({
+            day: index + 1,
+            plan: { kind: 'standard' },
+          })),
+        }),
+      ).toBe(true);
     expect(
       isWeeklySchedule({
-        days: [2, 5],
+        days: [{ day: 1, plan: { kind: 'standard' as const } }],
+      }),
+    ).toBe(true);
+    expect(
+      isWeeklySchedule({
+        days: [
+          { day: 1, plan: { kind: 'standard' as const } },
+          { day: 3, plan: { kind: 'standard' as const } },
+          { day: 6, plan: { kind: 'standard' as const } },
+        ],
+      }),
+    ).toBe(true);
+    expect(
+      isWeeklySchedule({
+        days: [
+          { day: 2, plan: { kind: 'standard' as const } },
+          { day: 5, plan: { kind: 'standard' as const } },
+        ],
         moved: { from: '2026-10-27', to: '2026-10-30' },
       }),
     ).toBe(true);
@@ -30,12 +56,22 @@ describe('weekly schedule validation', () => {
       {},
       { days: '1' },
       { days: [] },
-      { days: [1, 2, 3, 4] },
-      { days: [1, 1] },
+      {
+        days: Array.from({ length: 6 }, (_, index) => ({
+          day: index + 1,
+          plan: { kind: 'standard' },
+        })),
+      },
+      {
+        days: [
+          { day: 1, plan: { kind: 'standard' as const } },
+          { day: 1, plan: { kind: 'standard' as const } },
+        ],
+      },
       { days: [1.5] },
-      { days: [0] },
-      { days: [8] },
-      { days: [1], extra: true },
+      { days: [{ day: 0, plan: { kind: 'standard' as const } }] },
+      { days: [{ day: 8, plan: { kind: 'standard' as const } }] },
+      { days: [{ day: 1, plan: { kind: 'standard' as const } }], extra: true },
     ]) {
       expect(isWeeklySchedule(value)).toBe(false);
     }
@@ -53,13 +89,24 @@ describe('weekly schedule validation', () => {
       { from: '2026-10-27', to: '2026-10-27' },
       { from: '2026-10-28', to: '2026-10-30' },
     ]) {
-      expect(isWeeklySchedule({ days: [2, 5], moved })).toBe(false);
+      expect(
+        isWeeklySchedule({
+          days: [
+            { day: 2, plan: { kind: 'standard' as const } },
+            { day: 5, plan: { kind: 'standard' as const } },
+          ],
+          moved,
+        }),
+      ).toBe(false);
     }
   });
 
   it('copies valid data and treats invalid persisted values as absent', () => {
     const withMove = {
-      days: [2, 5],
+      days: [
+        { day: 2, plan: { kind: 'standard' as const } },
+        { day: 5, plan: { kind: 'standard' as const } },
+      ],
       moved: { from: '2026-10-27', to: '2026-10-30' },
     };
     const copy = readWeeklySchedule(withMove);
@@ -67,8 +114,79 @@ describe('weekly schedule validation', () => {
     expect(copy).not.toBe(withMove);
     expect(copy?.days).not.toBe(withMove.days);
     expect(copy?.moved).not.toBe(withMove.moved);
-    expect(readWeeklySchedule({ days: [1, 1] })).toBeNull();
-    expect(readWeeklySchedule({ days: [1] })).toEqual({ days: [1] });
+    expect(
+      readWeeklySchedule({
+        days: [
+          { day: 1, plan: { kind: 'standard' as const } },
+          { day: 1, plan: { kind: 'standard' as const } },
+        ],
+      }),
+    ).toBeNull();
+    expect(
+      readWeeklySchedule({
+        days: [{ day: 1, plan: { kind: 'standard' as const } }],
+      }),
+    ).toEqual({ days: [{ day: 1, plan: { kind: 'standard' as const } }] });
+  });
+});
+
+describe('weekly assignments', () => {
+  it('validates every plan kind and refuses daily custom focus or unknown fields', () => {
+    for (const plan of [
+      null,
+      [],
+      3,
+      {},
+      { kind: 'bad' },
+      { kind: 'standard', extra: true },
+      { kind: 'focus', focus: 'custom' },
+      { kind: 'focus', focus: 'push', extra: true },
+      { kind: 'workout', workoutId: '' },
+      { kind: 'workout', workoutId: 4 },
+      { kind: 'workout', workoutId: 'a'.repeat(101) },
+      { kind: 'workout' },
+    ])
+      expect(isWeeklyDayPlan(plan)).toBe(false);
+    for (const plan of [
+      { kind: 'standard' },
+      { kind: 'focus', focus: 'push' },
+      { kind: 'workout', workoutId: 'one' },
+    ])
+      expect(isWeeklyDayPlan(plan)).toBe(true);
+    for (const item of [
+      null,
+      [],
+      1,
+      { day: 1 },
+      { day: 1, plan: { kind: 'bad' } },
+      { day: 1, plan: { kind: 'standard' }, extra: 1 },
+    ])
+      expect(isWeeklySchedule({ days: [item] })).toBe(false);
+  });
+  it('resolves moved assignment, absent days, and a missing saved workout conservatively', () => {
+    const schedule = {
+      days: [{ day: 2, plan: { kind: 'workout' as const, workoutId: 'one' } }],
+      moved: { from: '2026-10-27', to: '2026-10-30' },
+    };
+    expect(planForDate(schedule, '2026-10-27')).toBeNull();
+    expect(planForDate(schedule, '2026-10-30')).toEqual({
+      kind: 'workout',
+      workoutId: 'one',
+    });
+    expect(planForDate(schedule, '2026-10-30', [])).toEqual({
+      kind: 'standard',
+    });
+    expect(planForDate(schedule, '2026-10-30', ['one'])).toEqual({
+      kind: 'workout',
+      workoutId: 'one',
+    });
+    expect(planForDate(schedule, '2026-10-28')).toBeNull();
+    expect(planForDate(schedule, '2026-11-03')).toEqual({
+      kind: 'workout',
+      workoutId: 'one',
+    });
+    expect(planForDate(schedule, 'invalid')).toBeNull();
+    expect(planForDate(null, '2026-10-30')).toBeNull();
   });
 });
 
@@ -81,13 +199,18 @@ describe('weekly schedule dates', () => {
     expect(nextOccurrence('2026-10-27', 8)).toBeNull();
     expect(nextOccurrence('2026-10-27', 1.5)).toBeNull();
     expect(nextPlannedDate(null, '2026-10-27')).toBeNull();
-    expect(nextPlannedDate({ days: [1] }, 'bad-date')).toBeNull();
+    expect(
+      nextPlannedDate(
+        { days: [{ day: 1, plan: { kind: 'standard' as const } }] },
+        'bad-date',
+      ),
+    ).toBeNull();
     expect(nextPlannedDate({ days: [] } as never, '2026-10-27')).toBeNull();
   });
 
   it('skips a moved source date and independently considers its destination', () => {
     const schedule = {
-      days: [2],
+      days: [{ day: 2, plan: { kind: 'standard' as const } }],
       moved: { from: '2026-10-27', to: '2026-10-30' },
     };
     expect(nextPlannedDate(schedule, '2026-10-27')).toBe('2026-10-30');
@@ -97,14 +220,17 @@ describe('weekly schedule dates', () => {
 
   it('supports moving earlier and crossing calendar weeks', () => {
     const earlier = {
-      days: [2, 4],
+      days: [
+        { day: 2, plan: { kind: 'standard' as const } },
+        { day: 4, plan: { kind: 'standard' as const } },
+      ],
       moved: { from: '2026-10-29', to: '2026-10-27' },
     };
     expect(nextPlannedDate(earlier, '2026-10-26')).toBe('2026-10-27');
     expect(nextPlannedDate(earlier, '2026-10-28')).toBe('2026-11-03');
 
     const acrossWeeks = {
-      days: [2],
+      days: [{ day: 2, plan: { kind: 'standard' as const } }],
       moved: { from: '2026-11-03', to: '2026-11-06' },
     };
     expect(nextPlannedDate(acrossWeeks, '2026-10-31')).toBe('2026-11-06');
@@ -113,18 +239,33 @@ describe('weekly schedule dates', () => {
   it('ignores past moves, removes their source, and skips completed standard dates', () => {
     expect(
       nextPlannedDate(
-        { days: [2], moved: { from: '2026-10-27', to: '2026-10-26' } },
+        {
+          days: [{ day: 2, plan: { kind: 'standard' as const } }],
+          moved: { from: '2026-10-27', to: '2026-10-26' },
+        },
         '2026-10-27',
       ),
     ).toBe('2026-11-03');
     expect(
       nextPlannedDate(
-        { days: [2], moved: { from: '2026-10-20', to: '2026-10-22' } },
+        {
+          days: [{ day: 2, plan: { kind: 'standard' as const } }],
+          moved: { from: '2026-10-20', to: '2026-10-22' },
+        },
         '2026-10-28',
       ),
     ).toBe('2026-11-03');
     expect(
-      nextPlannedDate({ days: [2, 4] }, '2026-10-27', ['2026-10-27']),
+      nextPlannedDate(
+        {
+          days: [
+            { day: 2, plan: { kind: 'standard' as const } },
+            { day: 4, plan: { kind: 'standard' as const } },
+          ],
+        },
+        '2026-10-27',
+        ['2026-10-27'],
+      ),
     ).toBe('2026-10-29');
   });
 
@@ -132,7 +273,13 @@ describe('weekly schedule dates', () => {
     const completed = Array.from({ length: 366 }, (_, index) =>
       addDays('2026-01-01', index),
     );
-    expect(nextPlannedDate({ days: [1] }, '2026-01-01', completed)).toBeNull();
+    expect(
+      nextPlannedDate(
+        { days: [{ day: 1, plan: { kind: 'standard' as const } }] },
+        '2026-01-01',
+        completed,
+      ),
+    ).toBeNull();
   });
 });
 
@@ -164,7 +311,12 @@ describe('completed custom workouts in the weekly plan', () => {
   });
 
   it('moves the planned date past the day of a custom workout', () => {
-    const schedule = { days: [1, 3] }; // 2026-10-26 is a Monday
+    const schedule = {
+      days: [
+        { day: 1, plan: { kind: 'standard' as const } },
+        { day: 3, plan: { kind: 'standard' as const } },
+      ],
+    }; // 2026-10-26 is a Monday
     expect(nextPlannedDate(schedule, '2026-10-26', [])).toBe('2026-10-26');
     expect(
       nextPlannedDate(

@@ -1,7 +1,26 @@
-import type { Session, WeeklySchedule } from '../domain/types';
+import { type RoutineFocus, routineFocusIds } from '../content/focusPresets';
+import type { Session, WeeklyDayPlan, WeeklySchedule } from '../domain/types';
 import { addDays, isRealDate, weekdayIndex } from '../lib/dates';
 
-/** Strict runtime check shared by the UI and backup validation. */
+/** Strict plan guard: custom focus requires regions and is deliberately daily-only. */
+export function isWeeklyDayPlan(value: unknown): value is WeeklyDayPlan {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const plan = value as Record<string, unknown>;
+  if (plan.kind === 'standard') return Object.keys(plan).length === 1;
+  if (plan.kind === 'focus')
+    return (
+      Object.keys(plan).length === 2 &&
+      routineFocusIds.includes(plan.focus as RoutineFocus)
+    );
+  return (
+    plan.kind === 'workout' &&
+    Object.keys(plan).length === 2 &&
+    typeof plan.workoutId === 'string' &&
+    plan.workoutId.length > 0 &&
+    plan.workoutId.length <= 100
+  );
+}
+/** Strict runtime check shared by UI and backup validation. */
 export function isWeeklySchedule(value: unknown): value is WeeklySchedule {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const candidate = value as Record<string, unknown>;
@@ -10,12 +29,20 @@ export function isWeeklySchedule(value: unknown): value is WeeklySchedule {
   if (
     !Array.isArray(candidate.days) ||
     candidate.days.length < 1 ||
-    candidate.days.length > 3 ||
+    candidate.days.length > 5 ||
     candidate.days.some(
-      (day) =>
-        !Number.isInteger(day) || (day as number) < 1 || (day as number) > 7,
+      (item) =>
+        !item ||
+        typeof item !== 'object' ||
+        Array.isArray(item) ||
+        Object.keys(item).length !== 2 ||
+        !Number.isInteger(item.day) ||
+        item.day < 1 ||
+        item.day > 7 ||
+        !isWeeklyDayPlan(item.plan),
     ) ||
-    new Set(candidate.days).size !== candidate.days.length
+    new Set(candidate.days.map((item) => item.day)).size !==
+      candidate.days.length
   )
     return false;
   if (candidate.moved === undefined) return true;
@@ -32,16 +59,33 @@ export function isWeeklySchedule(value: unknown): value is WeeklySchedule {
     isRealDate(moved.from) &&
     isRealDate(moved.to) &&
     moved.from !== moved.to &&
-    candidate.days.includes(weekdayIndex(moved.from) + 1)
+    candidate.days.some(
+      (item) => item.day === weekdayIndex(moved.from as string) + 1,
+    )
   );
 }
-
 /** Invalid or absent persisted values are treated as no plan. */
 export function readWeeklySchedule(value: unknown): WeeklySchedule | null {
-  if (!isWeeklySchedule(value)) return null;
-  return value.moved
-    ? { days: [...value.days], moved: { ...value.moved } }
-    : { days: [...value.days] };
+  return isWeeklySchedule(value) ? structuredClone(value) : null;
+}
+/** Moved occurrences carry the source day's assignment. Unknown workout IDs use Next pass. */
+export function planForDate(
+  schedule: WeeklySchedule | null,
+  date: string,
+  workoutIds?: readonly string[],
+): WeeklyDayPlan | null {
+  if (!schedule || !isRealDate(date) || date === schedule.moved?.from)
+    return null;
+  const source = date === schedule.moved?.to ? schedule.moved.from : date;
+  const plan = schedule.days.find(
+    (item) => item.day === weekdayIndex(source) + 1,
+  )?.plan;
+  if (!plan) return null;
+  return plan.kind === 'workout' &&
+    workoutIds &&
+    !workoutIds.includes(plan.workoutId)
+    ? { kind: 'standard' }
+    : { ...plan };
 }
 
 /**
@@ -77,7 +121,7 @@ export function nextPlannedDate(
   for (let offset = 0; offset < 366; offset += 1) {
     const date = addDays(today, offset);
     if (
-      schedule.days.includes(weekdayIndex(date) + 1) &&
+      schedule.days.some((item) => item.day === weekdayIndex(date) + 1) &&
       date !== schedule.moved?.from &&
       !completed.has(date)
     ) {

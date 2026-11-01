@@ -1,10 +1,12 @@
 import { exercises } from '../content/exercises';
+import { type WorkoutGroup, workoutGroups } from '../content/focusPresets';
 import type {
   ExerciseId,
   PlannedExercise,
   TrainingPreferences,
 } from '../domain/types';
-import { formatShortDate, toLocalDate } from '../lib/dates';
+import { formatShortDate, toLocalDate, weekdayIndex } from '../lib/dates';
+import { readWeeklySchedule } from '../rules/weeklySchedule';
 import { getDb } from './db';
 import { saveTrainingPreferences } from './training';
 
@@ -13,22 +15,31 @@ export interface CustomWorkout {
   name: string;
   exerciseIds: ExerciseId[];
   plan?: PlannedExercise[];
+  group?: WorkoutGroup;
 }
 export function readCustomWorkouts(value: unknown): CustomWorkout[] {
   if (!Array.isArray(value)) return [];
-  return value.filter(
-    (item): item is CustomWorkout =>
-      item &&
-      typeof item.id === 'string' &&
-      typeof item.name === 'string' &&
-      item.name.trim().length > 0 &&
-      item.name.length <= 60 &&
-      Array.isArray(item.exerciseIds) &&
-      item.exerciseIds.length > 0 &&
-      item.exerciseIds.length <= 12 &&
-      new Set(item.exerciseIds).size === item.exerciseIds.length &&
-      item.exerciseIds.every((id: string) => Object.hasOwn(exercises, id)),
-  );
+  return value
+    .filter(
+      (item): item is CustomWorkout =>
+        item &&
+        typeof item.id === 'string' &&
+        typeof item.name === 'string' &&
+        item.name.trim().length > 0 &&
+        item.name.length <= 60 &&
+        Array.isArray(item.exerciseIds) &&
+        item.exerciseIds.length > 0 &&
+        item.exerciseIds.length <= 12 &&
+        new Set(item.exerciseIds).size === item.exerciseIds.length &&
+        item.exerciseIds.every((id: string) => Object.hasOwn(exercises, id)),
+    )
+    .map((item) => {
+      const { group, ...rest } = item;
+      return {
+        ...rest,
+        ...(workoutGroups.includes(group as WorkoutGroup) ? { group } : {}),
+      };
+    });
 }
 
 export const maxWorkoutExercises = 12;
@@ -107,9 +118,38 @@ async function writeWorkouts(
 
 async function updateWorkouts(
   change: (current: CustomWorkout[]) => CustomWorkout[],
+  removedId?: string,
 ): Promise<void> {
   const db = getDb();
-  await db.transaction('rw', db.meta, () => writeWorkouts(change));
+  await db.transaction('rw', db.meta, async () => {
+    await writeWorkouts(change);
+    if (!removedId) return;
+    const schedule = readWeeklySchedule(
+      (await db.meta.get('weeklySchedule'))?.value,
+    );
+    if (!schedule) return;
+    const days = schedule.days.filter(
+      (item) =>
+        item.plan.kind !== 'workout' || item.plan.workoutId !== removedId,
+    );
+    if (!days.length) {
+      await db.meta.delete('weeklySchedule');
+      return;
+    }
+    await db.meta.put({
+      key: 'weeklySchedule',
+      value: {
+        days,
+        ...(schedule.moved &&
+        days.some(
+          (item) =>
+            item.day === weekdayIndex(schedule.moved?.from as string) + 1,
+        )
+          ? { moved: schedule.moved }
+          : {}),
+      },
+    });
+  });
 }
 
 /**
@@ -202,6 +242,7 @@ export async function renameCustomWorkout(
   name: string,
   exerciseIds: ExerciseId[],
   plan: PlannedExercise[] | undefined,
+  group?: WorkoutGroup,
 ): Promise<void> {
   await updateWorkouts((current) => {
     if (!current.some((item) => item.id === id))
@@ -214,14 +255,37 @@ export async function renameCustomWorkout(
       throw new WorkoutNameClashError(name.trim());
     return current.map((item) =>
       item.id === id
-        ? { ...item, name: name.trim(), exerciseIds, ...(plan ? { plan } : {}) }
+        ? {
+            ...item,
+            name: name.trim(),
+            exerciseIds,
+            ...(plan ? { plan } : {}),
+            ...(group ? { group } : {}),
+          }
         : item,
     );
   });
 }
 
 export async function deleteCustomWorkout(id: string): Promise<void> {
-  await updateWorkouts((current) => current.filter((item) => item.id !== id));
+  await updateWorkouts(
+    (current) => current.filter((item) => item.id !== id),
+    id,
+  );
+}
+
+/** Explicit automatic selection removes only the override, keeping the workout. */
+export async function setCustomWorkoutGroup(
+  id: string,
+  group: WorkoutGroup | undefined,
+): Promise<void> {
+  await updateWorkouts((current) =>
+    current.map((item) => {
+      if (item.id !== id) return item;
+      const { group: _old, ...rest } = item;
+      return { ...rest, ...(group ? { group } : {}) };
+    }),
+  );
 }
 
 /** Appends exercises; the stored dose is only extended when it exists. */

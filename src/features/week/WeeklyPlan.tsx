@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
+import { Link } from 'wouter';
 import { getDb, type StommeDB } from '../../db/db';
 import type {
   Session,
@@ -10,7 +11,6 @@ import {
   addDays,
   formatLongDate,
   toLocalDate,
-  weekdayIndex,
   weekStart,
 } from '../../lib/dates';
 import { restStatus } from '../../rules/schedule';
@@ -22,17 +22,6 @@ import {
 } from '../../rules/weeklySchedule';
 import { Banner } from '../../ui/Banner';
 import { Button } from '../../ui/Button';
-import { Icon } from '../../ui/Icon';
-
-const WEEKDAYS = [
-  'Måndag',
-  'Tisdag',
-  'Onsdag',
-  'Torsdag',
-  'Fredag',
-  'Lördag',
-  'Söndag',
-];
 
 /** Persists only a user's preferred days and an explicit one-date move. */
 export async function saveWeeklySchedule(
@@ -122,35 +111,6 @@ export function WeeklyPlan({
     moveTarget ?? (schedule?.moved?.from === moveFrom ? schedule.moved.to : '');
   const busy = stored === undefined || saving;
 
-  async function updateDays(day: number) {
-    if (busy) return;
-    setSaveError(false);
-    const days = schedule?.days.includes(day)
-      ? schedule.days.filter((item) => item !== day)
-      : [...(schedule?.days ?? []), day].sort((a, b) => a - b);
-    if (days.length > 3) return;
-    setSaving(true);
-    try {
-      if (days.length === 0) {
-        await clearWeeklySchedule();
-      } else {
-        const candidate: WeeklySchedule = {
-          days,
-          ...(schedule?.moved &&
-          days.includes(weekdayIndex(schedule.moved.from) + 1)
-            ? { moved: schedule.moved }
-            : {}),
-        };
-        await saveWeeklySchedule(candidate);
-      }
-      setMoveTarget(null);
-    } catch {
-      setSaveError(true);
-    } finally {
-      setSaving(false);
-    }
-  }
-
   async function moveNextOccurrence() {
     if (busy || !moveFrom || !target || target < today || target === moveFrom)
       return;
@@ -217,39 +177,15 @@ export function WeeklyPlan({
       {stored !== undefined && (
         <details className="border-t-2 border-edge pt-2">
           <summary className="flex min-h-12 cursor-pointer items-center font-bold text-accent underline underline-offset-4">
-            {schedule ? 'Ändra veckoplan' : 'Välj träningsdagar'}
+            {schedule ? 'Ändra veckoplan' : 'Veckoplanering'}
           </summary>
           <div className="space-y-4 pt-3">
-            <p className="m-0 text-base text-ink-soft">
-              Välj en till tre dagar som brukar passa. Två dagar är en bra
-              start.
-            </p>
-            <fieldset className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <legend className="sr-only">Välj träningsdagar</legend>
-              {WEEKDAYS.map((name, index) => {
-                const day = index + 1;
-                const selected = schedule?.days.includes(day) ?? false;
-                return (
-                  <button
-                    key={day}
-                    type="button"
-                    aria-pressed={selected}
-                    disabled={
-                      busy || (!selected && (schedule?.days.length ?? 0) >= 3)
-                    }
-                    onClick={() => void updateDays(day)}
-                    className={`flex min-h-12 items-center justify-center gap-2 rounded-md border-[3px] px-3 text-base font-bold disabled:opacity-50 ${selected ? 'border-accent bg-surface-tint text-accent' : 'border-edge bg-surface text-ink'}`}
-                  >
-                    <Icon
-                      name={selected ? 'check' : 'plus'}
-                      size={18}
-                      className="shrink-0"
-                    />
-                    {name}
-                  </button>
-                );
-              })}
-            </fieldset>
+            <Link
+              href="/vecka"
+              className="flex min-h-12 items-center font-bold underline"
+            >
+              Planera veckan
+            </Link>
             {schedule && moveFrom && (
               <div className="space-y-2">
                 <label

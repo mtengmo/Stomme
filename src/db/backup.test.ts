@@ -132,6 +132,55 @@ async function snapshot() {
 }
 
 describe('backup', () => {
+  it('round trips focused sessions and grouped weekly assignments, rejects malformed new fields', async () => {
+    const backup = await valid();
+    backup.meta.push({
+      key: 'customWorkouts',
+      value: [
+        {
+          id: 'one',
+          name: 'Presspass',
+          exerciseIds: ['push-up'],
+          group: 'push',
+        },
+      ],
+    });
+    backup.meta.push({
+      key: 'weeklySchedule',
+      value: {
+        days: [
+          { day: 1, plan: { kind: 'workout', workoutId: 'one' } },
+          { day: 3, plan: { kind: 'focus', focus: 'pull' } },
+          { day: 5, plan: { kind: 'standard' } },
+        ],
+      },
+    });
+    expect(parseBackup(serializeBackup(backup)).meta).toEqual(backup.meta);
+    const group = backup.meta.find(
+      (row) => row.key === 'customWorkouts',
+    ) as any;
+    group.value[0].group = 'bad';
+    expect(() => parseBackup(serializeBackup(backup))).toThrow();
+    group.value[0].group = 'push';
+    const schedule = backup.meta.find(
+      (row) => row.key === 'weeklySchedule',
+    ) as any;
+    for (const days of [
+      Array.from({ length: 6 }, (_, i) => ({
+        day: i + 1,
+        plan: { kind: 'standard' },
+      })),
+      [
+        { day: 1, plan: { kind: 'standard' } },
+        { day: 1, plan: { kind: 'standard' } },
+      ],
+      [{ day: 1, plan: { kind: 'focus', focus: 'custom' } }],
+      [{ day: 1, plan: { kind: 'standard' }, extra: true }],
+    ]) {
+      schedule.value.days = days;
+      expect(() => parseBackup(serializeBackup(backup))).toThrow();
+    }
+  });
   it('round trips named custom selections and session names', async () => {
     const variant = exerciseMetadata['dead-bug'].variants[0];
     if (!variant) throw new Error('Missing dead bug variant');

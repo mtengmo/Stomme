@@ -329,9 +329,14 @@ export type TrainingRoutines = Partial<
   Record<RoutineFocus, Partial<Record<TemplateId, PlannedExercise[]>>>
 >;
 
+/** A weekly focus always has a complete preset; custom regions belong to a daily draft. */
+export type WeeklyDayPlan =
+  | { kind: 'standard' }
+  | { kind: 'focus'; focus: RoutineFocus }
+  | { kind: 'workout'; workoutId: string };
 /** ISO weekdays (Monday 1, Sunday 7); moved replaces one dated occurrence. */
 export interface WeeklySchedule {
-  days: number[];
+  days: { day: number; plan: WeeklyDayPlan }[];
   moved?: { from: string; to: string };
 }
 

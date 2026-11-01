@@ -435,7 +435,32 @@ const metaSchema = z.discriminatedUnion('key', [
     key: z.literal('weeklySchedule'),
     value: z
       .strictObject({
-        days: z.array(z.number().int().min(1).max(7)).min(1).max(3),
+        days: z
+          .array(
+            z.strictObject({
+              day: z.number().int().min(1).max(7),
+              plan: z.discriminatedUnion('kind', [
+                z.strictObject({ kind: z.literal('standard') }),
+                z.strictObject({
+                  kind: z.literal('focus'),
+                  focus: z.enum([
+                    'full',
+                    'upper',
+                    'lower',
+                    'push',
+                    'pull',
+                    'legs',
+                  ]),
+                }),
+                z.strictObject({
+                  kind: z.literal('workout'),
+                  workoutId: z.string().min(1).max(100),
+                }),
+              ]),
+            }),
+          )
+          .min(1)
+          .max(5),
         moved: z.strictObject({ from: localDate, to: localDate }).optional(),
       })
       .refine(isWeeklySchedule),
@@ -454,6 +479,9 @@ const metaSchema = z.discriminatedUnion('key', [
         z.strictObject({
           id: z.string().min(1).max(100),
           name: z.string().trim().min(1).max(60),
+          group: z
+            .enum(['push', 'pull', 'legs', 'upper', 'full', 'other'])
+            .optional(),
           plan: savedRehabPlan.optional(),
           exerciseIds: z
             .array(

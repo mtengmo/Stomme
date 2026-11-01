@@ -3,13 +3,16 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { TrainingPreferences } from '../domain/types';
 import { inventory } from '../test/inventory';
 import {
+  appendToCustomWorkout,
   createCustomWorkout,
   createNamedCustomWorkout,
+  deleteCustomWorkout,
   maxCustomWorkouts,
   orderByRecentUse,
   readCustomWorkouts,
   renameCustomWorkout,
   saveStartWithCustomWorkout,
+  setCustomWorkoutGroup,
   uniqueWorkoutName,
   WorkoutNameClashError,
 } from './customWorkouts';
@@ -24,6 +27,41 @@ const prefs: TrainingPreferences = {
 beforeEach(async () => {
   await getDb().delete();
   await getDb().open();
+});
+
+it('keeps a manual group through rename and append, drops invalid group alone, and clears deleted assignments atomically', async () => {
+  const id = await createNamedCustomWorkout('Press', ['push-up']);
+  await setCustomWorkoutGroup(id, 'push');
+  await renameCustomWorkout(id, 'Mitt presspass', ['push-up'], undefined);
+  await appendToCustomWorkout(id, ['dead-bug'], undefined);
+  const read = async () =>
+    readCustomWorkouts((await getDb().meta.get('customWorkouts'))?.value);
+  expect((await read())[0]?.group).toBe('push');
+  expect(
+    readCustomWorkouts([{ ...(await read())[0], group: 'invalid' }])[0],
+  ).not.toHaveProperty('group');
+  await getDb().meta.put({
+    key: 'weeklySchedule',
+    value: {
+      days: [
+        { day: 2, plan: { kind: 'workout', workoutId: id } },
+        { day: 5, plan: { kind: 'focus', focus: 'pull' } },
+      ],
+      moved: { from: '2026-10-27', to: '2026-10-30' },
+    },
+  });
+  await deleteCustomWorkout(id);
+  expect((await getDb().meta.get('weeklySchedule'))?.value).toEqual({
+    days: [{ day: 5, plan: { kind: 'focus', focus: 'pull' } }],
+  });
+  expect(await read()).toEqual([]);
+  const other = await createNamedCustomWorkout('Annat', ['dead-bug']);
+  await getDb().meta.put({
+    key: 'weeklySchedule',
+    value: { days: [{ day: 2, plan: { kind: 'workout', workoutId: other } }] },
+  });
+  await deleteCustomWorkout(other);
+  expect(await getDb().meta.get('weeklySchedule')).toBeUndefined();
 });
 
 describe('saveStartWithCustomWorkout', () => {

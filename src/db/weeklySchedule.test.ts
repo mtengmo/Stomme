@@ -23,24 +23,46 @@ afterEach(async () => {
 describe('weekly schedule persistence', () => {
   it('saves, validates on read, and clears the local plan', async () => {
     const schedule = {
-      days: [2, 5],
+      days: [
+        { day: 2, plan: { kind: 'standard' as const } },
+        { day: 5, plan: { kind: 'standard' as const } },
+      ],
       moved: { from: '2026-10-27', to: '2026-10-30' },
     };
     await saveWeeklySchedule(schedule, db);
     expect(await loadWeeklySchedule(db)).toEqual(schedule);
 
-    await db.meta.put({ key: 'weeklySchedule', value: { days: [1, 1] } });
+    await db.meta.put({
+      key: 'weeklySchedule',
+      value: {
+        days: [
+          { day: 1, plan: { kind: 'standard' as const } },
+          { day: 1, plan: { kind: 'standard' as const } },
+        ],
+      },
+    });
     expect(await loadWeeklySchedule(db)).toBeNull();
 
-    await saveWeeklySchedule({ days: [1] }, db);
+    await saveWeeklySchedule(
+      { days: [{ day: 1, plan: { kind: 'standard' as const } }] },
+      db,
+    );
     await clearWeeklySchedule(db);
     expect(await db.meta.get('weeklySchedule')).toBeUndefined();
   });
 
   it('refuses to persist malformed values', async () => {
-    await expect(saveWeeklySchedule({ days: [1, 1] }, db)).rejects.toThrow(
-      'Ogiltig veckoplan',
-    );
+    await expect(
+      saveWeeklySchedule(
+        {
+          days: [
+            { day: 1, plan: { kind: 'standard' as const } },
+            { day: 1, plan: { kind: 'standard' as const } },
+          ],
+        },
+        db,
+      ),
+    ).rejects.toThrow('Ogiltig veckoplan');
     expect(await db.meta.get('weeklySchedule')).toBeUndefined();
   });
 });
