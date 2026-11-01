@@ -39,7 +39,7 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Hur känns kroppen?', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText('Styrka för löpning · Pass A', { exact: true }),
+      page.getByText('Allmän styrka · Pass A', { exact: true }),
     ).toBeVisible();
     await page.screenshot({
       path: test.info().outputPath('preparation-context.png'),
