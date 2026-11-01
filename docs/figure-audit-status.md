@@ -6,7 +6,7 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 | Övning | Fel | Status | Commit |
 |---|---|---|---|
 | E49 quad-set | Vänster tå klipps 7,4 (ram `24 128 160 52`) | done | 9eca5d8 |
-| E79 dumbbell-pullover | Ram osymmetrisk, vänster hand klipps 8,5 | todo | |
+| E79 dumbbell-pullover | Ram osymmetrisk, vänster hand klipps 8,5 | done | 32a879a |
 | E44 prone-on-forearms | Tå klipps 5 på båda sidor | todo | |
 | E45 heel-slide | Klipps 2 till höger | todo | |
 | E42 bench-side-plank-leg-lift | Sned vy klipps 4 | todo | |

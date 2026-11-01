@@ -27,7 +27,11 @@ const sample = (make: (t: number) => Pose): Pose[] =>
   Array.from({ length: STEPS + 1 }, (_, i) => make(i / STEPS));
 
 /** Ids whose joints once left the framing; guarded for both working sides. */
-const GUARDED: ExerciseId[] = ['quad-set', 'dumbbell-pullover'];
+const GUARDED: ExerciseId[] = [
+  'quad-set',
+  'dumbbell-pullover',
+  'prone-on-forearms',
+];
 
 const outside = (frames: Pose[], viewBox: ViewBox) =>
   checkPoseGeometry(frames, {
