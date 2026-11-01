@@ -141,31 +141,64 @@ for (const width of [320, 360, 412]) {
       ).toContainText('1');
       await weekly
         .locator('summary')
-        .filter({ hasText: /^Välj träningsdagar$/ })
+        .filter({ hasText: /^Veckoplanering$/ })
         .click();
-      await weekly.getByRole('button', { name: 'Måndag', exact: true }).click();
+      await weekly.getByRole('link', { name: 'Planera veckan' }).click();
       await expect(
-        weekly.getByRole('button', { name: 'Måndag', exact: true }),
-      ).toHaveAttribute('aria-pressed', 'true');
-      await weekly
-        .getByRole('button', { name: 'Torsdag', exact: true })
-        .click();
+        page.getByRole('heading', { name: 'Planera veckan' }),
+      ).toBeVisible();
+      const { todayName, tomorrowName } = await page.evaluate(() => {
+        const names = [
+          'Måndag',
+          'Tisdag',
+          'Onsdag',
+          'Torsdag',
+          'Fredag',
+          'Lördag',
+          'Söndag',
+        ];
+        const index = (new Date().getDay() + 6) % 7;
+        return {
+          todayName: names[index] as string,
+          tomorrowName: names[(index + 1) % 7] as string,
+        };
+      });
+      await page
+        .getByRole('combobox', { name: todayName })
+        .selectOption('focus:push');
+      await page
+        .getByRole('combobox', { name: tomorrowName })
+        .selectOption('standard');
+      await page.screenshot({
+        path: test.info().outputPath(`week-${width}-${scheme}.png`),
+        fullPage: true,
+      });
+      await page.getByRole('button', { name: 'Spara', exact: true }).click();
       await expect(
-        weekly.getByRole('button', { name: 'Torsdag', exact: true }),
-      ).toHaveAttribute('aria-pressed', 'true');
+        page.getByRole('heading', { name: 'Idag: Press', exact: true }),
+      ).toBeVisible();
+      await page.goto('/#/vecka');
+      await expect(page.getByRole('combobox', { name: todayName })).toHaveValue(
+        'focus:push',
+      );
+      await expect(
+        page.getByRole('combobox', { name: tomorrowName }),
+      ).toHaveValue('standard');
+      await page.goto('/#/');
+      await expect(
+        page.getByRole('heading', { name: 'Idag: Press', exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+      ).toHaveAttribute('href', /#\/traning\/[AB]\?fokus=push$/);
       await weekly.getByText('Ändra veckoplan', { exact: true }).click();
       await page.reload();
       await weekly.scrollIntoViewIfNeeded();
       await page.screenshot({
-        path: test.info().outputPath(`week-${width}-${scheme}.png`),
+        path: test.info().outputPath(`week-editor-${width}-${scheme}.png`),
+        fullPage: true,
       });
       await weekly.getByText('Ändra veckoplan', { exact: true }).click();
-      await expect(
-        weekly.getByRole('button', { name: 'Måndag', exact: true }),
-      ).toHaveAttribute('aria-pressed', 'true');
-      await expect(
-        weekly.getByRole('button', { name: 'Torsdag', exact: true }),
-      ).toHaveAttribute('aria-pressed', 'true');
       const date = new Date();
       date.setDate(date.getDate() + 10);
       const moveDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;

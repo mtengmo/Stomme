@@ -114,8 +114,9 @@ for (const scheme of SCHEMES)
           page.getByRole('heading', { name: /pass/i }).first(),
         ).toBeVisible();
         await setScale(page, scale);
+        await expect(page.getByText(/^Dagens fokus:/)).toBeVisible();
         await expect(
-          page.getByRole('link', { name: /Dagens fokus.*Byt/ }),
+          page.getByRole('link', { name: 'Byt', exact: true }),
         ).toBeInViewport({ ratio: 1 });
         await expect(
           page.getByRole('link', { name: 'Visa nästa pass' }),
@@ -142,6 +143,22 @@ for (const scheme of SCHEMES)
         await expect(action).toBeInViewport({ ratio: 1 });
         await expectNavClearance(page, 'focus picker');
         if (scale === 100) await expectNoScroll(page, 'focus picker');
+      });
+
+      test('week planner keeps Save reachable above navigation', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general' });
+        await page.goto('/#/vecka');
+        await setScale(page, scale);
+        await expect(
+          page.getByRole('heading', { name: 'Planera veckan' }),
+        ).toBeVisible();
+        const save = page.getByRole('button', { name: 'Spara', exact: true });
+        await expect(save).toBeInViewport({ ratio: 1 });
+        await expectNavClearance(page, 'week planner');
       });
     });
   }

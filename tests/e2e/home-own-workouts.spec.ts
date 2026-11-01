@@ -56,6 +56,9 @@ for (const { width, scheme } of cases) {
     ).toBeVisible();
     const list = page.getByRole('region', { name: 'Mina pass' });
     await expect(list).toBeVisible();
+    await expect(list.getByRole('link').first()).toContainText(
+      /Press · 1 övning · ca \d+ min/,
+    );
     await expect(page.getByText('Avsluta passet först.')).toHaveCount(0);
     expect(
       await page.evaluate(

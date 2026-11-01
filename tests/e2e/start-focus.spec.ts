@@ -23,11 +23,16 @@ async function prepareGeneral(page: import('@playwright/test').Page) {
   await page.goto('/#/');
 }
 
-async function choosePress(page: import('@playwright/test').Page) {
-  await page.getByRole('link', { name: /Byt/ }).click();
+async function openFocus(page: import('@playwright/test').Page) {
+  await page.getByText(/^Dagens fokus:/).waitFor();
+  await page.getByRole('link', { name: 'Byt', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Vad tränar du idag?' }),
   ).toBeVisible();
+}
+
+async function choosePress(page: import('@playwright/test').Page) {
+  await openFocus(page);
   await page.getByRole('radio', { name: /^Press/ }).check();
   await page.getByRole('button', { name: 'Visa passet', exact: true }).click();
   await expect(page).toHaveURL(/#\/traning\/[AB]\?fokus=push$/);
@@ -48,16 +53,41 @@ for (const scenario of CASES)
 
       test('Home opens the focus picker and Press opens its preview', async ({
         page,
-      }) => {
+      }, testInfo) => {
         await prepareGeneral(page);
         if (scenario.scale !== 100)
           await page.addStyleTag({
             content: `html{font-size:${scenario.scale}%}`,
           });
+        await expect(page.getByText(/^Dagens fokus:/)).toBeVisible();
         await expect(
-          page.getByRole('link', { name: /Dagens fokus.*Byt/ }),
+          page.getByRole('link', { name: 'Byt', exact: true }),
         ).toBeVisible();
-        await choosePress(page);
+        await page.screenshot({
+          path: testInfo.outputPath(`home-${scenario.name}-${colorScheme}.png`),
+          fullPage: true,
+        });
+        await openFocus(page);
+        await page.screenshot({
+          path: testInfo.outputPath(
+            `focus-${scenario.name}-${colorScheme}.png`,
+          ),
+          fullPage: true,
+        });
+        await page.getByRole('radio', { name: /^Press/ }).check();
+        await page
+          .getByRole('button', { name: 'Visa passet', exact: true })
+          .click();
+        await expect(page).toHaveURL(/#\/traning\/[AB]\?fokus=push$/);
+        await expect(
+          page.getByRole('heading', { name: 'Fokus: Press', exact: true }),
+        ).toBeVisible();
+        await page.screenshot({
+          path: testInfo.outputPath(
+            `preview-${scenario.name}-${colorScheme}.png`,
+          ),
+          fullPage: true,
+        });
 
         for (const id of IMPACT_IDS)
           await expect(
