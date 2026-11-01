@@ -43,6 +43,7 @@ const TYPE_LABEL: Record<ViolationType, string> = {
   'segment-drift': 'lemmar ändrar längd',
   'limb-asymmetry': 'höger och vänster olika långa',
   'loop-mismatch': 'loopen sluter inte',
+  'support-gap': 'stödkontakt saknas',
 };
 
 const mirrorPt = ([x, y]: readonly [number, number]): [number, number] => [

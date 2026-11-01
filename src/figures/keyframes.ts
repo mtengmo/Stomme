@@ -111,13 +111,23 @@ export type ViolationType =
   | 'head-clearance'
   | 'segment-drift'
   | 'limb-asymmetry'
-  | 'loop-mismatch';
+  | 'loop-mismatch'
+  | 'support-gap';
 
 export interface Violation {
   type: ViolationType;
   /** Frame index; -1 for violations about the whole sequence. */
   frame: number;
   detail: string;
+  /** Stable id for allowlisting, for example `limb-asymmetry:kR-aR`. */
+  key?: string;
+}
+
+/** A joint that must stay within `maxGap` of a prop surface (a hand on a wall). */
+export interface Support {
+  joint: keyof Pose;
+  prop: Prop['type'];
+  maxGap: number;
 }
 
 export interface GateOptions {
@@ -130,6 +140,12 @@ export interface GateOptions {
   lengthTolerance?: number;
   /** Allowed overlap of a foot point into a prop before it counts. Default 1. */
   contactTolerance?: number;
+  /** Known contacts that must hold in every frame. */
+  supports?: readonly Support[];
+  /** Violation keys that are accepted, each with the reason. */
+  allowlist?: Readonly<Record<string, string>>;
+  /** Segments (`a-b`) exempt from the drift check (front views foreshorten). */
+  skipDrift?: readonly string[];
 }
 
 const JOINTS = [
@@ -201,10 +217,32 @@ function obstacles(props: readonly Prop[], floorY: number) {
         x1: p.x,
         y1: p.y,
         x2: p.x + p.w,
-        y2: p.y + 4,
+        y2: p.y + 7,
       });
   }
   return rects;
+}
+
+function gapToProp(pt: Pt, p: Prop): number | undefined {
+  const rect = (x1: number, y1: number, x2: number, y2: number) =>
+    Math.hypot(
+      Math.max(x1 - pt[0], 0, pt[0] - x2),
+      Math.max(y1 - pt[1], 0, pt[1] - y2),
+    );
+  switch (p.type) {
+    case 'wall':
+      return Math.abs(pt[0] - p.x);
+    case 'step':
+      return rect(p.x, p.y, p.x + p.w, 178);
+    case 'bench':
+      return rect(p.x, p.y, p.x + p.w, p.y + 7);
+    case 'rail':
+      return rect(p.x1, p.y, p.x2, p.y);
+    case 'chair':
+      return rect(p.x, p.y, p.x + p.w, p.y + 4);
+    default:
+      return undefined;
+  }
 }
 
 /**
@@ -223,6 +261,19 @@ export function checkPoseGeometry(
   const contact = opts.contactTolerance ?? 1;
   const rects = obstacles(opts.props, opts.floorY);
   frames.forEach((pose, frame) => {
+    for (const sup of opts.supports ?? []) {
+      const gaps = opts.props
+        .filter((pr) => pr.type === sup.prop)
+        .map((pr) => gapToProp(pose[sup.joint], pr))
+        .filter((g): g is number => g !== undefined);
+      if (gaps.length > 0 && Math.min(...gaps) > sup.maxGap)
+        out.push({
+          type: 'support-gap',
+          frame,
+          key: `support-gap:${sup.joint}`,
+          detail: `${sup.joint} är ${Math.min(...gaps).toFixed(1)} från ${sup.prop}`,
+        });
+    }
     for (const key of JOINTS) {
       const [x, y] = pose[key];
       if (y > opts.floorY)
@@ -250,6 +301,7 @@ export function checkPoseGeometry(
           out.push({
             type: 'foot-in-prop',
             frame,
+            key: `foot-in-prop:${key}`,
             detail: `${key} ligger inne i ${r.name}`,
           });
       }
@@ -274,25 +326,29 @@ export function checkPoseGeometry(
   });
   const first = frames[0];
   const last = frames[frames.length - 1];
-  if (!first || !last) return out;
+  if (!first || !last) return filterAllowed(out, opts.allowlist);
   SEGMENTS.forEach(([a, b], i) => {
     const lengths = frames.map((f) => dist(f[a], f[b]));
     const spread = Math.max(...lengths) - Math.min(...lengths);
-    if (spread > tol)
+    if (spread > tol && !opts.skipDrift?.includes(`${a}-${b}`))
       out.push({
         type: 'segment-drift',
         frame: -1,
+        key: `segment-drift:${a}-${b}`,
         detail: `${a}-${b} ändrar längd med ${spread.toFixed(1)}`,
       });
     const mirror = MIRRORED.find(([p]) => p === i);
     if (mirror) {
       const [, q] = mirror;
       const [c, d] = SEGMENTS[q] as readonly [keyof Pose, keyof Pose];
-      const gap = Math.abs(dist(first[a], first[b]) - dist(first[c], first[d]));
+      const gap = Math.max(
+        ...frames.map((f) => Math.abs(dist(f[a], f[b]) - dist(f[c], f[d]))),
+      );
       if (gap > tol)
         out.push({
           type: 'limb-asymmetry',
           frame: -1,
+          key: `limb-asymmetry:${a}-${b}`,
           detail: `${a}-${b} och ${c}-${d} skiljer sig med ${gap.toFixed(1)}`,
         });
     }
@@ -303,8 +359,16 @@ export function checkPoseGeometry(
       out.push({
         type: 'loop-mismatch',
         frame: -1,
+        key: `loop-mismatch:${key}`,
         detail: `${key} skiljer sig mellan första och sista rutan`,
       });
   }
-  return out;
+  return filterAllowed(out, opts.allowlist);
+}
+
+function filterAllowed(
+  found: Violation[],
+  allowlist: GateOptions['allowlist'],
+): Violation[] {
+  return found.filter((v) => !(v.key && allowlist && v.key in allowlist));
 }

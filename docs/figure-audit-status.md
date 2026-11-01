@@ -16,3 +16,21 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 
 
 Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren har nu ett räcke. Texten ändrades inte (rapporterad till ledaren).
+
+## Rättningar enligt docs/figure-fix-specs.md
+
+| Del | Innehåll | Status | Commit |
+|---|---|---|---|
+| W0 | Kontrollen: bänk 7, supports, allowlist, skipDrift, asymmetri över alla rutor, `applyEquipmentPose`, ratchet-test `figureGeometry.test.ts` med baslinje | done | (fylls i nästa commit) |
+| W1 | E94 wall-tibialis-raise | todo | |
+| W2 | E91 copenhagen-hold | todo | |
+| W3 | E02 step-up sidovy | todo | |
+| W3b | E02 step-up frontvy | todo | |
+| W4 | E42 bench-side-plank-leg-lift | todo | |
+| W5 | Plankfamiljen | todo | |
+| W6 | E16 floor-press | todo | |
+| W7 | E60 burpee | todo | |
+| W9 | Knäböjsfamiljen | todo | |
+| E96-text | vägg eller räcke | todo | |
+| W8, W10-W12 | Görs inte i denna körning | ej påbörjad | |
+

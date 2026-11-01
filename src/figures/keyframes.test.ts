@@ -239,4 +239,66 @@ describe('checkPoseGeometry', () => {
     });
     expect(found.some((v) => v.type === 'segment-drift')).toBe(false);
   });
+  it('treats a bench as 7 units thick', () => {
+    expect(
+      types([moved(standing, { aL: [40, 146], tL: [45, 146] })]),
+    ).toContain('foot-in-prop');
+  });
+  it('checks support contacts in every frame', () => {
+    const opts: GateOptions = {
+      ...options,
+      supports: [{ joint: 'hR', prop: 'wall', maxGap: 4 }],
+    };
+    expect(types([moved(standing, { hR: [22, 90] })], opts)).not.toContain(
+      'support-gap',
+    );
+    expect(
+      types([moved(standing, { hR: [22, 90] }), standing], opts),
+    ).toContain('support-gap');
+    const benchOpts: GateOptions = {
+      ...options,
+      supports: [{ joint: 'aL', prop: 'bench', maxGap: 2 }],
+    };
+    expect(
+      types([moved(standing, { aL: [40, 138] })], benchOpts),
+    ).not.toContain('support-gap');
+    expect(types([moved(standing, { aL: [40, 120] })], benchOpts)).toContain(
+      'support-gap',
+    );
+    const stepOpts: GateOptions = {
+      ...options,
+      supports: [{ joint: 'aL', prop: 'step', maxGap: 2 }],
+    };
+    expect(
+      types([moved(standing, { aL: [160, 158] })], stepOpts),
+    ).not.toContain('support-gap');
+    const unknown: GateOptions = {
+      ...options,
+      supports: [{ joint: 'aL', prop: 'bosu', maxGap: 2 }],
+    };
+    expect(types([standing], unknown)).not.toContain('support-gap');
+  });
+  it('lets an allowlisted violation key through, and only that key', () => {
+    const longer = moved(standing, { kR: [100, 131] });
+    const found = (allow: Record<string, string>) =>
+      checkPoseGeometry([standing, longer, standing], {
+        ...options,
+        allowlist: allow,
+      }).map((v) => v.key);
+    expect(found({})).toContain('segment-drift:hip-kR');
+    expect(found({ 'segment-drift:hip-kR': 'foreshortened' })).not.toContain(
+      'segment-drift:hip-kR',
+    );
+  });
+  it('skips drift for listed segments and measures asymmetry over all frames', () => {
+    const longer = moved(standing, { kR: [100, 131] });
+    expect(
+      checkPoseGeometry([standing, longer, standing], {
+        ...options,
+        skipDrift: ['hip-kR', 'kR-aR'],
+      }).filter((v) => v.type === 'segment-drift'),
+    ).toEqual([]);
+    const asym = checkPoseGeometry([standing, longer], options);
+    expect(asym.some((v) => v.type === 'limb-asymmetry')).toBe(true);
+  });
 });
