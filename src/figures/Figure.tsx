@@ -212,6 +212,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'quad-set': '8 128 176 52',
   'dumbbell-pullover': '-2 20 196 168',
   'prone-on-forearms': '4 20 184 168',
+  'heel-slide': '6 20 180 168',
 };
 
 /** One whole repetition per cycle for sequence figures, in milliseconds. */
