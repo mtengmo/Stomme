@@ -1,6 +1,7 @@
 import type { BodyweightId } from '../content/bodyweightExercises';
 import { isBodyweightAddition } from '../content/bodyweightExercises';
 import type { ExerciseId } from '../domain/types';
+import { burpeePose } from './burpeeKeyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
@@ -376,49 +377,6 @@ function climber(t: number): Pose {
     tL: foot(al),
   };
 }
-function blend(a: Pose, b: Pose, t: number): Pose {
-  const result = { ...a };
-  for (const key of Object.keys(a) as (keyof Pose)[])
-    result[key] = [mix(a[key][0], b[key][0], t), mix(a[key][1], b[key][1], t)];
-  return result;
-}
-function burpee(t: number): Pose {
-  const facingRight = (p: Pose): Pose =>
-    Object.fromEntries(
-      Object.entries(p).map(([key, point]) => [
-        key,
-        [200 - point[0], point[1]],
-      ]),
-    ) as unknown as Pose;
-  const crouch = squat(1);
-  const handsDown: Pose = {
-    ...crouch,
-    eR: [111, 158],
-    hR: [137, 174],
-    eL: [106, 156],
-    hL: [132, 171],
-  };
-  const jump = squat(0, 20);
-  jump.eR = [jump.neck[0] + 10, jump.neck[1] - 20];
-  jump.hR = [jump.neck[0] + 12, jump.neck[1] - 43];
-  jump.eL = [jump.neck[0] + 6, jump.neck[1] - 18];
-  jump.hL = [jump.neck[0] + 8, jump.neck[1] - 41];
-  const frames = [
-    squat(0),
-    handsDown,
-    facingRight(pushUp(0)),
-    facingRight(pushUp(1)),
-    facingRight(pushUp(0)),
-    handsDown,
-    squat(0),
-    jump,
-    squat(0),
-  ];
-  const n = Math.min(frames.length - 2, Math.floor(t * (frames.length - 1))),
-    local = t * (frames.length - 1) - n;
-  return blend(frames[n] as Pose, frames[n + 1] as Pose, local);
-}
-
 /** Stand, squat, push off, fly (apex at 0.575), land into a squat, stand. */
 function squatJump(t: number): Pose {
   if (t < 0.3) return squat(t / 0.3);
@@ -687,7 +645,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'back-extension': back,
   'parallel-dip': dip,
   'lying-leg-raise': legRaise,
-  burpee,
+  burpee: burpeePose,
   plank,
   'squat-jump': squatJump,
   'single-leg-lateral-hop': lateralHop,
