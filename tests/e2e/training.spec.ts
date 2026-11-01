@@ -94,7 +94,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await page.goto('/#/');
   await expect(
     page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
-  ).toHaveAttribute('href', '#/traning/B');
+  ).toHaveAttribute('href', /^#\/traning\/B(\?fokus=[a-z]+)?$/);
   await expect(
     page.getByRole('button', { name: 'Byt inriktning' }),
   ).toBeHidden();
