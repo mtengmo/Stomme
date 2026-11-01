@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { RoutineFocus } from '../../content/focusPresets';
+import { focusLabel, type RoutineFocus } from '../../content/focusPresets';
 import { getDb } from '../../db/db';
 import {
   resetTrainingRoutine,
@@ -34,14 +34,22 @@ export function RoutineControls({
     result?.plan === plan && result.kind === 'saved' ? result.text : '';
   const error =
     result?.plan === plan && result.kind === 'error' ? result.text : '';
+  const full = programId === 'full';
+  const name = full
+    ? `pass ${templateId}`
+    : `pass för ${focusLabel(programId)}`;
   return (
     <section
-      aria-label={`Mitt pass ${templateId}`}
+      aria-label={
+        full
+          ? `Mitt pass ${templateId}`
+          : `Mitt pass · ${focusLabel(programId)}`
+      }
       className="flex flex-col gap-2 border-t-2 border-edge pt-3"
     >
       <p className="m-0 text-base text-ink-soft">
         {hasSaved
-          ? `Du utgår från ditt sparade pass ${templateId}. Nya ändringar gäller bara idag tills du sparar igen.`
+          ? `Du utgår från ditt sparade ${name}. Nya ändringar gäller bara idag tills du sparar igen.`
           : 'Ändringar gäller bara idag. Du kan spara upplägget till nästa gång.'}
       </p>
       <details>
@@ -64,7 +72,9 @@ export function RoutineControls({
                 setResult({
                   plan,
                   kind: 'saved',
-                  text: `Ditt pass ${templateId} är sparat till nästa gång.`,
+                  text: full
+                    ? `Ditt pass ${templateId} är sparat till nästa gång.`
+                    : `Passet för ${focusLabel(programId)} är sparat till nästa gång.`,
                 });
               } catch {
                 setResult({
@@ -77,7 +87,9 @@ export function RoutineControls({
               }
             }}
           >
-            Behåll som mitt pass {templateId}
+            {full
+              ? `Behåll som mitt pass ${templateId}`
+              : `Behåll för ${focusLabel(programId)}`}
           </Button>
           {hasSaved ? (
             <details>
@@ -85,8 +97,8 @@ export function RoutineControls({
                 Återställ appens förslag
               </summary>
               <p className="m-0 mb-3 text-base">
-                Tar bort det sparade upplägget för pass {templateId} i den här
-                inriktningen och visar appens förslag igen.
+                Tar bort det sparade upplägget för {name} i den här inriktningen
+                och visar appens förslag igen.
               </p>
               <Button
                 variant="secondary"

@@ -398,6 +398,10 @@ export function TrainingHome() {
           data.savedWorkouts.map((w) => w.id),
         )
       : null;
+  const displayedFocus =
+    todayPlan?.kind === 'focus'
+      ? { focus: { id: todayPlan.focus }, suggested: false }
+      : dailyFocus;
   const nextDate =
     preferences?.programId === 'general'
       ? nextPlannedDate(data.schedule, today, completedDates)
@@ -454,7 +458,10 @@ export function TrainingHome() {
       </h1>
       <p className="m-0 text-lg font-bold">
         {trainingName(preferences)}
-        {!active && preferences.programId !== 'rehab'
+        {!active &&
+        preferences.programId !== 'rehab' &&
+        todayPlan?.kind !== 'workout' &&
+        displayedFocus?.focus.id === 'full'
           ? ` · Pass ${nextId}`
           : ''}
       </p>
@@ -465,10 +472,16 @@ export function TrainingHome() {
       ) : null}
       {preferences.programId === 'general' && dailyFocus && !active ? (
         <p className="m-0 -mt-3 flex min-h-12 flex-wrap items-center gap-x-2 text-base">
-          Dagens fokus: {focusLabel(dailyFocus.focus.id)}
-          {dailyFocus.suggested ? ' (förslag)' : ''} ·{' '}
+          {todayPlan?.kind === 'workout'
+            ? `Planerat eget pass: ${planLabel(todayPlan, data.savedWorkouts)}`
+            : `Dagens fokus: ${focusLabel((displayedFocus ?? dailyFocus).focus.id)}`}
+          {!todayPlan && dailyFocus.suggested ? ' (förslag)' : ''} ·{' '}
           <Link
-            href="/fokus"
+            href={
+              todayPlan?.kind === 'focus'
+                ? `/fokus?${focusQuery({ id: todayPlan.focus })}`
+                : '/fokus'
+            }
             className="inline-flex min-h-12 items-center font-bold underline"
           >
             Byt

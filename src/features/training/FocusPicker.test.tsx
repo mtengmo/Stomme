@@ -20,6 +20,18 @@ beforeEach(async () => {
   });
 });
 afterEach(cleanup);
+it.each([
+  ['push', 'Press'],
+  ['egen&delar=shoulders', 'Helkropp'],
+  ['invalid', 'Helkropp'],
+])('resolves the current planned focus safely from %s', async (query, name) => {
+  window.location.hash = `#/fokus?fokus=${query}`;
+  render(<App />);
+  const radio = await screen.findByRole('radio', {
+    name: new RegExp(`^${name}`),
+  });
+  expect((radio as HTMLInputElement).checked).toBe(true);
+});
 it('offers seven focuses, disables unavailable regions, and hands off through preview', async () => {
   const user = userEvent.setup();
   render(<App />);
