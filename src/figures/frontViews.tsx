@@ -6,6 +6,7 @@ import { figures } from './poses';
 import { FloorLine, Held } from './props';
 
 export const supportedFrontViews = [
+  'seated-tibial-rotation',
   'goblet-squat',
   'dumbbell-rdl',
   'kettlebell-rack-carry',
@@ -31,6 +32,7 @@ export type FigureAngle = 'side' | 'front' | 'oblique';
 
 /** Start with the angle that explains each movement most clearly. */
 export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
+  if (exerciseId === 'seated-tibial-rotation') return 'front';
   if (exerciseId === 'side-lunge') return 'front';
   if (exerciseId === 'russian-twist') return 'oblique';
   return 'side';
@@ -45,6 +47,7 @@ export function supportsObliqueView(
 export function supportedViewsFor(
   exerciseId: ExerciseId,
 ): readonly FigureAngle[] {
+  if (exerciseId === 'seated-tibial-rotation') return ['front'];
   if (supportsFrontView(exerciseId)) return ['side', 'front'];
   if (supportsObliqueView(exerciseId)) return ['side', 'oblique'];
   return ['side'];
@@ -95,6 +98,27 @@ export function frontMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'seated-tibial-rotation') {
+    // Feet rotate in the horizontal plane; the shins and knees stay still.
+    const angle = mix(0.65, -0.65, t);
+    const dx = 13 * Math.sin(angle),
+      dy = 8 * Math.cos(angle);
+    return skeleton(
+      [100, 61],
+      [100, 76],
+      [100, 116],
+      [78, 99],
+      [88, 121],
+      [122, 99],
+      [112, 121],
+      [92, 132],
+      [90, 164],
+      [90 + dx, 164 + dy],
+      [108, 132],
+      [110, 164],
+      [110 - dx, 164 + dy],
+    );
+  }
   if (exerciseId === 'half-squat') {
     const depth = t;
     const hipY = mix(112, 131, depth);
@@ -651,6 +675,27 @@ export function FrontFigureFrame({
     >
       <title>{`${exerciseId} – ${angle}`}</title>
       <FloorLine />
+      {exerciseId === 'seated-tibial-rotation' ? (
+        <g
+          fill="none"
+          stroke="var(--equipment)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        >
+          <path data-support="chair" d="M75 83v39h50V83M78 124v51M122 124v51" />
+          <circle
+            data-support="knee-cushion"
+            cx="100"
+            cy="132"
+            r="5"
+            fill="var(--surface)"
+          />
+          <path
+            data-equipment="band"
+            d={`M${pose.tR[0] - 3} ${pose.tR[1] - 3} Q100 ${pose.tR[1] - 9} ${pose.tL[0] + 3} ${pose.tL[1] - 3} Q${pose.tL[0] + 8} ${pose.tL[1] + 5} ${pose.tL[0]} ${pose.tL[1] + 6} Q100 ${pose.tR[1] + 10} ${pose.tR[0]} ${pose.tR[1] + 6} Q${pose.tR[0] - 8} ${pose.tR[1] + 3} ${pose.tR[0] - 3} ${pose.tR[1] - 3}Z`}
+          />
+        </g>
+      ) : null}
       {exerciseId === 'split-squat' ? (
         <path
           data-contact-plane="rear-foot"

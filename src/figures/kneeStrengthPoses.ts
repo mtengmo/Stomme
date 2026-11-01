@@ -3,6 +3,7 @@ import { lerpPt, type Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 
 export type KneeStrengthId =
+  | 'seated-tibial-rotation'
   | 'step-down'
   | 'bosu-squat'
   | 'copenhagen-hold'
@@ -65,6 +66,25 @@ export function stepDownPose(t: number): Pose {
     joint(hip, freeAnkle, 39, 39, -1),
     freeAnkle,
     [155, freeAnkle[1] + 3],
+  );
+}
+
+/** Side fallback for a motion whose rotation is shown in the authored front view. */
+export function seatedTibialRotationPose(): Pose {
+  return body(
+    [87, 65],
+    [85, 81],
+    [85, 123],
+    [101, 101],
+    [117, 121],
+    [97, 101],
+    [113, 121],
+    [119, 125],
+    [123, 169],
+    [136, 174],
+    [115, 123],
+    [119, 167],
+    [132, 172],
   );
 }
 
@@ -209,6 +229,8 @@ export function kneeStrengthMovementPose(
   t: number,
 ): Pose | undefined {
   switch (id) {
+    case 'seated-tibial-rotation':
+      return seatedTibialRotationPose();
     case 'step-down':
       return stepDownPose(t);
     case 'bosu-squat':
@@ -226,6 +248,11 @@ export function kneeStrengthMovementPose(
   }
 }
 export const kneeStrengthFigures: Record<KneeStrengthId, FigureSpec> = {
+  'seated-tibial-rotation': {
+    start: seatedTibialRotationPose(),
+    end: seatedTibialRotationPose(),
+    props: [{ type: 'chair', x: 72, y: 126, w: 40 }],
+  },
   'step-down': {
     start: stepDownPose(0),
     end: stepDownPose(1),

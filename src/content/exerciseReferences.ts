@@ -95,6 +95,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'nordic-hamstring-curl': 'E92',
   'bent-knee-calf-hold': 'E93',
   'wall-tibialis-raise': 'E94',
+  'seated-tibial-rotation': 'E98',
 };
 
 export function exerciseReviewHref(id: ExerciseId): string {

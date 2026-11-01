@@ -8,8 +8,23 @@ import { kneeStrengthExercises } from './kneeStrengthExercises';
 
 const details: Record<
   string,
-  [EquipmentType, TechnicalLevel, string, string, string, string]
+  [
+    EquipmentType | EquipmentType[],
+    TechnicalLevel,
+    string,
+    string,
+    string,
+    string | undefined,
+  ]
 > = {
+  'seated-tibial-rotation': [
+    ['chair', 'band'],
+    'basic',
+    'Sittande med stilla lår och ett litet kontrollerat rörelseomfång utan extra vikt.',
+    'Redaktionellt upplägg: sittande skenbensrotation',
+    'Stomme',
+    undefined,
+  ],
   'step-down': [
     'step',
     'practiced',
@@ -84,7 +99,10 @@ export const kneeStrengthMetadata: Partial<
             label: 'Kroppsvikt med stödutrustning',
             equipment: [
               { type: 'bodyweight', count: 1 },
-              { type: gear, count: 1 },
+              ...(Array.isArray(gear) ? gear : [gear]).map((type) => ({
+                type,
+                count: 1,
+              })),
             ],
             technicalLevel,
             technicalReason,
@@ -99,11 +117,15 @@ export const kneeStrengthMetadata: Partial<
           {
             title,
             publisher,
-            url,
-            note: `${exercise.id === 'bosu-squat' ? 'Tillverkaren avråder från att stå på plattformsidan. Appen visar kupolen uppåt. ' : exercise.id === 'nordic-hamstring-curl' ? 'Fixerade anklar, bromsad sänkning och handassisterad återgång. ' : ''}${doseNote}`,
+            ...(url ? { url } : {}),
+            note: `${exercise.id === 'bosu-squat' ? 'Tillverkaren avråder från att stå på plattformsidan. Appen visar kupolen uppåt. ' : exercise.id === 'nordic-hamstring-curl' ? 'Fixerade anklar, bromsad sänkning och handassisterad återgång. ' : exercise.id === 'seated-tibial-rotation' ? 'Redaktionell övning utan verifierad extern källa för den sittande bandvarianten. Dos och upplägg är appens förslag. ' : ''}${doseNote}`,
           },
         ],
-        reviewedAt: exercise.id === 'step-down' ? '2026-11-01' : '2026-10-30',
+        reviewedAt: ['step-down', 'seated-tibial-rotation'].includes(
+          exercise.id,
+        )
+          ? '2026-11-01'
+          : '2026-10-30',
         sidePolicy: exercise.perSide ? 'choose-side' : 'both',
         ...(exercise.id === 'step-down' ? { easierExerciseId: 'step-up' } : {}),
         ...(exercise.id === 'bosu-squat'

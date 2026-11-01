@@ -20,6 +20,27 @@ import {
 import { generalSlots, runningEasier } from './rosterSlots';
 
 describe('knee strength catalogue contracts', () => {
+  it('keeps editorial tibial rotation bilateral, knee-loaded and outside automatic rosters', () => {
+    const id = 'seated-tibial-rotation';
+    expect(exercises[id]).toMatchObject({
+      perSide: false,
+      kneeLoaded: true,
+      range: { start: 10, max: 20, step: 2 },
+    });
+    expect(exerciseMetadata[id].reviewedAt).toBe('2026-11-01');
+    expect(exerciseMetadata[id].variants[0]).toMatchObject({
+      technicalLevel: 'basic',
+      equipment: [
+        { type: 'bodyweight', count: 1 },
+        { type: 'chair', count: 1 },
+        { type: 'band', count: 1 },
+      ],
+    });
+    expect(movementSlots[id]).toBeUndefined();
+    expect(JSON.stringify(generalSlots)).not.toContain(id);
+    expect(JSON.stringify(runningEasier)).not.toContain(id);
+    expect(kneeRehabExercises.map((e) => e.id)).not.toContain(id);
+  });
   it('keeps step-down as a library-only, knee-loaded per-leg exercise', () => {
     const id = 'step-down';
     expect(exercises[id]).toMatchObject({
@@ -41,7 +62,7 @@ describe('knee strength catalogue contracts', () => {
   it('adds stable references with editable doses and bodyweight only', () => {
     expect(
       kneeStrengthExercises.map((e) => exerciseReferences[e.id]).sort(),
-    ).toEqual(['E90', 'E91', 'E92', 'E93', 'E94', 'E96']);
+    ).toEqual(['E90', 'E91', 'E92', 'E93', 'E94', 'E96', 'E98']);
     expect(exercises['wall-sit'].range.start).toBe(30);
     expect(exerciseReferences['wall-sit']).toBe('E11');
     expect(exerciseReferences['bench-side-plank-leg-lift']).toBe('E42');
@@ -49,7 +70,12 @@ describe('knee strength catalogue contracts', () => {
       expect(e.loadLadder.map((load) => load.kg)).toEqual([0]);
       expect(heavyStartAllowed(e.id)).toBe(false);
       expect(exerciseMetadata[e.id].sources[0]?.note).toContain('redigerbara');
-      expect(exerciseMetadata[e.id].sources[0]?.url).toMatch(/^https:/);
+      if (e.id === 'seated-tibial-rotation') {
+        expect(exerciseMetadata[e.id].sources[0]?.url).toBeUndefined();
+        expect(exerciseMetadata[e.id].sources[0]?.note).toContain(
+          'utan verifierad extern källa',
+        );
+      } else expect(exerciseMetadata[e.id].sources[0]?.url).toMatch(/^https:/);
     }
     expect(repTempo('nordic-hamstring-curl')).toBeNull();
     expect(exercises['nordic-hamstring-curl'].range).toEqual({

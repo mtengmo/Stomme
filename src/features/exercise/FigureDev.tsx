@@ -6,6 +6,7 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'decline-push-up',
   'diamond-push-up',
   'blast-off-push-up',
+  'seated-tibial-rotation',
   'plank-arm-lift',
   'push-up',
   'pull-up',
@@ -56,6 +57,10 @@ export function FigureDev() {
                           : figures[ex.id][k]
                       }
                       working={w}
+                      view={
+                        ex.id === 'seated-tibial-rotation' ? 'front' : 'side'
+                      }
+                      phase={k === 'start' ? 0 : k === 'middle' ? 0.5 : 1}
                       showMuscles={false}
                     />
                     <p className="m-0 text-center text-base">
@@ -80,6 +85,10 @@ export function FigureDev() {
                       exerciseId={ex.id}
                       pose={movementPose(ex.id, t)}
                       working={ex.perSide ? 'right' : null}
+                      view={
+                        ex.id === 'seated-tibial-rotation' ? 'front' : 'side'
+                      }
+                      phase={t}
                       showMuscles={ex.id === 'quad-set'}
                     />
                     <p className="m-0 text-center text-base">t = {t}</p>

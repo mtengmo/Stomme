@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { exerciseMetadata } from '../content/exerciseMetadata';
 import { inventory } from '../test/inventory';
 import {
   capabilities,
@@ -52,6 +53,20 @@ describe('capabilities', () => {
 });
 
 describe('equipmentFits and missingRequirements', () => {
+  it('requires a chair and band for seated tibial rotation', () => {
+    const requirements =
+      exerciseMetadata['seated-tibial-rotation'].variants[0]?.equipment;
+    if (!requirements) throw new Error('missing tibial rotation variant');
+    const chair = inventory({ support: ['chair'] });
+    expect(equipmentFits(requirements, chair)).toBe(false);
+    expect(missingRequirements(requirements, chair)).toEqual(['Gummiband']);
+    expect(
+      equipmentFits(requirements, inventory({ support: ['chair', 'band'] })),
+    ).toBe(true);
+    expect(equipmentFits(requirements, inventory({ support: ['band'] }))).toBe(
+      false,
+    );
+  });
   const pair = [{ type: 'dumbbell', count: 2 }];
   it('needs a pair at one weight for two dumbbells', () => {
     expect(equipmentFits(pair, inventory({ dumbbells: [[5, 1]] }))).toBe(false);

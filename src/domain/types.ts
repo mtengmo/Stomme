@@ -91,7 +91,8 @@ export type ExerciseId =
   | 'copenhagen-hold'
   | 'nordic-hamstring-curl'
   | 'bent-knee-calf-hold'
-  | 'wall-tibialis-raise';
+  | 'wall-tibialis-raise'
+  | 'seated-tibial-rotation';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

@@ -52,6 +52,16 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('exercise library', () => {
+  it('finds seated tibial rotation by its alias', async () => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    await user.type(screen.getByLabelText('Sök övning'), 'tibiarotation');
+    expect(
+      screen.getByRole('link', {
+        name: exercises['seated-tibial-rotation'].name,
+      }),
+    ).toBeTruthy();
+  });
   it('finds step-down by its Swedish alias', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);

@@ -375,6 +375,22 @@ describe('top of the range', () => {
 });
 
 describe('pain gate', () => {
+  it('seated tibial rotation holds its dose and flags the physio after stop pain', () => {
+    const previous = last('seated-tibial-rotation', {
+      sets: 2,
+      target: 12,
+      load: 0,
+      pain: 'stop',
+    });
+    expectS(
+      next('seated-tibial-rotation', 2, 3, previous),
+      2,
+      12,
+      0,
+      'pain_stop_hold',
+      true,
+    );
+  });
   it('step-down holds its dose and flags the physio after stop pain', () => {
     const previous = last('step-down', {
       sets: 2,

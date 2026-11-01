@@ -3,6 +3,27 @@ import type { Exercise } from '../domain/types';
 /** Editable editorial starting ranges, not a treatment prescription. */
 export const kneeStrengthExercises: Exercise[] = [
   {
+    id: 'seated-tibial-rotation',
+    name: 'Sittande skenbensrotation',
+    muscles: ['Insida lår', 'Knästabilisering', 'Underben'],
+    tips: [
+      'Sitt på en stadig stol med knäna böjda och en liten kudde, ett block eller en hopvikt handduk mellan knäna. Lägg ett lätt gummiband runt framfötterna.',
+      'Håll låren stilla och rotera underbenen lugnt så att fötterna vinklas inåt och utåt i ett litet, bekvämt rörelseomfång.',
+      'Återgå till startläget utan att rycka i bandet. Inåt, utåt och tillbaka är en repetition med båda benen tillsammans. Avbryt vid knäsmärta.',
+    ],
+    commonMistake:
+      'Du flyttar knäna isär eller tvingar fram ett stort rörelseomfång.',
+    easierVariant:
+      'Ta bort bandet och rotera ett litet intervall utan motstånd.',
+    unit: 'reps',
+    perSide: false,
+    range: { start: 10, max: 20, step: 2 },
+    loadLadder: [{ kg: 0, label: 'Kroppsvikt' }],
+    startLoadIndex: 0,
+    week1LoadIndex: 0,
+    kneeLoaded: true,
+  },
+  {
     id: 'step-down',
     name: 'Nedsteg från steg',
     muscles: ['Framsida lår', 'Säte'],

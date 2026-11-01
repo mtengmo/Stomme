@@ -43,6 +43,12 @@ Tillagd 2026-11-01 efter att användaren bekräftat instruktionstexten från [In
 
 E96 (`step-down`) är `kneeLoaded: true`, nivå `practiced`, utrustning `step`, och en biblioteksövning utan automatisk plats i rehab eller roster. Sidvalet avser benet som står kvar på steget. Referensen E96 är permanent; E85, E86 och E89 är fortfarande reserverade. E97 `toe-squat` förblir pausad tills en källa finns.
 
+## E98 Sittande skenbensrotation
+
+Tillagd 2026-11-01 som en redaktionell övning; ingen källa hittades för sittande skenbensrotation med band. Sitt på en stol med ett block, en kudde eller en vikt handduk mellan knäna och ett gummiband runt framfötterna. Rotera underbenen inåt och utåt. Övningen är bilateral (`perSide: false`), nivå `basic`, utrustning stol och band, och `kneeLoaded: true` så befintlig smärtregel kan stoppa övningen. Dosen 10–20 repetitioner i steg om 2 är appens förslag. Lättare alternativ: ta bort bandet och rotera genom ett litet rörelseomfång utan motstånd.
+
+E98 (`seated-tibial-rotation`) är endast en biblioteksövning och läggs inte automatiskt i rehab eller roster. Referensen E98 är permanent; E85, E86 och E89 är fortsatt reserverade. E97 `toe-squat` förblir pausad i väntan på källa.
+
 ## Genomfort och verifierat
 
 Fem nya poster E90–E94 byggda; E11 ateranvands. Tre nya utrustningsval, totalt tio stodval, med kompatibel backupvalidering. Onboardingfiler ar ororda. 266 riktade tester passerade; efter kodnings- och hallbildskorrigeringen passerade ytterligare 101 riktade tester. Typkontroll och produktionsbygge passerade. Biome har fem befintliga varningar. Mobilkontroll vid 320/390 px gav ingen horisontell overflow for nagon av de fem; samlad figurgranskning omfattade rorelsefaser, sidval och minskad rorelse. Testloggar och bilder finns lokalt i `.impeccable/review/knee-strength/`.

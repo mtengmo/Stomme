@@ -102,6 +102,11 @@ export const exerciseMuscles: Record<
     secondary: [],
     qualities: [],
   },
+  'seated-tibial-rotation': {
+    primary: ['hip-adductors'],
+    secondary: ['tibialis'],
+    qualities: [],
+  },
   'decline-push-up': { ...bodyweightDetails['decline-push-up'], qualities: [] },
   'diamond-push-up': { ...bodyweightDetails['diamond-push-up'], qualities: [] },
   'blast-off-push-up': {

@@ -15,8 +15,32 @@ import {
 } from './frontViews';
 
 describe('authored frontal demonstrations', () => {
+  it('rotates seated feet with still knees and ankles, a cushion and foot band', () => {
+    const start = frontMovementPose('seated-tibial-rotation', 0);
+    const end = frontMovementPose('seated-tibial-rotation', 1);
+    expect(end.kR).toEqual(start.kR);
+    expect(end.kL).toEqual(start.kL);
+    expect(end.aR).toEqual(start.aR);
+    expect(end.aL).toEqual(start.aL);
+    expect(start.tR[0]).toBeGreaterThan(start.aR[0]);
+    expect(end.tR[0]).toBeLessThan(end.aR[0]);
+    expect(start.tL[0]).toBeLessThan(start.aL[0]);
+    expect(end.tL[0]).toBeGreaterThan(end.aL[0]);
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="seated-tibial-rotation"
+        pose={movementPose('seated-tibial-rotation', 0.5)}
+        view="front"
+        phase={0.5}
+      />,
+    );
+    expect(markup).toContain('data-support="chair"');
+    expect(markup).toContain('data-support="knee-cushion"');
+    expect(markup).toContain('data-equipment="band"');
+  });
   it('supports the authored front-view exercises and complementary oblique views', () => {
     expect(supportedFrontViews).toEqual([
+      'seated-tibial-rotation',
       'goblet-squat',
       'dumbbell-rdl',
       'kettlebell-rack-carry',
@@ -43,6 +67,7 @@ describe('authored frontal demonstrations', () => {
     expect(defaultViewFor('side-lunge')).toBe('front');
     expect(defaultViewFor('reverse-lunge')).toBe('side');
     expect(defaultViewFor('russian-twist')).toBe('oblique');
+    expect(defaultViewFor('seated-tibial-rotation')).toBe('front');
   });
 
   it('marks anatomical H/V sides without mirroring the frontal figure', () => {

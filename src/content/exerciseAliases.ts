@@ -15,6 +15,11 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   ],
   'bent-knee-calf-hold': ['Bent knee calf isometric', 'Soleus-håll'],
   'wall-tibialis-raise': ['Tibialis raises', 'Tålyft', 'Framfotslyft mot vägg'],
+  'seated-tibial-rotation': [
+    'Tibial rotation',
+    'Skenbensrotation',
+    'Tibiarotation',
+  ],
   'decline-push-up': ['Decline push-up', 'Armhävning med fötter på stol'],
   'diamond-push-up': [
     'Diamond push-up',
