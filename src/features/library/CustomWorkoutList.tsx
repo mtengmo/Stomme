@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useRef, useState } from 'react';
 import { Link } from 'wouter';
+import { workoutGroupLabels, workoutGroups } from '../../content/focusPresets';
 import { isTrainingPreferences } from '../../content/programmes';
 import {
   type CustomWorkout,
@@ -13,6 +14,8 @@ import { getMeta, listSessions } from '../../db/repo';
 import type { TrainingPreferences } from '../../domain/types';
 import { formatShortDate } from '../../lib/dates';
 import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
+import { readWeeklySchedule } from '../../rules/weeklySchedule';
+import { groupOf } from '../../rules/workoutGroups';
 import { buttonClass } from '../../ui/Button';
 import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
 
@@ -115,6 +118,7 @@ function useData() {
     return {
       training: await getMeta(db, 'training'),
       saved: readCustomWorkouts(await getMeta(db, 'customWorkouts')),
+      schedule: readWeeklySchedule(await getMeta(db, 'weeklySchedule')),
       sessions: await listSessions(db),
       logs: await db.setLogs.toArray(),
       painReported: painLogsShowPain(await db.painLogs.toArray()),
@@ -126,19 +130,41 @@ type ListData = NonNullable<ReturnType<typeof useData>>;
 
 const homeRowLimit = 3;
 
+const weekdayTags = ['', 'mån', 'tis', 'ons', 'tor', 'fre', 'lör', 'sön'];
+
 function homeMeta(
   workout: CustomWorkout,
   minutes: number | undefined,
   lastUsed: string | undefined,
+  schedule: ListData['schedule'],
+  rehab: boolean,
 ): string {
   const count = workout.exerciseIds.length;
-  return [
-    `${count} ${count === 1 ? 'övning' : 'övningar'}`,
-    minutes !== undefined ? `ca ${minutes} min` : '',
-    lastUsed ? `senast ${formatShortDate(lastUsed).replace(/\.$/, '')}` : '',
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  const parts: string[] = [];
+  if (!rehab) {
+    parts.push(workoutGroupLabels[groupOf(workout)]);
+    const days =
+      schedule?.days
+        .filter(
+          (entry) =>
+            entry.plan.kind === 'workout' &&
+            entry.plan.workoutId === workout.id,
+        )
+        .map((entry) => entry.day)
+        .sort((a, b) => a - b) ?? [];
+    if (days.length)
+      parts.push(
+        days
+          .map((day) => weekdayTags[day])
+          .filter((day): day is string => !!day)
+          .join(', '),
+      );
+  }
+  parts.push(`${count} ${count === 1 ? 'övning' : 'övningar'}`);
+  if (minutes !== undefined) parts.push(`ca ${minutes} min`);
+  if (lastUsed)
+    parts.push(`senast ${formatShortDate(lastUsed).replace(/\.$/, '')}`);
+  return parts.join(' · ');
 }
 
 /** Home: the whole row is one link; no per-row actions. */
@@ -168,6 +194,8 @@ function HomeRows({
                 workout,
                 minutesFor(workout, preferences, data),
                 lastUsed.get(workout.id),
+                data.schedule,
+                preferences?.programId === 'rehab',
               )}
             </span>
           </>
@@ -192,6 +220,47 @@ function HomeRows({
         );
       })}
     </ul>
+  );
+}
+
+function WorkoutSettingsRow({
+  workout,
+  minutes,
+  disabled,
+}: {
+  workout: CustomWorkout;
+  minutes: number | undefined;
+  disabled: boolean;
+}) {
+  return (
+    <li className="flex flex-col gap-1 border-t-2 border-edge py-2 first:border-t-0">
+      <p className="m-0 break-words text-lg font-bold">{workout.name}</p>
+      <p className="m-0 text-base text-ink-soft">
+        {workout.exerciseIds.length} övn
+        {minutes !== undefined ? ` · ca ${minutes} min` : ''}
+      </p>
+      <div className="flex flex-wrap items-center gap-x-4">
+        {disabled ? (
+          <span
+            aria-disabled="true"
+            className="flex min-h-12 items-center text-base font-bold opacity-50"
+          >
+            Visa och starta
+          </span>
+        ) : (
+          <>
+            <Link
+              href={`/traning/A?workout=${workout.id}`}
+              aria-label={`Visa och starta: ${workout.name}`}
+              className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+            >
+              Visa och starta
+            </Link>
+            <DeleteWorkoutButton workout={workout} />
+          </>
+        )}
+      </div>
+    </li>
   );
 }
 
@@ -284,46 +353,47 @@ export function CustomWorkoutList({
       {data.saved.length ? null : (
         <p className="m-0 mt-2 text-base">Inga egna pass än.</p>
       )}
-      <ul className="m-0 mt-2 flex list-none flex-col p-0">
-        {data.saved.map((workout) => {
-          const minutes = minutesFor(workout, preferences, data);
-          return (
-            <li
+      {preferences?.programId === 'rehab' ? (
+        <ul className="m-0 mt-2 flex list-none flex-col p-0">
+          {data.saved.map((workout) => (
+            <WorkoutSettingsRow
               key={workout.id}
-              className="flex flex-col gap-1 border-t-2 border-edge py-2 first:border-t-0"
-            >
-              <p className="m-0 break-words text-lg font-bold">
-                {workout.name}
-              </p>
-              <p className="m-0 text-base text-ink-soft">
-                {workout.exerciseIds.length} övn
-                {minutes !== undefined ? ` · ca ${minutes} min` : ''}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-4">
-                {disabled ? (
-                  <span
-                    aria-disabled="true"
-                    className="flex min-h-12 items-center text-base font-bold opacity-50"
-                  >
-                    Visa och starta
-                  </span>
-                ) : (
-                  <>
-                    <Link
-                      href={`/traning/A?workout=${workout.id}`}
-                      aria-label={`Visa och starta: ${workout.name}`}
-                      className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
-                    >
-                      Visa och starta
-                    </Link>
-                    <DeleteWorkoutButton workout={workout} />
-                  </>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+              workout={workout}
+              minutes={minutesFor(workout, preferences, data)}
+              disabled={disabled}
+            />
+          ))}
+        </ul>
+      ) : (
+        <div className="mt-2 flex flex-col gap-4">
+          {workoutGroups.map((group) => {
+            const rows = data.saved.filter(
+              (workout) => groupOf(workout) === group,
+            );
+            if (!rows.length) return null;
+            return (
+              <section key={group} aria-labelledby={`workout-group-${group}`}>
+                <h3
+                  id={`workout-group-${group}`}
+                  className="m-0 border-b-2 border-edge pb-1 text-2xl font-bold"
+                >
+                  {workoutGroupLabels[group]}
+                </h3>
+                <ul className="m-0 flex list-none flex-col p-0">
+                  {rows.map((workout) => (
+                    <WorkoutSettingsRow
+                      key={workout.id}
+                      workout={workout}
+                      minutes={minutesFor(workout, preferences, data)}
+                      disabled={disabled}
+                    />
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+      )}
       {alwaysShow ? (
         <Link
           href="/nytt-pass"

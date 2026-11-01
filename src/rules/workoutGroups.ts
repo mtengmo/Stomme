@@ -14,13 +14,15 @@ export interface WorkoutGroupInput {
 const push = new Set<MuscleGroupId>(['chest', 'shoulders', 'triceps']);
 const pull = new Set<MuscleGroupId>(['back', 'biceps', 'forearms']);
 const legs = new Set<MuscleGroupId>(
-  bodyRegions.find((region) => region.id === 'legs')?.muscles ?? [],
+  bodyRegions
+    .filter((region) => region.id === 'legs')
+    .flatMap((region) => region.muscles),
 );
 const upper = new Set<MuscleGroupId>([...push, ...pull]);
 
 /** Primary muscles represented by a custom workout, with core excluded. */
 export function workoutMuscles(
-  workout: Pick<CustomWorkout, 'exerciseIds'>,
+  workout: Pick<WorkoutGroupInput, 'exerciseIds'>,
 ): MuscleGroupId[] {
   const result = new Set<MuscleGroupId>();
   for (const id of workout.exerciseIds) {

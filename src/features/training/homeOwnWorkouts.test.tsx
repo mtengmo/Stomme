@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
 import { getDb } from '../../db/db';
@@ -64,7 +64,7 @@ it('shows the newest three rows, the rest behind "Visa alla", no quick row', asy
   expect(screen.queryByText('Eller kör ett eget pass:')).toBeNull();
   expect(screen.queryByText(/Visa och starta/)).toBeNull();
   expect(screen.queryByRole('button', { name: /Ta bort/ })).toBeNull();
-  expect(screen.getAllByText(/^1 övning · ca \d+ min$/)).toHaveLength(5);
+  expect(screen.getAllByText(/^Ben · 1 övning · ca \d+ min$/)).toHaveLength(5);
 });
 
 it('puts the most recently used first with a "senast" date', async () => {
@@ -87,7 +87,78 @@ it('puts the most recently used first with a "senast" date', async () => {
     'Pass nummer 3',
     'Pass nummer 2',
   ]);
-  expect(screen.getByText(/senast 19 okt$/)).toBeTruthy();
+  expect(
+    screen.getByText(/Ben · 1 övning · ca \d+ min · senast 19 okt$/),
+  ).toBeTruthy();
+});
+
+it('shows a workout group and only its assigned weekdays in Home metadata', async () => {
+  await setMeta(getDb(), 'customWorkouts', saved(5));
+  await setMeta(getDb(), 'weeklySchedule', {
+    days: [
+      { day: 1, plan: { kind: 'workout', workoutId: 'w5' } },
+      { day: 2, plan: { kind: 'standard' } },
+      { day: 4, plan: { kind: 'workout', workoutId: 'w5' } },
+      { day: 5, plan: { kind: 'focus', focus: 'pull' } },
+    ],
+  });
+  render(<App />);
+  await screen.findByRole('region', { name: 'Mina pass' });
+  expect(
+    screen.getByRole('link', {
+      name: /Pass nummer 5 Ben · mån, tor · 1 övning · ca \d+ min/,
+    }),
+  ).toBeTruthy();
+});
+
+it('groups settings workouts in the fixed order of labels', async () => {
+  await setMeta(getDb(), 'customWorkouts', [
+    {
+      id: 'upper',
+      name: 'Överkropp',
+      exerciseIds: ['floor-press', 'supported-row'],
+    },
+    { id: 'other', name: 'Bål', exerciseIds: ['dead-bug'] },
+    {
+      id: 'full',
+      name: 'Helkropp',
+      exerciseIds: ['floor-press', 'goblet-chair-squat'],
+    },
+    { id: 'legs', name: 'Ben', exerciseIds: ['goblet-chair-squat'] },
+    { id: 'pull', name: 'Drag', exerciseIds: ['supported-row'] },
+    { id: 'push', name: 'Press', exerciseIds: ['floor-press'] },
+  ]);
+  window.location.hash = '#/ovningar';
+  render(<App />);
+  const list = await screen.findByRole('region', { name: 'Mina pass' });
+  expect(
+    [...list.querySelectorAll('h3')].map((heading) => heading.textContent),
+  ).toEqual(['Press', 'Drag', 'Ben', 'Överkropp', 'Helkropp', 'Övrigt']);
+});
+
+it('omits group and weekday labels for rehab in Home and settings', async () => {
+  await setMeta(getDb(), 'training', { ...prefs, programId: 'rehab' });
+  await setMeta(getDb(), 'customWorkouts', [
+    {
+      id: 'w1',
+      name: 'Pass nummer 1',
+      exerciseIds: ['single-leg-rdl'],
+      group: 'push',
+    },
+  ]);
+  await setMeta(getDb(), 'weeklySchedule', {
+    days: [{ day: 1, plan: { kind: 'workout', workoutId: 'w1' } }],
+  });
+  render(<App />);
+  const home = await screen.findByRole('region', { name: 'Mina pass' });
+  const row = within(home).getByRole('link', { name: /Pass nummer 1/ });
+  expect(row.textContent).toContain('1 övning');
+  expect(row.textContent).not.toMatch(/Press|mån/);
+
+  window.location.hash = '#/ovningar';
+  await screen.findByRole('heading', { name: 'Övningar' });
+  const settings = await screen.findByRole('region', { name: 'Mina pass' });
+  expect(settings.querySelectorAll('h3')).toHaveLength(0);
 });
 
 it('keeps the rows usable while only a preparation exists', async () => {
@@ -98,7 +169,7 @@ it('keeps the rows usable while only a preparation exists', async () => {
   expect(await screen.findByRole('region', { name: 'Mina pass' })).toBeTruthy();
   expect(screen.queryByText('Avsluta passet först.')).toBeNull();
   expect(
-    screen.getByRole('link', { name: /^Pass nummer 1 1 övning/ }),
+    screen.getByRole('link', { name: /^Pass nummer 1 Ben · 1 övning/ }),
   ).toBeTruthy();
 });
 
