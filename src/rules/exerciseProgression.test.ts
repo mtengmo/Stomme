@@ -82,8 +82,12 @@ describe('optional harder exercises', () => {
       'diamond-push-up',
       'blast-off-push-up',
     ]);
+    // The single-leg calf raise is knee loaded, so pain on record withholds it.
     expect(
       suggest(fixture('calf-raise'), 'calf-raise', preferences, true),
+    ).toEqual([]);
+    expect(
+      suggest(fixture('calf-raise'), 'calf-raise', preferences, false),
     ).toEqual(['single-leg-calf-raise']);
   });
   it.each(['older', 'other-programme'] as const)(
@@ -135,6 +139,16 @@ describe('optional harder exercises', () => {
     expect(
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
     ).toEqual([]);
+  });
+  it('offers step-down after step-up without pain, but not with pain on record', () => {
+    const data = fixture('step-up');
+    const withStep = {
+      ...preferences,
+      equipment: [...preferences.equipment, 'step' as const],
+    };
+    expect(suggest(data, 'step-up', withStep, false)).toEqual(['step-down']);
+    // step-down is knee loaded, so global pain on record withholds the offer.
+    expect(suggest(data, 'step-up', withStep, true)).toEqual([]);
   });
   it('only suggests harder exercises allowed for the experience level', () => {
     const data = fixture('goblet-squat');

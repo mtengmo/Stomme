@@ -101,7 +101,7 @@ Sittande på stol med ett block, en kudde eller ihopvikt handduk mellan knäna o
 - `kneeLoaded: true` som förval. Den bär ingen last, men det gör att "smärta stopp" fungerar. Alternativ `false` som E94 (öppen fråga nedan).
 - Utrustning: stol (`chair`) och `band`. Etiketten "Gummiband" täcker miniband. Kudde eller handduk står bara i instruktionen. Ingen ny `EquipmentType`.
 - Kodändring: fältet för utrustning i `details` i `kneeStrengthMetadata.ts` måste kunna ta `EquipmentType | EquipmentType[]`. Påverkar E90-E94, så kör befintliga tester.
-- Muskler: "Insida lår", "Knästabilisering", "Underben". Kontrollera att nycklarna finns i `muscles.ts` (`adductors`, `tibialis` eller liknande).
+- Muskler: "Insida lår", "Underben". Kontrollera att nycklarna finns i `muscles.ts` (`adductors`, `tibialis` eller liknande).
 - Lättare: ta bort bandet och rotera ett litet intervall utan motstånd.
 - Källa: ingen. Märk som redaktionell i källanoten (som woodchop) med appens förslag på dos och upplägg. Rehab Hero "Knee Counter Rotation" är en annan övning (halvknästående, band under stortån) och ska inte citeras.
 - Alias: `Tibial rotation`, `Skenbensrotation`, `Tibiarotation`.
