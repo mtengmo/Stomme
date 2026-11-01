@@ -12,7 +12,7 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 | E42 bench-side-plank-leg-lift | Sned vy klipps 4 | done | 6b16e75 |
 | E42 bench-side-plank-leg-lift | Fot i steg-rekvisita i sidovyn (kollision) | todo, lämnas till Opus | |
 | E29 hamstring-curl | 1,0 under golv | falskt positivt, ingen åtgärd | |
-| E96 step-down | Befordra piloten till katalogfigur (steg 19 cm, räcke, IK, jämförelsesidan visar fryst Tidigare mot ny) | done, väntar på visuell granskning | (se nedan) |
+| E96 step-down | Befordra piloten till katalogfigur (steg 19 cm, räcke, IK, jämförelsesidan visar fryst Tidigare mot ny) | done, väntar på visuell granskning | b35f531 |
 
 
 Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren har nu ett räcke. Texten ändrades inte (rapporterad till ledaren).
