@@ -18,6 +18,8 @@ const IMPACT_IDS = [
   'squat-jump',
   'jumping-lunge',
   'burpee',
+  'single-leg-lateral-hop',
+  'box-jump',
 ] as const;
 
 async function prepareGeneral(page: import('@playwright/test').Page) {

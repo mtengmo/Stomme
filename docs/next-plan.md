@@ -43,3 +43,5 @@ Use a feature branch, preserve the Swedish notebook design, and inspect real mob
 2026-11-01: Fokus väljs inför varje allmänt pass med muskelbaserade återhämtningsförslag och rutiner per fokus. Kroppsdelsval får nya kurerade rostrar; löpprogrammet är borttaget. Rehab och det ursprungliga knäprogrammet är kvar. Backup kräver v3.
 
 2026-11-01: Egna pass grupperas automatiskt eller manuellt och kan planeras på 1–5 veckodagar via /vecka. Veckoförslag sparas först med Spara, och dagens tilldelning öppnar alltid förhandsvisningen. Välj själv används bara för dagens pass eftersom veckoplanens fokus inte har kroppsdelar.
+
+2026-11-01: Plyometriska övningar E99 Sidohopp på ett ben (redaktionell, tid per ben) och E100 Boxhopp (NASM, steg, räknas för hand). Bara bibliotek, knäbelastade och i `impactExercises`; ingen roster, rehabplan eller progressionslänk. Rehabväljaren döljer nu impact-övningar (`pickableInProgramme`). Se `docs/plan-plyo-exercises.md`.

@@ -74,3 +74,7 @@ The harder links are wall → knee → push-up → decline, and two-leg → sing
 Blast off-armhävning is now an editorial entry (publisher Stomme, no link; no verified external source for the variant). Interpretation, from only two stills of an Instagram video by Alexia Clark (caption chest, core, shoulders, triceps, quads), with about 85% confidence that hands stay planted and about 60% on the exact sequence: start on toes with knees bent just above the mat, hips high and back and hands planted forward; extend the legs to glide the body forward and down into a low plank with the chest near the hands; press back to the start. Hands and feet do not move and nothing leaves the floor.
 
 Technical bodyweight press. Dose is an editable app proposal of 5 to 10 reps per set, not a source prescription. Primary chest and triceps; secondary shoulders, core and quads; no `power` quality. Normal controlled tempo (about 2 s forward, 2 s back), not an impact exercise, not in any roster, `kneeLoaded: false`, never added to a rehabilitation roster automatically. Avoid with wrist or shoulder problems.
+
+## Later plyometric additions (not from the article)
+
+E99 Sidohopp på ett ben and E100 Boxhopp are library-only plyometric exercises, planned in `plan-plyo-exercises.md`. E99 is editorial (no NASM or ACE page found); E100 follows the NASM Box Jumps page, with a low step and stepping down instead of jumping down. Both are knee-loaded impact exercises, hidden in rehab and when symptoms are on record, and in no roster or progression link.
