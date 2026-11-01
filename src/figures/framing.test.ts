@@ -31,6 +31,8 @@ const GUARDED: ExerciseId[] = [
   'quad-set',
   'dumbbell-pullover',
   'prone-on-forearms',
+  'heel-slide',
+  'bench-side-plank-leg-lift',
 ];
 
 const outside = (frames: Pose[], viewBox: ViewBox) =>
@@ -58,7 +60,7 @@ describe('FRAMING keeps every joint in view on both working sides', () => {
     });
   }
 
-  it.skip('bench-side-plank-leg-lift oblique view', () => {
+  it('bench-side-plank-leg-lift oblique view', () => {
     const id = 'bench-side-plank-leg-lift';
     if (!(supportedObliqueViews as readonly string[]).includes(id)) return;
     const viewBox = viewBoxOf(id);
