@@ -15,6 +15,32 @@ export const EMPTY_FLAGS: PreviewFlags = {
 
 const suffix = '.flags';
 
+export interface DraftSafety {
+  painOnRecord: boolean;
+  edited: boolean;
+}
+export function readDraftSafety(draftKey: string): DraftSafety | undefined {
+  try {
+    const value = JSON.parse(
+      sessionStorage.getItem(`${draftKey}.safety`) ?? 'null',
+    );
+    return value &&
+      typeof value.painOnRecord === 'boolean' &&
+      typeof value.edited === 'boolean'
+      ? { painOnRecord: value.painOnRecord, edited: value.edited }
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+export function writeDraftSafety(draftKey: string, value: DraftSafety): void {
+  try {
+    sessionStorage.setItem(`${draftKey}.safety`, JSON.stringify(value));
+  } catch {
+    /* Drafts remain usable without storage. */
+  }
+}
+
 /** Reads and validates stored flags; anything malformed falls back to the defaults. */
 export function readFlags(draftKey: string): PreviewFlags {
   try {

@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clearFlags, EMPTY_FLAGS, readFlags, writeFlags } from './previewDraft';
+import {
+  clearFlags,
+  EMPTY_FLAGS,
+  readDraftSafety,
+  readFlags,
+  writeDraftSafety,
+  writeFlags,
+} from './previewDraft';
 
 const store = new Map<string, string>();
 beforeEach(() => {
@@ -37,5 +44,23 @@ describe('previewDraft', () => {
     expect(readFlags('k')).toEqual(EMPTY_FLAGS);
     writeFlags('k', EMPTY_FLAGS);
     clearFlags('k');
+  });
+  it('round-trips draft safety', () => {
+    writeDraftSafety('k', { painOnRecord: true, edited: false });
+    expect(readDraftSafety('k')).toEqual({ painOnRecord: true, edited: false });
+  });
+  it.each([
+    'not json',
+    'null',
+    '{"painOnRecord":true}',
+    '{"painOnRecord":"yes","edited":false}',
+  ])('ignores corrupt draft safety %s', (raw) => {
+    store.set('k.safety', raw);
+    expect(readDraftSafety('k')).toBeUndefined();
+  });
+  it('draft safety survives a missing sessionStorage', () => {
+    (globalThis as { sessionStorage?: unknown }).sessionStorage = undefined;
+    expect(readDraftSafety('k')).toBeUndefined();
+    writeDraftSafety('k', { painOnRecord: false, edited: false });
   });
 });

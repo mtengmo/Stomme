@@ -96,7 +96,14 @@ import {
 } from './defaultPlan';
 import { ExercisePicker } from './ExercisePicker';
 import { NextLevelSuggestions } from './NextLevelSuggestions';
-import { clearFlags, readFlags, writeFlags } from './previewDraft';
+import {
+  clearFlags,
+  EMPTY_FLAGS,
+  readDraftSafety,
+  readFlags,
+  writeDraftSafety,
+  writeFlags,
+} from './previewDraft';
 import { ReadyWorkout } from './ReadyWorkout';
 import { RehabCollection } from './RehabCollection';
 import { RoutineControls } from './RoutineControls';
@@ -172,6 +179,21 @@ function PreviewEditor({
           (session.regions ?? []).join() === (focus.regions ?? []).join())),
   );
 
+  const painOnRecord = symptomsOnRecord(sessions, painReported ?? false);
+  const [draftSafety] = useState(() => readDraftSafety(draftKey));
+  const explicitPlan = Boolean(
+    preparation ||
+      customWorkout ||
+      (focus.id !== 'custom' && savedRoutines?.[focus.id]?.[id]),
+  );
+  const refreshAutoDraft =
+    preferences.programId === 'general' &&
+    !explicitPlan &&
+    painOnRecord &&
+    draftSafety?.painOnRecord === false &&
+    !draftSafety.edited;
+  const editedDraft = useRef(draftSafety?.edited ?? explicitPlan);
+
   const [plan, setPlan] = useState(() => {
     try {
       const saved: unknown = JSON.parse(
@@ -179,6 +201,7 @@ function PreviewEditor({
       );
 
       if (
+        !refreshAutoDraft &&
         Array.isArray(saved) &&
         saved.length <= 12 &&
         saved.every(
@@ -191,8 +214,11 @@ function PreviewEditor({
                 typeof item[key] === 'number' && Number.isFinite(item[key]),
             ),
         )
-      )
+      ) {
+        // A draft without provenance may contain explicit user edits.
+        if (!draftSafety) editedDraft.current = true;
         return saved as PlannedExercise[];
+      }
     } catch {
       /* A damaged draft never replaces the saved session. */
     }
@@ -229,12 +255,17 @@ function PreviewEditor({
   useEffect(() => {
     try {
       sessionStorage.setItem(draftKey, JSON.stringify(plan));
+      writeDraftSafety(draftKey, { painOnRecord, edited: editedDraft.current });
     } catch {
       /* Storage may be unavailable; starting still works. */
     }
-  }, [draftKey, plan]);
+  }, [draftKey, plan, painOnRecord]);
 
-  const [flags0] = useState(() => readFlags(draftKey));
+  const [flags0] = useState(() =>
+    refreshAutoDraft
+      ? { ...EMPTY_FLAGS, checkBefore: readFlags(draftKey).checkBefore }
+      : readFlags(draftKey),
+  );
   const [confirmed, setConfirmed] = useState(() => {
     if (!flags0.confirmed) return false;
     try {
@@ -301,6 +332,7 @@ function PreviewEditor({
   const [workoutName, setWorkoutName] = useState(customWorkout?.name ?? '');
 
   function updatePlan(value: SetStateAction<PlannedExercise[]>) {
+    editedDraft.current = true;
     setShortSelected(false);
     setConfirmed(false);
     setRemoved(null);
@@ -1618,6 +1650,7 @@ function PreviewEditor({
                       sessionStorage.removeItem(`${draftKey}.open`);
                       sessionStorage.removeItem(`${draftKey}.short`);
                       sessionStorage.removeItem(`${draftKey}.picker`);
+                      sessionStorage.removeItem(`${draftKey}.safety`);
                       clearFlags(draftKey);
                     } catch {
                       /* No persistent draft to clear. */
@@ -1708,7 +1741,7 @@ export function TrainingPreview({ id }: { id: string }) {
   const focus = requestedFocus ?? defaultFocus(data.preferences);
   return (
     <EquipmentPreview
-      key={`${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
+      key={`${symptomsOnRecord(data.sessions, data.painReported)}-${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
       customWorkout={customWorkout}
       focus={focus}
       preparationId={data.preparationId}
