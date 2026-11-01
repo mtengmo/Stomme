@@ -12,6 +12,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { harderExerciseSuggestions } from '../../rules/exerciseProgression';
+import { painLogsShowPain, symptomsOnRecord } from '../../rules/painOnRecord';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
 export function NextLevelSuggestions({
@@ -19,16 +20,24 @@ export function NextLevelSuggestions({
   preferences,
   sessions,
   logs,
+  painOnRecord,
   onChoose,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
   sessions: Session[];
   logs: SetLog[];
+  painOnRecord: boolean;
   onChoose?: (from: ExerciseId, to: ExerciseId) => void;
 }) {
   const suggestions = plan.flatMap((item) =>
-    harderExerciseSuggestions(item.exerciseId, preferences, sessions, logs)
+    harderExerciseSuggestions(
+      item.exerciseId,
+      preferences,
+      sessions,
+      logs,
+      painOnRecord,
+    )
       .filter((id) => !plan.some((entry) => entry.exerciseId === id))
       .map((id) => ({ from: item.exerciseId, to: id })),
   );
@@ -87,6 +96,7 @@ export function SummaryNextLevel({ session }: { session: Session }) {
       preferences: await getMeta(getDb(), 'training'),
       sessions: await listSessions(getDb()),
       logs: await getDb().setLogs.toArray(),
+      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
     }),
     [],
   );
@@ -104,6 +114,7 @@ export function SummaryNextLevel({ session }: { session: Session }) {
       preferences={data.preferences}
       sessions={data.sessions}
       logs={data.logs}
+      painOnRecord={symptomsOnRecord(data.sessions, data.painReported)}
     />
   );
 }

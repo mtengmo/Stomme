@@ -6,7 +6,6 @@ import { rehabGroupOf } from '../../content/programmes';
 import { validateTrainingPlan } from '../../db/training';
 import type {
   ExerciseId,
-  PainLog,
   PlannedExercise,
   RehabFocus,
   Session,
@@ -22,9 +21,13 @@ import {
   heavyStartAllowed,
   startingSets,
 } from '../../rules/levelPolicy';
+import { symptomsOnRecord } from '../../rules/painOnRecord';
+
 import { buildRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { startingWeight } from '../../rules/weightInventory';
+
+export { painLogsShowPain } from '../../rules/painOnRecord';
 
 const START_NOTE =
   'Startförslag för din träningsvana. Anpassa antal och vikt före start.';
@@ -90,32 +93,6 @@ export function basePlan(
         }
       : {}),
   };
-}
-
-/** Any reported symptom on record: starts light and leaves out impact exercises. */
-function symptomsOnRecord(sessions: Session[], painReported: boolean) {
-  return (
-    painReported ||
-    sessions.some(
-      (session) =>
-        session.abortReason === 'pain_stop' ||
-        Object.values(session.checkins ?? {}).some(
-          (check) => check?.symptoms,
-        ) ||
-        Object.values(session.feedback).some((item) => item?.symptoms),
-    )
-  );
-}
-
-/** Any pain reading above zero or a red flag counts as pain on record. */
-export function painLogsShowPain(logs: readonly PainLog[]): boolean {
-  return logs.some(
-    (log) =>
-      log.score > 0 ||
-      log.redFlags.sharp ||
-      log.redFlags.swelling ||
-      log.redFlags.locking,
-  );
 }
 
 /** Saved plan, then the last session for the focus, then the group's starter values. */

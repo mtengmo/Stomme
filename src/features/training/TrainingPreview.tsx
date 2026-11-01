@@ -61,6 +61,7 @@ import type {
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
+import { symptomsOnRecord } from '../../rules/painOnRecord';
 import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
@@ -1357,6 +1358,7 @@ function PreviewEditor({
               preferences={preferences}
               sessions={sessions}
               logs={logs}
+              painOnRecord={symptomsOnRecord(sessions, painReported ?? false)}
               onChoose={(from, to) => {
                 updatePlan((current) =>
                   current.map((item) =>
