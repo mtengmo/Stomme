@@ -121,6 +121,15 @@ describe('weeklyVolume', () => {
     expect(v[10]).toMatchObject({ weekStart: '2026-10-12', sets: 1 });
     expect(v[0]?.sets).toBe(0);
   });
+
+  it('keeps the last session week when "through" is not later than it', () => {
+    const v = weeklyVolume(
+      [session('a', '2026-10-20')],
+      [log('a', 'step-up', 1)],
+      { through: '2026-10-05' },
+    );
+    expect(v.at(-1)).toMatchObject({ weekStart: '2026-10-19', sets: 1 });
+  });
 });
 
 describe('loadPerExercise', () => {
