@@ -12,19 +12,16 @@ describe('contact aware knee figures', () => {
   it('keeps both step-down legs reachable with fixed thigh, shin and foot lengths', () => {
     for (const phase of phases) {
       const pose = movementPose('step-down', phase);
-      for (const [knee, ankle, toe, thigh, shin] of [
-        ['kR', 'aR', 'tR', 32, 31],
-        ['kL', 'aL', 'tL', 39, 39],
+      for (const [knee, ankle, toe, thigh, shin, foot] of [
+        ['kR', 'aR', 'tR', 34, 33, 13],
+        ['kL', 'aL', 'tL', 34, 33, 13],
       ] as const) {
         expect(distance(pose.hip, pose[ankle])).toBeLessThanOrEqual(
           thigh + shin,
         );
         expect(distance(pose.hip, pose[knee])).toBeCloseTo(thigh, 8);
         expect(distance(pose[knee], pose[ankle])).toBeCloseTo(shin, 8);
-        expect(distance(pose[ankle], pose[toe])).toBeCloseTo(
-          Math.hypot(13, 3),
-          8,
-        );
+        expect(distance(pose[ankle], pose[toe])).toBeCloseTo(foot, 8);
       }
     }
   });
@@ -126,19 +123,23 @@ describe('contact aware knee figures', () => {
     expect(distance(bottom.hip, bottom.aR)).toBeGreaterThanOrEqual(47);
     expect(distance(bottom.hip, bottom.aL)).toBeGreaterThanOrEqual(47);
   });
-  it('lowers the free heel past the step while the supporting foot stays planted', () => {
+  it('lowers the free heel 5-8 cm below a stair-height step without touching the floor', () => {
     const start = movementPose('step-down', 0),
       end = movementPose('step-down', 1);
+    const step = figures['step-down'].props.find((p) => p.type === 'step');
     expect(start.aR).toEqual(end.aR);
-    expect(end.aL[0]).toBeGreaterThan(127);
-    expect(end.aL[1]).toBeGreaterThan(146);
+    // Stair height: 14 units (about 19 cm), replacing the old 32-unit step.
+    expect(step).toEqual({ type: 'step', x: 84, y: 164, w: 34 });
+    expect(end.aL[0]).toBeGreaterThan(118);
+    expect(end.aL[1]).toBeGreaterThan(165);
+    expect(end.aL[1]).toBeLessThan(168);
     expect(end.aL[1]).toBeGreaterThan(start.aL[1]);
-    expect(figures['step-down'].props).toContainEqual({
-      type: 'step',
-      x: 91,
-      y: 146,
-      w: 36,
-    });
+    expect(178 - Math.max(end.aL[1], end.tL[1])).toBeGreaterThanOrEqual(6);
+  });
+  it('supports the step-down with a banister beside the body, not a wall', () => {
+    const props = figures['step-down'].props;
+    expect(props.some((p) => p.type === 'rail')).toBe(true);
+    expect(props.some((p) => p.type === 'wall')).toBe(false);
   });
   it('renders specialty supports and holds in session stills', () => {
     for (const id of ['copenhagen-hold', 'bent-knee-calf-hold'] as const) {

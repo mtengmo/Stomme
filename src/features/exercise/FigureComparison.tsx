@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FigureFrame,
-  movementPose,
   usePrefersReducedMotion,
   type Working,
 } from '../../figures/Figure';
@@ -10,8 +9,9 @@ import {
   type Violation,
   type ViolationType,
 } from '../../figures/keyframes';
+import { legacyStepDownPose } from '../../figures/kneeStrengthPoses';
 import { cycleProgress } from '../../figures/lerp';
-import { figures, type Pose } from '../../figures/poses';
+import type { Pose, Prop } from '../../figures/poses';
 import {
   mirrorProp,
   STEP_DOWN_PILOT_PROPS,
@@ -19,6 +19,12 @@ import {
   stepDownGateOptions,
   stepDownKeyframePose,
 } from '../../figures/stepDownKeyframes';
+
+/** The pre-keyframe E96 scene, frozen for comparison. */
+const LEGACY_PROPS: Prop[] = [
+  { type: 'step', x: 91, y: 146, w: 36 },
+  { type: 'wall', x: 62 },
+];
 
 /** One full repetition, in milliseconds, for both versions. */
 const CYCLE_MS = 6000;
@@ -64,7 +70,7 @@ function mirrorPose(p: Pose): Pose {
 
 function currentFrames(side: Working): Pose[] {
   return Array.from({ length: FRAME_COUNT + 1 }, (_, i) => {
-    const pose = movementPose('step-down', currentPhase(i / FRAME_COUNT));
+    const pose = legacyStepDownPose(currentPhase(i / FRAME_COUNT));
     return side === 'right' ? pose : mirrorPose(pose);
   });
 }
@@ -105,7 +111,7 @@ function GateSummary({
   );
 }
 
-/** Pilot: the catalogue E96 step-down next to the keyframe + IK version. */
+/** Pilot: the frozen pre-keyframe E96 step-down next to the keyframe + IK version (now the catalogue figure). */
 export function FigureComparison() {
   const reduced = usePrefersReducedMotion();
   const [side, setSide] = useState<Working>('right');
@@ -130,7 +136,7 @@ export function FigureComparison() {
   }, [playing, reduced]);
 
   const gates = useMemo(() => {
-    const catalogueProps = figures['step-down'].props;
+    const catalogueProps = LEGACY_PROPS;
     return {
       current: checkPoseGeometry(
         currentFrames(side),
@@ -151,19 +157,20 @@ export function FigureComparison() {
     <div className="mx-auto flex max-w-md flex-col gap-4 px-4 pt-3 pb-[var(--app-nav-clear)]">
       <h1 className="m-0 text-3xl font-bold">Figurjämförelse</h1>
       <p className="m-0 text-base text-ink-soft">
-        Nedsteg (E96) med två sätt att animera samma rörelse. Bara för
-        granskning.
+        Nedsteg (E96): den tidigare handritade figuren mot den nya med
+        nyckelrutor och IK, som nu är katalogfiguren. Bara för granskning.
       </p>
       <div className="grid grid-cols-2 gap-2" data-testid="comparison">
         <div className={cardClass}>
           <FigureFrame
             exerciseId="step-down"
-            pose={movementPose('step-down', currentPhase(u))}
+            pose={legacyStepDownPose(currentPhase(u))}
+            props={LEGACY_PROPS}
             working={side}
             phase={currentPhase(u)}
             showMuscles={false}
           />
-          <p className="m-0 text-center text-base font-bold">Nuvarande</p>
+          <p className="m-0 text-center text-base font-bold">Tidigare</p>
         </div>
         <div className={cardClass}>
           <FigureFrame
@@ -228,7 +235,7 @@ export function FigureComparison() {
       ) : null}
       <section className="flex flex-col gap-2" aria-label="Geometrikontroll">
         <h2 className="m-0 text-xl font-bold">Geometrikontroll</h2>
-        <GateSummary title="Nuvarande" violations={gates.current} />
+        <GateSummary title="Tidigare" violations={gates.current} />
         <GateSummary title="Nyckelrutor + IK" violations={gates.keyframes} />
         <p className="m-0 text-base text-ink-soft">
           Kontrollen prövar {FRAME_COUNT + 1} rutor per version: fötter under
@@ -236,8 +243,8 @@ export function FigureComparison() {
           lemlängder som ändras eller skiljer mellan sidorna, och att sista
           rutan är lika med första. Piloten använder ett steg i trapphöjd (cirka
           19 cm) och hälen stannar 5 till 8 cm under steget, utan att nå golvet.
-          Dagens E96 har ett steg på cirka 43 cm och går cirka 20 cm under det,
-          vilket är djupare än källan säger.
+          Tidigare E96 hade ett steg på cirka 43 cm och går cirka 20 cm under
+          det, vilket är djupare än källan säger.
         </p>
       </section>
     </div>

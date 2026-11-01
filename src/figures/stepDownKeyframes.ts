@@ -151,6 +151,15 @@ export function stepDownKeyframePose(t: number): Pose {
   };
 }
 
+/**
+ * Catalogue pose: `t` runs 0 (standing on the step) to 1 (lowest point), as
+ * `movementPose` expects. The card itself plays 0 -> 1 -> 0 with holds, so the
+ * return follows the lowering path in reverse.
+ */
+export function stepDownDescentPose(t: number): Pose {
+  return stepDownKeyframePose(Math.max(0, Math.min(1, t)) * 0.5);
+}
+
 const mirrorPt = ([x, y]: Pt): Pt => [MIRROR_X - x, y];
 
 /** The pose as it appears on screen for the working side. */

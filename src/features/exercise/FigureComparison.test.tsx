@@ -16,10 +16,10 @@ describe('FigureComparison', () => {
     expect(
       screen.getByRole('heading', { name: 'Figurjämförelse' }),
     ).toBeTruthy();
-    expect(screen.getAllByText('Nuvarande').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Tidigare').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Nyckelrutor + IK').length).toBeGreaterThan(0);
     expect(svgs()).toHaveLength(2);
-    // The keyframe version passes; the catalogue one reports violations.
+    // The keyframe version passes; the frozen earlier one reports violations.
     expect(screen.getAllByTestId('gate-pass')).toHaveLength(1);
     expect(screen.getAllByTestId('gate-fail')).toHaveLength(1);
   });

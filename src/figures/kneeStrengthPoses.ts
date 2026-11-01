@@ -1,6 +1,10 @@
 import type { ExerciseId } from '../domain/types';
 import { lerpPt, type Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
+import {
+  STEP_DOWN_PILOT_PROPS,
+  stepDownDescentPose,
+} from './stepDownKeyframes';
 
 export type KneeStrengthId =
   | 'seated-tibial-rotation'
@@ -43,8 +47,11 @@ const body = (
   tL: Pt,
 ): Pose => ({ head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL });
 
-/** Supporting foot stays on the step as the other heel drops beyond its edge. */
-export function stepDownPose(t: number): Pose {
+/**
+ * The previous hand-authored E96 pose (43 cm step, wall, uneven legs), kept
+ * only so the comparison page can still show it next to the catalogue figure.
+ */
+export function legacyStepDownPose(t: number): Pose {
   const q = clamp(t),
     ankle: Pt = [108, 143],
     toe: Pt = [121, 146];
@@ -233,7 +240,7 @@ export function kneeStrengthMovementPose(
     case 'seated-tibial-rotation':
       return seatedTibialRotationPose();
     case 'step-down':
-      return stepDownPose(t);
+      return stepDownDescentPose(t);
     case 'bosu-squat':
       return bosuSquatPose(t);
     case 'copenhagen-hold':
@@ -255,12 +262,9 @@ export const kneeStrengthFigures: Record<KneeStrengthId, FigureSpec> = {
     props: [{ type: 'chair', x: 72, y: 126, w: 40 }],
   },
   'step-down': {
-    start: stepDownPose(0),
-    end: stepDownPose(1),
-    props: [
-      { type: 'step', x: 91, y: 146, w: 36 },
-      { type: 'wall', x: 62 },
-    ],
+    start: stepDownDescentPose(0),
+    end: stepDownDescentPose(1),
+    props: STEP_DOWN_PILOT_PROPS,
   },
   'bosu-squat': {
     start: bosuSquatPose(0),
