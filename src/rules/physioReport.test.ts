@@ -108,8 +108,8 @@ describe('physiotherapist report data', () => {
   it('filters inclusive dates and each programme without changing input order', () => {
     const data = [
       session('before', '2026-10-19', 'general'),
-      session('general', '2026-10-20', 'general'),
-      session('running', '2026-10-21', 'running'),
+      session('general-1', '2026-10-20', 'general'),
+      session('general-2', '2026-10-21', 'general'),
       session('knee', '2026-10-22', 'rehab', { rehabFocus: 'knee' }),
       session('physio', '2026-10-22', 'rehab', { rehabFocus: 'knee-physio' }),
       session('custom', '2026-10-22', 'rehab', { rehabFocus: 'custom' }),
@@ -128,11 +128,10 @@ describe('physiotherapist report data', () => {
       'legacy',
       'old-custom',
       'physio',
-      'running',
-      'general',
+      'general-2',
+      'general-1',
     ]);
-    expect(ids('general')).toEqual(['general']);
-    expect(ids('running')).toEqual(['running']);
+    expect(ids('general')).toEqual(['general-2', 'general-1']);
     expect(ids('knee')).toEqual(['knee']);
     expect(ids('knee-physio')).toEqual(['physio']);
     expect(ids('rehab')).toEqual(['custom', 'old-custom']);

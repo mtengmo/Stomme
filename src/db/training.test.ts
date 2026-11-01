@@ -211,12 +211,12 @@ describe('programme persistence and safety boundaries', () => {
     expect(await canReplaceTrainingPreparation(db, prepared)).toBe(true);
     await saveTrainingPreferences(db, {
       ...preferences,
-      programId: 'running',
+      programId: 'rehab',
       experience: 'regular',
     });
     expect(await db.sessions.count()).toBe(0);
     expect((await db.meta.get('training'))?.value).toMatchObject({
-      programId: 'running',
+      programId: 'rehab',
       experience: 'regular',
     });
   });
@@ -253,7 +253,7 @@ describe('programme persistence and safety boundaries', () => {
     );
     vi.spyOn(db.meta, 'put').mockRejectedValueOnce(new Error('Storage full'));
     await expect(
-      saveTrainingPreferences(db, { ...preferences, programId: 'running' }),
+      saveTrainingPreferences(db, { ...preferences, programId: 'rehab' }),
     ).rejects.toThrow('Storage full');
     expect(await db.sessions.get(prepared.id)).toEqual(prepared);
     expect((await db.meta.get('training'))?.value).toEqual(preferences);
@@ -335,7 +335,7 @@ describe('programme persistence and safety boundaries', () => {
         await db.sessions.update(prepared.id, { note: 'Min anteckning' });
       const snapshot = await db.sessions.get(prepared.id);
       await expect(
-        saveTrainingPreferences(db, { ...preferences, programId: 'running' }),
+        saveTrainingPreferences(db, { ...preferences, programId: 'rehab' }),
       ).rejects.toThrow(/pågående/);
       expect(await db.sessions.get(prepared.id)).toEqual(snapshot);
     },

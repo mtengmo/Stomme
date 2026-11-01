@@ -39,7 +39,7 @@ export function Onboarding() {
         Välkommen till Stomme
       </h1>
       <p className="m-0 text-xl">
-        Färdiga pass för styrka, löpning och knäträning. Välj ett fokus så
+        Färdiga pass för styrka och knäträning. Välj ett fokus så
         hjälper vi dig att komma igång.
       </p>
       <p className="m-0 text-base text-ink-soft">

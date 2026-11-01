@@ -6,7 +6,7 @@ import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingPreferences } from '../../db/training';
 import type { ExerciseId, TrainingPreferences } from '../../domain/types';
-import { regionsAvailable } from '../../rules/programRosters';
+import { focusAvailable } from '../../rules/programRosters';
 import { Button } from '../../ui/Button';
 import { CustomPicker } from './CustomPicker';
 import { customWorkoutPlan } from './defaultPlan';
@@ -30,7 +30,6 @@ const optionClass =
   'flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-2 text-lg';
 const goals: { id: Goal; label: string }[] = [
   { id: 'general', label: 'Bli starkare' },
-  { id: 'running', label: 'Styrka för löpning' },
   { id: 'build', label: 'Skapa eget pass' },
   { id: 'knee', label: 'Knärehab' },
 ];
@@ -113,7 +112,7 @@ export function QuickStart() {
   const available = useMemo(
     () =>
       goal === 'general'
-        ? regionsAvailable(preferencesFromDraft({ ...draft, focus: 'all' }))
+        ? focusAvailable(preferencesFromDraft({ ...draft, focus: 'all' })).regions
         : [],
     [goal, draft],
   );
@@ -313,12 +312,15 @@ export function QuickStart() {
               <p className="m-0 text-base text-ink-soft">
                 {goal === 'build'
                   ? 'Styr vilka övningar vi visar, antal set och startvikt.'
-                  : 'Gäller styrketräning. Din löpvana kan vara en annan.'}
+                  : 'Gäller styrketräning.'}
               </p>
             </fieldset>
           ) : null}
           {step === 'focus' ? (
             <>
+              <p className="m-0 text-lg">
+                Du väljer fokus inför varje pass på träningssidan.
+              </p>
               <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
                 <legend className="sr-only">Fokus</legend>
                 {(

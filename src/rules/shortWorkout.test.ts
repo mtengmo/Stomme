@@ -47,11 +47,11 @@ describe('short workout', () => {
 
   it('declines rehab, custom, empty and plans that cannot be shortened', () => {
     expect(shortWorkoutPlan([item('push-up')], 'rehab')).toBeNull();
-    expect(shortWorkoutPlan([item('push-up')], 'running', true)).toBeNull();
+    expect(shortWorkoutPlan([item('push-up')], 'general', true)).toBeNull();
     expect(shortWorkoutPlan([], 'general')).toBeNull();
     expect(shortWorkoutPlan([item('push-up', 1)], 'general')).toBeNull();
     expect(
-      shortWorkoutPlan([item('push-up', 3)], 'running')?.plan[0]?.sets,
+      shortWorkoutPlan([item('push-up', 3)], 'general')?.plan[0]?.sets,
     ).toBe(2);
   });
 

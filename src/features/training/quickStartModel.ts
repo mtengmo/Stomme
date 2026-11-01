@@ -12,7 +12,6 @@ import type {
 
 export type Goal =
   | 'general'
-  | 'running'
   | 'build'
   | 'knee'
   | 'physio'
@@ -33,7 +32,6 @@ export const levelHints: Record<Experience, string> = {
 
 const goals: Goal[] = [
   'general',
-  'running',
   'build',
   'knee',
   'physio',
@@ -42,7 +40,6 @@ const goals: Goal[] = [
 
 export function stepsFor(goal: Goal | null): Step[] {
   if (goal === 'general') return ['goal', 'equipment', 'level', 'focus'];
-  if (goal === 'running') return ['goal', 'equipment', 'level'];
   if (goal === 'build') return ['goal', 'equipment', 'level', 'pick'];
   return goal ? ['goal', 'equipment'] : ['goal'];
 }
@@ -56,7 +53,6 @@ export function allowedEquipment(goal: Goal | null): EquipmentChoice[] {
   const base: EquipmentChoice[] = ['chair', 'support'];
   if (
     goal === 'general' ||
-    goal === 'running' ||
     goal === 'build' ||
     goal === 'custom'
   )
@@ -192,7 +188,7 @@ export function preferencesFromDraft(
       ? 'rehab'
       : goal === 'build'
         ? 'general'
-        : (goal as 'general' | 'running'),
+        : 'general',
     equipment: [...new Set(equipment)],
     // Rehab never uses the strength level.
     experience: rehab ? 'new' : draft.experience,

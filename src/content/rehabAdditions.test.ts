@@ -38,7 +38,7 @@ describe('new rehab-source catalogue additions', () => {
   });
 
   it('keeps these entries out of default strength and rehab rosters', () => {
-    for (const programId of ['general', 'running', 'rehab'] as const) {
+    for (const programId of ['general', 'general', 'rehab'] as const) {
       for (const template of ['A', 'B'] as const) {
         const roster = initialTrainingRoster(
           {

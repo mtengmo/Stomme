@@ -9,7 +9,7 @@ import {
 } from './weightInventory';
 
 const preferences: TrainingPreferences = {
-  programId: 'running',
+  programId: 'general',
   experience: 'some',
   ...inventory({ dumbbells: [[5, 2]], kettlebells: [[8, 1]] }),
   weights: [

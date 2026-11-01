@@ -203,13 +203,12 @@ export function History() {
               >
                 <option value="all">Alla inriktningar</option>
                 <option value="general">Allmän styrka</option>
-                <option value="running">Styrka för löpning</option>
                 <option value="knee">Knärehab · AAOS</option>
                 <option value="knee-physio">
                   Knärehab · Fysioterapeutens program
                 </option>
                 <option value="rehab">Mitt eget rehabprogram</option>
-                <option value="legacy">Ursprungligt knä- och löpprogram</option>
+                <option value="legacy">Ursprungligt program</option>
               </select>
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -378,7 +377,7 @@ export function History() {
       {exerciseIds.length > 0 ? (
         <section aria-label="Ursprungliga programmets belastning">
           <p className="m-0 text-base text-ink-soft">
-            Belastningen nedan gäller det ursprungliga knä- och löpprogrammet.
+            Belastningen nedan gäller det ursprungliga programmet.
             För nya pass: använd Jämför en övning.
           </p>
           <StepLineChart logs={legacyLogs} exerciseIds={exerciseIds} />

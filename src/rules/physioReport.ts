@@ -11,7 +11,6 @@ import { isRealDate } from '../lib/dates';
 export type ReportProgramme =
   | 'all'
   | 'general'
-  | 'running'
   | 'knee'
   | 'knee-physio'
   | 'rehab'
@@ -20,11 +19,10 @@ export type ReportProgramme =
 export const reportProgrammeLabels: Record<ReportProgramme, string> = {
   all: 'Alla inriktningar',
   general: 'Allmän styrka',
-  running: 'Styrka för löpning',
   knee: 'Knärehab · AAOS',
   'knee-physio': 'Knärehab · fysioterapeutens program',
   rehab: 'Mitt eget rehabprogram',
-  legacy: 'Ursprungligt knä- och löpprogram',
+  legacy: 'Ursprungligt program',
 };
 
 export interface ReportSelection {

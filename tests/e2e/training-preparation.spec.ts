@@ -12,7 +12,7 @@ for (const width of [360, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await quickStart(page, { goal: 'running', level: 'some' });
+    await quickStart(page, { goal: 'general', level: 'some' });
     await page
       .getByRole('button', { name: 'Anpassa passet', exact: true })
       .click();

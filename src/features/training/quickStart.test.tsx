@@ -155,13 +155,13 @@ it('falls back to defaults for an old or damaged draft', async () => {
 
 it('preserves a returning user’s active session and makes resuming the primary action', async () => {
   await setMeta(getDb(), 'training', {
-    programId: 'running',
+    programId: 'general',
     equipment: ['bodyweight'],
     experience: 'new',
   });
   const session = await createSession(getDb(), {
     templateId: 'A',
-    programId: 'running',
+    programId: 'general',
     date: toLocalDate(new Date()),
     startedAt: new Date().toISOString(),
     status: 'in_progress',
@@ -195,13 +195,13 @@ it('preserves a returning user’s active session and makes resuming the primary
   ).toBe(true);
   expect(await getDb().sessions.get(session.id)).toMatchObject({
     status: 'in_progress',
-    programId: 'running',
+    programId: 'general',
   });
 });
 
-it('starts ordinary running strength without a mandatory before questionnaire', async () => {
+it('starts ordinary strength without a mandatory before questionnaire', async () => {
   await setMeta(getDb(), 'training', {
-    programId: 'running',
+    programId: 'general',
     equipment: ['bodyweight'],
     experience: 'some',
   });

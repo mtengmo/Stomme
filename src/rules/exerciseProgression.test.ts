@@ -93,7 +93,7 @@ describe('optional harder exercises', () => {
       symptomatic.plan = [];
       symptomatic.feedback = { plank: { symptoms: symptom } };
       if (where === 'older') symptomatic.startedAt = '2026-10-01T08:00:00Z';
-      else symptomatic.programId = 'running';
+      else symptomatic.programId = 'general';
       data.sessions.push(symptomatic);
       expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
     },
@@ -168,7 +168,7 @@ describe('optional harder exercises', () => {
     ).not.toContain('blast-off-push-up');
     expect(suggest({ sessions: [], logs: [] })).toEqual([]);
     const data = fixture();
-    required(data.sessions[0]).programId = 'running';
+    required(data.sessions[0]).programId = 'general';
     expect(suggest(data)).toEqual([]);
   });
   it.each([
@@ -258,7 +258,7 @@ describe('optional harder exercises', () => {
       if (where === 'pain_stop') newer.abortReason = 'pain_stop';
       data.sessions.push(newer);
       expect(suggest(data)).toEqual([]);
-      newer.programId = 'running';
+      newer.programId = 'general';
       expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
       newer.programId = 'general';
       newer.startedAt = '2026-10-01T08:00:00Z';

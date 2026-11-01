@@ -20,7 +20,6 @@ import { amountText, EFFORT_LABEL } from './labels';
 
 const programmeLabel: Record<ProgramId | 'legacy', string> = {
   general: programmeNames.general,
-  running: programmeNames.running,
   rehab: programmeNames.rehab,
   legacy: 'Äldre pass utan programuppgift',
 };

@@ -15,7 +15,7 @@ for (const [width, scheme] of [
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await quickStart(page, { goal: 'running' });
+    await quickStart(page, { goal: 'general' });
     const openSetup = async () => {
       await page.goto('/#/');
       await page.getByText('Ändra', { exact: true }).click();

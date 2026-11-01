@@ -17,7 +17,7 @@ import {
   isTrainingPreferences,
   isWorkoutEquipment,
 } from './programmes';
-import { generalSlots, runningEasier } from './rosterSlots';
+import { generalSlots } from './rosterSlots';
 
 describe('knee strength catalogue contracts', () => {
   it('keeps editorial tibial rotation bilateral, knee-loaded and outside automatic rosters', () => {
@@ -38,7 +38,6 @@ describe('knee strength catalogue contracts', () => {
     });
     expect(movementSlots[id]).toBeUndefined();
     expect(JSON.stringify(generalSlots)).not.toContain(id);
-    expect(JSON.stringify(runningEasier)).not.toContain(id);
     expect(kneeRehabExercises.map((e) => e.id)).not.toContain(id);
   });
   it('keeps step-down as a library-only, knee-loaded per-leg exercise', () => {
@@ -54,7 +53,6 @@ describe('knee strength catalogue contracts', () => {
     expect(exerciseMetadata[id].reviewedAt).toBe('2026-11-01');
     expect(movementSlots[id]).toBeUndefined();
     expect(JSON.stringify(generalSlots)).not.toContain(id);
-    expect(JSON.stringify(runningEasier)).not.toContain(id);
     expect(kneeRehabExercises.map((e) => e.id)).not.toContain(id);
     for (const ref of ['E85', 'E86', 'E89', 'E97'])
       expect(Object.values(exerciseReferences)).not.toContain(ref);

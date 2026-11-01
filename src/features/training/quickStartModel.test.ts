@@ -18,7 +18,6 @@ describe('quick start model', () => {
       'level',
       'focus',
     ]);
-    expect(stepsFor('running')).toEqual(['goal', 'equipment', 'level']);
     for (const goal of ['knee', 'physio', 'custom'] as const)
       expect(stepsFor(goal)).toEqual(['goal', 'equipment']);
   });
@@ -29,7 +28,7 @@ describe('quick start model', () => {
     expect(readDraft('[1,2]')).toEqual(emptyDraft);
     const draft = readDraft(
       JSON.stringify({
-        goal: 'running',
+        goal: 'unknown',
         step: 'focus',
         equipment: ['laser'],
         experience: 9,
@@ -37,8 +36,8 @@ describe('quick start model', () => {
       }),
     );
     expect(draft).toMatchObject({
-      goal: 'running',
-      step: 'equipment',
+      goal: null,
+      step: 'goal',
       equipment: DEFAULT_SUPPORT,
       experience: 'new',
       bodyParts: [],
@@ -112,7 +111,7 @@ describe('quick start model', () => {
       preferencesFromDraft({ ...base, focus: 'select' }).bodyParts,
     ).toEqual(['legs']);
     expect(
-      preferencesFromDraft({ ...base, goal: 'running', focus: 'select' })
+      preferencesFromDraft({ ...base, goal: 'build', focus: 'select' })
         .bodyParts,
     ).toBeUndefined();
   });
@@ -164,7 +163,6 @@ describe('quick start model', () => {
     expect(stepsFor('build')).toEqual(['goal', 'equipment', 'level', 'pick']);
     for (const goal of [
       'general',
-      'running',
       'knee',
       'physio',
       'custom',
@@ -176,7 +174,7 @@ describe('quick start model', () => {
     expect(
       readDraft(JSON.stringify({ goal: 'build', step: 'pick' })).step,
     ).toBe('pick');
-    for (const goal of ['general', 'running', 'knee', 'physio', 'custom'])
+    for (const goal of ['general', 'knee', 'physio', 'custom'])
       expect(readDraft(JSON.stringify({ goal, step: 'pick' })).step).not.toBe(
         'pick',
       );

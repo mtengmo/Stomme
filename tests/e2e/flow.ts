@@ -260,14 +260,12 @@ export async function removeAllExercises(page: Page): Promise<void> {
 
 export type QuickStartGoal =
   | 'general'
-  | 'running'
   | 'build'
   | 'knee'
   | 'physio'
   | 'custom';
 const GOAL_BUTTON: Record<QuickStartGoal, string> = {
   general: 'Bli starkare',
-  running: 'Styrka för löpning',
   build: 'Skapa eget pass',
   knee: 'Knärehab',
   physio: 'Jag har fysioterapeutens knäprogram (9 övningar)',
@@ -280,7 +278,6 @@ const LEVEL_LABEL = {
 };
 const FINISH: Record<QuickStartGoal, string> = {
   general: 'Visa mitt pass',
-  running: 'Visa mitt pass',
   build: 'Skapa pass',
   knee: 'Visa mitt pass',
   physio: 'Visa mitt program',
@@ -322,7 +319,7 @@ export async function quickStart(
     await page
       .getByRole('combobox', { name: /Arbetande sida/ })
       .selectOption(side);
-  if (goal === 'general' || goal === 'running' || goal === 'build') {
+  if (goal === 'general' || goal === 'build') {
     await page.getByRole('button', { name: 'Nästa', exact: true }).click();
     if (level)
       await page.getByRole('radio', { name: LEVEL_LABEL[level] }).check();

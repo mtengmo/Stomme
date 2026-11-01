@@ -130,25 +130,11 @@ function makeFixture() {
     ],
     feedback: { 'dead-bug': { skipped: true } },
   });
-  const running = session('report-running', 0, {
-    programId: 'running',
-    status: 'in_progress',
-    startedAt: new Date().toISOString(),
-    finishedAt: undefined,
-    plan: [
-      planned('step-up', {
-        target: 8,
-        weightKg: 0,
-        variantId: 'bodyweight',
-        sides: ['right', 'left'],
-      }),
-    ],
-  });
   const outside = session('report-outside-range', 28, {
     programId: 'general',
     plan: [planned('push-up')],
   });
-  const sessionMap = [general, knee, legacy, short, custom, running, outside];
+  const sessionMap = [general, knee, legacy, short, custom, outside];
   const logs = [
     {
       id: 'actual-right',
@@ -234,18 +220,6 @@ function makeFixture() {
       weightKg: 0,
       variantId: 'bodyweight',
       loggedAt: stamp(custom.date, 8),
-    },
-    {
-      id: 'running-actual',
-      sessionId: running.id,
-      exerciseId: 'step-up',
-      setNumber: 1,
-      side: 'left',
-      amount: 5,
-      loadIndex: 0,
-      weightKg: 0,
-      variantId: 'bodyweight',
-      loggedAt: stamp(running.date, 8),
     },
     {
       id: 'outside-actual',
@@ -336,13 +310,10 @@ for (const width of [320, 360, 412]) {
       await openReport(page);
 
       const articles = page.locator('[data-report-session]');
-      await expect(articles).toHaveCount(6);
+      await expect(articles).toHaveCount(5);
       await expect(
         page.locator('[data-report-session="report-outside-range"]'),
       ).toHaveCount(0);
-      await expect(
-        page.locator('[data-report-session="report-running"]'),
-      ).toContainText('Pågående pass');
       await expect(
         page.locator('[data-report-session="report-custom"]'),
       ).toContainText('Mitt eget pass');
@@ -462,7 +433,7 @@ for (const width of [320, 360, 412]) {
       await from.fill(localDateOffset(27));
       await to.fill(localDateOffset(0));
       await programme.selectOption('all');
-      await expect(articles).toHaveCount(6);
+      await expect(articles).toHaveCount(5);
       await page
         .getByRole('button', { name: 'Skriv ut eller spara PDF' })
         .click();

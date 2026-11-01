@@ -26,7 +26,7 @@ export function weeklyProgress(
       start,
       completed: 0,
       incomplete: 0,
-      byProgramme: { general: 0, running: 0, rehab: 0, legacy: 0 },
+      byProgramme: { general: 0, rehab: 0, legacy: 0 },
     };
     for (const session of sessions) {
       if (session.date > today || weekStart(session.date) !== start) continue;

@@ -100,12 +100,12 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   ).toBeHidden();
 });
 
-test('running direction uses body-wide check-ins and keeps effort separate from symptoms', async ({
+test('general direction uses body-wide check-ins and keeps effort separate from symptoms', async ({
   page,
 }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await quickStart(page, { goal: 'running' });
+  await quickStart(page, { goal: 'general' });
   await page
     .getByRole('button', { name: 'Anpassa passet', exact: true })
     .click();
@@ -155,7 +155,7 @@ test('running direction uses body-wide check-ins and keeps effort separate from 
   expect(saved).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
-        programId: 'running',
+        programId: 'general',
         feedback: expect.objectContaining({
           'goblet-chair-squat': expect.objectContaining({
             effort: 'easy',

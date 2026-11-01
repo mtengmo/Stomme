@@ -8,7 +8,7 @@ import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 
 const prefs = {
-  programId: 'running',
+  programId: 'general',
   equipment: ['bodyweight', 'chair', 'support'],
   experience: 'some',
 };

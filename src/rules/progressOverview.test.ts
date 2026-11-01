@@ -58,7 +58,7 @@ describe('progress overview aggregation', () => {
       [
         session('a', '2026-10-19', 'completed', 'general'),
         session('b', '2026-10-21', 'aborted', 'rehab'),
-        session('c', '2026-10-19', 'completed', 'running'),
+        session('c', '2026-10-19', 'completed', 'general'),
         session('future', '2026-10-23', 'completed', 'rehab'),
         session('outside', '2026-09-01'),
       ],
@@ -75,7 +75,7 @@ describe('progress overview aggregation', () => {
     expect(rows[3]).toMatchObject({
       completed: 2,
       incomplete: 1,
-      byProgramme: { general: 1, running: 1, rehab: 0, legacy: 0 },
+      byProgramme: { general: 2, rehab: 0, legacy: 0 },
     });
     expect(weeklyProgress([], '2026-10-21', 12)).toHaveLength(12);
   });

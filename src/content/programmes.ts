@@ -19,7 +19,6 @@ export const experienceLabels: Record<
 export const programmeNames: Record<ProgramId, string> = {
   general: 'Allmän styrka',
 
-  running: 'Styrka för löpning',
 
   rehab: 'Mitt rehabprogram',
 };

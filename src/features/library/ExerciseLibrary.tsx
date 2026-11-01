@@ -165,7 +165,7 @@ export function ExerciseLibrary() {
         <header>
           <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
           <p className="m-0 mt-3 text-base text-ink-soft">
-            Hela kroppen, knäfokus och löpstyrka. Välj efter syfte, muskler och
+            Hela kroppen och knäfokus. Välj efter syfte, muskler och
             utrustning.
           </p>
         </header>
