@@ -24,18 +24,31 @@ import type {
   RehabFocus,
   TrainingPreferences,
 } from '../../domain/types';
-import { toLocalDate } from '../../lib/dates';
+import { toLocalDate, weekdayIndex } from '../../lib/dates';
 import { focusQuery } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
+import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { focusAvailable } from '../../rules/programRosters';
-import { recentMuscles, recoveryNote } from '../../rules/recovery';
+import {
+  muscleRecoveryNote,
+  recentMuscles,
+  recoveryNote,
+} from '../../rules/recovery';
 import { nextTemplateId } from '../../rules/schedule';
 import { trainingDayAfterDue } from '../../rules/training';
+import {
+  completedTrainingDates,
+  nextPlannedDate,
+  planForDate,
+} from '../../rules/weeklySchedule';
+import { musclesForPlan } from '../../rules/weekSuggestion';
 import { Button, buttonClass } from '../../ui/Button';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
+import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
+import { painLogsShowPain } from './defaultPlan';
 import { startingFocus } from './focusModel';
 import { QuickStart } from './QuickStart';
 
@@ -300,6 +313,7 @@ export function TrainingHome() {
     );
     return {
       schedule: await loadWeeklySchedule(),
+      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
       preferences,
       sessions,
       legacyProgramme,
@@ -361,16 +375,48 @@ export function TrainingHome() {
         preferences,
         data.sessions,
         new Date(),
-        focusAvailable(preferences).presets,
+        focusAvailable(preferences, {
+          painOnRecord: symptomsOnRecord(data.sessions, data.painReported),
+        }).presets,
       )
     : undefined;
+  const today = toLocalDate(new Date());
+  const completedDates = completedTrainingDates(
+    data.sessions,
+    preferences?.programId,
+  );
+  const todayPlan =
+    preferences?.programId === 'general' && !completedDates.includes(today)
+      ? planForDate(
+          data.schedule,
+          today,
+          data.savedWorkouts.map((w) => w.id),
+        )
+      : null;
+  const nextDate =
+    preferences?.programId === 'general'
+      ? nextPlannedDate(data.schedule, today, completedDates)
+      : null;
+  const nextPlan = nextDate
+    ? planForDate(
+        data.schedule,
+        nextDate,
+        data.savedWorkouts.map((w) => w.id),
+      )
+    : null;
   const restNote =
     preferences?.programId === 'general' && dailyFocus
-      ? recoveryNote(
-          recentMuscles(data.sessions, new Date()),
-          dailyFocus.focus,
-          new Date(),
-        )
+      ? todayPlan && todayPlan.kind !== 'standard'
+        ? muscleRecoveryNote(
+            recentMuscles(data.sessions, new Date()),
+            musclesForPlan(todayPlan, data.savedWorkouts),
+            new Date(),
+          )
+        : recoveryNote(
+            recentMuscles(data.sessions, new Date()),
+            dailyFocus.focus,
+            new Date(),
+          )
       : '';
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
@@ -397,7 +443,9 @@ export function TrainingHome() {
           ? 'Förbered ditt pass'
           : active
             ? 'Fortsätt ditt pass'
-            : 'Nästa pass'}
+            : todayPlan
+              ? `Idag: ${planLabel(todayPlan, data.savedWorkouts)}`
+              : 'Nästa pass'}
       </h1>
       <p className="m-0 text-lg font-bold">
         {trainingName(preferences)}
@@ -427,7 +475,9 @@ export function TrainingHome() {
         href={
           active
             ? `/session/${active.id}`
-            : `/traning/${nextId}${dailyFocus && preferences.programId === 'general' ? `?${focusQuery(dailyFocus.focus)}` : ''}`
+            : todayPlan
+              ? planHref(todayPlan, data.savedWorkouts, nextId)
+              : `/traning/${nextId}${dailyFocus && preferences.programId === 'general' ? `?${focusQuery(dailyFocus.focus)}` : ''}`
         }
         className={buttonClass('primary')}
       >
@@ -437,6 +487,13 @@ export function TrainingHome() {
             ? 'Fortsätt passet'
             : 'Visa nästa pass'}
       </Link>
+      {!active && !todayPlan && nextDate && nextPlan ? (
+        <p className="m-0 -mt-3 text-base text-ink-soft">
+          Nästa planerade:{' '}
+          {weekdayNames[weekdayIndex(nextDate)]?.toLocaleLowerCase('sv')} ·{' '}
+          {planLabel(nextPlan, data.savedWorkouts)}
+        </p>
+      ) : null}
       {restNote ? (
         <p className="m-0 -mt-3 text-base text-ink-soft">{restNote}</p>
       ) : null}

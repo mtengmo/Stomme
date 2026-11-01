@@ -52,7 +52,14 @@ export function recoveryNote(
   focus: WorkoutFocus,
   now: Date,
 ): string {
-  const overlap = focusTargets(focus).filter((m) => recent[m] !== undefined);
+  return muscleRecoveryNote(recent, focusTargets(focus), now);
+}
+export function muscleRecoveryNote(
+  recent: RecentMuscles,
+  targets: readonly MuscleGroupId[],
+  now: Date,
+): string {
+  const overlap = targets.filter((m) => recent[m] !== undefined);
   if (!overlap.length) return '';
   const names = overlap.map((m) =>
     muscleGroups[m].label.toLocaleLowerCase('sv'),

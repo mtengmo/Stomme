@@ -12,6 +12,7 @@ import { focusAvailable } from '../../rules/programRosters';
 import { recentMuscles, recoveryNote } from '../../rules/recovery';
 import { nextTemplateId } from '../../rules/schedule';
 import { Button } from '../../ui/Button';
+import { painLogsShowPain } from './defaultPlan';
 import { startingFocus } from './focusModel';
 import { RegionChecklist } from './RegionChecklist';
 
@@ -20,6 +21,7 @@ export function FocusPicker() {
     async () => ({
       preferences: await getMeta(getDb(), 'training'),
       sessions: await listSessions(getDb()),
+      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
     }),
     [],
   );
@@ -29,19 +31,27 @@ export function FocusPicker() {
     data.preferences.programId === 'rehab'
   )
     return <Redirect to="/" />;
-  return <Picker preferences={data.preferences} sessions={data.sessions} />;
+  return (
+    <Picker
+      preferences={data.preferences}
+      sessions={data.sessions}
+      painReported={data.painReported}
+    />
+  );
 }
 function Picker({
   preferences,
   sessions,
+  painReported,
 }: {
+  painReported: boolean;
   preferences: TrainingPreferences;
   sessions: Session[];
 }) {
   const [, navigate] = useLocation();
   const now = new Date();
   const available = focusAvailable(preferences, {
-    painOnRecord: symptomsOnRecord(sessions, false),
+    painOnRecord: symptomsOnRecord(sessions, painReported),
   });
   const [focus, setFocus] = useState<WorkoutFocus>(
     () => startingFocus(preferences, sessions, now, available.presets).focus,

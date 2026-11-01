@@ -519,7 +519,7 @@ describe('programme-specific progression', () => {
     });
     const other = session({
       id: 'other',
-      programId: 'general',
+      programId: 'rehab',
       startedAt: '2026-10-20T08:00:00.000Z',
     });
     const legacy = session({

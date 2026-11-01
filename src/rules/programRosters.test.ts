@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
-import { focusPresets, legMuscles } from '../content/focusPresets';
+import {
+  focusPresets,
+  focusTargets,
+  legMuscles,
+} from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import { impactExercises, rehabAdditionIds } from '../content/rosterSlots';
 import type {
@@ -76,6 +80,11 @@ describe('daily focus rosters', () => {
                     legMuscles.includes(m),
                   ),
                 ).toBe(false);
+              expect(
+                exerciseMuscles[id].primary
+                  .filter((m) => m !== 'core')
+                  .every((m) => focusTargets({ id: preset.id }).includes(m)),
+              ).toBe(true);
             }
           });
   it('explicit full ignores onboarding body parts and preserves the old full roster', () => {

@@ -197,13 +197,21 @@ function focusRoster(
     if (ids.length === before) break;
   }
   if (!ids.length || ids.length >= 3) return { ids, notes };
-  const filler = wholeBody(preferences, template, context);
-  for (const id of filler.ids) {
+  // A sparse focus gets core-only whole-body candidates, so the advisory
+  // filler cannot silently introduce leg/press work into a pull day.
+  const filler = [...generalSlots.A, ...generalSlots.B]
+    .flatMap((slot) => slot.candidates)
+    .filter((id) => exerciseMuscles[id].primary.every((m) => m === 'core'));
+  for (const id of filler) {
     if (ids.length >= 3) break;
-    if (!ids.includes(id)) {
-      ids.push(id);
-      if (filler.notes[id]) notes[id] = filler.notes[id];
-    }
+    add(
+      pickFromSlot(
+        { id: 'core-fill', candidates: [id] },
+        preferences,
+        context,
+        new Set(ids),
+      ),
+    );
   }
   return { ids, notes, note: TOP_UP_NOTE };
 }

@@ -93,6 +93,11 @@ const TrainingHome = lazy(() =>
     default: m.TrainingHome,
   })),
 );
+const WeekPlanner = lazy(() =>
+  import('./features/week/WeekPlanner').then((m) => ({
+    default: m.WeekPlanner,
+  })),
+);
 const FocusPicker = lazy(() =>
   import('./features/training/FocusPicker').then((m) => ({
     default: m.FocusPicker,
@@ -174,6 +179,7 @@ function Shell() {
         <Suspense fallback={null}>
           <Switch>
             <Route path="/">{() => <TrainingHome />}</Route>
+            <Route path="/vecka">{() => <WeekPlanner />}</Route>
             <Route path="/fokus">{() => <FocusPicker />}</Route>
             <Route path="/traning/:id">
               {(params) => <TrainingPreview id={params.id} />}

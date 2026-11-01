@@ -68,6 +68,59 @@ afterEach(async () => {
 });
 
 describe('programme persistence and safety boundaries', () => {
+  it('stores daily focus only on standard general sessions and round trips valid custom regions', async () => {
+    const full = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+      undefined,
+      { focus: { id: 'pull' } },
+    );
+    expect(full.focus).toBe('pull');
+    expect(full.regions).toBeUndefined();
+    await db.sessions.clear();
+    const custom = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+      undefined,
+      { focus: { id: 'custom', regions: ['back', 'arms'] } },
+    );
+    expect(custom.regions).toEqual(['back', 'arms']);
+    const backup = await exportAll(db);
+    expect(parseBackup(serializeBackup(backup)).sessions[0]?.focus).toBe(
+      'custom',
+    );
+    const malformed = structuredClone(backup);
+    if (malformed.sessions[0]) malformed.sessions[0].regions = undefined;
+    expect(() => parseBackup(serializeBackup(malformed))).toThrow();
+    await db.sessions.clear();
+    const own = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+      { id: 'one', name: 'Eget' },
+      { focus: { id: 'push' } },
+    );
+    expect(own.focus).toBeUndefined();
+    await db.sessions.clear();
+    const rehab = await startTrainingSession(
+      db,
+      { ...preferences, programId: 'rehab' },
+      'A',
+      [plan],
+      now,
+      undefined,
+      { focus: { id: 'push' } },
+    );
+    expect(rehab.focus).toBeUndefined();
+  });
   it('uses a borrowed workout snapshot without changing home equipment', async () => {
     const home: TrainingPreferences = {
       ...preferences,

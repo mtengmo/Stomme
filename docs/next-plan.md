@@ -39,3 +39,7 @@ The exercise/history handoff was merged and pushed as `14cfb28`. The next reques
 
 Use a feature branch, preserve the Swedish notebook design, and inspect real mobile screenshots before committing UI changes. Run check, coverage tests and build; run browser/accessibility/upgrade checks for relevant changes. Commit on the feature branch. Merge or push only when asked. Named Claude agents from the original handoff are not required by this repository.
 2026-11-01: E95 Explosiv armhävning added to the bodyweight catalogue; technical plyometric press, impact, avoid with wrist or shoulder problems.
+
+2026-11-01: Fokus väljs inför varje allmänt pass med muskelbaserade återhämtningsförslag och rutiner per fokus. Kroppsdelsval får nya kurerade rostrar; löpprogrammet är borttaget. Rehab och det ursprungliga knäprogrammet är kvar. Backup kräver v3.
+
+2026-11-01: Egna pass grupperas automatiskt eller manuellt och kan planeras på 1–5 veckodagar via /vecka. Veckoförslag sparas först med Spara, och dagens tilldelning öppnar alltid förhandsvisningen. Välj själv används bara för dagens pass eftersom veckoplanens fokus inte har kroppsdelar.

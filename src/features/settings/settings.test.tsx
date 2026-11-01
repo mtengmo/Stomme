@@ -131,7 +131,7 @@ describe('Settings', () => {
   it.each([
     ['not json', /kunde inte läsas som en säkerhetskopia/],
     ['{"schemaVersion":99}', /annan version/],
-    ['{"schemaVersion":1}', /stämmer inte/],
+    ['{"schemaVersion":1}', /annan version/],
   ])('rejects %s with a Swedish message', async (text, msg) => {
     render(<Settings page="sakerhetskopia" />);
     await userEvent.upload(

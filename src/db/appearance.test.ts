@@ -33,10 +33,10 @@ describe('appearance is a device preference, not data', () => {
     expect(await db.meta.count()).toBe(0);
   });
 
-  it('a backup never contains the appearance and its schema is unchanged', async () => {
+  it('a backup never contains the appearance and its uses the current schema', async () => {
     setAppearance({ scheme: 'dark' });
     const backup = await exportAll(db, new Date('2026-10-20T10:00:00Z'));
-    expect(BACKUP_SCHEMA_VERSION).toBe(2);
+    expect(BACKUP_SCHEMA_VERSION).toBe(3);
     expect(Object.keys(backup).sort()).toEqual([
       'exportedAt',
       'meta',
@@ -49,7 +49,7 @@ describe('appearance is a device preference, not data', () => {
     expect(serializeBackup(backup)).not.toContain('dark');
   });
 
-  it('a backup made before themes still imports and leaves the appearance alone', async () => {
+  it('a current backup imports and leaves the device appearance alone', async () => {
     const legacy = JSON.stringify({
       schemaVersion: 3,
       exportedAt: '2026-10-01T10:00:00.000Z',

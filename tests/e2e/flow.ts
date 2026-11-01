@@ -258,12 +258,7 @@ export async function removeAllExercises(page: Page): Promise<void> {
   }
 }
 
-export type QuickStartGoal =
-  | 'general'
-  | 'build'
-  | 'knee'
-  | 'physio'
-  | 'custom';
+export type QuickStartGoal = 'general' | 'build' | 'knee' | 'physio' | 'custom';
 const GOAL_BUTTON: Record<QuickStartGoal, string> = {
   general: 'Bli starkare',
   build: 'Skapa eget pass',

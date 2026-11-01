@@ -5,7 +5,13 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exerciseList, exercises } from '../../content/exercises';
-import { focusLabel, type WorkoutFocus } from '../../content/focusPresets';
+import {
+  focusLabel,
+  type WorkoutFocus,
+  type WorkoutGroup,
+  workoutGroupLabels,
+  workoutGroups,
+} from '../../content/focusPresets';
 import {
   kneeConditioningPlan,
   kneeRehabExercises,
@@ -36,6 +42,7 @@ import {
   createNamedCustomWorkout,
   readCustomWorkouts,
   renameCustomWorkout,
+  setCustomWorkoutGroup,
   WorkoutNameClashError,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
@@ -74,10 +81,13 @@ import {
   startingWeight,
   weightLabel,
 } from '../../rules/weightInventory';
+import { groupOf } from '../../rules/workoutGroups';
 import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { DeleteWorkoutButton } from '../library/CustomWorkoutList';
+import { weekdayNames } from '../week/planModel';
+import { loadWeeklySchedule } from '../week/WeeklyPlan';
 import {
   basePlan,
   customWorkoutPlan,
@@ -144,6 +154,10 @@ function PreviewEditor({
   savedRoutines?: TrainingRoutines;
 }) {
   const [, navigate] = useLocation();
+  const weeklySchedule = useLiveQuery(loadWeeklySchedule, []);
+  const [workoutGroup, setWorkoutGroup] = useState<WorkoutGroup | ''>(
+    customWorkout?.group ?? '',
+  );
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
   const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${focus.id}.${(focus.regions ?? []).join(',')}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
@@ -1404,6 +1418,57 @@ function PreviewEditor({
 
           {!equipmentOverride && editing && customWorkout ? (
             <>
+              {preferences.programId !== 'rehab' ? (
+                <>
+                  <label className="flex flex-col gap-2 text-base font-bold">
+                    Grupp
+                    <select
+                      className={inputClass}
+                      value={workoutGroup}
+                      onChange={(event) => {
+                        setWorkoutGroup(
+                          event.target.value as WorkoutGroup | '',
+                        );
+                        setSaved(false);
+                      }}
+                    >
+                      <option value="">
+                        Automatiskt (
+                        {
+                          workoutGroupLabels[
+                            groupOf({
+                              exerciseIds: plan.map((item) => item.exerciseId),
+                            })
+                          ]
+                        }
+                        )
+                      </option>
+                      {workoutGroups.map((group) => (
+                        <option key={group} value={group}>
+                          {workoutGroupLabels[group]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {weeklySchedule?.days.some(
+                    (item) =>
+                      item.plan.kind === 'workout' &&
+                      item.plan.workoutId === customWorkout.id,
+                  ) ? (
+                    <p className="m-0 text-base text-ink-soft">
+                      Planerade dagar:{' '}
+                      {weeklySchedule.days
+                        .filter(
+                          (item) =>
+                            item.plan.kind === 'workout' &&
+                            item.plan.workoutId === customWorkout.id,
+                        )
+                        .map((item) => weekdayNames[item.day - 1])
+                        .join(', ')}
+                    </p>
+                  ) : null}
+                </>
+              ) : null}
               <Button
                 variant="secondary"
                 disabled={busy || !ready || !workoutName.trim()}
@@ -1417,6 +1482,11 @@ function PreviewEditor({
                       plan.map((item) => item.exerciseId),
                       plan,
                     );
+                    if (preferences.programId !== 'rehab')
+                      await setCustomWorkoutGroup(
+                        customWorkout.id,
+                        workoutGroup || undefined,
+                      );
                     setSaved(true);
                   } catch (caught) {
                     setError(
