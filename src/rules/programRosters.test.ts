@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
+import { focusPresets, legMuscles } from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import { impactExercises, rehabAdditionIds } from '../content/rosterSlots';
 import type {
@@ -8,11 +9,11 @@ import type {
   TrainingPreferences,
 } from '../domain/types';
 import { equipmentFits, type Inventory } from './equipment';
-import { allowedLevels, chooseVariant } from './levelPolicy';
+import { chooseVariant } from './levelPolicy';
 import {
   buildRoster,
+  focusAvailable,
   initialTrainingRoster,
-  regionsAvailable,
 } from './programRosters';
 
 const weights: TrainingPreferences['weights'] = [
@@ -47,17 +48,76 @@ const equipmentSets: [string, Inventory][] = [
   ['everything', everything],
 ];
 
-describe('initial training roster', () => {
-  it('fills a running roster without apparatus using unique basic bodyweight work', () => {
-    const roster = buildRoster(
-      { programId: 'running', experience: 'new', equipment: [] },
-      'A',
-    );
-    expect(roster.ids.length).toBeGreaterThanOrEqual(3);
-    expect(new Set(roster.ids).size).toBe(roster.ids.length);
-    expect(roster.ids).toContain('glute-bridge');
-    expect(roster.ids).toContain('dead-bug');
+describe('daily focus rosters', () => {
+  for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
+    for (const experience of ['new', 'some', 'regular'] as const)
+      for (const [name, inventory] of equipmentSets)
+        for (const template of ['A', 'B'] as const)
+          it(`${preset.id} ${experience} ${name} ${template} has safe unique choices`, () => {
+            const preferences: TrainingPreferences = {
+              programId: 'general',
+              experience,
+              ...inventory,
+            };
+            const roster = buildRoster(preferences, template, {
+              focus: { id: preset.id },
+              painOnRecord: true,
+            });
+            expect(roster.ids.length).toBeGreaterThanOrEqual(3);
+            expect(roster.ids.length).toBeLessThanOrEqual(6);
+            expect(new Set(roster.ids).size).toBe(roster.ids.length);
+            for (const id of roster.ids) {
+              expect(impactExercises.has(id)).toBe(false);
+              expect(rehabAdditionIds.has(id)).toBe(false);
+              expect(chooseVariant(id, preferences)).toBeDefined();
+              if (preset.id === 'push')
+                expect(
+                  exerciseMuscles[id].primary.some((m) =>
+                    legMuscles.includes(m),
+                  ),
+                ).toBe(false);
+            }
+          });
+  it('explicit full ignores onboarding body parts and preserves the old full roster', () => {
+    const preferences: TrainingPreferences = {
+      programId: 'general',
+      experience: 'some',
+      ...everything,
+    };
+    for (const template of ['A', 'B'] as const)
+      expect(
+        buildRoster({ ...preferences, bodyParts: ['chest'] }, template, {
+          focus: { id: 'full' },
+        }),
+      ).toEqual(buildRoster(preferences, template));
   });
+  it('keeps rehabilitation isolated even with an explicit focus', () => {
+    expect(
+      buildRoster(
+        { programId: 'rehab', experience: 'new', equipment: [] },
+        'A',
+        { focus: { id: 'push' } },
+      ),
+    ).toEqual({ ids: [], notes: {} });
+  });
+  it('makes sparse pull bodyweight top-up explicit and lists unavailable regions', () => {
+    const preferences: TrainingPreferences = {
+      programId: 'general',
+      experience: 'new',
+      equipment: ['bodyweight'],
+    };
+    expect(
+      buildRoster(preferences, 'A', { focus: { id: 'pull' } }).note,
+    ).toContain('Kompletterat');
+    expect(focusAvailable(preferences).presets).toContain('push');
+    expect(focusAvailable(preferences).regions).not.toContain('shoulders');
+    expect(
+      buildRoster(preferences, 'B', { focus: { id: 'push' } }).notes,
+    ).not.toEqual({});
+  });
+});
+
+describe('initial training roster', () => {
   it('is empty for rehab', () => {
     expect(
       initialTrainingRoster(
@@ -76,7 +136,7 @@ describe('initial training roster', () => {
     expect(initialTrainingRoster(preferences, 'A')).toEqual([]);
   });
 
-  for (const programId of ['general', 'running'] as const)
+  for (const programId of ['general'] as const)
     for (const experience of ['new', 'some', 'regular'] as const)
       for (const [name, owned] of equipmentSets)
         for (const template of ['A', 'B'] as TemplateId[])
@@ -95,42 +155,8 @@ describe('initial training roster', () => {
               const variant = chooseVariant(id, preferences);
               expect(variant).toBeDefined();
               expect(equipmentFits(variant?.equipment ?? [], owned)).toBe(true);
-              // Running only swaps to allowed levels; general may use a flagged easiest fallback.
-              if (programId === 'running')
-                expect(allowedLevels(experience)).toContain(
-                  variant?.technicalLevel,
-                );
             }
           });
-
-  it('starts running new on the easiest squat', () => {
-    const ids = initialTrainingRoster(
-      {
-        programId: 'running',
-        experience: 'new',
-        equipment: everything.equipment,
-        weights,
-      },
-      'A',
-    );
-    expect(ids[0]).toBe('goblet-chair-squat');
-    expect(ids).not.toContain('single-leg-rdl');
-    expect(ids).not.toContain('side-plank');
-  });
-
-  it('keeps the full running template for regular training', () => {
-    const ids = initialTrainingRoster(
-      {
-        programId: 'running',
-        experience: 'regular',
-        equipment: everything.equipment,
-        weights,
-      },
-      'A',
-    );
-    expect(ids).toContain('single-leg-rdl');
-    expect(ids).toContain('side-plank');
-  });
 
   it('includes the floor press for some experience with two dumbbells', () => {
     const ids = initialTrainingRoster(
@@ -216,7 +242,7 @@ describe('initial training roster', () => {
       ).toEqual([]);
     });
     it('lists the regions that have exercises', () => {
-      const regions = regionsAvailable(thin);
+      const regions = focusAvailable(thin).regions;
       expect(regions).toContain('legs');
       expect(regions).not.toContain('shoulders');
     });
@@ -268,7 +294,7 @@ describe('basic push-ups and calf raise in the rosters', () => {
   it('never rosters wall push-up or crunch', () => {
     for (const experience of ['new', 'some', 'regular'] as const)
       for (const template of ['A', 'B'] as const)
-        for (const programId of ['general', 'running'] as const) {
+        for (const programId of ['general'] as const) {
           const ids = buildRoster(
             { programId, experience, equipment: everything.equipment },
             template,
@@ -277,14 +303,5 @@ describe('basic push-ups and calf raise in the rosters', () => {
           expect(ids).not.toContain('crunch');
           expect(ids).not.toContain('blast-off-push-up');
         }
-  });
-
-  it('gives a new runner calf raise in place of the single-leg version', () => {
-    const ids = buildRoster(
-      { programId: 'running', experience: 'new', ...bodyweight },
-      'B',
-    ).ids;
-    expect(ids).not.toContain('single-leg-calf-raise');
-    expect(ids).toContain('calf-raise');
   });
 });

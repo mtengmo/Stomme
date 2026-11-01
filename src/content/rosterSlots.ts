@@ -1,4 +1,5 @@
 import type { ExerciseId, TemplateId } from '../domain/types';
+import type { MuscleGroupId } from './muscles';
 import { rehabAdditions } from './rehabAdditions';
 
 export interface RosterSlot {
@@ -107,11 +108,118 @@ export const impactExercises: ReadonlySet<ExerciseId> = new Set([
   'burpee',
 ]);
 
-/** Same-slot easier exercises used when a running template exercise is above the user's level. */
-export const runningEasier: Partial<Record<ExerciseId, ExerciseId[]>> = {
-  'single-leg-rdl': ['dumbbell-rdl', 'glute-bridge'],
-  'side-plank': ['plank', 'dead-bug'],
-  'split-squat': ['step-up', 'goblet-chair-squat', 'wall-sit'],
-  'single-leg-hip-thrust': ['glute-bridge'],
-  'single-leg-calf-raise': ['calf-raise'],
-};
+/** Explicit opt-in for daily focus. Library and clinician-only additions stay out. */
+export const focusSlots: (RosterSlot & { targets: MuscleGroupId[] })[] = [
+  {
+    id: 'squat',
+    targets: ['quads', 'glutes'],
+    candidates: [
+      'goblet-chair-squat',
+      'goblet-squat',
+      'kettlebell-goblet-squat',
+      'sumo-squat',
+      'squat-jump',
+    ],
+  },
+  {
+    id: 'hinge',
+    targets: ['glutes', 'hamstrings'],
+    candidates: [
+      'glute-bridge',
+      'weighted-glute-bridge',
+      'dumbbell-rdl',
+      'kettlebell-deadlift',
+      'single-leg-rdl',
+      'kettlebell-swing',
+      'one-arm-kettlebell-swing',
+    ],
+  },
+  {
+    id: 'split-leg',
+    targets: ['quads', 'glutes'],
+    candidates: [
+      'step-up',
+      'split-squat',
+      'reverse-lunge',
+      'forward-lunge',
+      'side-lunge',
+      'walking-lunge',
+      'jumping-lunge',
+    ],
+  },
+  {
+    id: 'horizontal-press',
+    targets: ['chest', 'triceps'],
+    candidates: [
+      'floor-press',
+      'kettlebell-floor-press',
+      'knee-push-up',
+      'push-up',
+      'decline-push-up',
+      'diamond-push-up',
+      'parallel-dip',
+    ],
+  },
+  {
+    id: 'overhead',
+    targets: ['shoulders'],
+    candidates: ['shoulder-press', 'kettlebell-press'],
+  },
+  {
+    id: 'row',
+    targets: ['back'],
+    candidates: [
+      'back-extension',
+      'bird-dog',
+      'supported-row',
+      'bent-over-row',
+    ],
+  },
+  {
+    id: 'vertical-pull',
+    targets: ['back', 'biceps'],
+    candidates: ['chin-up', 'pull-up'],
+  },
+  {
+    id: 'lateral-raise',
+    targets: ['shoulders'],
+    candidates: ['lateral-raise'],
+  },
+  {
+    id: 'curl',
+    targets: ['biceps', 'forearms'],
+    candidates: ['hammer-curl', 'biceps-curl'],
+  },
+  {
+    id: 'arm-extension',
+    targets: ['triceps'],
+    candidates: ['triceps-kickback', 'overhead-triceps-extension'],
+  },
+  {
+    id: 'calf',
+    targets: ['calves'],
+    candidates: ['calf-raise', 'single-leg-calf-raise'],
+  },
+  { id: 'hip-side', targets: ['quads', 'glutes'], candidates: ['side-lunge'] },
+  {
+    id: 'carry',
+    targets: ['core', 'forearms'],
+    candidates: ['farmer-carry', 'suitcase-carry', 'kettlebell-rack-carry'],
+  },
+  {
+    id: 'core',
+    targets: ['core'],
+    candidates: [
+      'dead-bug',
+      'plank',
+      'lying-leg-raise',
+      'mountain-climber',
+      'plank-arm-lift',
+    ],
+  },
+  {
+    id: 'side-core',
+    targets: ['core'],
+    candidates: ['side-plank', 'russian-twist', 'woodchop'],
+  },
+];

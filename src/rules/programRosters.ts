@@ -1,16 +1,18 @@
+import type { ExerciseVariant } from '../content/exerciseMetadata';
 import {
-  type ExerciseVariant,
-  exerciseMetadata,
-} from '../content/exerciseMetadata';
+  type FocusId,
+  focusPresets,
+  focusTargets,
+  type WorkoutFocus,
+} from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import {
+  focusSlots,
   generalSlots,
   impactExercises,
   type RosterSlot,
   rehabAdditionIds,
-  runningEasier,
 } from '../content/rosterSlots';
-import { templates } from '../content/templates';
 import type {
   BodyRegionId,
   ExerciseId,
@@ -28,6 +30,7 @@ import {
 export interface RosterContext {
   /** Symptoms or pain on record: no impact exercises, lightest weights. */
   painOnRecord?: boolean;
+  focus?: WorkoutFocus;
 }
 
 export interface Roster {
@@ -122,95 +125,83 @@ function wholeBody(
   return { ids, notes };
 }
 
-function allPicks(
-  preferences: TrainingPreferences,
-  context: RosterContext,
-): ExerciseId[] {
-  const ids: ExerciseId[] = [];
-  for (const slot of [...generalSlots.A, ...generalSlots.B]) {
-    const pick = pickFromSlot(slot, preferences, context, new Set(ids));
-    if (pick) ids.push(pick.id);
-  }
-  return ids;
-}
-
-function matchesRegion(id: ExerciseId, region: BodyRegionId): boolean {
-  const muscles = bodyRegions.find((item) => item.id === region)?.muscles ?? [];
-  return exerciseMuscles[id].primary.some((muscle) => muscles.includes(muscle));
-}
-
-/** Regions with at least one exercise for this equipment and level. */
-export function regionsAvailable(
+/** Presets and regions with at least one equipment- and level-eligible pick. */
+export function focusAvailable(
   preferences: TrainingPreferences,
   context: RosterContext = {},
-): BodyRegionId[] {
-  const picks = allPicks({ ...preferences, bodyParts: undefined }, context);
-  return bodyRegions
-    .map((region) => region.id)
-    .filter((region) => picks.some((id) => matchesRegion(id, region)));
+): { presets: FocusId[]; regions: BodyRegionId[] } {
+  const ids = focusSlots.flatMap((slot) => {
+    const pick = pickFromSlot(slot, preferences, context, new Set());
+    return pick ? [pick.id] : [];
+  });
+  const hasMuscle = (targets: readonly string[]) =>
+    ids.some((id) =>
+      exerciseMuscles[id].primary.some((m) => targets.includes(m)),
+    );
+  return {
+    presets: focusPresets
+      .filter(
+        (p) => p.id === 'full' || p.id === 'custom' || hasMuscle(p.targets),
+      )
+      .map((p) => p.id),
+    regions: bodyRegions.filter((r) => hasMuscle(r.muscles)).map((r) => r.id),
+  };
 }
 
-function focused(
+function focusRoster(
   preferences: TrainingPreferences,
   template: TemplateId,
-  regions: BodyRegionId[],
+  focus: WorkoutFocus,
   context: RosterContext,
 ): Roster {
-  const picks = allPicks({ ...preferences, bodyParts: undefined }, context);
-  const perRegion = regions.map((region) =>
-    picks.filter((id) => matchesRegion(id, region)),
-  );
-  const offset = template === 'A' ? 0 : 1;
+  const targets = focusTargets(focus);
+  const preset = focusPresets.find(
+    (p) => p.id === focus.id,
+  ) as (typeof focusPresets)[number];
+  const slots = (
+    preset.slots.length
+      ? preset.slots.map(
+          (id) =>
+            focusSlots.find((s) => s.id === id) as (typeof focusSlots)[number],
+        )
+      : focusSlots
+  )
+    .filter((slot) => slot.targets.some((m) => targets.includes(m)))
+    .map((slot) => ({
+      ...slot,
+      candidates: slot.candidates.filter((id) =>
+        exerciseMuscles[id].primary.some((m) => targets.includes(m)),
+      ),
+    }));
   const ids: ExerciseId[] = [];
-  const add = (id: ExerciseId | undefined) => {
-    if (id && !ids.includes(id) && ids.length < 5) ids.push(id);
+  const notes: Roster['notes'] = {};
+  const limit = preferences.experience === 'regular' ? 6 : 5;
+  const add = (pick: ReturnType<typeof pickFromSlot>) => {
+    if (!pick) return;
+    ids.push(pick.id);
+    if (pick.note) notes[pick.id] = pick.note;
   };
-  // Pass A takes each region's 1st, 3rd... pick and pass B its 2nd, 4th..., so the
-  // two passes differ as sets. A pool of one or two exercises can only repeat.
-  for (const list of perRegion) add(list[offset] ?? list[0]);
-  for (const list of perRegion)
-    list.forEach((id, index) => {
-      if (index % 2 === offset) add(id);
-    });
-  for (const list of perRegion)
-    for (const id of list) if (ids.length < 3) add(id);
-  if (!ids.length) return { ids: [], notes: {} };
-  if (ids.length >= 3) return { ids, notes: {} };
+  // Compound slots come first. Further rounds draw unique alternatives through
+  // the same equipment, level, weight and symptom policy as every other pick.
+  for (let round = 0; round < limit && ids.length < limit; round++) {
+    const before = ids.length;
+    for (const slot of slots) {
+      if (ids.length >= limit) break;
+      const used = new Set(ids);
+      const first = pickFromSlot(slot, preferences, context, used);
+      if (template === 'B' && round === 0 && first) {
+        used.add(first.id);
+        add(pickFromSlot(slot, preferences, context, used) ?? first);
+      } else add(first);
+    }
+    if (ids.length === before) break;
+  }
+  if (!ids.length || ids.length >= 3) return { ids, notes };
   for (const id of wholeBody(preferences, template, context).ids) {
     if (ids.length >= 3) break;
-    add(id);
+    if (!ids.includes(id)) ids.push(id);
   }
-  return { ids, notes: {}, note: TOP_UP_NOTE };
-}
-
-/** Running keeps its A/B template; a lower level swaps in easier same-slot exercises. */
-function running(
-  preferences: TrainingPreferences,
-  template: TemplateId,
-): Roster {
-  const levels = allowedLevels(preferences.experience);
-  const ids: ExerciseId[] = [];
-  const ok = (id: ExerciseId) =>
-    fits(id, preferences) &&
-    usable(id, preferences) &&
-    levels.includes(levelOf(id, preferences)) &&
-    !ids.includes(id);
-  for (const item of templates[template].items) {
-    const original = item.exerciseId;
-    if (ok(original)) {
-      ids.push(original);
-      continue;
-    }
-    const easier = exerciseMetadata[original].easierExerciseId;
-    const chain = [
-      ...(easier ? [easier] : []),
-      ...(runningEasier[original] ?? []),
-    ];
-    // Nothing easier fits: the exercise is dropped rather than kept above the user's level.
-    const replacement = chain.find(ok);
-    if (replacement) ids.push(replacement);
-  }
-  return { ids, notes: {} };
+  return { ids, notes, note: TOP_UP_NOTE };
 }
 
 export function buildRoster(
@@ -219,17 +210,15 @@ export function buildRoster(
   context: RosterContext = {},
 ): Roster {
   if (preferences.programId === 'rehab') return { ids: [], notes: {} };
-  const roster =
-    preferences.programId === 'running'
-      ? running(preferences, template)
-      : preferences.bodyParts?.length
-        ? focused(preferences, template, preferences.bodyParts, context)
-        : wholeBody(preferences, template, context);
-  // Whole-body and running slots already provide at least three apparatus-free
-  // options at every level. A focused selection may intentionally stay empty.
-  return roster;
+  const focus =
+    context.focus ??
+    (preferences.bodyParts?.length
+      ? { id: 'custom' as const, regions: preferences.bodyParts }
+      : { id: 'full' as const });
+  return focus.id === 'full'
+    ? wholeBody(preferences, template, context)
+    : focusRoster(preferences, template, focus, context);
 }
-
 export function initialTrainingRoster(
   preferences: TrainingPreferences,
   template: TemplateId,
