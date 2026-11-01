@@ -3,6 +3,8 @@ import { exerciseReferences } from '../../src/content/exerciseReferences';
 import { addWeight, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
+test.use({ ...devices['Pixel 7'], storageState: FRESH_STATE });
+
 const CASES = [
   { name: '320x640', viewport: { width: 320, height: 640 }, scale: 100 },
   { name: '390x844', viewport: { width: 390, height: 844 }, scale: 100 },
@@ -44,12 +46,7 @@ async function choosePress(page: import('@playwright/test').Page) {
 for (const scenario of CASES)
   for (const colorScheme of SCHEMES) {
     test.describe(`start focus ${scenario.name} ${colorScheme}`, () => {
-      test.use({
-        ...devices['Pixel 7'],
-        storageState: FRESH_STATE,
-        viewport: scenario.viewport,
-        colorScheme,
-      });
+      test.use({ viewport: scenario.viewport, colorScheme });
 
       test('Home opens the focus picker and Press opens its preview', async ({
         page,
@@ -100,12 +97,7 @@ for (const scenario of CASES)
   }
 
 test.describe('start focus after a reported symptom', () => {
-  test.use({
-    ...devices['Pixel 7'],
-    storageState: FRESH_STATE,
-    viewport: { width: 390, height: 844 },
-    colorScheme: 'light',
-  });
+  test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'light' });
 
   test('Press omits impact work and starts at bodyweight after a symptom', async ({
     page,

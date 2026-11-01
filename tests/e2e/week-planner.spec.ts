@@ -2,6 +2,8 @@ import { devices, expect, test } from '@playwright/test';
 import { quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
+test.use({ ...devices['Pixel 7'], storageState: FRESH_STATE });
+
 const CASES = [
   { name: '320x640', viewport: { width: 320, height: 640 }, scale: 100 },
   { name: '390x844', viewport: { width: 390, height: 844 }, scale: 100 },
@@ -31,12 +33,7 @@ async function localWeekdays(page: import('@playwright/test').Page) {
 for (const scenario of CASES)
   for (const colorScheme of SCHEMES) {
     test.describe(`week planner ${scenario.name} ${colorScheme}`, () => {
-      test.use({
-        ...devices['Pixel 7'],
-        storageState: FRESH_STATE,
-        viewport: scenario.viewport,
-        colorScheme,
-      });
+      test.use({ viewport: scenario.viewport, colorScheme });
 
       test('suggests, saves and opens today’s planned focus', async ({
         page,
