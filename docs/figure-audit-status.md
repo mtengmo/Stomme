@@ -27,8 +27,8 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 | W3 | E02 step-up sidovy | done | cd7d4f9 |
 | W3b | E02 step-up frontvy | done | a971f09 |
 | W4 | E42 bench-side-plank-leg-lift (sido- och sned vy; ram `8 20 184 168`) | done | 1f8064f |
-| W5 | Plankfamiljen (plank, plank-arm-lift, push-up, decline, diamond). Avvikelse: bortre knä IK-böjer åt -1 (spec: 1 gav knä under golvet), bortre fot 3 enheter vinkelrätt mot benet i stället för [-3,-3] så att benet inte knickar. Burpee ärver push-up-poser och får tillfälligt några tiondelar sämre baslinje (ersätts i W7). | done | (nästa commit) |
-| W6 | E16 floor-press | todo | |
+| W5 | Plankfamiljen (plank, plank-arm-lift, push-up, decline, diamond). Avvikelse: bortre knä IK-böjer åt -1 (spec: 1 gav knä under golvet), bortre fot 3 enheter vinkelrätt mot benet i stället för [-3,-3] så att benet inte knickar. Burpee ärver push-up-poser och får tillfälligt några tiondelar sämre baslinje (ersätts i W7). | done | 05d9a4b |
+| W6 | E16 floor-press (avvikelse: delade `floorBase` fick bortre knä via IK så benen blir lika långa, krävdes för att kontrollen skulle bli []; gäller även dumbbell-pullover och kettlebell-floor-press) | done | (nästa commit) |
 | W7 | E60 burpee | todo | |
 | W9 | Knäböjsfamiljen | todo | |
 | E96-text | vägg eller räcke | todo | |

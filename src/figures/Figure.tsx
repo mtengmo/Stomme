@@ -4,6 +4,7 @@ import type { ExerciseId } from '../domain/types';
 import { repTempo } from '../rules/repTempo';
 import {
   dumbbellPulloverPose,
+  floorPressPose,
   hamstringCurlPose,
   kettlebellFloorPressPose,
   seatedKneeExtensionPose,
@@ -67,6 +68,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')
     return kettlebellFloorPressPose(t);
+  if (exerciseId === 'floor-press') return floorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   if (exerciseId === 'step-up') return stepUpPose(t);

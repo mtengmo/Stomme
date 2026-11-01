@@ -1,5 +1,6 @@
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
+import { joint } from './rehabPoses';
 
 type P = Pt;
 function p(
@@ -110,7 +111,7 @@ const rowStart = p(
     [74, 177],
   ],
 );
-const floorBase = p(
+const floorBaseRaw = p(
   [39, 167],
   [54, 170],
   [99, 171],
@@ -130,6 +131,18 @@ const floorBase = p(
   ],
 );
 
+/** Same pose with the far knee solved so both legs are equally long. */
+const floorBase: Pose = {
+  ...floorBaseRaw,
+  kL: joint(
+    floorBaseRaw.hip,
+    floorBaseRaw.aL,
+    Math.hypot(26, 26),
+    Math.hypot(21, 29),
+    -1,
+  ),
+};
+
 /** One-arm floor press: upper arm rotates while the forearm stays upright. */
 export function kettlebellFloorPressPose(progress: number): Pose {
   const t = Math.min(1, Math.max(0, progress));
@@ -145,6 +158,22 @@ export function kettlebellFloorPressPose(progress: number): Pose {
     eL: [78, 174],
     hL: [98, 174],
   };
+}
+
+/** Two-arm floor press: both upper arms rotate with the forearms upright. */
+export function floorPressPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const angle = Math.asin(4 / 26) * (1 - t) - (Math.PI / 2) * t;
+  const arm = (a: number): [P, P] => {
+    const elbow: P = [
+      floorBase.neck[0] + 26 * Math.cos(a),
+      floorBase.neck[1] + 26 * Math.sin(a),
+    ];
+    return [elbow, [elbow[0], elbow[1] - 26]];
+  };
+  const [eR, hR] = arm(angle);
+  const [eL, hL] = arm(angle - 0.16);
+  return { ...floorBase, eR, hR, eL, hL };
 }
 
 /** Fixed-length, softly bent arm arc for a floor-limited pullover. */
@@ -563,14 +592,8 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'floor-press': {
-    start: floorBase,
-    end: {
-      ...floorBase,
-      eR: [70, 147],
-      hR: [70, 121],
-      eL: [50, 147],
-      hL: [50, 121],
-    },
+    start: floorPressPose(0),
+    end: floorPressPose(1),
     props: mat,
     held: twoDumbbells,
   },

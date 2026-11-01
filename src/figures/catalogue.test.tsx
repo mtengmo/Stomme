@@ -4,6 +4,7 @@ import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exerciseList } from '../content/exercises';
 import { loadPresentation } from '../content/loadPresentation';
 import { FigureFrame, movementPose } from './Figure';
+import { checkPoseGeometry } from './keyframes';
 import { figures } from './poses';
 
 describe('catalogue equipment and contacts', () => {
@@ -145,6 +146,30 @@ describe('catalogue equipment and contacts', () => {
     const centerY = /cy="([\d.]+)"/.exec(bell)?.[1];
     expect(centerY).toBeDefined();
     expect(Number(centerY) + 11).toBeLessThan(178);
+  });
+  it('two-arm floor press: upright forearms, constant 26 unit segments, passes the gate', () => {
+    const length = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+    for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+      const p = movementPose('floor-press', t);
+      for (const [e, h] of [
+        ['eR', 'hR'],
+        ['eL', 'hL'],
+      ] as const) {
+        expect(p[h][0]).toBeCloseTo(p[e][0], 8);
+        expect(length(p.neck, p[e])).toBeCloseTo(26, 8);
+        expect(length(p[e], p[h])).toBeCloseTo(26, 8);
+      }
+    }
+    const mid = movementPose('floor-press', 0.5);
+    expect(
+      checkPoseGeometry([mid], {
+        floorY: 178,
+        viewBox: [14, 20, 164, 168],
+        props: figures['floor-press'].props,
+        minHeadClearance: 9,
+      }),
+    ).toEqual([]);
   });
   it('keeps the one-arm floor press supported, upright at the forearm and constant in limb length', () => {
     const start = movementPose('kettlebell-floor-press', 0);
