@@ -21,6 +21,70 @@ beforeEach(async () => {
   });
 });
 afterEach(cleanup);
+it('preserves a dated move on Save while its source day remains and drops it when removed', async () => {
+  const moved = { from: '2026-11-02', to: '2026-11-04' };
+  await setMeta(getDb(), 'weeklySchedule', {
+    days: [
+      { day: 1, plan: { kind: 'focus', focus: 'push' } },
+      { day: 4, plan: { kind: 'standard' } },
+    ],
+    moved,
+  });
+  const user = userEvent.setup();
+  render(<App />);
+  const thursday = await screen.findByRole('combobox', { name: 'Torsdag' });
+  await user.selectOptions(thursday, 'focus:pull');
+  await user.click(screen.getByRole('button', { name: 'Spara' }));
+  await waitFor(async () =>
+    expect((await getDb().meta.get('weeklySchedule'))?.value).toHaveProperty(
+      'moved',
+      moved,
+    ),
+  );
+  window.location.hash = '#/vecka';
+  const monday = await screen.findByRole('combobox', { name: 'Måndag' });
+  await user.selectOptions(monday, 'rest');
+  await user.click(screen.getByRole('button', { name: 'Spara' }));
+  await waitFor(async () =>
+    expect(
+      (await getDb().meta.get('weeklySchedule'))?.value,
+    ).not.toHaveProperty('moved'),
+  );
+});
+it('shows and saves Next pass for an unknown workout assignment from an import', async () => {
+  await setMeta(getDb(), 'weeklySchedule', {
+    days: [{ day: 1, plan: { kind: 'workout', workoutId: 'missing' } }],
+  });
+  const user = userEvent.setup();
+  render(<App />);
+  const monday = await screen.findByRole('combobox', { name: 'Måndag' });
+  expect((monday as HTMLSelectElement).value).toBe('standard');
+  await user.click(screen.getByRole('button', { name: 'Spara' }));
+  await waitFor(async () =>
+    expect((await getDb().meta.get('weeklySchedule'))?.value).toEqual({
+      days: [{ day: 1, plan: { kind: 'standard' } }],
+    }),
+  );
+});
+it('normalizes an unsaved assignment when its workout disappears in another tab', async () => {
+  await setMeta(getDb(), 'customWorkouts', [
+    { id: 'one', name: 'Mitt pass', exerciseIds: ['push-up'] },
+  ]);
+  const user = userEvent.setup();
+  render(<App />);
+  const monday = await screen.findByRole('combobox', { name: 'Måndag' });
+  await user.selectOptions(monday, 'workout:one');
+  await setMeta(getDb(), 'customWorkouts', []);
+  await waitFor(() =>
+    expect((monday as HTMLSelectElement).value).toBe('standard'),
+  );
+  await user.click(screen.getByRole('button', { name: 'Spara' }));
+  await waitFor(async () =>
+    expect((await getDb().meta.get('weeklySchedule'))?.value).toEqual({
+      days: [{ day: 1, plan: { kind: 'standard' } }],
+    }),
+  );
+});
 it('keeps suggestions local until Save and offers complete focus presets without custom', async () => {
   const user = userEvent.setup();
   render(<App />);

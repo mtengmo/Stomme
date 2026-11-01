@@ -11,6 +11,7 @@ import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
 import { inventorySummary } from '../../rules/equipment';
 import { Icon } from '../../ui/Icon';
+import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { CustomPicker } from './CustomPicker';
 
 const SELECTION_KEY = 'stomme.new-workout.selection';
@@ -87,6 +88,15 @@ export function NewWorkout() {
         onCreate={create}
         idPrefix="new"
       />
+      <details className="pb-24">
+        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
+          Dina sparade pass
+        </summary>
+        <CustomWorkoutList
+          headingId="new-saved-workouts"
+          title="Sparade pass"
+        />
+      </details>
     </div>
   );
 }

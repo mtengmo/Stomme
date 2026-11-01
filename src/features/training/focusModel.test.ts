@@ -49,20 +49,57 @@ describe('focus URLs and defaults', () => {
       feedback: {},
     } as Session;
     expect(
-      startingFocus(preferences, [session], now, ['push', 'pull', 'full']),
+      startingFocus(preferences, [session], now, ['push', 'pull', 'full'], []),
     ).toEqual({ focus: { id: 'pull' }, suggested: true });
     expect(
-      startingFocus(preferences, [session], new Date('2026-11-10T12:00:00Z'), [
-        'push',
-        'full',
-      ]).focus,
+      startingFocus(
+        preferences,
+        [session],
+        new Date('2026-11-10T12:00:00Z'),
+        ['push', 'full'],
+        [],
+      ).focus,
     ).toEqual({ id: 'push' });
-    expect(startingFocus(preferences, [], now, ['full']).focus).toEqual({
+    expect(startingFocus(preferences, [], now, ['full'], []).focus).toEqual({
       id: 'full',
     });
     expect(defaultFocus({ ...preferences, bodyParts: ['legs'] })).toEqual({
       id: 'custom',
       regions: ['legs'],
     });
+  });
+  it('filters stale custom regions against current equipment and falls back to full when none remain', () => {
+    const now = new Date('2026-11-10T12:00:00Z');
+    const session = {
+      id: 'custom',
+      templateId: 'A',
+      date: '2026-11-01',
+      startedAt: '2026-11-01T11:00:00Z',
+      programWeek: 1,
+      programId: 'general',
+      focus: 'custom',
+      regions: ['shoulders', 'back'],
+      status: 'completed',
+      finishedAt: '2026-11-01T12:00:00Z',
+      plan: [],
+      feedback: {},
+    } as Session;
+    expect(
+      startingFocus(preferences, [session], now, ['full', 'custom'], ['back'])
+        .focus,
+    ).toEqual({ id: 'custom', regions: ['back'] });
+    expect(
+      startingFocus(preferences, [session], now, ['full', 'custom'], []).focus,
+    ).toEqual({ id: 'full' });
+    expect(
+      startingFocus(
+        { ...preferences, bodyParts: ['shoulders'] },
+        [],
+        now,
+        ['full', 'custom'],
+        [],
+      ).focus,
+    ).toEqual({ id: 'full' });
+    expect(session.regions).toEqual(['shoulders', 'back']);
   });
 });

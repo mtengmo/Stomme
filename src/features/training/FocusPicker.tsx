@@ -54,7 +54,14 @@ function Picker({
     painOnRecord: symptomsOnRecord(sessions, painReported),
   });
   const [focus, setFocus] = useState<WorkoutFocus>(
-    () => startingFocus(preferences, sessions, now, available.presets).focus,
+    () =>
+      startingFocus(
+        preferences,
+        sessions,
+        now,
+        available.presets,
+        available.regions,
+      ).focus,
   );
   const recent = recentMuscles(sessions, now);
   const nextId = nextTemplateId(

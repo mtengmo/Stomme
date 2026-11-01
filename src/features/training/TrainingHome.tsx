@@ -370,16 +370,21 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
-  const dailyFocus = preferences
-    ? startingFocus(
-        preferences,
-        data.sessions,
-        new Date(),
-        focusAvailable(preferences, {
-          painOnRecord: symptomsOnRecord(data.sessions, data.painReported),
-        }).presets,
-      )
+  const availability = preferences
+    ? focusAvailable(preferences, {
+        painOnRecord: symptomsOnRecord(data.sessions, data.painReported),
+      })
     : undefined;
+  const dailyFocus =
+    preferences && availability
+      ? startingFocus(
+          preferences,
+          data.sessions,
+          new Date(),
+          availability.presets,
+          availability.regions,
+        )
+      : undefined;
   const today = toLocalDate(new Date());
   const completedDates = completedTrainingDates(
     data.sessions,

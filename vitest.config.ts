@@ -50,6 +50,8 @@ export default defineConfig({
           ],
           pool: 'threads',
           isolate: false,
+          // Module mocking requires a fresh module graph, unlike pure unit tests.
+          exclude: ['src/rules/exerciseProgression.impact.test.ts'],
         },
       },
       {
@@ -62,6 +64,7 @@ export default defineConfig({
             'src/db/**/*.test.ts',
             'src/lib/storage.test.ts',
             'src/lib/share.test.ts',
+            'src/rules/exerciseProgression.impact.test.ts',
           ],
           pool: 'threads',
           isolate: true,

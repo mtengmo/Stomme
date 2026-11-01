@@ -19,6 +19,7 @@ import type {
   WeeklyDayPlan,
   WeeklySchedule,
 } from '../../domain/types';
+import { weekdayIndex } from '../../lib/dates';
 import { recentMuscles } from '../../rules/recovery';
 import { suggestWeek, weekConflicts } from '../../rules/weekSuggestion';
 import { groupOf } from '../../rules/workoutGroups';
@@ -82,7 +83,16 @@ function Planner({
   const [notes, setNotes] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const conflicts = weekConflicts({ days }, workouts);
+  // Missing IDs can come from an import or deletion in another tab. Keep the
+  // visible choice and the saved value identical while preserving this draft.
+  const normalizedDays = days.map((item) => {
+    const plan = item.plan;
+    return plan.kind === 'workout' &&
+      !workouts.some((workout) => workout.id === plan.workoutId)
+      ? { ...item, plan: { kind: 'standard' as const } }
+      : item;
+  });
+  const conflicts = weekConflicts({ days: normalizedDays }, workouts);
   function change(day: number, value: string) {
     const rest = days.filter((item) => item.day !== day);
     const plan: WeeklyDayPlan | undefined =
@@ -162,7 +172,7 @@ function Planner({
                 aria-label={name}
                 className={selectClass}
                 value={selectedPlanValue(
-                  days.find((item) => item.day === index + 1)?.plan,
+                  normalizedDays.find((item) => item.day === index + 1)?.plan,
                 )}
                 onChange={(event) => change(index + 1, event.target.value)}
               >
@@ -223,7 +233,18 @@ function Planner({
               setBusy(true);
               setError('');
               try {
-                if (days.length) await saveWeeklySchedule({ days });
+                if (normalizedDays.length)
+                  await saveWeeklySchedule({
+                    days: normalizedDays,
+                    ...(initial?.moved &&
+                    normalizedDays.some(
+                      (item) =>
+                        item.day ===
+                        weekdayIndex(initial.moved?.from as string) + 1,
+                    )
+                      ? { moved: initial.moved }
+                      : {}),
+                  });
                 else await clearWeeklySchedule();
                 navigate('/');
               } catch {

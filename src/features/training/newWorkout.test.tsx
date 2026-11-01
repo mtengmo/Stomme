@@ -22,6 +22,21 @@ beforeEach(async () => {
   await setMeta(getDb(), 'onboarding', { acceptedAt: '2026-10-20T08:00:00Z' });
 });
 afterEach(cleanup);
+it('keeps grouped saved workouts collapsed on the creation page without a duplicate create link', async () => {
+  await setMeta(getDb(), 'training', prefs);
+  await setMeta(getDb(), 'customWorkouts', [
+    { id: 'one', name: 'Mitt presspass', exerciseIds: ['push-up'] },
+  ]);
+  window.location.hash = '#/nytt-pass';
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Skapa eget pass' });
+  expect(screen.queryByRole('heading', { name: 'Press' })).toBeNull();
+  await user.click(screen.getByText('Dina sparade pass'));
+  expect(await screen.findByRole('heading', { name: 'Press' })).toBeTruthy();
+  expect(screen.getByText('Mitt presspass')).toBeTruthy();
+  expect(screen.queryByRole('link', { name: 'Skapa eget pass' })).toBeNull();
+});
 
 it('Home shows an empty Mina pass with a link to the picker', async () => {
   await setMeta(getDb(), 'training', prefs);
