@@ -199,7 +199,7 @@ export function bandShape(
 }
 
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
-const FRAMING: Partial<Record<ExerciseId, string>> = {
+export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'plank-arm-lift': '0 20 200 168',
   'decline-push-up': '14 20 182 168',
   'pull-up': '10 0 180 188',
@@ -209,7 +209,7 @@ const FRAMING: Partial<Record<ExerciseId, string>> = {
   'box-jump': '0 0 200 188',
   'blast-off-push-up': '0 0 200 188',
   'step-down': '14 0 164 188',
-  'quad-set': '24 128 160 52',
+  'quad-set': '8 128 176 52',
   'dumbbell-pullover': '-4 20 180 168',
 };
 
