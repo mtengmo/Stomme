@@ -27,6 +27,7 @@ const BASELINE_PATH = new URL(
 );
 const TOLERANCE = 0.5;
 const STEPS = 100;
+const FRONT_THIGH_MAX = 36;
 const NO_SIDE_VIEW: string[] = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
@@ -71,10 +72,10 @@ function measure(
   };
   for (const seg of SEGMENTS) {
     const lengths = frames.map((f) => dist(f[seg[0]], f[seg[1]]));
-    const first = lengths[0] as number;
+    // A front view foreshortens thighs; they may shrink but never exceed 36.
     const spread =
       isThigh(seg) && view === 'front'
-        ? Math.max(...lengths) - first
+        ? Math.max(...lengths) - FRONT_THIGH_MAX + TOLERANCE
         : Math.max(...lengths) - Math.min(...lengths);
     put(`drift:${seg[0]}-${seg[1]}`, spread);
   }

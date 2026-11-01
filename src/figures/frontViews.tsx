@@ -383,33 +383,58 @@ export function frontMovementPose(
   ) {
     const step = exerciseId === 'step-up' || exerciseId === 'step-down';
     const down = exerciseId === 'step-down';
+    // Step-up keeps both shins vertical at a fixed 33 and only foreshortens
+    // the thighs (a front view cannot show a longer thigh).
+    const up = exerciseId === 'step-up';
     const hipY = down
       ? mix(84, 98, t)
-      : step
-        ? mix(108, 84, t)
-        : mix(112, 140, t);
+      : up
+        ? mix(110, 92, t)
+        : step
+          ? mix(108, 84, t)
+          : mix(112, 140, t);
+    const otherAnkleY = mix(174, 150, t);
     const neckY = hipY - 44;
     // Feet occupy distinct depth planes: the support remains fixed while the
     // trailing foot rises (step-up) or rests on the rear bench (split squat).
     const selected = {
       knee: point(
         82,
-        down ? mix(113, 122, t) : step ? mix(117, 113, t) : mix(146, 155, t),
+        up
+          ? 123
+          : down
+            ? mix(113, 122, t)
+            : step
+              ? mix(117, 113, t)
+              : mix(146, 155, t),
       ),
-      ankle: point(82, step ? 143 : 174),
-      toe: point(72, step ? 146 : 177),
+      ankle: point(82, up ? 156 : step ? 143 : 174),
+      toe: point(72, up ? 159 : step ? 146 : 177),
     };
-    const other = {
-      knee: point(
-        118,
-        down ? mix(113, 132, t) : step ? mix(140, 113, t) : mix(132, 155, t),
-      ),
-      ankle: point(
-        120,
-        down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
-      ),
-      toe: point(130, down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142),
-    };
+    const other = up
+      ? {
+          knee: point(118, otherAnkleY - 33),
+          ankle: point(118, otherAnkleY),
+          toe: point(128, otherAnkleY + 3),
+        }
+      : {
+          knee: point(
+            118,
+            down
+              ? mix(113, 132, t)
+              : step
+                ? mix(140, 113, t)
+                : mix(132, 155, t),
+          ),
+          ankle: point(
+            120,
+            down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
+          ),
+          toe: point(
+            130,
+            down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142,
+          ),
+        };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
     // Anatomical right is always viewer-left; select geometry before placing it.
@@ -815,11 +840,19 @@ export function FrontFigureFrame({
                 : 107
             }
             y={
-              exerciseId === 'step-up' || exerciseId === 'step-down' ? 146 : 142
+              exerciseId === 'step-up'
+                ? 159
+                : exerciseId === 'step-down'
+                  ? 146
+                  : 142
             }
             width="34"
             height={
-              exerciseId === 'step-up' || exerciseId === 'step-down' ? 31 : 35
+              exerciseId === 'step-up'
+                ? 18
+                : exerciseId === 'step-down'
+                  ? 31
+                  : 35
             }
             rx="2"
           />

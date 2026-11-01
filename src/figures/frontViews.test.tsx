@@ -13,6 +13,7 @@ import {
   obliqueMovementPose,
   supportedObliqueViews,
 } from './frontViews';
+import { figures } from './poses';
 
 describe('authored frontal demonstrations', () => {
   it('rotates seated feet with still knees and ankles, a cushion and foot band', () => {
@@ -273,6 +274,38 @@ describe('authored frontal demonstrations', () => {
   });
 });
 
+describe('step-up front view proportions', () => {
+  it.each(['right', 'left'] as const)(
+    'keeps both shins vertical at a fixed length and never stretches a thigh (%s)',
+    (side) => {
+      for (let i = 0; i <= 40; i++) {
+        const pose = frontMovementPose('step-up', i / 40, side);
+        for (const leg of ['R', 'L'] as const) {
+          const knee = pose[`k${leg}`];
+          const ankle = pose[`a${leg}`];
+          expect(knee[0]).toBeCloseTo(ankle[0], 8);
+          expect(ankle[1] - knee[1]).toBeCloseTo(33, 8);
+          const thigh = Math.hypot(
+            pose.hip[0] - knee[0],
+            pose.hip[1] - knee[1],
+          );
+          expect(thigh).toBeLessThanOrEqual(36);
+        }
+      }
+    },
+  );
+  it('draws a stair-height step in the front view, and leaves step-down alone', () => {
+    const rect = (id: 'step-up' | 'step-down') =>
+      renderToStaticMarkup(
+        <FigureFrame exerciseId={id} pose={figures[id].end} view="front" />,
+      ).match(
+        /data-support="step"[^>]*><rect[^>]*y="(\d+)"[^>]*height="(\d+)"/,
+      );
+    expect(rect('step-up')?.slice(1)).toEqual(['159', '18']);
+    expect(rect('step-down')?.slice(1)).toEqual(['146', '31']);
+  });
+});
+
 describe('front pilot support contacts', () => {
   it.each(['right', 'left'] as const)(
     'keeps the %s support foot planted throughout both leg exercises',
@@ -283,7 +316,7 @@ describe('front pilot support contacts', () => {
         const split = frontMovementPose('rear-foot-split-squat', t, side);
         const selected = side === 'right' ? 'R' : 'L';
         const other = side === 'right' ? 'L' : 'R';
-        expect(step[`t${selected}`][1]).toBe(146);
+        expect(step[`t${selected}`][1]).toBe(159);
         expect(split[`t${selected}`][1]).toBe(177);
         expect(split[`t${other}`][1]).toBe(142);
         expect(step[`k${selected}`][0]).toBe(step[`a${selected}`][0]);
