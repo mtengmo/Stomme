@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { BURPEE_KEYFRAMES, burpeePose } from './burpeeKeyframes';
+import {
+  BURPEE_KEYFRAMES,
+  BURPEE_STILL_PHASES,
+  burpeePose,
+} from './burpeeKeyframes';
 import { checkPoseGeometry } from './keyframes';
 import { figures, POSE_KEYS, type Pose } from './poses';
 
@@ -45,5 +49,33 @@ describe('E60 burpee keyframes', () => {
     );
     expect(burpeePose(0.84).aR[1]).toBeLessThan(165);
     expect(burpeePose(0.84).hR[1]).toBeLessThan(burpeePose(0.84).head[1]);
+  });
+  it('never jumps a joint more than 8 units in one 1/400 step, on both sides', () => {
+    for (const side of [(p: Pose) => p, mirror]) {
+      let prev = side(burpeePose(0));
+      for (let i = 1; i <= 400; i++) {
+        const cur = side(burpeePose(i / 400));
+        for (const k of POSE_KEYS)
+          expect(
+            Math.hypot(cur[k][0] - prev[k][0], cur[k][1] - prev[k][1]),
+          ).toBeLessThan(8);
+        prev = cur;
+      }
+    }
+  });
+  it('keeps the feet low during the jump back and the jump in', () => {
+    for (const t of [0.16, 0.19, 0.22, 0.56, 0.6]) {
+      const p = burpeePose(t);
+      expect(Math.min(p.aR[1], p.aL[1])).toBeGreaterThan(160);
+    }
+  });
+  it('keeps every hand clear of the head in all reduced-motion stills', () => {
+    for (const phase of BURPEE_STILL_PHASES) {
+      const p = burpeePose(phase);
+      for (const hand of [p.hR, p.hL])
+        expect(
+          Math.hypot(hand[0] - p.head[0], hand[1] - p.head[1]),
+        ).toBeGreaterThan(9);
+    }
   });
 });

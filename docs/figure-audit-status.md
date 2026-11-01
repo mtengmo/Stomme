@@ -34,3 +34,16 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 | E96-text | vägg eller räcke | done | d21b054 |
 | W8, W10-W12 | Görs inte i denna körning | ej påbörjad | |
 
+## Opus-granskning (M/L-punkter)
+
+| Punkt | Innehåll | Status | Commit |
+|---|---|---|---|
+| M1+M2 | Burpee: fötter låga (ankel y 170) med höften pikad (y 132, lutning 1,9), inga hopp i leder (<8 enheter per 1/400-steg), extra armnyckelrutor 0,8/0,88, reducerad-rörelse-ruta 0,84 | done | (nästa commit) |
+| M3 | E96 frontvy | todo | |
+| L1 | supports med okänd rekvisita ger fel | todo | |
+| L3 | E96 djup, text och test | todo | |
+| L4 | E42 ram + rekvisita i framing-test | todo | |
+| L5 | mountain-climber, statusdokument | todo | |
+| L6 | sumo-test tillbaka | todo | |
+| Ratchet | fail vid förbättring > 0,1 | todo | |
+

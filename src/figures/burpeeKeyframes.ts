@@ -60,15 +60,13 @@ const v = (
 
 const STAND = v(100, 108, 0.05, 108, 174, 0, 4, 44);
 const HANDS_DOWN = v(92, 150, 1.1, 108, 174, 1);
-const KICK = v(93, 148, 1.13, 55, 130, 1);
-const TUCK = v(92, 149, 1.11, 82, 136, 1);
+const KICK = v(92, 132, 1.9, 60, 170, 1);
 const PLANK = v(93.8, 146.9, 1.152, 33.1, 174, 1);
 
 export const BURPEE_KEYFRAMES: readonly Keyframe<BurpeeValues>[] = [
   { t: 0, name: 'Stå', values: { ...STAND } },
   { t: 0.12, name: 'Händer i golvet', values: { ...HANDS_DOWN } },
-  { t: 0.15, name: 'Fötterna lyfter', values: { ...TUCK } },
-  { t: 0.2, name: 'Hoppar bak', values: { ...KICK } },
+  { t: 0.19, name: 'Hoppar bak', values: { ...KICK } },
   { t: 0.25, name: 'Plankläge', values: { ...PLANK } },
   {
     t: 0.37,
@@ -77,13 +75,22 @@ export const BURPEE_KEYFRAMES: readonly Keyframe<BurpeeValues>[] = [
   },
   { t: 0.5, name: 'Plankläge', values: { ...PLANK } },
   { t: 0.56, name: 'Hoppar in', values: { ...KICK } },
-  { t: 0.6, name: 'Fötterna lyfter', values: { ...TUCK } },
-  { t: 0.66, name: 'Händer i golvet', values: { ...HANDS_DOWN } },
-  { t: 0.78, name: 'Stå', values: { ...STAND } },
+  { t: 0.63, name: 'Händer i golvet', values: { ...HANDS_DOWN } },
+  { t: 0.75, name: 'Stå', values: { ...STAND } },
+  {
+    t: 0.8,
+    name: 'Armarna lyfter',
+    values: v(100, 102, 0.05, 108, 168, 0, 26, -2),
+  },
   {
     t: 0.84,
     name: 'Upphopp',
     values: v(100, 88, 0.05, 108, 154, 0, 6, -44),
+  },
+  {
+    t: 0.88,
+    name: 'Armarna sänks',
+    values: v(100, 100, 0.1, 108, 164, 0, 26, -4),
   },
   {
     t: 0.92,
@@ -136,3 +143,6 @@ export function burpeePose(t: number): Pose {
     tL: toe(far.end),
   };
 }
+
+/** Phases of the four reduced-motion stills, in order. */
+export const BURPEE_STILL_PHASES = [0, 0.125, 0.375, 0.84] as const;

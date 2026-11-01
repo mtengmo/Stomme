@@ -11,6 +11,7 @@ import {
   walkingLungePose,
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
+import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
 import { constrainLegInterpolation } from './constrainedLegs';
 import { applyEquipmentPose } from './equipmentPose';
 import type { FigureAngle } from './frontViews';
@@ -544,10 +545,19 @@ export function Figure({
             ]
           : exerciseId === 'burpee'
             ? [
-                ['Stå', movementPose(exerciseId, 0)],
-                ['Händer i golvet', movementPose(exerciseId, 0.125)],
-                ['Armhävning', movementPose(exerciseId, 0.375)],
-                ['Hopp och landning', movementPose(exerciseId, 0.875)],
+                ['Stå', movementPose(exerciseId, BURPEE_STILL_PHASES[0])],
+                [
+                  'Händer i golvet',
+                  movementPose(exerciseId, BURPEE_STILL_PHASES[1]),
+                ],
+                [
+                  'Armhävning',
+                  movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
+                ],
+                [
+                  'Hopp och landning',
+                  movementPose(exerciseId, BURPEE_STILL_PHASES[3]),
+                ],
               ]
             : exerciseId === 'box-jump'
               ? [
