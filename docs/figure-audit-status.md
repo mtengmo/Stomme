@@ -22,8 +22,8 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 | Del | Innehåll | Status | Commit |
 |---|---|---|---|
 | W0 | Kontrollen: bänk 7, supports, allowlist, skipDrift, asymmetri över alla rutor, `applyEquipmentPose`, ratchet-test `figureGeometry.test.ts` med baslinje | done | 42c0e2b |
-| W1 | E94 wall-tibialis-raise | todo | |
-| W2 | E91 copenhagen-hold | todo | |
+| W1 | E94 wall-tibialis-raise | done | a723c4c |
+| W2 | E91 copenhagen-hold | done | (nästa commit) |
 | W3 | E02 step-up sidovy | todo | |
 | W3b | E02 step-up frontvy | todo | |
 | W4 | E42 bench-side-plank-leg-lift | todo | |

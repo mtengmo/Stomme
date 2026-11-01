@@ -179,4 +179,37 @@ describe('contact aware knee figures', () => {
       for (const key of POSE_KEYS)
         expect(f[key][0]).toBeGreaterThanOrEqual(wall.x + 3);
   });
+  it('copenhagen hold: knee rests on the bench, torso is straight, passes the gate', () => {
+    const bench = figures['copenhagen-hold'].props.find(
+      (p) => p.type === 'bench',
+    );
+    if (bench?.type !== 'bench') throw new Error('missing bench');
+    const frames = Array.from({ length: 101 }, (_, i) =>
+      movementPose('copenhagen-hold', i / 100),
+    );
+    for (const f of frames) {
+      expect(f.kR[1]).toBeGreaterThanOrEqual(bench.y - 4);
+      expect(f.kR[1]).toBeLessThanOrEqual(bench.y);
+    }
+    // The figure is a hold: it is drawn at its end pose (t = 1).
+    const hold = movementPose('copenhagen-hold', 1);
+    expect(hold.aL[1]).toBeLessThanOrEqual(170);
+    expect(hold.tL[1]).toBeLessThanOrEqual(170);
+    const angle = (a: Pt, b: Pt) => Math.atan2(b[1] - a[1], b[0] - a[0]);
+    const d = angle(hold.kR, hold.hip) - angle(hold.hip, hold.neck);
+    const gap = Math.abs(Math.atan2(Math.sin(d), Math.cos(d)));
+    expect(gap).toBeLessThan(0.05);
+    expect(
+      checkPoseGeometry([hold, hold], {
+        floorY: 178,
+        viewBox: [14, 20, 164, 168],
+        props: figures['copenhagen-hold'].props,
+        minHeadClearance: 9,
+        allowlist: {
+          'limb-asymmetry:kR-aR': 'bent shin points away from the camera',
+          'limb-asymmetry:aR-tR': 'bent shin points away from the camera',
+        },
+      }),
+    ).toEqual([]);
+  });
 });
