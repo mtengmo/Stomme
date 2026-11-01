@@ -28,6 +28,7 @@ import {
   POSE_KEYS,
   type Pose,
   type PoseKey,
+  type Prop,
 } from './poses';
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
@@ -251,9 +252,12 @@ export function FigureFrame({
   viewBox: viewBoxProp,
   view = 'side',
   phase = 0,
+  props: propsOverride,
 }: {
   exerciseId: ExerciseId;
   pose: Pose;
+  /** Replaces the catalogue props (comparison pilot only). */
+  props?: readonly Prop[];
   /** null: both sides work in blue, without an H/V marker. */
   working?: Working | null;
   showMuscles?: boolean;
@@ -391,7 +395,7 @@ export function FigureFrame({
     >
       <title>{exerciseId}</title>
       <g transform={mirror}>
-        {spec.props.map((pr) => (
+        {(propsOverride ?? spec.props).map((pr) => (
           <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
         ))}
         <FloorLine />

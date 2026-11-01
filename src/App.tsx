@@ -56,6 +56,13 @@ const FigureDev = import.meta.env.DEV
       })),
     )
   : null;
+// Pilot comparison page: lazy chunk, reachable by URL in the deployed build,
+// linked from nowhere.
+const FigureComparison = lazy(() =>
+  import('./features/exercise/FigureComparison').then((m) => ({
+    default: m.FigureComparison,
+  })),
+);
 const isTiming = (value: string): value is 'before' | 'after' | 'dayAfter' =>
   ['before', 'after', 'dayAfter'].includes(value);
 const PhysioReport = lazy(() =>
@@ -226,6 +233,9 @@ function Shell() {
             {FigureDev ? (
               <Route path="/dev/figurer">{() => <FigureDev />}</Route>
             ) : null}
+            <Route path="/dev/figurer-jamforelse">
+              {() => <FigureComparison />}
+            </Route>
             {DemoSeed ? (
               <Route path="/dev/demo">
                 {() => (
