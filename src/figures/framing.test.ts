@@ -56,7 +56,23 @@ describe('FRAMING keeps every joint in view on both working sides', () => {
           : right.map(mirror);
       expect(outside(right, viewBox)).toEqual([]);
       expect(outside(left, viewBox)).toEqual([]);
-      expect(figures[id]).toBeDefined();
+      // Props (a bench, a step, a wall) must fit on both sides too; a mat is a floor strip that may bleed off the edge.
+      for (const prop of figures[id].props.filter((p) => p.type !== 'mat')) {
+        const xs: number[] =
+          'x1' in prop
+            ? [prop.x1, prop.x2]
+            : 'w' in prop
+              ? [prop.x, prop.x + prop.w]
+              : 'x' in prop
+                ? [prop.x]
+                : [];
+        for (const x of xs) {
+          expect(x).toBeGreaterThanOrEqual(viewBox[0]);
+          expect(x).toBeLessThanOrEqual(viewBox[0] + viewBox[2]);
+          expect(MIRROR_X - x).toBeGreaterThanOrEqual(viewBox[0]);
+          expect(MIRROR_X - x).toBeLessThanOrEqual(viewBox[0] + viewBox[2]);
+        }
+      }
     });
   }
 

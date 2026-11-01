@@ -172,7 +172,7 @@ describe('rehabilitation movement geometry', () => {
     expect(
       checkPoseGeometry(frames, {
         floorY: 178,
-        viewBox: [8, 20, 184, 168],
+        viewBox: [4, 20, 184, 168],
         props: rehabFigures['bench-side-plank-leg-lift'].props,
         minHeadClearance: 9,
         allowlist: Object.fromEntries(

@@ -221,7 +221,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'dumbbell-pullover': '-2 20 196 168',
   'prone-on-forearms': '4 20 184 168',
   'heel-slide': '6 20 180 168',
-  'bench-side-plank-leg-lift': '8 20 184 168',
+  'bench-side-plank-leg-lift': '4 20 184 168',
 };
 
 /** One whole repetition per cycle for sequence figures, in milliseconds. */
