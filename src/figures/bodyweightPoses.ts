@@ -119,44 +119,43 @@ function diamondPushUp(t: number): Pose {
   };
 }
 
-/** A whole repetition with a small flight at t=.75 and a soft landing. */
+/**
+ * Planted hands and toes. t=0: hips high and back, knees bent just above the mat,
+ * shoulders behind the hands. t=1: legs straight, low plank with the chest at
+ * the hands. The body glides forward and down; nothing leaves the floor.
+ */
 function blastOffPushUp(t: number): Pose {
-  if (t === 1) return pushUp(0);
-  const bend =
-    t < 0.4
-      ? t / 0.4
-      : t < 0.625
-        ? mix(1, 0.15, (t - 0.4) / 0.225)
-        : t < 0.875
-          ? 0.15
-          : t < 0.94
-            ? mix(0.15, 0.35, (t - 0.875) / 0.065)
-            : 0.35 * (1 - (t - 0.94) / 0.06);
-  const p = pushUp(bend);
-  if (t <= 0.625 || t >= 0.875) return p;
-  const lift = 6 * Math.sin((Math.PI * (t - 0.625)) / 0.25);
-  const angle = lift / 110;
-  // Rotate the trunk about the planted toes; keep the lift small.
-  const raised = (point: Pt): Pt => {
-    const dx = point[0] - p.aR[0],
-      dy = point[1] - p.aR[1];
-    return [
-      p.aR[0] + dx * Math.cos(angle) - dy * Math.sin(angle),
-      p.aR[1] + dx * Math.sin(angle) + dy * Math.cos(angle),
-    ];
-  };
-  return {
-    ...p,
-    head: raised(p.head),
-    neck: raised(p.neck),
-    hip: raised(p.hip),
-    kR: raised(p.kR),
-    kL: raised(p.kL),
-    eR: raised(p.eR),
-    eL: raised(p.eL),
-    hR: [p.hR[0], p.hR[1] - lift],
-    hL: [p.hL[0], p.hL[1] - lift],
-  };
+  const ankle: Pt = [165, 174],
+    farAnkle: Pt = [162, 171];
+  const hand: Pt = [64.6, 174],
+    farHand: Pt = [68.6, 171];
+  const hipAngle = mix(-2.075, -3.02, t);
+  // The legs are straight well before the chest reaches the hands.
+  const hip = polar(ankle, mix(48.2, 64, Math.min(1, t / 0.75)), hipAngle);
+  const trunk = mix(2.581, 3.263, t);
+  const neck = polar(hip, 46, trunk);
+  // The far leg runs parallel to the near one, as in the push-up.
+  const farHip: Pt = [hip[0] - 3, hip[1] - 3];
+  const armLength = 22.5;
+  return pose(
+    polar(neck, 14, trunk),
+    neck,
+    hip,
+    [
+      joint(neck, hand, armLength, armLength, -1),
+      hand,
+      joint(neck, farHand, armLength, armLength, -1),
+      farHand,
+    ],
+    [
+      joint(hip, ankle, 32, 32, 1),
+      ankle,
+      foot(ankle),
+      joint(farHip, farAnkle, 32, 32, 1),
+      farAnkle,
+      [171, 174],
+    ],
+  );
 }
 
 function plankArmLift(t: number): Pose {
@@ -559,13 +558,11 @@ export const bodyweightFigures = Object.fromEntries(
     id,
     {
       start: handler(0),
-      end: handler(
-        id === 'plank-arm-lift' ? 0.25 : id === 'blast-off-push-up' ? 0.4 : 1,
-      ),
+      end: handler(id === 'plank-arm-lift' ? 0.25 : 1),
       motion:
         id === 'plank'
           ? 'hold'
-          : id === 'burpee' || id === 'squat-jump' || id === 'blast-off-push-up'
+          : id === 'burpee' || id === 'squat-jump'
             ? 'sequence'
             : 'controlled',
       props:

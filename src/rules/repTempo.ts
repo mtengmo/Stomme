@@ -21,7 +21,6 @@ const MANUAL_REPS: readonly ExerciseId[] = [
 
 /** Ballistic and plyometric work gets one suggested beat per rep, no holds. */
 const FIXED_REP_MS: Partial<Record<ExerciseId, number>> = {
-  'blast-off-push-up': 2_500,
   'squat-jump': 3_000,
   'jumping-lunge': 3_000,
   'kettlebell-swing': 2_000,
@@ -59,8 +58,7 @@ export function repTempo(id: ExerciseId): RepTempo | null {
       relaxMs: 0,
       repMs: fixed,
       hasHold: false,
-      // The explosive push-up also draws a closed cycle, including landing.
-      sequence: SEQUENCE_FIGURES.includes(id) || id === 'blast-off-push-up',
+      sequence: SEQUENCE_FIGURES.includes(id),
     };
   const { relaxSeconds } = exerciseMetadata[id];
   // The physio catalogue prescribes no hold; the beat still pauses 3 s at the top.

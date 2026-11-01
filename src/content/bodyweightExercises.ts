@@ -259,18 +259,18 @@ export const bodyweightExercises: Exercise[] = [
   ),
   exercise(
     'blast-off-push-up',
-    'Explosiv armhävning',
-    ['Bröst', 'Triceps', 'Axlar', 'Bål'],
+    'Blast off-armhävning',
+    ['Bröst', 'Triceps', 'Axlar', 'Bål', 'Framsida lår'],
     [
-      'Stöd på tårna med händerna något bredare än axlarna och kroppen rak.',
-      'Sänk bröstet kontrollerat mot golvet.',
-      'Pressa upp explosivt så att händerna lättar en kort stund. Landa mjukt med lätt böjda armbågar och gå in i nästa sänkning.',
+      'Start på tårna med händerna i golvet framför axlarna, knäna böjda strax ovanför golvet och höften bakåt.',
+      'Sträck benen och för kroppen framåt och nedåt så att bröstet hamnar nära händerna, med armbågarna snett bakåt och rak bål.',
+      'Pressa tillbaka till startläget med höften bakåt och knäna böjda. Fram och tillbaka är en repetition. Händer och fötter står kvar.',
     ],
-    'Du landar med raka, låsta armar eller höften sjunker vid landningen.',
-    'Gör rörelsen med knäna i golvet eller händerna på en stadig bänk, eller gör vanliga armhävningar utan att lyfta händerna.',
-    3,
-    'reps',
+    'Höften sjunker i det låga läget eller axlarna glider långt förbi händerna.',
+    'Gör en kortare rörelse framåt, eller gör vanliga armhävningar med knäna i golvet.',
     5,
+    'reps',
+    10,
   ),
   exercise(
     'plank-arm-lift',
@@ -318,7 +318,7 @@ export const bodyweightDetails: Record<
     reason: string;
     primary: MuscleGroupId[];
     secondary: MuscleGroupId[];
-    source: string;
+    source?: string;
     publisher: string;
     note: string;
   }
@@ -327,13 +327,11 @@ export const bodyweightDetails: Record<
     equipment: 'bodyweight',
     level: 'technical',
     reason:
-      'Explosiv press där händerna lämnar golvet kräver kraft, landningskontroll och stabila handleder och axlar.',
+      'Kroppen förs fram och tillbaka över fasta händer, vilket kräver bålkontroll och belastar handleder och axlar.',
     primary: ['chest', 'triceps'],
-    secondary: ['shoulders', 'core'],
-    source:
-      'https://www.nasm.org/resource-center/exercise-library/plyometric-push-up',
-    publisher: 'NASM',
-    note: 'Plyometrisk variant. Landa mjukt med böjda armbågar. Vila helt mellan seten. Undvik vid handleds- eller axelbesvär. Ingen extra vikt. Startdosen är appens förslag.',
+    secondary: ['shoulders', 'core', 'quads'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa för varianten. Dos och upplägg är appens förslag. Händerna och fötterna står kvar och inget lämnar golvet. Undvik vid handleds- eller axelbesvär. Ingen extra vikt.',
   },
   'decline-push-up': {
     equipment: 'chair',

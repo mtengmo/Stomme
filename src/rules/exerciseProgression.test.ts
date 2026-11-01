@@ -75,17 +75,19 @@ const suggest = (
   harderExerciseSuggestions(id, prefs, data.sessions, data.logs, painOnRecord);
 
 describe('optional harder exercises', () => {
-  it('filters impact suggestions for global pain without blocking non-impact progression', () => {
+  it('does not treat the push-up variants as impact when global pain is recorded', () => {
+    // The blast off push-up keeps the hands planted, so it is not impact.
     expect(suggest(fixture(), 'push-up', preferences, true)).toEqual([
       'decline-push-up',
       'diamond-push-up',
+      'blast-off-push-up',
     ]);
     expect(
       suggest(fixture('calf-raise'), 'calf-raise', preferences, true),
     ).toEqual(['single-leg-calf-raise']);
   });
   it.each(['older', 'other-programme'] as const)(
-    'filters impact suggestions for %s symptoms',
+    'keeps non-impact push-up suggestions for %s symptoms',
     (where) => {
       const data = fixture();
       const symptomatic = structuredClone(required(data.sessions[1]));
@@ -95,7 +97,11 @@ describe('optional harder exercises', () => {
       if (where === 'older') symptomatic.startedAt = '2026-10-01T08:00:00Z';
       else symptomatic.programId = 'running';
       data.sessions.push(symptomatic);
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
     },
   );
   it('offers harder push-ups after the latest two successes without changing history', () => {
@@ -259,10 +265,18 @@ describe('optional harder exercises', () => {
       data.sessions.push(newer);
       expect(suggest(data)).toEqual([]);
       newer.programId = 'running';
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
       newer.programId = 'general';
       newer.startedAt = '2026-10-01T08:00:00Z';
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
     },
   );
   it('supports legacy missing sides/variants and ignores unrelated logs', () => {
