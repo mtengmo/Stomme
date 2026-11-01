@@ -9,6 +9,21 @@ const phases = Array.from({ length: 41 }, (_, i) => i / 40);
 const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
 describe('contact aware knee figures', () => {
+  it('frames the step-down head and floor throughout the movement', () => {
+    for (const phase of [0, 0.5, 1]) {
+      const pose = movementPose('step-down', phase);
+      const markup = renderToStaticMarkup(
+        <FigureFrame exerciseId="step-down" pose={pose} />,
+      );
+      const box = markup
+        .match(/viewBox="([^"]+)"/)?.[1]
+        ?.split(' ')
+        .map(Number);
+      if (!box) throw new Error('missing frame');
+      expect(box[1]).toBeLessThanOrEqual(pose.head[1] - 12);
+      expect((box[1] ?? 0) + (box[3] ?? 0)).toBeGreaterThanOrEqual(181);
+    }
+  });
   it('keeps every joint finite and legs fixed in length', () => {
     for (const exercise of kneeStrengthExercises)
       for (const phase of phases) {

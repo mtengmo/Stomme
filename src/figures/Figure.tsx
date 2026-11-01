@@ -206,6 +206,7 @@ const FRAMING: Partial<Record<ExerciseId, string>> = {
   burpee: '0 -30 200 218',
   'squat-jump': '0 0 200 188',
   'blast-off-push-up': '0 0 200 188',
+  'step-down': '14 0 164 188',
   'quad-set': '24 128 160 52',
   'dumbbell-pullover': '-4 20 180 168',
 };
