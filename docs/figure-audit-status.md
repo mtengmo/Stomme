@@ -30,7 +30,7 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 | W5 | Plankfamiljen (plank, plank-arm-lift, push-up, decline, diamond). Avvikelse: bortre knä IK-böjer åt -1 (spec: 1 gav knä under golvet), bortre fot 3 enheter vinkelrätt mot benet i stället för [-3,-3] så att benet inte knickar. Burpee ärver push-up-poser och får tillfälligt några tiondelar sämre baslinje (ersätts i W7). | done | 05d9a4b |
 | W6 | E16 floor-press (avvikelse: delade `floorBase` fick bortre knä via IK så benen blir lika långa, krävdes för att kontrollen skulle bli []; gäller även dumbbell-pullover och kettlebell-floor-press) | done | bececf3 |
 | W7 | E60 burpee (avvikelse: bortre knä böjs åt -1 för att knäna ska peka framåt; spec-nyckelrutorna fick extra nyckelruta 'Fötterna lyfter' (t0,15 och 0,6), hoppet bak/in med fötterna i luften (ankel y 130) och 0,63/0,75 flyttade till 0,66/0,78 annars gick knäna under golvet vid hopp bak) | done | 7aecd65 |
-| W9 | Knäböjsfamiljen: squat-curl, thruster, single-arm-thruster, goblet-squat, kettlebell-goblet-squat är klara. kettlebell-deadlift och dumbbell-rdl ("helst även") är TODO. Avvikelse: SHIN 26,5 i stället för 26,3 (med 26,3 klipptes bortre fotled 0,04 enheter, ankeln ska vara fast). | done (delvis) | (nästa commit) |
-| E96-text | vägg eller räcke | todo | |
+| W9 | Knäböjsfamiljen: squat-curl, thruster, single-arm-thruster, goblet-squat, kettlebell-goblet-squat är klara. kettlebell-deadlift och dumbbell-rdl ("helst även") är TODO. Avvikelse: SHIN 26,5 i stället för 26,3 (med 26,3 klipptes bortre fotled 0,04 enheter, ankeln ska vara fast). | done (delvis) | 6f58404 |
+| E96-text | vägg eller räcke | done | (nästa commit) |
 | W8, W10-W12 | Görs inte i denna körning | ej påbörjad | |
 

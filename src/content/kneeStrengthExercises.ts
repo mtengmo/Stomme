@@ -28,7 +28,7 @@ export const kneeStrengthExercises: Exercise[] = [
     name: 'Nedsteg från steg',
     muscles: ['Framsida lår', 'Säte'],
     tips: [
-      'Ställ dig på ett lågt steg med ena benet stadigt nära kanten och den andra foten fri framför steget. Håll i väggen för stöd.',
+      'Ställ dig på ett lågt steg med ena benet stadigt nära kanten och den andra foten fri framför steget. Håll i väggen eller ett räcke för stöd.',
       'Böj det stående knät kontrollerat och sänk den fria hälen tills den är cirka 5–8 cm under stegets ovansida.',
       'Tryck tillbaka upp med det stående benet. Håll knät i linje med andra tån och låt inte rörelsen ta fart framåt. Ned och upp är en repetition per ben.',
     ],
