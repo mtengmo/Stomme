@@ -76,9 +76,9 @@ function Picker({
     !focus.regions?.some((r) => available.regions.includes(r));
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-5 pb-[var(--app-nav-height)]">
-      <div className="flex flex-col gap-4 pb-28">
+      <div className="flex flex-col gap-4 pb-20">
         <h1 className="m-0 text-4xl font-extrabold">Vad tränar du idag?</h1>
-        <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+        <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
           <legend className="sr-only">Dagens fokus</legend>
           {focusPresets.map((preset) => {
             const enabled = available.presets.includes(preset.id);

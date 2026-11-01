@@ -45,7 +45,7 @@ for (const [width, scheme] of [
     await expect(page.getByLabel('Namn på passet')).toBeVisible();
     await openSetup();
     await expect(
-      page.getByRole('radio', { name: 'Bli starkare' }),
+      page.getByRole('radio', { name: 'Allmän styrka' }),
     ).toBeChecked();
   });
 }

@@ -336,8 +336,12 @@ export async function quickStart(
       }
     }
   }
-  if (finish)
+  if (finish) {
     await page.getByRole('button', { name: FINISH[goal], exact: true }).click();
+    // Setup saves asynchronously before navigation. Callers may now navigate
+    // onward without a late setup navigation overwriting their destination.
+    await expect(page).toHaveURL(/#\/traning\/A(?:\?|$)/);
+  }
 }
 
 const CHIP_KG = {
