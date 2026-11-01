@@ -119,6 +119,46 @@ function diamondPushUp(t: number): Pose {
   };
 }
 
+/** A whole repetition with a small flight at t=.75 and a soft landing. */
+function blastOffPushUp(t: number): Pose {
+  if (t === 1) return pushUp(0);
+  const bend =
+    t < 0.4
+      ? t / 0.4
+      : t < 0.625
+        ? mix(1, 0.15, (t - 0.4) / 0.225)
+        : t < 0.875
+          ? 0.15
+          : t < 0.94
+            ? mix(0.15, 0.35, (t - 0.875) / 0.065)
+            : 0.35 * (1 - (t - 0.94) / 0.06);
+  const p = pushUp(bend);
+  if (t <= 0.625 || t >= 0.875) return p;
+  const lift = 6 * Math.sin((Math.PI * (t - 0.625)) / 0.25);
+  const angle = lift / 110;
+  // Rotate the trunk about the planted toes; keep the lift small.
+  const raised = (point: Pt): Pt => {
+    const dx = point[0] - p.aR[0],
+      dy = point[1] - p.aR[1];
+    return [
+      p.aR[0] + dx * Math.cos(angle) - dy * Math.sin(angle),
+      p.aR[1] + dx * Math.sin(angle) + dy * Math.cos(angle),
+    ];
+  };
+  return {
+    ...p,
+    head: raised(p.head),
+    neck: raised(p.neck),
+    hip: raised(p.hip),
+    kR: raised(p.kR),
+    kL: raised(p.kL),
+    eR: raised(p.eR),
+    eL: raised(p.eL),
+    hR: [p.hR[0], p.hR[1] - lift],
+    hL: [p.hL[0], p.hL[1] - lift],
+  };
+}
+
 function plankArmLift(t: number): Pose {
   const p = plank();
   // One cycle includes both arms and returns to both forearms on the mat.
@@ -488,6 +528,7 @@ function crunch(t: number): Pose {
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'decline-push-up': declinePushUp,
   'diamond-push-up': diamondPushUp,
+  'blast-off-push-up': blastOffPushUp,
   'plank-arm-lift': plankArmLift,
   'push-up': pushUp,
   'pull-up': (t) => pull(t, false),
@@ -518,11 +559,13 @@ export const bodyweightFigures = Object.fromEntries(
     id,
     {
       start: handler(0),
-      end: handler(id === 'plank-arm-lift' ? 0.25 : 1),
+      end: handler(
+        id === 'plank-arm-lift' ? 0.25 : id === 'blast-off-push-up' ? 0.4 : 1,
+      ),
       motion:
         id === 'plank'
           ? 'hold'
-          : id === 'burpee' || id === 'squat-jump'
+          : id === 'burpee' || id === 'squat-jump' || id === 'blast-off-push-up'
             ? 'sequence'
             : 'controlled',
       props:

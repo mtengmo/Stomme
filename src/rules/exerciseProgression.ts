@@ -79,7 +79,7 @@ export function harderExerciseSuggestions(
   });
   if (!qualifies) return [];
   const candidates: ExerciseId[] =
-    id === 'push-up' ? [next, 'diamond-push-up'] : [next];
+    id === 'push-up' ? [next, 'diamond-push-up', 'blast-off-push-up'] : [next];
   const levels = allowedLevels(preferences.experience);
   return candidates.filter((candidate) =>
     exerciseMetadata[candidate].variants.some(

@@ -103,6 +103,7 @@ describe('repProgress', () => {
 describe('ballistic beats', () => {
   it.each([
     ['squat-jump', 3000],
+    ['blast-off-push-up', 2500],
     ['jumping-lunge', 3000],
     ['kettlebell-swing', 2000],
     ['one-arm-kettlebell-swing', 2000],
@@ -124,6 +125,14 @@ describe('ballistic beats', () => {
     expect(repProgress(t, 1500)).toBeCloseTo(0.25, 5);
     expect(repProgress(t, 6000)).toBe(0);
     expect(repProgress(t, 4500)).toBeCloseTo(0.75, 5);
+  });
+  it('explosive push-up passes through one flight and landing per counted rep', () => {
+    const tempo = repTempo('blast-off-push-up');
+    if (!tempo) throw new Error('tempo');
+    expect(repProgress(tempo, 625)).toBe(0.25);
+    expect(repProgress(tempo, 1875)).toBe(0.75);
+    expect(repProgress(tempo, 2500)).toBe(0);
+    expect(repPosition(tempo, 2500).completed).toBe(1);
   });
   it('swing and lunge use the up and down ping-pong', () => {
     const t = repTempo('kettlebell-swing');

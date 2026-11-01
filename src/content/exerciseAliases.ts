@@ -21,6 +21,12 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Diamantarmhävning',
     'Smala armhävningar',
   ],
+  'blast-off-push-up': [
+    'Blast off push-up',
+    'Plyometrisk armhävning',
+    'Explosiv armhävning',
+    'Plyo push-up',
+  ],
   'plank-arm-lift': ['Planka med armlyft', 'Plank with arm lift'],
   'push-up': ['Armhävningar', 'Push up', 'Push-up'],
   'pull-up': ['Pull ups', 'Pull-ups', 'Chins med överhandsgrepp'],

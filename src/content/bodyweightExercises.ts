@@ -258,6 +258,21 @@ export const bodyweightExercises: Exercise[] = [
     'Flytta händerna bredare och välj en vanlig armhävning.',
   ),
   exercise(
+    'blast-off-push-up',
+    'Explosiv armhävning',
+    ['Bröst', 'Triceps', 'Axlar', 'Bål'],
+    [
+      'Stöd på tårna med händerna något bredare än axlarna och kroppen rak.',
+      'Sänk bröstet kontrollerat mot golvet.',
+      'Pressa upp explosivt så att händerna lättar en kort stund. Landa mjukt med lätt böjda armbågar och gå in i nästa sänkning.',
+    ],
+    'Du landar med raka, låsta armar eller höften sjunker vid landningen.',
+    'Gör rörelsen med knäna i golvet eller händerna på en stadig bänk, eller gör vanliga armhävningar utan att lyfta händerna.',
+    3,
+    'reps',
+    5,
+  ),
+  exercise(
     'plank-arm-lift',
     'Planka med armlyft',
     ['Bål', 'Axlar'],
@@ -276,6 +291,7 @@ export type BodyweightId = (typeof bodyweightIds)[number];
 export const bodyweightIds = [
   'decline-push-up',
   'diamond-push-up',
+  'blast-off-push-up',
   'plank-arm-lift',
   'push-up',
   'pull-up',
@@ -307,6 +323,18 @@ export const bodyweightDetails: Record<
     note: string;
   }
 > = {
+  'blast-off-push-up': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Explosiv press där händerna lämnar golvet kräver kraft, landningskontroll och stabila handleder och axlar.',
+    primary: ['chest', 'triceps'],
+    secondary: ['shoulders', 'core'],
+    source:
+      'https://www.nasm.org/resource-center/exercise-library/plyometric-push-up',
+    publisher: 'NASM',
+    note: 'Plyometrisk variant. Landa mjukt med böjda armbågar. Vila helt mellan seten. Undvik vid handleds- eller axelbesvär. Ingen extra vikt. Startdosen är appens förslag.',
+  },
   'decline-push-up': {
     equipment: 'chair',
     level: 'technical',

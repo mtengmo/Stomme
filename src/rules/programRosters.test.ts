@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
-import { rehabAdditionIds } from '../content/rosterSlots';
+import { impactExercises, rehabAdditionIds } from '../content/rosterSlots';
 import type {
   BodyRegionId,
   TemplateId,
@@ -167,6 +167,8 @@ describe('initial training roster', () => {
     );
     expect(ids).not.toContain('squat-jump');
     expect(ids).not.toContain('burpee');
+    expect(ids).not.toContain('blast-off-push-up');
+    expect(impactExercises.has('blast-off-push-up')).toBe(true);
   });
 
   it('falls back to bodyweight when a weighted exercise has no registered weight', () => {
@@ -273,6 +275,7 @@ describe('basic push-ups and calf raise in the rosters', () => {
           ).ids;
           expect(ids).not.toContain('wall-push-up');
           expect(ids).not.toContain('crunch');
+          expect(ids).not.toContain('blast-off-push-up');
         }
   });
 

@@ -101,6 +101,7 @@ export const rehabAdditionIds: ReadonlySet<ExerciseId> = new Set(
 
 /** Impact exercises are left out once pain or symptoms are on record. */
 export const impactExercises: ReadonlySet<ExerciseId> = new Set([
+  'blast-off-push-up',
   'squat-jump',
   'jumping-lunge',
   'burpee',

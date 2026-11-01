@@ -38,3 +38,4 @@ The exercise/history handoff was merged and pushed as `14cfb28`. The next reques
 ## Working convention
 
 Use a feature branch, preserve the Swedish notebook design, and inspect real mobile screenshots before committing UI changes. Run check, coverage tests and build; run browser/accessibility/upgrade checks for relevant changes. Commit on the feature branch. Merge or push only when asked. Named Claude agents from the original handoff are not required by this repository.
+2026-11-01: E95 Explosiv armhävning added to the bodyweight catalogue; technical plyometric press, impact, avoid with wrist or shoulder problems.

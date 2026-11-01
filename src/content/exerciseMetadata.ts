@@ -1235,37 +1235,40 @@ export const exerciseMetadata = Object.fromEntries(
             },
           ]
         : sourceFor(id),
-      reviewedAt: [
-        'bent-over-row',
-        'sumo-squat',
-        'weighted-glute-bridge',
-        'overhead-triceps-extension',
-        'dumbbell-pullover',
-        'side-lunge',
-        'walking-lunge',
-        'kettlebell-goblet-squat',
-        'russian-twist',
-        'woodchop',
-        'kettlebell-halo',
-        'one-arm-kettlebell-swing',
-      ].includes(id)
-        ? '2026-10-29'
-        : [
-              'decline-push-up',
-              'diamond-push-up',
-              'plank-arm-lift',
-              'knee-push-up',
-              'wall-push-up',
-              'calf-raise',
-              'crunch',
-              'squat-curl',
-              'thruster',
-              'single-arm-thruster',
-            ].includes(id)
-          ? '2026-10-28'
-          : added
-            ? '2026-10-24'
-            : '2026-10-20',
+      reviewedAt:
+        id === 'blast-off-push-up'
+          ? '2026-11-01'
+          : [
+                'bent-over-row',
+                'sumo-squat',
+                'weighted-glute-bridge',
+                'overhead-triceps-extension',
+                'dumbbell-pullover',
+                'side-lunge',
+                'walking-lunge',
+                'kettlebell-goblet-squat',
+                'russian-twist',
+                'woodchop',
+                'kettlebell-halo',
+                'one-arm-kettlebell-swing',
+              ].includes(id)
+            ? '2026-10-29'
+            : [
+                  'decline-push-up',
+                  'diamond-push-up',
+                  'plank-arm-lift',
+                  'knee-push-up',
+                  'wall-push-up',
+                  'calf-raise',
+                  'crunch',
+                  'squat-curl',
+                  'thruster',
+                  'single-arm-thruster',
+                ].includes(id)
+              ? '2026-10-28'
+              : added
+                ? '2026-10-24'
+                : '2026-10-20',
       sidePolicy: exercise.perSide ? 'choose-side' : 'both',
     };
     if (page && exercise.unit === 'reps' && id !== 'single-leg-calf-raise')
@@ -1291,7 +1294,11 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'wall-push-up') metadata.harderExerciseId = 'knee-push-up';
     if (id === 'knee-push-up') metadata.harderExerciseId = 'push-up';
     if (id === 'push-up') metadata.harderExerciseId = 'decline-push-up';
-    if (id === 'decline-push-up' || id === 'diamond-push-up')
+    if (
+      id === 'decline-push-up' ||
+      id === 'diamond-push-up' ||
+      id === 'blast-off-push-up'
+    )
       metadata.easierExerciseId = 'push-up';
     if (id === 'calf-raise')
       metadata.harderExerciseId = 'single-leg-calf-raise';

@@ -61,6 +61,7 @@ export function ReadyWorkout({
         'push-up',
         'decline-push-up',
         'diamond-push-up',
+        'blast-off-push-up',
         'parallel-dip',
       ].includes(exerciseId),
     )

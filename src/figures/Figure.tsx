@@ -205,6 +205,7 @@ const FRAMING: Partial<Record<ExerciseId, string>> = {
   'chin-up': '10 0 180 188',
   burpee: '0 -30 200 218',
   'squat-jump': '0 0 200 188',
+  'blast-off-push-up': '0 0 200 188',
   'quad-set': '24 128 160 52',
   'dumbbell-pullover': '-4 20 180 168',
 };
@@ -557,8 +558,16 @@ export function Figure({
           ? driven
           : spec.motion === 'sequence'
             ? (elapsedMs.current %
-                (exerciseId === 'squat-jump' ? 4500 : 12000)) /
-              (exerciseId === 'squat-jump' ? 4500 : 12000)
+                (exerciseId === 'squat-jump'
+                  ? 4500
+                  : exerciseId === 'blast-off-push-up'
+                    ? 2500
+                    : 12000)) /
+              (exerciseId === 'squat-jump'
+                ? 4500
+                : exerciseId === 'blast-off-push-up'
+                  ? 2500
+                  : 12000)
             : spec.motion === 'ballistic'
               ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
               : cycleProgress(

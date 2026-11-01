@@ -8,7 +8,11 @@ import { exerciseMuscles } from './muscles';
 
 describe('expanded library integrity', () => {
   it('preserves permanent E01–E84, E87 and E88 references and original load indices', () => {
-    expect(exerciseList.map((e) => exerciseReferences[e.id])).toEqual([
+    expect(
+      exerciseList
+        .map((e) => exerciseReferences[e.id])
+        .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))),
+    ).toEqual([
       ...Array.from(
         { length: 84 },
         (_, i) => `E${String(i + 1).padStart(2, '0')}`,
@@ -20,6 +24,7 @@ describe('expanded library integrity', () => {
       'E92',
       'E93',
       'E94',
+      'E95',
     ]);
     expect(
       exercises['goblet-chair-squat'].loadLadder.map((load) => load.kg),

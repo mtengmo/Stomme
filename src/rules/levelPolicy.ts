@@ -26,6 +26,7 @@ export const movementSlots: Partial<Record<ExerciseId, string>> = {
   'push-up': 'horizontal-press',
   'decline-push-up': 'horizontal-press',
   'diamond-push-up': 'horizontal-press',
+  'blast-off-push-up': 'horizontal-press',
   'plank-arm-lift': 'core',
   woodchop: 'core',
   'kettlebell-halo': 'core',

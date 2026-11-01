@@ -15,15 +15,18 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('ballistic exercises render without crashing', () => {
-  it.each(['squat-jump', 'burpee', 'jumping-lunge', 'kettlebell-swing'])(
-    'guide page for %s',
-    async (id) => {
-      window.location.hash = `#/ovning/${id}`;
-      render(<App />);
-      expect(await screen.findByRole('heading', { level: 1 })).toBeTruthy();
-      expect(screen.queryByText('Något gick fel')).toBeNull();
-    },
-  );
+  it.each([
+    'squat-jump',
+    'burpee',
+    'jumping-lunge',
+    'kettlebell-swing',
+    'blast-off-push-up',
+  ])('guide page for %s', async (id) => {
+    window.location.hash = `#/ovning/${id}`;
+    render(<App />);
+    expect(await screen.findByRole('heading', { level: 1 })).toBeTruthy();
+    expect(screen.queryByText('Något gick fel')).toBeNull();
+  });
 
   it('library lists them', async () => {
     window.location.hash = '#/ovningar';

@@ -104,6 +104,11 @@ export const exerciseMuscles: Record<
   },
   'decline-push-up': { ...bodyweightDetails['decline-push-up'], qualities: [] },
   'diamond-push-up': { ...bodyweightDetails['diamond-push-up'], qualities: [] },
+  'blast-off-push-up': {
+    primary: ['chest', 'triceps'],
+    secondary: ['shoulders', 'core'],
+    qualities: ['power'],
+  },
   'plank-arm-lift': { ...bodyweightDetails['plank-arm-lift'], qualities: [] },
   'push-up': { ...bodyweightDetails['push-up'], qualities: [] },
   'pull-up': { ...bodyweightDetails['pull-up'], qualities: ['grip'] },

@@ -4,6 +4,7 @@ import type { ExerciseId } from '../domain/types';
 export const exerciseReferences: Record<ExerciseId, string> = {
   'decline-push-up': 'E69',
   'diamond-push-up': 'E70',
+  'blast-off-push-up': 'E95',
   'plank-arm-lift': 'E71',
   'goblet-chair-squat': 'E01',
   'step-up': 'E02',

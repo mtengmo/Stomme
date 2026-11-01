@@ -142,6 +142,7 @@ describe('rep counting on the set screen', () => {
 
   it.each([
     'squat-jump',
+    'blast-off-push-up',
     'burpee',
     'jumping-lunge',
     'kettlebell-swing',

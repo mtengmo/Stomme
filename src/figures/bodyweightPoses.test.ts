@@ -65,6 +65,23 @@ describe('bodyweight movement paths', () => {
     expect(left.neck).toEqual(start.neck);
     expect(figures['plank-arm-lift'].end.hR[1]).toBeLessThan(start.hR[1] - 30);
   });
+  it('explosive push-up lifts both hands briefly and lands back on the floor', () => {
+    const start = movementPose('blast-off-push-up', 0);
+    expect(movementPose('blast-off-push-up', 1)).toEqual(start);
+    const air = movementPose('blast-off-push-up', 0.75);
+    expect(air.hR[1]).toBeLessThan(start.hR[1] - 5);
+    expect(air.hL[1]).toBeLessThan(start.hL[1] - 5);
+    for (const t of [0, 0.4, 0.625, 0.875, 1]) {
+      const p = movementPose('blast-off-push-up', t);
+      expect(p.hR).toEqual(start.hR);
+      expect(p.hL).toEqual(start.hL);
+      expect(p.aR).toEqual(start.aR);
+      expect(distance(p.neck, p.hip)).toBeCloseTo(
+        distance(start.neck, start.hip),
+        8,
+      );
+    }
+  });
   it.each(['pull-up', 'chin-up', 'parallel-dip'] as const)(
     '%s retains both apparatus contacts',
     (id) => {

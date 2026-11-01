@@ -5,6 +5,7 @@ import { figures } from '../../figures/poses';
 const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'decline-push-up',
   'diamond-push-up',
+  'blast-off-push-up',
   'plank-arm-lift',
   'push-up',
   'pull-up',
