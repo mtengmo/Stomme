@@ -5,6 +5,7 @@ import { BarChart } from '../../charts/BarChart';
 import { PainChart } from '../../charts/PainChart';
 import { StepLineChart } from '../../charts/StepLineChart';
 import { exercises } from '../../content/exercises';
+import { focusLabel } from '../../content/focusPresets';
 import { rehabGroupOf, trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { listSessions } from '../../db/repo';
@@ -293,7 +294,7 @@ export function History() {
                       <span className="flex flex-col">
                         <span className="count text-3xl leading-none">
                           {s.customWorkoutName ??
-                            `${s.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.templateId}`}
+                            `${s.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.templateId}${s.focus ? ` · ${focusLabel(s.focus)}` : ''}`}
                         </span>
                         <span className="mt-1 text-base font-bold">
                           {trainingName(s)}
@@ -377,8 +378,8 @@ export function History() {
       {exerciseIds.length > 0 ? (
         <section aria-label="Ursprungliga programmets belastning">
           <p className="m-0 text-base text-ink-soft">
-            Belastningen nedan gäller det ursprungliga programmet.
-            För nya pass: använd Jämför en övning.
+            Belastningen nedan gäller det ursprungliga programmet. För nya pass:
+            använd Jämför en övning.
           </p>
           <StepLineChart logs={legacyLogs} exerciseIds={exerciseIds} />
         </section>

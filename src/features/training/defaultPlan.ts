@@ -1,5 +1,6 @@
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exercises } from '../../content/exercises';
+import type { WorkoutFocus } from '../../content/focusPresets';
 import { kneeConditioningPlan } from '../../content/kneeRehab';
 import { physioKneePlan } from '../../content/physioKneeProgramme';
 import { rehabGroupOf } from '../../content/programmes';
@@ -14,6 +15,7 @@ import type {
   TrainingPreferences,
   TrainingRoutines,
 } from '../../domain/types';
+import { defaultFocus } from '../../lib/focus';
 import { equipmentFits } from '../../rules/equipment';
 import {
   chooseStartingWeight,
@@ -104,6 +106,7 @@ export function defaultPlan(
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
   painReported = false,
   savedRoutines?: TrainingRoutines,
+  focus: WorkoutFocus = defaultFocus(preferences),
 ): PlannedExercise[] {
   if (preferences.programId === 'rehab') {
     const focus = preferences.rehabFocus ?? 'custom';
@@ -127,7 +130,8 @@ export function defaultPlan(
           : [])
     );
   }
-  const saved = savedRoutines?.[preferences.programId]?.[id];
+  const saved =
+    focus.id !== 'custom' ? savedRoutines?.[focus.id]?.[id] : undefined;
   if (saved && validateTrainingPlan(saved))
     return saved.map((item) => {
       const variant = exerciseMetadata[item.exerciseId].variants.find(
@@ -160,7 +164,7 @@ export function defaultPlan(
       };
     });
   const painOnRecord = symptomsOnRecord(sessions, painReported);
-  const roster = buildRoster(preferences, id, { painOnRecord });
+  const roster = buildRoster(preferences, id, { painOnRecord, focus });
   return roster.ids.map((exerciseId, index) => {
     const plan = basePlan(exerciseId, preferences, {
       index,

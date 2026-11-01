@@ -1,3 +1,5 @@
+import type { FocusId, RoutineFocus } from '../content/focusPresets';
+
 export type ExerciseId =
   | 'decline-push-up'
   | 'diamond-push-up'
@@ -128,7 +130,7 @@ export interface Exercise {
 export type TemplateId = 'A' | 'B';
 
 export type RehabFocus = 'custom' | 'knee' | 'knee-physio';
-export type ProgramId = 'general' | 'running' | 'rehab';
+export type ProgramId = 'general' | 'rehab';
 /** Support items only; dumbbells and kettlebells live in the weights. */
 export type EquipmentChoice =
   | 'bodyweight'
@@ -248,13 +250,16 @@ export interface Session {
   templateId: TemplateId;
   customWorkoutId?: string;
   customWorkoutName?: string;
+  /** Only standard general sessions carry daily focus. */
+  focus?: FocusId;
+  regions?: BodyRegionId[];
   /** Absent means a full workout. Short sessions do not establish progression. */
   workoutMode?: 'short';
   /** Original full plan for restoring a short preparation after reload. */
   fullPlan?: PlannedExercise[];
   /** Equipment used for this workout; absent means the saved home selection. */
   equipmentOverride?: WorkoutEquipment;
-  /** Absent on original knee/running sessions. */
+  /** Absent on original knee sessions. */
   programId?: ProgramId;
   /** Experience selected when this workout was prepared. */
   experience?: TrainingPreferences['experience'];
@@ -320,9 +325,8 @@ export interface MetaEntry {
   value: unknown;
 }
 
-export type StandardProgramId = 'general' | 'running';
 export type TrainingRoutines = Partial<
-  Record<StandardProgramId, Partial<Record<TemplateId, PlannedExercise[]>>>
+  Record<RoutineFocus, Partial<Record<TemplateId, PlannedExercise[]>>>
 >;
 
 /** ISO weekdays (Monday 1, Sunday 7); moved replaces one dated occurrence. */

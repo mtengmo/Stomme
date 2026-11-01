@@ -51,7 +51,7 @@ describe('appearance is a device preference, not data', () => {
 
   it('a backup made before themes still imports and leaves the appearance alone', async () => {
     const legacy = JSON.stringify({
-      schemaVersion: 2,
+      schemaVersion: 3,
       exportedAt: '2026-10-01T10:00:00.000Z',
       sessions: [],
       setLogs: [],

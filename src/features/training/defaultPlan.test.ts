@@ -101,7 +101,7 @@ describe('level-driven general start plan', () => {
       { ...(original[1] as PlannedExercise), sets: 4, restSec: 90 },
       { ...(original[0] as PlannedExercise), sets: 3, restSec: 75 },
     ];
-    const routines = { general: { A: saved } };
+    const routines = { full: { A: saved } };
     const restored = defaultPlan(
       general('new'),
       'A',
@@ -178,7 +178,7 @@ describe('level-driven general start plan', () => {
         loggedAt: prior.startedAt,
       },
     ];
-    const routines = { general: { A: [right] } };
+    const routines = { full: { A: [right] } };
     const restored = defaultPlan(
       general('new'),
       'A',

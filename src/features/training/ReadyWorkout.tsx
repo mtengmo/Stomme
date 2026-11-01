@@ -25,12 +25,14 @@ export function ReadyWorkout({
   preferences,
   onChange,
   short = false,
+  fullBody = !preferences.bodyParts?.length,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
   /** Opens the editor with this exercise's row open. */
   onChange(index: number): void;
   short?: boolean;
+  fullBody?: boolean;
 }) {
   const knee =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
@@ -75,7 +77,10 @@ export function ReadyWorkout({
         {short ? 'Ditt kortpass' : 'Ditt pass'} · {plan.length}{' '}
         {plan.length === 1 ? 'övning' : 'övningar'}
       </h2>
-      {!short && preferences.programId === 'general' && missing.length > 0 ? (
+      {!short &&
+      fullBody &&
+      preferences.programId === 'general' &&
+      missing.length > 0 ? (
         <p className="m-0 text-base">
           Urvalet täcker inte alla delar av helkroppspasset. Saknas:{' '}
           {missing.join(', ')}. Se över utrustningen och alternativen under

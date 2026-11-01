@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { focusLabel } from '../../content/focusPresets';
 import { bodyRegions } from '../../content/muscles';
 import {
   experienceLabels,
@@ -24,25 +25,24 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
+import { focusQuery } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
-import { nextTemplateId, restStatus } from '../../rules/schedule';
+import { focusAvailable } from '../../rules/programRosters';
+import { recentMuscles, recoveryNote } from '../../rules/recovery';
+import { nextTemplateId } from '../../rules/schedule';
 import { trainingDayAfterDue } from '../../rules/training';
 import { Button, buttonClass } from '../../ui/Button';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
-import {
-  loadWeeklySchedule,
-  restAdviceText,
-  WeeklyPlan,
-} from '../week/WeeklyPlan';
+import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
+import { startingFocus } from './focusModel';
 import { QuickStart } from './QuickStart';
 
 const inputClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
 
 export { inputClass };
-
 export function TrainingSetup({
   current,
   onSaved,
@@ -283,7 +283,6 @@ export function TrainingSetup({
     </section>
   );
 }
-
 export function TrainingHome() {
   const data = useLiveQuery(async () => {
     const [preferences, sessions, legacyProgramme] = await Promise.all([
@@ -357,20 +356,21 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
-  // Without a weekly plan the rest advice lives in the lead; with one it stays
-  // in the weekly plan.
-  const rest = restStatus(
-    data.sessions.filter(
-      (session) => session.programId === preferences?.programId,
-    ),
-    new Date(),
-  );
+  const dailyFocus = preferences
+    ? startingFocus(
+        preferences,
+        data.sessions,
+        new Date(),
+        focusAvailable(preferences).presets,
+      )
+    : undefined;
   const restNote =
-    preferences &&
-    preferences.programId !== 'rehab' &&
-    !data.schedule &&
-    !rest.ok
-      ? restAdviceText(rest)
+    preferences?.programId === 'general' && dailyFocus
+      ? recoveryNote(
+          recentMuscles(data.sessions, new Date()),
+          dailyFocus.focus,
+          new Date(),
+        )
       : '';
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
   if (legacy)
@@ -410,12 +410,25 @@ export function TrainingHome() {
           Träningsvana: {experienceLabels[preferences.experience]}
         </p>
       ) : null}
-      {restNote ? (
-        <p className="m-0 -mt-3 text-base text-ink-soft">{restNote}</p>
+      {preferences.programId === 'general' && dailyFocus && !active ? (
+        <p className="m-0 -mt-3 flex min-h-12 flex-wrap items-center gap-x-2 text-base">
+          Dagens fokus: {focusLabel(dailyFocus.focus.id)}
+          {dailyFocus.suggested ? ' (förslag)' : ''} ·{' '}
+          <Link
+            href="/fokus"
+            className="inline-flex min-h-12 items-center font-bold underline"
+          >
+            Byt
+          </Link>
+        </p>
       ) : null}
       <TimeoutNotice />
       <Link
-        href={active ? `/session/${active.id}` : `/traning/${nextId}`}
+        href={
+          active
+            ? `/session/${active.id}`
+            : `/traning/${nextId}${dailyFocus && preferences.programId === 'general' ? `?${focusQuery(dailyFocus.focus)}` : ''}`
+        }
         className={buttonClass('primary')}
       >
         {prepared
@@ -424,6 +437,9 @@ export function TrainingHome() {
             ? 'Fortsätt passet'
             : 'Visa nästa pass'}
       </Link>
+      {restNote ? (
+        <p className="m-0 -mt-3 text-base text-ink-soft">{restNote}</p>
+      ) : null}
       {due.map((session) => (
         <Link
           key={session.id}

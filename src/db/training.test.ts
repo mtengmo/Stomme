@@ -379,45 +379,6 @@ describe('programme persistence and safety boundaries', () => {
     expect((await db.sessions.get(legacy.id))?.programId).toBeUndefined();
   });
 
-  it('imports a v1 backup additively and retains separate legacy effort and knee pain', async () => {
-    const legacy: Session = {
-      id: 'legacy',
-      templateId: 'A',
-      date: '2026-10-20',
-      startedAt: now.toISOString(),
-      status: 'completed',
-      programWeek: 1,
-      plan: [],
-      feedback: { 'step-up': { effort: 'hard' } },
-    };
-    const pain = {
-      id: 'p',
-      sessionId: legacy.id,
-      date: legacy.date,
-      timing: 'after',
-      score: 2,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: now.toISOString(),
-    };
-    await importAll(
-      db,
-      JSON.stringify({
-        schemaVersion: 1,
-        exportedAt: now.toISOString(),
-        sessions: [legacy],
-        setLogs: [],
-        painLogs: [pain],
-        meta: [],
-      }),
-    );
-    const result = await exportAll(db, now);
-    expect(result.schemaVersion).toBe(2);
-    expect(result.sessions).toEqual([legacy]);
-    expect(result.painLogs).toEqual([pain]);
-    expect(result.sessions[0]?.checkins).toBeUndefined();
-  });
-
   it('round-trips programme policy, independent questions, custom weight, variant and selected side', async () => {
     await saveTrainingPreferences(db, preferences);
     const session = await startTrainingSession(

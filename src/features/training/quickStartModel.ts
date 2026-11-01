@@ -10,12 +10,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 
-export type Goal =
-  | 'general'
-  | 'build'
-  | 'knee'
-  | 'physio'
-  | 'custom';
+export type Goal = 'general' | 'build' | 'knee' | 'physio' | 'custom';
 export type Step = 'goal' | 'equipment' | 'level' | 'focus' | 'pick';
 export type Focus = 'all' | 'select';
 export type Side = 'both' | 'right' | 'left';
@@ -30,13 +25,7 @@ export const levelHints: Record<Experience, string> = {
   regular: 'Alla övningar, 3–4 set, tyngre startvikter.',
 };
 
-const goals: Goal[] = [
-  'general',
-  'build',
-  'knee',
-  'physio',
-  'custom',
-];
+const goals: Goal[] = ['general', 'build', 'knee', 'physio', 'custom'];
 
 export function stepsFor(goal: Goal | null): Step[] {
   if (goal === 'general') return ['goal', 'equipment', 'level', 'focus'];
@@ -51,11 +40,7 @@ export function isRehabGoal(goal: Goal | null): boolean {
 /** Support items the checklist may offer for a goal; anything else is dropped on save. */
 export function allowedEquipment(goal: Goal | null): EquipmentChoice[] {
   const base: EquipmentChoice[] = ['chair', 'support'];
-  if (
-    goal === 'general' ||
-    goal === 'build' ||
-    goal === 'custom'
-  )
+  if (goal === 'general' || goal === 'build' || goal === 'custom')
     return [...base, 'step', 'band', 'pull-up-bar', 'dip-bars'];
   if (goal === 'physio') return [...base, 'band'];
   return base;
@@ -184,11 +169,7 @@ export function preferencesFromDraft(
       ? draft.bodyParts.filter((part) => regions.includes(part))
       : [];
   return {
-    programId: rehab
-      ? 'rehab'
-      : goal === 'build'
-        ? 'general'
-        : 'general',
+    programId: rehab ? 'rehab' : 'general',
     equipment: [...new Set(equipment)],
     // Rehab never uses the strength level.
     experience: rehab ? 'new' : draft.experience,

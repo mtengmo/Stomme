@@ -93,6 +93,11 @@ const TrainingHome = lazy(() =>
     default: m.TrainingHome,
   })),
 );
+const FocusPicker = lazy(() =>
+  import('./features/training/FocusPicker').then((m) => ({
+    default: m.FocusPicker,
+  })),
+);
 const TrainingPreview = lazy(() =>
   import('./features/training/TrainingPreview').then((m) => ({
     default: m.TrainingPreview,
@@ -169,6 +174,7 @@ function Shell() {
         <Suspense fallback={null}>
           <Switch>
             <Route path="/">{() => <TrainingHome />}</Route>
+            <Route path="/fokus">{() => <FocusPicker />}</Route>
             <Route path="/traning/:id">
               {(params) => <TrainingPreview id={params.id} />}
             </Route>

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
-import { bodyRegions } from '../../content/muscles';
 import { experienceLabels } from '../../content/programmes';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
@@ -23,6 +22,7 @@ import {
   showsWeights,
   stepsFor,
 } from './quickStartModel';
+import { RegionChecklist } from './RegionChecklist';
 
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
@@ -112,7 +112,8 @@ export function QuickStart() {
   const available = useMemo(
     () =>
       goal === 'general'
-        ? focusAvailable(preferencesFromDraft({ ...draft, focus: 'all' })).regions
+        ? focusAvailable(preferencesFromDraft({ ...draft, focus: 'all' }))
+            .regions
         : [],
     [goal, draft],
   );
@@ -345,56 +346,11 @@ export function QuickStart() {
                 ))}
               </fieldset>
               {focus === 'select' ? (
-                <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-                  <legend className="mb-1 text-base font-bold">
-                    Kroppsdelar
-                  </legend>
-                  {bodyRegions.map((region) => {
-                    const enabled = available.includes(region.id);
-                    return (
-                      <div key={region.id}>
-                        <label
-                          className={`flex min-h-12 items-center gap-3 text-lg ${enabled ? '' : 'text-ink-soft'}`}
-                        >
-                          <input
-                            className="size-6"
-                            type="checkbox"
-                            disabled={!enabled}
-                            aria-describedby={
-                              enabled ? undefined : `region-${region.id}`
-                            }
-                            checked={
-                              enabled && draft.bodyParts.includes(region.id)
-                            }
-                            onChange={(event) =>
-                              update({
-                                bodyParts: event.target.checked
-                                  ? [
-                                      ...new Set([
-                                        ...draft.bodyParts,
-                                        region.id,
-                                      ]),
-                                    ]
-                                  : draft.bodyParts.filter(
-                                      (part) => part !== region.id,
-                                    ),
-                              })
-                            }
-                          />
-                          {region.label}
-                        </label>
-                        {enabled ? null : (
-                          <p
-                            id={`region-${region.id}`}
-                            className="m-0 pl-9 text-base text-ink-soft"
-                          >
-                            Inga övningar med din utrustning och vana.
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </fieldset>
+                <RegionChecklist
+                  value={draft.bodyParts}
+                  available={available}
+                  onChange={(bodyParts) => update({ bodyParts })}
+                />
               ) : null}
             </>
           ) : null}

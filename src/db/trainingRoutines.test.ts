@@ -29,25 +29,25 @@ describe('saved standard routines', () => {
   it('keeps each direction and programme separate, clones on read, and backs up', async () => {
     const a = defaultPlan(preferences, 'A', [], []);
     const b = defaultPlan(preferences, 'B', [], []);
-    await saveTrainingRoutine(db, 'general', 'A', a);
-    await saveTrainingRoutine(db, 'general', 'B', b);
-    await saveTrainingRoutine(db, 'running', 'A', a);
+    await saveTrainingRoutine(db, 'full', 'A', a);
+    await saveTrainingRoutine(db, 'full', 'B', b);
+    await saveTrainingRoutine(db, 'push', 'A', a);
     const stored = await getTrainingRoutines(db);
-    expect(stored.general?.A).toEqual(a);
-    expect(stored.general?.B).toEqual(b);
-    expect(stored.running?.A).toEqual(a);
-    stored.general?.A?.splice(0);
-    expect((await getTrainingRoutines(db)).general?.A).toEqual(a);
+    expect(stored.full?.A).toEqual(a);
+    expect(stored.full?.B).toEqual(b);
+    expect(stored.push?.A).toEqual(a);
+    stored.full?.A?.splice(0);
+    expect((await getTrainingRoutines(db)).full?.A).toEqual(a);
     const backup = parseBackup(serializeBackup(await exportAll(db)));
     expect(
       backup.meta.find((row) => row.key === 'trainingRoutines')?.value,
     ).toEqual(await getTrainingRoutines(db));
-    await resetTrainingRoutine(db, 'general', 'A');
-    expect((await getTrainingRoutines(db)).general?.A).toBeUndefined();
-    await resetTrainingRoutine(db, 'general', 'B');
-    await resetTrainingRoutine(db, 'running', 'A');
+    await resetTrainingRoutine(db, 'full', 'A');
+    expect((await getTrainingRoutines(db)).full?.A).toBeUndefined();
+    await resetTrainingRoutine(db, 'full', 'B');
+    await resetTrainingRoutine(db, 'push', 'A');
     expect(await db.meta.get('trainingRoutines')).toBeUndefined();
-    await resetTrainingRoutine(db, 'running', 'A');
+    await resetTrainingRoutine(db, 'push', 'A');
   });
 
   it('rejects malformed routines and invalid saves', async () => {
@@ -55,28 +55,28 @@ describe('saved standard routines', () => {
     expect(isTrainingRoutines(null)).toBe(false);
     expect(isTrainingRoutines([])).toBe(false);
     expect(isTrainingRoutines({ rehab: { A: a } })).toBe(false);
-    expect(isTrainingRoutines({ general: [] })).toBe(false);
-    expect(isTrainingRoutines({ general: { C: a } })).toBe(false);
-    expect(isTrainingRoutines({ general: { A: [] } })).toBe(false);
-    await expect(saveTrainingRoutine(db, 'general', 'A', [])).rejects.toThrow();
+    expect(isTrainingRoutines({ full: [] })).toBe(false);
+    expect(isTrainingRoutines({ full: { C: a } })).toBe(false);
+    expect(isTrainingRoutines({ full: { A: [] } })).toBe(false);
+    await expect(saveTrainingRoutine(db, 'full', 'A', [])).rejects.toThrow();
     await db.meta.put({
       key: 'trainingRoutines',
-      value: { general: { A: [] } },
+      value: { full: { A: [] } },
     });
     expect(await getTrainingRoutines(db)).toEqual({});
-    await expect(saveTrainingRoutine(db, 'general', 'A', a)).rejects.toThrow();
-    await expect(resetTrainingRoutine(db, 'general', 'A')).rejects.toThrow();
+    await expect(saveTrainingRoutine(db, 'full', 'A', a)).rejects.toThrow();
+    await expect(resetTrainingRoutine(db, 'full', 'A')).rejects.toThrow();
   });
 
   it('rejects malformed routine metadata in a backup', async () => {
     const a = defaultPlan(preferences, 'A', [], []);
-    await saveTrainingRoutine(db, 'general', 'A', a);
+    await saveTrainingRoutine(db, 'full', 'A', a);
     const backup = await exportAll(db);
     const row = backup.meta.find((entry) => entry.key === 'trainingRoutines');
     if (!row) throw new Error('Missing routine fixture');
-    row.value = { general: { A: a, C: a } };
+    row.value = { full: { A: a, C: a } };
     expect(() => parseBackup(serializeBackup(backup))).toThrow();
-    row.value = { general: { A: [{ ...a[0], sets: 0 }] } };
+    row.value = { full: { A: [{ ...a[0], sets: 0 }] } };
     expect(() => parseBackup(serializeBackup(backup))).toThrow();
   });
 });

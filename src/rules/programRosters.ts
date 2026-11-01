@@ -197,9 +197,13 @@ function focusRoster(
     if (ids.length === before) break;
   }
   if (!ids.length || ids.length >= 3) return { ids, notes };
-  for (const id of wholeBody(preferences, template, context).ids) {
+  const filler = wholeBody(preferences, template, context);
+  for (const id of filler.ids) {
     if (ids.length >= 3) break;
-    if (!ids.includes(id)) ids.push(id);
+    if (!ids.includes(id)) {
+      ids.push(id);
+      if (filler.notes[id]) notes[id] = filler.notes[id];
+    }
   }
   return { ids, notes, note: TOP_UP_NOTE };
 }

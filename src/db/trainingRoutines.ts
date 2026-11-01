@@ -1,13 +1,13 @@
+import { type RoutineFocus, routineFocusIds } from '../content/focusPresets';
 import type {
   PlannedExercise,
-  StandardProgramId,
   TemplateId,
   TrainingRoutines,
 } from '../domain/types';
 import type { StommeDB } from './db';
 import { validateTrainingPlan } from './training';
 
-const programs: readonly StandardProgramId[] = ['general', 'running'];
+const programs = routineFocusIds;
 const templates: readonly TemplateId[] = ['A', 'B'];
 
 /** Strict shape guard used for stored data and backup import. */
@@ -15,7 +15,7 @@ export function isTrainingRoutines(value: unknown): value is TrainingRoutines {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const routines = value as Record<string, unknown>;
   return Object.entries(routines).every(([program, plans]) => {
-    if (!programs.includes(program as StandardProgramId)) return false;
+    if (!programs.includes(program as RoutineFocus)) return false;
     if (!plans || typeof plans !== 'object' || Array.isArray(plans))
       return false;
     return Object.entries(plans).every(
@@ -37,7 +37,7 @@ export async function getTrainingRoutines(
 
 export async function saveTrainingRoutine(
   db: StommeDB,
-  programId: StandardProgramId,
+  programId: RoutineFocus,
   templateId: TemplateId,
   plan: PlannedExercise[],
 ): Promise<void> {
@@ -69,7 +69,7 @@ export async function saveTrainingRoutine(
 
 export async function resetTrainingRoutine(
   db: StommeDB,
-  programId: StandardProgramId,
+  programId: RoutineFocus,
   templateId: TemplateId,
 ): Promise<void> {
   if (!programs.includes(programId) || !templates.includes(templateId))

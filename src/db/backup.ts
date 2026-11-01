@@ -26,7 +26,7 @@ import { validateTrainingPlan } from './training';
 import { isTrainingRoutines } from './trainingRoutines';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
-export const BACKUP_SCHEMA_VERSION = 2;
+export const BACKUP_SCHEMA_VERSION = 3;
 /** Import size limit (risk R12). */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -243,10 +243,19 @@ const sessionSchema = z
     templateId: z.enum(['A', 'B']),
     customWorkoutId: z.string().min(1).max(100).optional(),
     customWorkoutName: z.string().min(1).max(60).optional(),
+    focus: z
+      .enum(['full', 'upper', 'lower', 'push', 'pull', 'legs', 'custom'])
+      .optional(),
+    regions: z
+      .array(z.enum(['legs', 'core', 'back', 'chest', 'shoulders', 'arms']))
+      .min(1)
+      .max(6)
+      .refine((parts) => new Set(parts).size === parts.length)
+      .optional(),
     workoutMode: z.literal('short').optional(),
     fullPlan: z.array(plannedExercise).min(1).max(12).optional(),
     equipmentOverride: workoutEquipmentSchema.optional(),
-    programId: z.enum(['general', 'running', 'rehab']).optional(),
+    programId: z.enum(['general', 'rehab']).optional(),
     experience: z.enum(['new', 'some', 'regular']).optional(),
     policyVersion: z.literal(1).optional(),
     rehabFocus: z.enum(['custom', 'knee', 'knee-physio']).optional(),
@@ -275,6 +284,13 @@ const sessionSchema = z
     note: z.string().max(5000).optional(),
   })
   .superRefine((session, ctx) => {
+    if (
+      (session.focus &&
+        (session.programId !== 'general' || session.customWorkoutId)) ||
+      (session.focus === 'custom' && !session.regions) ||
+      (session.regions && session.focus !== 'custom')
+    )
+      ctx.addIssue({ code: 'custom', message: 'Invalid daily focus' });
     if (
       session.equipmentOverride &&
       (!session.programId ||
@@ -406,8 +422,12 @@ const metaSchema = z.discriminatedUnion('key', [
     key: z.literal('trainingRoutines'),
     value: z
       .strictObject({
-        general: routinePlans.optional(),
-        running: routinePlans.optional(),
+        full: routinePlans.optional(),
+        upper: routinePlans.optional(),
+        lower: routinePlans.optional(),
+        push: routinePlans.optional(),
+        pull: routinePlans.optional(),
+        legs: routinePlans.optional(),
       })
       .refine(isTrainingRoutines),
   }),
@@ -476,7 +496,7 @@ const metaSchema = z.discriminatedUnion('key', [
   z.strictObject({
     key: z.literal('training'),
     value: z.strictObject({
-      programId: z.enum(['general', 'running', 'rehab']),
+      programId: z.enum(['general', 'rehab']),
       experience: z.enum(['new', 'some', 'regular']),
       rehabFocus: z.enum(['custom', 'knee', 'knee-physio']).optional(),
       rehabSide: z.enum(['right', 'left', 'both']).optional(),
@@ -509,7 +529,7 @@ const metaSchema = z.discriminatedUnion('key', [
 ]);
 
 const backupSchema = z.strictObject({
-  schemaVersion: z.union([z.literal(1), z.literal(BACKUP_SCHEMA_VERSION)]),
+  schemaVersion: z.literal(BACKUP_SCHEMA_VERSION),
   exportedAt: instant,
   sessions: z.array(sessionSchema),
   setLogs: z.array(setLogSchema),
@@ -536,8 +556,7 @@ export function parseBackup(text: string): BackupFile {
     typeof raw === 'object' &&
     raw !== null &&
     'schemaVersion' in raw &&
-    raw.schemaVersion !== BACKUP_SCHEMA_VERSION &&
-    raw.schemaVersion !== 1
+    raw.schemaVersion !== BACKUP_SCHEMA_VERSION
   ) {
     throw new BackupError(
       'schema_version',
@@ -549,8 +568,6 @@ export function parseBackup(text: string): BackupFile {
     throw new BackupError('invalid', 'Backup content is not valid');
   }
   const b = parsed.data as BackupFile;
-  // v1 is an additive migration: absent programme fields preserve the legacy policy.
-  b.schemaVersion = BACKUP_SCHEMA_VERSION;
   const sessionIds = new Set(b.sessions.map((s) => s.id));
   const metaKeys = new Set(b.meta.map((m) => m.key));
   if (

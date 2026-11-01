@@ -1,14 +1,11 @@
 import { useState } from 'react';
+import type { RoutineFocus } from '../../content/focusPresets';
 import { getDb } from '../../db/db';
 import {
   resetTrainingRoutine,
   saveTrainingRoutine,
 } from '../../db/trainingRoutines';
-import type {
-  PlannedExercise,
-  StandardProgramId,
-  TemplateId,
-} from '../../domain/types';
+import type { PlannedExercise, TemplateId } from '../../domain/types';
 import { Button } from '../../ui/Button';
 
 /** Saving a normal routine is always separate from today's draft and short version. */
@@ -21,7 +18,7 @@ export function RoutineControls({
   onReset,
 }: {
   plan: PlannedExercise[];
-  programId: StandardProgramId;
+  programId: RoutineFocus;
   templateId: TemplateId;
   hasSaved: boolean;
   disabled: boolean;

@@ -149,6 +149,7 @@ export async function startTrainingSession(
     workoutMode?: 'short';
     fullPlan?: PlannedExercise[];
     equipmentOverride?: WorkoutEquipment;
+    focus?: import('../content/focusPresets').WorkoutFocus;
   } = {},
 ): Promise<Session> {
   const fullPlan = options.fullPlan;
@@ -242,6 +243,29 @@ export async function startTrainingSession(
           : {}),
 
         programId: preferences.programId,
+        ...(preferences.programId === 'general' && !customWorkout
+          ? {
+              focus:
+                options.focus?.id ??
+                (preferences.bodyParts?.length
+                  ? ('custom' as const)
+                  : ('full' as const)),
+              ...((options.focus?.id === 'custom'
+                ? options.focus.regions
+                : !options.focus
+                  ? preferences.bodyParts
+                  : undefined
+              )?.length
+                ? {
+                    regions: [
+                      ...(options.focus?.regions ??
+                        preferences.bodyParts ??
+                        []),
+                    ],
+                  }
+                : {}),
+            }
+          : {}),
         experience: preferences.experience,
 
         policyVersion: 1,

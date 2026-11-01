@@ -161,12 +161,7 @@ describe('quick start model', () => {
 
   it('adds a pick step only for building your own workout', () => {
     expect(stepsFor('build')).toEqual(['goal', 'equipment', 'level', 'pick']);
-    for (const goal of [
-      'general',
-      'knee',
-      'physio',
-      'custom',
-    ] as const)
+    for (const goal of ['general', 'knee', 'physio', 'custom'] as const)
       expect(stepsFor(goal)).not.toContain('pick');
   });
 

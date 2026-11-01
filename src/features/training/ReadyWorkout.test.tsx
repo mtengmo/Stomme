@@ -25,3 +25,25 @@ it('shows the heavy-start note in the overview but not the generic start line', 
   expect(screen.getAllByText(/Tung startvikt/).length).toBeGreaterThan(0);
   expect(screen.queryByText(/^Startförslag/)).toBeNull();
 });
+
+it('omits the whole-body coverage warning for an intentional focus', () => {
+  const plan = defaultPlan(
+    preferences,
+    'A',
+    [],
+    [],
+    undefined,
+    false,
+    undefined,
+    { id: 'push' },
+  );
+  render(
+    <ReadyWorkout
+      plan={plan}
+      preferences={preferences}
+      fullBody={false}
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.queryByText(/Saknas:/)).toBeNull();
+});

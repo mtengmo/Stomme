@@ -5,6 +5,7 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseSideCue } from '../../content/exerciseSideCues';
 import { exerciseList, exercises } from '../../content/exercises';
+import { focusLabel, type WorkoutFocus } from '../../content/focusPresets';
 import {
   kneeConditioningPlan,
   kneeRehabExercises,
@@ -58,6 +59,7 @@ import type {
   TrainingRoutines,
   WorkoutEquipment,
 } from '../../domain/types';
+import { defaultFocus, parseFocus } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
@@ -114,6 +116,7 @@ function PreviewEditor({
   savedPlans,
   painReported,
   customWorkout,
+  focus,
   preparationId,
   savedRoutines,
   homePreferences,
@@ -136,18 +139,23 @@ function PreviewEditor({
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>;
   painReported?: boolean;
   customWorkout?: CustomWorkout;
+  focus: WorkoutFocus;
   preparationId?: string;
   savedRoutines?: TrainingRoutines;
 }) {
   const [, navigate] = useLocation();
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${focus.id}.${(focus.regions ?? []).join(',')}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
   const preparation = sessions.find(
     (session) =>
       session.id === preparationId &&
       session.templateId === id &&
-      session.customWorkoutId === customWorkout?.id,
+      session.customWorkoutId === customWorkout?.id &&
+      (customWorkout ||
+        preferences.programId === 'rehab' ||
+        (session.focus === focus.id &&
+          (session.regions ?? []).join() === (focus.regions ?? []).join())),
   );
 
   const [plan, setPlan] = useState(() => {
@@ -200,6 +208,7 @@ function PreviewEditor({
       savedPlans,
       painReported,
       savedRoutines,
+      focus,
     );
   });
 
@@ -447,7 +456,9 @@ function PreviewEditor({
           {customWorkout?.name ??
             (preferences.programId === 'rehab'
               ? 'Mitt rehabpass'
-              : `Pass ${id}`)}
+              : focus.id === 'full'
+                ? `Pass ${id}`
+                : `Fokus: ${focusLabel(focus.id)}`)}
         </h1>
 
         <p className="m-0 mt-2 text-lg font-bold">
@@ -458,17 +469,14 @@ function PreviewEditor({
             Träningsvana: {experienceLabels[preferences.experience]}
           </p>
         ) : null}
-        {preferences.programId === 'general' &&
-        preferences.bodyParts?.length ? (
+        {preferences.programId === 'general' && !customWorkout ? (
           <p className="m-0 mt-1 text-base text-ink-soft">
             Fokus:{' '}
-            {preferences.bodyParts
-              .map(
-                (part) =>
-                  bodyRegions.find((region) => region.id === part)?.label ??
-                  part,
-              )
-              .join(', ')}
+            {focus.id === 'custom'
+              ? (focus.regions ?? [])
+                  .map((part) => bodyRegions.find((r) => r.id === part)?.label)
+                  .join(', ')
+              : focusLabel(focus.id)}
           </p>
         ) : null}
         {customWorkout ? (
@@ -1314,6 +1322,7 @@ function PreviewEditor({
             <ReadyWorkout
               plan={workoutPlan}
               short={short}
+              fullBody={!customWorkout && focus.id === 'full'}
               preferences={preferences}
               onChange={(index) => {
                 setExpandedIndex(
@@ -1330,12 +1339,13 @@ function PreviewEditor({
           {!equipmentOverride &&
           !short &&
           !customWorkout &&
-          preferences.programId !== 'rehab' ? (
+          preferences.programId !== 'rehab' &&
+          focus.id !== 'custom' ? (
             <RoutineControls
               plan={plan}
-              programId={preferences.programId}
+              programId={focus.id}
               templateId={id}
-              hasSaved={Boolean(savedRoutines?.[preferences.programId]?.[id])}
+              hasSaved={Boolean(savedRoutines?.[focus.id]?.[id])}
               disabled={busy || !ready}
               onReset={() => {
                 updatePlan(
@@ -1346,6 +1356,8 @@ function PreviewEditor({
                     logs,
                     savedPlans,
                     painReported,
+                    undefined,
+                    focus,
                   ),
                 );
                 setExpandedIndex(null);
@@ -1526,6 +1538,7 @@ function PreviewEditor({
                           ? { workoutMode: 'short' as const, fullPlan: plan }
                           : {}),
                         ...(equipmentOverride ? { equipmentOverride } : {}),
+                        focus,
                       },
                     );
 
@@ -1568,7 +1581,9 @@ function PreviewEditor({
 }
 
 export function TrainingPreview({ id }: { id: string }) {
-  const workoutId = new URLSearchParams(useHashSearch()).get('workout');
+  const search = useHashSearch();
+  const workoutId = new URLSearchParams(search).get('workout');
+  const requestedFocus = parseFocus(search);
   const data = useLiveQuery(async () => {
     const sessions = await listSessions(getDb());
     const active = sessions.find((session) => session.status === 'in_progress');
@@ -1620,10 +1635,12 @@ export function TrainingPreview({ id }: { id: string }) {
         </Link>
       </div>
     );
+  const focus = requestedFocus ?? defaultFocus(data.preferences);
   return (
     <EquipmentPreview
-      key={`${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
+      key={`${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
       customWorkout={customWorkout}
+      focus={focus}
       preparationId={data.preparationId}
       preferences={data.preferences}
       id={id}
