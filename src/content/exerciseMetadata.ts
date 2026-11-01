@@ -137,6 +137,8 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'glute-bridge': 'Grundläggande höftsträckning för säte och baksida lår.',
   'reverse-lunge': 'Kontrollerad benstyrka med steg bakåt.',
   'forward-lunge': 'Benstyrka och inbromsning av ett steg framåt.',
+  'single-leg-lateral-hop': 'Landning och sidokontroll på ett ben.',
+  'box-jump': 'Explosiv benstyrka med kontrollerad landning.',
 };
 type VariantSeed = [EquipmentType, number, number[], string, EquipmentType?];
 const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
@@ -1186,9 +1188,10 @@ export const exerciseMetadata = Object.fromEntries(
             'bodyweight',
             1,
             [0],
-            added.equipment === 'bodyweight'
-              ? genericBodyweightCue
-              : `Använd ${equipmentLabels[added.equipment].toLocaleLowerCase('sv')} avsedd för kroppsvikt.`,
+            added.cue ??
+              (added.equipment === 'bodyweight'
+                ? genericBodyweightCue
+                : `Använd ${equipmentLabels[added.equipment].toLocaleLowerCase('sv')} avsedd för kroppsvikt.`),
             added.equipment === 'bodyweight' ? undefined : added.equipment,
           ],
         ]
@@ -1236,7 +1239,9 @@ export const exerciseMetadata = Object.fromEntries(
           ]
         : sourceFor(id),
       reviewedAt:
-        id === 'blast-off-push-up'
+        id === 'blast-off-push-up' ||
+        id === 'single-leg-lateral-hop' ||
+        id === 'box-jump'
           ? '2026-11-01'
           : [
                 'bent-over-row',
@@ -1290,6 +1295,7 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'single-leg-hip-thrust')
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
+    if (id === 'box-jump') metadata.easierExerciseId = 'step-up';
     if (id === 'push-up') metadata.easierExerciseId = 'knee-push-up';
     if (id === 'step-up' && !metadata.harderExerciseId)
       metadata.harderExerciseId = 'step-down';

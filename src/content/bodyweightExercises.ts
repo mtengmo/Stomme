@@ -1,6 +1,15 @@
-import type { Exercise } from '../domain/types';
+import type { Exercise, SideKind } from '../domain/types';
 import type { EquipmentType, TechnicalLevel } from './exerciseMetadata';
 import type { MuscleGroupId } from './muscles';
+
+/** Impact exercises that load the knee (burpee and the jumping additions). */
+const KNEE_LOADED_IDS: ReadonlySet<string> = new Set([
+  'burpee',
+  'squat-jump',
+  'jumping-lunge',
+  'single-leg-lateral-hop',
+  'box-jump',
+]);
 
 /** Library additions only. Doses are editable app proposals, not source prescriptions. */
 function exercise(
@@ -13,6 +22,7 @@ function exercise(
   start = 6,
   unit: Exercise['unit'] = 'reps',
   maxReps = 12,
+  sideKind?: SideKind,
 ): Exercise {
   return {
     id,
@@ -22,7 +32,8 @@ function exercise(
     commonMistake,
     easierVariant,
     unit,
-    perSide: false,
+    perSide: sideKind !== undefined,
+    ...(sideKind ? { sideKind } : {}),
     range: {
       start,
       max: unit === 'seconds' ? 30 : maxReps,
@@ -31,7 +42,7 @@ function exercise(
     loadLadder: [{ kg: 0, label: 'Kroppsvikt' }],
     startLoadIndex: 0,
     week1LoadIndex: 0,
-    kneeLoaded: ['burpee', 'squat-jump', 'jumping-lunge'].includes(id),
+    kneeLoaded: KNEE_LOADED_IDS.has(id),
     optional: true,
   };
 }
@@ -285,6 +296,37 @@ export const bodyweightExercises: Exercise[] = [
     'Behåll båda underarmarna i golvet och välj vanlig planka.',
     6,
   ),
+  exercise(
+    'single-leg-lateral-hop',
+    'Sidohopp på ett ben',
+    ['Vader', 'Sidan av höften', 'Framsida lår', 'Säte', 'Bål'],
+    [
+      'Stå på det valda benet med lätt böjt knä och den andra foten lyft. Tänk dig en linje på golvet bredvid foten, ha halkfritt underlag och fritt omkring dig.',
+      'Hoppa en kort bit åt sidan över linjen och tillbaka, landa mjukt på framfoten med knät i samma riktning som tårna och bromsa med höft och knä.',
+      'Fortsätt från sida till sida i jämn takt under tiden som visas, sätt ned andra foten om du tappar balansen, byt sedan ben.',
+    ],
+    'Knät faller inåt vid landningen, eller du landar med stelt ben.',
+    'Gör kortare hopp, eller hoppa på två fötter. Ännu lättare: stå på ett ben utan att hoppa.',
+    20,
+    'seconds',
+    30,
+    'ben',
+  ),
+  exercise(
+    'box-jump',
+    'Boxhopp',
+    ['Framsida lår', 'Säte', 'Vader', 'Baksida lår', 'Bål'],
+    [
+      'Ställ ett lågt, stadigt steg eller en låda på ett halkfritt golv så att den inte kan glida eller välta, stå en kort bit framför med fötterna ungefär höftbrett.',
+      'Böj höfter och knän, ta fart med armarna och hoppa upp, landa mjukt med hela foten på steget och knäna i samma riktning som tårna.',
+      'Res dig upp helt på steget och kliv sedan ned en fot i taget. Hoppa inte ned. Upp och ned är en repetition; hitta balansen före nästa.',
+    ],
+    'Steget är så högt att du landar i djup knäböj eller med tårna på kanten.',
+    'Använd ett lägre steg, eller gör uppsteg utan hopp.',
+    5,
+    'reps',
+    8,
+  ),
 ];
 
 export type BodyweightId = (typeof bodyweightIds)[number];
@@ -292,6 +334,8 @@ export const bodyweightIds = [
   'decline-push-up',
   'diamond-push-up',
   'blast-off-push-up',
+  'single-leg-lateral-hop',
+  'box-jump',
   'plank-arm-lift',
   'push-up',
   'pull-up',
@@ -321,6 +365,8 @@ export const bodyweightDetails: Record<
     source?: string;
     publisher: string;
     note: string;
+    /** Overrides the default equipment cue of the seeded variant. */
+    cue?: string;
   }
 > = {
   'blast-off-push-up': {
@@ -332,6 +378,28 @@ export const bodyweightDetails: Record<
     secondary: ['shoulders', 'core', 'quads'],
     publisher: 'Stomme',
     note: 'Redaktionell övning utan verifierad extern källa för varianten. Dos och upplägg är appens förslag. Händerna och fötterna står kvar och inget lämnar golvet. Undvik vid handleds- eller axelbesvär. Ingen extra vikt.',
+  },
+  'single-leg-lateral-hop': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Upprepade hopp och landningar på ett ben kräver balans och kontroll av knät.',
+    primary: ['calves', 'hip-abductors'],
+    secondary: ['quads', 'glutes', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Korta hopp åt sidan med landning på samma ben. Tiden gäller per ben. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad.',
+  },
+  'box-jump': {
+    equipment: 'step',
+    level: 'technical',
+    reason:
+      'Hopp upp på en upphöjd yta kräver kraft, precision och mjuk landning.',
+    primary: ['quads', 'glutes', 'calves'],
+    secondary: ['hamstrings', 'core'],
+    source: 'https://www.nasm.org/resource-center/exercise-library/box-jumps',
+    publisher: 'NASM',
+    note: 'Hopp upp, nedkliv. Steget ska vara lågt och stadigt. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad.',
+    cue: 'Ett lågt, stadigt steg eller en låda som inte kan glida, välta eller ge efter. Börja lågt.',
   },
   'decline-push-up': {
     equipment: 'chair',

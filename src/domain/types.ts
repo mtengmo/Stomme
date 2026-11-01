@@ -94,7 +94,9 @@ export type ExerciseId =
   | 'nordic-hamstring-curl'
   | 'bent-knee-calf-hold'
   | 'wall-tibialis-raise'
-  | 'seated-tibial-rotation';
+  | 'seated-tibial-rotation'
+  | 'single-leg-lateral-hop'
+  | 'box-jump';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

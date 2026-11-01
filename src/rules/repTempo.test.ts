@@ -100,6 +100,13 @@ describe('repProgress', () => {
   });
 });
 
+describe('plyometric additions', () => {
+  it('counts box jumps by hand and times the lateral hop', () => {
+    expect(repTempo('box-jump')).toBeNull();
+    expect(repTempo('single-leg-lateral-hop')).toBeNull();
+  });
+});
+
 describe('ballistic beats', () => {
   it.each([
     ['squat-jump', 3000],

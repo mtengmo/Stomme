@@ -4,9 +4,11 @@ import type { Pt } from './lerp';
 import type { Pose } from './poses';
 import { figures } from './poses';
 import { FloorLine, Held } from './props';
+import { joint } from './rehabPoses';
 
 export const supportedFrontViews = [
   'seated-tibial-rotation',
+  'single-leg-lateral-hop',
   'goblet-squat',
   'dumbbell-rdl',
   'kettlebell-rack-carry',
@@ -28,11 +30,17 @@ export const supportedObliqueViews = [
   'russian-twist',
 ] as const satisfies readonly ExerciseId[];
 
+/** Front-only demonstrations: the movement cannot be read from the side. */
+const FRONT_ONLY: readonly ExerciseId[] = [
+  'seated-tibial-rotation',
+  'single-leg-lateral-hop',
+];
+
 export type FigureAngle = 'side' | 'front' | 'oblique';
 
 /** Start with the angle that explains each movement most clearly. */
 export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
-  if (exerciseId === 'seated-tibial-rotation') return 'front';
+  if (FRONT_ONLY.includes(exerciseId)) return 'front';
   if (exerciseId === 'side-lunge') return 'front';
   if (exerciseId === 'russian-twist') return 'oblique';
   return 'side';
@@ -47,7 +55,7 @@ export function supportsObliqueView(
 export function supportedViewsFor(
   exerciseId: ExerciseId,
 ): readonly FigureAngle[] {
-  if (exerciseId === 'seated-tibial-rotation') return ['front'];
+  if (FRONT_ONLY.includes(exerciseId)) return ['front'];
   if (supportsFrontView(exerciseId)) return ['side', 'front'];
   if (supportsObliqueView(exerciseId)) return ['side', 'oblique'];
   return ['side'];
@@ -91,6 +99,64 @@ function skeleton(
   return { head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL };
 }
 
+/**
+ * Hop from side to side on the working leg: the foot leaves the floor
+ * mid-hop, the free foot stays beside the calf, and every segment keeps its
+ * length. Authored for the right leg; the left is its mirror image.
+ */
+function lateralHopPose(t: number, working: Working | null): Pose {
+  const lift = 12 * Math.sin(Math.PI * t);
+  // The knee bends further at each landing and is longest mid-hop.
+  const reach = 66 + 3.5 * Math.sin(Math.PI * t);
+  const hx = mix(85, 115, t);
+  const hip = point(hx, 174 - lift - reach);
+  const neck = point(hx, hip[1] - 43);
+  const supportAnkle = point(hx, 174 - lift);
+  const freeAnkle = point(hx + 9, supportAnkle[1] - 24);
+  const right = {
+    knee: joint(hip, supportAnkle, 36, 34, 1),
+    ankle: supportAnkle,
+    toe: point(supportAnkle[0] - 10, supportAnkle[1] + 3),
+  };
+  const left = {
+    knee: joint(hip, freeAnkle, 36, 34, -1),
+    ankle: freeAnkle,
+    toe: point(freeAnkle[0] + 9, freeAnkle[1] + 3),
+  };
+  const pose = skeleton(
+    point(hx, neck[1] - 14),
+    neck,
+    hip,
+    point(hx - 18, neck[1] + 19),
+    point(hx - 23, neck[1] + 41),
+    point(hx + 18, neck[1] + 19),
+    point(hx + 23, neck[1] + 41),
+    right.knee,
+    right.ankle,
+    right.toe,
+    left.knee,
+    left.ankle,
+    left.toe,
+  );
+  if (working !== 'left') return pose;
+  const flip = (pt: Pt): Pt => point(200 - pt[0], pt[1]);
+  return {
+    head: flip(pose.head),
+    neck: flip(pose.neck),
+    hip: flip(pose.hip),
+    eR: flip(pose.eL),
+    hR: flip(pose.hL),
+    eL: flip(pose.eR),
+    hL: flip(pose.hR),
+    kR: flip(pose.kL),
+    aR: flip(pose.aL),
+    tR: flip(pose.tL),
+    kL: flip(pose.kR),
+    aL: flip(pose.aR),
+    tL: flip(pose.tR),
+  };
+}
+
 /** Purpose-drawn frontal geometry for the small set of readable front views. */
 export function frontMovementPose(
   exerciseId: FrontViewExercise,
@@ -98,6 +164,8 @@ export function frontMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'single-leg-lateral-hop')
+    return lateralHopPose(t, working);
   if (exerciseId === 'seated-tibial-rotation') {
     // Feet rotate in the horizontal plane; the shins and knees stay still.
     const angle = mix(0.65, -0.65, t);
@@ -695,6 +763,16 @@ export function FrontFigureFrame({
             d={`M${pose.tR[0] - 3} ${pose.tR[1] - 3} Q100 ${pose.tR[1] - 9} ${pose.tL[0] + 3} ${pose.tL[1] - 3} Q${pose.tL[0] + 8} ${pose.tL[1] + 5} ${pose.tL[0]} ${pose.tL[1] + 6} Q100 ${pose.tR[1] + 10} ${pose.tR[0]} ${pose.tR[1] + 6} Q${pose.tR[0] - 8} ${pose.tR[1] + 3} ${pose.tR[0] - 3} ${pose.tR[1] - 3}Z`}
           />
         </g>
+      ) : null}
+      {exerciseId === 'single-leg-lateral-hop' ? (
+        <path
+          data-contact-plane="hop-line"
+          d="M97 171v8M103 171v8"
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
       ) : null}
       {exerciseId === 'split-squat' ? (
         <path

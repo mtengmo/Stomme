@@ -13,7 +13,7 @@ it('round-trips the new exercises and apparatus without changing older IDs', asy
       experience: 'regular',
       equipment: ['bodyweight', 'pull-up-bar', 'dip-bars'],
     });
-    // A custom workout holds at most 12 exercises: two workouts cover every id.
+    // A custom workout holds at most 12 exercises: three workouts cover every id.
     await setMeta(db, 'customWorkouts', [
       {
         id: 'bodyweight-1',
@@ -23,7 +23,12 @@ it('round-trips the new exercises and apparatus without changing older IDs', asy
       {
         id: 'bodyweight-2',
         name: 'Kroppsvikt 2',
-        exerciseIds: bodyweightIds.slice(8),
+        exerciseIds: bodyweightIds.slice(8, 20),
+      },
+      {
+        id: 'bodyweight-3',
+        name: 'Kroppsvikt 3',
+        exerciseIds: bodyweightIds.slice(20),
       },
     ]);
     const snapshot = await exportAll(db);

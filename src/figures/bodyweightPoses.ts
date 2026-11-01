@@ -402,6 +402,132 @@ function squatJump(t: number): Pose {
   return squat(1 - (t - 0.85) / 0.15);
 }
 
+/** Side view of the hop: one-legged stance with a small bounce (the front view carries the lateral travel). */
+function lateralHop(t: number): Pose {
+  const lift = 6 * Math.sin(Math.PI * t);
+  const ar: Pt = [100, 174 - lift];
+  const hip: Pt = [100, ar[1] - 66 - 3 * Math.sin(Math.PI * t)],
+    neck: Pt = [100, hip[1] - 43];
+  const al: Pt = [88, ar[1] - 26];
+  return pose(
+    [102, neck[1] - 14],
+    neck,
+    hip,
+    [
+      [neck[0] + 8, neck[1] + 22],
+      [neck[0] + 8, neck[1] + 42],
+      [neck[0] + 5, neck[1] + 22],
+      [neck[0] + 5, neck[1] + 42],
+    ],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 34, 1),
+      al,
+      foot(al),
+    ],
+  );
+}
+
+/** The step is about 30 cm high (44 px wide); ankles rest 3 px above its top so the toes touch it. */
+export const BOX_PROP = { x: 125, y: 156, w: 44 } as const;
+const BOX_ANKLE_Y = BOX_PROP.y - 3;
+const BOX_START_X = 75;
+const BOX_LAND_X = 140;
+const smooth = (x: number) => x * x * (3 - 2 * x);
+
+/** Both legs reach their feet from the hip; thigh and shin keep their length. */
+function boxPose(hip: Pt, lean: number, ar: Pt, al: Pt): Pose {
+  // The trunk keeps its length when it leans.
+  const neck: Pt = [hip[0] + lean, hip[1] - Math.sqrt(43 * 43 - lean * lean)];
+  return pose(
+    [neck[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [
+      [neck[0] + 16, neck[1] + 17],
+      [neck[0] + 30, neck[1] + 8],
+      [neck[0] + 13, neck[1] + 20],
+      [neck[0] + 27, neck[1] + 11],
+    ],
+    [
+      joint(hip, ar, 36, 36, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 36, -1),
+      al,
+      foot(al),
+    ],
+  );
+}
+/** Upright stance whose feet are `floor` high; `crouch` 0..1 sinks the hips. */
+function boxStance(hipX: number, floor: number, crouch: number): Pose {
+  return boxPose(
+    [hipX + 6 * crouch, floor - 63 + 22 * crouch],
+    8 * crouch,
+    [hipX + 14, floor],
+    [hipX + 1, floor],
+  );
+}
+/** A foot moving back along the step's top and then straight down beside it. */
+function footDown(from: Pt, toX: number, f: number): Pt {
+  if (f < 0.5) {
+    const u = smooth(f * 2);
+    return [mix(from[0], toX, u), BOX_ANKLE_Y - 8 * Math.sin(Math.PI * u)];
+  }
+  return [toX, mix(BOX_ANKLE_Y, 174, smooth(f * 2 - 1))];
+}
+
+/**
+ * Stand, dip, jump forward and up (0.3-0.5), land on the step (0.5-0.6),
+ * stand tall, step down backwards one foot at a time (0.7-0.9) and stand on
+ * the start place again.
+ */
+function boxJump(t: number): Pose {
+  if (t < 0.2) return boxStance(BOX_START_X, 174, smooth(t / 0.2) * 0.5);
+  if (t < 0.3)
+    return boxStance(BOX_START_X, 174, 0.5 - smooth((t - 0.2) / 0.1) * 0.5);
+  if (t < 0.5) {
+    const u = (t - 0.3) / 0.2;
+    return boxStance(
+      mix(BOX_START_X, BOX_LAND_X, u),
+      mix(174, BOX_ANKLE_Y, u) - 26 * Math.sin(Math.PI * u),
+      0.2 * (1 - Math.abs(2 * u - 1)),
+    );
+  }
+  if (t < 0.6)
+    return boxStance(
+      BOX_LAND_X,
+      BOX_ANKLE_Y,
+      0.4 * Math.sin((Math.PI * (t - 0.5)) / 0.1),
+    );
+  if (t < 0.7) return boxStance(BOX_LAND_X, BOX_ANKLE_Y, 0);
+  if (t < 0.9) {
+    const u = (t - 0.7) / 0.2;
+    const topFar: Pt = [BOX_LAND_X + 1, BOX_ANKLE_Y];
+    const topNear: Pt = [BOX_LAND_X + 14, BOX_ANKLE_Y];
+    const startNear: Pt = [BOX_START_X + 14, 174];
+    const startFar: Pt = [BOX_START_X + 1, 174];
+    const mid: Pt = [112, 110];
+    const hip: Pt =
+      u < 0.5
+        ? [
+            mix(BOX_LAND_X, mid[0], smooth(u * 2)),
+            mix(BOX_ANKLE_Y - 63, mid[1], smooth(u * 2)),
+          ]
+        : [
+            mix(mid[0], BOX_START_X, smooth(u * 2 - 1)),
+            mix(mid[1], 174 - 63, smooth(u * 2 - 1)),
+          ];
+    // The near foot reaches the floor first (u = 0.5); the far foot follows.
+    const near = u < 0.5 ? footDown(topNear, startNear[0], u * 2) : startNear;
+    const far = u < 0.5 ? topFar : footDown(topFar, startFar[0], u * 2 - 1);
+    return boxPose(hip, 0, near, far);
+  }
+  return boxStance(BOX_START_X, 174, 0);
+}
+
 /** Knees on the floor: the body pivots at the knees as one rigid lever. */
 function kneePushUp(t: number): Pose {
   const knee: Pt = [138, 173];
@@ -538,6 +664,8 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   burpee,
   plank,
   'squat-jump': squatJump,
+  'single-leg-lateral-hop': lateralHop,
+  'box-jump': boxJump,
   'jumping-lunge': lunge,
   'mountain-climber': climber,
   'knee-push-up': kneePushUp,
@@ -562,9 +690,11 @@ export const bodyweightFigures = Object.fromEntries(
       motion:
         id === 'plank'
           ? 'hold'
-          : id === 'burpee' || id === 'squat-jump'
+          : id === 'burpee' || id === 'squat-jump' || id === 'box-jump'
             ? 'sequence'
-            : 'controlled',
+            : id === 'single-leg-lateral-hop'
+              ? 'ballistic'
+              : 'controlled',
       props:
         id === 'decline-push-up'
           ? [{ type: 'chair', x: 154, y: 137, w: 32 }]
@@ -574,7 +704,9 @@ export const bodyweightFigures = Object.fromEntries(
               ? [{ type: 'dip-bars', x: 101, y: 117, w: 32 }]
               : id === 'wall-push-up'
                 ? [{ type: 'wall', x: 157 }]
-                : [{ type: 'mat', x1: 18, x2: 187 }],
+                : id === 'box-jump'
+                  ? [{ type: 'step', ...BOX_PROP }]
+                  : [{ type: 'mat', x1: 18, x2: 187 }],
     },
   ]),
 ) as Record<BodyweightId, FigureSpec>;

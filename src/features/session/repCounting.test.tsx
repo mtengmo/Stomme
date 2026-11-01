@@ -132,6 +132,7 @@ describe('rep counting on the set screen', () => {
   it.each([
     'pull-up',
     'parallel-dip',
+    'box-jump',
     'balance-clock',
     'farmer-carry',
   ] as const)('%s stays manual', (id) => {

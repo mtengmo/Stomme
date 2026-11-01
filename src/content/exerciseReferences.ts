@@ -96,7 +96,14 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'bent-knee-calf-hold': 'E93',
   'wall-tibialis-raise': 'E94',
   'seated-tibial-rotation': 'E98',
+  'single-leg-lateral-hop': 'E99',
+  'box-jump': 'E100',
 };
+
+/** Orders references numerically, so E99 comes before E100 and E10 before E11. */
+export function compareReferences(a: string, b: string): number {
+  return Number(a.slice(1)) - Number(b.slice(1));
+}
 
 export function exerciseReviewHref(id: ExerciseId): string {
   return `/granska?ovning=${exerciseReferences[id]}`;

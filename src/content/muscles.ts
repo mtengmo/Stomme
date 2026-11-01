@@ -123,6 +123,11 @@ export const exerciseMuscles: Record<
   burpee: { ...bodyweightDetails.burpee, qualities: ['power'] },
   plank: { ...bodyweightDetails.plank, qualities: [] },
   'squat-jump': { ...bodyweightDetails['squat-jump'], qualities: ['power'] },
+  'single-leg-lateral-hop': {
+    ...bodyweightDetails['single-leg-lateral-hop'],
+    qualities: ['power', 'balance'],
+  },
+  'box-jump': { ...bodyweightDetails['box-jump'], qualities: ['power'] },
   'jumping-lunge': {
     ...bodyweightDetails['jumping-lunge'],
     qualities: ['power'],

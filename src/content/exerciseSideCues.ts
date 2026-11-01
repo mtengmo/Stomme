@@ -39,6 +39,11 @@ const stretchLeg: CueFactory = (side) => ({
   explanation: `Håll sträckningen på det ${sideAdjective(side)} benet under tiden som visas.`,
 });
 
+const lateralHopLeg: CueFactory = (side) => ({
+  label: `Hoppa på ${sideWord(side)} ben`,
+  explanation: `Hoppa från sida till sida på det ${sideAdjective(side)} benet; den andra foten är lyft hela tiden.`,
+});
+
 const cues: Partial<Record<ExerciseId, CueFactory>> = {
   'copenhagen-hold': (side) => ({
     label: `${sideWord(side)} knä överst på bänken`,
@@ -48,6 +53,7 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     label: `Stå på ${sideWord(side)} ben`,
     explanation: `Håll det ${sideAdjective(side)} knät böjt och hälen uppe. Den andra foten är fri.`,
   }),
+  'single-leg-lateral-hop': lateralHopLeg,
   'step-up': plantedFoot,
   'step-down': plantedFoot,
   'single-leg-rdl': plantedFoot,

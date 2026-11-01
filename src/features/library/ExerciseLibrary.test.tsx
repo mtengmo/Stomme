@@ -73,6 +73,15 @@ describe('exercise library', () => {
       screen.queryByRole('link', { name: exercises['step-up'].name }),
     ).toBeNull();
   });
+  it.each([
+    ['sidohopp', 'single-leg-lateral-hop'],
+    ['boxhopp', 'box-jump'],
+  ] as const)('finds %s by name', async (term, id) => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    await user.type(screen.getByLabelText('Sök övning'), term);
+    expect(screen.getByRole('link', { name: exercises[id].name })).toBeTruthy();
+  });
   it('shows compact rows by default: name, one meta line and a 48 px toggle, no extras', () => {
     render(<TestRoutes />);
     const row = screen

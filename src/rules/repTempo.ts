@@ -17,6 +17,8 @@ const MANUAL_REPS: readonly ExerciseId[] = [
   'pull-up',
   'chin-up',
   'parallel-dip',
+  // Full reset and step down between jumps; no fixed pace.
+  'box-jump',
 ];
 
 /** Ballistic and plyometric work gets one suggested beat per rep, no holds. */

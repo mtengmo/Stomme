@@ -17,6 +17,8 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'burpee',
   'plank',
   'squat-jump',
+  'single-leg-lateral-hop',
+  'box-jump',
   'jumping-lunge',
   'mountain-climber',
   'knee-push-up',
@@ -29,6 +31,11 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'band-hip-extension',
   'balance-clock',
 ]);
+
+const devView = (id: string) =>
+  id === 'seated-tibial-rotation' || id === 'single-leg-lateral-hop'
+    ? 'front'
+    : 'side';
 
 /** DEV only: every start/mid/end pose, right then left, static, for review. */
 export function FigureDev() {
@@ -57,9 +64,7 @@ export function FigureDev() {
                           : figures[ex.id][k]
                       }
                       working={w}
-                      view={
-                        ex.id === 'seated-tibial-rotation' ? 'front' : 'side'
-                      }
+                      view={devView(ex.id)}
                       phase={k === 'start' ? 0 : k === 'middle' ? 0.5 : 1}
                       showMuscles={false}
                     />
@@ -85,9 +90,7 @@ export function FigureDev() {
                       exerciseId={ex.id}
                       pose={movementPose(ex.id, t)}
                       working={ex.perSide ? 'right' : null}
-                      view={
-                        ex.id === 'seated-tibial-rotation' ? 'front' : 'side'
-                      }
+                      view={devView(ex.id)}
                       phase={t}
                       showMuscles={ex.id === 'quad-set'}
                     />

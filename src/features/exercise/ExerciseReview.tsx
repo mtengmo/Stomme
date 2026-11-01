@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'wouter';
 
 import {
+  compareReferences,
   exerciseReferences,
   exerciseReviewHref,
 } from '../../content/exerciseReferences';
@@ -12,7 +13,7 @@ import { useHashSearch } from '../../lib/hashLocation';
 import { ExerciseCardBody } from './ExerciseCard';
 
 const catalogue = [...exerciseList].sort((a, b) =>
-  exerciseReferences[a.id].localeCompare(exerciseReferences[b.id]),
+  compareReferences(exerciseReferences[a.id], exerciseReferences[b.id]),
 );
 
 /** Read-only review with exercise navigation and the unified bounded guide. */

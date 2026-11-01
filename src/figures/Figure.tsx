@@ -205,11 +205,19 @@ const FRAMING: Partial<Record<ExerciseId, string>> = {
   'chin-up': '10 0 180 188',
   burpee: '0 -30 200 218',
   'squat-jump': '0 0 200 188',
+  'box-jump': '0 0 200 188',
   'blast-off-push-up': '0 0 200 188',
   'step-down': '14 0 164 188',
   'quad-set': '24 128 160 52',
   'dumbbell-pullover': '-4 20 180 168',
 };
+
+/** One whole repetition per cycle for sequence figures, in milliseconds. */
+const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
+  'squat-jump': 4500,
+  'box-jump': 5000,
+};
+const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;
 
 /**
  * DEV only review hook: `?phase=0..1` in the hash (for example
@@ -558,9 +566,8 @@ export function Figure({
         driven !== undefined
           ? driven
           : spec.motion === 'sequence'
-            ? (elapsedMs.current %
-                (exerciseId === 'squat-jump' ? 4500 : 12000)) /
-              (exerciseId === 'squat-jump' ? 4500 : 12000)
+            ? (elapsedMs.current % sequenceMs(exerciseId)) /
+              sequenceMs(exerciseId)
             : spec.motion === 'ballistic'
               ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
               : cycleProgress(
@@ -596,27 +603,34 @@ export function Figure({
                 ['Armhävning', movementPose(exerciseId, 0.375)],
                 ['Hopp och landning', movementPose(exerciseId, 0.875)],
               ]
-            : exerciseId === 'walking-lunge'
-              ? walkingLungeReducedFrames()
-              : exerciseId === 'russian-twist'
-                ? russianTwistReducedFrames()
-                : exerciseId === 'squat-jump' ||
-                    exerciseId === 'mountain-climber' ||
-                    exerciseId === 'plank-arm-lift'
-                  ? [
-                      ['Start', movementPose(exerciseId, 0)],
-                      [
-                        'Rörelse',
-                        movementPose(
-                          exerciseId,
-                          exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                        ),
-                      ],
-                    ]
-                  : [
-                      ['Start', spec.start],
-                      ['Slut', spec.end],
-                    ];
+            : exerciseId === 'box-jump'
+              ? [
+                  ['Start', movementPose(exerciseId, 0)],
+                  ['Hopp', movementPose(exerciseId, 0.4)],
+                  ['Landa på steget', movementPose(exerciseId, 0.55)],
+                  ['Kliv ned', movementPose(exerciseId, 0.8)],
+                ]
+              : exerciseId === 'walking-lunge'
+                ? walkingLungeReducedFrames()
+                : exerciseId === 'russian-twist'
+                  ? russianTwistReducedFrames()
+                  : exerciseId === 'squat-jump' ||
+                      exerciseId === 'mountain-climber' ||
+                      exerciseId === 'plank-arm-lift'
+                    ? [
+                        ['Start', movementPose(exerciseId, 0)],
+                        [
+                          'Rörelse',
+                          movementPose(
+                            exerciseId,
+                            exerciseId === 'squat-jump' ? 0.575 : 0.25,
+                          ),
+                        ],
+                      ]
+                    : [
+                        ['Start', spec.start],
+                        ['Slut', spec.end],
+                      ];
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (

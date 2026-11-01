@@ -105,6 +105,8 @@ export const impactExercises: ReadonlySet<ExerciseId> = new Set([
   'squat-jump',
   'jumping-lunge',
   'burpee',
+  'single-leg-lateral-hop',
+  'box-jump',
 ]);
 
 /** Explicit opt-in for daily focus. Library and clinician-only additions stay out. */

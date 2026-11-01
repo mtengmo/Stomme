@@ -41,6 +41,7 @@ describe('authored frontal demonstrations', () => {
   it('supports the authored front-view exercises and complementary oblique views', () => {
     expect(supportedFrontViews).toEqual([
       'seated-tibial-rotation',
+      'single-leg-lateral-hop',
       'goblet-squat',
       'dumbbell-rdl',
       'kettlebell-rack-carry',
