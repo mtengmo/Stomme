@@ -34,6 +34,15 @@ function pose(
   };
 }
 const foot = (a: Pt): Pt => [a[0] + 9, a[1] + 3];
+/**
+ * The far foot of a straight-bodied support: 3 units off the near foot,
+ * perpendicular to the leg, so the far leg is as long as the near one and
+ * stays straight (an offset along the leg would force a visible knee kink).
+ */
+const farFoot = (ankle: Pt, angle: number): Pt => [
+  ankle[0] - 3 * Math.sin(angle),
+  ankle[1] + 3 * Math.cos(angle),
+];
 function pushUp(t: number): Pose {
   const ankle: Pt = [165, 174];
   const angle = mix(-2.72, -3.02, t);
@@ -57,21 +66,51 @@ function pushUp(t: number): Pose {
       polar(ankle, 32, angle),
       ankle,
       foot(ankle),
-      polar([162, 171], 32, angle),
-      [162, 171],
-      [171, 174],
+      joint(hip, farFoot(ankle, angle), 32, 32, -1),
+      farFoot(ankle, angle),
+      foot(farFoot(ankle, angle)),
+    ],
+  );
+}
+/** Forearm plank angle: shoulders over the elbows, trunk straight to the toes. */
+const PLANK_ANGLE = -2.912;
+/**
+ * Forearm plank. Each upper arm drops 25 from the shoulder to an elbow on the
+ * mat and the forearm lies forward 23. `lift` raises that arm forward off the
+ * mat (plank arm lift); the far arm sits a little forward of the near one.
+ */
+function forearmPlank(liftR = 0, liftL = 0): Pose {
+  const ankle: Pt = [165, 174],
+    farAnkle = farFoot(ankle, PLANK_ANGLE);
+  const neck = polar(ankle, 110, PLANK_ANGLE),
+    hip = polar(ankle, 64, PLANK_ANGLE);
+  const arm = (lift: number, spread: number): [Pt, Pt] => {
+    const elbow = polar(
+      neck,
+      25,
+      mix(Math.PI / 2 + spread, Math.PI - 0.08, lift),
+    );
+    return [elbow, polar(elbow, 23, Math.PI + mix(0, -0.08, lift))];
+  };
+  const [eR, hR] = arm(liftR, 0);
+  const [eL, hL] = arm(liftL, 0.15);
+  return pose(
+    polar(neck, 14, PLANK_ANGLE),
+    neck,
+    hip,
+    [eR, hR, eL, hL],
+    [
+      polar(ankle, 32, PLANK_ANGLE),
+      ankle,
+      foot(ankle),
+      joint(hip, farAnkle, 32, 32, -1),
+      farAnkle,
+      foot(farAnkle),
     ],
   );
 }
 function plank(): Pose {
-  const p = pushUp(0.2);
-  return {
-    ...p,
-    eR: [p.neck[0], 174],
-    hR: [p.neck[0] - 21, 174],
-    eL: [p.neck[0] + 4, 171],
-    hL: [p.neck[0] - 17, 171],
-  };
+  return forearmPlank();
 }
 
 /** Elevated toe contacts; the whole trunk pivots about the feet. */
@@ -98,9 +137,9 @@ function declinePushUp(t: number): Pose {
       polar(ankle, 32, angle),
       ankle,
       [174, 137],
-      polar([162, 131], 32, angle),
-      [162, 131],
-      [171, 134],
+      joint(hip, farFoot(ankle, angle), 32, 32, -1),
+      farFoot(ankle, angle),
+      foot(farFoot(ankle, angle)),
     ],
   );
 }
@@ -159,23 +198,10 @@ function blastOffPushUp(t: number): Pose {
 }
 
 function plankArmLift(t: number): Pose {
-  const p = plank();
   // One cycle includes both arms and returns to both forearms on the mat.
   const right = Math.max(0, Math.sin(2 * Math.PI * t));
   const left = Math.max(0, -Math.sin(2 * Math.PI * t));
-  const raisedElbow: Pt = [p.neck[0] - 23, p.neck[1] - 3];
-  const raisedHand: Pt = [p.neck[0] - 46, p.neck[1] - 6];
-  const point = (a: Pt, b: Pt, phase: number): Pt => [
-    mix(a[0], b[0], phase),
-    mix(a[1], b[1], phase),
-  ];
-  return {
-    ...p,
-    eR: point(p.eR, raisedElbow, right),
-    hR: point(p.hR, raisedHand, right),
-    eL: point(p.eL, raisedElbow, left),
-    hL: point(p.hL, raisedHand, left),
-  };
+  return forearmPlank(right, left);
 }
 function pull(t: number, chin: boolean): Pose {
   const neck: Pt = [100, mix(80, 36, t)],

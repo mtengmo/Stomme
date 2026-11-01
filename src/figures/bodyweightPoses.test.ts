@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { bodyweightIds } from '../content/bodyweightExercises';
 import { movementPose } from './Figure';
+import { checkPoseGeometry } from './keyframes';
 import type { Pt } from './lerp';
 import { figures, POSE_KEYS } from './poses';
 
@@ -59,11 +60,11 @@ describe('bodyweight movement paths', () => {
     const left = movementPose('plank-arm-lift', 0.75);
     expect(right.hL).toEqual(start.hL);
     expect(left.hR).toEqual(start.hR);
-    expect(right.hR[1]).toBeLessThan(start.hR[1] - 30);
-    expect(left.hL[1]).toBeLessThan(start.hL[1] - 30);
+    expect(right.hR[1]).toBeLessThan(start.hR[1] - 20);
+    expect(left.hL[1]).toBeLessThan(start.hL[1] - 20);
     expect(right.hip).toEqual(start.hip);
     expect(left.neck).toEqual(start.neck);
-    expect(figures['plank-arm-lift'].end.hR[1]).toBeLessThan(start.hR[1] - 30);
+    expect(figures['plank-arm-lift'].end.hR[1]).toBeLessThan(start.hR[1] - 20);
   });
   it('blast off push-up glides over planted hands and toes with constant segments', () => {
     const start = movementPose('blast-off-push-up', 0);
@@ -185,5 +186,28 @@ describe('bodyweight movement paths', () => {
     expect(
       Math.atan2(pivot[1] - top.neck[1], pivot[0] - top.neck[0]),
     ).toBeCloseTo(0.7, 8);
+  });
+  it.each(['plank', 'plank-arm-lift', 'push-up'] as const)(
+    '%s passes the geometry gate mid-rep',
+    (id) => {
+      const frame = movementPose(id, 0.5);
+      expect(
+        checkPoseGeometry([frame], {
+          floorY: 178,
+          viewBox: [0, 20, 200, 168],
+          props: figures[id].props,
+          minHeadClearance: 9,
+        }),
+      ).toEqual([]);
+    },
+  );
+  it('plank: forearms lie on the mat with real 25 and 23 unit arm segments', () => {
+    const p = movementPose('plank', 0);
+    expect(Math.hypot(p.neck[0] - p.eR[0], p.neck[1] - p.eR[1])).toBeCloseTo(
+      25,
+    );
+    expect(Math.hypot(p.eR[0] - p.hR[0], p.eR[1] - p.hR[1])).toBeCloseTo(23);
+    expect(p.neck[0]).toBeCloseTo(57.8, 0);
+    expect(p.neck[1]).toBeCloseTo(149, 0);
   });
 });

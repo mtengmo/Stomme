@@ -90,9 +90,16 @@ describe('expanded library integrity', () => {
         for (const key of POSE_KEYS)
           for (const [axis, value] of pose[key].entries()) {
             expect(Number.isFinite(value)).toBe(true);
-            // The floor pullover has an explicitly wider frame for its overhead arc.
+            // The floor pullover and the plank arm lift (forearm reaching
+            // forward) have explicitly wider frames.
             expect(value).toBeGreaterThanOrEqual(
-              exercise.id === 'dumbbell-pullover' && axis === 0 ? -4 : 14,
+              axis !== 0
+                ? 14
+                : exercise.id === 'dumbbell-pullover'
+                  ? -4
+                  : exercise.id === 'plank-arm-lift'
+                    ? 0
+                    : 14,
             );
             expect(value).toBeLessThanOrEqual(188);
           }
