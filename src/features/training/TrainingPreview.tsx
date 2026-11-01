@@ -70,6 +70,7 @@ import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { symptomsOnRecord } from '../../rules/painOnRecord';
+import { pickableInProgramme } from '../../rules/pickerPolicy';
 import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
@@ -341,9 +342,10 @@ function PreviewEditor({
 
   const compatible = available(preferences).filter(
     (ex) =>
-      preferences.programId !== 'rehab' ||
-      rehabGroup(preferences) !== 'aaos' ||
-      kneeRehabExercises.some((knee) => knee.id === ex.id),
+      pickableInProgramme(ex.id, preferences) &&
+      (preferences.programId !== 'rehab' ||
+        rehabGroup(preferences) !== 'aaos' ||
+        kneeRehabExercises.some((knee) => knee.id === ex.id)),
   );
 
   const [picker, setPicker] = useState<ExerciseId | 'add' | null>(() => {
@@ -439,9 +441,15 @@ function PreviewEditor({
           selectedIds={plan.map((item) => item.exerciseId)}
           replacingId={picker === 'add' ? undefined : picker}
           allowedIds={
-            preferences.programId === 'rehab' &&
-            rehabGroup(preferences) === 'aaos'
-              ? kneeRehabExercises.map((exercise) => exercise.id)
+            preferences.programId === 'rehab'
+              ? (rehabGroup(preferences) === 'aaos'
+                  ? kneeRehabExercises
+                  : exerciseList
+                )
+                  .map((exercise) => exercise.id)
+                  .filter((exerciseId) =>
+                    pickableInProgramme(exerciseId, preferences),
+                  )
               : undefined
           }
           pickerKey={`${draftKey}.picker-filters.${picker}`}
