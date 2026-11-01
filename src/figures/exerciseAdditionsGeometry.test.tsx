@@ -88,10 +88,12 @@ describe('sumo squat figure geometry', () => {
       [start.kR, start.aR],
       [start.kL, start.aL],
     ] as const) {
-      expect(distance(start.hip, knee) + distance(knee, ankle)).toBeCloseTo(
-        distance(start.hip, ankle),
-        2,
-      );
+      // Standing legs are within half a unit of fully extended (IK, 30.8 + 26.5).
+      expect(
+        distance(start.hip, knee) +
+          distance(knee, ankle) -
+          distance(start.hip, ankle),
+      ).toBeLessThan(0.5);
     }
 
     for (let frame = 0; frame <= 20; frame++) {
@@ -508,14 +510,16 @@ describe('kettlebell goblet squat figure geometry', () => {
       ),
     ).toBe(50);
 
+    // Standing legs are within half a unit of fully extended (IK, 30.8 + 26.5).
     for (const [knee, ankle] of [
       [start.kR, start.aR],
       [start.kL, start.aL],
     ] as const)
-      expect(distance(start.hip, knee) + distance(knee, ankle)).toBeCloseTo(
-        distance(start.hip, ankle),
-        2,
-      );
+      expect(
+        distance(start.hip, knee) +
+          distance(knee, ankle) -
+          distance(start.hip, ankle),
+      ).toBeLessThan(0.5);
 
     for (let frame = 0; frame <= 20; frame++) {
       const pose = movementPose('kettlebell-goblet-squat', frame / 20);
@@ -524,8 +528,8 @@ describe('kettlebell goblet squat figure geometry', () => {
       expect(pose.aL).toEqual(start.aL);
       expect(pose.tL).toEqual(start.tL);
       expect(pose.hR).toEqual(pose.hL);
-      expect(distance(pose.neck, pose.eR)).toBeGreaterThan(24);
-      expect(distance(pose.neck, pose.eR)).toBeLessThan(34);
+      // Arms are two-bone IK now: constant 24 and 20 unit segments.
+      expect(distance(pose.neck, pose.eR)).toBeCloseTo(24, 6);
       expect(distance(pose.eR, pose.hR)).toBeGreaterThan(16);
       expect(distance(pose.eR, pose.hR)).toBeLessThan(23);
     }

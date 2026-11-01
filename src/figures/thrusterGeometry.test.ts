@@ -16,8 +16,24 @@ describe('thruster figure timing', () => {
       expect(halfSquat.hip[1]).toBeGreaterThan(rack.hip[1]);
       expect(halfSquat.hR[1]).toBeGreaterThan(rack.hR[1]);
       expect(rack.hip).toEqual([98, 118]);
-      expect(rack.kR).toEqual([104, 148]);
-      expect(rack.kL).toEqual([90, 148]);
+      // Knees now come from two-bone IK with fixed ankles: close to the old
+      // hand-placed [104,148] and [90,148].
+      const near = (a: readonly number[], b: readonly number[]) =>
+        Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+      expect(near(rack.kR, [104, 148])).toBeLessThan(3);
+      expect(near(rack.kL, [90, 148])).toBeLessThan(3);
+
+      // Rack: the near hand sits at the shoulder rack, overhead above the head.
+      expect(
+        Math.hypot(
+          rack.hR[0] - (rack.neck[0] + 13),
+          rack.hR[1] - (rack.neck[1] - 2),
+        ),
+      ).toBeLessThan(0.5);
+      expect(overhead.hR[1]).toBeLessThanOrEqual(overhead.head[1] - 15);
+      expect(Math.abs(overhead.hR[0] - overhead.neck[0])).toBeLessThanOrEqual(
+        12,
+      );
 
       // The second half keeps the body standing as the weight presses up.
       expect(press.hip).toEqual(rack.hip);

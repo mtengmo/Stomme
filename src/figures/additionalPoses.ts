@@ -1,6 +1,7 @@
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
+import { squatFamilyPose } from './squatFamilyKeyframes';
 
 type P = Pt;
 function p(
@@ -41,38 +42,6 @@ const twoDumbbells: FigureSpec['held'] = {
 };
 const oneDumbbell: FigureSpec['held'] = { kind: 'dumbbell', hands: ['hR'] };
 const oneBell: FigureSpec['held'] = { kind: 'kettlebell', hands: ['hR'] };
-const gobletArms: [P, P, P, P] = [
-  [117, 98],
-  [111, 82],
-  [108, 100],
-  [108, 82],
-];
-const gobletStart = {
-  ...stand,
-  eR: gobletArms[0],
-  hR: gobletArms[1],
-  eL: gobletArms[2],
-  hL: gobletArms[3],
-};
-const squatBottom = p(
-  [112, 91],
-  [105, 105],
-  [81, 140],
-  [
-    [124, 123],
-    [118, 108],
-    [116, 125],
-    [115, 109],
-  ],
-  [
-    [120, 144],
-    [108, 174],
-    [119, 177],
-    [99, 143],
-    [86, 174],
-    [97, 177],
-  ],
-);
 const hinge = p(
   [145, 108],
   [132, 111],
@@ -463,28 +432,14 @@ export const additionalFigures = {
     held: oneBell,
   },
   'goblet-squat': {
-    start: gobletStart,
-    end: squatBottom,
+    start: squatFamilyPose('goblet-squat', 0),
+    end: squatFamilyPose('goblet-squat', 1),
     props: [],
     held: oneDumbbell,
   },
   'kettlebell-goblet-squat': {
-    start: {
-      ...stand,
-      kR: [103.36, 148],
-      kL: [91.57, 148],
-      eR: [116, 100],
-      hR: [110, 83],
-      eL: [116, 100],
-      hL: [110, 83],
-    },
-    end: {
-      ...squatBottom,
-      eR: [124, 123],
-      hR: [116, 107],
-      eL: [124, 123],
-      hL: [116, 107],
-    },
+    start: squatFamilyPose('kettlebell-goblet-squat', 0),
+    end: squatFamilyPose('kettlebell-goblet-squat', 1),
     props: [],
     // In the side projection both hands overlap around the horns; render the
     // single bell at their shared grip point, with its mass below the palms.
@@ -640,49 +595,24 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   'squat-curl': {
-    start: {
-      ...squatBottom,
-      eR: [111, 128],
-      hR: [114, 152],
-      eL: [96, 128],
-      hL: [100, 152],
-    },
-    end: { ...stand, eR: [111, 97], hR: [125, 79], eL: [85, 97], hL: [99, 79] },
+    start: squatFamilyPose('squat-curl', 0),
+    end: squatFamilyPose('squat-curl', 1),
     props: [],
     held: twoDumbbells,
   },
   thruster: {
-    start: {
-      ...squatBottom,
-      eR: [120, 122],
-      hR: [118, 104],
-      eL: [104, 122],
-      hL: [106, 104],
-    },
+    start: squatFamilyPose('thruster', 0),
     // A thruster finishes the squat and returns to the shoulder rack before
-    // the overhead press starts. This waypoint also makes the lowering path
-    // return overhead -> rack -> squat.
-    middle: {
-      ...stand,
-      eR: [113, 93],
-      hR: [111, 72],
-      eL: [83, 93],
-      hL: [85, 72],
-    },
-    end: {
-      ...stand,
-      eR: [112, 59],
-      hR: [108, 34],
-      eL: [84, 59],
-      hL: [88, 34],
-    },
+    // the overhead press starts; the lowering path returns overhead -> rack -> squat.
+    middle: squatFamilyPose('thruster', 0.5),
+    end: squatFamilyPose('thruster', 1),
     props: [],
     held: twoDumbbells,
   },
   'single-arm-thruster': {
-    start: { ...squatBottom, eR: [120, 122], hR: [118, 104] },
-    middle: { ...stand, eR: [113, 93], hR: [111, 72] },
-    end: { ...stand, eR: [112, 59], hR: [108, 34] },
+    start: squatFamilyPose('single-arm-thruster', 0),
+    middle: squatFamilyPose('single-arm-thruster', 0.5),
+    end: squatFamilyPose('single-arm-thruster', 1),
     props: [],
     held: oneDumbbell,
   },
