@@ -38,12 +38,12 @@ Noter: övningstexten för E96 sa "Håll i väggen för stöd" men figuren har e
 
 | Punkt | Innehåll | Status | Commit |
 |---|---|---|---|
-| M1+M2 | Burpee: fötter låga (ankel y 170) med höften pikad (y 132, lutning 1,9), inga hopp i leder (<8 enheter per 1/400-steg), extra armnyckelrutor 0,8/0,88, reducerad-rörelse-ruta 0,84 | done | (nästa commit) |
-| M3 | E96 frontvy: steg 14 enheter, stödankel 3 över stegets topp, fri fot 0-4,5 enheter under, lodräta skenben 33, lår <=36; testad i frontViews.test; ratchet-rader för step-down front borttagna | done | (nästa commit) |
-| L1 | supports med okänd rekvisita ger fel; supports används i produktionstester (wall-tibialis-raise, E42); skipDrift var död och är borttagen | done | (se git log, 'L1') |
-| L3 | E96: lägsta ankel y 168,5 (4,5 enheter = ca 6 cm under steget), golvluft >= 6 enheter, test och jämförelsesidans text i linje | done | (samma commit som M3) |
-| L4 | E42 ram `4 20 184 168` + rekvisita (ej mattor) kontrolleras på båda sidor i framing-test | done | (nästa commit) |
-| L5 | mountain-climber: båda benen via IK med 34/34 (33/33 räckte inte till vid start och gav 0,6 drift/asymmetri); statusdokumentets E96-notis rättad | done | (nästa commit) |
-| L6 | sumo-test tillbaka | done | (se git log, 'L6 + ratchet') |
-| Ratchet | fail vid förbättring > 0,1 | done | (se git log, 'L6 + ratchet') |
+| M1+M2 | Burpee: fötter låga (ankel y 170) med höften pikad (y 132, lutning 1,9), inga hopp i leder (<8 enheter per 1/400-steg), extra armnyckelrutor 0,8/0,88, reducerad-rörelse-ruta 0,84 | done | 133062a |
+| M3 | E96 frontvy: steg 14 enheter, stödankel 3 över stegets topp, fri fot 0-4,5 enheter under, lodräta skenben 33, lår <=36; testad i frontViews.test; ratchet-rader för step-down front borttagna | done | 4ae63e0 |
+| L1 | supports med okänd rekvisita ger fel; supports används i produktionstester (wall-tibialis-raise, E42); skipDrift var död och är borttagen | done | 72e152d |
+| L3 | E96: lägsta ankel y 168,5 (4,5 enheter = ca 6 cm under steget), golvluft >= 6 enheter, test och jämförelsesidans text i linje | done | 4ae63e0 |
+| L4 | E42 ram `4 20 184 168` + rekvisita (ej mattor) kontrolleras på båda sidor i framing-test | done | 8dcecdb |
+| L5 | mountain-climber: båda benen via IK med 34/34 (33/33 räckte inte till vid start och gav 0,6 drift/asymmetri); statusdokumentets E96-notis rättad | done | d585cb6 |
+| L6 | sumo-test tillbaka | done | 995f5a8 |
+| Ratchet | fail vid förbättring > 0,1 | done | 995f5a8 |
 
