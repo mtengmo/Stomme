@@ -11,7 +11,7 @@ for (const width of [320, 390]) {
       await expect(
         page.getByRole('heading', { name: 'Figurjämförelse' }),
       ).toBeVisible();
-      await expect(page.getByText('Nuvarande').first()).toBeVisible();
+      await expect(page.getByText('Tidigare').first()).toBeVisible();
       await expect(page.getByText('Nyckelrutor + IK').first()).toBeVisible();
       const overflow = await page.evaluate(
         () =>
