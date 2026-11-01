@@ -5,7 +5,7 @@ export const kneeStrengthExercises: Exercise[] = [
   {
     id: 'seated-tibial-rotation',
     name: 'Sittande skenbensrotation',
-    muscles: ['Insida lår', 'Knästabilisering', 'Underben'],
+    muscles: ['Insida lår', 'Underben'],
     tips: [
       'Sitt på en stadig stol med knäna böjda och en liten kudde, ett block eller en hopvikt handduk mellan knäna. Lägg ett lätt gummiband runt framfötterna.',
       'Håll låren stilla och rotera underbenen lugnt så att fötterna vinklas inåt och utåt i ett litet, bekvämt rörelseomfång.',

@@ -321,3 +321,18 @@ describe('technical levels used by the starting level', () => {
     ).toBe('practiced');
   });
 });
+
+describe('E95 blast off push-up', () => {
+  it('is an editorial entry without an external link or a power quality', () => {
+    const metadata = exerciseMetadata['blast-off-push-up'];
+    expect(metadata.sources).toHaveLength(1);
+    expect(metadata.sources[0]?.publisher).toBe('Stomme');
+    expect(metadata.sources[0]?.url).toBeUndefined();
+    expect(metadata.sources[0]?.note).toContain('Redaktionell övning');
+    expect(exerciseMuscles['blast-off-push-up']).toMatchObject({
+      primary: ['chest', 'triceps'],
+      secondary: ['shoulders', 'core', 'quads'],
+      qualities: [],
+    });
+  });
+});

@@ -559,16 +559,8 @@ export function Figure({
           ? driven
           : spec.motion === 'sequence'
             ? (elapsedMs.current %
-                (exerciseId === 'squat-jump'
-                  ? 4500
-                  : exerciseId === 'blast-off-push-up'
-                    ? 2500
-                    : 12000)) /
-              (exerciseId === 'squat-jump'
-                ? 4500
-                : exerciseId === 'blast-off-push-up'
-                  ? 2500
-                  : 12000)
+                (exerciseId === 'squat-jump' ? 4500 : 12000)) /
+              (exerciseId === 'squat-jump' ? 4500 : 12000)
             : spec.motion === 'ballistic'
               ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
               : cycleProgress(

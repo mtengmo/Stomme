@@ -62,7 +62,7 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('impact progression suggestions', () => {
-  it('removes the direct explosive-push-up swap when global pain is recorded', () => {
+  it('keeps the non-impact blast off push-up swap when global pain is recorded', () => {
     render(
       <NextLevelSuggestions
         plan={sessions[0]?.plan ?? []}
@@ -74,14 +74,14 @@ describe('impact progression suggestions', () => {
       />,
     );
     expect(
-      screen.queryByRole('button', { name: 'Byt till explosiv armhävning' }),
-    ).toBeNull();
+      screen.getByRole('button', { name: 'Byt till blast off-armhävning' }),
+    ).toBeTruthy();
     expect(
       screen.getByRole('button', { name: 'Byt till smala armhävningar' }),
     ).toBeTruthy();
   });
 
-  it('updates summary suggestions when a positive pain log is added', async () => {
+  it('keeps non-impact summary suggestions when a positive pain log is added', async () => {
     const session = sessions[1];
     if (!session) throw new Error('missing session');
     await setMeta(getDb(), 'training', preferences);
@@ -89,7 +89,7 @@ describe('impact progression suggestions', () => {
     await getDb().setLogs.bulkAdd(logs);
     render(<SummaryNextLevel session={session} />);
     expect(
-      await screen.findByRole('link', { name: 'Explosiv armhävning' }),
+      await screen.findByRole('link', { name: 'Blast off-armhävning' }),
     ).toBeTruthy();
     await getDb().painLogs.add({
       id: 'older-pain',
@@ -101,11 +101,10 @@ describe('impact progression suggestions', () => {
       redFlags: { sharp: false, swelling: false, locking: false },
       createdAt: '2026-10-01T10:00:00Z',
     });
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('link', { name: 'Explosiv armhävning' }),
-      ).toBeNull(),
-    );
+    await waitFor(() => expect(getDb().painLogs.count()).resolves.toBe(1));
+    expect(
+      screen.getByRole('link', { name: 'Blast off-armhävning' }),
+    ).toBeTruthy();
     expect(
       screen.getByRole('link', { name: 'Smala armhävningar' }),
     ).toBeTruthy();

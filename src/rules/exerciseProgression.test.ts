@@ -75,17 +75,23 @@ const suggest = (
   harderExerciseSuggestions(id, prefs, data.sessions, data.logs, painOnRecord);
 
 describe('optional harder exercises', () => {
-  it('filters impact suggestions for global pain without blocking non-impact progression', () => {
+  it('does not treat the push-up variants as impact when global pain is recorded', () => {
+    // The blast off push-up keeps the hands planted, so it is not impact.
     expect(suggest(fixture(), 'push-up', preferences, true)).toEqual([
       'decline-push-up',
       'diamond-push-up',
+      'blast-off-push-up',
     ]);
+    // The single-leg calf raise is knee loaded, so pain on record withholds it.
     expect(
       suggest(fixture('calf-raise'), 'calf-raise', preferences, true),
+    ).toEqual([]);
+    expect(
+      suggest(fixture('calf-raise'), 'calf-raise', preferences, false),
     ).toEqual(['single-leg-calf-raise']);
   });
   it.each(['older', 'other-programme'] as const)(
-    'filters impact suggestions for %s symptoms',
+    'keeps non-impact push-up suggestions for %s symptoms',
     (where) => {
       const data = fixture();
       const symptomatic = structuredClone(required(data.sessions[1]));
@@ -95,7 +101,11 @@ describe('optional harder exercises', () => {
       if (where === 'older') symptomatic.startedAt = '2026-10-01T08:00:00Z';
       else symptomatic.programId = 'rehab';
       data.sessions.push(symptomatic);
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
     },
   );
   it('offers harder push-ups after the latest two successes without changing history', () => {
@@ -129,6 +139,16 @@ describe('optional harder exercises', () => {
     expect(
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
     ).toEqual([]);
+  });
+  it('offers step-down after step-up without pain, but not with pain on record', () => {
+    const data = fixture('step-up');
+    const withStep = {
+      ...preferences,
+      equipment: [...preferences.equipment, 'step' as const],
+    };
+    expect(suggest(data, 'step-up', withStep, false)).toEqual(['step-down']);
+    // step-down is knee loaded, so global pain on record withholds the offer.
+    expect(suggest(data, 'step-up', withStep, true)).toEqual([]);
   });
   it('only suggests harder exercises allowed for the experience level', () => {
     const data = fixture('goblet-squat');
@@ -258,11 +278,24 @@ describe('optional harder exercises', () => {
       if (where === 'pain_stop') newer.abortReason = 'pain_stop';
       data.sessions.push(newer);
       expect(suggest(data)).toEqual([]);
+<<<<<<< HEAD
       newer.programId = 'rehab';
       expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+=======
+      newer.programId = 'running';
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
+>>>>>>> main
       newer.programId = 'general';
       newer.startedAt = '2026-10-01T08:00:00Z';
-      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
+      expect(suggest(data)).toEqual([
+        'decline-push-up',
+        'diamond-push-up',
+        'blast-off-push-up',
+      ]);
     },
   );
   it('supports legacy missing sides/variants and ignores unrelated logs', () => {

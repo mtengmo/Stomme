@@ -203,7 +203,7 @@ describe('initial training roster', () => {
     expect(ids).not.toContain('squat-jump');
     expect(ids).not.toContain('burpee');
     expect(ids).not.toContain('blast-off-push-up');
-    expect(impactExercises.has('blast-off-push-up')).toBe(true);
+    expect(impactExercises.has('blast-off-push-up')).toBe(false);
   });
 
   it('falls back to bodyweight when a weighted exercise has no registered weight', () => {

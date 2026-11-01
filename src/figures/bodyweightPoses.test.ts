@@ -65,22 +65,34 @@ describe('bodyweight movement paths', () => {
     expect(left.neck).toEqual(start.neck);
     expect(figures['plank-arm-lift'].end.hR[1]).toBeLessThan(start.hR[1] - 30);
   });
-  it('explosive push-up lifts both hands briefly and lands back on the floor', () => {
+  it('blast off push-up glides over planted hands and toes with constant segments', () => {
     const start = movementPose('blast-off-push-up', 0);
-    expect(movementPose('blast-off-push-up', 1)).toEqual(start);
-    const air = movementPose('blast-off-push-up', 0.75);
-    expect(air.hR[1]).toBeLessThan(start.hR[1] - 5);
-    expect(air.hL[1]).toBeLessThan(start.hL[1] - 5);
-    for (const t of [0, 0.4, 0.625, 0.875, 1]) {
-      const p = movementPose('blast-off-push-up', t);
+    const end = movementPose('blast-off-push-up', 1);
+    for (let n = 0; n <= 40; n++) {
+      const p = movementPose('blast-off-push-up', n / 40);
       expect(p.hR).toEqual(start.hR);
       expect(p.hL).toEqual(start.hL);
       expect(p.aR).toEqual(start.aR);
-      expect(distance(p.neck, p.hip)).toBeCloseTo(
-        distance(start.neck, start.hip),
-        8,
-      );
+      expect(p.tR).toEqual(start.tR);
+      expect(distance(p.neck, p.hip)).toBeCloseTo(46, 8);
+      expect(distance(p.hip, p.kR)).toBeCloseTo(32, 6);
+      expect(distance(p.kR, p.aR)).toBeCloseTo(32, 6);
+      expect(distance(p.neck, p.eR)).toBeCloseTo(22.5, 6);
+      expect(distance(p.eR, p.hR)).toBeCloseTo(22.5, 6);
+      expect(p.kR[1]).toBeLessThan(174);
+      expect(p.kL[1]).toBeLessThan(174);
+      expect(p.head[1] + 9).toBeLessThan(170);
+      expect(p.head[0]).toBeGreaterThan(0);
     }
+    // Hips back and knees bent, shoulders behind the hands.
+    expect(start.neck[0]).toBeGreaterThan(start.hR[0]);
+    expect(start.hip[1]).toBeLessThan(end.hip[1] - 25);
+    expect(distance(start.hip, start.aR)).toBeLessThan(60);
+    // Low plank: legs straight, chest at or in front of the hands.
+    expect(end.neck[0]).toBeLessThanOrEqual(end.hR[0]);
+    expect(distance(end.hip, end.aR)).toBeCloseTo(64, 6);
+    expect(figures['blast-off-push-up'].end).toEqual(end);
+    expect(figures['blast-off-push-up'].motion).toBe('controlled');
   });
   it.each(['pull-up', 'chin-up', 'parallel-dip'] as const)(
     '%s retains both apparatus contacts',

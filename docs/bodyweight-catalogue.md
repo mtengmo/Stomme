@@ -67,6 +67,10 @@ The harder links are wall → knee → push-up → decline, and two-leg → sing
 
 “Prova nästa nivå” is an optional preview/summary suggestion. It requires the latest two attempts in the same programme to be completed, every planned set/side at the catalogue maximum, effort easy, an after-check of good, and no symptoms since the older attempt. Aborted/skipped attempts, early-ended sets, extra weight, missing results and mismatched variants block it. Rehab is excluded. Equipment must fit. A preview switch requires an explicit tap and uses the new exercise's start dose; it never edits saved workouts or completed history automatically.
 
-## Explosive push-up (E95)
+## Blast off push-up (E95)
 
-2026-11-01. Explosiv armhävning is a technical bodyweight plyometric press with 3 sets of 5 reps as an app-proposed starting dose; NASM recommends 3–5 reps per set with full rest. Source: [NASM Plyometric Push-Up](https://www.nasm.org/resource-center/exercise-library/plyometric-push-up), opened 2026-11-01. Hands briefly leave the floor; land softly with bent elbows. It is not knee-dominant and has `kneeLoaded: false`; it is never added to a rehabilitation roster automatically and counts as impact. Avoid with wrist or shoulder problems.
+2026-11-01. **Correction: the first version of E95 was wrong.** It was built as an explosive plyometric push-up (hands leave the floor) citing NASM Plyometric Push-Up, which is a different exercise. That citation is removed.
+
+Blast off-armhävning is now an editorial entry (publisher Stomme, no link; no verified external source for the variant). Interpretation, from only two stills of an Instagram video by Alexia Clark (caption chest, core, shoulders, triceps, quads), with about 85% confidence that hands stay planted and about 60% on the exact sequence: start on toes with knees bent just above the mat, hips high and back and hands planted forward; extend the legs to glide the body forward and down into a low plank with the chest near the hands; press back to the start. Hands and feet do not move and nothing leaves the floor.
+
+Technical bodyweight press. Dose is an editable app proposal of 5 to 10 reps per set, not a source prescription. Primary chest and triceps; secondary shoulders, core and quads; no `power` quality. Normal controlled tempo (about 2 s forward, 2 s back), not an impact exercise, not in any roster, `kneeLoaded: false`, never added to a rehabilitation roster automatically. Avoid with wrist or shoulder problems.

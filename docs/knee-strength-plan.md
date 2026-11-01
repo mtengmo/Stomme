@@ -53,6 +53,3 @@ Tillagd 2026-11-01 som en redaktionell övning; ingen källa hittades för sitta
 
 E98 (`seated-tibial-rotation`) är endast en biblioteksövning och läggs inte automatiskt i rehab eller roster. Referensen E98 är permanent; E85, E86 och E89 är fortsatt reserverade. E97 `toe-squat` förblir pausad i väntan på källa.
 
-## Genomfort och verifierat
-
-Fem nya poster E90–E94 byggda; E11 ateranvands. Tre nya utrustningsval, totalt tio stodval, med kompatibel backupvalidering. Onboardingfiler ar ororda. 266 riktade tester passerade; efter kodnings- och hallbildskorrigeringen passerade ytterligare 101 riktade tester. Typkontroll och produktionsbygge passerade. Biome har fem befintliga varningar. Mobilkontroll vid 320/390 px gav ingen horisontell overflow for nagon av de fem; samlad figurgranskning omfattade rorelsefaser, sidval och minskad rorelse. Testloggar och bilder finns lokalt i `.impeccable/review/knee-strength/`.

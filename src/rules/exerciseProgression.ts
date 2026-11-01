@@ -87,7 +87,10 @@ export function harderExerciseSuggestions(
   const globalPain = symptomsOnRecord(sessions, painOnRecord);
   return candidates.filter(
     (candidate) =>
-      !(globalPain && impactExercises.has(candidate)) &&
+      !(
+        globalPain &&
+        (impactExercises.has(candidate) || exercises[candidate].kneeLoaded)
+      ) &&
       exerciseMetadata[candidate].variants.some(
         (variant) =>
           equipmentFits(variant.equipment, preferences) &&
