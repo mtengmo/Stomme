@@ -9,7 +9,7 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 | E79 dumbbell-pullover | Ram osymmetrisk, vänster hand klipps 8,5 | done | 32a879a |
 | E44 prone-on-forearms | Tå klipps 5 på båda sidor | done | fea50ad |
 | E45 heel-slide | Klipps 2 till höger | done | 2933cf4 |
-| E42 bench-side-plank-leg-lift | Sned vy klipps 4 | todo | |
+| E42 bench-side-plank-leg-lift | Sned vy klipps 4 | done | 6b16e75 |
 | E42 bench-side-plank-leg-lift | Fot i steg-rekvisita i sidovyn (kollision) | todo, lämnas till Opus | |
 | E29 hamstring-curl | 1,0 under golv | falskt positivt, ingen åtgärd | |
 | E96 step-down | Befordra piloten till katalogfigur | todo | |

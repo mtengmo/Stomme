@@ -377,7 +377,7 @@ describe('knee programme figures', () => {
     const html = renderToStaticMarkup(
       <FigureFrame exerciseId="quad-set" pose={quadSetPose(1)} showMuscles />,
     );
-    expect(html).toContain('viewBox="24 128 160 52"');
+    expect(html).toContain('viewBox="8 128 176 52"');
     expect(html).toMatch(/data-body-side="near" stroke="var\(--accent\)"/);
   });
 
