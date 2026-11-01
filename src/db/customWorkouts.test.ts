@@ -168,3 +168,16 @@ describe('automatic and named names', () => {
     ).rejects.toBeInstanceOf(WorkoutNameClashError);
   });
 });
+
+it('renames and sets or clears the group in one call', async () => {
+  const id = await createNamedCustomWorkout('Grupp', ['push-up']);
+  const read = async () =>
+    readCustomWorkouts((await getDb().meta.get('customWorkouts'))?.value)[0];
+  await renameCustomWorkout(id, 'Grupp', ['push-up'], undefined, 'push');
+  expect((await read())?.group).toBe('push');
+  await renameCustomWorkout(id, 'Grupp 2', ['push-up'], undefined);
+  expect((await read())?.group).toBe('push');
+  await renameCustomWorkout(id, 'Grupp 2', ['push-up'], undefined, null);
+  expect(await read()).not.toHaveProperty('group');
+  expect((await read())?.name).toBe('Grupp 2');
+});

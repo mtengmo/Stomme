@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Session } from '../domain/types';
-import { recentMuscles, recoveryNote, suggestFocus } from './recovery';
+import {
+  muscleRecoveryNote,
+  recentMuscles,
+  recoveryNote,
+  suggestFocus,
+} from './recovery';
 
 const now = new Date('2026-11-04T12:00:00Z');
 function session(overrides: Partial<Session> = {}): Session {
@@ -97,5 +102,16 @@ describe('muscle recovery advice', () => {
         now,
       ),
     ).toContain('för 2 dagar sedan');
+  });
+  it('counts calendar days, not elapsed hours', () => {
+    const morning = new Date(2026, 10, 4, 8, 0);
+    const lastNight = new Date(2026, 10, 3, 20, 0).getTime();
+    const earlier = new Date(2026, 10, 4, 6, 0).getTime();
+    expect(
+      muscleRecoveryNote({ chest: lastNight }, ['chest'], morning),
+    ).toContain('Bröst tränades för 1 dag sedan');
+    expect(
+      muscleRecoveryNote({ chest: earlier }, ['chest'], morning),
+    ).toContain('tränades idag');
   });
 });

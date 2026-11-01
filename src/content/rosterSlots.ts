@@ -199,7 +199,6 @@ export const focusSlots: (RosterSlot & { targets: MuscleGroupId[] })[] = [
     targets: ['calves'],
     candidates: ['calf-raise', 'single-leg-calf-raise'],
   },
-  { id: 'hip-side', targets: ['quads', 'glutes'], candidates: ['side-lunge'] },
   {
     id: 'carry',
     targets: ['core', 'forearms'],

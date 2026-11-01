@@ -6,14 +6,23 @@ import {
   legMuscles,
 } from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
-import { impactExercises, rehabAdditionIds } from '../content/rosterSlots';
+import {
+  focusSlots,
+  impactExercises,
+  rehabAdditionIds,
+} from '../content/rosterSlots';
 import type {
   BodyRegionId,
   TemplateId,
   TrainingPreferences,
 } from '../domain/types';
 import { equipmentFits, type Inventory } from './equipment';
-import { chooseVariant } from './levelPolicy';
+import {
+  allowedLevels,
+  chooseVariant,
+  variantsThatFit,
+  variantUsable,
+} from './levelPolicy';
 import {
   buildRoster,
   focusAvailable,
@@ -120,10 +129,100 @@ describe('daily focus rosters', () => {
     ).toContain('Kompletterat');
     expect(focusAvailable(preferences).presets).toContain('push');
     expect(focusAvailable(preferences).regions).not.toContain('shoulders');
+    // A bodyweight user has in-level push choices, so no fallback note.
     expect(
       buildRoster(preferences, 'B', { focus: { id: 'push' } }).notes,
-    ).not.toEqual({});
+    ).toEqual({});
   });
+  it('mentions core-only top-up in the note', () => {
+    expect(
+      buildRoster(
+        { programId: 'general', experience: 'new', equipment: ['bodyweight'] },
+        'A',
+        { focus: { id: 'pull' } },
+      ).note,
+    ).toContain('Kompletterat med bålövningar');
+  });
+  for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
+    for (const experience of ['new', 'some', 'regular'] as const)
+      for (const [name, inventory] of equipmentSets)
+        for (const template of ['A', 'B'] as const)
+          it(`${preset.id} ${experience} ${name} ${template} without pain stays valid`, () => {
+            const preferences: TrainingPreferences = {
+              programId: 'general',
+              experience,
+              ...inventory,
+            };
+            const roster = buildRoster(preferences, template, {
+              focus: { id: preset.id },
+              painOnRecord: false,
+            });
+            expect(roster.ids.length).toBeGreaterThanOrEqual(3);
+            expect(roster.ids.length).toBeLessThanOrEqual(6);
+            expect(new Set(roster.ids).size).toBe(roster.ids.length);
+            for (const id of roster.ids) {
+              expect(rehabAdditionIds.has(id)).toBe(false);
+              expect(chooseVariant(id, preferences)).toBeDefined();
+            }
+          });
+  const beginnerInventories: [string, TrainingPreferences][] = [
+    [
+      'bodyweight',
+      { programId: 'general', experience: 'new', equipment: ['bodyweight'] },
+    ],
+    [
+      'step',
+      {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight', 'step'],
+      },
+    ],
+    [
+      'pull-up bar',
+      {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight', 'pull-up-bar'],
+      },
+    ],
+  ];
+  for (const experience of ['new', 'some'] as const)
+    for (const [name, base] of beginnerInventories)
+      for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
+        for (const template of ['A', 'B'] as const)
+          it(`${preset.id} ${experience} ${name} ${template} avoids impact and above-level work`, () => {
+            const preferences = { ...base, experience };
+            const roster = buildRoster(preferences, template, {
+              focus: { id: preset.id },
+            });
+            const levels = allowedLevels(experience);
+            for (const id of roster.ids) {
+              const level = (
+                chooseVariant(id, preferences) as { technicalLevel: string }
+              ).technicalLevel;
+              const inLevel = (levels as readonly string[]).includes(level);
+              // Above-level picks exist only with the explicit note; in-level never carry it.
+              expect(roster.notes[id] === undefined).toBe(inLevel);
+              if (!inLevel)
+                // EASIEST_NOTE only when the originating slot had nothing in level.
+                for (const slot of focusSlots.filter((sl) =>
+                  sl.candidates.includes(id),
+                ))
+                  for (const other of slot.candidates) {
+                    const variant = chooseVariant(other, preferences);
+                    const otherInLevel =
+                      !!variant &&
+                      variantUsable(preferences, variant) &&
+                      variantsThatFit(other, preferences).length > 0 &&
+                      (levels as readonly string[]).includes(
+                        variant.technicalLevel,
+                      );
+                    expect(otherInLevel).toBe(false);
+                  }
+              if (inLevel) expect(impactExercises.has(id)).toBe(false);
+            }
+          });
 });
 
 describe('initial training roster', () => {

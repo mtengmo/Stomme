@@ -42,7 +42,7 @@ export interface Roster {
 }
 
 const TOP_UP_NOTE =
-  'Kompletterat med helkroppsövningar eftersom få övningar passar vald kroppsdel och utrustning.';
+  'Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.';
 const EASIEST_NOTE =
   'Ingen övning på din nivå passar utrustningen. Den lättaste som finns är vald; kontrollera före start.';
 
@@ -79,6 +79,8 @@ function pickFromSlot(
   preferences: TrainingPreferences,
   context: RosterContext,
   used: ReadonlySet<ExerciseId>,
+  /** false: return only in-level picks, never the easiest above-level one. */
+  allowFallback = true,
 ): { id: ExerciseId; note?: string } | undefined {
   const levels = allowedLevels(preferences.experience);
   // A weighted exercise without a registered weight is never suggested; the slot moves on.
@@ -91,6 +93,7 @@ function pickFromSlot(
   );
   const pool = base.filter((id) => levels.includes(levelOf(id, preferences)));
   if (!pool.length) {
+    if (!allowFallback) return undefined;
     const easiest = [...base].sort(
       (a, b) =>
         levelRankOf(levelOf(a, preferences)) -
@@ -188,10 +191,18 @@ function focusRoster(
     for (const slot of slots) {
       if (ids.length >= limit) break;
       const used = new Set(ids);
-      const first = pickFromSlot(slot, preferences, context, used);
+      const first = pickFromSlot(slot, preferences, context, used, round === 0);
       if (template === 'B' && round === 0 && first) {
         used.add(first.id);
-        add(pickFromSlot(slot, preferences, context, used) ?? first);
+        // The alternative is taken only when it is an in-level pick.
+        const alternative = pickFromSlot(
+          slot,
+          preferences,
+          context,
+          used,
+          false,
+        );
+        add(alternative ?? first);
       } else add(first);
     }
     if (ids.length === before) break;

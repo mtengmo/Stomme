@@ -9,6 +9,7 @@ import {
   muscleGroups,
 } from '../content/muscles';
 import type { Session } from '../domain/types';
+import { daysBetween, toLocalDate } from '../lib/dates';
 
 /** Latest training instant for each primary muscle inside the advisory window. */
 export function recentMuscles(
@@ -65,7 +66,7 @@ export function muscleRecoveryNote(
     muscleGroups[m].label.toLocaleLowerCase('sv'),
   );
   const latest = Math.max(...overlap.map((m) => recent[m] as number));
-  const days = Math.floor((now.getTime() - latest) / 86_400_000);
+  const days = daysBetween(toLocalDate(new Date(latest)), toLocalDate(now));
   const muscles =
     names.length === 1
       ? (names[0] as string)

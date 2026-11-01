@@ -56,15 +56,7 @@ export const focusPresets: {
     id: 'lower',
     label: 'Underkropp & bål',
     targets: [...legMuscles, 'core'],
-    slots: [
-      'squat',
-      'hinge',
-      'split-leg',
-      'calf',
-      'hip-side',
-      'core',
-      'side-core',
-    ],
+    slots: ['squat', 'hinge', 'split-leg', 'calf', 'core', 'side-core'],
   },
   {
     id: 'push',
@@ -82,7 +74,7 @@ export const focusPresets: {
     id: 'legs',
     label: 'Ben',
     targets: legMuscles,
-    slots: ['squat', 'hinge', 'split-leg', 'calf', 'hip-side'],
+    slots: ['squat', 'hinge', 'split-leg', 'calf'],
   },
   { id: 'custom', label: 'Välj själv', targets: [], slots: [] },
 ];

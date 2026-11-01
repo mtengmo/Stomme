@@ -42,7 +42,6 @@ import {
   createNamedCustomWorkout,
   readCustomWorkouts,
   renameCustomWorkout,
-  setCustomWorkoutGroup,
   WorkoutNameClashError,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
@@ -1513,12 +1512,10 @@ function PreviewEditor({
                       workoutName,
                       plan.map((item) => item.exerciseId),
                       plan,
+                      preferences.programId === 'rehab'
+                        ? undefined
+                        : workoutGroup || null,
                     );
-                    if (preferences.programId !== 'rehab')
-                      await setCustomWorkoutGroup(
-                        customWorkout.id,
-                        workoutGroup || undefined,
-                      );
                     setSaved(true);
                   } catch (caught) {
                     setError(

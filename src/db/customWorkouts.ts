@@ -242,7 +242,8 @@ export async function renameCustomWorkout(
   name: string,
   exerciseIds: ExerciseId[],
   plan: PlannedExercise[] | undefined,
-  group?: WorkoutGroup,
+  /** undefined keeps the stored group, null clears it (automatic). */
+  group?: WorkoutGroup | null,
 ): Promise<void> {
   await updateWorkouts((current) => {
     if (!current.some((item) => item.id === id))
@@ -253,17 +254,18 @@ export async function renameCustomWorkout(
       )
     )
       throw new WorkoutNameClashError(name.trim());
-    return current.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            name: name.trim(),
-            exerciseIds,
-            ...(plan ? { plan } : {}),
-            ...(group ? { group } : {}),
-          }
-        : item,
-    );
+    return current.map((item) => {
+      if (item.id !== id) return item;
+      const { group: stored, ...rest } = item;
+      const nextGroup = group === undefined ? stored : (group ?? undefined);
+      return {
+        ...rest,
+        name: name.trim(),
+        exerciseIds,
+        ...(plan ? { plan } : {}),
+        ...(nextGroup ? { group: nextGroup } : {}),
+      };
+    });
   });
 }
 
