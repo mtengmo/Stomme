@@ -44,7 +44,7 @@ function solveKnee(
 
 /**
  * The side catalogue interpolates joint coordinates independently. These
- * demonstrations include clear limb shrinkage (step-up and lunges), so solve
+ * demonstrations include clear limb shrinkage (the lunges), so solve
  * their knees from stable segment lengths while keeping hips, ankles and feet
  * on their authored paths.
  */
@@ -55,7 +55,6 @@ export function constrainLegInterpolation(
 ): Pose {
   if (
     ![
-      'step-up',
       'step-down',
       'split-squat',
       'reverse-lunge',
@@ -67,9 +66,7 @@ export function constrainLegInterpolation(
 
   const out = { ...pose };
   const anchor =
-    exerciseId === 'step-up' ||
-    exerciseId === 'step-down' ||
-    exerciseId === 'split-squat'
+    exerciseId === 'step-down' || exerciseId === 'split-squat'
       ? referencePoses[0]
       : exerciseId === 'single-leg-rdl'
         ? referencePoses.at(-1)

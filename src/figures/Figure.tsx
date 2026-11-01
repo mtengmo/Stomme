@@ -33,6 +33,7 @@ import {
 } from './poses';
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { heelSlidePose, rehabMovementPose } from './rehabPoses';
+import { stepUpPose } from './stepUpKeyframes';
 
 export type { FigureAngle } from './frontViews';
 export {
@@ -68,6 +69,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
     return kettlebellFloorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
+  if (exerciseId === 'step-up') return stepUpPose(t);
   const spec = figures[exerciseId];
   const interpolated = !spec.middle
     ? lerpPose(spec.start, spec.end, t)

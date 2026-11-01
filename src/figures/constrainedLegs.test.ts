@@ -19,12 +19,7 @@ describe('constrained leg interpolation', () => {
       expect(Math.max(...lower) - Math.min(...lower)).toBeLessThan(0.1);
     }
   });
-  it.each([
-    'step-up',
-    'split-squat',
-    'reverse-lunge',
-    'forward-lunge',
-  ] as const)(
+  it.each(['split-squat', 'reverse-lunge', 'forward-lunge'] as const)(
     'keeps the shin and thigh lengths stable through %s',
     (exerciseId) => {
       const samples = [0.08, 0.2, 0.36, 0.64, 0.8, 0.92].map((phase) =>

@@ -5,6 +5,7 @@ import { kneeStrengthFigures } from './kneeStrengthPoses';
 import type { Pt } from './lerp';
 import { type PhysioFigureId, physioFigures } from './physioPoses';
 import { rehabFigures } from './rehabPoses';
+import { STEP_UP_PROPS, stepUpPose } from './stepUpKeyframes';
 
 /**
  * Side-view skeleton in a 200x200 viewBox, facing right (floor poses: head
@@ -155,45 +156,9 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
     held: { kind: 'dumbbell', hands: ['hR'] },
   },
   'step-up': {
-    start: pose(
-      [104, 52],
-      [102, 66],
-      [100, 104],
-      [
-        [102, 84],
-        [102, 102],
-        [100, 84],
-        [100, 102],
-      ],
-      [
-        [131, 114],
-        [130, 142],
-        [140, 145],
-        [95, 136],
-        [88, 172],
-        [98, 177],
-      ],
-    ),
-    end: pose(
-      [132, 32],
-      [130, 46],
-      [130, 84],
-      [
-        [130, 64],
-        [130, 82],
-        [128, 64],
-        [128, 82],
-      ],
-      [
-        [131, 114],
-        [130, 142],
-        [140, 145],
-        [150, 112],
-        [150, 138],
-        [158, 140],
-      ],
-    ),
-    props: [{ type: 'step', x: 110, y: 146, w: 48 }],
+    start: stepUpPose(0),
+    end: stepUpPose(1),
+    props: STEP_UP_PROPS,
     held: { kind: 'dumbbell', hands: ['hR', 'hL'] },
   },
   'single-leg-rdl': {
