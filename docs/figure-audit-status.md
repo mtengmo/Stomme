@@ -10,7 +10,7 @@ Källa: audit av alla figurer med `checkPoseGeometry`. Test: `src/figures/framin
 | E44 prone-on-forearms | Tå klipps 5 på båda sidor | done | fea50ad |
 | E45 heel-slide | Klipps 2 till höger | done | 2933cf4 |
 | E42 bench-side-plank-leg-lift | Sned vy klipps 4 | done | 6b16e75 |
-| E42 bench-side-plank-leg-lift | Fot i steg-rekvisita i sidovyn (kollision) | todo, lämnas till Opus | |
+| E42 bench-side-plank-leg-lift | Fot i steg-rekvisita i sidovyn (kollision) | done i W4 (bänk 32 bred, stödfoten på plattan) | (W4) |
 | E29 hamstring-curl | 1,0 under golv | falskt positivt, ingen åtgärd | |
 | E96 step-down | Befordra piloten till katalogfigur (steg 19 cm, räcke, IK, jämförelsesidan visar fryst Tidigare mot ny) | done, väntar på visuell granskning | b35f531 |
 
@@ -25,8 +25,8 @@ Noter: övningstexten för E96 säger "Håll i väggen för stöd" men figuren h
 | W1 | E94 wall-tibialis-raise | done | a723c4c |
 | W2 | E91 copenhagen-hold | done | cd411a0 |
 | W3 | E02 step-up sidovy | done | cd7d4f9 |
-| W3b | E02 step-up frontvy | done | (nästa commit) |
-| W4 | E42 bench-side-plank-leg-lift | todo | |
+| W3b | E02 step-up frontvy | done | a971f09 |
+| W4 | E42 bench-side-plank-leg-lift (sido- och sned vy; ram `8 20 184 168`) | done | (nästa commit) |
 | W5 | Plankfamiljen | todo | |
 | W6 | E16 floor-press | todo | |
 | W7 | E60 burpee | todo | |

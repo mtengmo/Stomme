@@ -81,30 +81,30 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
     );
   },
   'bench-side-plank-leg-lift': (t) => {
-    const hip: Pt = [102, 132],
+    const hip: Pt = [102, 143],
       ankle: Pt = [163, 139];
-    // Keep the lower foot just below the supported foot so the legs remain
-    // distinct in the profile drawing at the top of the lift.
-    const angle = mix(0.74, 0.24, t),
+    // The lifting leg keeps one length (61.1) and swings from the toe near the
+    // floor up to the ankle just under the bench plate.
+    const angle = mix(0.551, 0.198, t),
       moving: Pt = [
-        hip[0] + 62 * Math.cos(angle),
-        hip[1] + 62 * Math.sin(angle),
+        hip[0] + 61.1 * Math.cos(angle),
+        hip[1] + 61.1 * Math.sin(angle),
       ];
     return skeleton(
-      [35, 124],
-      [49, 132],
+      [35, 139],
+      [49, 147],
       hip,
       [
         [52, 173],
         [78, 173],
-        [67, 111],
-        [94, 127],
+        [66, 127],
+        [88.5, 140],
       ],
       [
         [(hip[0] + moving[0]) / 2, (hip[1] + moving[1]) / 2],
         moving,
         toe(moving),
-        [132, 135],
+        [(hip[0] + ankle[0]) / 2, (hip[1] + ankle[1]) / 2],
         ankle,
         toe(ankle),
       ],
@@ -300,7 +300,7 @@ export const rehabFigures = Object.fromEntries(
         id === 'rear-foot-split-squat'
           ? [{ type: 'step', x: 30, y: 142, w: 39 }]
           : id === 'bench-side-plank-leg-lift'
-            ? [{ type: 'step', x: 154, y: 143, w: 30 }]
+            ? [{ type: 'bench', x: 152, y: 143, w: 32 }]
             : id === 'single-leg-chair-squat'
               ? [{ type: 'chair', x: 46, y: 144, w: 38 }]
               : [{ type: 'mat', x1: 18, x2: 187 }],

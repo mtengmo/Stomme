@@ -647,36 +647,41 @@ export function obliqueMovementPose(
     );
   }
 
-  const hip: Pt = [106, 128];
-  const knee: Pt = [138, 146];
-  const angle = mix(0.78, -0.42, t);
-  const movingAnkle: Pt = [
-    knee[0] + 34 * Math.cos(angle),
-    knee[1] + 34 * Math.sin(angle),
-  ];
+  const hip: Pt = [106, 136];
   const supportAnkle: Pt = [163, 122];
+  const angle = mix(1.15, -0.42, t);
+  const kneeDir: Pt = [32, 10];
+  const kneeLen = Math.hypot(kneeDir[0], kneeDir[1]);
+  const knee: Pt = [
+    hip[0] + (29.35 * kneeDir[0]) / kneeLen,
+    hip[1] + (29.35 * kneeDir[1]) / kneeLen,
+  ];
+  const movingAnkle: Pt = [
+    knee[0] + 29.35 * Math.cos(angle),
+    knee[1] + 29.35 * Math.sin(angle),
+  ];
   const toe = (ankle: Pt): Pt => [ankle[0] + 10, ankle[1] + 3];
   const moving = { knee, ankle: movingAnkle, toe: toe(movingAnkle) };
   const supported = {
-    knee: point(137, 120),
+    knee: point((hip[0] + supportAnkle[0]) / 2, (hip[1] + supportAnkle[1]) / 2),
     ankle: supportAnkle,
     toe: toe(supportAnkle),
   };
   const right = working === 'left' ? supported : moving;
   const left = working === 'left' ? moving : supported;
   const lowerArm: [Pt, Pt] = [
-    [57, 176],
-    [94, 176],
+    [56, 176],
+    [86.4, 176],
   ];
   const upperArm: [Pt, Pt] = [
-    [70, 109],
-    [97, 123],
+    [70, 131],
+    [97, 145],
   ];
   const rightArm = working === 'left' ? upperArm : lowerArm;
   const leftArm = working === 'left' ? lowerArm : upperArm;
   return skeleton(
-    [34, 120],
-    [52, 128],
+    [34, 142],
+    [52, 150],
     hip,
     ...rightArm,
     ...leftArm,

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { heelSlidePose, rehabMovementPose } from './rehabPoses';
+import { checkPoseGeometry } from './keyframes';
+import { POSE_KEYS, type Pose } from './poses';
+import { heelSlidePose, rehabFigures, rehabMovementPose } from './rehabPoses';
 
 const pose = (id: Parameters<typeof rehabMovementPose>[0], t: number) => {
   const result = rehabMovementPose(id, t);
@@ -103,7 +105,7 @@ describe('rehabilitation movement geometry', () => {
       expect(current.kL).toEqual(supportKnee);
       expect(current.aR[1]).toBeGreaterThan(current.aL[1] + 5);
       expect(current.kR[1]).toBeGreaterThan(current.kL[1] + 2);
-      expect(current.aR[1]).toBeLessThanOrEqual(174);
+      expect(current.aR[1]).toBeLessThanOrEqual(176);
       expect(current.tR[1]).toBeGreaterThanOrEqual(current.aR[1]);
     }
   });
@@ -141,5 +143,42 @@ describe('rehabilitation movement geometry', () => {
     const end = pose('single-leg-floor-bridge', 1);
     expect(end.tL[0]).toBeGreaterThan(end.aL[0]);
     expect(end.tL[1]).toBeLessThan(end.aL[1]);
+  });
+
+  it('E42 side plank: rests the supported foot on a bench plate and passes the gate', () => {
+    const bench = rehabFigures['bench-side-plank-leg-lift'].props.find(
+      (p) => p.type === 'bench',
+    );
+    if (bench?.type !== 'bench') throw new Error('missing bench');
+    const frames = Array.from({ length: 101 }, (_, i) =>
+      pose('bench-side-plank-leg-lift', i / 100),
+    );
+    for (const f of frames) {
+      for (const key of ['aL', 'tL'] as const) {
+        expect(f[key][1]).toBeGreaterThanOrEqual(bench.y - 4);
+        expect(f[key][1]).toBeLessThanOrEqual(bench.y);
+      }
+      expect(
+        Math.abs(distance(f.neck, f.eR) - distance(f.neck, f.eL)),
+      ).toBeLessThanOrEqual(1);
+    }
+    expect((frames[0] as Pose).tR[1]).toBeGreaterThanOrEqual(175);
+    const top = frames.at(-1) as Pose;
+    for (const key of ['aR', 'tR'] as const) {
+      expect(top[key][1]).toBeGreaterThanOrEqual(153);
+      expect(top[key][0]).toBeGreaterThanOrEqual(bench.x);
+      expect(top[key][0]).toBeLessThanOrEqual(bench.x + bench.w);
+    }
+    expect(
+      checkPoseGeometry(frames, {
+        floorY: 178,
+        viewBox: [8, 20, 184, 168],
+        props: rehabFigures['bench-side-plank-leg-lift'].props,
+        minHeadClearance: 9,
+        allowlist: Object.fromEntries(
+          POSE_KEYS.map((k) => [`loop-mismatch:${k}`, 'controlled motion']),
+        ),
+      }),
+    ).toEqual([]);
   });
 });
