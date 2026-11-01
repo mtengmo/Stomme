@@ -77,4 +77,4 @@ Technical bodyweight press. Dose is an editable app proposal of 5 to 10 reps per
 
 ## Later plyometric additions (not from the article)
 
-E99 Sidohopp på ett ben and E100 Boxhopp are library-only plyometric exercises, planned in `plan-plyo-exercises.md`. E99 is editorial (no NASM or ACE page found); E100 follows the NASM Box Jumps page, with a low step and stepping down instead of jumping down. Both are knee-loaded impact exercises, hidden in rehab and when symptoms are on record, and in no roster or progression link.
+E99 Sidohopp på ett ben and E100 Boxhopp are library-only plyometric exercises, planned in `plan-plyo-exercises.md`. E99 is editorial (no NASM or ACE page found); E100 follows the NASM Box Jumps page, with a low step and stepping down instead of jumping down. Both are knee-loaded impact exercises and members of `impactExercises`. They are in no roster, slot, rehab list or progression link, and rehab never offers them in the exercise picker or when building a custom workout (`pickableInProgramme`). Workouts saved earlier are not rewritten. The E100 dose (3-5 reps, rest fully, never to failure) stays within NASM's guidance.

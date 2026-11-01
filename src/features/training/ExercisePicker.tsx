@@ -117,6 +117,8 @@ export interface ExercisePickerProps {
   selectedIds: ExerciseId[];
   replacingId?: ExerciseId;
   allowedIds?: readonly ExerciseId[];
+  /** Replaces the default note shown above a restricted list. */
+  allowedNote?: string;
   onChoose(id: ExerciseId): void;
   onCancel(): void;
   /** Stable preview/draft key; preserves filters across guide navigation. */
@@ -130,6 +132,7 @@ export function ExercisePicker({
   selectedIds,
   replacingId,
   allowedIds,
+  allowedNote = 'Visar bara övningar som ingår i den tillåtna samlingen.',
   onChoose,
   onCancel,
   pickerKey,
@@ -297,9 +300,7 @@ export function ExercisePicker({
             {replacingId ? 'Byt övning' : 'Lägg till övning'}
           </Heading>
           {allowedIds ? (
-            <p className="m-0 mt-2 text-base text-ink-soft">
-              Visar bara övningar som ingår i den tillåtna samlingen.
-            </p>
+            <p className="m-0 mt-2 text-base text-ink-soft">{allowedNote}</p>
           ) : null}
         </div>
         <button

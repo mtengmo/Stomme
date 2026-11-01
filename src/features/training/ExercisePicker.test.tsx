@@ -29,12 +29,14 @@ const preferences: TrainingPreferences = {
 
 function PickerRoutes({
   allowedIds,
+  allowedNote,
   replacingId,
   selectedIds = [],
   equipment = preferences.equipment,
   onChoose = () => {},
 }: {
   allowedIds?: readonly ExerciseId[];
+  allowedNote?: string;
   replacingId?: ExerciseId;
   selectedIds?: ExerciseId[];
   equipment?: TrainingPreferences['equipment'];
@@ -50,6 +52,7 @@ function PickerRoutes({
             selectedIds={selectedIds}
             replacingId={replacingId}
             allowedIds={allowedIds}
+            allowedNote={allowedNote}
             pickerKey="picker-test"
             onChoose={onChoose}
             onCancel={() => {}}
@@ -82,6 +85,29 @@ afterEach(async () => {
 });
 
 describe('ExercisePicker', () => {
+  it('explains a restricted list with the default or the given note', async () => {
+    const { unmount } = render(<PickerRoutes allowedIds={['dead-bug']} />);
+    expect(
+      await screen.findByText(
+        'Visar bara övningar som ingår i den tillåtna samlingen.',
+      ),
+    ).toBeTruthy();
+    unmount();
+    render(
+      <PickerRoutes
+        allowedIds={['dead-bug']}
+        allowedNote="Hopp- och stötövningar visas inte i rehab."
+      />,
+    );
+    expect(
+      await screen.findByText('Hopp- och stötövningar visas inte i rehab.'),
+    ).toBeTruthy();
+    expect(
+      screen.queryByText(
+        'Visar bara övningar som ingår i den tillåtna samlingen.',
+      ),
+    ).toBeNull();
+  });
   it('filters by broad body region and preserves primary/supporting labels', async () => {
     const user = userEvent.setup();
     render(

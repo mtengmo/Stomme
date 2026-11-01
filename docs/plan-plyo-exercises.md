@@ -37,7 +37,7 @@ URL:er får aldrig hittas på.
 
 ## E100 Boxhopp (`box-jump`)
 
-- `bodyweightExercises.ts`: `unit: 'reps'`, `perSide: false`, `exercise(..., 5, 'reps', 8)` (`{start 5, max 8, step 1}`). Lägg i `MANUAL_REPS` i `src/rules/repTempo.ts` med kommentaren "Full återställning och nedkliv mellan hoppen; ingen fast takt."
+- `bodyweightExercises.ts`: `unit: 'reps'`, `perSide: false`, `exercise(..., 3, 'reps', 5)` (`{start 3, max 5, step 1}`, inom NASM:s 3-5 repetitioner; ändrat efter granskning). Lägg i `MANUAL_REPS` i `src/rules/repTempo.ts` med kommentaren "Full återställning och nedkliv mellan hoppen; ingen fast takt."
 - Muskler: primära `['quads', 'glutes', 'calves']`, sekundära `['hamstrings', 'core']`, `qualities: ['power']`. Etiketter `['Framsida lår', 'Säte', 'Vader', 'Baksida lår', 'Bål']`.
 - Nivå `technical`, utrustning `step`. `reason`: "Hopp upp på en upphöjd yta kräver kraft, precision och mjuk landning."
 - Lägg ett valfritt `cue?: string` i `bodyweightDetails`. Seed-koden i `exerciseMetadata.ts` (~rad 1189) ska använda `added.cue ?? <dagens text>`. Cue: "Ett lågt, stadigt steg eller en låda som inte kan glida, välta eller ge efter. Börja lågt."
@@ -80,7 +80,7 @@ URL:er får aldrig hittas på.
 
 - `exerciseMetadata.test.ts`: integritetslistan får E99 och E100. Källa verifierad URL eller Stomme utan URL med "Redaktionell övning", aldrig AAOS. `purposes.knee` saknas, `purposes.running` finns. Box-jump-utrustning `[{bodyweight,1},{step,1}]`, cue innehåller "stadig". `easierExerciseId === 'step-up'`. Ingen post har `harderExerciseId` som pekar på de nya.
 - `kneeStrength.test.ts`: E85, E86, E89, E97 oanvända.
-- Nytt `src/content/plyometrics.test.ts`: `kneeLoaded` för båda. E99 `seconds`, `perSide`, `sideKind 'ben'`, `{20,30,5}`, `sidePolicy 'choose-side'`. E100 `{5,8,1}`, `perSide false`. Båda saknas i `generalSlots`, `focusSlots`, `movementSlots`, `rehabAdditionIds`, `kneeRehabExercises` och fysioplanen. Sidokuen säger "Hoppa på".
+- Nytt `src/content/plyometrics.test.ts`: `kneeLoaded` för båda. E99 `seconds`, `perSide`, `sideKind 'ben'`, `{20,30,5}`, `sidePolicy 'choose-side'`. E100 `{3,5,1}`, `perSide false`. Båda saknas i `generalSlots`, `focusSlots`, `movementSlots`, `rehabAdditionIds`, `kneeRehabExercises` och fysioplanen. Sidokuen säger "Hoppa på".
 - `programRosters.test.ts`: för alla erfarenheter, utrustning med/utan `step`, mallarna A och B, alla fokusval och `painOnRecord` true/false: ingen roster innehåller de nya ID:na, inklusive glest fall med lättaste nivå.
 - `repTempo.test.ts` (båda `null`), `favouriteSuggestions.test.ts` (`[]`), `exerciseProgression.test.ts` (inget nästa-nivå-förslag returnerar dem), `equipment.test.ts` (box-jump kräver `step`), `libraryFilters.test.ts` ("Löpstyrka" hittar båda, "en sida" och tid hittar E99).
 - Steg 8: `pickerPolicy.test.ts` (rehab + impact utesluts, rehab + vanlig tillåts, general + impact tillåts).

@@ -9,6 +9,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { filterExercises } from '../../rules/libraryFilters';
+import { pickableInProgramme } from '../../rules/pickerPolicy';
 import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
 import { FavouritesProvider } from '../exercise/FavouriteButton';
 import { ResultList, ResultViewSwitch } from '../library/ExerciseResults';
@@ -42,11 +43,17 @@ export function CustomPicker({
   // Rehab never uses the strength level, so level fit is not offered there.
   const rehab = preferences.programId === 'rehab';
   const filters = pickFiltersFrom(query, !rehab);
-  const { primary, supporting } = filterExercises(exerciseList, filters, {
-    inventory: preferences,
-    favourites,
-    experience: preferences.experience,
-  });
+  const { primary, supporting } = filterExercises(
+    exerciseList.filter((exercise) =>
+      pickableInProgramme(exercise.id, preferences),
+    ),
+    filters,
+    {
+      inventory: preferences,
+      favourites,
+      experience: preferences.experience,
+    },
+  );
   const count = primary.length + supporting.length;
   const area = filters.muscle
     ? muscleGroups[filters.muscle].label

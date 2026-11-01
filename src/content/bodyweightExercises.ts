@@ -323,9 +323,9 @@ export const bodyweightExercises: Exercise[] = [
     ],
     'Steget är så högt att du landar i djup knäböj eller med tårna på kanten.',
     'Använd ett lägre steg, eller gör uppsteg utan hopp.',
-    5,
+    3,
     'reps',
-    8,
+    5,
   ),
 ];
 
@@ -398,7 +398,7 @@ export const bodyweightDetails: Record<
     secondary: ['hamstrings', 'core'],
     source: 'https://www.nasm.org/resource-center/exercise-library/box-jumps',
     publisher: 'NASM',
-    note: 'Hopp upp, nedkliv. Steget ska vara lågt och stadigt. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad.',
+    note: 'Hopp upp, nedkliv. Steget ska vara lågt och stadigt. Vila fullt mellan hoppen och gå aldrig till utmattning; dosen är högst 5 repetitioner per set. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad.',
     cue: 'Ett lågt, stadigt steg eller en låda som inte kan glida, välta eller ge efter. Börja lågt.',
   },
   'decline-push-up': {

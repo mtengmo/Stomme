@@ -26,6 +26,7 @@ import type {
   TrainingPreferences,
 } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
+import { pickableInProgramme } from '../../rules/pickerPolicy';
 import {
   type SelectionSummary,
   selectionSummary,
@@ -208,9 +209,11 @@ export function WorkoutBuilder({
   const reason = (id: ExerciseId) =>
     existing.includes(id)
       ? 'Redan i passet'
-      : kneeOnly && !kneeRehabExercises.some((knee) => knee.id === id)
-        ? 'Ingår inte i knäprogrammet'
-        : undefined;
+      : preferences && !pickableInProgramme(id, preferences)
+        ? 'Hopp visas inte i rehab'
+        : kneeOnly && !kneeRehabExercises.some((knee) => knee.id === id)
+          ? 'Ingår inte i knäprogrammet'
+          : undefined;
   const full = saved.length >= maxCustomWorkouts && !target;
 
   const planFor = (list: readonly ExerciseId[]) =>

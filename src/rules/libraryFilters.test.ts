@@ -37,6 +37,24 @@ const fits = (
 ) =>
   matchesLibraryFilters(exercises[id], { ...empty, ...patch }, inventory, mine);
 
+describe('reference search', () => {
+  it('matches a reference exactly, case-insensitively, never as a prefix', () => {
+    expect(fits('wall-sit', { term: 'e11' })).toBe(true);
+    expect(fits('wall-sit', { term: ' E11 ' })).toBe(true);
+    expect(fits('wall-sit', { term: 'E1' })).toBe(false);
+    expect(fits('wall-sit', { term: 'E110' })).toBe(false);
+    expect(fits('box-jump', { term: 'e10' })).toBe(false);
+    expect(fits('box-jump', { term: 'e100' })).toBe(true);
+    expect(fits('single-leg-lateral-hop', { term: 'E99' })).toBe(true);
+    expect(fits('box-jump', { term: 'E99' })).toBe(false);
+  });
+  it('keeps free-text search unchanged', () => {
+    expect(fits('box-jump', { term: 'boxh' })).toBe(true);
+    expect(fits('box-jump', { term: 'e' })).toBe(true);
+    expect(fits('box-jump', { term: 'ex1' })).toBe(false);
+  });
+});
+
 describe('equipment and library filter contracts', () => {
   it('counts the chosen implements and does not let one dumbbell stand in for a pair or a kettlebell', () => {
     expect(

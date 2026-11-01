@@ -54,7 +54,11 @@ export function matchesLibraryFilters(
   )
     return false;
   const term = filters.term.trim().toLocaleLowerCase('sv');
-  if (
+  // A reference such as "e10" is matched exactly, so it never finds E100.
+  if (/^e\d+$/.test(term)) {
+    if (exerciseReferences[exercise.id].toLocaleLowerCase('sv') !== term)
+      return false;
+  } else if (
     term &&
     !`${exercise.name} ${exerciseSearchText(exercise.id)} ${exerciseReferences[exercise.id]}`
       .toLocaleLowerCase('sv')

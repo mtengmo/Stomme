@@ -452,6 +452,11 @@ function PreviewEditor({
                   )
               : undefined
           }
+          allowedNote={
+            rehabGroup(preferences) === 'aaos'
+              ? undefined
+              : 'Hopp- och stötövningar visas inte i rehab.'
+          }
           pickerKey={`${draftKey}.picker-filters.${picker}`}
           onCancel={() => {
             restoreFocus.current =

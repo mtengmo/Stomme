@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { ExerciseId, TemplateId } from '../domain/types';
+import type { BodyRegionId, ExerciseId, TemplateId } from '../domain/types';
 import { equipmentFits } from '../rules/equipment';
-import { harderExerciseSuggestions } from '../rules/exerciseProgression';
 import { favouriteAlternatives } from '../rules/favouriteSuggestions';
 import { movementSlots } from '../rules/levelPolicy';
 import { emptyExerciseFilters, filterExercises } from '../rules/libraryFilters';
@@ -71,7 +70,7 @@ describe('plyometric library additions', () => {
     expect(exercises['box-jump']).toMatchObject({
       unit: 'reps',
       perSide: false,
-      range: { start: 5, max: 8, step: 1 },
+      range: { start: 3, max: 5, step: 1 },
     });
     expect(exercises['box-jump'].sideKind).toBeUndefined();
     expect(exerciseMetadata['box-jump'].sidePolicy).toBe('both');
@@ -241,7 +240,7 @@ describe('plyometric library additions', () => {
     expect(timed).not.toContain('box-jump');
   });
 
-  it('is never suggested as a favourite alternative or a harder step', () => {
+  it('is never suggested as a favourite alternative', () => {
     const preferences = {
       programId: 'general' as const,
       experience: 'regular' as const,
@@ -249,10 +248,6 @@ describe('plyometric library additions', () => {
     };
     for (const id of ids)
       expect(favouriteAlternatives(id, [...ids], [], preferences)).toEqual([]);
-    for (const other of exerciseList)
-      expect(
-        harderExerciseSuggestions(other.id, preferences, [], [], false),
-      ).toEqual([]);
   });
 });
 
@@ -270,9 +265,19 @@ describe('plyometric exercises stay out of every roster', () => {
     ],
     ['bodyweight only', inventory()],
   ] as const;
+  const regions = [
+    'legs',
+    'core',
+    'back',
+    'chest',
+    'shoulders',
+    'arms',
+  ] as const;
   const focuses = [
     undefined,
     ...focusPresets.filter((p) => p.id !== 'custom').map((p) => ({ id: p.id })),
+    ...regions.map((region) => ({ id: 'custom' as const, regions: [region] })),
+    { id: 'custom' as const, regions: [...regions] },
   ];
   const banned = new Set<ExerciseId>(ids);
 
@@ -289,6 +294,17 @@ describe('plyometric exercises stay out of every roster', () => {
               );
               for (const id of roster.ids) expect(banned.has(id)).toBe(false);
             }
+        // Body parts chosen in setup pick the custom focus when none is given.
+        for (const bodyParts of [
+          ['legs'],
+          ['legs', 'core'],
+          [...regions],
+        ] as BodyRegionId[][])
+          for (const id of buildRoster(
+            { programId: 'general', experience, ...equipment, bodyParts },
+            'A',
+          ).ids)
+            expect(banned.has(id)).toBe(false);
       });
 });
 
