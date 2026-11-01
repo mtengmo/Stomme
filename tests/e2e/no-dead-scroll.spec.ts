@@ -103,7 +103,9 @@ for (const scheme of SCHEMES)
         await expectNavClearance(page, 'setup level');
       });
 
-      test('Home after setup does not scroll', async ({ page }) => {
+      test('Home focus row and next-pass action stay in view', async ({
+        page,
+      }) => {
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
@@ -113,9 +115,33 @@ for (const scheme of SCHEMES)
         ).toBeVisible();
         await setScale(page, scale);
         await expect(
+          page.getByRole('link', { name: /Dagens fokus.*Byt/ }),
+        ).toBeInViewport({ ratio: 1 });
+        await expect(
           page.getByRole('link', { name: 'Visa nästa pass' }),
         ).toBeInViewport({ ratio: 1 });
         await expectNavClearance(page, 'home');
+      });
+
+      test('/fokus keeps the primary action visible above navigation', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general' });
+        await page.goto('/#/fokus');
+        await setScale(page, scale);
+        await expect(
+          page.getByRole('heading', { name: 'Vad tränar du idag?' }),
+        ).toBeVisible();
+        await expect(page.getByRole('radio', { name: /^Press/ })).toBeVisible();
+        const action = page.getByRole('button', {
+          name: 'Visa passet',
+          exact: true,
+        });
+        await expect(action).toBeInViewport({ ratio: 1 });
+        await expectNavClearance(page, 'focus picker');
+        if (scale === 100) await expectNoScroll(page, 'focus picker');
       });
     });
   }
