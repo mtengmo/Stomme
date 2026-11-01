@@ -175,6 +175,10 @@ describe('rehabilitation movement geometry', () => {
         viewBox: [4, 20, 184, 168],
         props: rehabFigures['bench-side-plank-leg-lift'].props,
         minHeadClearance: 9,
+        supports: [
+          { joint: 'aL', prop: 'bench', maxGap: 5 },
+          { joint: 'tL', prop: 'bench', maxGap: 5 },
+        ],
         allowlist: Object.fromEntries(
           POSE_KEYS.map((k) => [`loop-mismatch:${k}`, 'controlled motion']),
         ),

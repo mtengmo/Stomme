@@ -144,8 +144,6 @@ export interface GateOptions {
   supports?: readonly Support[];
   /** Violation keys that are accepted, each with the reason. */
   allowlist?: Readonly<Record<string, string>>;
-  /** Segments (`a-b`) exempt from the drift check (front views foreshorten). */
-  skipDrift?: readonly string[];
 }
 
 const JOINTS = [
@@ -266,7 +264,14 @@ export function checkPoseGeometry(
         .filter((pr) => pr.type === sup.prop)
         .map((pr) => gapToProp(pose[sup.joint], pr))
         .filter((g): g is number => g !== undefined);
-      if (gaps.length > 0 && Math.min(...gaps) > sup.maxGap)
+      if (gaps.length === 0)
+        out.push({
+          type: 'support-gap',
+          frame,
+          key: `support-gap:${sup.joint}`,
+          detail: `${sup.joint} ska stödjas av ${sup.prop} men scenen saknar den`,
+        });
+      else if (Math.min(...gaps) > sup.maxGap)
         out.push({
           type: 'support-gap',
           frame,
@@ -330,7 +335,7 @@ export function checkPoseGeometry(
   SEGMENTS.forEach(([a, b], i) => {
     const lengths = frames.map((f) => dist(f[a], f[b]));
     const spread = Math.max(...lengths) - Math.min(...lengths);
-    if (spread > tol && !opts.skipDrift?.includes(`${a}-${b}`))
+    if (spread > tol)
       out.push({
         type: 'segment-drift',
         frame: -1,

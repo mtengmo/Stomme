@@ -272,11 +272,12 @@ describe('checkPoseGeometry', () => {
     expect(
       types([moved(standing, { aL: [160, 158] })], stepOpts),
     ).not.toContain('support-gap');
+    // A support whose prop is not in the scene is a violation, not a pass.
     const unknown: GateOptions = {
       ...options,
       supports: [{ joint: 'aL', prop: 'bosu', maxGap: 2 }],
     };
-    expect(types([standing], unknown)).not.toContain('support-gap');
+    expect(types([standing], unknown)).toContain('support-gap');
   });
   it('lets an allowlisted violation key through, and only that key', () => {
     const longer = moved(standing, { kR: [100, 131] });
@@ -290,14 +291,8 @@ describe('checkPoseGeometry', () => {
       'segment-drift:hip-kR',
     );
   });
-  it('skips drift for listed segments and measures asymmetry over all frames', () => {
+  it('measures asymmetry over all frames, not only the first', () => {
     const longer = moved(standing, { kR: [100, 131] });
-    expect(
-      checkPoseGeometry([standing, longer, standing], {
-        ...options,
-        skipDrift: ['hip-kR', 'kR-aR'],
-      }).filter((v) => v.type === 'segment-drift'),
-    ).toEqual([]);
     const asym = checkPoseGeometry([standing, longer], options);
     expect(asym.some((v) => v.type === 'limb-asymmetry')).toBe(true);
   });

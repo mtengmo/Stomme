@@ -168,6 +168,11 @@ describe('contact aware knee figures', () => {
         viewBox: [14, 20, 164, 168],
         props: figures['wall-tibialis-raise'].props,
         minHeadClearance: 9,
+        // Back against the wall: neck and hip stay within 5 units of it.
+        supports: [
+          { joint: 'neck', prop: 'wall', maxGap: 5 },
+          { joint: 'hip', prop: 'wall', maxGap: 5 },
+        ],
         // A controlled rep ends where it peaks, so the loop is not closed.
         allowlist: {
           'loop-mismatch:tR': 'controlled motion',
