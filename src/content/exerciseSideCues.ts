@@ -49,6 +49,7 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     explanation: `Håll det ${sideAdjective(side)} knät böjt och hälen uppe. Den andra foten är fri.`,
   }),
   'step-up': plantedFoot,
+  'step-down': plantedFoot,
   'single-leg-rdl': plantedFoot,
   'dead-bug': (side) => ({
     label: `${sideWord(side)} arm + ${otherWord(side)} ben`,

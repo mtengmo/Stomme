@@ -375,6 +375,15 @@ describe('top of the range', () => {
 });
 
 describe('pain gate', () => {
+  it('step-down holds its dose and flags the physio after stop pain', () => {
+    const previous = last('step-down', {
+      sets: 2,
+      target: 8,
+      load: 0,
+      pain: 'stop',
+    });
+    expectS(next('step-down', 2, 3, previous), 2, 8, 0, 'pain_stop_hold', true);
+  });
   it('warn on a knee-loaded exercise repeats exactly (no week 3 set)', () => {
     const l = last('split-squat', {
       sets: 2,

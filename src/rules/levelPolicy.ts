@@ -81,6 +81,7 @@ export function levelRankOf(level: TechnicalLevel): number {
 const heavySlots = new Set(['squat', 'hinge', 'row', 'horizontal-press']);
 /** One-sided or overhead work stays below the heaviest weight even in a heavy slot. */
 export const limitedExercises = new Set<ExerciseId>([
+  'step-down',
   'bosu-squat',
   'copenhagen-hold',
   'nordic-hamstring-curl',

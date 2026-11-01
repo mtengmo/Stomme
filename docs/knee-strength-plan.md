@@ -37,6 +37,12 @@ Verifiering: en fokuserad uppsättning innehålls-, utrustnings-, backup-, timer
 
 Tokenrapport sparas separat med mätbara lokala räknare, cache särredovisad och uttryckliga luckor. Ingen uppskattning presenteras som uppmätt kontoförbrukning.
 
+## E96 Nedsteg från steg
+
+Tillagd 2026-11-01 efter att användaren bekräftat instruktionstexten från [InStep Physiotherapy: Steps downs](https://education.instepphysio.ca/Injuries-Conditions/Knee/Exercises/Steps-downs/a~1087/article.html); sidan gav 403 vid egen kontroll. Stå på ett lågt steg med ena benet stadigt, håll i väggen vid behov och böj det stående knät kontrollerat medan den fria hälen sänks mot golvet. Stanna när hälen är 2–3 tum under steget och pressa tillbaka upp med stående ben. Håll knät i linje med andra tån; undvik att falla snabbt eller låta knät falla inåt. Lättare alternativ: lägre steg och handstöd. Repetitionsdosen är appens förslag, eftersom källan inte anger dos.
+
+E96 (`step-down`) är `kneeLoaded: true`, nivå `practiced`, utrustning `step`, och en biblioteksövning utan automatisk plats i rehab eller roster. Sidvalet avser benet som står kvar på steget. Referensen E96 är permanent; E85, E86 och E89 är fortfarande reserverade. E97 `toe-squat` förblir pausad tills en källa finns.
+
 ## Genomfort och verifierat
 
 Fem nya poster E90–E94 byggda; E11 ateranvands. Tre nya utrustningsval, totalt tio stodval, med kompatibel backupvalidering. Onboardingfiler ar ororda. 266 riktade tester passerade; efter kodnings- och hallbildskorrigeringen passerade ytterligare 101 riktade tester. Typkontroll och produktionsbygge passerade. Biome har fem befintliga varningar. Mobilkontroll vid 320/390 px gav ingen horisontell overflow for nagon av de fem; samlad figurgranskning omfattade rorelsefaser, sidval och minskad rorelse. Testloggar och bilder finns lokalt i `.impeccable/review/knee-strength/`.

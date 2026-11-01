@@ -587,7 +587,7 @@ export function SetScreen({
                       : 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
                     : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>
-            {['step-up', 'split-squat'].includes(exercise.id) ? (
+            {['step-up', 'step-down', 'split-squat'].includes(exercise.id) ? (
               <p className="m-0 text-base">
                 Fråga fysioterapeuten vilken höjd eller vilket rörelseomfång som
                 passar dig.

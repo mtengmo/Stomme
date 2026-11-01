@@ -1291,6 +1291,8 @@ export const exerciseMetadata = Object.fromEntries(
       metadata.easierExerciseId = 'glute-bridge';
     if (id === 'single-leg-floor-bridge') metadata.holdSeconds = 2;
     if (id === 'push-up') metadata.easierExerciseId = 'knee-push-up';
+    if (id === 'step-up' && !metadata.harderExerciseId)
+      metadata.harderExerciseId = 'step-down';
     if (id === 'wall-push-up') metadata.harderExerciseId = 'knee-push-up';
     if (id === 'knee-push-up') metadata.harderExerciseId = 'push-up';
     if (id === 'push-up') metadata.harderExerciseId = 'decline-push-up';

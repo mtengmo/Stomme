@@ -3,6 +3,26 @@ import type { Exercise } from '../domain/types';
 /** Editable editorial starting ranges, not a treatment prescription. */
 export const kneeStrengthExercises: Exercise[] = [
   {
+    id: 'step-down',
+    name: 'Nedsteg från steg',
+    muscles: ['Framsida lår', 'Säte'],
+    tips: [
+      'Ställ dig på ett lågt steg med ena benet stadigt nära kanten och den andra foten fri framför steget. Håll i väggen för stöd.',
+      'Böj det stående knät kontrollerat och sänk den fria hälen tills den är cirka 5–8 cm under stegets ovansida.',
+      'Tryck tillbaka upp med det stående benet. Håll knät i linje med andra tån och låt inte rörelsen ta fart framåt. Ned och upp är en repetition per ben.',
+    ],
+    commonMistake: 'Du faller ner snabbt eller låter knät falla inåt.',
+    easierVariant: 'Använd ett lägre steg och mer handstöd.',
+    unit: 'reps',
+    perSide: true,
+    sideKind: 'ben',
+    range: { start: 6, max: 10, step: 1 },
+    loadLadder: [{ kg: 0, label: 'Kroppsvikt' }],
+    startLoadIndex: 0,
+    week1LoadIndex: 0,
+    kneeLoaded: true,
+  },
+  {
     id: 'bosu-squat',
     name: 'Knäböj på BOSU',
     muscles: ['Framsida lår', 'Säte'],

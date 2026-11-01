@@ -30,6 +30,7 @@ import { KettlebellRackGrip } from './KettlebellRackGrip';
 
 const ASK_PHYSIO: Partial<Record<ExerciseId, string>> = {
   'step-up': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
+  'step-down': 'Fråga fysioterapeuten vilken steghöjd som passar dig.',
   'split-squat': 'Fråga fysioterapeuten hur djupt du ska gå ner.',
 };
 const MUSCLE_OVERLAY_EXERCISES = new Set<ExerciseId>([

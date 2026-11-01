@@ -10,6 +10,14 @@ const details: Record<
   string,
   [EquipmentType, TechnicalLevel, string, string, string, string]
 > = {
+  'step-down': [
+    'step',
+    'practiced',
+    'Det stående benet bromsar sänkningen med knät i linje med foten.',
+    'Steps downs',
+    'InStep Physiotherapy',
+    'https://education.instepphysio.ca/Injuries-Conditions/Knee/Exercises/Steps-downs/a~1087/article.html',
+  ],
   'bosu-squat': [
     'bosu',
     'technical',
@@ -95,8 +103,9 @@ export const kneeStrengthMetadata: Partial<
             note: `${exercise.id === 'bosu-squat' ? 'Tillverkaren avråder från att stå på plattformsidan. Appen visar kupolen uppåt. ' : exercise.id === 'nordic-hamstring-curl' ? 'Fixerade anklar, bromsad sänkning och handassisterad återgång. ' : ''}${doseNote}`,
           },
         ],
-        reviewedAt: '2026-10-30',
+        reviewedAt: exercise.id === 'step-down' ? '2026-11-01' : '2026-10-30',
         sidePolicy: exercise.perSide ? 'choose-side' : 'both',
+        ...(exercise.id === 'step-down' ? { easierExerciseId: 'step-up' } : {}),
         ...(exercise.id === 'bosu-squat'
           ? { easierExerciseId: 'goblet-chair-squat' }
           : {}),

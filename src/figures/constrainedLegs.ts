@@ -56,6 +56,7 @@ export function constrainLegInterpolation(
   if (
     ![
       'step-up',
+      'step-down',
       'split-squat',
       'reverse-lunge',
       'forward-lunge',
@@ -66,7 +67,9 @@ export function constrainLegInterpolation(
 
   const out = { ...pose };
   const anchor =
-    exerciseId === 'step-up' || exerciseId === 'split-squat'
+    exerciseId === 'step-up' ||
+    exerciseId === 'step-down' ||
+    exerciseId === 'split-squat'
       ? referencePoses[0]
       : exerciseId === 'single-leg-rdl'
         ? referencePoses.at(-1)

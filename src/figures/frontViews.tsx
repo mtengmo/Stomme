@@ -10,6 +10,7 @@ export const supportedFrontViews = [
   'dumbbell-rdl',
   'kettlebell-rack-carry',
   'step-up',
+  'step-down',
   'rear-foot-split-squat',
   'suitcase-carry',
   'reverse-lunge',
@@ -283,21 +284,39 @@ export function frontMovementPose(
       left.toe,
     );
   }
-  if (exerciseId === 'step-up' || exerciseId === 'rear-foot-split-squat') {
-    const step = exerciseId === 'step-up';
-    const hipY = step ? mix(108, 84, t) : mix(112, 140, t);
+  if (
+    exerciseId === 'step-up' ||
+    exerciseId === 'step-down' ||
+    exerciseId === 'rear-foot-split-squat'
+  ) {
+    const step = exerciseId === 'step-up' || exerciseId === 'step-down';
+    const down = exerciseId === 'step-down';
+    const hipY = down
+      ? mix(84, 98, t)
+      : step
+        ? mix(108, 84, t)
+        : mix(112, 140, t);
     const neckY = hipY - 44;
     // Feet occupy distinct depth planes: the support remains fixed while the
     // trailing foot rises (step-up) or rests on the rear bench (split squat).
     const selected = {
-      knee: point(82, step ? mix(117, 113, t) : mix(146, 155, t)),
+      knee: point(
+        82,
+        down ? mix(113, 122, t) : step ? mix(117, 113, t) : mix(146, 155, t),
+      ),
       ankle: point(82, step ? 143 : 174),
       toe: point(72, step ? 146 : 177),
     };
     const other = {
-      knee: point(118, step ? mix(140, 113, t) : mix(132, 155, t)),
-      ankle: point(120, step ? mix(174, 138, t) : 139),
-      toe: point(130, step ? mix(177, 141, t) : 142),
+      knee: point(
+        118,
+        down ? mix(113, 132, t) : step ? mix(140, 113, t) : mix(132, 155, t),
+      ),
+      ankle: point(
+        120,
+        down ? mix(143, 163, t) : step ? mix(174, 138, t) : 139,
+      ),
+      toe: point(130, down ? mix(146, 166, t) : step ? mix(177, 141, t) : 142),
     };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
@@ -620,7 +639,11 @@ export function FrontFigureFrame({
 
   return (
     <svg
-      viewBox={exerciseId === 'step-up' ? '14 0 164 188' : viewBox}
+      viewBox={
+        exerciseId === 'step-up' || exerciseId === 'step-down'
+          ? '14 0 164 188'
+          : viewBox
+      }
       role="img"
       aria-hidden="true"
       className="block h-auto w-full"
@@ -648,18 +671,33 @@ export function FrontFigureFrame({
           strokeDasharray="4 3"
         />
       ) : null}
-      {exerciseId === 'step-up' || exerciseId === 'rear-foot-split-squat' ? (
+      {exerciseId === 'step-up' ||
+      exerciseId === 'step-down' ||
+      exerciseId === 'rear-foot-split-squat' ? (
         <g
-          data-support={exerciseId === 'step-up' ? 'step' : 'rear-bench'}
+          data-support={
+            exerciseId === 'step-up' || exerciseId === 'step-down'
+              ? 'step'
+              : 'rear-bench'
+          }
           fill="var(--surface)"
           stroke="var(--equipment)"
           strokeWidth="2"
         >
           <rect
-            x={(exerciseId === 'step-up') === (working !== 'left') ? 61 : 107}
-            y={exerciseId === 'step-up' ? 146 : 142}
+            x={
+              (exerciseId === 'step-up' || exerciseId === 'step-down') ===
+              (working !== 'left')
+                ? 61
+                : 107
+            }
+            y={
+              exerciseId === 'step-up' || exerciseId === 'step-down' ? 146 : 142
+            }
             width="34"
-            height={exerciseId === 'step-up' ? 31 : 35}
+            height={
+              exerciseId === 'step-up' || exerciseId === 'step-down' ? 31 : 35
+            }
             rx="2"
           />
         </g>

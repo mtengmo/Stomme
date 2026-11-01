@@ -8,6 +8,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'plank-arm-lift': 'E71',
   'goblet-chair-squat': 'E01',
   'step-up': 'E02',
+  'step-down': 'E96',
   'single-leg-rdl': 'E03',
   'dead-bug': 'E04',
   'side-plank': 'E05',

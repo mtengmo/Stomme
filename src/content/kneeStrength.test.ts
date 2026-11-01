@@ -1,27 +1,47 @@
 import { describe, expect, it } from 'vitest';
 import { equipmentFits } from '../rules/equipment';
-import { allowedLevels, heavyStartAllowed } from '../rules/levelPolicy';
+import {
+  allowedLevels,
+  heavyStartAllowed,
+  movementSlots,
+} from '../rules/levelPolicy';
 import { repTempo } from '../rules/repTempo';
 import { exerciseMetadata } from './exerciseMetadata';
 import { exerciseReferences } from './exerciseReferences';
 import { exerciseSideCue } from './exerciseSideCues';
 import { exercises } from './exercises';
+import { kneeRehabExercises } from './kneeRehab';
 import { kneeStrengthExercises } from './kneeStrengthExercises';
 import {
   equipmentChoices,
   isTrainingPreferences,
   isWorkoutEquipment,
 } from './programmes';
+import { generalSlots, runningEasier } from './rosterSlots';
 
 describe('knee strength catalogue contracts', () => {
-  it('adds five stable references with editable doses and bodyweight only', () => {
-    expect(kneeStrengthExercises.map((e) => exerciseReferences[e.id])).toEqual([
-      'E90',
-      'E91',
-      'E92',
-      'E93',
-      'E94',
-    ]);
+  it('keeps step-down as a library-only, knee-loaded per-leg exercise', () => {
+    const id = 'step-down';
+    expect(exercises[id]).toMatchObject({
+      perSide: true,
+      sideKind: 'ben',
+      kneeLoaded: true,
+      range: { start: 6, max: 10, step: 1 },
+    });
+    expect(exerciseMetadata[id].easierExerciseId).toBe('step-up');
+    expect(exerciseMetadata['step-up'].harderExerciseId).toBe(id);
+    expect(exerciseMetadata[id].reviewedAt).toBe('2026-11-01');
+    expect(movementSlots[id]).toBeUndefined();
+    expect(JSON.stringify(generalSlots)).not.toContain(id);
+    expect(JSON.stringify(runningEasier)).not.toContain(id);
+    expect(kneeRehabExercises.map((e) => e.id)).not.toContain(id);
+    for (const ref of ['E85', 'E86', 'E89', 'E97'])
+      expect(Object.values(exerciseReferences)).not.toContain(ref);
+  });
+  it('adds stable references with editable doses and bodyweight only', () => {
+    expect(
+      kneeStrengthExercises.map((e) => exerciseReferences[e.id]).sort(),
+    ).toEqual(['E90', 'E91', 'E92', 'E93', 'E94', 'E96']);
     expect(exercises['wall-sit'].range.start).toBe(30);
     expect(exerciseReferences['wall-sit']).toBe('E11');
     expect(exerciseReferences['bench-side-plank-leg-lift']).toBe('E42');

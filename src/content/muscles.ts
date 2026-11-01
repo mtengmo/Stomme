@@ -141,6 +141,11 @@ export const exerciseMuscles: Record<
     secondary: [],
     qualities: [],
   },
+  'step-down': {
+    primary: ['quads', 'glutes'],
+    secondary: ['core'],
+    qualities: [],
+  },
   'single-leg-rdl': {
     primary: ['hamstrings', 'glutes'],
     secondary: ['core'],

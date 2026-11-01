@@ -3,6 +3,7 @@ import { lerpPt, type Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 
 export type KneeStrengthId =
+  | 'step-down'
   | 'bosu-squat'
   | 'copenhagen-hold'
   | 'nordic-hamstring-curl'
@@ -40,6 +41,32 @@ const body = (
   aL: Pt,
   tL: Pt,
 ): Pose => ({ head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL });
+
+/** Supporting foot stays on the step as the other heel drops beyond its edge. */
+export function stepDownPose(t: number): Pose {
+  const q = clamp(t),
+    ankle: Pt = [108, 143],
+    toe: Pt = [121, 146];
+  const hip: Pt = [103 - 7 * q, 81 + 14 * q];
+  const neck = polar(hip, 42, -Math.PI / 2 + 0.05 * q);
+  const freeAnkle: Pt = [142, 145 + 20 * q];
+  const hand: Pt = [65, 77];
+  return body(
+    [neck[0] + 2, neck[1] - 15],
+    neck,
+    hip,
+    joint(neck, hand, 25, 25),
+    hand,
+    [neck[0] + 12, neck[1] + 20],
+    [neck[0] + 14, neck[1] + 40],
+    joint(hip, ankle, 32, 31, -1),
+    ankle,
+    toe,
+    joint(hip, freeAnkle, 39, 39, -1),
+    freeAnkle,
+    [155, freeAnkle[1] + 3],
+  );
+}
 
 export function bosuSquatPose(t: number): Pose {
   const q = clamp(t),
@@ -182,6 +209,8 @@ export function kneeStrengthMovementPose(
   t: number,
 ): Pose | undefined {
   switch (id) {
+    case 'step-down':
+      return stepDownPose(t);
     case 'bosu-squat':
       return bosuSquatPose(t);
     case 'copenhagen-hold':
@@ -197,6 +226,14 @@ export function kneeStrengthMovementPose(
   }
 }
 export const kneeStrengthFigures: Record<KneeStrengthId, FigureSpec> = {
+  'step-down': {
+    start: stepDownPose(0),
+    end: stepDownPose(1),
+    props: [
+      { type: 'step', x: 91, y: 146, w: 36 },
+      { type: 'wall', x: 62 },
+    ],
+  },
   'bosu-squat': {
     start: bosuSquatPose(0),
     end: bosuSquatPose(1),

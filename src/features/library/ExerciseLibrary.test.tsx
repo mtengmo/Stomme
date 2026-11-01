@@ -11,7 +11,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Link, Route, Router, Switch } from 'wouter';
-import { exercises } from '../../content/exercises';
+import { exerciseList, exercises } from '../../content/exercises';
 import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
 import { getDb } from '../../db/db';
 import { toggleFavourite } from '../../db/favourites';
@@ -52,6 +52,17 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('exercise library', () => {
+  it('finds step-down by its Swedish alias', async () => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    await user.type(screen.getByLabelText('Sök övning'), 'nedsteg');
+    expect(
+      screen.getByRole('link', { name: exercises['step-down'].name }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole('link', { name: exercises['step-up'].name }),
+    ).toBeNull();
+  });
   it('shows compact rows by default: name, one meta line and a 48 px toggle, no extras', () => {
     render(<TestRoutes />);
     const row = screen
@@ -89,7 +100,9 @@ describe('exercise library', () => {
   it('shows all exercises, equipment, template links and optional status', () => {
     detailed();
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('91 övningar');
+    expect(screen.getByRole('status').textContent).toBe(
+      `${exerciseList.length} övningar`,
+    );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
     ).toBe('true');
@@ -164,7 +177,9 @@ describe('exercise library', () => {
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     window.history.back();
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('91 övningar'),
+      expect(screen.getByRole('status').textContent).toBe(
+        `${exerciseList.length} övningar`,
+      ),
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -174,7 +189,9 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
-    expect(screen.getByRole('status').textContent).toBe('91 övningar');
+    expect(screen.getByRole('status').textContent).toBe(
+      `${exerciseList.length} övningar`,
+    );
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
 
@@ -238,7 +255,9 @@ describe('exercise library', () => {
     expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
     await waitFor(() =>
-      expect(screen.getByRole('status').textContent).toBe('91 övningar'),
+      expect(screen.getByRole('status').textContent).toBe(
+        `${exerciseList.length} övningar`,
+      ),
     );
   });
 

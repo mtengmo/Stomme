@@ -21,6 +21,7 @@ describe('authored frontal demonstrations', () => {
       'dumbbell-rdl',
       'kettlebell-rack-carry',
       'step-up',
+      'step-down',
       'rear-foot-split-squat',
       'suitcase-carry',
       'reverse-lunge',

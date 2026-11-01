@@ -50,6 +50,7 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   crunch: ['Situps', 'Sit-ups', 'Crunch', 'Magövning'],
   'goblet-chair-squat': ['Stolknäböj', 'Gobletknäböj till stol', 'Chair squat'],
   'step-up': ['Uppsteg på låda', 'Uppsteg', 'Step up', 'Step-up'],
+  'step-down': ['Step down', 'Step-down', 'Nedsteg', 'Excentriskt nedsteg'],
   'single-leg-rdl': [
     'Enbensmarklyft',
     'Enbens rumänskt marklyft',

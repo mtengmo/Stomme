@@ -37,6 +37,7 @@ describe('contact aware knee figures', () => {
         ['nordic-hamstring-curl', ['kR', 'kL', 'aR', 'aL']],
         ['wall-tibialis-raise', ['aR', 'aL']],
         ['bent-knee-calf-hold', ['tR']],
+        ['step-down', ['aR', 'tR']],
       ] as const)
         for (const key of keys)
           expect(movementPose(id, phase)[key]).toEqual(
@@ -90,6 +91,20 @@ describe('contact aware knee figures', () => {
     const bottom = movementPose('bosu-squat', 1);
     expect(distance(bottom.hip, bottom.aR)).toBeGreaterThanOrEqual(47);
     expect(distance(bottom.hip, bottom.aL)).toBeGreaterThanOrEqual(47);
+  });
+  it('lowers the free heel past the step while the supporting foot stays planted', () => {
+    const start = movementPose('step-down', 0),
+      end = movementPose('step-down', 1);
+    expect(start.aR).toEqual(end.aR);
+    expect(end.aL[0]).toBeGreaterThan(127);
+    expect(end.aL[1]).toBeGreaterThan(146);
+    expect(end.aL[1]).toBeGreaterThan(start.aL[1]);
+    expect(figures['step-down'].props).toContainEqual({
+      type: 'step',
+      x: 91,
+      y: 146,
+      w: 36,
+    });
   });
   it('renders specialty supports and holds in session stills', () => {
     for (const id of ['copenhagen-hold', 'bent-knee-calf-hold'] as const) {

@@ -5,6 +5,7 @@ export type ExerciseId =
   | 'plank-arm-lift'
   | 'goblet-chair-squat'
   | 'step-up'
+  | 'step-down'
   | 'single-leg-rdl'
   | 'dead-bug'
   | 'side-plank'
