@@ -42,10 +42,7 @@ export function groupOf(workout: WorkoutGroupInput): WorkoutGroup {
   if (muscles.every((muscle) => pull.has(muscle))) return 'pull';
   if (muscles.every((muscle) => legs.has(muscle))) return 'legs';
   if (muscles.every((muscle) => upper.has(muscle))) return 'upper';
-  if (
-    muscles.some((muscle) => upper.has(muscle)) &&
-    muscles.some((muscle) => legs.has(muscle))
-  )
-    return 'full';
-  return 'other';
+  // Every non-core muscle belongs to upper or legs; remaining combinations
+  // necessarily contain both after the single-region checks above.
+  return 'full';
 }

@@ -10,6 +10,32 @@ const workout = (
 ) => ({ id, exerciseIds, group });
 const options = { workouts: [], daysPerWeek: 3 as const, recent: {}, now };
 describe('weekly suggestions', () => {
+  const allMuscles = [
+    workout('all', [
+      'push-up',
+      'shoulder-press',
+      'glute-bridge',
+      'back-extension',
+      'hammer-curl',
+    ]),
+  ];
+  it('backtracks away from a full-body day when an adjacent day has no disjoint candidate', () => {
+    const result = suggestWeek({
+      ...options,
+      workouts: allMuscles,
+      daysPerWeek: 4,
+    });
+    expect(weekConflicts(result.schedule, allMuscles)).toEqual([]);
+  });
+  it('keeps recovery advisory when no free day avoids occupied full-body neighbors', () => {
+    const result = suggestWeek({
+      ...options,
+      workouts: allMuscles,
+      recent: { chest: now.getTime() },
+    });
+    expect(result.notes.join(' ')).toContain('överlappar nyligen');
+    expect(new Set(result.schedule.days.map((d) => d.day)).size).toBe(3);
+  });
   it('uses deterministic templates, fills shortages with complete presets, and never mutates input', () => {
     for (const [count, days] of [
       [2, [1, 4]],
