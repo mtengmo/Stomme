@@ -161,8 +161,10 @@ describe('figure geometry ratchet', () => {
       .map(([k, v]) => `${k}: ${v} (baseline ${baseline[k] ?? 'none'})`);
     expect(worse).toEqual([]);
   });
-  it('fixed figures have their baseline row removed', () => {
-    const stale = Object.keys(baseline).filter((k) => !(k in current));
+  it('fixed or improved figures have their baseline row lowered or removed', () => {
+    const stale = Object.entries(baseline)
+      .filter(([k, v]) => (current[k] ?? 0) < v - 0.1)
+      .map(([k, v]) => `${k}: baseline ${v}, now ${current[k] ?? 'ok'}`);
     expect(stale).toEqual([]);
   });
 });

@@ -88,12 +88,10 @@ describe('sumo squat figure geometry', () => {
       [start.kR, start.aR],
       [start.kL, start.aL],
     ] as const) {
-      // Standing legs are within half a unit of fully extended (IK, 30.8 + 26.5).
-      expect(
-        distance(start.hip, knee) +
-          distance(knee, ankle) -
-          distance(start.hip, ankle),
-      ).toBeLessThan(0.5);
+      expect(distance(start.hip, knee) + distance(knee, ankle)).toBeCloseTo(
+        distance(start.hip, ankle),
+        2,
+      );
     }
 
     for (let frame = 0; frame <= 20; frame++) {
