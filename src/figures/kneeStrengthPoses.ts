@@ -50,7 +50,8 @@ export function stepDownPose(t: number): Pose {
     toe: Pt = [121, 146];
   const hip: Pt = [103 - 7 * q, 81 + 14 * q];
   const neck = polar(hip, 42, -Math.PI / 2 + 0.05 * q);
-  const freeAnkle: Pt = [142, 145 + 20 * q];
+  // A modest heel drop keeps the free leg within its two 39-unit segments.
+  const freeAnkle: Pt = [140, 145 + 13 * q];
   const hand: Pt = [65, 77];
   return body(
     [neck[0] + 2, neck[1] - 15],
@@ -65,7 +66,7 @@ export function stepDownPose(t: number): Pose {
     toe,
     joint(hip, freeAnkle, 39, 39, -1),
     freeAnkle,
-    [155, freeAnkle[1] + 3],
+    [153, freeAnkle[1] + 3],
   );
 }
 

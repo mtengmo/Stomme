@@ -9,6 +9,25 @@ const phases = Array.from({ length: 41 }, (_, i) => i / 40);
 const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
 describe('contact aware knee figures', () => {
+  it('keeps both step-down legs reachable with fixed thigh, shin and foot lengths', () => {
+    for (const phase of phases) {
+      const pose = movementPose('step-down', phase);
+      for (const [knee, ankle, toe, thigh, shin] of [
+        ['kR', 'aR', 'tR', 32, 31],
+        ['kL', 'aL', 'tL', 39, 39],
+      ] as const) {
+        expect(distance(pose.hip, pose[ankle])).toBeLessThanOrEqual(
+          thigh + shin,
+        );
+        expect(distance(pose.hip, pose[knee])).toBeCloseTo(thigh, 8);
+        expect(distance(pose[knee], pose[ankle])).toBeCloseTo(shin, 8);
+        expect(distance(pose[ankle], pose[toe])).toBeCloseTo(
+          Math.hypot(13, 3),
+          8,
+        );
+      }
+    }
+  });
   it('frames the step-down head and floor throughout the movement', () => {
     for (const phase of [0, 0.5, 1]) {
       const pose = movementPose('step-down', phase);

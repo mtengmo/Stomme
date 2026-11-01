@@ -338,9 +338,9 @@ export function frontMovementPose(
       ),
       ankle: point(
         120,
-        down ? mix(143, 163, t) : step ? mix(174, 138, t) : 139,
+        down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
       ),
-      toe: point(130, down ? mix(146, 166, t) : step ? mix(177, 141, t) : 142),
+      toe: point(130, down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142),
     };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
