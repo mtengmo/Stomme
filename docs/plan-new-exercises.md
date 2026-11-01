@@ -50,7 +50,7 @@ Texterna får inte lova effekter på VMO eller knäskålens bana. Använd "Trän
 - Inte `impactExercises`: inget lämnar golvet och inget landas, så smärtfiltret ska inte dölja den. Handleds- och axelvarningen finns i noten. Inte i något roster.
 - Inte `FIXED_REP_MS` och inte sekvensfigur: vanlig kontrollerad takt (ca 2 s framåt, 2 s tillbaka).
 - Progression: länkad som tidigare från `push-up` (`diamond-push-up`, `blast-off-push-up`) och `easierExerciseId = 'push-up'`.
-- Animation: `blastOffPushUp(t)` med fasta händer och tår, konstanta segmentlängder, knän över golvet. t=0 höften bakåt, t=1 låg planka. Reducerad rörelse visar det låga läget. Granskas i `/dev/figurer`.
+- Animation: `blastOffPushUp(t)` med fasta händer och tår, konstanta segmentlängder, knän över golvet. t=0 höften bakåt, t=1 låg planka. Reducerad rörelse visar start (höften bakåt) och slut (låg planka). Granskas i `/dev/figurer`.
 
 **Tester:** pose (fasta kontakter, segmentlängder, axelrörelse, knä ovanför golv), `repTempo` (ingen fast takt), `programRosters` (inte impact, inte i roster), källa (Stomme, ingen URL), muskler inklusive quads, progressionens smärtfall.
 

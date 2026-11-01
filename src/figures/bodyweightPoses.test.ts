@@ -81,7 +81,7 @@ describe('bodyweight movement paths', () => {
       expect(distance(p.eR, p.hR)).toBeCloseTo(22.5, 6);
       expect(p.kR[1]).toBeLessThan(174);
       expect(p.kL[1]).toBeLessThan(174);
-      expect(p.head[1]).toBeLessThan(174);
+      expect(p.head[1] + 9).toBeLessThan(170);
       expect(p.head[0]).toBeGreaterThan(0);
     }
     // Hips back and knees bent, shoulders behind the hands.

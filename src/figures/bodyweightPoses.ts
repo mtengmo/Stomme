@@ -132,7 +132,7 @@ function blastOffPushUp(t: number): Pose {
   const hipAngle = mix(-2.075, -3.02, t);
   // The legs are straight well before the chest reaches the hands.
   const hip = polar(ankle, mix(48.2, 64, Math.min(1, t / 0.75)), hipAngle);
-  const trunk = mix(2.581, 3.263, t);
+  const trunk = mix(2.75, 3.263, t);
   const neck = polar(hip, 46, trunk);
   // The far leg runs parallel to the near one, as in the push-up.
   const farHip: Pt = [hip[0] - 3, hip[1] - 3];
