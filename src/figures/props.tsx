@@ -100,6 +100,17 @@ export function PropShape({ prop }: { prop: Prop }) {
     }
     case 'wall':
       return <line x1={prop.x} y1="16" x2={prop.x} y2={FLOOR_Y} {...PROP} />;
+    case 'rail':
+      return (
+        <line
+          data-equipment="rail"
+          x1={prop.x1}
+          y1={prop.y}
+          x2={prop.x2}
+          y2={prop.y}
+          {...PROP}
+        />
+      );
     case 'mat':
       return (
         <rect

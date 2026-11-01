@@ -11,8 +11,9 @@ import type { Pose, Prop } from './poses';
 /**
  * E96 step-down as a keyframe pilot. Standing leg (near side, R) stays planted
  * on the step and bends as the hip lowers; the far leg hangs forward past the
- * step edge, the heel taps the floor, pauses, and the body rises again. The
- * hand rests on the wall. Everything is authored as a few numbers per keyframe
+ * step edge, the heel stops about 5-8 cm below the step (it does not touch the
+ * floor), pauses, and the body rises again. The far hand rests on a banister
+ * beside the body. Everything is authored as a few numbers per keyframe
  * and rendered through two-bone IK, so segment lengths cannot drift.
  *
  * Coordinates match the existing figures: 200x200 box, facing right, floor at
@@ -20,11 +21,13 @@ import type { Pose, Prop } from './poses';
  * Figure.tsx does it.
  */
 
+const RAIL_Y = 106;
+
 export const STEP_DOWN_PILOT_PROPS: Prop[] = [
-  // A step of roughly 20 cm at this scale. The catalogue figure uses a step
-  // twice as tall, which keeps its heel from ever reaching the floor.
+  // Stair height: 14 units, roughly 19 cm at this scale (the catalogue
+  // figure uses a step of about 43 cm).
   { type: 'step', x: 84, y: 164, w: 34 },
-  { type: 'wall', x: 62 },
+  { type: 'rail', x1: 70, x2: 132, y: RAIL_Y },
 ];
 
 export const STEP_DOWN_VIEWBOX = [14, 0, 164, 188] as const;
@@ -53,75 +56,54 @@ export interface StepDownValues extends Record<string, number> {
   footY: number;
   /** Free foot angle below horizontal (negative = toes up). */
   footAngle: number;
-  /** Hand on the wall, vertical position. */
-  handY: number;
 }
 
-const TAP = {
-  hipX: 97,
-  hipY: 111,
-  lean: 0.2,
-  footX: 122,
-  footY: 172.5,
-  footAngle: -0.25,
-  handY: 90,
+const LOWEST = {
+  hipX: 98,
+  hipY: 106,
+  lean: 0.15,
+  footX: 124,
+  footY: 166,
+  footAngle: -0.1,
+};
+const STANDING = {
+  hipX: 100,
+  hipY: 96,
+  lean: 0.03,
+  footX: 124,
+  footY: 150,
+  footAngle: 0.5,
 };
 
 export const STEP_DOWN_KEYFRAMES: readonly Keyframe<StepDownValues>[] = [
-  {
-    t: 0,
-    name: 'Stående på steget',
-    values: {
-      hipX: 100,
-      hipY: 96,
-      lean: 0.03,
-      footX: 124,
-      footY: 150,
-      footAngle: 0.5,
-      handY: 82,
-    },
-  },
+  { t: 0, name: 'Stående på steget', values: { ...STANDING } },
   {
     t: 0.3,
     name: 'Sänker',
     values: {
-      hipX: 98,
-      hipY: 103,
-      lean: 0.11,
+      hipX: 99,
+      hipY: 101,
+      lean: 0.09,
       footX: 124,
-      footY: 163,
-      footAngle: 0.25,
-      handY: 85,
+      footY: 159,
+      footAngle: 0.2,
     },
   },
-  { t: 0.5, name: 'Hälen i golvet', values: { ...TAP } },
-  { t: 0.58, name: 'Paus', values: { ...TAP } },
+  { t: 0.5, name: 'Lägsta punkt', values: { ...LOWEST } },
+  { t: 0.58, name: 'Paus', values: { ...LOWEST } },
   {
     t: 0.8,
     name: 'Reser sig',
     values: {
       hipX: 99,
-      hipY: 102,
-      lean: 0.1,
+      hipY: 100,
+      lean: 0.08,
       footX: 124,
-      footY: 160,
-      footAngle: 0.3,
-      handY: 85,
+      footY: 157,
+      footAngle: 0.25,
     },
   },
-  {
-    t: 1,
-    name: 'Stående på steget',
-    values: {
-      hipX: 100,
-      hipY: 96,
-      lean: 0.03,
-      footX: 124,
-      footY: 150,
-      footAngle: 0.5,
-      handY: 82,
-    },
-  },
+  { t: 1, name: 'Stående på steget', values: { ...STANDING } },
 ];
 
 /** Pose for working side R, as the renderer wants it (mirrors itself for L). */
@@ -136,10 +118,18 @@ export function stepDownKeyframePose(t: number): Pose {
     ankle[0] + FOOT * Math.cos(angle),
     ankle[1] + FOOT * Math.sin(angle),
   ];
-  const nearArm = solveTwoBone(neck, [65, v.handY], UPPER_ARM, FOREARM, -1);
+  // Far (grey) hand rests on the banister beside the body; the near (blue)
+  // arm hangs relaxed, slightly forward. Elbows point backwards.
   const farArm = solveTwoBone(
     neck,
-    [neck[0] + 8, neck[1] + 44],
+    [v.hipX + 16, RAIL_Y],
+    UPPER_ARM,
+    FOREARM,
+    1,
+  );
+  const nearArm = solveTwoBone(
+    neck,
+    [neck[0] + 12, neck[1] + 46],
     UPPER_ARM,
     FOREARM,
     1,
@@ -187,6 +177,8 @@ export function stepDownWorldPose(t: number, side: 'right' | 'left'): Pose {
 export function mirrorProp(prop: Prop): Prop {
   if (prop.type === 'step') return { ...prop, x: MIRROR_X - prop.x - prop.w };
   if (prop.type === 'wall') return { ...prop, x: MIRROR_X - prop.x };
+  if (prop.type === 'rail')
+    return { ...prop, x1: MIRROR_X - prop.x2, x2: MIRROR_X - prop.x1 };
   return prop;
 }
 

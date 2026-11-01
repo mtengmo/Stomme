@@ -51,6 +51,7 @@ export type Prop =
   | { type: 'chair'; x: number; y: number; w: number }
   | { type: 'step'; x: number; y: number; w: number }
   | { type: 'wall'; x: number }
+  | { type: 'rail'; x1: number; x2: number; y: number }
   | { type: 'mat'; x1: number; x2: number }
   | { type: 'pull-up-bar'; x1: number; x2: number; y: number }
   | { type: 'dip-bars'; x: number; y: number; w: number };

@@ -6,8 +6,12 @@ Piloten ändrar ingen övning i katalogen. E96 är oförändrad.
 ## Vad piloten visade
 
 - `src/figures/keyframes.ts`: nyckelrutor med lättnad, tvåbens-IK (höft-knä-fotled, axel-armbåge-handled) och `checkPoseGeometry`.
-- `src/figures/stepDownKeyframes.ts`: E96 som sex nyckelrutor (fyra olika poser, hållet vid hälnedslaget och loopen sluter).
-- Dagens E96 klarar inte grinden: höger och vänster ben är olika långa (63 mot 78) och den närmaste armen ändrar längd med cirka 2 enheter under rörelsen. Hälen når heller aldrig golvet, eftersom steget är 32 enheter högt (cirka hälften av benlängden).
+- `src/figures/stepDownKeyframes.ts`: E96 som sex nyckelrutor (fyra olika poser, hållet i lägsta punkten och loopen sluter).
+- Dagens E96 klarar inte grinden och har fyra fel, som är skälet att migrera den först:
+  1. Benen är olika långa (63 mot 78 enheter).
+  2. Den närmaste armen ändrar längd med cirka 2 enheter under rörelsen.
+  3. Steget är för högt (32 enheter, cirka 43 cm) och höften/foten går för djupt (cirka 20 cm under steget).
+  4. Källan (InStep) säger "stanna när hälen är 2-3 tum under steget", alltså cirka 5-8 cm. Hälen ska inte nå golvet. Piloten stannar därför cirka 5-8 cm under ett steg i trapphöjd (14 enheter, cirka 19 cm) och stödjer handen på ett räcke.
 
 ## Steg
 

@@ -234,8 +234,10 @@ export function FigureComparison() {
           Kontrollen prövar {FRAME_COUNT + 1} rutor per version: fötter under
           golvet, utanför bilden eller inne i steget, huvudets avstånd,
           lemlängder som ändras eller skiljer mellan sidorna, och att sista
-          rutan är lika med första. Den nya versionen använder ett lägre steg
-          (cirka 20 cm) så att hälen verkligen når golvet.
+          rutan är lika med första. Piloten använder ett steg i trapphöjd (cirka
+          19 cm) och hälen stannar 5 till 8 cm under steget, utan att nå golvet.
+          Dagens E96 har ett steg på cirka 43 cm och går cirka 20 cm under det,
+          vilket är djupare än källan säger.
         </p>
       </section>
     </div>
