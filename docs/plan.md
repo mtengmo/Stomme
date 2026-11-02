@@ -1,5 +1,7 @@
 # Stomme: MVP build plan
 
+> Historiskt dokument. Det gamla knäprogrammet och tabellen `PainLog` är borttagna (Dexie v3, backup v4). Se `docs/plan-pain-rehab-only.md`.
+
 Author: architect-einstein, saved 2026-10-18. Source: `docs/spec.md`. Greenfield repo.
 Scope: 10 exercises (+ optional wall sit), Android Chrome PWA, local data only, no sync/Garmin/accounts. UI text Swedish; code, identifiers, comments English.
 

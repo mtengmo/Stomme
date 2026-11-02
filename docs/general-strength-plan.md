@@ -30,7 +30,7 @@ Examples:
 
 On small screens, show purpose and search directly; put the remaining options behind “Fler filter” with an active-filter count. Preserve the bounded exercise reader and visible close/back controls.
 
-“Mitt program” is exact membership. “Knäfokus” and “Löpstyrka” are overlapping curated collections, not synonyms for that membership. Never derive them from the existing `kneeLoaded` flag: that flag currently controls pain-related progression logic, not suitability. A “Rehab” shortcut should mean the user's actual rehab programme, with no universal “rehab-safe” badge.
+“Mitt program” is exact membership. “Knäfokus” and “Löpstyrka” are overlapping curated collections, not synonyms for that membership. Never derive them from the existing `kneeLoaded` flag: that flag is now metadata only (the pain progression logic was removed in plan-pain-rehab-only P3), not suitability. A “Rehab” shortcut should mean the user's actual rehab programme, with no universal “rehab-safe” badge.
 
 ## Proposed additions
 

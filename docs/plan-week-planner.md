@@ -63,7 +63,7 @@ Ny ren `rules/weekSuggestion.ts`: `suggestWeek({workouts, daysPerWeek 2–5, pre
 ## U6. "Idag: X" på Hem (Sonnet)
 
 `TrainingHome.tsx`: om dagens datum är en planerad dag (med hänsyn till `moved`) och inget pass är klart ännu, säger huvudkortet **"Idag: Press"** och länkar till `/traning/A?workout=id` eller `/traning/{nextId}?fokus=push`. Annars visas "Nästa pass" som i dag plus en rad som "Nästa planerade: torsdag · Drag". Läser `days[].plan` direkt. Den muskelspecifika vilanteckningen från T4 är rådgivande text på kortet och blockerar aldrig. Raden "Dagens fokus" från T6 låter dig fortfarande byta.
-Alla smärtgrindar nås fortfarande via `TrainingPreview`. Kopian ska vara rådgivande ("förslag"), inte ett måste träna.
+Alla rehabgrindar nås fortfarande via `TrainingPreview`; ventilen för vanliga pass bor i passkörningen så att varje ingång når den. Kopian ska vara rådgivande ("förslag"), inte ett måste träna.
 
 ## U7. E2E (Sonnet)
 
@@ -74,7 +74,7 @@ Alla smärtgrindar nås fortfarande via `TrainingPreview`. Kopian ska vara rådg
 
 ## U8. Säkerhetsgranskning (Opus, reviewer)
 
-Rehab- och fysioisolering, att smärtgrindarna nås från "Idag"-kortet, att kopian är rådgivande, att schemaändringarna inte lämnar dinglande id.
+Rehab- och fysioisolering, att rehabgrindarna nås från "Idag"-kortet, ventilen för vanliga pass bor i passkörningen så att varje ingång når den, att kopian är rådgivande, att schemaändringarna inte lämnar dinglande id.
 
 ## U9. Docs (Haiku)
 
@@ -85,7 +85,7 @@ En rad i `docs/next-plan.md`. Uppdatera copyn "Välj en till tre dagar".
 - Höjningen av dagsgränsen från 3 till 5 ändrar copy och befintliga tester.
 - Dinglande pass-id i veckoplanen (täcks i U1).
 - Egna pass är globala, så gruppering beror på det aktuella programmet.
-- Planen kan läsas som en regel att träna oavsett läge. Håll copyn rådgivande, och smärtgrindarna gäller alltid.
+- Planen kan läsas som en regel att träna oavsett läge. Håll copyn rådgivande, och rehabgrindarna gäller alltid. Ventilen för vanliga pass bor i passkörningen så att varje ingång når den.
 - Hemmets höjd med "Idag"-kortet vid 360x640 / 130 %.
 
 ## Öppna frågor (förval inom hakparentes)

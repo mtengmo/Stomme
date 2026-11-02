@@ -39,11 +39,11 @@ Rör inte övningsinnehållet (E95/E96/E98 rättas på en annan gren, E97 är pa
 
 ## Säkerhet (får inte ändras)
 
-- Rehab: tidig retur i `buildRoster`, rehabgrenen i `defaultPlan`, AAOS- och fysioplanerna, `startReadiness`, careState-stopp, smärtcheck-ins, `symptomsOnRecord` och `impactExercises`-uteslutning är orörda.
+- Rehab: tidig retur i `buildRoster`, rehabgrenen i `defaultPlan`, AAOS- och fysioplanerna, `startReadiness`, rehabincheckningar och stoppet "Avbryt – det gör ont" är orörda. (Globala smärtfilter är borttagna för vanliga pass, se `plan-pain-rehab-only.md` P1.)
 - Hem och `/fokus` länkar bara till `/traning/:id`. Grindarna i `TrainingPreview` är fortfarande enda vägen att starta.
 - Fokusväljaren döljs för rehab. Rehabpass får inget `focus`-fält.
-- Alla övningar väljs via befintliga `pickFromSlot` (utrustning, registrerad vikt, nivåfönster, lättaste-fallback-not, impact-uteslutning vid `painOnRecord`, `rehabAdditionIds`).
-- Återhämtningsförslaget är rådgivande. Det blockerar aldrig och ändrar aldrig smärtgrindar.
+- Alla övningar väljs via befintliga `pickFromSlot` (utrustning, registrerad vikt, nivåfönster, lättaste-fallback-not, `rehabAdditionIds`). Smärta filtrerar inte längre rostret.
+- Återhämtningsförslaget är rådgivande. Det blockerar aldrig och ändrar aldrig rehabgrindar.
 
 ## Uppgifter i ordning
 
@@ -60,7 +60,7 @@ Källa:
 - Historik och rapporter: `features/history/History.tsx` (~rad 206), `rules/physioReport.ts` (~rad 14, 23), `rules/progressOverview.ts` (~rad 29), `features/history/ProgressOverview.tsx` (~rad 23).
 - Copy: `features/onboarding/Onboarding.tsx` (~rad 42), `features/library/ExerciseLibrary.tsx` (~rad 168).
 - Behåll biblioteksetiketten "Löpstyrka" (`Purpose 'running'`, `runningReasons` i `content/exerciseMetadata.ts`). Den beskriver övningar och inte ett program.
-- Behåll `content/templates.ts` (används av det gamla programmet, se T0-L nedan).
+- Behåll `content/templates.ts` och `rules/prescription.ts` även efter T0-L (de raderades inte i P3).
 
 Tester som uppdateras eller tas bort (grep på `running`, varje träff raderas eller byts till `general`):
 - `programRosters.test.ts` (~rad 51, 83, 106, 121, 282), `content/kneeStrength.test.ts` (~rad 41, 57, `runningEasier`), `quickStartModel.test.ts`, `quickStart.test.tsx`, `setupOwnWorkouts.test.tsx`, `db/training.test.ts`, `db/trainingRoutines.test.ts`, `db/session.test.ts`, `db/sessionTimeout.test.ts`, `physioReport.test.ts`, `progressOverview.test.ts`, `shortWorkout.test.ts`, `pain.test.ts`, `training.test.ts`, `weightInventory.test.ts`, `exerciseProgression.test.ts`.
@@ -87,7 +87,7 @@ Klart när: ingen `running`-träff återstår utanför `content/templates.ts` (g
 - Tester i `programRosters.test.ts` (100 % grenar i `src/rules`):
   - per preset × erfarenhet × A/B: 3–6 unika övningar som passar
   - Press innehåller aldrig en övning med ben som huvudmuskel
-  - impact uteslutet med `painOnRecord`
+  - impact ingår inte i rostret när en användare har registrerat symptom (`painOnRecord` borttagen i P1, så inget smärtfilter längre)
   - rehab ger `[]`
   - `full` är lika med gamla `wholeBody` (ögonblicksbild)
   - uppdatera befintliga kroppsdelstester (~rad 183-222)
@@ -118,11 +118,11 @@ Eftersom scheman får ändras direkt:
 
 - Ny `tests/e2e/start-focus.spec.ts` vid 320x640, 390x844 och 360x640 130 %, ljust och mörkt.
 - Utöka `no-dead-scroll.spec.ts` med `/fokus` och Hem med fokusraden.
-- Smärtväg: rapportera ett symptom, sedan har Press-rostret ingen impact-övning och startar på lättaste vikt.
+- Smärtväg (ändrad i P1): ett registrerat symptom ändrar inte rostret eller vikterna för vanliga användare. "Det gör ont" på en övning ger bara en notering i förhandsvisningen och hoppar inte över övningen av sig själv.
 
 ### T8. Säkerhetsgranskning (Opus, reviewer)
 
-Rosterlistorna och bibliotekslistan, smärtgrindar, rehabvägen, copy.
+Rosterlistorna och bibliotekslistan, rehabgrindar (smärtfiltren är borttagna), rehabvägen, copy.
 
 ### T9. Docs (Haiku)
 
@@ -133,11 +133,13 @@ Kör `npm run check`, `test:cov`, `build` och relevanta Playwright-specar. Grans
 ## Separat uppgift efteråt: T0-L, ta bort det gamla "Knä och löpning · ursprungligt program"
 
 Planeras och granskas separat (Opus-plan, Sonnet, Opus-granskning). Börja inte med den i fas 1.
+
+**Status: genomförd som P3 i `docs/plan-pain-rehab-only.md` (commit 7f8bfdf och följande). Texten nedan beskriver planen.**
 Programmet nås i dag bara via gamla data eller genom att skriva `/#/pass/A`. Det är inte enklare för den här funktionen och rör smärtsystemet och e2e-uppsättningen.
 
 Skulle raderas: rutten `/pass/:id` (`App.tsx` ~rad 184), `features/pass/*`, `content/templates.ts`, `content/alternatives.ts`, `rules/nextPlan.ts` (`buildPlan`, `wallSitPlan`), `planningData`, `programStartDate`, `addWallSit` och de gamla grenarna i `logSet`/`startSession`/`replanSession` i `db/repo.ts`, `features/week/WeekView.tsx`, `weekTally.ts`, `StaleSession.tsx`, det gamla 0–10-knäsmärtflödet (`PainScreen`, `careState`, `PainNotices`, `recordPainReading`/`addPainLog`, `PainLog` och tabellen, kräver Dexie-versionshöjning), meta `'program'`, `legacy`-grenen i `TrainingHome` och namnfallbackarna (`templates[...].name` i `Runner.tsx`, `Summary.tsx`, `PainNotices`, `ExerciseCard`, `ExerciseLibrary`, `ExerciseResults`, `dev/demoData.ts` blir `Pass ${templateId}`).
 
-Förutsättning: skriv om e2e-selen först. `playPassA`, hands-free-testet och varje no-dead-scroll-test för passskärmen går via `/#/pass/A` och måste gå via `quickStart(general)` → `/traning/A` → "Börja passet". Kontrollera stoppgrinden innan `careState` raderas. Det allmänna programmets smärtgrindar är check-ins plus `symptomsOnRecord`/`startReadiness`, och de ska stå kvar. Det gamla 0–10-stoppbanderollet skyddar bara gamla pass.
+Förutsättning: skriv om e2e-selen först. `playPassA`, hands-free-testet och varje no-dead-scroll-test för passskärmen går via `/#/pass/A` och måste gå via `quickStart(general)` → `/traning/A` → "Börja passet". Stoppgrinden kontrollerades före radering. Rehabgrindarna är obligatoriska rehabincheckningar, symptom i rehab och `startReadiness`, och de står kvar. Vanliga pass får ingen obligatorisk incheckning; ventilen "Det gör ont" ersätter den. Det gamla 0–10-stoppbanderollet skyddade bara gamla pass.
 
 ## Risker
 

@@ -52,7 +52,7 @@ Tydlig träningsguide, inte kalkylblad. Mobil först (360–430 px). En sak per 
 - WorkoutTemplate: id, namn (A/B), lista med övning, set, reps, startvikt, vila (s)
 - Session: id, datum, mall, smärta före, smärta efter, anteckning
 - SetLog: session, övning, setnummer, sida (höger/vänster/båda), reps, vikt kg
-- PainLog: datum, tidpunkt (före/efter/dagen efter), skala 0–10, plats (höger knä)
+- PainLog: (borttagen i Dexie v3, se `plan-pain-rehab-only.md`; gamla data följer inte med längre)
 
 ## Teknik (förslag, får ifrågasättas)
 Vite + React + TypeScript + Tailwind; IndexedDB via Dexie med JSON export/import; SVG-diagram eller Recharts; PWA via vite-plugin-pwa; Vitest för progressions- och smärtregler.

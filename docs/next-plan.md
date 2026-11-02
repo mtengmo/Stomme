@@ -45,3 +45,5 @@ Use a feature branch, preserve the Swedish notebook design, and inspect real mob
 2026-11-01: Egna pass grupperas automatiskt eller manuellt och kan planeras på 1–5 veckodagar via /vecka. Veckoförslag sparas först med Spara, och dagens tilldelning öppnar alltid förhandsvisningen. Välj själv används bara för dagens pass eftersom veckoplanens fokus inte har kroppsdelar.
 
 2026-11-01: Plyometriska övningar E99 Sidohopp på ett ben (redaktionell, tid per ben) och E100 Boxhopp (NASM, steg, räknas för hand). Bara bibliotek, knäbelastade och i `impactExercises`; ingen roster, rehabplan eller progressionslänk. Rehabväljaren döljer nu impact-övningar (`pickableInProgramme`). Se `docs/plan-plyo-exercises.md`.
+
+2026-11-03: Smärtfunktionen är bara för rehab (`docs/plan-pain-rehab-only.md`, P1–P4): globala smärtfilter borttagna för vanliga pass, "Det gör ont" per övning, incheckningar bara i rehab, gamla knäprogrammet och tabellen `PainLog` borttagna (Dexie v3, backup v4). P5 säkerhetsgranskning väntar.

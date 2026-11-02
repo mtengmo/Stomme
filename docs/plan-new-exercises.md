@@ -61,7 +61,7 @@ Stå på ett steg vänd nedåt. Böj det stående benet kontrollerat och sänk d
 **Data**
 - Placering: `src/content/kneeStrengthExercises.ts` och `kneeStrengthMetadata.ts`, bredvid E90-E94.
 - `unit: 'reps'`, `perSide: true`, `sideKind: 'ben'`, intervall `{start: 6, max: 10, step: 1}`, kroppsvikt.
-- `kneeLoaded: true` (smärtregeln i `src/rules/progression.ts` rad ~107-149: "stopp" avbryter övningen, annan rapport håller progressionen).
+- `kneeLoaded: true` är bara metadata sedan P3 (`docs/plan-pain-rehab-only.md`). Ingen smärtregel i `progression.ts` finns längre (filen är borttagen), så flaggan styr inte stopp eller progression. Stopp i vanliga pass sker via "Det gör ont" per övning.
 - Nivå `practiced`. Utrustning `step`. Muskler: "Framsida lår", "Säte".
 - Tips (från källan): ställ dig på ett lågt steg med ena benet stadigt, håll i väggen för stöd. Böj det stående knät kontrollerat och sänk den fria hälen. Stanna när hälen är 2-3 tum under steget, tryck tillbaka upp med det stående benet. Håll knät i linje med andra tån och låt inte rörelsen ta fart framåt.
 - Vanligt fel: att falla ner snabbt eller att knät faller inåt.
@@ -98,7 +98,7 @@ Sittande på stol med ett block, en kudde eller ihopvikt handduk mellan knäna o
 
 **Data**
 - Placering som E96. `unit: 'reps'`, `perSide: false`, intervall `{start: 10, max: 20, step: 2}`, nivå `basic`.
-- `kneeLoaded: true` som förval. Den bär ingen last, men det gör att "smärta stopp" fungerar. Alternativ `false` som E94 (öppen fråga nedan).
+- `kneeLoaded: true` som förval. Den bär ingen last. `kneeLoaded` är bara metadata och styr inget, så valet påverkar inte stopp. Alternativ `false` som E94 (öppen fråga nedan).
 - Utrustning: stol (`chair`) och `band`. Etiketten "Gummiband" täcker miniband. Kudde eller handduk står bara i instruktionen. Ingen ny `EquipmentType`.
 - Kodändring: fältet för utrustning i `details` i `kneeStrengthMetadata.ts` måste kunna ta `EquipmentType | EquipmentType[]`. Påverkar E90-E94, så kör befintliga tester.
 - Muskler: "Insida lår", "Underben". Kontrollera att nycklarna finns i `muscles.ts` (`adductors`, `tibialis` eller liknande).
@@ -113,7 +113,7 @@ Som E96 steg 1-3, 5, 6 och 8 (id i `types.ts`, `'seated-tibial-rotation': 'E98'`
 Rörelsen sker i horisontalplanet och syns inte från sidan. Bygg en frontvy i `frontViews.tsx`: sittande figur, knän ihop med en liten cirkel emellan, bandet som en ögla runt framfötterna (återanvänd slappt band-logiken i `Figure.tsx:164` om det går), fötterna vinklas in och ut. Om det tar mer än ungefär en halv dag: använd en statisk sittande pose med en pil som cue.
 
 **Tester**
-Som för E96 (referens, intervall, ej i roster eller rehab, alias hittar den, "pain stop" stoppar). Dessutom `src/rules/equipment.test.ts`: saknar "Gummiband" utan band, passar med stol och band. Pose-test för den valda varianten.
+Som för E96 (referens, intervall, ej i roster eller rehab, alias hittar den, "Avbryt – det gör ont" ger `pain_stop` som för övriga övningar). Dessutom `src/rules/equipment.test.ts`: saknar "Gummiband" utan band, passar med stol och band. Pose-test för den valda varianten.
 
 ---
 
