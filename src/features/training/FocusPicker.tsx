@@ -6,7 +6,8 @@ import { isTrainingPreferences } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
 import type { Session, TrainingPreferences } from '../../domain/types';
-import { focusQuery } from '../../lib/focus';
+import { focusQuery, parseFocus } from '../../lib/focus';
+import { useHashSearch } from '../../lib/hashLocation';
 import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { focusAvailable } from '../../rules/programRosters';
 import { recentMuscles, recoveryNote } from '../../rules/recovery';
@@ -49,20 +50,28 @@ function Picker({
   sessions: Session[];
 }) {
   const [, navigate] = useLocation();
+  const requested = parseFocus(useHashSearch());
   const now = new Date();
   const available = focusAvailable(preferences, {
     painOnRecord: symptomsOnRecord(sessions, painReported),
   });
-  const [focus, setFocus] = useState<WorkoutFocus>(
-    () =>
-      startingFocus(
-        preferences,
-        sessions,
-        now,
-        available.presets,
-        available.regions,
-      ).focus,
-  );
+  const [focus, setFocus] = useState<WorkoutFocus>(() => {
+    if (requested?.id === 'custom') {
+      const regions = requested.regions?.filter((id) =>
+        available.regions.includes(id),
+      );
+      if (regions?.length) return { id: 'custom', regions };
+    } else if (requested && available.presets.includes(requested.id)) {
+      return requested;
+    }
+    return startingFocus(
+      preferences,
+      sessions,
+      now,
+      available.presets,
+      available.regions,
+    ).focus;
+  });
   const recent = recentMuscles(sessions, now);
   const nextId = nextTemplateId(
     sessions.filter(

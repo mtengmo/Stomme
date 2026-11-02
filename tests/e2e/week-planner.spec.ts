@@ -58,6 +58,11 @@ for (const scenario of CASES)
         await expect(
           page.getByRole('heading', { name: 'Planera veckan' }),
         ).toBeVisible();
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
         await page.getByRole('button', { name: 'Föreslå vecka' }).click();
         await expect(
           page.getByRole('status').filter({ hasText: 'Förslaget visas nedan' }),
@@ -85,6 +90,12 @@ for (const scenario of CASES)
         await expect(
           page.getByRole('heading', { name: 'Idag: Press', exact: true }),
         ).toBeVisible();
+        await expect(
+          page.getByText('Dagens fokus: Press', { exact: false }),
+        ).toBeVisible();
+        await expect(
+          page.getByText('Dagens fokus: Helkropp', { exact: false }),
+        ).toHaveCount(0);
         await page.screenshot({
           path: testInfo.outputPath(
             `today-${scenario.name}-${colorScheme}.png`,
@@ -94,6 +105,8 @@ for (const scenario of CASES)
         await expect(
           page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
         ).toHaveAttribute('href', /#\/traning\/[AB]\?fokus=push$/);
+        await page.getByRole('link', { name: 'Byt', exact: true }).click();
+        await expect(page.getByRole('radio', { name: /^Press/ })).toBeChecked();
 
         await page.goto('/#/vecka');
         await expect(page.getByRole('combobox', { name: today })).toHaveValue(

@@ -130,8 +130,11 @@ for (const width of [320, 360, 412]) {
       ).toBeVisible();
       await page.goto('/');
       await expect(
-        page.getByText('Allmän styrka · Pass A', { exact: true }),
+        page.getByText('Allmän styrka', { exact: true }),
       ).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+      ).toHaveAttribute('href', /#\/traning\/A(?:\?|$)/);
       const weekly = page.getByRole('region', {
         name: 'Veckoplan',
         exact: true,

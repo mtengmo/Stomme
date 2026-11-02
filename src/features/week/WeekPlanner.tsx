@@ -56,7 +56,7 @@ export function WeekPlanner() {
   );
 }
 const selectClass =
-  'min-h-12 min-w-0 flex-1 rounded-sm border-2 border-edge bg-surface px-2 text-base text-ink';
+  'min-h-12 w-0 min-w-0 flex-1 rounded-sm border-2 border-edge bg-surface px-2 text-base text-ink';
 function selectedPlanValue(plan?: WeeklyDayPlan): string {
   return !plan
     ? 'rest'
@@ -160,12 +160,12 @@ function Planner({
         >
           Föreslå vecka
         </Button>
-        <fieldset className="m-0 flex flex-col border-0 p-0">
+        <fieldset className="m-0 flex min-w-0 flex-col border-0 p-0">
           <legend className="sr-only">Pass per veckodag</legend>
           {weekdayNames.map((name, index) => (
             <label
               key={name}
-              className="flex min-h-14 items-center gap-2 border-b-2 border-edge py-1"
+              className="flex min-h-14 w-full min-w-0 items-center gap-2 border-b-2 border-edge py-1"
             >
               <span className="w-20 shrink-0 text-base font-bold">{name}</span>
               <select
