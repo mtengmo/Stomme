@@ -1,5 +1,5 @@
 import { devices, expect, test } from '@playwright/test';
-import { answerPain } from './flow';
+import { startPassA } from './flow';
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
 
@@ -84,19 +84,14 @@ test('delete all data needs two steps and returns to onboarding', {
 });
 
 test('no update banner appears during a session', async ({ page }) => {
-  await page.goto('/#/pass/A');
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 0);
-  await expect(page.locator('[data-step]')).toBeVisible();
+  await startPassA(page, true);
   await expect(page.getByText('Ny version finns')).toHaveCount(0);
 });
 
 test('workout help is keyboard accessible without trapping focus', async ({
   page,
 }) => {
-  await page.goto('/#/pass/A');
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 0);
+  await startPassA(page, true);
   const help = page.getByText('Hur gör man?', { exact: true });
   await help.focus();
   await page.keyboard.press('Enter');

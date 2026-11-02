@@ -49,7 +49,7 @@ URL:er får aldrig hittas på.
 
 ## Säkerhet
 
-- `kneeLoaded: true` och `impactExercises` för båda. Lägg dem också i `IMPACT_IDS` i `tests/e2e/start-focus.spec.ts`.
+- `kneeLoaded: true` för båda. (`impactExercises` är borttagen i P1 av `plan-pain-rehab-only.md`; ta inte med den.) Lägg dem också i `IMPACT_IDS` i `tests/e2e/start-focus.spec.ts`.
 - Ska aldrig vara fallback för nybörjare eller nivåbegränsade: `pickFromSlot` väljer bara bland `slot.candidates` och bålutfyllnaden bara bland bålkandidater. Så länge ID:na saknas i slots kan de inte komma in. Ska testas.
 - Rehab: AAOS-urvalet filtreras på `orthoinfo.aaos.org`-URL, så källorna får aldrig vara AAOS. `rehabAdditions`, fysioplanen och `kneeConditioningPlan` är explicita listor.
 - Befintlig lucka: i rehab med fokus physio eller custom tillåter väljaren i `TrainingPreview.tsx` (~rad 342 och 441) hela katalogen, alltså redan E62, E63 och burpee. Åtgärdas i steg 8 nedan.
@@ -81,7 +81,7 @@ URL:er får aldrig hittas på.
 - `exerciseMetadata.test.ts`: integritetslistan får E99 och E100. Källa verifierad URL eller Stomme utan URL med "Redaktionell övning", aldrig AAOS. `purposes.knee` saknas, `purposes.running` finns. Box-jump-utrustning `[{bodyweight,1},{step,1}]`, cue innehåller "stadig". `easierExerciseId === 'step-up'`. Ingen post har `harderExerciseId` som pekar på de nya.
 - `kneeStrength.test.ts`: E85, E86, E89, E97 oanvända.
 - Nytt `src/content/plyometrics.test.ts`: `kneeLoaded` för båda. E99 `seconds`, `perSide`, `sideKind 'ben'`, `{20,30,5}`, `sidePolicy 'choose-side'`. E100 `{3,5,1}`, `perSide false`. Båda saknas i `generalSlots`, `focusSlots`, `movementSlots`, `rehabAdditionIds`, `kneeRehabExercises` och fysioplanen. Sidokuen säger "Hoppa på".
-- `programRosters.test.ts`: för alla erfarenheter, utrustning med/utan `step`, mallarna A och B, alla fokusval och `painOnRecord` true/false: ingen roster innehåller de nya ID:na, inklusive glest fall med lättaste nivå.
+- `programRosters.test.ts`: för alla erfarenheter, utrustning med/utan `step`, mallarna A och B, alla fokusval och utan smärtfilter (`painOnRecord` är borttagen): ingen roster innehåller de nya ID:na, inklusive glest fall med lättaste nivå.
 - `repTempo.test.ts` (båda `null`), `favouriteSuggestions.test.ts` (`[]`), `exerciseProgression.test.ts` (inget nästa-nivå-förslag returnerar dem), `equipment.test.ts` (box-jump kräver `step`), `libraryFilters.test.ts` ("Löpstyrka" hittar båda, "en sida" och tid hittar E99).
 - Steg 8: `pickerPolicy.test.ts` (rehab + impact utesluts, rehab + vanlig tillåts, general + impact tillåts).
 - Figurer: `frontViews.test.tsx` (E99 `defaultViewFor` `'front'`, `supportedViewsFor` `['front']`, konstanta segmentlängder, stödfot vid golv vid t=0/1, fria benet aldrig under golv, höger/vänster spegelvända). `bodyweightPoses.test.ts` för box-jump: konstanta segmentlängder, fötter aldrig inne i stegets rektangel eller under golvet, vid t≈0,6 båda fötterna på stegets ovansida, t=0 och t=1 samma golvplats, under nedklivet når en fot golvet före den andra.

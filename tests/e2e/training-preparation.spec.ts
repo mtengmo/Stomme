@@ -25,36 +25,18 @@ for (const width of [360, 1280]) {
       path: test.info().outputPath('compact-editor.png'),
       fullPage: true,
     });
-    // Ordinary training starts directly; asking first is an explicit choice.
-    await page
-      .getByText('Besvär eller något att anpassa idag?', { exact: true })
-      .click();
-    await page
-      .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
-      .check();
+    // Ordinary training starts directly, with no question first.
     await page
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
+    await expect(page).toHaveURL(/#\/session\//);
     await expect(
-      page.getByRole('heading', { name: 'Hur känns kroppen?', exact: true }),
+      page.getByRole('button', { name: 'Klar set', exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByText('Allmän styrka · Pass A', { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByText(/Allmän styrka · A/)).toBeVisible();
     await page.screenshot({
       path: test.info().outputPath('preparation-context.png'),
     });
-    await page.getByRole('link', { name: 'Ändra passet', exact: true }).click();
-    await page
-      .getByRole('button', { name: 'Anpassa passet', exact: true })
-      .click();
-    await page
-      .getByRole('button', { name: /Ändra$/ })
-      .first()
-      .click();
-    await expect(page.getByLabel('Set', { exact: true }).first()).toHaveValue(
-      '4',
-    );
     await page.goto('/#/');
     await expect(
       page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
@@ -171,7 +153,7 @@ test('the add-exercise picker narrows by body region and lists primary matches f
   ).toBe(true);
 });
 
-test('a removed exercise can be restored and a deferred after answer can be given later', async ({
+test('a removed exercise can be restored and a regular session ends without an after question', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -193,18 +175,11 @@ test('a removed exercise can be restored and a deferred after answer can be give
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
   await completeSets(page);
   await page.getByRole('button', { name: 'Lagom', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: 'Hur kändes passet?' }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Svara senare', exact: true }).click();
   await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();
-  await page
-    .getByRole('link', { name: 'Svara på hur passet kändes', exact: true })
-    .click();
-  await page.getByRole('radio', { name: 'Bra' }).check();
-  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
-  await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();
+  expect(page.url()).not.toMatch(/kansla/);
+  await page.getByRole('button', { name: 'Avsluta pass', exact: true }).click();
+  await expect(page).toHaveURL(/#\/$/);
+  await page.goto('/#/historik');
   await expect(
     page.getByRole('link', { name: 'Svara på hur passet kändes' }),
   ).toHaveCount(0);

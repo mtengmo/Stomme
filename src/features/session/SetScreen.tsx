@@ -48,6 +48,9 @@ interface SetScreenProps {
   onCancelTimer?(): void;
   onReportSymptoms?(): void;
   symptomReported?: boolean;
+  /** Regular training: opens the pain valve for this exercise. */
+  onHurt?(): void;
+  hurtMarked?: boolean;
   busy: boolean;
   onDone(
     amount: number,
@@ -73,6 +76,8 @@ export function SetScreen({
   onCancelTimer,
   onReportSymptoms,
   symptomReported,
+  onHurt,
+  hurtMarked,
   busy,
   onDone,
   onSkip,
@@ -621,6 +626,15 @@ export function SetScreen({
                 </span>
               </>
             )}
+          </button>
+        ) : null}
+        {onHurt ? (
+          <button
+            type="button"
+            onClick={onHurt}
+            className="session-report min-h-12 cursor-pointer py-3 text-base font-bold underline"
+          >
+            {hurtMarked ? 'Gjorde ont · visa val' : 'Det gör ont'}
           </button>
         ) : null}
       </section>

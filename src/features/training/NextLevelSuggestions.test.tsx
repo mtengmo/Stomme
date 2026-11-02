@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
@@ -62,14 +62,13 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('impact progression suggestions', () => {
-  it('keeps the non-impact blast off push-up swap when global pain is recorded', () => {
+  it('keeps the non-impact blast off push-up swap regardless of pain history', () => {
     render(
       <NextLevelSuggestions
         plan={sessions[0]?.plan ?? []}
         preferences={preferences}
         sessions={sessions}
         logs={logs}
-        painOnRecord
         onChoose={() => {}}
       />,
     );
@@ -81,7 +80,7 @@ describe('impact progression suggestions', () => {
     ).toBeTruthy();
   });
 
-  it('keeps non-impact summary suggestions when a positive pain log is added', async () => {
+  it('shows the non-impact summary suggestions', async () => {
     const session = sessions[1];
     if (!session) throw new Error('missing session');
     await setMeta(getDb(), 'training', preferences);
@@ -91,17 +90,6 @@ describe('impact progression suggestions', () => {
     expect(
       await screen.findByRole('link', { name: 'Blast off-armhävning' }),
     ).toBeTruthy();
-    await getDb().painLogs.add({
-      id: 'older-pain',
-      sessionId: 'older-rehab',
-      date: '2026-10-01',
-      timing: 'after',
-      score: 2,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: '2026-10-01T10:00:00Z',
-    });
-    await waitFor(() => expect(getDb().painLogs.count()).resolves.toBe(1));
     expect(
       screen.getByRole('link', { name: 'Blast off-armhävning' }),
     ).toBeTruthy();

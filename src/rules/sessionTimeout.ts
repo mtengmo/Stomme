@@ -1,4 +1,4 @@
-import type { PainLog, Session, SetLog } from '../domain/types';
+import type { Session, SetLog } from '../domain/types';
 
 /** An open session with no activity for this long is ended automatically. */
 export const IDLE_LIMIT_MIN = 90;
@@ -6,17 +6,15 @@ const IDLE_LIMIT_MS = IDLE_LIMIT_MIN * 60_000;
 
 /**
  * The latest instant something was recorded in the session: its start, every
- * set, pain reading and check-in. Feedback has no timestamp and is ignored.
+ * set and check-in. Feedback has no timestamp and is ignored.
  */
 export function lastActivity(
   session: Session,
   setLogs: readonly Pick<SetLog, 'loggedAt'>[],
-  painLogs: readonly Pick<PainLog, 'createdAt'>[],
 ): string {
   const stamps = [
     session.startedAt,
     ...setLogs.map((l) => l.loggedAt),
-    ...painLogs.map((p) => p.createdAt),
     ...Object.values(session.checkins ?? {}).flatMap((c) =>
       c ? [c.recordedAt] : [],
     ),

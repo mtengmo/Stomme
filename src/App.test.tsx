@@ -1,21 +1,14 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import {
-  cleanup,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
 import { getDb } from './db/db';
-import { createSession, getMeta, setMeta } from './db/repo';
+import { getMeta, setMeta } from './db/repo';
 import { isoWeekNumber } from './features/week/passState';
-import { WeekView } from './features/week/WeekView';
 
-const NOW = new Date(2026, 9, 14, 12, 0); // Wednesday 14 Oct 2026
+const _NOW = new Date(2026, 9, 14, 12, 0); // Wednesday 14 Oct 2026
 
 beforeEach(async () => {
   window.location.hash = '#/';
@@ -62,77 +55,6 @@ describe('onboarding gating', () => {
     ).toEqual(['Träning', 'Historik', 'Inställningar']);
     expect(screen.queryByText(/Välkommen till Stomme/)).toBeNull();
     expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
-  });
-});
-
-describe('week view', () => {
-  it('works with an empty database', async () => {
-    render(<WeekView now={NOW} />);
-    expect(await screen.findByText('Starta pass')).toBeTruthy();
-    expect(screen.getByText('Idag')).toBeTruthy(); // Pass A is next
-    expect(screen.getByText('Kommande')).toBeTruthy();
-    expect(screen.queryByText('Klar')).toBeNull();
-    expect(screen.queryByText(/Vila –/)).toBeNull();
-    expect(screen.getAllByRole('listitem').length).toBeGreaterThan(7);
-  });
-
-  it('marks a completed pass Klar and moves "next" to the other pass', async () => {
-    await createSession(getDb(), {
-      templateId: 'A',
-      date: '2026-10-13',
-      startedAt: '2026-10-13T08:00:00Z',
-      finishedAt: '2026-10-13T08:30:00Z',
-      status: 'completed',
-      programWeek: 1,
-      plan: [],
-      feedback: {},
-    });
-    render(<WeekView now={NOW} />);
-    expect(await screen.findByText('Klar')).toBeTruthy();
-    expect(screen.getByText('Idag')).toBeTruthy();
-    expect(screen.getByText('Nästa pass')).toBeTruthy();
-    await waitFor(() =>
-      expect(screen.getByText(/Vila – tidigast/)).toBeTruthy(),
-    );
-    expect(
-      screen.getByRole('link', { name: 'Starta pass' }).getAttribute('href'),
-    ).toBe('/pass/B');
-  });
-
-  it('shows the active adapted roster after both weekly passes are already complete', async () => {
-    for (const templateId of ['A', 'B'] as const) {
-      await createSession(getDb(), {
-        templateId,
-        date: '2026-10-13',
-        startedAt: `2026-10-13T0${templateId === 'A' ? 8 : 9}:00:00Z`,
-        status: 'completed',
-        programWeek: 1,
-        plan: [],
-        feedback: {},
-      });
-    }
-    await createSession(getDb(), {
-      templateId: 'A',
-      date: '2026-10-14',
-      startedAt: '2026-10-14T10:00:00Z',
-      status: 'in_progress',
-      programWeek: 3,
-      feedback: {},
-      plan: ['split-squat', 'wall-sit'].map((exerciseId) => ({
-        exerciseId: exerciseId as 'split-squat' | 'wall-sit',
-        sets: 3,
-        target: 8,
-        loadIndex: 0,
-        weightKg: 0,
-        restSec: 60,
-        reason: 'first_time' as const,
-      })),
-    });
-    render(<WeekView now={NOW} />);
-    expect(await screen.findByText('Pågår')).toBeTruthy();
-    expect(
-      screen.getByRole('img', { name: 'Pass A: 0 av 6 set klara' }),
-    ).toBeTruthy();
   });
 });
 

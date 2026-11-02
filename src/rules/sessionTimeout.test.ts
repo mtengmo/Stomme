@@ -18,25 +18,23 @@ const session = (extra: Partial<Session> = {}): Session => ({
 
 describe('lastActivity', () => {
   it('is the start when nothing else was recorded', () => {
-    expect(lastActivity(session(), [], [])).toBe(iso(0));
+    expect(lastActivity(session(), [])).toBe(iso(0));
   });
   it('ignores missing optional check-ins in older records', () => {
-    expect(
-      lastActivity(session({ checkins: { after: undefined } }), [], []),
-    ).toBe(iso(0));
+    expect(lastActivity(session({ checkins: { after: undefined } }), [])).toBe(
+      iso(0),
+    );
   });
 
-  it('takes the latest of sets, pain readings and check-ins', () => {
+  it('takes the latest of sets and check-ins', () => {
     const s = session({
       checkins: {
         before: { recordedAt: iso(5), feeling: 'ready', symptoms: null },
       },
     });
-    expect(
-      lastActivity(s, [{ loggedAt: iso(20) }], [{ createdAt: iso(30) }]),
-    ).toBe(iso(30));
-    expect(lastActivity(s, [{ loggedAt: iso(40) }], [])).toBe(iso(40));
-    expect(lastActivity(s, [], [])).toBe(iso(5));
+    expect(lastActivity(s, [{ loggedAt: iso(20) }])).toBe(iso(20));
+    expect(lastActivity(s, [{ loggedAt: iso(40) }])).toBe(iso(40));
+    expect(lastActivity(s, [])).toBe(iso(5));
   });
 });
 
@@ -63,7 +61,7 @@ describe('isSessionStale', () => {
 
 describe('invalid timestamps', () => {
   it('falls back to the start and treats an invalid start as not stale', () => {
-    expect(lastActivity(session({ startedAt: 'nonsense' }), [], [])).toBe(
+    expect(lastActivity(session({ startedAt: 'nonsense' }), [])).toBe(
       'nonsense',
     );
     expect(isSessionStale('nonsense', new Date(T0 + 99 * 3600_000))).toBe(

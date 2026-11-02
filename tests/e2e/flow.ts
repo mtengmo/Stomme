@@ -28,69 +28,113 @@ export async function freezeClock(page: Page): Promise<void> {
 
 export type Stage =
   | 'preview'
-  | 'pain'
   | 'set-first'
   | 'set-side'
   | 'set-timed'
   | 'set-after-skip'
   | 'rest'
   | 'effort'
-  | 'pain-after'
   | 'summary';
 
 const ACTION =
-  /^(Klar set|Hoppa över vila|Avsluta pass|Spara|Starta – 5 s förberedelse)$/;
-
-/** Fills the pain picker (score, optional red flags) and saves. */
-export async function answerPain(
-  page: Page,
-  score: number,
-  flags: string[] = [],
-): Promise<void> {
-  await page
-    .getByRole('radio', { name: new RegExp(`^${score}(,|$)`) })
-    .check({ force: true });
-  for (const f of flags) await page.getByRole('switch', { name: f }).click();
-  await page.getByRole('button', { name: 'Spara' }).click();
-}
+  /^(Klar set|Hoppa över vila|Avsluta pass|Starta – 5 s förberedelse)$/;
 
 /**
- * Onboarding (skipped when the spec already runs on the shared onboarded
- * state), then the preview of Pass A (nothing started yet).
+ * Starts a regular (general) user from a clean first visit: onboarding, the
+ * first-use questions and the preview of Pass A (nothing started yet).
+ * With `onboarded` the shared onboarded storage state is assumed.
  */
 export async function openPreview(
   page: Page,
   onboarded = false,
+  options: Partial<Parameters<typeof quickStart>[1]> = {},
 ): Promise<void> {
-  if (onboarded) {
-    await page.goto('/#/pass/A');
-  } else {
-    await page.goto('/');
+  await page.goto('/');
+  if (!onboarded)
     await page.getByRole('button', { name: /Jag förstår/ }).click();
-    await page.goto('/#/pass/A');
-  }
+  await quickStart(page, { goal: 'general', ...options });
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
 }
 
 /**
- * Plays Pass A from a clean database: onboarding, preview, then only the
- * primary action on each screen (Klar set, skip rest, Lagom, Avsluta pass).
- * Calls `onStage` the first time each kind of screen is on show.
+ * Opens the preview, replaces the whole pass with one chosen exercise (`sets`
+ * sets) and starts it. For specs that need one known exercise on screen.
+ */
+export async function startOnlyExercise(
+  page: Page,
+  exerciseId: ExerciseId,
+  options: {
+    sets?: number;
+    onboarded?: boolean;
+    quickStart?: Partial<Parameters<typeof quickStart>[1]>;
+  } = {},
+): Promise<void> {
+  await openPreview(page, options.onboarded ?? true, options.quickStart);
+  await page
+    .getByRole('button', { name: 'Anpassa passet', exact: true })
+    .click();
+  await removeAllExercises(page);
+  await addExercise(page, exerciseId);
+  if (options.sets !== undefined)
+    await page.getByLabel('Set', { exact: true }).fill(String(options.sets));
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await expect(page.locator('[data-step]')).toBeVisible();
+}
+
+/** Opens the preview of Pass A and starts it: no questions, straight to the first set. */
+export async function startPassA(page: Page, onboarded = false): Promise<void> {
+  await openPreview(page, onboarded);
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await expect(page.locator('[data-step]')).toBeVisible();
+}
+
+/** Number of distinct (exercise, set number) pairs stored; both sides of a set count once. */
+async function storedSetCount(page: Page): Promise<number> {
+  return page.evaluate(
+    () =>
+      new Promise<number>((resolve, reject) => {
+        const open = indexedDB.open('stomme');
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const request = open.result
+            .transaction('setLogs')
+            .objectStore('setLogs')
+            .getAll();
+          request.onsuccess = () => {
+            open.result.close();
+            const rows = request.result as {
+              exerciseId: string;
+              setNumber: number;
+            }[];
+            resolve(
+              new Set(rows.map((r) => `${r.exerciseId}|${r.setNumber}`)).size,
+            );
+          };
+          request.onerror = () => reject(request.error);
+        };
+      }),
+  );
+}
+
+/**
+ * Plays Pass A of a new regular user from a clean database: onboarding,
+ * quick start, preview, then only the primary action on each screen (Klar set,
+ * skip rest, Lagom, Avsluta pass). Calls `onStage` the first time each kind of
+ * screen is on show. `planned` is the set total the tally showed at the start;
+ * `sets` is what was stored.
  */
 export async function playPassA(
   page: Page,
   onStage: (stage: Stage) => Promise<void> = async () => {},
-): Promise<{ sets: number }> {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.goto('/#/pass/A');
-  await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
+): Promise<{ sets: number; planned: number }> {
+  await openPreview(page);
   await onStage('preview');
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await expect(page.getByRole('heading', { name: /Hur känns/ })).toBeVisible();
-  await onStage('pain');
-  await answerPain(page, 0);
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
   await expect(page.locator('[data-step]')).toBeVisible();
+  const tally = await page
+    .getByRole('img', { name: /set klara/ })
+    .getAttribute('aria-label');
+  const planned = Number(/av (\d+) set klara/.exec(tally ?? '')?.[1]);
 
   const seen = new Set<Stage>();
   const once = async (stage: Stage) => {
@@ -99,8 +143,7 @@ export async function playPassA(
     await onStage(stage);
   };
 
-  let sets = 0;
-  for (let guard = 0; guard < 80; guard++) {
+  for (let guard = 0; guard < 120; guard++) {
     const action = page.getByRole('button', { name: ACTION }).first();
     const finalEffort = page.getByRole('heading', {
       name: /Hur ansträngande/,
@@ -118,39 +161,21 @@ export async function playPassA(
       await once('set-timed');
       await freezeClock(page);
       await action.click();
-      // Pass A ends with two right/left pairs of 20-second side planks.
-      for (let set = 0; set < 2; set++) {
-        for (const side of ['Höger sida nedåt', 'Vänster sida nedåt']) {
-          await expect(page.getByText(side, { exact: true })).toBeVisible();
-          await expect(page.getByRole('timer')).toHaveText('0:05');
-          await page.clock.fastForward(5_000);
-          await expect(page.getByRole('timer')).toHaveText('0:20');
-          await page.clock.fastForward(20_000);
-          sets += 1;
-        }
-        if (set === 0) {
-          await expect(
-            page.getByRole('heading', { name: 'Vila', exact: true }),
-          ).toBeVisible();
-          await page.clock.fastForward(60_000);
-        }
+      // Drive the countdowns (preparation, holds, sides, rests) until the
+      // effort question or a plain action shows again.
+      const plain = page.getByRole('button', {
+        name: /^(Klar set|Avsluta pass)$/,
+      });
+      const effort = page.getByRole('button', {
+        name: 'Lagom',
+        exact: true,
+      });
+      for (let tick = 0; tick < 200; tick++) {
+        if ((await effort.count()) || (await plain.count())) break;
+        await page.clock.fastForward(5_000);
       }
-      await expect(
-        page.getByRole('button', { name: 'Lagom', exact: true }),
-      ).toBeVisible();
       await page.clock.resume();
       continue;
-    }
-
-    if (name === 'Spara') {
-      await once('pain-after');
-      await answerPain(page, 0);
-      // Saving the 'after' reading finishes the session and shows the summary.
-      const home = page.getByRole('link', { name: 'Till träningen' });
-      await home.waitFor();
-      await once('summary');
-      await home.click();
-      break;
     }
 
     if (name === 'Avsluta pass') {
@@ -164,11 +189,10 @@ export async function playPassA(
 
     if (name === 'Klar set') {
       const heading = (await page.locator('h1').innerText()).trim();
-      if (heading.startsWith('Sidoplanka')) await once('set-timed');
-      else if (await page.getByText(/Set \d av \d · Höger/).count())
+      if (await page.getByText(/Set \d av \d · Höger/).count())
         await once('set-side');
+      else if (/^Sidoplanka|^Plankan/.test(heading)) await once('set-timed');
       else await once('set-first');
-      sets += 1;
     } else if (name === 'Hoppa över vila') {
       await once('rest');
       if (
@@ -188,8 +212,18 @@ export async function playPassA(
     }).toPass();
   }
 
-  await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
-  return { sets };
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(
+    page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+  ).toBeVisible();
+  return { sets: await storedSetCount(page), planned };
+}
+
+/** From a running session: "Avbryt", then "Avbryt – det gör ont", ending on the stop screen. */
+export async function abortForPain(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Avbryt', exact: true }).click();
+  await page.getByRole('button', { name: 'Avbryt – det gör ont' }).click();
+  await expect(page).toHaveURL(/#\/stopp\//);
 }
 
 /** Starts Pass A, skips the first exercise and reports the next set screen. */
@@ -197,11 +231,7 @@ export async function skipFirstExercise(
   page: Page,
   onStage: (stage: Stage) => Promise<void>,
 ): Promise<void> {
-  await page.goto('/');
-  await page.getByRole('button', { name: /Jag förstår/ }).click();
-  await page.goto('/#/pass/A');
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 0);
+  await startPassA(page);
   const frame = page.locator('[data-step]');
   const before = await frame.getAttribute('data-step');
   await page.getByRole('button', { name: 'Hoppa över övningen' }).click();

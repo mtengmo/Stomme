@@ -1,7 +1,6 @@
 import { devices, expect, test } from '@playwright/test';
 import { exerciseList } from '../../src/content/exercises';
 import { exerciseMuscles } from '../../src/content/muscles';
-import { answerPain, openPreview } from './flow';
 
 const calfCount = Object.values(exerciseMuscles).filter(
   (tags) =>
@@ -49,64 +48,6 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   );
 });
 
-test('a selected exercise survives inspection, pain replanning and session reload', async ({
-  page,
-}) => {
-  await openPreview(page, true);
-  await page
-    .getByRole('button', { name: 'Byt övning', exact: true })
-    .first()
-    .click();
-  await page.getByLabel('Övning i moment 1').selectOption('split-squat');
-  await page
-    .getByRole('link', {
-      name: 'Station\u00e4rt utfall (split squat)',
-      exact: true,
-    })
-    .click();
-  await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
-  await expect(
-    page.getByRole('link', {
-      name: 'Station\u00e4rt utfall (split squat)',
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Starta pass', exact: true }).click();
-  await answerPain(page, 0);
-  await expect(
-    page.getByRole('heading', {
-      name: 'Station\u00e4rt utfall (split squat)',
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.reload();
-  await expect(
-    page.getByRole('heading', {
-      name: 'Station\u00e4rt utfall (split squat)',
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.goto('/#/pass/A');
-  await expect(
-    page.getByRole('button', { name: 'Fortsätt passet', exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole('link', {
-      name: 'Station\u00e4rt utfall (split squat)',
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole('link', {
-      name: 'Sitta ner och resa sig från stol (goblet)',
-      exact: true,
-    }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole('button', { name: 'Byt övning', exact: true }),
-  ).toHaveCount(0);
-});
-
 test('muscle highlights have a text alternative and respect reduced motion', async ({
   page,
 }) => {
@@ -141,29 +82,4 @@ test('muscle highlights have a text alternative and respect reduced motion', asy
     .getByRole('button', { name: 'Spela rörelsen', exact: true })
     .click();
   await expect.poll(() => movingFigure.innerHTML()).not.toBe(frozen);
-});
-
-test('optional sixth exercise wraps inside the narrow week card', async ({
-  page,
-}) => {
-  await openPreview(page, true);
-  await page.getByRole('button', { name: 'Starta pass', exact: true }).click();
-  await answerPain(page, 5);
-  await page.getByRole('switch', { name: /väggsittning/i }).click();
-  await page
-    .getByRole('button', { name: 'Fortsätt ändå', exact: true })
-    .click();
-  await page.getByRole('button', { name: 'Klar set', exact: true }).waitFor();
-  await page.goto('/#/');
-  const tally = page.getByRole('img', { name: /^Pass A:/ });
-  await expect(page.getByText('Pågår', { exact: true })).toBeVisible();
-  await expect(tally.locator(':scope > span')).toHaveCount(6);
-  const fits = await tally.evaluate((el) => {
-    const box = el.getBoundingClientRect();
-    return [...el.children].every((child) => {
-      const bounds = child.getBoundingClientRect();
-      return bounds.left >= box.left - 1 && bounds.right <= box.right + 1;
-    });
-  });
-  expect(fits).toBe(true);
 });

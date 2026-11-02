@@ -6,7 +6,6 @@ import {
 } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { bodyRegions, primaryMuscleLabel } from '../../content/muscles';
-import { templates } from '../../content/templates';
 import type { Exercise, TrainingPreferences } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
 import type { Inventory } from '../../rules/equipment';
@@ -244,9 +243,6 @@ function CompactRow({
 
 function DetailedRow({ exercise, inventory, experience, reason }: RowProps) {
   const missing = missingEquipment(exercise.id, inventory);
-  const membership = Object.values(templates).filter((template) =>
-    template.items.some((item) => item.exerciseId === exercise.id),
-  );
   return (
     <li className="grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-4 border-t-2 border-edge py-4">
       <div className="flex flex-col items-start gap-2">
@@ -298,15 +294,6 @@ function DetailedRow({ exercise, inventory, experience, reason }: RowProps) {
         {exercise.optional ? (
           <p className="m-0 mt-2 text-base font-bold">Valfri övning</p>
         ) : null}
-        {membership.map((template) => (
-          <Link
-            key={template.id}
-            href={`/pass/${template.id}`}
-            className="inline-flex min-h-12 items-center text-base font-bold underline decoration-2 underline-offset-4"
-          >
-            Ingår i {template.name}
-          </Link>
-        ))}
       </div>
     </li>
   );

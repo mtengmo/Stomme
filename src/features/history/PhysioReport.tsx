@@ -119,15 +119,10 @@ function ReportExerciseRow({ row }: { row: ReportExercise }) {
 
 async function loadReport() {
   const db = getDb();
-  return db.transaction(
-    'r',
-    [db.sessions, db.setLogs, db.painLogs],
-    async () => ({
-      sessions: await db.sessions.toArray(),
-      setLogs: await db.setLogs.toArray(),
-      painLogs: await db.painLogs.toArray(),
-    }),
-  );
+  return db.transaction('r', [db.sessions, db.setLogs], async () => ({
+    sessions: await db.sessions.toArray(),
+    setLogs: await db.setLogs.toArray(),
+  }));
 }
 
 export function PhysioReport() {
@@ -143,7 +138,7 @@ export function PhysioReport() {
         Hämtar träningshistoriken…
       </p>
     );
-  const report = buildPhysioReport(data.sessions, data.setLogs, data.painLogs, {
+  const report = buildPhysioReport(data.sessions, data.setLogs, {
     from,
     to,
     programme,
@@ -325,57 +320,10 @@ export function PhysioReport() {
                     </dl>
                   ) : (
                     <p className="m-0 text-base">
-                      Äldre program: knäsmärtskattningar visas separat.
+                      Äldre program: inga besvärsfrågor sparade.
                     </p>
                   )}
                 </section>
-                {row.painLogs.length || !row.session.programId ? (
-                  <section
-                    aria-label="Äldre knäsmärtskattningar"
-                    className="report-checkins flex flex-col gap-2"
-                  >
-                    <h3 className="m-0 text-2xl font-bold">
-                      Äldre knäsmärtskattningar
-                    </h3>
-                    <p className="m-0 text-base">
-                      Höger knä. Dessa skattningar redovisas separat från de nya
-                      frågorna om besvär.
-                    </p>
-                    <ul className="m-0 flex list-none flex-col gap-2 p-0">
-                      {(['before', 'after', 'dayAfter'] as const).map(
-                        (timing) => {
-                          const pain = row.painLogs.filter(
-                            (log) => log.timing === timing,
-                          );
-                          return (
-                            <li key={timing} className="text-base">
-                              <strong>{timingLabels[timing]}: </strong>
-                              {pain.length
-                                ? pain.map((log) => (
-                                    <span key={log.id}>
-                                      {log.score}/10
-                                      {log.redFlags.sharp
-                                        ? ' · Skarp smärta'
-                                        : ''}
-                                      {log.redFlags.swelling
-                                        ? ' · Svullnad'
-                                        : ''}
-                                      {log.redFlags.locking ? ' · Låsning' : ''}{' '}
-                                      (registrerat{' '}
-                                      {timestamp.format(
-                                        new Date(log.createdAt),
-                                      )}
-                                      ){' '}
-                                    </span>
-                                  ))
-                                : 'Svar saknas'}
-                            </li>
-                          );
-                        },
-                      )}
-                    </ul>
-                  </section>
-                ) : null}
                 <div className="flex flex-col">
                   {row.exercises.map((exercise) => (
                     <ReportExerciseRow

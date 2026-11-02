@@ -63,14 +63,18 @@ describe('sessions', () => {
 
 describe('meta', () => {
   it('returns undefined for missing keys', async () => {
-    expect(await getMeta(db, 'program')).toBeUndefined();
+    expect(await getMeta(db, 'backup')).toBeUndefined();
   });
 
   it('sets, reads and overwrites values', async () => {
-    await setMeta(db, 'program', { startDate: '2026-10-19' });
-    expect(await getMeta(db, 'program')).toEqual({ startDate: '2026-10-19' });
-    await setMeta(db, 'program', { startDate: '2026-10-26' });
-    expect(await getMeta(db, 'program')).toEqual({ startDate: '2026-10-26' });
+    await setMeta(db, 'backup', { lastExportAt: '2026-10-19T08:00:00.000Z' });
+    expect(await getMeta(db, 'backup')).toEqual({
+      lastExportAt: '2026-10-19T08:00:00.000Z',
+    });
+    await setMeta(db, 'backup', { lastExportAt: '2026-10-26T08:00:00.000Z' });
+    expect(await getMeta(db, 'backup')).toEqual({
+      lastExportAt: '2026-10-26T08:00:00.000Z',
+    });
   });
 });
 

@@ -11,11 +11,13 @@ import { daysBetween } from '../lib/dates';
 import { equipmentFits } from './equipment';
 import { variantWeights } from './weightInventory';
 
-function hasSymptoms(session: Session): boolean {
+/** Rehab keeps its session-wide symptom hold; regular training never has one. */
+function hasRehabSymptoms(session: Session): boolean {
   return (
-    session.abortReason === 'pain_stop' ||
-    Object.values(session.checkins ?? {}).some((item) => !!item?.symptoms) ||
-    Object.values(session.feedback).some((item) => !!item?.symptoms)
+    session.programId === 'rehab' &&
+    (session.abortReason === 'pain_stop' ||
+      Object.values(session.checkins ?? {}).some((item) => !!item?.symptoms) ||
+      Object.values(session.feedback).some((item) => !!item?.symptoms))
   );
 }
 
@@ -72,11 +74,12 @@ export function trainingPlanSuggestion(
       };
   }
   const suggestion = trainingSuggestion(plan, previous, logs);
+  // Regular training: only a "hurt" mark on this very exercise holds it back.
   const newerSymptoms = sessions.some(
     (session) =>
       session.programId === preferences.programId &&
       (!previous || session.startedAt > previous.startedAt) &&
-      hasSymptoms(session),
+      (session.feedback[plan.exerciseId]?.hurt || hasRehabSymptoms(session)),
   );
   const withRecentSymptomHold = (candidate: PlannedExercise) =>
     newerSymptoms
@@ -88,7 +91,7 @@ export function trainingPlanSuggestion(
           ),
           explanation: [
             candidate.explanation,
-            'Besvär rapporterades i ett senare pass. Ingen automatisk ökning; kontrollera innan du startar.',
+            'Ingen automatisk ökning för den här övningen. Kontrollera innan du startar.',
           ]
             .filter(Boolean)
             .join(' '),
@@ -151,9 +154,7 @@ export function trainingPlanSuggestion(
     ex.unit === 'reps' &&
     previous.programId !== 'rehab' &&
     previous.feedback[plan.exerciseId]?.effort === 'easy' &&
-    previous.checkins?.after?.feeling === 'good' &&
-    !Object.values(previous.checkins).some((item) => item?.symptoms) &&
-    !Object.values(previous.feedback).some((item) => item?.symptoms) &&
+    !previous.feedback[plan.exerciseId]?.hurt &&
     logs
       .filter(
         (item) =>
@@ -167,6 +168,23 @@ export function trainingPlanSuggestion(
     };
   }
   return withRecentSymptomHold(suggestion);
+}
+
+/** True when the latest finished attempt at this exercise was flagged as painful. */
+export function hurtLastTime(
+  exerciseId: PlannedExercise['exerciseId'],
+  programId: Session['programId'],
+  sessions: readonly Session[],
+): boolean {
+  const last = sessions
+    .filter(
+      (session) =>
+        session.programId === programId &&
+        session.status !== 'in_progress' &&
+        session.plan.some((item) => item.exerciseId === exerciseId),
+    )
+    .sort((a, b) => b.startedAt.localeCompare(a.startedAt))[0];
+  return !!last?.feedback[exerciseId]?.hurt;
 }
 
 /** General strength uses its own transparent policy, without knee-specific thresholds. */
@@ -204,9 +222,7 @@ export function trainingSuggestion(
     loadIndex: last.loadIndex,
     weightKg: last.weightKg,
   };
-  const symptoms =
-    Object.values(previous.feedback).some((value) => value?.symptoms) ||
-    Object.values(previous.checkins ?? {}).some((check) => check?.symptoms);
+  const symptoms = !!feedback?.hurt || hasRehabSymptoms(previous);
   const sides =
     base.sides ??
     (exercises[plan.exerciseId].perSide ? ['right', 'left'] : ['both']);
@@ -224,7 +240,9 @@ export function trainingSuggestion(
     return {
       ...base,
       explanation:
-        'Besvär rapporterades. Ingen automatisk ökning; anpassa innan du startar.',
+        previous.programId === 'rehab'
+          ? 'Besvär rapporterades. Ingen automatisk ökning; anpassa innan du startar.'
+          : 'Ingen automatisk ökning för den här övningen.',
     };
   if (previous.programId === 'rehab')
     return {
@@ -242,8 +260,6 @@ export function trainingSuggestion(
     ) &&
     plan.sets <= (previousPlan?.sets ?? plan.sets) &&
     feedback?.effort === 'easy' &&
-    previous.checkins?.after?.feeling === 'good' &&
-    !previous.checkins.after.symptoms &&
     exercises[plan.exerciseId].unit === 'reps' &&
     last.amount < exercises[plan.exerciseId].range.max
   ) {
@@ -251,7 +267,7 @@ export function trainingSuggestion(
       ...base,
       target: last.amount + 1,
       explanation:
-        'Alla set klara, lätt ansträngning och inga rapporterade besvär efteråt: förslag +1 repetition.',
+        'Alla set klara och lätt ansträngning: förslag +1 repetition.',
     };
   }
   return {
@@ -262,17 +278,11 @@ export function trainingSuggestion(
 }
 
 export function trainingDayAfterDue(session: Session, today: string): boolean {
-  if (
-    !session.programId ||
-    session.status !== 'completed' ||
-    session.checkins?.dayAfter ||
-    daysBetween(session.date, today) !== 1
-  )
-    return false;
   return (
-    session.programId === 'rehab' ||
-    Object.values(session.checkins ?? {}).some((check) => check?.symptoms) ||
-    Object.values(session.feedback).some((feedback) => feedback?.symptoms)
+    session.programId === 'rehab' &&
+    session.status === 'completed' &&
+    !session.checkins?.dayAfter &&
+    daysBetween(session.date, today) === 1
   );
 }
 export function validateCheckin(

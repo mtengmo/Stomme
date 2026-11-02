@@ -8,12 +8,10 @@ import { getMeta, listSessions } from '../../db/repo';
 import type { Session, TrainingPreferences } from '../../domain/types';
 import { focusQuery, parseFocus } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
-import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { focusAvailable } from '../../rules/programRosters';
 import { recentMuscles, recoveryNote } from '../../rules/recovery';
 import { nextTemplateId } from '../../rules/schedule';
 import { Button } from '../../ui/Button';
-import { painLogsShowPain } from './defaultPlan';
 import { startingFocus } from './focusModel';
 import { RegionChecklist } from './RegionChecklist';
 
@@ -22,7 +20,6 @@ export function FocusPicker() {
     async () => ({
       preferences: await getMeta(getDb(), 'training'),
       sessions: await listSessions(getDb()),
-      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
     }),
     [],
   );
@@ -32,29 +29,19 @@ export function FocusPicker() {
     data.preferences.programId === 'rehab'
   )
     return <Redirect to="/" />;
-  return (
-    <Picker
-      preferences={data.preferences}
-      sessions={data.sessions}
-      painReported={data.painReported}
-    />
-  );
+  return <Picker preferences={data.preferences} sessions={data.sessions} />;
 }
 function Picker({
   preferences,
   sessions,
-  painReported,
 }: {
-  painReported: boolean;
   preferences: TrainingPreferences;
   sessions: Session[];
 }) {
   const [, navigate] = useLocation();
   const requested = parseFocus(useHashSearch());
   const now = new Date();
-  const available = focusAvailable(preferences, {
-    painOnRecord: symptomsOnRecord(sessions, painReported),
-  });
+  const available = focusAvailable(preferences);
   const [focus, setFocus] = useState<WorkoutFocus>(() => {
     if (requested?.id === 'custom') {
       const regions = requested.regions?.filter((id) =>

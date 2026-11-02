@@ -27,16 +27,9 @@ it('shows the heavy-start note in the overview but not the generic start line', 
 });
 
 it('omits the whole-body coverage warning for an intentional focus', () => {
-  const plan = defaultPlan(
-    preferences,
-    'A',
-    [],
-    [],
-    undefined,
-    false,
-    undefined,
-    { id: 'push' },
-  );
+  const plan = defaultPlan(preferences, 'A', [], [], undefined, undefined, {
+    id: 'push',
+  });
   render(
     <ReadyWorkout
       plan={plan}

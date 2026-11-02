@@ -48,16 +48,6 @@ try {
         path: `${out}/${tag}-library.png`,
         fullPage: true,
       });
-      await page.goto(`${base}/#/pass/A`);
-      await page
-        .getByRole('button', { name: 'Byt övning', exact: true })
-        .first()
-        .click();
-      await page.getByLabel('Övning i moment 1').selectOption('split-squat');
-      await page.screenshot({
-        path: `${out}/${tag}-choices.png`,
-        fullPage: true,
-      });
       for (const { id } of exerciseList) {
         await page.goto(`${base}/#/ovning/${id}`);
         await page

@@ -69,13 +69,12 @@ import { defaultFocus, parseFocus } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
-import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { pickableInProgramme } from '../../rules/pickerPolicy';
 import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
 } from '../../rules/shortWorkout';
-import { trainingPlanSuggestion } from '../../rules/training';
+import { hurtLastTime, trainingPlanSuggestion } from '../../rules/training';
 import {
   availableWeights,
   startingWeight,
@@ -88,17 +87,11 @@ import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { DeleteWorkoutButton } from '../library/CustomWorkoutList';
 import { weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule } from '../week/WeeklyPlan';
-import {
-  basePlan,
-  customWorkoutPlan,
-  defaultPlan,
-  painLogsShowPain,
-} from './defaultPlan';
+import { basePlan, customWorkoutPlan, defaultPlan } from './defaultPlan';
 import { ExercisePicker } from './ExercisePicker';
 import { NextLevelSuggestions } from './NextLevelSuggestions';
 import {
   clearFlags,
-  EMPTY_FLAGS,
   readDraftSafety,
   readFlags,
   writeDraftSafety,
@@ -131,7 +124,6 @@ function PreviewEditor({
   logs,
 
   savedPlans,
-  painReported,
   customWorkout,
   focus,
   preparationId,
@@ -154,7 +146,6 @@ function PreviewEditor({
   logs: SetLog[];
 
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>;
-  painReported?: boolean;
   customWorkout?: CustomWorkout;
   focus: WorkoutFocus;
   preparationId?: string;
@@ -179,19 +170,12 @@ function PreviewEditor({
           (session.regions ?? []).join() === (focus.regions ?? []).join())),
   );
 
-  const painOnRecord = symptomsOnRecord(sessions, painReported ?? false);
   const [draftSafety] = useState(() => readDraftSafety(draftKey));
   const explicitPlan = Boolean(
     preparation ||
       customWorkout ||
       (focus.id !== 'custom' && savedRoutines?.[focus.id]?.[id]),
   );
-  const refreshAutoDraft =
-    preferences.programId === 'general' &&
-    !explicitPlan &&
-    painOnRecord &&
-    draftSafety?.painOnRecord === false &&
-    !draftSafety.edited;
   const editedDraft = useRef(draftSafety?.edited ?? explicitPlan);
 
   const [plan, setPlan] = useState(() => {
@@ -201,7 +185,6 @@ function PreviewEditor({
       );
 
       if (
-        !refreshAutoDraft &&
         Array.isArray(saved) &&
         saved.length <= 12 &&
         saved.every(
@@ -238,7 +221,6 @@ function PreviewEditor({
         preferences,
         sessions,
         logs,
-        painReported,
       );
     return defaultPlan(
       preferences,
@@ -246,7 +228,6 @@ function PreviewEditor({
       sessions,
       logs,
       savedPlans,
-      painReported,
       savedRoutines,
       focus,
     );
@@ -255,17 +236,13 @@ function PreviewEditor({
   useEffect(() => {
     try {
       sessionStorage.setItem(draftKey, JSON.stringify(plan));
-      writeDraftSafety(draftKey, { painOnRecord, edited: editedDraft.current });
+      writeDraftSafety(draftKey, { edited: editedDraft.current });
     } catch {
       /* Storage may be unavailable; starting still works. */
     }
-  }, [draftKey, plan, painOnRecord]);
+  }, [draftKey, plan]);
 
-  const [flags0] = useState(() =>
-    refreshAutoDraft
-      ? { ...EMPTY_FLAGS, checkBefore: readFlags(draftKey).checkBefore }
-      : readFlags(draftKey),
-  );
+  const [flags0] = useState(() => readFlags(draftKey));
   const [confirmed, setConfirmed] = useState(() => {
     if (!flags0.confirmed) return false;
     try {
@@ -277,7 +254,6 @@ function PreviewEditor({
       return false;
     }
   });
-  const [checkBefore, setCheckBefore] = useState(flags0.checkBefore);
   const [editing, setEditing] = useState(() => {
     if (
       customWorkout ||
@@ -396,8 +372,8 @@ function PreviewEditor({
     index: number;
   } | null>(flags0.removed);
   useEffect(() => {
-    writeFlags(draftKey, { confirmed, checkBefore, removed });
-  }, [draftKey, confirmed, checkBefore, removed]);
+    writeFlags(draftKey, { confirmed, removed });
+  }, [draftKey, confirmed, removed]);
   const active = sessions.find(
     (session) =>
       session.status === 'in_progress' && session.id !== preparationId,
@@ -978,6 +954,17 @@ function PreviewEditor({
                               )
                             : null}
 
+                          {preferences.programId !== 'rehab' &&
+                          hurtLastTime(
+                            item.exerciseId,
+                            preferences.programId,
+                            sessions,
+                          ) ? (
+                            <p className="m-0 text-base font-bold">
+                              Gjorde ont senast. Välj lättare eller hoppa över.
+                            </p>
+                          ) : null}
+
                           {physioPaper &&
                           item.explanation?.startsWith('Förifyllt') ? null : (
                             <p className="m-0 text-base text-ink-soft">
@@ -1413,7 +1400,6 @@ function PreviewEditor({
                     sessions,
                     logs,
                     savedPlans,
-                    painReported,
                     undefined,
                     focus,
                   ),
@@ -1428,7 +1414,6 @@ function PreviewEditor({
               preferences={preferences}
               sessions={sessions}
               logs={logs}
-              painOnRecord={symptomsOnRecord(sessions, painReported ?? false)}
               onChoose={(from, to) => {
                 updatePlan((current) =>
                   current.map((item) =>
@@ -1438,27 +1423,6 @@ function PreviewEditor({
               }}
             />
           ) : null}
-          {preferences.programId === 'rehab' ? null : (
-            <details className="border-y-2 border-edge py-2">
-              <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                Besvär eller något att anpassa idag?
-              </summary>
-              <label className="flex min-h-12 items-start gap-3 py-2 text-base">
-                <input
-                  type="checkbox"
-                  checked={checkBefore}
-                  onChange={(event) => setCheckBefore(event.target.checked)}
-                  className="size-6 shrink-0"
-                />
-                Fråga hur kroppen känns före passet. Annars börjar passet
-                direkt.
-              </label>
-              <p className="m-0 text-base text-ink-soft">
-                Du kan alltid rapportera besvär under passet. Ett överhoppat
-                svar sparas inte som besvärsfritt.
-              </p>
-            </details>
-          )}
 
           {!equipmentOverride && editing && customWorkout ? (
             <>
@@ -1668,7 +1632,7 @@ function PreviewEditor({
 
                     onStarted?.();
                     navigate(
-                      preferences.programId === 'rehab' || checkBefore
+                      preferences.programId === 'rehab'
                         ? `/kansla/${session.id}/before`
                         : `/session/${session.id}`,
                     );
@@ -1713,7 +1677,6 @@ export function TrainingPreview({ id }: { id: string }) {
       sessions,
 
       logs: await getDb().setLogs.toArray(),
-      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
       preparationId,
 
       savedPlans: (await getMeta(getDb(), 'rehabPlans')) as
@@ -1751,7 +1714,7 @@ export function TrainingPreview({ id }: { id: string }) {
   const focus = requestedFocus ?? defaultFocus(data.preferences);
   return (
     <EquipmentPreview
-      key={`${symptomsOnRecord(data.sessions, data.painReported)}-${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
+      key={`${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
       customWorkout={customWorkout}
       focus={focus}
       preparationId={data.preparationId}
@@ -1761,7 +1724,6 @@ export function TrainingPreview({ id }: { id: string }) {
       logs={data.logs}
       savedPlans={data.savedPlans}
       savedRoutines={data.savedRoutines}
-      painReported={data.painReported}
     />
   );
 }

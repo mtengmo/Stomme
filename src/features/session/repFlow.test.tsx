@@ -88,17 +88,6 @@ async function open(...items: ReturnType<typeof plan>[]) {
     plan: items,
     feedback: {},
   });
-  // A stored before reading keeps the runner from replanning the session.
-  await getDb().painLogs.add({
-    id: 'p-before',
-    sessionId: session.id,
-    date: toLocalDate(new Date()),
-    timing: 'before',
-    score: 0,
-    location: 'right_knee',
-    redFlags: { sharp: false, swelling: false, locking: false },
-    createdAt: new Date().toISOString(),
-  });
   window.location.hash = `#/session/${session.id}`;
   render(<App />);
   return session;

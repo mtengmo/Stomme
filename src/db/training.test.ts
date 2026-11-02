@@ -29,6 +29,8 @@ const preferences: TrainingPreferences = {
   experience: 'some',
   ...inventory({ dumbbells: [[5, 1]] }),
 };
+/** Check-ins belong to rehab; regular training has none. */
+const rehabPrefs: TrainingPreferences = { ...preferences, programId: 'rehab' };
 const plan: PlannedExercise = {
   exerciseId: 'single-leg-rdl',
   sets: 2,
@@ -314,14 +316,14 @@ describe('programme persistence and safety boundaries', () => {
   it('replaces an unstarted A with B and snapshots experience; the clock starts with the answers', async () => {
     const prepared = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,
     );
     const replacement = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'B',
       [{ ...plan, target: 9 }],
       now,
@@ -343,12 +345,12 @@ describe('programme persistence and safety boundaries', () => {
     );
     expect((await db.sessions.get(replacement.id))?.date).toBe('2026-10-21');
   });
-  it.each(['answers', 'sets', 'pain', 'feedback', 'legacy', 'note'] as const)(
+  it.each(['answers', 'sets', 'feedback', 'legacy', 'note'] as const)(
     'keeps %s when changing preferences is requested',
     async (kind) => {
       const prepared = await startTrainingSession(
         db,
-        preferences,
+        kind === 'answers' ? rehabPrefs : preferences,
         'A',
         [plan],
         now,
@@ -367,17 +369,6 @@ describe('programme persistence and safety boundaries', () => {
           weightKg: 7.5,
           loggedAt: now.toISOString(),
         });
-      if (kind === 'pain')
-        await db.painLogs.put({
-          id: 'pain',
-          sessionId: prepared.id,
-          date: prepared.date,
-          timing: 'before',
-          score: 2,
-          location: 'right_knee',
-          redFlags: { sharp: false, swelling: false, locking: false },
-          createdAt: now.toISOString(),
-        });
       if (kind === 'feedback')
         await db.sessions.update(prepared.id, {
           feedback: { [plan.exerciseId]: { skipped: true } },
@@ -388,13 +379,16 @@ describe('programme persistence and safety boundaries', () => {
         await db.sessions.update(prepared.id, { note: 'Min anteckning' });
       const snapshot = await db.sessions.get(prepared.id);
       await expect(
-        saveTrainingPreferences(db, { ...preferences, programId: 'rehab' }),
+        saveTrainingPreferences(db, {
+          ...preferences,
+          programId: kind === 'answers' ? 'general' : 'rehab',
+        }),
       ).rejects.toThrow(/pågående/);
       expect(await db.sessions.get(prepared.id)).toEqual(snapshot);
     },
   );
 
-  it('opens a real version1 database without rewriting legacy pain, effort or active plan', async () => {
+  it('opens a real version 1 database, keeping sessions and dropping pain readings', async () => {
     const old = new Dexie(db.name);
     old.version(1).stores({
       sessions: 'id, date, status, templateId',
@@ -412,23 +406,23 @@ describe('programme persistence and safety boundaries', () => {
       plan: [{ ...plan, variantId: undefined, sides: undefined, weightKg: 5 }],
       feedback: { 'single-leg-rdl': { effort: 'hard', skipped: false } },
     };
-    const pain = {
-      id: 'pain',
-      sessionId: legacy.id,
-      date: legacy.date,
-      timing: 'before',
-      score: 4,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: now.toISOString(),
-    };
     await old.table('sessions').put(legacy);
-    await old.table('painLogs').put(pain);
+    await old.table('painLogs').put({ id: 'pain', sessionId: legacy.id });
     old.close();
     await db.open();
-    expect(db.verno).toBe(2);
-    expect(await db.sessions.get(legacy.id)).toEqual(legacy);
-    expect(await db.painLogs.get(pain.id)).toEqual(pain);
+    expect(db.verno).toBe(3);
+    // An in-progress programless session cannot be resumed any more: it is closed.
+    expect(await db.sessions.get(legacy.id)).toEqual({
+      ...legacy,
+      status: 'aborted',
+      abortReason: 'user',
+      finishedAt: legacy.startedAt,
+    });
+    expect(db.tables.map((table) => table.name).sort()).toEqual([
+      'meta',
+      'sessions',
+      'setLogs',
+    ]);
     expect((await db.sessions.get(legacy.id))?.programId).toBeUndefined();
   });
 
@@ -436,7 +430,7 @@ describe('programme persistence and safety boundaries', () => {
     await saveTrainingPreferences(db, preferences);
     const session = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,
@@ -457,7 +451,7 @@ describe('programme persistence and safety boundaries', () => {
     await importAll(db, serializeBackup(backup));
     expect(await exportAll(db, now)).toEqual(backup);
     expect(await db.sessions.get(session.id)).toMatchObject({
-      programId: 'general',
+      programId: 'rehab',
       policyVersion: 1,
       checkins: { before, after },
       feedback: {
@@ -537,16 +531,10 @@ describe('programme persistence and safety boundaries', () => {
 
   it('prevents changing programmes during an active session and returns its unchanged snapshot on repeated start', async () => {
     await saveTrainingPreferences(db, preferences);
-    const active = await startTrainingSession(
-      db,
-      preferences,
-      'A',
-      [plan],
-      now,
-    );
+    const active = await startTrainingSession(db, rehabPrefs, 'A', [plan], now);
     await recordTrainingCheckin(db, active.id, 'before', before);
     const started = await db.sessions.get(active.id);
-    const changed = { ...preferences, programId: 'rehab' as const };
+    const changed = { ...preferences, programId: 'general' as const };
     await expect(saveTrainingPreferences(db, changed)).rejects.toThrow(
       /pågående/,
     );
@@ -611,7 +599,7 @@ describe('programme persistence and safety boundaries', () => {
   ])('rejects a set outside its saved side/variant/dose: %j', async (patch) => {
     const session = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,
@@ -623,10 +611,42 @@ describe('programme persistence and safety boundaries', () => {
     expect(await db.setLogs.count()).toBe(0);
   });
 
-  it('rejects a before answer with after-feeling choices and an after answer with readiness choices', async () => {
+  it('rejects check-ins for regular training: only rehab has them', async () => {
     const session = await startTrainingSession(
       db,
       preferences,
+      'A',
+      [plan],
+      now,
+    );
+    for (const timing of ['before', 'after', 'dayAfter'] as const)
+      await expect(
+        recordTrainingCheckin(db, session.id, timing, before),
+      ).rejects.toThrow();
+    expect((await db.sessions.get(session.id))?.checkins).toEqual({});
+  });
+
+  it('round-trips a per-exercise hurt mark through backup and keeps it per exercise', async () => {
+    const session = await startTrainingSession(
+      db,
+      preferences,
+      'A',
+      [plan],
+      now,
+    );
+    await setFeedback(db, session.id, plan.exerciseId, { hurt: true });
+    const backup = await exportAll(db, now);
+    await importAll(db, serializeBackup(backup));
+    expect((await db.sessions.get(session.id))?.feedback).toEqual({
+      [plan.exerciseId]: { hurt: true },
+    });
+    expect(await exportAll(db, now)).toEqual(backup);
+  });
+
+  it('rejects a before answer with after-feeling choices and an after answer with readiness choices', async () => {
+    const session = await startTrainingSession(
+      db,
+      rehabPrefs,
       'A',
       [plan],
       now,
@@ -672,11 +692,12 @@ describe('programme persistence and safety boundaries', () => {
   it('completes a deferred after answer once, keeps the completion time and allows a late answer', async () => {
     const session = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,
     );
+    await recordTrainingCheckin(db, session.id, 'before', before);
     const finished = new Date('2026-10-20T08:20:00.000Z');
     await deferAfterCheckin(db, session.id, finished);
     await deferAfterCheckin(
@@ -709,7 +730,7 @@ describe('programme persistence and safety boundaries', () => {
   it('never defers an aborted or legacy session', async () => {
     const session = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,
@@ -725,7 +746,7 @@ describe('programme persistence and safety boundaries', () => {
   it('rejects crafted schema2 plans and sets without replacing existing data', async () => {
     const session = await startTrainingSession(
       db,
-      preferences,
+      rehabPrefs,
       'A',
       [plan],
       now,

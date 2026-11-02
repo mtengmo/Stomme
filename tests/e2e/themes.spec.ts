@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { SCHEMES, themes } from '../../src/styles/themes/registry';
-import { answerPain } from './flow';
+import { abortForPain, openPreview, startPassA } from './flow';
 
 const rgb = (hex: string) => {
   const n = (i: number) => Number.parseInt(hex.slice(i, i + 2), 16);
@@ -53,7 +53,7 @@ test.describe('@themes every registered theme and scheme', () => {
   for (const theme of themes) {
     for (const scheme of SCHEMES) {
       const tokens = theme.tokens[scheme];
-      test(`@themes ${theme.id} ${scheme}: week, set and stop`, async ({
+      test(`@themes ${theme.id} ${scheme}: preview, set, stop and history`, async ({
         page,
       }) => {
         await page.addInitScript(
@@ -83,13 +83,40 @@ test.describe('@themes every registered theme and scheme', () => {
         expect(expand(read.meta)).toBe(tokens.paper);
         expect(expand(read.paper)).toBe(tokens.paper);
 
-        // Week: primary button and the done chip compute to their tokens.
-        await seedDone(page);
-        await page.reload();
-        const start = page.getByRole('link', { name: 'Starta pass' });
+        // Preview: the primary button computes to its tokens.
+        await openPreview(page, true);
+        const start = page.getByRole('button', {
+          name: 'Börja passet',
+          exact: true,
+        });
         await expect(start).toBeVisible();
         await expect(start).toHaveCSS('background-color', rgb(tokens.action));
         await expect(start).toHaveCSS('color', rgb(tokens['action-ink']));
+        await noOverflow(page);
+
+        // Set screen.
+        await start.click();
+        const done = page.getByRole('button', { name: 'Klar set' });
+        await expect(done).toBeVisible();
+        await expect(done).toHaveCSS('background-color', rgb(tokens.action));
+        await noOverflow(page);
+
+        // Stop screen: 6 px --care frame, icon and the word Stopp.
+        await abortForPain(page);
+        await expect(
+          page.getByRole('heading', { name: 'Avbryt passet.' }),
+        ).toBeVisible();
+        await expect(page.getByText('Stopp', { exact: true })).toBeVisible();
+        const frame = page
+          .locator('h1')
+          .locator('xpath=ancestor::div[contains(@class,"border-care")][1]');
+        await expect(frame).toHaveCSS('border-top-width', '6px');
+        await expect(frame).toHaveCSS('border-top-color', rgb(tokens.care));
+        await noOverflow(page);
+
+        // History: the done chip computes to its tokens.
+        await seedDone(page);
+        await page.goto('/#/historik/s-done');
         const chip = page.getByText('Klar', { exact: true }).first();
         await expect(chip).toBeVisible();
         await expect(chip).toHaveCSS(
@@ -102,30 +129,6 @@ test.describe('@themes every registered theme and scheme', () => {
             rgb(tokens['done-fill']),
           );
         await noOverflow(page);
-
-        // Stop screen: 6 px --care frame, icon and the word Stopp.
-        await page.goto('/#/pass/A');
-        await page.getByRole('button', { name: 'Starta pass' }).click();
-        await answerPain(page, 1, ['Skarp smärta']);
-        await expect(
-          page.getByRole('heading', { name: 'Avbryt passet.' }),
-        ).toBeVisible();
-        await expect(page.getByText('Stopp', { exact: true })).toBeVisible();
-        const frame = page
-          .locator('h1')
-          .locator('xpath=ancestor::div[contains(@class,"border-care")][1]');
-        await expect(frame).toHaveCSS('border-top-width', '6px');
-        await expect(frame).toHaveCSS('border-top-color', rgb(tokens.care));
-        await noOverflow(page);
-
-        // Set screen.
-        await page.goto('/#/pass/A');
-        await page.getByRole('button', { name: 'Starta pass' }).click();
-        await answerPain(page, 0);
-        const done = page.getByRole('button', { name: 'Klar set' });
-        await expect(done).toBeVisible();
-        await expect(done).toHaveCSS('background-color', rgb(tokens.action));
-        await noOverflow(page);
       });
     }
   }
@@ -135,9 +138,8 @@ test('@themes the stop screen button fits at 360 px and at 200% zoom, with a ret
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto('/#/pass/A');
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 1, ['Skarp smärta']);
+  await startPassA(page, true);
+  await abortForPain(page);
   const button = page.getByRole('button', { name: 'Till träningen' });
   await expect(button).toBeVisible();
   // The no-entry glyph belongs to the heading only: the button has one icon, the back arrow.
@@ -150,28 +152,5 @@ test('@themes the stop screen button fits at 360 px and at 200% zoom, with a ret
     expect(box?.x ?? -1).toBeGreaterThanOrEqual(0);
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width);
     await noOverflow(page);
-  }
-});
-
-test('@themes the week action bar sits flush on the nav on short and tall screens', async ({
-  page,
-}) => {
-  await page.goto('/');
-  await seedDone(page);
-  for (const height of [800, 1300]) {
-    await page.setViewportSize({ width: 360, height });
-    await page.reload();
-    await expect(page.getByRole('link', { name: 'Starta pass' })).toBeVisible();
-    const gap = await page.evaluate(() => {
-      const bar = [...document.querySelectorAll('div.sticky')].find((d) =>
-        d.textContent?.includes('Starta pass'),
-      );
-      const nav = document.querySelector('nav');
-      return (
-        (nav?.getBoundingClientRect().top ?? -1) -
-        (bar?.getBoundingClientRect().bottom ?? -2)
-      );
-    });
-    expect(gap, `gap at ${height}px`).toBe(0);
   }
 });

@@ -33,21 +33,10 @@ const SessionDetail = lazy(() =>
     default: m.SessionDetail,
   })),
 );
-const PassPreview = lazy(() =>
-  import('./features/pass/PassPreview').then((m) => ({
-    default: m.PassPreview,
+const StopRoute = lazy(() =>
+  import('./features/session/StopRoute').then((m) => ({
+    default: m.StopRoute,
   })),
-);
-const UnknownPass = lazy(() =>
-  import('./features/pass/PassPreview').then((m) => ({
-    default: m.UnknownPass,
-  })),
-);
-const PainScreen = lazy(() =>
-  import('./features/pain/PainScreen').then((m) => ({ default: m.PainScreen })),
-);
-const StopScreen = lazy(() =>
-  import('./features/pain/PainScreen').then((m) => ({ default: m.StopScreen })),
 );
 const FigureDev = import.meta.env.DEV
   ? lazy(() =>
@@ -63,8 +52,6 @@ const FigureComparison = lazy(() =>
     default: m.FigureComparison,
   })),
 );
-const isTiming = (value: string): value is 'before' | 'after' | 'dayAfter' =>
-  ['before', 'after', 'dayAfter'].includes(value);
 const PhysioReport = lazy(() =>
   import('./features/history/PhysioReport').then((m) => ({
     default: m.PhysioReport,
@@ -150,7 +137,6 @@ function Shell() {
   const [location] = useLocation();
   const inSession =
     location.startsWith('/session/') ||
-    location.startsWith('/smarta/') ||
     location.startsWith('/kansla/') ||
     location.startsWith('/traning/') ||
     location.startsWith('/stopp/');
@@ -200,31 +186,12 @@ function Shell() {
                 />
               )}
             </Route>
-            <Route path="/pass/:id">
-              {(params) =>
-                params.id === 'A' || params.id === 'B' ? (
-                  <PassPreview id={params.id} />
-                ) : (
-                  <UnknownPass />
-                )
-              }
-            </Route>
             <Route path="/session/:id">
               {(params) => <SessionScreen id={params.id} />}
             </Route>
-            <Route path="/smarta/:sessionId/:timing">
-              {(params) =>
-                isTiming(params.timing) ? (
-                  <PainScreen
-                    sessionId={params.sessionId}
-                    timing={params.timing}
-                  />
-                ) : (
-                  <UnknownPass />
-                )
-              }
+            <Route path="/stopp/:sessionId">
+              {(params) => <StopRoute sessionId={params.sessionId} />}
             </Route>
-            <Route path="/stopp/:sessionId">{() => <StopRoute />}</Route>
             <Route path="/ovning/:id">
               {(params) => <ExerciseCardPage id={params.id} />}
             </Route>
@@ -265,9 +232,4 @@ function Shell() {
       {navVisible(location) ? <BottomNav /> : null}
     </>
   );
-}
-
-function StopRoute() {
-  const [, navigate] = useLocation();
-  return <StopScreen onHome={() => navigate('/')} />;
 }

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Redirect, useLocation } from 'wouter';
 import { PAIN_COPY } from '../../content/copy';
+import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exercises } from '../../content/exercises';
 import { programmeNames } from '../../content/programmes';
-import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import {
   abortSession,
@@ -30,6 +30,7 @@ import { Snackbar } from '../../ui/Snackbar';
 import type { TallyItem } from '../../ui/Tally';
 import { ExerciseSymptoms } from '../training/Checkin';
 import { EffortScreen } from './EffortScreen';
+import { PainValve } from './PainValve';
 import { RestScreen } from './RestScreen';
 import { type CountInfo, SetScreen } from './SetScreen';
 import { Summary } from './Summary';
@@ -37,7 +38,7 @@ import { Summary } from './Summary';
 interface RunnerProps {
   session: Session;
   logs: SetLog[];
-  /** The 'after' pain reading is in; until then the end of the plan leads to it. */
+  /** The rehab 'after' check-in is in; until then the end of the plan leads to it. */
   hasAfter: boolean;
 }
 
@@ -66,6 +67,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [valve, setValve] = useState(false);
   const [timedExercise, setTimedExercise] = useState<ExerciseId | null>(null);
   const [restEffort, setRestEffort] = useState<Effort | undefined>();
   const snackKey = useRef(0);
@@ -155,7 +157,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       session.customWorkoutName ??
       (session.programId
         ? `${session.workoutMode === 'short' ? 'Kortpass · ' : ''}${programmeNames[session.programId]} · ${session.templateId}`
-        : templates[session.templateId].name),
+        : `Pass ${session.templateId}`),
     stepId: cursor,
     clock: formatClock(seconds),
     tally,
@@ -201,8 +203,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       navigate('/');
     });
 
-  const abortForPain = () =>
+  const abortForPain = (hurtExerciseId?: ExerciseId) =>
     run(async () => {
+      if (hurtExerciseId)
+        await setFeedback(getDb(), session.id, hurtExerciseId, { hurt: true });
       await abortSession(getDb(), session.id, new Date(), 'pain_stop');
       navigate(`/stopp/${session.id}`);
     });
@@ -226,7 +230,13 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={abortForPain}
+            onClick={() =>
+              abortForPain(
+                session.programId && session.programId !== 'rehab'
+                  ? step?.exerciseId
+                  : undefined,
+              )
+            }
             aria-describedby="pain-abort-hint"
           >
             {PAIN_COPY.stopAbortPain}
@@ -244,16 +254,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     );
   }
 
+  // Only rehab asks how the session felt (the caller sets hasAfter for
+  // regular training); everything else ends in the summary.
   if (!step && !hasAfter) {
-    return (
-      <Redirect
-        to={
-          session.programId
-            ? `/kansla/${session.id}/after`
-            : `/smarta/${session.id}/after`
-        }
-      />
-    );
+    return <Redirect to={`/kansla/${session.id}/after`} />;
   }
 
   if (!step) {
@@ -277,7 +281,47 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       .at(-1);
     // The suggestion in the plan is the prefill; what the user logs becomes the base.
     const prior = mine;
-    if (reporting && session.programId)
+    if (valve && session.programId && session.programId !== 'rehab') {
+      const variant = exerciseMetadata[step.exerciseId].variants.find(
+        (item) => item.id === (prior?.variantId ?? plan?.variantId),
+      );
+      const easierId = exerciseMetadata[step.exerciseId].easierExerciseId;
+      return (
+        <PainValve
+          exerciseName={ex.name}
+          easierText={variant?.easierOption ?? ex.easierVariant}
+          easierExerciseName={easierId ? exercises[easierId].name : undefined}
+          busy={busy}
+          error={error}
+          onBack={() => setValve(false)}
+          onSkip={() =>
+            run(async () => {
+              setTimedExercise(null);
+              const db = getDb();
+              await setFeedback(db, session.id, step.exerciseId, {
+                skipped: true,
+                hurt: true,
+              });
+              setValve(false);
+              advance({
+                ...session.feedback,
+                [step.exerciseId]: { skipped: true, hurt: true },
+              });
+            })
+          }
+          onAbort={() => abortForPain(step.exerciseId)}
+          onContinue={() =>
+            run(async () => {
+              await setFeedback(getDb(), session.id, step.exerciseId, {
+                hurt: true,
+              });
+              setValve(false);
+            })
+          }
+        />
+      );
+    }
+    if (reporting && session.programId === 'rehab')
       return (
         <div className="mx-auto flex max-w-md flex-col gap-4 px-5 py-6">
           <ExerciseSymptoms
@@ -318,7 +362,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         onStartTimer={() => setTimedExercise(ex.id)}
         onCancelTimer={() => setTimedExercise(null)}
         onReportSymptoms={
-          session.programId
+          session.programId === 'rehab'
             ? () => {
                 setTimedExercise(null);
                 setReporting(true);
@@ -326,6 +370,15 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
             : undefined
         }
         symptomReported={!!session.feedback[step.exerciseId]?.symptoms}
+        onHurt={
+          session.programId && session.programId !== 'rehab'
+            ? () => {
+                setTimedExercise(null);
+                setValve(true);
+              }
+            : undefined
+        }
+        hurtMarked={!!session.feedback[step.exerciseId]?.hurt}
         busy={busy}
         onSkip={() =>
           run(async () => {

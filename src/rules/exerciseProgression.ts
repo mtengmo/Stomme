@@ -1,6 +1,5 @@
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
-import { impactExercises } from '../content/rosterSlots';
 import type {
   ExerciseId,
   Session,
@@ -9,7 +8,6 @@ import type {
 } from '../domain/types';
 import { equipmentFits } from './equipment';
 import { allowedLevels } from './levelPolicy';
-import { symptomsOnRecord } from './painOnRecord';
 
 /** Optional exercise changes only: never mutates a plan or progresses rehab. */
 export function harderExerciseSuggestions(
@@ -17,7 +15,6 @@ export function harderExerciseSuggestions(
   preferences: TrainingPreferences,
   sessions: readonly Session[],
   logs: readonly SetLog[],
-  painOnRecord: boolean,
 ): ExerciseId[] {
   const next = exerciseMetadata[id].harderExerciseId;
   if (preferences.programId === 'rehab' || !next) return [];
@@ -37,18 +34,8 @@ export function harderExerciseSuggestions(
     .sort((a, b) => b.session.startedAt.localeCompare(a.session.startedAt))
     .slice(0, 2);
   if (attempts.length < 2) return [];
-  const oldest = attempts[1] as { session: Session };
-  const symptomsSince = sessions.some(
-    (session) =>
-      session.programId === preferences.programId &&
-      session.startedAt >= oldest.session.startedAt &&
-      (session.abortReason === 'pain_stop' ||
-        Object.values(session.feedback).some(
-          (feedback) => feedback?.symptoms,
-        ) ||
-        Object.values(session.checkins ?? {}).some((check) => check?.symptoms)),
-  );
-  if (symptomsSince) return [];
+  // Pain is per exercise: a "hurt" mark in either attempt blocks the suggestion.
+  if (attempts.some(({ session }) => session.feedback[id]?.hurt)) return [];
   const exercise = exercises[id];
   const qualifies = attempts.every(({ session, plan }) => {
     const feedback = session.feedback[id];
@@ -61,7 +48,6 @@ export function harderExerciseSuggestions(
       session.status === 'completed' &&
       !feedback?.skipped &&
       feedback?.effort === 'easy' &&
-      session.checkins?.after?.feeling === 'good' &&
       plan.sets > 0 &&
       sides.length > 0 &&
       Array.from({ length: plan.sets }, (_, index) => index + 1).every(
@@ -84,17 +70,11 @@ export function harderExerciseSuggestions(
   const candidates: ExerciseId[] =
     id === 'push-up' ? [next, 'diamond-push-up', 'blast-off-push-up'] : [next];
   const levels = allowedLevels(preferences.experience);
-  const globalPain = symptomsOnRecord(sessions, painOnRecord);
-  return candidates.filter(
-    (candidate) =>
-      !(
-        globalPain &&
-        (impactExercises.has(candidate) || exercises[candidate].kneeLoaded)
-      ) &&
-      exerciseMetadata[candidate].variants.some(
-        (variant) =>
-          equipmentFits(variant.equipment, preferences) &&
-          levels.includes(variant.technicalLevel),
-      ),
+  return candidates.filter((candidate) =>
+    exerciseMetadata[candidate].variants.some(
+      (variant) =>
+        equipmentFits(variant.equipment, preferences) &&
+        levels.includes(variant.technicalLevel),
+    ),
   );
 }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type {
   ExerciseId,
-  PainLog,
   PlannedExercise,
   ProgramId,
   Session,
@@ -65,24 +64,6 @@ function log(
   };
 }
 
-function pain(
-  id: string,
-  sessionId: string,
-  patch: Partial<PainLog> = {},
-): PainLog {
-  return {
-    id,
-    sessionId,
-    date: '2026-10-20',
-    timing: 'before',
-    score: 0,
-    location: 'right_knee',
-    redFlags: { sharp: false, swelling: false, locking: false },
-    createdAt: '2026-10-20T08:00:00.000Z',
-    ...patch,
-  };
-}
-
 const selection = {
   from: '2026-10-20',
   to: '2026-10-22',
@@ -97,7 +78,7 @@ describe('physiotherapist report data', () => {
   ])(
     'returns invalid without rendering records for bad date selection %#',
     (chosen) => {
-      expect(buildPhysioReport([session('a')], [], [], chosen)).toEqual({
+      expect(buildPhysioReport([session('a')], [], chosen)).toEqual({
         selection: chosen,
         valid: false,
         sessions: [],
@@ -119,7 +100,7 @@ describe('physiotherapist report data', () => {
     ];
     const before = structuredClone(data);
     const ids = (programme: ReportProgramme) =>
-      buildPhysioReport(data, [], [], { ...selection, programme }).sessions.map(
+      buildPhysioReport(data, [], { ...selection, programme }).sessions.map(
         (row) => row.session.id,
       );
     expect(ids('all')).toEqual([
@@ -150,7 +131,7 @@ describe('physiotherapist report data', () => {
       session('tomorrow', '2026-10-21'),
     ];
     expect(
-      buildPhysioReport(data, [], [], selection).sessions.map(
+      buildPhysioReport(data, [], selection).sessions.map(
         (row) => row.session.id,
       ),
     ).toEqual(['tomorrow', 'newer', 'a', 'b']);
@@ -197,7 +178,7 @@ describe('physiotherapist report data', () => {
       }),
       log('dangling', 'other', 'push-up'),
     ];
-    const result = buildPhysioReport([short], raw, [], selection);
+    const result = buildPhysioReport([short], raw, selection);
     expect(result.valid).toBe(true);
     expect(result.sessions[0]?.session.fullPlan).toHaveLength(2);
     expect(result.sessions[0]?.exercises.map((row) => row.exerciseId)).toEqual([
@@ -239,7 +220,7 @@ describe('physiotherapist report data', () => {
       }),
       log('aborted-actual', 'aborted', 'dead-bug', { amount: 4 }),
     ];
-    const result = buildPhysioReport([aborted, legacy], logs, [], selection);
+    const result = buildPhysioReport([aborted, legacy], logs, selection);
     expect(result.sessions[0]?.exercises.map((row) => row.exerciseId)).toEqual([
       'plank',
       'crunch',
@@ -258,33 +239,10 @@ describe('physiotherapist report data', () => {
     expect(result.sessions[1]?.exercises[1]?.logs[0]?.amount).toBe(4);
   });
 
-  it('keeps explicit zero pain and red flags separate from optional check-ins', () => {
+  it('carries no legacy pain readings, only the session and its sets', () => {
     const legacy = session('legacy');
-    const readings = [
-      pain('after-b', 'legacy', {
-        timing: 'after',
-        createdAt: '2026-10-20T09:00:00.000Z',
-      }),
-      pain('before', 'legacy', {
-        score: 0,
-        redFlags: { sharp: true, swelling: false, locking: false },
-      }),
-      pain('after-a', 'legacy', {
-        timing: 'after',
-        createdAt: '2026-10-20T09:00:00.000Z',
-      }),
-      pain('other', 'other'),
-    ];
-    const result = buildPhysioReport([legacy], [], readings, selection);
-    expect(result.sessions[0]?.painLogs.map((row) => row.id)).toEqual([
-      'before',
-      'after-a',
-      'after-b',
-    ]);
-    expect(result.sessions[0]?.painLogs[0]).toMatchObject({
-      score: 0,
-      redFlags: { sharp: true },
-    });
+    const result = buildPhysioReport([legacy], [], selection);
+    expect(result.sessions[0]).not.toHaveProperty('painLogs');
     expect(result.sessions[0]?.session.checkins).toBeUndefined();
   });
 
@@ -313,7 +271,6 @@ describe('physiotherapist report data', () => {
       buildPhysioReport(
         [s],
         raw,
-        [],
         selection,
       ).sessions[0]?.exercises[0]?.logs.map((row) => row.id),
     ).toEqual(['old', 'a', 'b', 'z']);

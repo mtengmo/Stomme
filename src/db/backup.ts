@@ -10,7 +10,6 @@ import {
 import type {
   ExerciseId,
   MetaEntry,
-  PainLog,
   ReasonCode,
   Session,
   SetLog,
@@ -26,7 +25,7 @@ import { validateTrainingPlan } from './training';
 import { isTrainingRoutines } from './trainingRoutines';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
-export const BACKUP_SCHEMA_VERSION = 3;
+export const BACKUP_SCHEMA_VERSION = 4;
 /** Import size limit (risk R12). */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -35,7 +34,6 @@ export interface BackupFile {
   exportedAt: string;
   sessions: Session[];
   setLogs: SetLog[];
-  painLogs: PainLog[];
   meta: MetaEntry[];
 }
 
@@ -62,21 +60,13 @@ export async function exportAll(
   db: StommeDB,
   now: Date = new Date(),
 ): Promise<BackupFile> {
-  return db.transaction(
-    'r',
-    db.sessions,
-    db.setLogs,
-    db.painLogs,
-    db.meta,
-    async () => ({
-      schemaVersion: BACKUP_SCHEMA_VERSION,
-      exportedAt: now.toISOString(),
-      sessions: await db.sessions.toArray(),
-      setLogs: await db.setLogs.toArray(),
-      painLogs: await db.painLogs.toArray(),
-      meta: await db.meta.toArray(),
-    }),
-  );
+  return db.transaction('r', db.sessions, db.setLogs, db.meta, async () => ({
+    schemaVersion: BACKUP_SCHEMA_VERSION,
+    exportedAt: now.toISOString(),
+    sessions: await db.sessions.toArray(),
+    setLogs: await db.setLogs.toArray(),
+    meta: await db.meta.toArray(),
+  }));
 }
 
 export function serializeBackup(backup: BackupFile): string {
@@ -130,8 +120,6 @@ const reasonCodes = [
   'hold_not_easy_at_max',
   'hold_waiting_for_3_sets',
   'max_level',
-  'pain_hold',
-  'pain_stop_hold',
 ] as const satisfies readonly ReasonCode[];
 const count = z.number().int().min(0).max(100_000);
 
@@ -235,6 +223,7 @@ const effortFeedback = z.strictObject({
   effortSkipped: z.boolean().optional(),
   skipped: z.boolean().optional(),
   symptoms: symptom.nullable().optional(),
+  hurt: z.literal(true).optional(),
 });
 
 const sessionSchema = z
@@ -391,23 +380,6 @@ const setLogSchema = z
     }
   });
 
-const score = z.number().int().min(0).max(10);
-
-const painLogSchema = z.strictObject({
-  id,
-  sessionId: id,
-  date: localDate,
-  timing: z.enum(['before', 'after', 'dayAfter']),
-  score,
-  location: z.literal('right_knee'),
-  redFlags: z.strictObject({
-    sharp: z.boolean(),
-    swelling: z.boolean(),
-    locking: z.boolean(),
-  }),
-  createdAt: instant,
-});
-
 const savedRehabPlan = z
   .array(plannedExercise)
   .min(1)
@@ -540,10 +512,6 @@ const metaSchema = z.discriminatedUnion('key', [
     }),
   }),
   z.strictObject({
-    key: z.literal('program'),
-    value: z.strictObject({ startDate: localDate }),
-  }),
-  z.strictObject({
     key: z.literal('onboarding'),
     value: z.strictObject({ acceptedAt: instant }),
   }),
@@ -561,7 +529,6 @@ const backupSchema = z.strictObject({
   exportedAt: instant,
   sessions: z.array(sessionSchema),
   setLogs: z.array(setLogSchema),
-  painLogs: z.array(painLogSchema),
   meta: z.array(metaSchema),
 });
 
@@ -601,19 +568,11 @@ export function parseBackup(text: string): BackupFile {
   if (
     duplicate(b.sessions) ||
     duplicate(b.setLogs) ||
-    duplicate(b.painLogs) ||
     metaKeys.size !== b.meta.length ||
-    b.setLogs.some((l) => !sessionIds.has(l.sessionId)) ||
-    b.painLogs.some((l) => !sessionIds.has(l.sessionId))
+    b.setLogs.some((l) => !sessionIds.has(l.sessionId))
   ) {
     throw new BackupError('invalid', 'Duplicate ids or dangling references');
   }
-  // An in-progress session with logged sets must have its 'before' pain
-  // reading (the pain gate runs before the first set); otherwise resuming it
-  // would skip the safety check.
-  const withBefore = new Set(
-    b.painLogs.filter((p) => p.timing === 'before').map((p) => p.sessionId),
-  );
   const setSessions = new Set(b.setLogs.map((l) => l.sessionId));
   const sessionsById = new Map(
     b.sessions.map((session) => [session.id, session]),
@@ -657,16 +616,13 @@ export function parseBackup(text: string): BackupFile {
       (s) =>
         s.status === 'in_progress' &&
         setSessions.has(s.id) &&
-        (s.programId === 'rehab'
-          ? !s.checkins?.before
-          : s.programId
-            ? false
-            : !withBefore.has(s.id)),
+        s.programId === 'rehab' &&
+        !s.checkins?.before,
     )
   ) {
     throw new BackupError(
       'invalid',
-      'In-progress session has sets but no pain reading before the session',
+      'In-progress rehab session has sets but no check-in before the session',
     );
   }
   return b;
@@ -684,7 +640,7 @@ export interface ImportOptions {
 export interface ImportResult {
   /** Everything that was in the database before the import. */
   safetyBackup: BackupFile;
-  counts: { sessions: number; setLogs: number; painLogs: number; meta: number };
+  counts: { sessions: number; setLogs: number; meta: number };
 }
 
 /**
@@ -699,31 +655,21 @@ export async function importAll(
   const backup = parseBackup(text);
   const safetyBackup = await exportAll(db, options.now ?? new Date());
   await options.beforeReplace?.(safetyBackup);
-  await db.transaction(
-    'rw',
-    db.sessions,
-    db.setLogs,
-    db.painLogs,
-    db.meta,
-    async () => {
-      await Promise.all([
-        db.sessions.clear(),
-        db.setLogs.clear(),
-        db.painLogs.clear(),
-        db.meta.clear(),
-      ]);
-      await db.sessions.bulkAdd(backup.sessions);
-      await db.setLogs.bulkAdd(backup.setLogs);
-      await db.painLogs.bulkAdd(backup.painLogs);
-      await db.meta.bulkAdd(backup.meta);
-    },
-  );
+  await db.transaction('rw', db.sessions, db.setLogs, db.meta, async () => {
+    await Promise.all([
+      db.sessions.clear(),
+      db.setLogs.clear(),
+      db.meta.clear(),
+    ]);
+    await db.sessions.bulkAdd(backup.sessions);
+    await db.setLogs.bulkAdd(backup.setLogs);
+    await db.meta.bulkAdd(backup.meta);
+  });
   return {
     safetyBackup,
     counts: {
       sessions: backup.sessions.length,
       setLogs: backup.setLogs.length,
-      painLogs: backup.painLogs.length,
       meta: backup.meta.length,
     },
   };

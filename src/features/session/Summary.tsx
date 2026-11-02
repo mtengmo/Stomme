@@ -102,7 +102,7 @@ export function Summary({
             <Button onClick={onFinish}>Avsluta pass</Button>
           ) : (
             <>
-              {session.programId &&
+              {session.programId === 'rehab' &&
               session.status === 'completed' &&
               !session.checkins?.after ? (
                 <Link

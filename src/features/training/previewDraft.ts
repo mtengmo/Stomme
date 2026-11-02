@@ -3,20 +3,17 @@ import type { PlannedExercise } from '../../domain/types';
 /** Preview state beyond the plan itself, kept per tab so leaving via the nav loses nothing. */
 export interface PreviewFlags {
   confirmed: boolean;
-  checkBefore: boolean;
   removed: { item: PlannedExercise; index: number } | null;
 }
 
 export const EMPTY_FLAGS: PreviewFlags = {
   confirmed: false,
-  checkBefore: false,
   removed: null,
 };
 
 const suffix = '.flags';
 
 export interface DraftSafety {
-  painOnRecord: boolean;
   edited: boolean;
 }
 export function readDraftSafety(draftKey: string): DraftSafety | undefined {
@@ -24,10 +21,8 @@ export function readDraftSafety(draftKey: string): DraftSafety | undefined {
     const value = JSON.parse(
       sessionStorage.getItem(`${draftKey}.safety`) ?? 'null',
     );
-    return value &&
-      typeof value.painOnRecord === 'boolean' &&
-      typeof value.edited === 'boolean'
-      ? { painOnRecord: value.painOnRecord, edited: value.edited }
+    return value && typeof value.edited === 'boolean'
+      ? { edited: value.edited }
       : undefined;
   } catch {
     return undefined;
@@ -64,7 +59,6 @@ export function readFlags(draftKey: string): PreviewFlags {
         : null;
     return {
       confirmed: v.confirmed === true,
-      checkBefore: v.checkBefore === true,
       removed,
     };
   } catch {

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { ExerciseId, PainLog, Session, SetLog } from '../domain/types';
-import {
-  loadPerExercise,
-  loggedExerciseIds,
-  painSeries,
-  weeklyVolume,
-} from './stats';
+import type { ExerciseId, Session, SetLog } from '../domain/types';
+import { loadPerExercise, loggedExerciseIds, weeklyVolume } from './stats';
 
 function session(id: string, date: string): Session {
   return {
@@ -171,43 +166,6 @@ describe('loadPerExercise', () => {
     const logs = [log('a', 'wall-sit', 1), log('a', 'step-up', 1)];
     expect(loggedExerciseIds(logs)).toEqual(['step-up', 'wall-sit']);
     expect(loggedExerciseIds([])).toEqual([]);
-  });
-});
-
-describe('painSeries', () => {
-  function pain(
-    id: string,
-    date: string,
-    timing: PainLog['timing'],
-    score: number,
-    createdAt = `${date}T10:00:00.000Z`,
-  ): PainLog {
-    return {
-      id,
-      sessionId: 's',
-      date,
-      timing,
-      score,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt,
-    };
-  }
-
-  it('is empty per timing without data', () => {
-    expect(painSeries([])).toEqual({ before: [], after: [], dayAfter: [] });
-  });
-
-  it('groups by timing and sorts by date', () => {
-    const s = painSeries([
-      pain('3', '2026-10-14', 'dayAfter', 3),
-      pain('2', '2026-10-13', 'after', 2),
-      pain('1', '2026-10-13', 'before', 1),
-      pain('0', '2026-10-06', 'before', 0),
-    ]);
-    expect(s.before.map((p) => p.score)).toEqual([0, 1]);
-    expect(s.after).toHaveLength(1);
-    expect(s.dayAfter[0]?.date).toBe('2026-10-14');
   });
 });
 

@@ -1,5 +1,5 @@
 import { devices, expect, test } from '@playwright/test';
-import { answerPain, openPreview } from './flow';
+import { openPreview } from './flow';
 import { REP_COUNT_MANUAL_KEY } from './state';
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 412, height: 915 } });
@@ -16,8 +16,7 @@ test('a rep exercise starts hands-free, pauses and can switch to manual', async 
   page,
 }) => {
   await openPreview(page, true);
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 0);
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
 
   const start = page.getByRole('button', { name: 'Starta – 5 s förberedelse' });
   await expect(start).toBeVisible();
@@ -35,8 +34,7 @@ test('a rep exercise starts hands-free, pauses and can switch to manual', async 
 
 test('Räkna själv brings back Klar set and is remembered', async ({ page }) => {
   await openPreview(page, true);
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await answerPain(page, 0);
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
   await page.getByText('Ändra set', { exact: true }).click();
   await page.getByRole('switch', { name: 'Räkna själv: av' }).click();
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();

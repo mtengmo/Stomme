@@ -6,7 +6,7 @@ import { exercises } from '../../content/exercises';
 import { trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { deleteSession } from '../../db/history';
-import type { ExerciseId, PainLog, SetLog } from '../../domain/types';
+import type { ExerciseId, SetLog } from '../../domain/types';
 import { formatLongDate } from '../../lib/dates';
 import { formatMinutes } from '../../lib/format';
 import { loggedVariant, sessionSetProgress } from '../../rules/history';
@@ -19,12 +19,6 @@ import { WorkoutEquipmentNotice } from '../session/WorkoutEquipmentNotice';
 import { CheckinHistory } from './CheckinHistory';
 import { amountText, EFFORT_LABEL, kgText, StatusChip } from './labels';
 
-const TIMING: Record<PainLog['timing'], string> = {
-  before: 'Före',
-  after: 'Efter',
-  dayAfter: 'Dagen efter',
-};
-const TIMING_ORDER: PainLog['timing'][] = ['before', 'after', 'dayAfter'];
 const SIDE: Record<SetLog['side'], string> = {
   right: 'höger',
   left: 'vänster',
@@ -35,8 +29,7 @@ async function load(id: string) {
   const db = getDb();
   const session = await db.sessions.get(id);
   const setLogs = await db.setLogs.where('sessionId').equals(id).toArray();
-  const painLogs = await db.painLogs.where('sessionId').equals(id).toArray();
-  return { session, setLogs, painLogs };
+  return { session, setLogs };
 }
 
 function BackLink() {
@@ -57,7 +50,7 @@ export function SessionDetail({ id }: { id: string }) {
   const [confirming, setConfirming] = useState(false);
   const [failed, setFailed] = useState(false);
   if (!data) return null;
-  const { session, setLogs, painLogs } = data;
+  const { session, setLogs } = data;
 
   if (!session) {
     return (
@@ -81,9 +74,6 @@ export function SessionDetail({ id }: { id: string }) {
       const ib = order.indexOf(b);
       return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
     },
-  );
-  const pain = TIMING_ORDER.flatMap((t) =>
-    painLogs.filter((p) => p.timing === t),
   );
   const duration =
     session.finishedAt && session.status === 'completed'
@@ -149,50 +139,6 @@ export function SessionDetail({ id }: { id: string }) {
         )}
       </section>
 
-      {!session.programId || pain.length ? (
-        <section className="flex flex-col gap-3" aria-label="Smärta">
-          <h2 className="m-0 text-3xl font-bold">Smärta i högerknäet</h2>
-          {pain.length === 0 ? (
-            <p className="m-0 text-base text-ink-soft">
-              Ingen smärta antecknad för det här passet.
-            </p>
-          ) : (
-            <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {pain.map((p) => {
-                const flags = [
-                  p.redFlags.sharp ? 'skarp smärta' : null,
-                  p.redFlags.swelling ? 'svullnad' : null,
-                  p.redFlags.locking ? 'låsning' : null,
-                ].filter(Boolean);
-                return (
-                  <li
-                    key={p.id}
-                    className="flex items-baseline justify-between gap-3 border-b-2 border-edge pb-2 text-base"
-                  >
-                    <span>
-                      {TIMING[p.timing]}
-                      {flags.length > 0 ? (
-                        <span className="text-ink-soft">
-                          {' '}
-                          · {flags.join(', ')}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className="count text-3xl leading-none">
-                      {p.score}
-                      <span className="text-base font-normal text-ink-soft">
-                        {' '}
-                        av 10
-                      </span>
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-      ) : null}
-
       {session.plan.some((p) => !present.includes(p.exerciseId)) ? (
         <section aria-label="Ej loggade övningar">
           <h2 className="m-0 text-2xl font-bold">Utan loggade set</h2>
@@ -221,8 +167,8 @@ export function SessionDetail({ id }: { id: string }) {
         {confirming ? (
           <>
             <Banner tone="warn">
-              Radera passet? Alla set och smärtvärden för det här passet tas
-              bort. Det går inte att ångra.
+              Radera passet? Alla set och svar för det här passet tas bort. Det
+              går inte att ångra.
             </Banner>
             {failed ? (
               <Banner tone="warn">

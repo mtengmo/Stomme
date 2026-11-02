@@ -27,7 +27,6 @@ import type {
 import { toLocalDate, weekdayIndex } from '../../lib/dates';
 import { focusQuery } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
-import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { focusAvailable } from '../../rules/programRosters';
 import {
   muscleRecoveryNote,
@@ -47,8 +46,6 @@ import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
-import { WeekView } from '../week/WeekView';
-import { painLogsShowPain } from './defaultPlan';
 import { startingFocus } from './focusModel';
 import { QuickStart } from './QuickStart';
 
@@ -298,10 +295,9 @@ export function TrainingSetup({
 }
 export function TrainingHome() {
   const data = useLiveQuery(async () => {
-    const [preferences, sessions, legacyProgramme] = await Promise.all([
+    const [preferences, sessions] = await Promise.all([
       getMeta(getDb(), 'training'),
       listSessions(getDb()),
-      getMeta(getDb(), 'program'),
     ]);
     const active = sessions.find((session) => session.status === 'in_progress');
     const preparationId =
@@ -313,10 +309,8 @@ export function TrainingHome() {
     );
     return {
       schedule: await loadWeeklySchedule(),
-      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
       preferences,
       sessions,
-      legacyProgramme,
       preparationId,
       savedWorkouts,
     };
@@ -341,9 +335,7 @@ export function TrainingHome() {
   const due = data.sessions.filter((session) =>
     trainingDayAfterDue(session, toLocalDate(new Date())),
   );
-  const legacy =
-    !preferences && (data.sessions.length > 0 || !!data.legacyProgramme);
-  if (!preferences && !legacy && !editing) return <QuickStart />;
+  if (!preferences && !editing) return <QuickStart />;
   if (editing)
     return (
       <div className="mx-auto max-w-md px-5 pt-5 pb-[var(--app-nav-clear)]">
@@ -370,11 +362,7 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
-  const availability = preferences
-    ? focusAvailable(preferences, {
-        painOnRecord: symptomsOnRecord(data.sessions, data.painReported),
-      })
-    : undefined;
+  const availability = preferences ? focusAvailable(preferences) : undefined;
   const dailyFocus =
     preferences && availability
       ? startingFocus(
@@ -428,22 +416,6 @@ export function TrainingHome() {
           )
       : '';
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
-  if (legacy)
-    return (
-      <>
-        <div className="mx-auto max-w-md px-5 pt-3">
-          <button
-            type="button"
-            disabled={locked}
-            onClick={() => setEditing(true)}
-            className="min-h-12 text-base font-bold underline disabled:opacity-50"
-          >
-            Ändra träningsinriktning
-          </button>
-        </div>
-        <WeekView />
-      </>
-    );
   if (!preferences) return null;
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
@@ -466,9 +438,14 @@ export function TrainingHome() {
           : ''}
       </p>
       {preferences.programId !== 'rehab' ? (
-        <p className="m-0 -mt-3 text-base text-ink-soft">
-          Träningsvana: {experienceLabels[preferences.experience]}
-        </p>
+        <>
+          <p className="m-0 -mt-3 text-base text-ink-soft">
+            Träningsvana: {experienceLabels[preferences.experience]}
+          </p>
+          <p className="m-0 -mt-3 text-base text-ink-soft">
+            Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.
+          </p>
+        </>
       ) : null}
       {preferences.programId === 'general' && dailyFocus && !active ? (
         <p className="m-0 -mt-3 flex min-h-12 flex-wrap items-center gap-x-2 text-base">
@@ -541,10 +518,10 @@ export function TrainingHome() {
             {nextId === 'A' ? 'B' : 'A'}. Du kan byta innan du börjar.
           </p>
           <p className="mt-2 text-base">
-            Nästa dos bygger på dina sparade set och svar om ansträngning och
-            besvär. Ett lätt, komplett pass utan rapporterade besvär kan ge en
-            extra repetition. Vikt ändrar du själv. Förslaget räknas om efter
-            nästa pass.
+            Nästa dos bygger på dina sparade set och svar om ansträngning. Ett
+            lätt, komplett pass kan ge en extra repetition, men inte för en
+            övning där det gjorde ont. Vikt ändrar du själv. Förslaget räknas om
+            efter nästa pass.
           </p>
           <Link
             href="/historik"

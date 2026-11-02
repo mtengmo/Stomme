@@ -7,12 +7,7 @@ import type {
 } from '../../domain/types';
 import { limitedExercises } from '../../rules/levelPolicy';
 import { inventory } from '../../test/inventory';
-import {
-  basePlan,
-  customWorkoutPlan,
-  defaultPlan,
-  painLogsShowPain,
-} from './defaultPlan';
+import { basePlan, customWorkoutPlan, defaultPlan } from './defaultPlan';
 import { defaultPlan as reExported } from './TrainingPreview';
 
 const prefs: TrainingPreferences = {
@@ -108,7 +103,6 @@ describe('level-driven general start plan', () => {
       [],
       [],
       undefined,
-      false,
       routines,
     );
     expect(restored.map((item) => item.exerciseId)).toEqual(
@@ -132,7 +126,7 @@ describe('level-driven general start plan', () => {
     if (restored[0]) restored[0].sets = 1;
     expect(saved[0]?.sets).toBe(4);
     expect(
-      defaultPlan(general('new'), 'B', [], [], undefined, false, routines),
+      defaultPlan(general('new'), 'B', [], [], undefined, routines),
     ).toEqual(defaultPlan(general('new'), 'B', [], []));
     const unavailable = defaultPlan(
       { ...general('new'), equipment: ['bodyweight'] },
@@ -140,7 +134,6 @@ describe('level-driven general start plan', () => {
       [],
       [],
       undefined,
-      false,
       routines,
     );
     expect(unavailable.map((item) => item.variantId)).toEqual(
@@ -185,7 +178,6 @@ describe('level-driven general start plan', () => {
       [prior],
       logs,
       undefined,
-      false,
       routines,
     );
     expect(restored[0]?.sides).toEqual(['right']);
@@ -195,13 +187,7 @@ describe('level-driven general start plan', () => {
       id: 'short-later',
       workoutMode: 'short',
       startedAt: '2026-01-03T10:00:00Z',
-      checkins: {
-        before: {
-          recordedAt: '2026-01-03T10:00:00Z',
-          feeling: 'tired',
-          symptoms: { area: 'Knä', side: 'left', score: 2 },
-        },
-      },
+      feedback: { 'dead-bug': { hurt: true } },
     };
     expect(
       defaultPlan(
@@ -210,17 +196,15 @@ describe('level-driven general start plan', () => {
         [shortSymptom, prior],
         logs,
         undefined,
-        false,
         routines,
       )[0]?.explanation,
-    ).toMatch(/Besvär/);
+    ).toMatch(/Ingen automatisk ökning/);
     const matching = defaultPlan(
       general('new'),
       'A',
       [{ ...prior, plan: [right] }],
       logs.map((log) => ({ ...log, side: 'right' as const })),
       undefined,
-      false,
       routines,
     );
     expect(matching[0]?.target).toBe(12);
@@ -249,23 +233,6 @@ describe('level-driven general start plan', () => {
     expect(heavy?.weightKg).toBe(24);
     expect(heavy?.explanation).toMatch(/Tung startvikt/);
   });
-  it('starts lightest and without heavy note when symptoms are on record', () => {
-    const symptomatic: Session = {
-      ...session('knee', 2),
-      programId: 'general',
-      checkins: {
-        before: {
-          recordedAt: '2026-01-02T10:00:00Z',
-          feeling: 'difficult',
-          symptoms: { area: 'Knä', side: 'right', score: 4 },
-        },
-      },
-    };
-    const plan = defaultPlan(general('regular'), 'A', [symptomatic], []);
-    expect(
-      plan.some((item) => /Tung startvikt/.test(item.explanation ?? '')),
-    ).toBe(false);
-  });
   it('keeps the lightest weight for adds and variant switches', () => {
     const plan = basePlan('goblet-squat', general('regular'));
     expect(plan.exerciseId).toBe('goblet-squat');
@@ -277,47 +244,49 @@ describe('level-driven general start plan', () => {
   it('leaves rehab on zero sets', () => {
     expect(basePlan('quad-set', prefs).sets).toBe(0);
   });
-  it('starts lightest after a pain stop or a painful reading', () => {
-    const stopped: Session = {
+  it('ignores recorded symptoms and pain stops for a regular user', () => {
+    const base: Session = {
       ...session('knee', 2),
       programId: 'general',
+      status: 'completed',
+    };
+    const stopped: Session = {
+      ...base,
       status: 'aborted',
       abortReason: 'pain_stop',
     };
+    const symptom: Session = {
+      ...base,
+      feedback: {
+        'floor-press': {
+          symptoms: [{ area: 'shoulder', side: 'right', score: 2 }],
+        },
+      } as unknown as Session['feedback'],
+    };
+    const prefs = general('regular');
+    const clean = defaultPlan(prefs, 'A', [], []);
     const heavy = (plan: PlannedExercise[]) =>
       plan.some((item) => /Tung startvikt/.test(item.explanation ?? ''));
-    expect(heavy(defaultPlan(general('regular'), 'A', [], []))).toBe(true);
-    expect(heavy(defaultPlan(general('regular'), 'A', [stopped], []))).toBe(
-      false,
-    );
-    expect(
-      heavy(defaultPlan(general('regular'), 'A', [], [], undefined, true)),
-    ).toBe(false);
-    const log = (score: number, sharp = false) => ({
-      id: 'p',
-      sessionId: 's',
-      date: '2026-01-02',
-      timing: 'before' as const,
-      score,
-      location: 'right_knee' as const,
-      redFlags: { sharp, swelling: false, locking: false },
-      createdAt: '2026-01-02T10:00:00Z',
-    });
-    expect(painLogsShowPain([log(0)])).toBe(false);
-    expect(painLogsShowPain([log(2)])).toBe(true);
-    expect(painLogsShowPain([log(0, true)])).toBe(true);
+    expect(heavy(clean)).toBe(true);
+    for (const history of [[stopped], [symptom]]) {
+      const plan = defaultPlan(prefs, 'A', history, []);
+      expect(plan.map((item) => item.exerciseId)).toEqual(
+        clean.map((item) => item.exerciseId),
+      );
+      expect(plan.map((item) => item.weightKg)).toEqual(
+        clean.map((item) => item.weightKg),
+      );
+      const [custom] = customWorkoutPlan(['floor-press'], prefs, history, []);
+      expect(custom?.weightKg).toBe(
+        customWorkoutPlan(['floor-press'], prefs, [], [])[0]?.weightKg,
+      );
+    }
   });
 });
 
 describe('customWorkoutPlan', () => {
   const heavyNote = (item: PlannedExercise) =>
     /Tung startvikt/.test(item.explanation ?? '');
-  const stopped: Session = {
-    ...session('knee', 2),
-    programId: 'general',
-    status: 'aborted',
-    abortReason: 'pain_stop',
-  };
   it('follows experience for sets and starting weight', () => {
     const ids = ['floor-press'] as const;
     const at = (e: TrainingPreferences['experience']) =>
@@ -334,23 +303,6 @@ describe('customWorkoutPlan', () => {
       expect(item?.weightKg, id).toBeLessThan(24);
       expect(heavyNote(item as PlannedExercise), id).toBe(false);
     }
-  });
-  it('starts lightest when pain is on record', () => {
-    const [stoppedPlan] = customWorkoutPlan(
-      ['floor-press'],
-      general('regular'),
-      [stopped],
-      [],
-    );
-    expect(stoppedPlan?.weightKg).toBe(8);
-    const [reported] = customWorkoutPlan(
-      ['floor-press'],
-      general('regular'),
-      [],
-      [],
-      true,
-    );
-    expect(reported?.weightKg).toBe(8);
   });
   it('starts rehab at zero sets and target', () => {
     const [item] = customWorkoutPlan(['quad-set'], prefs, [], []);

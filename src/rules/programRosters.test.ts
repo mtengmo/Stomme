@@ -6,11 +6,7 @@ import {
   legMuscles,
 } from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
-import {
-  focusSlots,
-  impactExercises,
-  rehabAdditionIds,
-} from '../content/rosterSlots';
+import { focusSlots, rehabAdditionIds } from '../content/rosterSlots';
 import type {
   BodyRegionId,
   TemplateId,
@@ -74,13 +70,11 @@ describe('daily focus rosters', () => {
             };
             const roster = buildRoster(preferences, template, {
               focus: { id: preset.id },
-              painOnRecord: true,
             });
             expect(roster.ids.length).toBeGreaterThanOrEqual(3);
             expect(roster.ids.length).toBeLessThanOrEqual(6);
             expect(new Set(roster.ids).size).toBe(roster.ids.length);
             for (const id of roster.ids) {
-              expect(impactExercises.has(id)).toBe(false);
               expect(rehabAdditionIds.has(id)).toBe(false);
               expect(chooseVariant(id, preferences)).toBeDefined();
               if (preset.id === 'push')
@@ -143,28 +137,6 @@ describe('daily focus rosters', () => {
       ).note,
     ).toContain('Kompletterat med bålövningar');
   });
-  for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
-    for (const experience of ['new', 'some', 'regular'] as const)
-      for (const [name, inventory] of equipmentSets)
-        for (const template of ['A', 'B'] as const)
-          it(`${preset.id} ${experience} ${name} ${template} without pain stays valid`, () => {
-            const preferences: TrainingPreferences = {
-              programId: 'general',
-              experience,
-              ...inventory,
-            };
-            const roster = buildRoster(preferences, template, {
-              focus: { id: preset.id },
-              painOnRecord: false,
-            });
-            expect(roster.ids.length).toBeGreaterThanOrEqual(3);
-            expect(roster.ids.length).toBeLessThanOrEqual(6);
-            expect(new Set(roster.ids).size).toBe(roster.ids.length);
-            for (const id of roster.ids) {
-              expect(rehabAdditionIds.has(id)).toBe(false);
-              expect(chooseVariant(id, preferences)).toBeDefined();
-            }
-          });
   const beginnerInventories: [string, TrainingPreferences][] = [
     [
       'bodyweight',
@@ -200,37 +172,33 @@ describe('daily focus rosters', () => {
     for (const [name, base] of beginnerInventories)
       for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
         for (const template of ['A', 'B'] as const)
-          for (const painOnRecord of [false, true])
-            it(`${preset.id} ${experience} ${name} ${template} pain=${painOnRecord} takes above-level work only as a last resort`, () => {
-              const preferences = { ...base, experience };
-              const roster = buildRoster(preferences, template, {
-                focus: { id: preset.id },
-                painOnRecord,
-              });
-              const levels = allowedLevels(experience);
-              const aboveLevel = roster.ids.filter(
-                (id) =>
-                  !(levels as readonly string[]).includes(
-                    (
-                      chooseVariant(id, preferences) as {
-                        technicalLevel: string;
-                      }
-                    ).technicalLevel,
-                  ),
-              );
-              // Above-level picks are noted, and appear only when fewer than
-              // three in-level picks exist.
-              expect(Object.keys(roster.notes).sort()).toEqual(
-                aboveLevel.sort(),
-              );
-              if (aboveLevel.length && preset.id !== 'full')
-                expect(roster.ids.length - aboveLevel.length).toBeLessThan(3);
-              if (roster.ids.length) {
-                expect(roster.ids.length).toBeGreaterThanOrEqual(3);
-                expect(roster.ids.length).toBeLessThanOrEqual(6);
-              }
-              expect(new Set(roster.ids).size).toBe(roster.ids.length);
+          it(`${preset.id} ${experience} ${name} ${template} takes above-level work only as a last resort`, () => {
+            const preferences = { ...base, experience };
+            const roster = buildRoster(preferences, template, {
+              focus: { id: preset.id },
             });
+            const levels = allowedLevels(experience);
+            const aboveLevel = roster.ids.filter(
+              (id) =>
+                !(levels as readonly string[]).includes(
+                  (
+                    chooseVariant(id, preferences) as {
+                      technicalLevel: string;
+                    }
+                  ).technicalLevel,
+                ),
+            );
+            // Above-level picks are noted, and appear only when fewer than
+            // three in-level picks exist.
+            expect(Object.keys(roster.notes).sort()).toEqual(aboveLevel.sort());
+            if (aboveLevel.length && preset.id !== 'full')
+              expect(roster.ids.length - aboveLevel.length).toBeLessThan(3);
+            if (roster.ids.length) {
+              expect(roster.ids.length).toBeGreaterThanOrEqual(3);
+              expect(roster.ids.length).toBeLessThanOrEqual(6);
+            }
+            expect(new Set(roster.ids).size).toBe(roster.ids.length);
+          });
   for (const experience of ['new', 'some'] as const)
     for (const [name, base] of beginnerInventories)
       for (const preset of focusPresets.filter((p) => p.id !== 'custom'))
@@ -264,7 +232,6 @@ describe('daily focus rosters', () => {
                       );
                     expect(otherInLevel).toBe(false);
                   }
-              if (inLevel) expect(impactExercises.has(id)).toBe(false);
             }
           });
 });
@@ -335,18 +302,6 @@ describe('initial training roster', () => {
         ),
       ),
     ).toBe(true);
-  });
-
-  it('leaves impact exercises out once symptoms are on record', () => {
-    const ids = initialTrainingRoster(
-      { programId: 'general', experience: 'regular', ...bodyweight },
-      'A',
-      { painOnRecord: true },
-    );
-    expect(ids).not.toContain('squat-jump');
-    expect(ids).not.toContain('burpee');
-    expect(ids).not.toContain('blast-off-push-up');
-    expect(impactExercises.has('blast-off-push-up')).toBe(false);
   });
 
   it('falls back to bodyweight when a weighted exercise has no registered weight', () => {

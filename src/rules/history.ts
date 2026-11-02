@@ -1,7 +1,7 @@
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
 
-import type { PainLog, Session, SetLog } from '../domain/types';
+import type { Session, SetLog } from '../domain/types';
 import { addDays, weekStart } from '../lib/dates';
 
 export function sessionSetProgress(session: Session, logs: readonly SetLog[]) {
@@ -31,17 +31,12 @@ export function sessionSetProgress(session: Session, logs: readonly SetLog[]) {
   return { done, total: session.plan.reduce((n, p) => n + p.sets, 0) };
 }
 
-export function symptomSummary(
-  session: Session,
-  pain: readonly PainLog[],
-): string {
-  if (!session.programId) {
-    const values = pain.filter((p) => p.sessionId === session.id);
+export function symptomSummary(session: Session): string {
+  const hurt = Object.entries(session.feedback)
+    .filter(([, f]) => f?.hurt)
+    .map(([id]) => exercises[id as keyof typeof exercises].name);
 
-    return values.length
-      ? `Höger knä: ${values.map((p) => p.score).join(' / ')} av 10`
-      : 'Besvär: svar saknas';
-  }
+  if (hurt.length) return `Gjorde ont: ${hurt.join(', ')}`;
 
   const checks = Object.values(session.checkins ?? {});
 
@@ -82,14 +77,11 @@ export interface HistorySummary {
   fourWeeksAborted: number;
   /** The newest session, whatever its state. */
   last: Session | undefined;
-  /** Pain score after the newest session, only when one was recorded. */
-  lastPainAfter: number | undefined;
 }
 
 /** Plain counts from the user's own sessions; nothing is estimated. */
 export function historySummary(
   sessions: readonly Session[],
-  painLogs: readonly PainLog[],
   today: string,
 ): HistorySummary {
   const thisWeek = weekStart(today);
@@ -99,9 +91,6 @@ export function historySummary(
     (a, b) =>
       b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt),
   )[0];
-  const after = last
-    ? painLogs.find((p) => p.sessionId === last.id && p.timing === 'after')
-    : undefined;
   return {
     weekCompleted: sessions.filter(
       (s) => s.status === 'completed' && s.date >= thisWeek,
@@ -109,6 +98,5 @@ export function historySummary(
     fourWeeksCompleted: inFour.filter((s) => s.status === 'completed').length,
     fourWeeksAborted: inFour.filter((s) => s.status === 'aborted').length,
     last,
-    lastPainAfter: after?.score,
   };
 }

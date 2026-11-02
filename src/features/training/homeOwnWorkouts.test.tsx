@@ -190,3 +190,18 @@ it('shows the empty text when nothing is saved', async () => {
   await screen.findByText('Inga egna pass än.');
   expect(screen.queryByText('Eller kör ett eget pass:')).toBeNull();
 });
+
+const painLine =
+  'Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.';
+
+it('shows the pain guidance on the home screen for regular training', async () => {
+  render(<App />);
+  await screen.findByText(painLine);
+});
+
+it('does not show the pain guidance for rehab', async () => {
+  await setMeta(getDb(), 'training', { ...prefs, programId: 'rehab' });
+  render(<App />);
+  await screen.findByRole('navigation', { name: 'Huvudmeny' });
+  expect(screen.queryByText(painLine)).toBeNull();
+});

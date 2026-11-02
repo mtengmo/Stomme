@@ -7,7 +7,8 @@ import { App } from '../../App';
 import { exercises } from '../../content/exercises';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
-import { answerPain } from '../pain/testHelpers';
+import { startTrainingSession } from '../../db/training';
+import type { TrainingPreferences } from '../../domain/types';
 import { ExerciseCardBody } from './ExerciseCard';
 
 beforeEach(async () => {
@@ -96,12 +97,33 @@ describe('ExerciseCardBody', () => {
 describe('inline workout technique', () => {
   it('keeps the edited amount while technique opens and closes', async () => {
     const user = userEvent.setup();
-    window.location.hash = '#/pass/A';
-    render(<App />);
-    await user.click(
-      await screen.findByRole('button', { name: 'Starta pass' }),
+    const prefs: TrainingPreferences = {
+      programId: 'general',
+      experience: 'some',
+      equipment: ['bodyweight'],
+      weights: [],
+    };
+    const session = await startTrainingSession(
+      getDb(),
+      prefs,
+      'A',
+      [
+        {
+          exerciseId: 'push-up',
+          sets: 2,
+          target: 10,
+          loadIndex: 0,
+          weightKg: 0,
+          restSec: 30,
+          reason: 'first_time',
+          variantId: 'bodyweight',
+          sides: ['both'],
+        },
+      ],
+      new Date(),
     );
-    await answerPain(user, 0);
+    window.location.hash = `#/session/${session.id}`;
+    render(<App />);
     await screen.findByText('Set 1 av 2');
     await user.click(screen.getByText('Ändra set', { exact: true }));
     await user.click(screen.getByRole('button', { name: 'Öka antal' }));
