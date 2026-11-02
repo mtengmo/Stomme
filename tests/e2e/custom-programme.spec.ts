@@ -155,17 +155,16 @@ for (const width of [320, 360, 412]) {
         .getByRole('button', { name: 'Börja passet', exact: true })
         .click();
       await expect(page).toHaveURL(/#\/session\//);
-      const home = page.getByRole('link', { name: 'Till träningen' });
       const next = page
         .getByRole('button', {
           name: /^(Klar set|Hoppa över vila|Lagom|Avsluta pass)$/,
         })
         .first();
-      for (let guard = 0; guard < 40 && !(await home.count()); guard++) {
-        await home.or(next).first().waitFor();
+      // Regular training ends in the summary, then back home: no questions.
+      for (let guard = 0; guard < 40 && !/#\/$/.test(page.url()); guard++) {
         await next.click({ timeout: 1_000 }).catch(() => {});
       }
-      await expect(home).toBeVisible();
+      await expect(page).toHaveURL(/#\/$/);
       await page.goto('/#/historik');
       await expect(page.getByText('Mitt nya pass').first()).toBeVisible();
 

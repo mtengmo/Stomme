@@ -1,30 +1,26 @@
 import { expect, test } from '@playwright/test';
-import { answerPain, freezeClock, openPreview } from './flow';
+import { freezeClock, startOnlyExercise } from './flow';
 
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },
   { width: 1280, height: 900 },
 ]) {
-  test(`movement and inline technique retain the selected load (${viewport.width})`, async ({
+  test(`movement and inline technique retain the edited amount (${viewport.width})`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
-    await openPreview(page, true);
-    await page
-      .getByRole('button', { name: 'Starta pass', exact: true })
-      .click();
-    await answerPain(page, 0);
-    await expect(page.locator('[data-equipment]')).toHaveCount(0);
+    await startOnlyExercise(page, 'goblet-chair-squat');
+    await expect(page.getByText('· Kroppsvikt', { exact: true })).toBeVisible();
     await page.getByText('Ändra set', { exact: true }).click();
-    await page.getByRole('button', { name: 'Öka vikt' }).click();
+    await page.getByRole('button', { name: 'Öka antal' }).click();
     await page.getByText('Ändra set', { exact: true }).click();
-    await expect(page.locator('[data-equipment="dumbbell"]')).toHaveCount(1);
+    await expect(page.getByText('11 reps')).toBeVisible();
     await page.getByText('Hur gör man?', { exact: true }).click();
     const technique = page.getByRole('region', { name: 'Teknik', exact: true });
     await expect(
       technique.getByRole('listitem').filter({
-        hasText: 'Håll hanteln med båda händerna nära bröstet.',
+        hasText: 'Ställ en stadig stol bakom dig.',
       }),
     ).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -61,10 +57,8 @@ for (const viewport of [
       path: test.info().outputPath('inline-technique.png'),
     });
     await page.getByText('Hur gör man?', { exact: true }).click();
-    await page.getByText('Ändra set', { exact: true }).click();
-    await page.getByRole('button', { name: 'Öka vikt' }).click();
-    await page.getByText('Ändra set', { exact: true }).click();
-    await expect(page.locator('[data-equipment="kettlebell"]')).toHaveCount(1);
+    // The edited amount survives opening and closing the technique.
+    await expect(page.getByText('11 reps')).toBeVisible();
   });
 }
 
@@ -78,11 +72,7 @@ for (const mode of [
 ]) {
   test(`technique remains accessible (${mode.name})`, async ({ page }) => {
     await page.setViewportSize(mode.viewport);
-    await openPreview(page, true);
-    await page
-      .getByRole('button', { name: 'Starta pass', exact: true })
-      .click();
-    await answerPain(page, 0);
+    await startOnlyExercise(page, 'goblet-chair-squat');
     await page.evaluate((scale) => {
       document.documentElement.style.fontSize = `${scale * 100}%`;
     }, mode.fontScale);
@@ -107,19 +97,7 @@ for (const width of [360, 390, 1280]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 800 });
-    await openPreview(page, true);
-    await page
-      .getByRole('button', { name: 'Starta pass', exact: true })
-      .click();
-    await answerPain(page, 0);
-    for (let i = 0; i < 4; i++) {
-      const frame = page.locator('[data-step]');
-      const before = await frame.getAttribute('data-step');
-      await page
-        .getByRole('button', { name: 'Hoppa över övningen', exact: true })
-        .click();
-      await expect(frame).not.toHaveAttribute('data-step', before ?? '');
-    }
+    await startOnlyExercise(page, 'side-plank', { sets: 2 });
     await expect(
       page.getByRole('heading', { name: 'Sidoplanka', exact: true }),
     ).toBeVisible();

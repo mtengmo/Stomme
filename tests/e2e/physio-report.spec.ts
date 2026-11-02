@@ -233,29 +233,7 @@ function makeFixture() {
       loggedAt: stamp(outside.date, 8),
     },
   ];
-  const painLogs = [
-    {
-      id: 'legacy-before',
-      sessionId: legacy.id,
-      date: legacy.date,
-      timing: 'before',
-      score: 5,
-      location: 'right_knee',
-      redFlags: { sharp: true, swelling: true, locking: false },
-      createdAt: stamp(legacy.date, 7),
-    },
-    {
-      id: 'legacy-day-after',
-      sessionId: legacy.id,
-      date: legacy.date,
-      timing: 'dayAfter',
-      score: 0,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: true },
-      createdAt: stamp(legacy.date, 9),
-    },
-  ];
-  return { sessions: sessionMap, logs, painLogs };
+  return { sessions: sessionMap, logs };
 }
 
 async function seed(page: Page) {
@@ -266,10 +244,9 @@ async function seed(page: Page) {
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-    const tx = db.transaction(['sessions', 'setLogs', 'painLogs'], 'readwrite');
+    const tx = db.transaction(['sessions', 'setLogs'], 'readwrite');
     for (const value of data.sessions) tx.objectStore('sessions').put(value);
     for (const value of data.logs) tx.objectStore('setLogs').put(value);
-    for (const value of data.painLogs) tx.objectStore('painLogs').put(value);
     await new Promise<void>((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -360,11 +337,12 @@ for (const width of [320, 360, 412]) {
       const legacyArticle = page.locator(
         '[data-report-session="report-legacy"]',
       );
-      await expect(legacyArticle).toContainText('Äldre knäsmärtskattningar');
       await expect(legacyArticle).toContainText(
-        '5/10 · Skarp smärta · Svullnad',
+        'Äldre program: inga besvärsfrågor sparade.',
       );
-      await expect(legacyArticle).toContainText('0/10 · Låsning');
+      await expect(legacyArticle).not.toContainText(
+        'Äldre knäsmärtskattningar',
+      );
       await expect(legacyArticle).toContainText(
         'Anteckning från ett äldre pass.',
       );

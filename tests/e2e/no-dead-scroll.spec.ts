@@ -3,8 +3,8 @@ import { exerciseReferences } from '../../src/content/exerciseReferences';
 import { exerciseList } from '../../src/content/exercises';
 import {
   addExercise,
-  answerPain,
   freezeClock,
+  openPreview,
   playPassA,
   quickStart,
   removeAllExercises,
@@ -314,11 +314,10 @@ for (const size of INNER_SIZES) {
         (key) => localStorage.removeItem(key),
         REP_COUNT_MANUAL_KEY,
       );
-      await page.goto('/');
-      await page.getByRole('button', { name: /Jag förstår/ }).click();
-      await page.goto('/#/pass/A');
-      await page.getByRole('button', { name: 'Starta pass' }).click();
-      await answerPain(page, 0);
+      await openPreview(page);
+      await page
+        .getByRole('button', { name: 'Börja passet', exact: true })
+        .click();
       const start = page.getByRole('button', {
         name: 'Starta – 5 s förberedelse',
       });
