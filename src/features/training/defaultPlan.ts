@@ -23,13 +23,10 @@ import {
   heavyStartAllowed,
   startingSets,
 } from '../../rules/levelPolicy';
-import { symptomsOnRecord } from '../../rules/painOnRecord';
 
 import { buildRoster } from '../../rules/programRosters';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { startingWeight } from '../../rules/weightInventory';
-
-export { painLogsShowPain } from '../../rules/painOnRecord';
 
 const START_NOTE =
   'Startförslag för din träningsvana. Anpassa antal och vikt före start.';
@@ -45,7 +42,7 @@ export interface BasePlanOptions {
    * Set only when building the first-session roster: level-driven variant and
    * starting weight. Variant switches, adds and favourites keep the lightest weight.
    */
-  roster?: { painOnRecord: boolean; note?: string };
+  roster?: { note?: string };
 }
 
 export function basePlan(
@@ -65,7 +62,6 @@ export function basePlan(
     variant && options.roster && !rehab
       ? chooseStartingWeight(preferences, variant, {
           heavyAllowed: heavyStartAllowed(id),
-          painOnRecord: options.roster.painOnRecord,
         })
       : {
           totalKg: variant ? startingWeight(preferences, variant) : 0,
@@ -104,7 +100,6 @@ export function defaultPlan(
   sessions: Session[],
   logs: SetLog[],
   savedPlans?: Partial<Record<RehabFocus, PlannedExercise[]>>,
-  painReported = false,
   savedRoutines?: TrainingRoutines,
   focus: WorkoutFocus = defaultFocus(preferences),
 ): PlannedExercise[] {
@@ -163,13 +158,11 @@ export function defaultPlan(
             : suggestion.explanation,
       };
     });
-  const painOnRecord = symptomsOnRecord(sessions, painReported);
-  const roster = buildRoster(preferences, id, { painOnRecord, focus });
+  const roster = buildRoster(preferences, id, { focus });
   return roster.ids.map((exerciseId, index) => {
     const plan = basePlan(exerciseId, preferences, {
       index,
       roster: {
-        painOnRecord,
         note: [roster.notes[exerciseId], roster.note].filter(Boolean).join(' '),
       },
     });
@@ -189,7 +182,7 @@ export function defaultPlan(
 /**
  * Dose for a custom workout: the roster rule picks variant, sets and starting
  * weight from experience (heavy start only for heavy-slot exercises that are
- * not limited; pain on record starts lightest; rehab starts at 0/0). History
+ * not limited; rehab starts at 0/0). History
  * then adds at most what trainingPlanSuggestion allows.
  */
 export function customWorkoutPlan(
@@ -197,13 +190,11 @@ export function customWorkoutPlan(
   preferences: TrainingPreferences,
   sessions: Session[],
   logs: SetLog[],
-  painReported = false,
 ): PlannedExercise[] {
-  const painOnRecord = symptomsOnRecord(sessions, painReported);
   return ids.map((exerciseId, index) => {
     const plan = basePlan(exerciseId, preferences, {
       index,
-      roster: { painOnRecord },
+      roster: {},
     });
     const suggestion = trainingPlanSuggestion(
       plan,

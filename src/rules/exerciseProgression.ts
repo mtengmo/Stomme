@@ -1,6 +1,5 @@
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
-import { impactExercises } from '../content/rosterSlots';
 import type {
   ExerciseId,
   Session,
@@ -9,7 +8,6 @@ import type {
 } from '../domain/types';
 import { equipmentFits } from './equipment';
 import { allowedLevels } from './levelPolicy';
-import { symptomsOnRecord } from './painOnRecord';
 
 /** Optional exercise changes only: never mutates a plan or progresses rehab. */
 export function harderExerciseSuggestions(
@@ -17,7 +15,6 @@ export function harderExerciseSuggestions(
   preferences: TrainingPreferences,
   sessions: readonly Session[],
   logs: readonly SetLog[],
-  painOnRecord: boolean,
 ): ExerciseId[] {
   const next = exerciseMetadata[id].harderExerciseId;
   if (preferences.programId === 'rehab' || !next) return [];
@@ -84,17 +81,11 @@ export function harderExerciseSuggestions(
   const candidates: ExerciseId[] =
     id === 'push-up' ? [next, 'diamond-push-up', 'blast-off-push-up'] : [next];
   const levels = allowedLevels(preferences.experience);
-  const globalPain = symptomsOnRecord(sessions, painOnRecord);
-  return candidates.filter(
-    (candidate) =>
-      !(
-        globalPain &&
-        (impactExercises.has(candidate) || exercises[candidate].kneeLoaded)
-      ) &&
-      exerciseMetadata[candidate].variants.some(
-        (variant) =>
-          equipmentFits(variant.equipment, preferences) &&
-          levels.includes(variant.technicalLevel),
-      ),
+  return candidates.filter((candidate) =>
+    exerciseMetadata[candidate].variants.some(
+      (variant) =>
+        equipmentFits(variant.equipment, preferences) &&
+        levels.includes(variant.technicalLevel),
+    ),
   );
 }

@@ -70,25 +70,13 @@ const suggest = (
   data = fixture(),
   id: ExerciseId = 'push-up',
   prefs = preferences,
-  painOnRecord = false,
-) =>
-  harderExerciseSuggestions(id, prefs, data.sessions, data.logs, painOnRecord);
+) => harderExerciseSuggestions(id, prefs, data.sessions, data.logs);
 
 describe('optional harder exercises', () => {
-  it('does not treat the push-up variants as impact when global pain is recorded', () => {
-    // The blast off push-up keeps the hands planted, so it is not impact.
-    expect(suggest(fixture(), 'push-up', preferences, true)).toEqual([
-      'decline-push-up',
-      'diamond-push-up',
-      'blast-off-push-up',
+  it('offers the knee-loaded single-leg calf raise as an optional step', () => {
+    expect(suggest(fixture('calf-raise'), 'calf-raise')).toEqual([
+      'single-leg-calf-raise',
     ]);
-    // The single-leg calf raise is knee loaded, so pain on record withholds it.
-    expect(
-      suggest(fixture('calf-raise'), 'calf-raise', preferences, true),
-    ).toEqual([]);
-    expect(
-      suggest(fixture('calf-raise'), 'calf-raise', preferences, false),
-    ).toEqual(['single-leg-calf-raise']);
   });
   it.each(['older', 'other-programme'] as const)(
     'keeps non-impact push-up suggestions for %s symptoms',
@@ -140,15 +128,13 @@ describe('optional harder exercises', () => {
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
     ).toEqual([]);
   });
-  it('offers step-down after step-up without pain, but not with pain on record', () => {
+  it('offers step-down after step-up', () => {
     const data = fixture('step-up');
     const withStep = {
       ...preferences,
       equipment: [...preferences.equipment, 'step' as const],
     };
-    expect(suggest(data, 'step-up', withStep, false)).toEqual(['step-down']);
-    // step-down is knee loaded, so global pain on record withholds the offer.
-    expect(suggest(data, 'step-up', withStep, true)).toEqual([]);
+    expect(suggest(data, 'step-up', withStep)).toEqual(['step-down']);
   });
   it('only suggests harder exercises allowed for the experience level', () => {
     const data = fixture('goblet-squat');

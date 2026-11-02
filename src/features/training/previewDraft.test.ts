@@ -46,21 +46,19 @@ describe('previewDraft', () => {
     clearFlags('k');
   });
   it('round-trips draft safety', () => {
-    writeDraftSafety('k', { painOnRecord: true, edited: false });
-    expect(readDraftSafety('k')).toEqual({ painOnRecord: true, edited: false });
+    writeDraftSafety('k', { edited: true });
+    expect(readDraftSafety('k')).toEqual({ edited: true });
   });
-  it.each([
-    'not json',
-    'null',
-    '{"painOnRecord":true}',
-    '{"painOnRecord":"yes","edited":false}',
-  ])('ignores corrupt draft safety %s', (raw) => {
-    store.set('k.safety', raw);
-    expect(readDraftSafety('k')).toBeUndefined();
-  });
+  it.each(['not json', 'null', '{}', '{"edited":"yes"}'])(
+    'ignores corrupt draft safety %s',
+    (raw) => {
+      store.set('k.safety', raw);
+      expect(readDraftSafety('k')).toBeUndefined();
+    },
+  );
   it('draft safety survives a missing sessionStorage', () => {
     (globalThis as { sessionStorage?: unknown }).sessionStorage = undefined;
     expect(readDraftSafety('k')).toBeUndefined();
-    writeDraftSafety('k', { painOnRecord: false, edited: false });
+    writeDraftSafety('k', { edited: false });
   });
 });

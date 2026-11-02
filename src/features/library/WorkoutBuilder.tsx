@@ -34,7 +34,7 @@ import {
 } from '../../rules/selectionSummary';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
-import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
+import { customWorkoutPlan } from '../training/defaultPlan';
 import { CustomWorkoutList } from './CustomWorkoutList';
 
 /**
@@ -186,7 +186,6 @@ export function WorkoutBuilder({
       saved: readCustomWorkouts(await getMeta(db, 'customWorkouts')),
       sessions: await listSessions(db),
       logs: await db.setLogs.toArray(),
-      painReported: painLogsShowPain(await db.painLogs.toArray()),
     };
   }, []);
   useEffect(() => {
@@ -223,7 +222,6 @@ export function WorkoutBuilder({
           preferences,
           data?.sessions ?? [],
           data?.logs ?? [],
-          data?.painReported ?? false,
         )
       : undefined;
   const summary = selectionSummary(ids, preferences, planFor);

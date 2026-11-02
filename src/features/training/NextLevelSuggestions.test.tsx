@@ -62,14 +62,13 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('impact progression suggestions', () => {
-  it('keeps the non-impact blast off push-up swap when global pain is recorded', () => {
+  it('keeps the non-impact blast off push-up swap regardless of pain history', () => {
     render(
       <NextLevelSuggestions
         plan={sessions[0]?.plan ?? []}
         preferences={preferences}
         sessions={sessions}
         logs={logs}
-        painOnRecord
         onChoose={() => {}}
       />,
     );

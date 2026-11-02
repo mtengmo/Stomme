@@ -177,20 +177,18 @@ export interface StartingWeight {
 }
 
 /**
- * Heavy-start policy for the first-session roster. Pain or symptoms on record
- * always start on the lightest weight.
+ * Heavy-start policy for the first-session roster.
  */
 export function chooseStartingWeight(
   preferences: TrainingPreferences,
   variant: ExerciseVariant,
-  options: { heavyAllowed: boolean; painOnRecord: boolean },
+  options: { heavyAllowed: boolean },
 ): StartingWeight {
   const choices = variantWeights(preferences, variant);
   if (!choices.length) return { totalKg: 0, heavy: false };
   const last = choices.length - 1;
-  const index = options.painOnRecord
-    ? 0
-    : preferences.experience === 'new'
+  const index =
+    preferences.experience === 'new'
       ? 0
       : preferences.experience === 'some'
         ? Math.min(Math.floor(last / 2), Math.max(last - 1, 0))

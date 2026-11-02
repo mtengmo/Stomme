@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { impactExercises } from '../content/rosterSlots';
+import { rehabImpactExercises } from '../content/rosterSlots';
 import { pickableInProgramme } from './pickerPolicy';
 
 describe('pickableInProgramme', () => {
   it('hides every impact exercise in rehab', () => {
-    for (const id of impactExercises)
+    for (const id of rehabImpactExercises)
       expect(pickableInProgramme(id, { programId: 'rehab' })).toBe(false);
     expect(pickableInProgramme('box-jump', { programId: 'rehab' })).toBe(false);
     expect(

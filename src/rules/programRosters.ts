@@ -9,7 +9,6 @@ import { bodyRegions, exerciseMuscles } from '../content/muscles';
 import {
   focusSlots,
   generalSlots,
-  impactExercises,
   type RosterSlot,
   rehabAdditionIds,
 } from '../content/rosterSlots';
@@ -28,8 +27,6 @@ import {
 } from './levelPolicy';
 
 export interface RosterContext {
-  /** Symptoms or pain on record: no impact exercises, lightest weights. */
-  painOnRecord?: boolean;
   focus?: WorkoutFocus;
 }
 
@@ -77,7 +74,6 @@ function isLoaded(id: ExerciseId, preferences: TrainingPreferences): boolean {
 function pickFromSlot(
   slot: RosterSlot,
   preferences: TrainingPreferences,
-  context: RosterContext,
   used: ReadonlySet<ExerciseId>,
   /** false: return only in-level picks, never the easiest above-level one. */
   allowFallback = true,
@@ -85,11 +81,7 @@ function pickFromSlot(
   const levels = allowedLevels(preferences.experience);
   // A weighted exercise without a registered weight is never suggested; the slot moves on.
   const base = slot.candidates.filter(
-    (id) =>
-      !used.has(id) &&
-      fits(id, preferences) &&
-      usable(id, preferences) &&
-      !(context.painOnRecord && impactExercises.has(id)),
+    (id) => !used.has(id) && fits(id, preferences) && usable(id, preferences),
   );
   const pool = base.filter((id) => levels.includes(levelOf(id, preferences)));
   if (!pool.length) {
@@ -115,12 +107,11 @@ function pickFromSlot(
 function wholeBody(
   preferences: TrainingPreferences,
   template: TemplateId,
-  context: RosterContext,
 ): Roster {
   const ids: ExerciseId[] = [];
   const notes: Roster['notes'] = {};
   for (const slot of generalSlots[template]) {
-    const pick = pickFromSlot(slot, preferences, context, new Set(ids));
+    const pick = pickFromSlot(slot, preferences, new Set(ids));
     if (!pick) continue;
     ids.push(pick.id);
     if (pick.note) notes[pick.id] = pick.note;
@@ -129,12 +120,12 @@ function wholeBody(
 }
 
 /** Presets and regions with at least one equipment- and level-eligible pick. */
-export function focusAvailable(
-  preferences: TrainingPreferences,
-  context: RosterContext = {},
-): { presets: FocusId[]; regions: BodyRegionId[] } {
+export function focusAvailable(preferences: TrainingPreferences): {
+  presets: FocusId[];
+  regions: BodyRegionId[];
+} {
   const ids = focusSlots.flatMap((slot) => {
-    const pick = pickFromSlot(slot, preferences, context, new Set());
+    const pick = pickFromSlot(slot, preferences, new Set());
     return pick ? [pick.id] : [];
   });
   const hasMuscle = (targets: readonly string[]) =>
@@ -155,7 +146,6 @@ function focusRoster(
   preferences: TrainingPreferences,
   template: TemplateId,
   focus: WorkoutFocus,
-  context: RosterContext,
 ): Roster {
   const targets = focusTargets(focus);
   const preset = focusPresets.find(
@@ -191,17 +181,11 @@ function focusRoster(
     for (const slot of slots) {
       if (ids.length >= limit) break;
       const used = new Set(ids);
-      const first = pickFromSlot(slot, preferences, context, used, false);
+      const first = pickFromSlot(slot, preferences, used, false);
       if (template === 'B' && round === 0 && first) {
         used.add(first.id);
         // The alternative is taken only when it is an in-level pick.
-        const alternative = pickFromSlot(
-          slot,
-          preferences,
-          context,
-          used,
-          false,
-        );
+        const alternative = pickFromSlot(slot, preferences, used, false);
         add(alternative ?? first);
       } else add(first);
     }
@@ -222,7 +206,6 @@ function focusRoster(
         pickFromSlot(
           { id: 'core-fill', candidates: [id] },
           preferences,
-          context,
           new Set(ids),
         ),
       );
@@ -232,7 +215,7 @@ function focusRoster(
   // above-level exercise of a slot is taken (flagged with EASIEST_NOTE).
   for (const slot of slots) {
     if (ids.length >= 3) break;
-    add(pickFromSlot(slot, preferences, context, new Set(ids), true));
+    add(pickFromSlot(slot, preferences, new Set(ids), true));
   }
   return toppedUp ? { ids, notes, note: TOP_UP_NOTE } : { ids, notes };
 }
@@ -249,8 +232,8 @@ export function buildRoster(
       ? { id: 'custom' as const, regions: preferences.bodyParts }
       : { id: 'full' as const });
   return focus.id === 'full'
-    ? wholeBody(preferences, template, context)
-    : focusRoster(preferences, template, focus, context);
+    ? wholeBody(preferences, template)
+    : focusRoster(preferences, template, focus);
 }
 export function initialTrainingRoster(
   preferences: TrainingPreferences,

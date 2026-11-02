@@ -183,7 +183,7 @@ export function QuickStart() {
     const id = await saveStartWithCustomWorkout(
       draftPrefs,
       ids,
-      customWorkoutPlan(ids, draftPrefs, [], [], false),
+      customWorkoutPlan(ids, draftPrefs, [], []),
     );
     clearDraft();
     navigate(`/traning/A?workout=${id}`);

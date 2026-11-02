@@ -19,8 +19,8 @@ import { physioKneeItems } from './physioKneeProgramme';
 import {
   focusSlots,
   generalSlots,
-  impactExercises,
   rehabAdditionIds,
+  rehabImpactExercises,
 } from './rosterSlots';
 
 const ids = ['single-leg-lateral-hop', 'box-jump'] as const;
@@ -36,7 +36,7 @@ describe('plyometric library additions', () => {
   it('marks both as knee-loaded impact exercises', () => {
     for (const id of ids) {
       expect(exercises[id].kneeLoaded).toBe(true);
-      expect(impactExercises.has(id)).toBe(true);
+      expect(rehabImpactExercises.has(id)).toBe(true);
       expect(exerciseMetadata[id].variants[0]?.technicalLevel).toBe(
         'technical',
       );
@@ -283,17 +283,16 @@ describe('plyometric exercises stay out of every roster', () => {
 
   for (const experience of ['new', 'some', 'regular'] as const)
     for (const [name, equipment] of equipmentSets)
-      it(`${experience} with ${name}: no template, focus or pain state picks them`, () => {
+      it(`${experience} with ${name}: no template or focus picks them`, () => {
         for (const template of ['A', 'B'] as TemplateId[])
-          for (const focus of focuses)
-            for (const painOnRecord of [true, false]) {
-              const roster = buildRoster(
-                { programId: 'general', experience, ...equipment },
-                template,
-                { ...(focus ? { focus } : {}), painOnRecord },
-              );
-              for (const id of roster.ids) expect(banned.has(id)).toBe(false);
-            }
+          for (const focus of focuses) {
+            const roster = buildRoster(
+              { programId: 'general', experience, ...equipment },
+              template,
+              focus ? { focus } : {},
+            );
+            for (const id of roster.ids) expect(banned.has(id)).toBe(false);
+          }
         // Body parts chosen in setup pick the custom focus when none is given.
         for (const bodyParts of [
           ['legs'],

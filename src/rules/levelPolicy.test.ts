@@ -71,29 +71,22 @@ describe('level policy', () => {
     if (!variant) throw new Error('missing variant');
     const pick = (
       experience: TrainingPreferences['experience'],
-      options: { heavyAllowed: boolean; painOnRecord: boolean },
+      options: { heavyAllowed: boolean },
     ) => chooseStartingWeight(prefs(experience), variant, options).totalKg;
-    const off = { heavyAllowed: true, painOnRecord: false };
+    const off = { heavyAllowed: true };
     expect(pick('new', off)).toBe(4);
     expect(pick('some', off)).toBe(8);
     expect(pick('regular', off)).toBe(12);
   });
 
-  it('caps one-sided and overhead work and honours pain on record', () => {
+  it('caps one-sided and overhead work', () => {
     const variant = chooseVariant('goblet-squat', prefs('regular'));
     if (!variant) throw new Error('missing variant');
     const capped = chooseStartingWeight(prefs('regular'), variant, {
       heavyAllowed: false,
-      painOnRecord: false,
     });
     expect(capped.totalKg).toBe(8);
     expect(capped.heavy).toBe(false);
-    expect(
-      chooseStartingWeight(prefs('regular'), variant, {
-        heavyAllowed: true,
-        painOnRecord: true,
-      }).totalKg,
-    ).toBe(4);
     expect(heavyStartAllowed('goblet-squat')).toBe(true);
     expect(heavyStartAllowed('floor-press')).toBe(true);
     expect(heavyStartAllowed('bent-over-row')).toBe(false);
@@ -119,7 +112,6 @@ describe('level policy', () => {
     expect(
       chooseStartingWeight(prefs('regular', false), variant, {
         heavyAllowed: true,
-        painOnRecord: false,
       }).totalKg,
     ).toBe(0);
   });
@@ -149,7 +141,6 @@ describe('level policy', () => {
         if (!choices.length) continue;
         const picked = chooseStartingWeight(preferences, variant, {
           heavyAllowed: heavyStartAllowed(id),
-          painOnRecord: false,
         }).totalKg;
         expect(picked).toBeLessThan(choices.at(-1)?.totalKg ?? 0);
       }
@@ -163,7 +154,6 @@ describe('level policy', () => {
     expect(
       chooseStartingWeight(one, variant, {
         heavyAllowed: false,
-        painOnRecord: false,
       }).totalKg,
     ).toBe(12);
   });

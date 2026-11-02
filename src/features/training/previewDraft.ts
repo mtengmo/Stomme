@@ -16,7 +16,6 @@ export const EMPTY_FLAGS: PreviewFlags = {
 const suffix = '.flags';
 
 export interface DraftSafety {
-  painOnRecord: boolean;
   edited: boolean;
 }
 export function readDraftSafety(draftKey: string): DraftSafety | undefined {
@@ -24,10 +23,8 @@ export function readDraftSafety(draftKey: string): DraftSafety | undefined {
     const value = JSON.parse(
       sessionStorage.getItem(`${draftKey}.safety`) ?? 'null',
     );
-    return value &&
-      typeof value.painOnRecord === 'boolean' &&
-      typeof value.edited === 'boolean'
-      ? { painOnRecord: value.painOnRecord, edited: value.edited }
+    return value && typeof value.edited === 'boolean'
+      ? { edited: value.edited }
       : undefined;
   } catch {
     return undefined;

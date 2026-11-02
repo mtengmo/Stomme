@@ -17,7 +17,7 @@ import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
 import { readWeeklySchedule } from '../../rules/weeklySchedule';
 import { groupOf } from '../../rules/workoutGroups';
 import { buttonClass } from '../../ui/Button';
-import { customWorkoutPlan, painLogsShowPain } from '../training/defaultPlan';
+import { customWorkoutPlan } from '../training/defaultPlan';
 
 /** Delete with an inline confirmation; focus goes to the safe choice first. */
 export function DeleteWorkoutButton({
@@ -107,7 +107,6 @@ function minutesFor(
       preferences,
       data.sessions,
       data.logs,
-      data.painReported,
     );
   return estimateWorkoutMinutes(plan);
 }
@@ -121,7 +120,6 @@ function useData() {
       schedule: readWeeklySchedule(await getMeta(db, 'weeklySchedule')),
       sessions: await listSessions(db),
       logs: await db.setLogs.toArray(),
-      painReported: painLogsShowPain(await db.painLogs.toArray()),
     };
   }, []);
 }

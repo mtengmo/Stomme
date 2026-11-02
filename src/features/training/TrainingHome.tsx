@@ -27,7 +27,6 @@ import type {
 import { toLocalDate, weekdayIndex } from '../../lib/dates';
 import { focusQuery } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
-import { symptomsOnRecord } from '../../rules/painOnRecord';
 import { focusAvailable } from '../../rules/programRosters';
 import {
   muscleRecoveryNote,
@@ -48,7 +47,6 @@ import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
 import { WeekView } from '../week/WeekView';
-import { painLogsShowPain } from './defaultPlan';
 import { startingFocus } from './focusModel';
 import { QuickStart } from './QuickStart';
 
@@ -313,7 +311,6 @@ export function TrainingHome() {
     );
     return {
       schedule: await loadWeeklySchedule(),
-      painReported: painLogsShowPain(await getDb().painLogs.toArray()),
       preferences,
       sessions,
       legacyProgramme,
@@ -370,11 +367,7 @@ export function TrainingHome() {
   );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
-  const availability = preferences
-    ? focusAvailable(preferences, {
-        painOnRecord: symptomsOnRecord(data.sessions, data.painReported),
-      })
-    : undefined;
+  const availability = preferences ? focusAvailable(preferences) : undefined;
   const dailyFocus =
     preferences && availability
       ? startingFocus(
@@ -466,9 +459,14 @@ export function TrainingHome() {
           : ''}
       </p>
       {preferences.programId !== 'rehab' ? (
-        <p className="m-0 -mt-3 text-base text-ink-soft">
-          Träningsvana: {experienceLabels[preferences.experience]}
-        </p>
+        <>
+          <p className="m-0 -mt-3 text-base text-ink-soft">
+            Träningsvana: {experienceLabels[preferences.experience]}
+          </p>
+          <p className="m-0 -mt-3 text-base text-ink-soft">
+            Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.
+          </p>
+        </>
       ) : null}
       {preferences.programId === 'general' && dailyFocus && !active ? (
         <p className="m-0 -mt-3 flex min-h-12 flex-wrap items-center gap-x-2 text-base">

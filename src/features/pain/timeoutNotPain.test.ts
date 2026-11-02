@@ -26,11 +26,11 @@ const prefs: TrainingPreferences = {
 };
 
 describe('a timeout is not a pain stop', () => {
-  it('does not put symptoms on record, so impact exercises stay in the plan', () => {
+  it('leaves the general plan the same after a timeout and after a pain stop', () => {
     const ids = (s: Session[]) =>
       defaultPlan(prefs, 'A', s, []).map((p) => p.exerciseId);
-    expect(ids([session('pain_stop')])).not.toContain('squat-jump');
-    expect(ids([session('timeout')])).toContain('squat-jump');
+    expect(ids([session('pain_stop')])).toEqual(ids([session('timeout')]));
+    expect(ids([session('timeout')])).toEqual(ids([]));
   });
 
   it('holds no progression: the worst pain status stays ok', () => {
