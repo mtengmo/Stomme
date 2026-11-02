@@ -4,10 +4,17 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { PAIN_COPY } from '../../content/copy';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 import { recordTrainingCheckin, startTrainingSession } from '../../db/training';
-import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
+import type {
+  PlannedExercise,
+  Session,
+  TrainingPreferences,
+} from '../../domain/types';
+import { hurtLastTime } from '../../rules/training';
+import { defaultPlan } from '../training/defaultPlan';
 import { PainValve } from './PainValve';
 
 const general: TrainingPreferences = {
@@ -54,6 +61,7 @@ describe('PainValve', () => {
         easierText="Gör den mot en vägg."
         easierExerciseName="Knäarmhävning"
         busy={false}
+        onBack={() => undefined}
         onSkip={onSkip}
         onAbort={onAbort}
         onContinue={onContinue}
@@ -84,6 +92,7 @@ describe('PainValve', () => {
         exerciseName="Knäarmhävning"
         easierText="Håll benen lägre."
         busy
+        onBack={() => undefined}
         onSkip={() => undefined}
         onAbort={() => undefined}
         onContinue={() => undefined}
@@ -94,10 +103,51 @@ describe('PainValve', () => {
       'Hoppa över övningen',
       'Avbryt passet',
       'Fortsätt ändå',
+      'Tillbaka',
     ])
       expect(
         (screen.getByRole('button', { name }) as HTMLButtonElement).disabled,
       ).toBe(true);
+  });
+});
+
+describe('PainValve back and errors', () => {
+  const noop = () => undefined;
+  it('Tillbaka only calls onBack', async () => {
+    const onBack = vi.fn();
+    const onSkip = vi.fn();
+    render(
+      <PainValve
+        exerciseName="Armhävning"
+        easierText="x"
+        busy={false}
+        onBack={onBack}
+        onSkip={onSkip}
+        onAbort={noop}
+        onContinue={noop}
+      />,
+    );
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Tillbaka' }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(onSkip).not.toHaveBeenCalled();
+  });
+
+  it('shows the write error only when there is one', () => {
+    const props = {
+      exerciseName: 'Armhävning',
+      easierText: 'x',
+      busy: false,
+      onBack: noop,
+      onSkip: noop,
+      onAbort: noop,
+      onContinue: noop,
+    };
+    const { rerender } = render(<PainValve {...props} />);
+    expect(screen.queryByRole('alert')).toBeNull();
+    rerender(<PainValve {...props} error />);
+    expect(screen.getByRole('alert').textContent).toBe(PAIN_COPY.error);
   });
 });
 
@@ -179,6 +229,52 @@ describe('the valve in a regular session', () => {
       abortReason: 'pain_stop',
       feedback: { 'push-up': { hurt: true } },
     });
+  });
+
+  it('Tillbaka returns to the set and writes nothing', async () => {
+    const user = userEvent.setup();
+    const session = await open();
+    await screen.findByRole('button', { name: 'Klar set' });
+    await user.click(screen.getByRole('button', { name: 'Det gör ont' }));
+    await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
+    await screen.findByRole('button', { name: 'Klar set' });
+    expect(await feedback(session.id)).toEqual({});
+  });
+
+  it('shows the error when a valve write fails', async () => {
+    const user = userEvent.setup();
+    await open();
+    await screen.findByRole('button', { name: 'Klar set' });
+    await user.click(screen.getByRole('button', { name: 'Det gör ont' }));
+    vi.spyOn(getDb().sessions, 'get').mockRejectedValue(new Error('x'));
+    vi.spyOn(getDb().sessions, 'update').mockRejectedValue(new Error('x'));
+    await user.click(screen.getByRole('button', { name: 'Fortsätt ändå' }));
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      PAIN_COPY.error,
+    );
+  });
+
+  it('marks the exercise hurt when the abort dialog is used for pain', async () => {
+    const user = userEvent.setup();
+    const session = await open();
+    await screen.findByRole('button', { name: 'Klar set' });
+    await user.click(screen.getByRole('button', { name: 'Avbryt' }));
+    await user.click(
+      await screen.findByRole('button', { name: PAIN_COPY.stopAbortPain }),
+    );
+    await waitFor(() =>
+      expect(window.location.hash).toBe(`#/stopp/${session.id}`),
+    );
+    const stored = await getDb().sessions.get(session.id);
+    expect(stored).toMatchObject({
+      abortReason: 'pain_stop',
+      feedback: { 'push-up': { hurt: true } },
+    });
+    expect(hurtLastTime('push-up', 'general', [stored as Session])).toBe(true);
+    const next = defaultPlan(general, 'A', [stored as Session], []).find(
+      (p) => p.exerciseId === 'push-up',
+    );
+    expect(next?.reason).not.toBe('increase_amount');
   });
 
   it('keeps rehab on its own report and without the valve', async () => {

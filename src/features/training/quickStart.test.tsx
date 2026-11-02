@@ -302,3 +302,13 @@ it('never reaches the pick step for knee rehab', async () => {
     screen.queryByRole('heading', { name: 'Välj dina övningar' }),
   ).toBeNull();
 });
+
+it('shows the pain guidance next to the goal choices on first run', async () => {
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Vad vill du träna?' });
+  expect(
+    screen.getByText(
+      'Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.',
+    ),
+  ).toBeTruthy();
+});

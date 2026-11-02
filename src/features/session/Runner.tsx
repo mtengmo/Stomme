@@ -230,7 +230,13 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           <Button
             variant="secondary"
             disabled={busy}
-            onClick={() => abortForPain()}
+            onClick={() =>
+              abortForPain(
+                session.programId && session.programId !== 'rehab'
+                  ? step?.exerciseId
+                  : undefined,
+              )
+            }
             aria-describedby="pain-abort-hint"
           >
             {PAIN_COPY.stopAbortPain}
@@ -277,7 +283,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     const prior = mine;
     if (valve && session.programId && session.programId !== 'rehab') {
       const variant = exerciseMetadata[step.exerciseId].variants.find(
-        (item) => item.id === plan?.variantId,
+        (item) => item.id === (prior?.variantId ?? plan?.variantId),
       );
       const easierId = exerciseMetadata[step.exerciseId].easierExerciseId;
       return (
@@ -286,6 +292,8 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
           easierText={variant?.easierOption ?? ex.easierVariant}
           easierExerciseName={easierId ? exercises[easierId].name : undefined}
           busy={busy}
+          error={error}
+          onBack={() => setValve(false)}
           onSkip={() =>
             run(async () => {
               setTimedExercise(null);

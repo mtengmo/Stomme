@@ -1,3 +1,4 @@
+import { PAIN_COPY } from '../../content/copy';
 import { Button } from '../../ui/Button';
 
 interface PainValveProps {
@@ -7,6 +8,9 @@ interface PainValveProps {
   /** Name of a linked easier exercise, where one exists. Shown as text only. */
   easierExerciseName?: string;
   busy: boolean;
+  /** A write failed. */
+  error?: boolean;
+  onBack(): void;
   onSkip(): void;
   onAbort(): void;
   onContinue(): void;
@@ -21,6 +25,8 @@ export function PainValve({
   easierText,
   easierExerciseName,
   busy,
+  error,
+  onBack,
   onSkip,
   onAbort,
   onContinue,
@@ -59,6 +65,14 @@ export function PainValve({
         <Button disabled={busy} onClick={onContinue}>
           Fortsätt ändå
         </Button>
+        <Button variant="secondary" disabled={busy} onClick={onBack}>
+          Tillbaka
+        </Button>
+        {error ? (
+          <p role="alert" className="m-0 text-center text-base font-bold">
+            {PAIN_COPY.error}
+          </p>
+        ) : null}
       </div>
     </section>
   );

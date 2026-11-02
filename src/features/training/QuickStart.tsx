@@ -222,6 +222,9 @@ export function QuickStart() {
             Välj ett fokus så gör vi ett pass åt dig, eller välj övningarna
             själv.
           </p>
+          <p className="m-0 text-base text-ink-soft">
+            Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.
+          </p>
           <div className="flex flex-col gap-3">
             {goals.map((item) => (
               <Button

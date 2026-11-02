@@ -2,6 +2,7 @@ import 'fake-indexeddb/auto';
 import Dexie from 'dexie';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Session, SetLog } from '../domain/types';
+import { exportAll, parseBackup, serializeBackup } from './backup';
 import { StommeDB } from './db';
 
 let name: string;
@@ -84,7 +85,7 @@ describe('Dexie version 3', () => {
     ]);
     expect(await db.sessions.get('s1')).toEqual(session);
     expect(await db.setLogs.get('l1')).toEqual(setLog);
-    expect(await db.table('meta').get('program')).toBeDefined();
+    expect(await db.table('meta').get('program')).toBeUndefined();
     expect(await db.sessions.where('status').equals('completed').count()).toBe(
       1,
     );
@@ -111,5 +112,52 @@ describe('Dexie version 3', () => {
     await db.open();
     expect(db.verno).toBe(3);
     expect(await db.sessions.count()).toBe(0);
+  });
+
+  it('upgrades a legacy device so that its own backup imports again', async () => {
+    await writeVersion2();
+    const old = new Dexie(name);
+    old.version(2).stores({
+      sessions: 'id, date, status, templateId',
+      setLogs: 'id, sessionId, [exerciseId+loggedAt]',
+      painLogs: 'id, sessionId, date, [sessionId+timing]',
+      meta: 'key',
+    });
+    const step = {
+      exerciseId: 'step-up',
+      sets: 2,
+      target: 8,
+      loadIndex: 0,
+      weightKg: 0,
+      restSec: 60,
+    };
+    await old.table('sessions').clear();
+    await old.table('setLogs').clear();
+    await old.table('sessions').bulkPut([
+      {
+        ...session,
+        id: 'legacy-done',
+        programId: undefined,
+        plan: [{ ...step, reason: 'pain_hold' }],
+      },
+      {
+        ...session,
+        id: 'legacy-open',
+        programId: undefined,
+        finishedAt: undefined,
+        status: 'in_progress',
+        plan: [{ ...step, reason: 'pain_stop_hold' }],
+      },
+    ]);
+    old.close();
+    db = new StommeDB(name);
+    await db.open();
+    expect(await db.table('meta').get('program')).toBeUndefined();
+    expect((await db.sessions.get('legacy-open'))?.status).toBe('aborted');
+    expect((await db.sessions.get('legacy-done'))?.plan[0]?.reason).toBe(
+      'hold_incomplete',
+    );
+    const backup = await exportAll(db);
+    expect(() => parseBackup(serializeBackup(backup))).not.toThrow();
   });
 });

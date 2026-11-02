@@ -411,7 +411,13 @@ describe('programme persistence and safety boundaries', () => {
     old.close();
     await db.open();
     expect(db.verno).toBe(3);
-    expect(await db.sessions.get(legacy.id)).toEqual(legacy);
+    // An in-progress programless session cannot be resumed any more: it is closed.
+    expect(await db.sessions.get(legacy.id)).toEqual({
+      ...legacy,
+      status: 'aborted',
+      abortReason: 'user',
+      finishedAt: legacy.startedAt,
+    });
     expect(db.tables.map((table) => table.name).sort()).toEqual([
       'meta',
       'sessions',

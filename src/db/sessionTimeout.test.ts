@@ -7,7 +7,7 @@ import type {
   TrainingPreferences,
 } from '../domain/types';
 import { defaultPlan } from '../features/training/defaultPlan';
-import { trainingDayAfterDue } from '../rules/training';
+import { hurtLastTime, trainingDayAfterDue } from '../rules/training';
 import { startSession } from '../test/legacySession';
 import { StommeDB } from './db';
 import { expireStaleSessions, getActiveSession, logSet } from './repo';
@@ -208,6 +208,21 @@ describe('a timeout is never a pain stop (rehab rule stays)', () => {
       defaultPlan(prefs, 'A', sessions, []).map((p) => p.exerciseId);
     expect(ids([ended('pain_stop')])).toEqual(ids([ended('timeout')]));
     expect(ids([ended('timeout')])).toEqual(ids([]));
+  });
+
+  it('a timeout has no effect, but a pain stop that marked the exercise does', () => {
+    const withPlan = (
+      abortReason: Session['abortReason'],
+      hurt: boolean,
+    ): Session => ({
+      ...ended(abortReason),
+      plan,
+      feedback: hurt ? { 'goblet-chair-squat': { hurt: true as const } } : {},
+    });
+    const found = (sessions: Session[]) =>
+      hurtLastTime('goblet-chair-squat', 'general', sessions);
+    expect(found([withPlan('timeout', false)])).toBe(false);
+    expect(found([withPlan('pain_stop', true)])).toBe(true);
   });
 
   it('asks for no rehab day-after answer', () => {
