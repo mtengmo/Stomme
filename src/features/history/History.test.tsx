@@ -96,7 +96,7 @@ it('shows new check-ins separately from effort and compares only the selected eq
   const session: Session = {
     id: 'new',
     templateId: 'A',
-    programId: 'general',
+    programId: 'rehab',
     date: '2026-10-20',
     startedAt: '2026-10-20T08:00:00Z',
     status: 'completed',
@@ -183,4 +183,39 @@ it('shows new check-ins separately from effort and compares only the selected eq
     'kettlebell',
   );
   expect(screen.getByText(/Set 1: 17 rep/)).toBeTruthy();
+});
+
+it('shows "Gjorde ont" for an exercise flagged in a regular session, with no unanswered check-ins', async () => {
+  const session: Session = {
+    id: 'hurt',
+    templateId: 'A',
+    programId: 'general',
+    date: '2026-10-20',
+    startedAt: '2026-10-20T08:00:00Z',
+    status: 'completed',
+    programWeek: 1,
+    plan: [
+      {
+        exerciseId: 'supported-row',
+        sets: 1,
+        target: 8,
+        loadIndex: 0,
+        weightKg: 10,
+        restSec: 60,
+        reason: 'first_time',
+        sides: ['left'],
+      },
+    ],
+    feedback: { 'supported-row': { effort: 'easy', hurt: true } },
+    checkins: {},
+  };
+  await getDb().sessions.add(session);
+  window.location.hash = '#/historik/hurt';
+  render(<App />);
+  const answers = await screen.findByRole('region', {
+    name: 'Känsla och besvär',
+  });
+  expect(within(answers).getByText(/Gjorde ont/)).toBeTruthy();
+  expect(within(answers).getAllByText('Inte efterfrågat').length).toBe(3);
+  expect(within(answers).queryByText('Svar saknas')).toBeNull();
 });

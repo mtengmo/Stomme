@@ -311,7 +311,9 @@ export async function recordTrainingCheckin(
   await db.transaction('rw', db.sessions, db.setLogs, async () => {
     const session = await db.sessions.get(id);
 
-    if (!session?.programId) throw new Error('Unknown training session');
+    // Check-ins belong to rehab only; regular training has the per-exercise valve.
+    if (session?.programId !== 'rehab')
+      throw new Error('Unknown training session');
 
     if (session.checkins?.[timing]) throw new Error('Svaret är redan sparat.');
 

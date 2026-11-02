@@ -187,13 +187,7 @@ describe('level-driven general start plan', () => {
       id: 'short-later',
       workoutMode: 'short',
       startedAt: '2026-01-03T10:00:00Z',
-      checkins: {
-        before: {
-          recordedAt: '2026-01-03T10:00:00Z',
-          feeling: 'tired',
-          symptoms: { area: 'Knä', side: 'left', score: 2 },
-        },
-      },
+      feedback: { 'dead-bug': { hurt: true } },
     };
     expect(
       defaultPlan(
@@ -204,7 +198,7 @@ describe('level-driven general start plan', () => {
         undefined,
         routines,
       )[0]?.explanation,
-    ).toMatch(/Besvär/);
+    ).toMatch(/Ingen automatisk ökning/);
     const matching = defaultPlan(
       general('new'),
       'A',
@@ -238,23 +232,6 @@ describe('level-driven general start plan', () => {
     const heavy = plan.find((item) => item.exerciseId === 'floor-press');
     expect(heavy?.weightKg).toBe(24);
     expect(heavy?.explanation).toMatch(/Tung startvikt/);
-  });
-  it('starts lightest and without heavy note when symptoms are on record', () => {
-    const symptomatic: Session = {
-      ...session('knee', 2),
-      programId: 'general',
-      checkins: {
-        before: {
-          recordedAt: '2026-01-02T10:00:00Z',
-          feeling: 'difficult',
-          symptoms: { area: 'Knä', side: 'right', score: 4 },
-        },
-      },
-    };
-    const plan = defaultPlan(general('regular'), 'A', [symptomatic], []);
-    expect(
-      plan.some((item) => /Tung startvikt/.test(item.explanation ?? '')),
-    ).toBe(false);
   });
   it('keeps the lightest weight for adds and variant switches', () => {
     const plan = basePlan('goblet-squat', general('regular'));

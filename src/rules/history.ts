@@ -43,6 +43,12 @@ export function symptomSummary(
       : 'Besvär: svar saknas';
   }
 
+  const hurt = Object.entries(session.feedback)
+    .filter(([, f]) => f?.hurt)
+    .map(([id]) => exercises[id as keyof typeof exercises].name);
+
+  if (hurt.length) return `Gjorde ont: ${hurt.join(', ')}`;
+
   const checks = Object.values(session.checkins ?? {});
 
   const during = Object.values(session.feedback)

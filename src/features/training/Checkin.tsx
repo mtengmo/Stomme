@@ -1,13 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, Redirect, useLocation } from 'wouter';
-import {
-  experienceLabels,
-  isTrainingPreferences,
-  trainingName,
-} from '../../content/programmes';
+import { trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
-import { getMeta } from '../../db/repo';
 import { deferAfterCheckin, recordTrainingCheckin } from '../../db/training';
 import type { SymptomReport, TrainingCheckin } from '../../domain/types';
 import { Button, buttonClass } from '../../ui/Button';
@@ -133,10 +128,7 @@ export function ExerciseSymptoms({
 
 export function Checkin({ id, timing }: { id: string; timing: string }) {
   const data = useLiveQuery(
-    async () => ({
-      session: await getDb().sessions.get(id),
-      preferences: await getMeta(getDb(), 'training'),
-    }),
+    async () => ({ session: await getDb().sessions.get(id) }),
     [id],
   );
   const [, navigate] = useLocation();
@@ -152,7 +144,7 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
   const [error, setError] = useState('');
   if (!data) return null;
   if (
-    !data.session?.programId ||
+    data.session?.programId !== 'rehab' ||
     !['before', 'after', 'dayAfter'].includes(timing)
   )
     return (
@@ -164,13 +156,6 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
       </div>
     );
   const session = data.session;
-  const experience =
-    session.experience ??
-    (session.status === 'in_progress' &&
-    isTrainingPreferences(data.preferences) &&
-    data.preferences.programId === session.programId
-      ? data.preferences.experience
-      : undefined);
   const period = timing as 'before' | 'after' | 'dayAfter';
   if (session.checkins?.[period])
     return <Redirect to={timing === 'before' ? `/session/${id}` : '/'} />;
@@ -208,11 +193,6 @@ export function Checkin({ id, timing }: { id: string; timing: string }) {
           {session.customWorkoutName ? `${session.customWorkoutName} · ` : ''}
           {trainingName(session)} · Pass {session.templateId}
         </p>
-        {experience && session.programId !== 'rehab' ? (
-          <p className="m-0 mt-1 text-base text-ink-soft">
-            Träningsvana: {experienceLabels[experience]}
-          </p>
-        ) : null}
       </header>
       {period === 'before' ? (
         <div className="flex flex-col gap-1">

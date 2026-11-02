@@ -182,7 +182,9 @@ export function ExerciseHistory({ id }: { id: string }) {
                 </p>
                 <p className="m-0 text-base">
                   Besvär under övningen:{' '}
-                  {symptomText(session.feedback[exercise.id]?.symptoms)}
+                  {session.feedback[exercise.id]?.hurt
+                    ? 'Gjorde ont'
+                    : symptomText(session.feedback[exercise.id]?.symptoms)}
                 </p>
                 <p className="m-0 text-base text-ink-soft">
                   Efter passet: {symptomText(session.checkins?.after?.symptoms)}

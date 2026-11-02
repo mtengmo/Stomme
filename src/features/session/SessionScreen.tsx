@@ -136,7 +136,10 @@ export function SessionScreen({ id }: { id: string }) {
       <Runner
         session={session.s}
         logs={logs}
-        hasAfter={!!session.s.checkins?.after}
+        hasAfter={
+          // Regular training has no "after" question; only rehab does.
+          session.s.programId !== 'rehab' || !!session.s.checkins?.after
+        }
       />
     );
   }

@@ -539,10 +539,10 @@ export function TrainingHome() {
             {nextId === 'A' ? 'B' : 'A'}. Du kan byta innan du börjar.
           </p>
           <p className="mt-2 text-base">
-            Nästa dos bygger på dina sparade set och svar om ansträngning och
-            besvär. Ett lätt, komplett pass utan rapporterade besvär kan ge en
-            extra repetition. Vikt ändrar du själv. Förslaget räknas om efter
-            nästa pass.
+            Nästa dos bygger på dina sparade set och svar om ansträngning. Ett
+            lätt, komplett pass kan ge en extra repetition, men inte för en
+            övning där det gjorde ont. Vikt ändrar du själv. Förslaget räknas om
+            efter nästa pass.
           </p>
           <Link
             href="/historik"

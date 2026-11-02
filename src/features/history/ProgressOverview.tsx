@@ -473,7 +473,10 @@ export function ProgressOverview({
                               ))}
                             </ul>
                             <p className="m-0">
-                              Vid övningen: {symptomText(feedback?.symptoms)}
+                              Vid övningen:{' '}
+                              {feedback?.hurt
+                                ? 'Gjorde ont'
+                                : symptomText(feedback?.symptoms)}
                             </p>
                             <p className="m-0">
                               Före:{' '}

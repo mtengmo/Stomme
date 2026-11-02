@@ -22,7 +22,6 @@ describe('previewDraft', () => {
   it('round-trips flags and clears them', () => {
     const flags = {
       confirmed: true,
-      checkBefore: true,
       removed: { item: { exerciseId: 'e12' } as never, index: 2 },
     };
     writeFlags('k', flags);

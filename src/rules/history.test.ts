@@ -59,6 +59,22 @@ describe('honest history summaries', () => {
       sessionSetProgress(session, [{ ...log, sessionId: 'another' }]),
     ).toEqual({ done: 0, total: 1 });
   });
+  it('names the exercises flagged as hurting in a regular session', () => {
+    expect(
+      symptomSummary(
+        {
+          ...session,
+          programId: 'general',
+          feedback: {
+            'straight-leg-raise': { effort: 'easy', hurt: true },
+            'dead-bug': { hurt: true },
+            plank: { effort: 'easy' },
+          },
+        },
+        [],
+      ),
+    ).toMatch(/^Gjorde ont: .+, .+$/);
+  });
   it('does not turn missing symptom answers or effort into absence of symptoms', () => {
     expect(symptomSummary(session, [])).toBe('Besvär: svar saknas');
     expect(

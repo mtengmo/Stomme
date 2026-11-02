@@ -477,7 +477,7 @@ for (const size of [
               for (const label of [
                 'Ändra set',
                 'Hur gör man?',
-                'Rapportera smärta eller besvär',
+                'Det gör ont',
               ]) {
                 const el = page
                   .getByText(label, { exact: true })

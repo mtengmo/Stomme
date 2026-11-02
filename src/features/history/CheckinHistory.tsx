@@ -27,13 +27,11 @@ const feelings = {
 
 export function CheckinHistory({ session }: { session: Session }) {
   const during = Object.entries(session.feedback).filter(
-    ([, f]) => f?.symptoms !== undefined,
+    ([, f]) => f?.symptoms !== undefined || f?.hurt,
   );
 
-  const nextDayExpected =
-    session.programId === 'rehab' ||
-    Object.values(session.checkins ?? {}).some((c) => c.symptoms !== null) ||
-    during.some(([, f]) => f?.symptoms);
+  // Check-ins belong to rehab; regular training only has the per-exercise valve.
+  const rehab = session.programId === 'rehab';
 
   return (
     <section aria-labelledby="checkin-history" className="flex flex-col gap-3">
@@ -62,7 +60,7 @@ export function CheckinHistory({ session }: { session: Session }) {
               <dd className="m-0 text-base">
                 {check
                   ? `${feelings[check.feeling]} · ${symptomText(check.symptoms)}`
-                  : timing === 'dayAfter' && !nextDayExpected
+                  : !rehab
                     ? 'Inte efterfrågat'
                     : 'Svar saknas'}
               </dd>
@@ -76,7 +74,7 @@ export function CheckinHistory({ session }: { session: Session }) {
           {during.map(([id, feedback]) => (
             <li key={id} className="border-b-2 border-edge py-2 text-base">
               {exercises[id as keyof typeof exercises].name}:{' '}
-              {symptomText(feedback?.symptoms)}
+              {feedback?.hurt ? 'Gjorde ont' : symptomText(feedback?.symptoms)}
               {feedback?.effort
                 ? ` · Ansträngning: ${EFFORT_LABEL[feedback.effort]}`
                 : ''}

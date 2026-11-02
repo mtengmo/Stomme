@@ -10,7 +10,7 @@ import { FRESH_STATE } from './state';
 // Covers onboarding or training setup, so it starts from a first visit.
 test.use({ storageState: FRESH_STATE });
 
-test('training setup keeps readiness, symptoms, effort, and after check-in separate', {
+test('regular training setup starts directly and ends in the summary, with no check-ins', {
   tag: '@smoke',
 }, async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
@@ -52,46 +52,22 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   await page.locator('ol').getByRole('link').first().click();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
-  await page
-    .getByText('Besvär eller något att anpassa idag?', { exact: true })
-    .click();
-  await page
-    .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
-    .check();
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
 
-  await expect(page).toHaveURL(/#\/kansla\/[^/]+\/before$/);
-  await expect(
-    page.getByRole('heading', { name: 'Hur känns kroppen?' }),
-  ).toBeVisible();
-  await page.getByRole('radio', { name: 'Redo att träna' }).check();
-  const saveBefore = page.getByRole('button', {
-    name: 'Spara och fortsätt',
-  });
-  await expect(saveBefore).toBeDisabled();
-  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await saveBefore.click();
-
-  await expect(page).toHaveURL(/#\/session\//);
+  await expect(page).toHaveURL(/#\/session\/[^/]+$/);
+  await expect(page.getByRole('radio', { name: 'Redo att träna' })).toHaveCount(
+    0,
+  );
   await expect(page.locator('[data-step]')).toBeVisible();
   await completeSets(page);
   await page.getByRole('button', { name: 'Lagom', exact: true }).click();
 
-  await expect(page).toHaveURL(/#\/kansla\/[^/]+\/after$/);
-  await expect(
-    page.getByRole('heading', { name: 'Hur kändes passet?' }),
-  ).toBeVisible();
-  await page.getByRole('radio', { name: 'Bra' }).check();
-  const saveAfter = page.getByRole('button', {
-    name: 'Spara och fortsätt',
-  });
-  await expect(saveAfter).toBeDisabled();
-  await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await saveAfter.click();
   await expect(
     page.getByRole('heading', { name: /Pass A klart/ }),
   ).toBeVisible();
-  await page.goto('/#/');
+  expect(page.url()).not.toMatch(/kansla/);
+  await page.getByRole('button', { name: 'Avsluta pass', exact: true }).click();
+  await expect(page).toHaveURL(/#\/$/);
   await expect(
     page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
   ).toHaveAttribute('href', /^#\/traning\/B(\?fokus=[a-z]+)?$/);
@@ -100,7 +76,7 @@ test('training setup keeps readiness, symptoms, effort, and after check-in separ
   ).toBeHidden();
 });
 
-test('general direction uses body-wide check-ins and keeps effort separate from symptoms', async ({
+test('general direction has no check-ins; "Det gör ont" marks only that exercise for that session', async ({
   page,
 }) => {
   await page.goto('/');
@@ -115,28 +91,30 @@ test('general direction uses body-wide check-ins and keeps effort separate from 
   await keepFirstExercises(page);
   await page.getByLabel('Set', { exact: true }).fill('1');
   await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
-  // Ordinary training starts directly: no mandatory before questionnaire.
+  // Ordinary training starts directly: no questionnaire, no rehab symptom report.
   await expect(page).toHaveURL(/#\/session\//);
   await expect(page.getByRole('radio', { name: 'Redo att träna' })).toHaveCount(
     0,
   );
-  await page
-    .getByRole('button', { name: 'Rapportera smärta eller besvär' })
-    .click();
-  await page.getByLabel('Var känns besvären?').selectOption('Axel');
-  await page
-    .getByRole('combobox', { name: 'Sida', exact: true })
-    .selectOption('left');
-  await page
-    .getByRole('group', { name: 'Besvärens intensitet (0–10)', exact: true })
-    .getByText('2', { exact: true })
-    .click();
-  await page.getByRole('button', { name: 'Spara besvär', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Rapportera smärta eller besvär' }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Det gör ont', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Det gör ont', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'Vid skarp smärta, svullnad eller om en led låser sig: avbryt och kontakta vården (1177).',
+    ),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Fortsätt ändå' }).click();
   await completeSets(page);
   await page.getByRole('button', { name: 'Lätt', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: 'Hur kändes passet?' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();
+  expect(page.url()).not.toMatch(/kansla/);
+  await page.getByRole('button', { name: 'Avsluta pass', exact: true }).click();
+  await expect(page).toHaveURL(/#\/$/);
   await page.reload();
   const saved = await page.evaluate(
     () =>
@@ -152,23 +130,16 @@ test('general direction uses body-wide check-ins and keeps effort separate from 
         };
       }),
   );
-  expect(saved).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({
-        programId: 'general',
-        feedback: expect.objectContaining({
-          'goblet-chair-squat': expect.objectContaining({
-            effort: 'easy',
-            symptoms: expect.objectContaining({
-              area: 'Axel',
-              side: 'left',
-              score: 2,
-            }),
-          }),
-        }),
-      }),
-    ]),
-  );
+  expect(saved).toEqual([
+    expect.objectContaining({
+      programId: 'general',
+      status: 'completed',
+      checkins: {},
+      feedback: {
+        'goblet-chair-squat': { effort: 'easy', hurt: true },
+      },
+    }),
+  ]);
 });
 
 test('rehab uses explicitly entered dose and selected left side through reload', async ({

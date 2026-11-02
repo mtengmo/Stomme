@@ -9,6 +9,7 @@ import type {
 import { inventory } from '../test/inventory';
 import { buildPlan } from './nextPlan';
 import {
+  hurtLastTime,
   trainingDayAfterDue,
   trainingPlanSuggestion,
   trainingSuggestion,
@@ -113,7 +114,7 @@ describe('programme-specific progression', () => {
       ).explanation,
     ).toMatch(/Inget komplett/);
   });
-  it('does not use short sessions as progression evidence, but short symptoms block a later increase', () => {
+  it('does not use short sessions as progression evidence, but a hurt mark in a short session blocks a later increase', () => {
     const full = session();
     expect(
       trainingPlanSuggestion(plan, preferences, [full], logs()).target,
@@ -138,13 +139,7 @@ describe('programme-specific progression', () => {
       id: 'short-later',
       workoutMode: 'short',
       startedAt: '2026-10-21T08:00:00.000Z',
-      checkins: {
-        before: {
-          feeling: 'tired',
-          symptoms: { area: 'Knä', side: 'left', score: 2 },
-          recordedAt: '2026-10-21T08:00:00.000Z',
-        },
-      },
+      feedback: { 'single-leg-rdl': { hurt: true } },
     });
     const blocked = trainingPlanSuggestion(
       plan,
@@ -153,33 +148,107 @@ describe('programme-specific progression', () => {
       logs(),
     );
     expect(blocked.target).toBe(8);
-    expect(blocked.explanation).toMatch(/Besvär/);
+    expect(blocked.explanation).toMatch(/Ingen automatisk ökning/);
     const feedbackSymptoms = session({
       id: 'short-feedback',
       workoutMode: 'short',
       checkins: undefined,
-      feedback: {
-        'single-leg-rdl': { symptoms: { area: 'Knä', side: 'left', score: 2 } },
-      },
+      feedback: { 'single-leg-rdl': { hurt: true } },
     });
     expect(
       trainingPlanSuggestion(plan, preferences, [feedbackSymptoms], [])
         .explanation,
-    ).toMatch(/Besvär/);
+    ).toMatch(/Ingen automatisk ökning/);
   });
-  it('holds progression after a newer full session with symptoms on another side', () => {
+  it('holds only the exercise that hurt, never other exercises or the whole session', () => {
+    const other: PlannedExercise = {
+      ...plan,
+      exerciseId: 'goblet-squat',
+      sides: undefined,
+      variantId: 'dumbbell',
+    };
+    const previous = session({
+      plan: [plan, other],
+      feedback: {
+        'single-leg-rdl': { effort: 'easy', hurt: true },
+        'goblet-squat': { effort: 'easy' },
+      },
+    });
+    const sym = trainingSuggestion(plan, previous, logs());
+    expect(sym).toMatchObject({ target: 8 });
+    expect(sym.explanation).toMatch(/Ingen automatisk ökning/);
+    const gobletLogs = logs().map((log) => ({
+      ...log,
+      exerciseId: 'goblet-squat' as const,
+      side: 'both' as const,
+    }));
+    expect(trainingSuggestion(other, previous, gobletLogs).target).toBe(9);
+    const later = session({
+      id: 'later',
+      startedAt: '2026-10-21T08:00:00.000Z',
+      plan: [other],
+      feedback: { 'goblet-squat': { hurt: true } },
+    });
+    expect(
+      trainingPlanSuggestion(plan, preferences, [later, session()], logs())
+        .target,
+    ).toBe(9);
+  });
+  it('keeps the rehab-wide symptom hold and its wording', () => {
+    const rehab = session({
+      programId: 'rehab',
+      feedback: {
+        'single-leg-rdl': { symptoms: { area: 'Knä', side: 'left', score: 2 } },
+      },
+    });
+    expect(trainingSuggestion(plan, rehab, logs()).explanation).toMatch(
+      /Besvär rapporterades/,
+    );
+    expect(
+      trainingSuggestion(plan, { ...rehab, checkins: undefined }, logs())
+        .explanation,
+    ).toMatch(/Besvär rapporterades/);
+    const stopped = session({
+      programId: 'rehab',
+      abortReason: 'pain_stop',
+      status: 'aborted',
+      id: 'later',
+      startedAt: '2026-10-21T08:00:00.000Z',
+    });
+    const rehabPrefs: TrainingPreferences = {
+      ...preferences,
+      programId: 'rehab',
+    };
+    expect(
+      trainingPlanSuggestion(
+        plan,
+        rehabPrefs,
+        [stopped, session({ programId: 'rehab' })],
+        logs(),
+      ).explanation,
+    ).toMatch(/Kontrollera innan du startar/);
+    const checkinOnly = session({
+      programId: 'rehab',
+      feedback: {},
+      checkins: {
+        before: {
+          feeling: 'ready',
+          symptoms: { area: 'Knä', side: 'left', score: 1 },
+          recordedAt: '2026-10-20T08:00:00.000Z',
+        },
+      },
+    });
+    expect(trainingSuggestion(plan, checkinOnly, logs()).explanation).toMatch(
+      /Besvär rapporterades/,
+    );
+  });
+  it('holds progression after a newer full session where the exercise hurt on another side', () => {
     const olderLeft = session();
     const newerRight = session({
       id: 'newer-right',
       startedAt: '2026-10-21T08:00:00.000Z',
       plan: [{ ...plan, sides: ['right'] }],
-      checkins: {
-        before: {
-          feeling: 'tired',
-          symptoms: { area: 'Knä', side: 'right', score: 2 },
-          recordedAt: '2026-10-21T08:00:00.000Z',
-        },
-      },
+      feedback: { 'single-leg-rdl': { hurt: true } },
     });
     expect(
       trainingPlanSuggestion(
@@ -200,9 +269,9 @@ describe('programme-specific progression', () => {
         plan.variantId,
         ['left'],
       ).explanation,
-    ).toMatch(/Besvär/);
+    ).toMatch(/Ingen automatisk ökning/);
   });
-  it('keeps borrowed workouts out of home progression evidence while retaining their symptom signal', () => {
+  it('keeps borrowed workouts out of home progression evidence while retaining their hurt signal', () => {
     const borrowed = session({
       equipmentOverride: {
         equipment: ['bodyweight'],
@@ -223,9 +292,7 @@ describe('programme-specific progression', () => {
         equipment: ['bodyweight'],
         weights: [],
       },
-      feedback: {
-        'single-leg-rdl': { symptoms: { area: 'Knä', side: 'left', score: 2 } },
-      },
+      feedback: { 'single-leg-rdl': { hurt: true } },
     });
     const result = trainingPlanSuggestion(
       plan,
@@ -234,7 +301,7 @@ describe('programme-specific progression', () => {
       logs('older'),
     );
     expect(result.target).toBe(8);
-    expect(result.explanation).toMatch(/Besvär/);
+    expect(result.explanation).toMatch(/Ingen automatisk ökning/);
   });
   it('keeps an unknown draft variant reviewable and does not invent history for an unowned starting load', () => {
     const unknown = { ...plan, variantId: 'old-variant' };
@@ -252,7 +319,7 @@ describe('programme-specific progression', () => {
   });
 
   it.each(['single-leg-rdl', 'goblet-squat'] as const)(
-    'requires all legacy sides and an after answer before suggesting a heavier %s',
+    'requires all sets on all legacy sides before suggesting a heavier %s',
     (exerciseId) => {
       const ex = exercises[exerciseId];
       const legacyPlan = {
@@ -292,10 +359,14 @@ describe('programme-specific progression', () => {
         legacyPlan,
         owned,
         [previous],
-        records,
+        records.filter((record) => record.setNumber === 1),
       );
       expect(result.weightKg).toBe(7.5);
       expect(result.explanation).not.toMatch(/Nästa registrerade/);
+      expect(
+        trainingPlanSuggestion(legacyPlan, owned, [previous], records)
+          .explanation,
+      ).toMatch(/Nästa registrerade/);
     },
   );
   it('restores the requested equipment variant rather than the latest different variant', () => {
@@ -352,7 +423,7 @@ describe('programme-specific progression', () => {
     );
     expect(incomplete.explanation).not.toMatch(/Nästa registrerade/);
   });
-  it('proposes one repetition after complete easy sets and an explicitly good symptom-free after answer', () => {
+  it('proposes one repetition after complete easy sets, with or without an after answer', () => {
     const suggestion = trainingSuggestion(plan, session(), logs());
     expect(suggestion).toMatchObject({
       target: 9,
@@ -361,18 +432,31 @@ describe('programme-specific progression', () => {
       sides: ['left'],
     });
     expect(suggestion.explanation).toMatch(/\+1 repetition/);
+    expect(
+      trainingSuggestion(plan, session({ checkins: undefined }), logs()).target,
+    ).toBe(9);
+    expect(
+      trainingSuggestion(
+        plan,
+        session({
+          checkins: {
+            after: {
+              feeling: 'difficult',
+              symptoms: null,
+              recordedAt: '2026-10-20T08:30:00.000Z',
+            },
+          },
+        }),
+        logs(),
+      ).target,
+    ).toBe(9);
   });
 
   it.each([
     [
-      'easy effort with exercise pain',
+      'easy effort on an exercise that hurt',
       session({
-        feedback: {
-          'single-leg-rdl': {
-            effort: 'easy',
-            symptoms: { area: 'Höft', side: 'left', score: 2 },
-          },
-        },
+        feedback: { 'single-leg-rdl': { effort: 'easy', hurt: true } },
       }),
     ],
     [
@@ -381,60 +465,7 @@ describe('programme-specific progression', () => {
         feedback: { 'single-leg-rdl': { effort: 'hard', symptoms: null } },
       }),
     ],
-    [
-      'unknown after answer',
-      session({
-        checkins: {
-          before: {
-            feeling: 'ready',
-            symptoms: null,
-            recordedAt: '2026-10-20T08:00:00.000Z',
-          },
-        },
-      }),
-    ],
-    [
-      'pain before workout',
-      session({
-        checkins: {
-          before: {
-            feeling: 'ready',
-            symptoms: { area: 'Rygg', side: 'unspecified', score: 1 },
-            recordedAt: '2026-10-20T08:00:00.000Z',
-          },
-          after: {
-            feeling: 'good',
-            symptoms: null,
-            recordedAt: '2026-10-20T08:30:00.000Z',
-          },
-        },
-      }),
-    ],
-    [
-      'difficult overall feeling without pain',
-      session({
-        checkins: {
-          after: {
-            feeling: 'difficult',
-            symptoms: null,
-            recordedAt: '2026-10-20T08:30:00.000Z',
-          },
-        },
-      }),
-    ],
     ['rehab even after easy painless sets', session({ programId: 'rehab' })],
-    [
-      'a deferred ("Svara senare") after answer',
-      session({
-        checkins: {
-          before: {
-            feeling: 'ready',
-            symptoms: null,
-            recordedAt: '2026-10-20T08:00:00.000Z',
-          },
-        },
-      }),
-    ],
     [
       'a skipped effort answer',
       session({ feedback: { 'single-leg-rdl': { effortSkipped: true } } }),
@@ -603,36 +634,19 @@ describe('conditional next-day answers', () => {
     ).toBe(true);
     expect(trainingDayAfterDue(session(), '2026-10-21')).toBe(false);
   });
-  it('asks after reported exercise or session symptoms, but not just hard effort', () => {
+  it('never asks regular training the next day, even after symptoms or hurt marks', () => {
     const symptom = { area: 'Axel', side: 'right' as const, score: 2 };
-    expect(
-      trainingDayAfterDue(
-        session({
-          feedback: { 'single-leg-rdl': { effort: 'easy', symptoms: symptom } },
-        }),
-        '2026-10-21',
-      ),
-    ).toBe(true);
-    expect(
-      trainingDayAfterDue(
-        session({
-          checkins: {
-            after: {
-              feeling: 'mixed',
-              symptoms: symptom,
-              recordedAt: '2026-10-20T08:30:00.000Z',
-            },
-          },
-        }),
-        '2026-10-21',
-      ),
-    ).toBe(true);
-    expect(
-      trainingDayAfterDue(
-        session({ feedback: { 'single-leg-rdl': { effort: 'hard' } } }),
-        '2026-10-21',
-      ),
-    ).toBe(false);
+    for (const patch of [
+      {
+        feedback: {
+          'single-leg-rdl': { effort: 'easy' as const, hurt: true as const },
+        },
+      },
+      { feedback: { 'single-leg-rdl': { symptoms: symptom } } },
+      { abortReason: 'pain_stop' as const },
+      {},
+    ])
+      expect(trainingDayAfterDue(session(patch), '2026-10-21')).toBe(false);
   });
   it('does not re-ask, ask early, ask an unfinished session, or treat legacy as rehab', () => {
     expect(
@@ -748,5 +762,35 @@ describe('laps are never progressed', () => {
     const suggestion = trainingSuggestion(lapsPlan, previous, lapLogs);
     expect(suggestion.target).toBe(3);
     expect(suggestion.explanation).not.toMatch(/\+1/);
+  });
+});
+
+describe('hurtLastTime', () => {
+  const hurtSession = session({
+    feedback: { 'single-leg-rdl': { hurt: true } },
+  });
+  it('is true when the latest finished attempt at the exercise was flagged', () => {
+    expect(hurtLastTime('single-leg-rdl', 'general', [hurtSession])).toBe(true);
+    // An aborted pain stop counts as finished; a newer clean attempt clears it.
+    expect(
+      hurtLastTime('single-leg-rdl', 'general', [
+        session({
+          id: 'newer',
+          startedAt: '2026-10-21T08:00:00.000Z',
+          feedback: { 'single-leg-rdl': { effort: 'easy' } },
+        }),
+        hurtSession,
+      ]),
+    ).toBe(false);
+  });
+  it('ignores other exercises, programmes and the session being prepared', () => {
+    expect(hurtLastTime('goblet-squat', 'general', [hurtSession])).toBe(false);
+    expect(hurtLastTime('single-leg-rdl', 'rehab', [hurtSession])).toBe(false);
+    expect(
+      hurtLastTime('single-leg-rdl', 'general', [
+        { ...hurtSession, status: 'in_progress' },
+      ]),
+    ).toBe(false);
+    expect(hurtLastTime('single-leg-rdl', 'general', [])).toBe(false);
   });
 });

@@ -245,6 +245,8 @@ export interface ExerciseFeedback {
   effortSkipped?: boolean;
   skipped?: boolean;
   symptoms?: SymptomReport | null;
+  /** Regular training: flagged as painful in this session only; never global. */
+  hurt?: true;
 }
 
 export interface Session {

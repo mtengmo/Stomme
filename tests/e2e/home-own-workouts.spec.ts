@@ -38,17 +38,9 @@ for (const { width, scheme } of cases) {
     // Open a standard pass and make a preparation without starting it.
     await page.goto('/#/traning/A');
     await page
-      .getByText('Besvär eller något att anpassa idag?', { exact: true })
-      .click();
-    await page
-      .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
-      .check();
-    await page
       .getByRole('button', { name: 'Börja passet', exact: true })
       .click();
-    await expect(
-      page.getByRole('heading', { name: 'Hur känns kroppen?', exact: true }),
-    ).toBeVisible();
+    await expect(page).toHaveURL(/#\/session\//);
 
     await page.goto('/#/');
     await expect(

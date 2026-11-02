@@ -45,11 +45,7 @@ export function HistoryTrends({ sessions }: { sessions: Session[] }) {
                 Dagen efter:{' '}
                 {session.checkins?.dayAfter
                   ? symptomText(session.checkins.dayAfter.symptoms)
-                  : session.programId === 'rehab' ||
-                      Object.values(session.checkins ?? {}).some(
-                        (c) => c.symptoms,
-                      ) ||
-                      Object.values(session.feedback).some((f) => f?.symptoms)
+                  : session.programId === 'rehab'
                     ? 'Svar saknas'
                     : 'Inte efterfrågat'}
               </p>

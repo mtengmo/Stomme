@@ -235,6 +235,7 @@ const effortFeedback = z.strictObject({
   effortSkipped: z.boolean().optional(),
   skipped: z.boolean().optional(),
   symptoms: symptom.nullable().optional(),
+  hurt: z.literal(true).optional(),
 });
 
 const sessionSchema = z

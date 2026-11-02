@@ -18,7 +18,7 @@ const preferences: TrainingPreferences = {
   experience: 'regular',
   equipment: ['bodyweight', 'chair', 'support'],
 };
-const symptom = { area: 'shoulder', side: 'right' as const, score: 2 };
+const symptoms = { area: 'shoulder', side: 'right' as const, score: 2 };
 function fixture(id: ExerciseId = 'push-up') {
   const sessions: Session[] = [1, 2].map((n) => ({
     id: `session-${n}`,
@@ -85,7 +85,7 @@ describe('optional harder exercises', () => {
       const symptomatic = structuredClone(required(data.sessions[1]));
       symptomatic.id = 'symptomatic';
       symptomatic.plan = [];
-      symptomatic.feedback = { plank: { symptoms: symptom } };
+      symptomatic.feedback = { plank: { symptoms } };
       if (where === 'older') symptomatic.startedAt = '2026-10-01T08:00:00Z';
       else symptomatic.programId = 'rehab';
       data.sessions.push(symptomatic);
@@ -109,7 +109,7 @@ describe('optional harder exercises', () => {
       ['diamond-push-up', 'blast-off-push-up'],
     );
   });
-  it('does not count a short success, but a short symptom blocks older full successes', () => {
+  it('does not count a short success, and a short session never blocks older full successes', () => {
     const data = fixture();
     const short = {
       ...required(data.sessions[1]),
@@ -122,11 +122,11 @@ describe('optional harder exercises', () => {
       ...short,
       id: 'short-later',
       startedAt: '2026-10-23T08:00:00Z',
-      feedback: { 'push-up': { symptoms: symptom } },
+      feedback: { 'push-up': { hurt: true as const } },
     };
     expect(
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
-    ).toEqual([]);
+    ).toHaveLength(3);
   });
   it('offers step-down after step-up', () => {
     const data = fixture('step-up');
@@ -194,28 +194,16 @@ describe('optional harder exercises', () => {
       s.feedback = {};
     },
     (s: Session) => {
-      s.checkins = undefined;
-    },
-    (s: Session) => {
-      s.checkins = {};
-    },
-    (s: Session) => {
-      required(required(s.checkins).after).feeling = 'mixed';
-    },
-    (s: Session) => {
       required(s.plan[0]).sets = 0;
     },
     (s: Session) => {
       required(s.plan[0]).sides = [];
     },
-  ])(
-    'requires completion, easy effort, after answer and planned sets (%#)',
-    (change) => {
-      const data = fixture();
-      change(required(data.sessions[1]));
-      expect(suggest(data)).toEqual([]);
-    },
-  );
+  ])('requires completion, easy effort and planned sets (%#)', (change) => {
+    const data = fixture();
+    change(required(data.sessions[1]));
+    expect(suggest(data)).toEqual([]);
+  });
   it.each([
     (l: SetLog) => {
       l.amount = 11;
@@ -249,36 +237,34 @@ describe('optional harder exercises', () => {
       expect(suggest(data)).toEqual([]);
     },
   );
-  it.each(['feedback', 'checkin', 'pain_stop'] as const)(
-    'blocks symptoms since the two attempts: %s',
-    (where) => {
+  it.each([0, 1] as const)(
+    'blocks when this exercise hurt in attempt %#, but only for that exercise',
+    (index) => {
       const data = fixture();
-      const newer = structuredClone(required(data.sessions[1]));
-      newer.id = 'newer';
-      newer.startedAt = '2026-10-23T08:00:00Z';
-      newer.plan = [];
-      if (where === 'feedback')
-        newer.feedback = { plank: { symptoms: symptom } };
-      if (where === 'checkin')
-        required(required(newer.checkins).after).symptoms = symptom;
-      if (where === 'pain_stop') newer.abortReason = 'pain_stop';
-      data.sessions.push(newer);
+      required(data.sessions[index]).feedback['push-up'] = {
+        effort: 'easy',
+        hurt: true,
+      };
       expect(suggest(data)).toEqual([]);
-      newer.programId = 'rehab';
-      expect(suggest(data)).toEqual([
-        'decline-push-up',
-        'diamond-push-up',
-        'blast-off-push-up',
-      ]);
-      newer.programId = 'general';
-      newer.startedAt = '2026-10-01T08:00:00Z';
-      expect(suggest(data)).toEqual([
-        'decline-push-up',
-        'diamond-push-up',
-        'blast-off-push-up',
-      ]);
+      const other = fixture();
+      required(other.sessions[index]).feedback.plank = { hurt: true };
+      expect(suggest(other)).toHaveLength(3);
     },
   );
+  it('ignores an old hurt mark and session-wide signals; the after answer is not needed', () => {
+    const data = fixture();
+    const old = structuredClone(required(data.sessions[0]));
+    old.id = 'old';
+    old.startedAt = '2026-10-01T08:00:00Z';
+    old.feedback = { 'push-up': { effort: 'easy', hurt: true } };
+    data.sessions.push(old);
+    for (const session of data.sessions) {
+      session.checkins = undefined;
+      session.feedback.plank = { symptoms };
+    }
+    required(data.sessions[1]).abortReason = 'pain_stop';
+    expect(suggest(data)).toHaveLength(3);
+  });
   it('supports legacy missing sides/variants and ignores unrelated logs', () => {
     const data = fixture();
     for (const session of data.sessions) {

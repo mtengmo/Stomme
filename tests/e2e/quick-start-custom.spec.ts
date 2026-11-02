@@ -51,7 +51,7 @@ for (const width of [320, 360, 412]) {
         /^Eget pass /,
       );
       await page.getByRole('button', { name: /Börja passet/ }).click();
-      await expect(page).toHaveURL(/#\/(session|kansla)\//);
+      await expect(page).toHaveURL(/#\/session\//);
     });
   }
 }

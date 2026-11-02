@@ -76,11 +76,11 @@ test('workout preview shows the nav above the start bar; the session hides it', 
   const [n, s] = await Promise.all([nav.boundingBox(), start.boundingBox()]);
   expect(s && n && s.y + s.height <= n.y).toBe(true);
   await start.click();
-  await page.waitForURL(/#\/(session|kansla)\//);
+  await page.waitForURL(/#\/session\//);
   await expect(nav).toHaveCount(0);
 });
 
-test('preview edits and the Besvär choice survive leaving via the nav; starting clears them', async ({
+test('preview edits survive leaving via the nav; starting clears them', async ({
   page,
 }) => {
   await accept(page);
@@ -93,13 +93,6 @@ test('preview edits and the Besvär choice survive leaving via the nav; starting
     .first()
     .click();
   await page.getByLabel('Set', { exact: true }).first().fill('4');
-  await page
-    .getByText('Besvär eller något att anpassa idag?', { exact: true })
-    .click();
-  const ask = page.getByRole('checkbox', {
-    name: /Fråga hur kroppen känns före passet/,
-  });
-  await ask.check();
   const trainingTab = page.getByRole('link', { name: 'Träning', exact: true });
   await expect(trainingTab).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Historik' }).click();
@@ -109,12 +102,8 @@ test('preview edits and the Besvär choice survive leaving via the nav; starting
   await expect(page.getByLabel('Set', { exact: true }).first()).toHaveValue(
     '4',
   );
-  await page
-    .getByText('Besvär eller något att anpassa idag?', { exact: true })
-    .click();
-  await expect(ask).toBeChecked();
   await page.getByRole('button', { name: 'Börja passet' }).click();
-  await page.waitForURL(/#\/kansla\//);
+  await page.waitForURL(/#\/session\//);
   const stored = await page.evaluate(() =>
     Object.keys(sessionStorage).filter((k) =>
       k.startsWith('stomme.training-draft'),

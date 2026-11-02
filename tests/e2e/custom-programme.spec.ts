@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { addWeight, answerPain, quickStart } from './flow';
+import { addWeight, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding and training setup, so it starts from a first visit.
@@ -155,19 +155,15 @@ for (const width of [320, 360, 412]) {
         .getByRole('button', { name: 'Börja passet', exact: true })
         .click();
       await expect(page).toHaveURL(/#\/session\//);
-      if (await page.getByRole('heading', { name: /Hur känns/ }).count())
-        await answerPain(page, 0);
       const home = page.getByRole('link', { name: 'Till träningen' });
       const next = page
         .getByRole('button', {
-          name: /^(Klar set|Hoppa över vila|Lagom|Avsluta pass|Svara senare|Spara)$/,
+          name: /^(Klar set|Hoppa över vila|Lagom|Avsluta pass)$/,
         })
         .first();
       for (let guard = 0; guard < 40 && !(await home.count()); guard++) {
         await home.or(next).first().waitFor();
-        const label = await next.innerText({ timeout: 1_000 }).catch(() => '');
-        if (label.trim() === 'Spara') await answerPain(page, 0);
-        else await next.click({ timeout: 1_000 }).catch(() => {});
+        await next.click({ timeout: 1_000 }).catch(() => {});
       }
       await expect(home).toBeVisible();
       await page.goto('/#/historik');

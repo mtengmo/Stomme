@@ -3,13 +3,11 @@ import type { PlannedExercise } from '../../domain/types';
 /** Preview state beyond the plan itself, kept per tab so leaving via the nav loses nothing. */
 export interface PreviewFlags {
   confirmed: boolean;
-  checkBefore: boolean;
   removed: { item: PlannedExercise; index: number } | null;
 }
 
 export const EMPTY_FLAGS: PreviewFlags = {
   confirmed: false,
-  checkBefore: false,
   removed: null,
 };
 
@@ -61,7 +59,6 @@ export function readFlags(draftKey: string): PreviewFlags {
         : null;
     return {
       confirmed: v.confirmed === true,
-      checkBefore: v.checkBefore === true,
       removed,
     };
   } catch {

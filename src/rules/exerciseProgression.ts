@@ -34,18 +34,8 @@ export function harderExerciseSuggestions(
     .sort((a, b) => b.session.startedAt.localeCompare(a.session.startedAt))
     .slice(0, 2);
   if (attempts.length < 2) return [];
-  const oldest = attempts[1] as { session: Session };
-  const symptomsSince = sessions.some(
-    (session) =>
-      session.programId === preferences.programId &&
-      session.startedAt >= oldest.session.startedAt &&
-      (session.abortReason === 'pain_stop' ||
-        Object.values(session.feedback).some(
-          (feedback) => feedback?.symptoms,
-        ) ||
-        Object.values(session.checkins ?? {}).some((check) => check?.symptoms)),
-  );
-  if (symptomsSince) return [];
+  // Pain is per exercise: a "hurt" mark in either attempt blocks the suggestion.
+  if (attempts.some(({ session }) => session.feedback[id]?.hurt)) return [];
   const exercise = exercises[id];
   const qualifies = attempts.every(({ session, plan }) => {
     const feedback = session.feedback[id];
@@ -58,7 +48,6 @@ export function harderExerciseSuggestions(
       session.status === 'completed' &&
       !feedback?.skipped &&
       feedback?.effort === 'easy' &&
-      session.checkins?.after?.feeling === 'good' &&
       plan.sets > 0 &&
       sides.length > 0 &&
       Array.from({ length: plan.sets }, (_, index) => index + 1).every(

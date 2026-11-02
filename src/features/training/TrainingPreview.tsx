@@ -74,7 +74,7 @@ import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
 } from '../../rules/shortWorkout';
-import { trainingPlanSuggestion } from '../../rules/training';
+import { hurtLastTime, trainingPlanSuggestion } from '../../rules/training';
 import {
   availableWeights,
   startingWeight,
@@ -254,7 +254,6 @@ function PreviewEditor({
       return false;
     }
   });
-  const [checkBefore, setCheckBefore] = useState(flags0.checkBefore);
   const [editing, setEditing] = useState(() => {
     if (
       customWorkout ||
@@ -373,8 +372,8 @@ function PreviewEditor({
     index: number;
   } | null>(flags0.removed);
   useEffect(() => {
-    writeFlags(draftKey, { confirmed, checkBefore, removed });
-  }, [draftKey, confirmed, checkBefore, removed]);
+    writeFlags(draftKey, { confirmed, removed });
+  }, [draftKey, confirmed, removed]);
   const active = sessions.find(
     (session) =>
       session.status === 'in_progress' && session.id !== preparationId,
@@ -955,6 +954,17 @@ function PreviewEditor({
                               )
                             : null}
 
+                          {preferences.programId !== 'rehab' &&
+                          hurtLastTime(
+                            item.exerciseId,
+                            preferences.programId,
+                            sessions,
+                          ) ? (
+                            <p className="m-0 text-base font-bold">
+                              Gjorde ont senast. Välj lättare eller hoppa över.
+                            </p>
+                          ) : null}
+
                           {physioPaper &&
                           item.explanation?.startsWith('Förifyllt') ? null : (
                             <p className="m-0 text-base text-ink-soft">
@@ -1413,27 +1423,6 @@ function PreviewEditor({
               }}
             />
           ) : null}
-          {preferences.programId === 'rehab' ? null : (
-            <details className="border-y-2 border-edge py-2">
-              <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-                Besvär eller något att anpassa idag?
-              </summary>
-              <label className="flex min-h-12 items-start gap-3 py-2 text-base">
-                <input
-                  type="checkbox"
-                  checked={checkBefore}
-                  onChange={(event) => setCheckBefore(event.target.checked)}
-                  className="size-6 shrink-0"
-                />
-                Fråga hur kroppen känns före passet. Annars börjar passet
-                direkt.
-              </label>
-              <p className="m-0 text-base text-ink-soft">
-                Du kan alltid rapportera besvär under passet. Ett överhoppat
-                svar sparas inte som besvärsfritt.
-              </p>
-            </details>
-          )}
 
           {!equipmentOverride && editing && customWorkout ? (
             <>
@@ -1643,7 +1632,7 @@ function PreviewEditor({
 
                     onStarted?.();
                     navigate(
-                      preferences.programId === 'rehab' || checkBefore
+                      preferences.programId === 'rehab'
                         ? `/kansla/${session.id}/before`
                         : `/session/${session.id}`,
                     );
