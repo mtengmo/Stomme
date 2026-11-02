@@ -3,17 +3,16 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { exercises } from '../content/exercises';
 import type { ExerciseId } from '../domain/types';
 import { buildSteps, resumeIndex } from '../rules/sessionPlan';
+import { startSession } from '../test/legacySession';
 import { StommeDB } from './db';
 import {
   abortSession,
   finishSession,
   getActiveSession,
-  getMeta,
   getSessionLogs,
   lastLogFor,
   logSet,
   setFeedback,
-  startSession,
   undoLastSet,
 } from './repo';
 
@@ -38,37 +37,6 @@ const goblet = (setNumber: number) => ({
   side: 'both' as const,
   amount: 10,
   loadIndex: 0,
-});
-
-describe('startSession', () => {
-  it('snapshots the plan and sets program.startDate on the first session', async () => {
-    const s = await startSession(db, 'A', T0);
-    expect(s).toMatchObject({
-      templateId: 'A',
-      status: 'in_progress',
-      programWeek: 1,
-      date: '2026-10-12',
-    });
-    expect(s.plan).toHaveLength(5);
-    expect(await getMeta(db, 'program')).toEqual({ startDate: '2026-10-12' });
-  });
-
-  it('keeps startDate and derives the week later', async () => {
-    const first = await startSession(db, 'A', T0);
-    await finishSession(db, first.id, at(1800));
-    const later = new Date(2026, 9, 26, 8, 0); // 14 days later
-    const second = await startSession(db, 'B', later);
-    expect(second.programWeek).toBe(3);
-    expect(second.plan[0]?.sets).toBeGreaterThanOrEqual(3);
-    expect(await getMeta(db, 'program')).toEqual({ startDate: '2026-10-12' });
-  });
-
-  it('returns the running session instead of starting another', async () => {
-    const a = await startSession(db, 'A', T0);
-    const b = await startSession(db, 'B', at(60));
-    expect(b.id).toBe(a.id);
-    expect(await db.sessions.count()).toBe(1);
-  });
 });
 
 describe('logging', () => {

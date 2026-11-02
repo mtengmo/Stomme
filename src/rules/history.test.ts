@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { PainLog, Session, SetLog } from '../domain/types';
+import type { Session, SetLog } from '../domain/types';
 import {
   historySummary,
   loggedVariant,
@@ -61,56 +61,47 @@ describe('honest history summaries', () => {
   });
   it('names the exercises flagged as hurting in a regular session', () => {
     expect(
-      symptomSummary(
-        {
-          ...session,
-          programId: 'general',
-          feedback: {
-            'straight-leg-raise': { effort: 'easy', hurt: true },
-            'dead-bug': { hurt: true },
-            plank: { effort: 'easy' },
-          },
+      symptomSummary({
+        ...session,
+        programId: 'general',
+        feedback: {
+          'straight-leg-raise': { effort: 'easy', hurt: true },
+          'dead-bug': { hurt: true },
+          plank: { effort: 'easy' },
         },
-        [],
-      ),
+      }),
     ).toMatch(/^Gjorde ont: .+, .+$/);
   });
   it('does not turn missing symptom answers or effort into absence of symptoms', () => {
-    expect(symptomSummary(session, [])).toBe('Besvär: svar saknas');
+    expect(symptomSummary(session)).toBe('Besvär: svar saknas');
     expect(
-      symptomSummary(
-        { ...session, feedback: { 'straight-leg-raise': { effort: 'easy' } } },
-        [],
-      ),
+      symptomSummary({
+        ...session,
+        feedback: { 'straight-leg-raise': { effort: 'easy' } },
+      }),
     ).toBe('Besvär: svar saknas');
     expect(
-      symptomSummary(
-        {
-          ...session,
-          checkins: {
-            before: {
-              recordedAt: session.startedAt,
-              feeling: 'ready',
-              symptoms: null,
-            },
+      symptomSummary({
+        ...session,
+        checkins: {
+          before: {
+            recordedAt: session.startedAt,
+            feeling: 'ready',
+            symptoms: null,
           },
         },
-        [],
-      ),
+      }),
     ).toBe('Inga besvär i sparade svar');
     expect(
-      symptomSummary(
-        {
-          ...session,
-          feedback: {
-            'straight-leg-raise': {
-              effort: 'easy',
-              symptoms: { area: 'Knä', side: 'left', score: 2 },
-            },
+      symptomSummary({
+        ...session,
+        feedback: {
+          'straight-leg-raise': {
+            effort: 'easy',
+            symptoms: { area: 'Knä', side: 'left', score: 2 },
           },
         },
-        [],
-      ),
+      }),
     ).toContain('Knä');
   });
   it('separates identical weights by equipment and keeps unknown variants explicit', () => {
@@ -129,8 +120,8 @@ describe('honest history summaries', () => {
 });
 
 describe('legacy symptom summary', () => {
-  it('says the answer is missing for a legacy session without pain logs', () => {
-    expect(symptomSummary({ ...session, programId: undefined }, [])).toBe(
+  it('says the answer is missing for a legacy session', () => {
+    expect(symptomSummary({ ...session, programId: undefined })).toBe(
       'Besvär: svar saknas',
     );
   });
@@ -148,21 +139,6 @@ describe('historySummary', () => {
     startedAt: `${date}T08:00:00Z`,
     status,
   });
-  const pain = (
-    sessionId: string,
-    score: number,
-    timing: PainLog['timing'],
-  ): PainLog => ({
-    id: `p-${sessionId}-${timing}`,
-    sessionId,
-    date: '2026-10-28',
-    timing,
-    score,
-    location: 'right_knee',
-    redFlags: { sharp: false, swelling: false, locking: false },
-    createdAt: '2026-10-28T09:00:00Z',
-  });
-
   it('counts this week and the last four calendar weeks from real sessions', () => {
     // Wednesday 2026-10-28: the week starts Monday 2026-10-26, four weeks back is 2026-10-05.
     const sessions = [
@@ -173,36 +149,20 @@ describe('historySummary', () => {
       at('e', '2026-10-04', 'completed'),
       at('f', '2026-10-28', 'in_progress'),
     ];
-    const s = historySummary(sessions, [], '2026-10-28');
+    const s = historySummary(sessions, '2026-10-28');
     expect(s.weekCompleted).toBe(1);
     expect(s.fourWeeksCompleted).toBe(3);
     expect(s.fourWeeksAborted).toBe(1);
     expect(s.last?.id).toBe('f');
   });
 
-  it('reports pain only when an after reading exists for the newest session', () => {
-    const sessions = [at('a', '2026-10-27', 'completed')];
-    expect(
-      historySummary(sessions, [], '2026-10-28').lastPainAfter,
-    ).toBeUndefined();
-    expect(
-      historySummary(sessions, [pain('a', 2, 'before')], '2026-10-28')
-        .lastPainAfter,
-    ).toBeUndefined();
-    expect(
-      historySummary(sessions, [pain('a', 2, 'after')], '2026-10-28')
-        .lastPainAfter,
-    ).toBe(2);
-  });
-
   it('has nothing to report without sessions', () => {
-    const s = historySummary([], [], '2026-10-28');
+    const s = historySummary([], '2026-10-28');
     expect(s).toEqual({
       weekCompleted: 0,
       fourWeeksCompleted: 0,
       fourWeeksAborted: 0,
       last: undefined,
-      lastPainAfter: undefined,
     });
   });
 });

@@ -5,7 +5,7 @@
  */
 import { exercises } from '../content/exercises';
 import { templates } from '../content/templates';
-import type { PainLog, Session, SetLog, TemplateId } from '../domain/types';
+import type { Session, SetLog, TemplateId } from '../domain/types';
 import { addDays, toLocalDate, weekStart } from '../lib/dates';
 
 export const DEMO_NOTE = 'Syntetisk testdata. Inte ett riktigt pass.';
@@ -13,7 +13,6 @@ export const DEMO_NOTE = 'Syntetisk testdata. Inte ett riktigt pass.';
 export interface DemoData {
   sessions: Session[];
   setLogs: SetLog[];
-  painLogs: PainLog[];
 }
 
 /** Twelve weeks back from `now`: two passes a week with a thin week and a missed one. */
@@ -22,7 +21,6 @@ export function buildDemoData(now: Date): DemoData {
   const monday = weekStart(today);
   const sessions: Session[] = [];
   const setLogs: SetLog[] = [];
-  const painLogs: PainLog[] = [];
   let seq = 0;
   const id = (p: string) => `demo-${p}-${++seq}`;
 
@@ -101,28 +99,7 @@ export function buildDemoData(now: Date): DemoData {
         }
       }
       sessions.push(session);
-
-      const wave = (progress * 3 + (templateId === 'A' ? 0 : 1)) % 5;
-      const scores = {
-        before: Math.min(3, 1 + (wave % 3)),
-        after: Math.min(5, 1 + wave),
-        dayAfter: Math.max(0, wave - 1),
-      };
-      for (const timing of ['before', 'after', 'dayAfter'] as const) {
-        const logDate = timing === 'dayAfter' ? addDays(date, 1) : date;
-        if (logDate > today) continue;
-        painLogs.push({
-          id: id('p'),
-          sessionId,
-          date: logDate,
-          timing,
-          score: scores[timing],
-          location: 'right_knee',
-          redFlags: { sharp: false, swelling: false, locking: false },
-          createdAt: `${logDate}T${timing === 'before' ? '17:25' : '18:00'}:00.000Z`,
-        });
-      }
     }
   }
-  return { sessions, setLogs, painLogs };
+  return { sessions, setLogs };
 }

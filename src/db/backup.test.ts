@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { exercises } from '../content/exercises';
-import type { PainLog, Session, SetLog } from '../domain/types';
+import type { Session, SetLog } from '../domain/types';
 import { inventory } from '../test/inventory';
 import {
   BACKUP_SCHEMA_VERSION,
@@ -68,27 +68,10 @@ const setLog = (
   loggedAt: '2026-10-19T08:05:00.000Z',
   ...over,
 });
-const painLog = (
-  id: string,
-  sessionId: string,
-  over: Partial<PainLog> = {},
-): PainLog => ({
-  id,
-  sessionId,
-  date: '2026-10-19',
-  timing: 'before',
-  score: 3,
-  location: 'right_knee',
-  redFlags: { sharp: false, swelling: false, locking: false },
-  createdAt: '2026-10-19T08:00:00.000Z',
-  ...over,
-});
-
 async function seed(note = 'hej') {
   await db.sessions.add(session('s1', { note }));
   await db.setLogs.add(setLog('l1', 's1'));
-  await db.painLogs.add(painLog('p1', 's1'));
-  await setMeta(db, 'program', { startDate: '2026-10-12' });
+  await setMeta(db, 'backup', { lastExportAt: '2026-10-19T09:00:00.000Z' });
 }
 
 async function valid() {
@@ -238,7 +221,6 @@ describe('backup', () => {
     expect(res.counts).toEqual({
       sessions: 1,
       setLogs: 1,
-      painLogs: 1,
       meta: 1,
     });
     expect(await snapshot()).toEqual(before);
@@ -294,7 +276,7 @@ describe('backup', () => {
 
   it('rejects wrong schemaVersion', async () => {
     const b = await valid();
-    for (const v of [0, 1, 2, 4, '1']) {
+    for (const v of [0, 1, 2, 3, 5, '4']) {
       await expect(
         importAll(db, text({ ...b, schemaVersion: v })),
       ).rejects.toMatchObject({
@@ -311,9 +293,8 @@ describe('backup', () => {
       { ...b, sessions: 'x' },
       { ...b, extra: 1 },
       { ...b, sessions: [{ ...b.sessions[0], status: 'weird' }] },
-      { ...b, painLogs: [{ ...b.painLogs[0], score: 11 }] },
-      { ...b, painLogs: [{ ...b.painLogs[0], score: -1 }] },
-      { ...b, painLogs: [{ ...b.painLogs[0], score: 2.5 }] },
+      { ...b, painLogs: [] },
+      { ...b, meta: [{ key: 'program', value: { startDate: '2026-10-12' } }] },
       { ...b, setLogs: [{ ...b.setLogs[0], exerciseId: 'nope' }] },
       {
         ...b,
@@ -349,7 +330,7 @@ describe('backup', () => {
     const b = await valid();
     await db.sessions.add(session('keep'));
     const before = await snapshot();
-    vi.spyOn(db.painLogs, 'bulkAdd').mockRejectedValue(new Error('boom'));
+    vi.spyOn(db.meta, 'bulkAdd').mockRejectedValue(new Error('boom'));
     await expect(importAll(db, text(b))).rejects.toThrow();
     vi.restoreAllMocks();
     expect(await snapshot()).toEqual(before);
@@ -364,23 +345,6 @@ describe('backup', () => {
     expect((await db.sessions.get('s1'))?.note).toBe(note);
   });
 
-  it('rejects an in-progress session with sets but no before-pain reading', async () => {
-    const b = await valid();
-    const bad = {
-      ...b,
-      sessions: [
-        session('s2', { status: 'in_progress', finishedAt: undefined }),
-      ],
-      setLogs: [setLog('l9', 's2')],
-      painLogs: [],
-    };
-    await expect(importAll(db, text(bad))).rejects.toMatchObject({
-      code: 'invalid',
-    });
-    const ok = { ...bad, painLogs: [painLog('p9', 's2')] };
-    await expect(importAll(db, text(ok))).resolves.toBeDefined();
-  });
-
   describe('crafted files', () => {
     const reject = async (mutate: (b: Record<string, any>) => void) => {
       const b = JSON.parse(text(await valid()));
@@ -390,15 +354,6 @@ describe('backup', () => {
       });
     };
     it.each([
-      [
-        'program.startDate is a number',
-        (b: any) => (b.meta = [{ key: 'program', value: { startDate: 5 } }]),
-      ],
-      [
-        'program.startDate is not a real date',
-        (b: any) =>
-          (b.meta = [{ key: 'program', value: { startDate: '2026-13-45' } }]),
-      ],
       [
         'backup.lastExportAt is garbage',
         (b: any) =>
@@ -441,7 +396,6 @@ describe('backup', () => {
     it('accepts valid meta shapes', async () => {
       const b = JSON.parse(text(await valid()));
       b.meta = [
-        { key: 'program', value: { startDate: '2026-10-12' } },
         {
           key: 'onboarding',
           value: { acceptedAt: '2026-10-01T00:00:00.000Z' },

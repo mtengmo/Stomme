@@ -345,7 +345,7 @@ describe('programme persistence and safety boundaries', () => {
     );
     expect((await db.sessions.get(replacement.id))?.date).toBe('2026-10-21');
   });
-  it.each(['answers', 'sets', 'pain', 'feedback', 'legacy', 'note'] as const)(
+  it.each(['answers', 'sets', 'feedback', 'legacy', 'note'] as const)(
     'keeps %s when changing preferences is requested',
     async (kind) => {
       const prepared = await startTrainingSession(
@@ -369,17 +369,6 @@ describe('programme persistence and safety boundaries', () => {
           weightKg: 7.5,
           loggedAt: now.toISOString(),
         });
-      if (kind === 'pain')
-        await db.painLogs.put({
-          id: 'pain',
-          sessionId: prepared.id,
-          date: prepared.date,
-          timing: 'before',
-          score: 2,
-          location: 'right_knee',
-          redFlags: { sharp: false, swelling: false, locking: false },
-          createdAt: now.toISOString(),
-        });
       if (kind === 'feedback')
         await db.sessions.update(prepared.id, {
           feedback: { [plan.exerciseId]: { skipped: true } },
@@ -399,7 +388,7 @@ describe('programme persistence and safety boundaries', () => {
     },
   );
 
-  it('opens a real version1 database without rewriting legacy pain, effort or active plan', async () => {
+  it('opens a real version 1 database, keeping sessions and dropping pain readings', async () => {
     const old = new Dexie(db.name);
     old.version(1).stores({
       sessions: 'id, date, status, templateId',
@@ -417,23 +406,17 @@ describe('programme persistence and safety boundaries', () => {
       plan: [{ ...plan, variantId: undefined, sides: undefined, weightKg: 5 }],
       feedback: { 'single-leg-rdl': { effort: 'hard', skipped: false } },
     };
-    const pain = {
-      id: 'pain',
-      sessionId: legacy.id,
-      date: legacy.date,
-      timing: 'before',
-      score: 4,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: now.toISOString(),
-    };
     await old.table('sessions').put(legacy);
-    await old.table('painLogs').put(pain);
+    await old.table('painLogs').put({ id: 'pain', sessionId: legacy.id });
     old.close();
     await db.open();
-    expect(db.verno).toBe(2);
+    expect(db.verno).toBe(3);
     expect(await db.sessions.get(legacy.id)).toEqual(legacy);
-    expect(await db.painLogs.get(pain.id)).toEqual(pain);
+    expect(db.tables.map((table) => table.name).sort()).toEqual([
+      'meta',
+      'sessions',
+      'setLogs',
+    ]);
     expect((await db.sessions.get(legacy.id))?.programId).toBeUndefined();
   });
 

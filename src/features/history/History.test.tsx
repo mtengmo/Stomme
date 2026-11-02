@@ -23,7 +23,6 @@ async function seed() {
   const db = getDb();
   await db.sessions.bulkAdd(d.sessions);
   await db.setLogs.bulkAdd(d.setLogs);
-  await db.painLogs.bulkAdd(d.painLogs);
   return d;
 }
 
@@ -34,15 +33,15 @@ describe('history screen', () => {
     expect(screen.queryByText(/Visa som tabell/)).toBeNull();
   });
 
-  it('shows the three charts with summaries and a table toggle', async () => {
+  it('shows the charts with summaries and a table toggle', async () => {
     await seed();
     render(<App />);
     const bars = await screen.findByRole('region', { name: 'Set per vecka' });
     expect(within(bars).getByText(/Senaste 4 veckorna: \d+ set/)).toBeTruthy();
     expect(screen.getByRole('region', { name: 'Belastning' })).toBeTruthy();
     expect(
-      screen.getByRole('region', { name: 'Smärta i högerknäet' }),
-    ).toBeTruthy();
+      screen.queryByRole('region', { name: 'Smärta i högerknäet' }),
+    ).toBeNull();
 
     const toggle = within(bars).getByRole('button', {
       name: 'Visa som tabell',
@@ -85,9 +84,6 @@ describe('history screen', () => {
     expect(await getDb().sessions.get(target.id)).toBeUndefined();
     expect(
       await getDb().setLogs.where('sessionId').equals(target.id).count(),
-    ).toBe(0);
-    expect(
-      await getDb().painLogs.where('sessionId').equals(target.id).count(),
     ).toBe(0);
   });
 });

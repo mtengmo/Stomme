@@ -220,7 +220,6 @@ describe('useAppUpdate lifecycle', () => {
 
   it.each([
     '/session/abc',
-    '/smarta/abc/before',
     '/kansla/abc/before',
     '/traning/abc',
     '/ovning/e01',

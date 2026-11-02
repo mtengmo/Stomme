@@ -22,7 +22,6 @@ import { exportAll, serializeBackup } from '../../db/backup';
 import { getDb } from '../../db/db';
 import { createSession, setMeta } from '../../db/repo';
 import { initInstall } from '../../lib/install';
-import { WeekView } from '../week/WeekView';
 import { Settings } from './Settings';
 
 beforeEach(async () => {
@@ -249,99 +248,7 @@ describe('update banner', () => {
   });
 });
 
-describe('backup reminder', () => {
-  const NOW = new Date(2026, 9, 14, 12, 0);
-
-  it('appears after 4 completed sessions without an export and links to settings', async () => {
-    for (let i = 1; i <= 4; i++) {
-      await createSession(getDb(), {
-        templateId: 'A',
-        date: `2026-10-0${i}`,
-        startedAt: `2026-10-0${i}T08:00:00.000Z`,
-        finishedAt: `2026-10-0${i}T08:30:00.000Z`,
-        status: 'completed',
-        programWeek: 1,
-        plan: [],
-        feedback: {},
-      });
-    }
-    render(<WeekView now={NOW} />);
-    expect(
-      await screen.findByText('Det var ett tag sedan du säkerhetskopierade'),
-    ).toBeTruthy();
-    expect(
-      screen
-        .getByRole('link', { name: 'Öppna inställningar' })
-        .getAttribute('href'),
-    ).toBe('/installningar');
-  });
-
-  it('is absent on a fresh install', async () => {
-    render(<WeekView now={NOW} />);
-    await screen.findByRole('heading', { name: /Vecka/ });
-    expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
-  });
-});
-
 describe('M6 review fixes', () => {
-  const NOW = new Date(2026, 9, 14, 12, 0);
-  const done = (i: number) =>
-    createSession(getDb(), {
-      templateId: 'A',
-      date: `2026-10-0${i}`,
-      startedAt: `2026-10-0${i}T08:00:00.000Z`,
-      finishedAt: `2026-10-0${i}T08:30:00.000Z`,
-      status: 'completed',
-      programWeek: 1,
-      plan: [],
-      feedback: {},
-    });
-
-  it('reminder shows the reason, can be snoozed, and stays hidden', async () => {
-    for (let i = 1; i <= 4; i++) await done(i);
-    await setMeta(getDb(), 'backup', {
-      lastExportAt: '2026-09-01T10:00:00.000Z',
-    });
-    render(<WeekView now={NOW} />);
-    expect(
-      await screen.findByText(/Senaste kopian: .*, 4 pass sedan/),
-    ).toBeTruthy();
-    await userEvent.click(screen.getByRole('button', { name: 'Senare' }));
-    await waitFor(() =>
-      expect(screen.queryByText(/säkerhetskopierade/)).toBeNull(),
-    );
-    cleanup();
-    render(<WeekView now={new Date(2026, 9, 20, 12, 0)} />);
-    await screen.findByRole('heading', { name: /Vecka/ });
-    expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
-    cleanup();
-    render(<WeekView now={new Date(2026, 9, 22, 12, 0)} />);
-    expect(await screen.findByText(/säkerhetskopierade/)).toBeTruthy();
-  });
-
-  it('says "Aldrig säkerhetskopierat" without an export', async () => {
-    for (let i = 1; i <= 4; i++) await done(i);
-    render(<WeekView now={NOW} />);
-    expect(await screen.findByText('Aldrig säkerhetskopierat')).toBeTruthy();
-  });
-
-  it('a pain stop notice outranks the reminder', async () => {
-    for (let i = 1; i <= 4; i++) await done(i);
-    await createSession(getDb(), {
-      templateId: 'B',
-      date: '2026-10-13',
-      startedAt: '2026-10-13T08:00:00.000Z',
-      status: 'aborted',
-      abortReason: 'pain_stop',
-      programWeek: 1,
-      plan: [],
-      feedback: {},
-    });
-    render(<WeekView now={NOW} />);
-    await screen.findByRole('heading', { name: /Vecka/ });
-    expect(screen.queryByText(/säkerhetskopierade/)).toBeNull();
-  });
-
   it('Back from the delete confirmation returns to settings', async () => {
     render(<App />);
     window.location.hash = '#/installningar';

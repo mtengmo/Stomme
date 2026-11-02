@@ -10,36 +10,21 @@ export default function DemoSeed() {
   async function fill() {
     const db = getDb();
     const d = buildDemoData(new Date());
-    await db.transaction(
-      'rw',
-      db.sessions,
-      db.setLogs,
-      db.painLogs,
-      async () => {
-        await db.sessions.clear();
-        await db.setLogs.clear();
-        await db.painLogs.clear();
-        await db.sessions.bulkAdd(d.sessions);
-        await db.setLogs.bulkAdd(d.setLogs);
-        await db.painLogs.bulkAdd(d.painLogs);
-      },
-    );
+    await db.transaction('rw', db.sessions, db.setLogs, async () => {
+      await db.sessions.clear();
+      await db.setLogs.clear();
+      await db.sessions.bulkAdd(d.sessions);
+      await db.setLogs.bulkAdd(d.setLogs);
+    });
     setDone(`Fyllde med ${d.sessions.length} syntetiska pass.`);
   }
 
   async function clear() {
     const db = getDb();
-    await db.transaction(
-      'rw',
-      db.sessions,
-      db.setLogs,
-      db.painLogs,
-      async () => {
-        await db.sessions.clear();
-        await db.setLogs.clear();
-        await db.painLogs.clear();
-      },
-    );
+    await db.transaction('rw', db.sessions, db.setLogs, async () => {
+      await db.sessions.clear();
+      await db.setLogs.clear();
+    });
     setDone('Historiken är tom.');
   }
 

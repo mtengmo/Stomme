@@ -10,9 +10,7 @@ const tabs: { href: string; label: string; icon: IconName }[] = [
 /** Exact match for the root tab; sub-routes (/historik/:id) keep their tab active. */
 export function isTabActive(href: string, location: string): boolean {
   return href === '/'
-    ? location === '/' ||
-        location.startsWith('/traning/') ||
-        location.startsWith('/pass/')
+    ? location === '/' || location.startsWith('/traning/')
     : location === href || location.startsWith(`${href}/`);
 }
 

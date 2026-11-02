@@ -55,8 +55,41 @@ async function seeded() {
 }
 
 describe('backup of the physiotherapist knee programme', () => {
-  it('uses schema version 3', () => {
-    expect(BACKUP_SCHEMA_VERSION).toBe(3);
+  it('uses schema version 4', () => {
+    expect(BACKUP_SCHEMA_VERSION).toBe(4);
+  });
+
+  it('rejects an in-progress rehab session with sets but no check-in before', async () => {
+    const first = plan[0];
+    if (!first) throw new Error('empty physio plan');
+    const backup = await seeded();
+    backup.sessions[0].status = 'in_progress';
+    delete backup.sessions[0].finishedAt;
+    backup.setLogs = [
+      {
+        id: 'l1',
+        sessionId: 'physio-1',
+        exerciseId: first.exerciseId,
+        setNumber: 1,
+        side: first.sides?.[0] ?? 'both',
+        amount: first.target,
+        loadIndex: first.loadIndex,
+        weightKg: first.weightKg,
+        variantId: first.variantId,
+        loggedAt: '2026-09-14T08:05:00.000Z',
+      },
+    ];
+    await expect(importAll(db, JSON.stringify(backup))).rejects.toMatchObject({
+      code: 'invalid',
+    });
+    backup.sessions[0].checkins = {
+      before: {
+        recordedAt: '2026-09-14T08:01:00.000Z',
+        feeling: 'ready',
+        symptoms: null,
+      },
+    };
+    await expect(importAll(db, JSON.stringify(backup))).resolves.toBeDefined();
   });
 
   it('round-trips focus, saved plan and session', async () => {

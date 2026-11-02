@@ -7,7 +7,6 @@ import type {
   TrainingPreferences,
 } from '../domain/types';
 import { inventory } from '../test/inventory';
-import { buildPlan } from './nextPlan';
 import {
   hurtLastTime,
   trainingDayAfterDue,
@@ -605,25 +604,6 @@ describe('programme-specific progression', () => {
       target: 8,
     });
     expect(withoutWeights.explanation).toMatch(/utrustningsvariant/);
-  });
-
-  it('preserves original A/B progression when newer programme records exist', () => {
-    const template = {
-      id: 'A' as const,
-      name: 'A',
-      items: [{ exerciseId: plan.exerciseId, sets: 2, restSec: 60 }],
-    };
-    const clean = buildPlan(template, 2, {
-      sessions: [],
-      setLogs: [],
-      painLogs: [],
-    });
-    const mixed = buildPlan(template, 2, {
-      sessions: [session()],
-      setLogs: logs(),
-      painLogs: [],
-    });
-    expect(mixed).toEqual(clean);
   });
 });
 

@@ -1,7 +1,6 @@
 import type {
   ExerciseFeedback,
   ExerciseId,
-  PainLog,
   PlannedExercise,
   Session,
   SetLog,
@@ -44,8 +43,6 @@ export interface ReportSession {
   /** Raw status, check-ins, short mode, notes and equipment provenance. */
   session: Session;
   exercises: ReportExercise[];
-  /** Raw pain readings, kept separate from programme symptom answers. */
-  painLogs: PainLog[];
 }
 
 export interface PhysioReport {
@@ -74,13 +71,10 @@ function programmeMatches(
   return session.programId === programme;
 }
 
-const painOrder = { before: 0, after: 1, dayAfter: 2 } as const;
-
 /** A read-only view of recorded sessions; no dose or symptom is inferred. */
 export function buildPhysioReport(
   sessions: readonly Session[],
   setLogs: readonly SetLog[],
-  painLogs: readonly PainLog[],
   selection: ReportSelection,
 ): PhysioReport {
   const selected = { ...selection };
@@ -143,14 +137,6 @@ export function buildPhysioReport(
           ),
         feedback: session.feedback[exerciseId],
       })),
-      painLogs: painLogs
-        .filter((pain) => pain.sessionId === session.id)
-        .sort(
-          (a, b) =>
-            painOrder[a.timing] - painOrder[b.timing] ||
-            a.createdAt.localeCompare(b.createdAt) ||
-            a.id.localeCompare(b.id),
-        ),
     };
   });
 

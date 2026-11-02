@@ -116,7 +116,7 @@ describe('exercise library', () => {
     ).toBe('true');
   });
 
-  it('shows all exercises, equipment, template links and optional status', () => {
+  it('shows all exercises, equipment and optional status, without links into the removed programme', () => {
     detailed();
     render(<TestRoutes />);
     expect(screen.getByRole('status').textContent).toBe(
@@ -135,12 +135,7 @@ describe('exercise library', () => {
     for (const exercise of Object.values(exercises)) {
       expect(linkNames.has(exercise.name), exercise.name).toBe(true);
     }
-    expect(
-      screen.getAllByRole('link', { name: 'Ingår i Pass A' }),
-    ).toHaveLength(5);
-    expect(
-      screen.getAllByRole('link', { name: 'Ingår i Pass B' }),
-    ).toHaveLength(5);
+    expect(screen.queryByRole('link', { name: /^Ingår i Pass/ })).toBeNull();
     expect(screen.getAllByText('Valfri övning').length).toBeGreaterThan(0);
     const wallSit = screen
       .getByRole('link', { name: 'Väggsittning' })

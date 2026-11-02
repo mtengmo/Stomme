@@ -124,7 +124,7 @@ export interface Exercise {
   startLoadIndex: number;
   /** Used in programme week 1. */
   week1LoadIndex: number;
-  /** Gated by the pain rule. */
+  /** Metadata only: marks knee-loading exercises (no rule gates on it any more). */
   kneeLoaded: boolean;
   optional?: boolean;
 }
@@ -222,9 +222,7 @@ export type ReasonCode =
   | 'hold_hard'
   | 'hold_not_easy_at_max'
   | 'hold_waiting_for_3_sets'
-  | 'max_level'
-  | 'pain_hold'
-  | 'pain_stop_hold';
+  | 'max_level';
 
 export interface PlannedExercise {
   exerciseId: ExerciseId;
@@ -302,21 +300,8 @@ export interface SetLog {
   loggedAt: string;
 }
 
-export interface PainLog {
-  id: string;
-  sessionId: string;
-  date: string;
-  timing: 'before' | 'after' | 'dayAfter';
-  /** Integer 0-10. */
-  score: number;
-  location: 'right_knee';
-  redFlags: { sharp: boolean; swelling: boolean; locking: boolean };
-  createdAt: string;
-}
-
 export interface MetaEntry {
   key:
-    | 'program'
     | 'onboarding'
     | 'backup'
     | 'training'
@@ -343,10 +328,3 @@ export interface WeeklySchedule {
   days: { day: number; plan: WeeklyDayPlan }[];
   moved?: { from: string; to: string };
 }
-
-export type PainStatus = 'ok' | 'warn' | 'stop';
-export type PainReason =
-  | 'red_flag'
-  | 'above_threshold'
-  | 'worse_than_previous_day'
-  | 'invalid_score';

@@ -43,11 +43,8 @@ export async function canReplaceTrainingPreparation(
     session.note?.trim()
   )
     return false;
-  const [sets, pain] = await Promise.all([
-    db.setLogs.where('sessionId').equals(session.id).count(),
-    db.painLogs.where('sessionId').equals(session.id).count(),
-  ]);
-  return sets === 0 && pain === 0;
+  const sets = await db.setLogs.where('sessionId').equals(session.id).count();
+  return sets === 0;
 }
 
 export async function saveTrainingPreferences(
@@ -66,23 +63,19 @@ export async function saveTrainingPreferences(
       'Ogiltiga träningsval. Kontrollera utrustningen och försök igen.',
     );
 
-  await db.transaction(
-    'rw',
-    [db.sessions, db.meta, db.setLogs, db.painLogs],
-    async () => {
-      const active = await getActiveSession(db);
-      if (active) {
-        if (!(await canReplaceTrainingPreparation(db, active)))
-          throw new Error(
-            'Avsluta det pågående passet innan du byter träningsinriktning.',
-          );
-        await db.sessions.delete(active.id);
-      }
+  await db.transaction('rw', [db.sessions, db.meta, db.setLogs], async () => {
+    const active = await getActiveSession(db);
+    if (active) {
+      if (!(await canReplaceTrainingPreparation(db, active)))
+        throw new Error(
+          'Avsluta det pågående passet innan du byter träningsinriktning.',
+        );
+      await db.sessions.delete(active.id);
+    }
 
-      await db.meta.put({ key: 'training', value: preferences });
-      await alsoWrite?.();
-    },
-  );
+    await db.meta.put({ key: 'training', value: preferences });
+    await alsoWrite?.();
+  });
 }
 
 export function validateTrainingPlan(plan: PlannedExercise[]): boolean {
@@ -201,99 +194,93 @@ export async function startTrainingSession(
   )
     throw new Error('Kontrollera övningar, antal, vikt och sidor.');
 
-  return db.transaction(
-    'rw',
-    [db.sessions, db.meta, db.setLogs, db.painLogs],
-    async () => {
-      await expireStaleSessions(db, now);
-      const active = await getActiveSession(db);
-      if (active) {
-        if (!(await canReplaceTrainingPreparation(db, active))) return active;
-        await db.sessions.delete(active.id);
-      }
+  return db.transaction('rw', [db.sessions, db.meta, db.setLogs], async () => {
+    await expireStaleSessions(db, now);
+    const active = await getActiveSession(db);
+    if (active) {
+      if (!(await canReplaceTrainingPreparation(db, active))) return active;
+      await db.sessions.delete(active.id);
+    }
 
-      const session: Session = {
-        id: crypto.randomUUID(),
+    const session: Session = {
+      id: crypto.randomUUID(),
 
-        templateId,
-        ...(customWorkout
-          ? {
-              customWorkoutId: customWorkout.id,
-              customWorkoutName: customWorkout.name,
-            }
-          : {}),
+      templateId,
+      ...(customWorkout
+        ? {
+            customWorkoutId: customWorkout.id,
+            customWorkoutName: customWorkout.name,
+          }
+        : {}),
 
-        ...(options.workoutMode === 'short'
-          ? {
-              workoutMode: 'short' as const,
-              fullPlan: structuredClone(fullPlan),
-            }
-          : {}),
+      ...(options.workoutMode === 'short'
+        ? {
+            workoutMode: 'short' as const,
+            fullPlan: structuredClone(fullPlan),
+          }
+        : {}),
 
-        ...(equipmentOverride
-          ? {
-              equipmentOverride: {
-                equipment: [...equipmentOverride.equipment],
-                weights: structuredClone(equipmentOverride.weights ?? []),
-                adjustableWeights: structuredClone(
-                  equipmentOverride.adjustableWeights ?? [],
-                ),
-              },
-            }
-          : {}),
+      ...(equipmentOverride
+        ? {
+            equipmentOverride: {
+              equipment: [...equipmentOverride.equipment],
+              weights: structuredClone(equipmentOverride.weights ?? []),
+              adjustableWeights: structuredClone(
+                equipmentOverride.adjustableWeights ?? [],
+              ),
+            },
+          }
+        : {}),
 
-        programId: preferences.programId,
-        ...(preferences.programId === 'general' && !customWorkout
-          ? {
-              focus:
-                options.focus?.id ??
-                (preferences.bodyParts?.length
-                  ? ('custom' as const)
-                  : ('full' as const)),
-              ...((options.focus?.id === 'custom'
-                ? options.focus.regions
-                : !options.focus
-                  ? preferences.bodyParts
-                  : undefined
-              )?.length
-                ? {
-                    regions: [
-                      ...(options.focus?.regions ??
-                        preferences.bodyParts ??
-                        []),
-                    ],
-                  }
-                : {}),
-            }
-          : {}),
-        experience: preferences.experience,
+      programId: preferences.programId,
+      ...(preferences.programId === 'general' && !customWorkout
+        ? {
+            focus:
+              options.focus?.id ??
+              (preferences.bodyParts?.length
+                ? ('custom' as const)
+                : ('full' as const)),
+            ...((options.focus?.id === 'custom'
+              ? options.focus.regions
+              : !options.focus
+                ? preferences.bodyParts
+                : undefined
+            )?.length
+              ? {
+                  regions: [
+                    ...(options.focus?.regions ?? preferences.bodyParts ?? []),
+                  ],
+                }
+              : {}),
+          }
+        : {}),
+      experience: preferences.experience,
 
-        policyVersion: 1,
+      policyVersion: 1,
 
-        ...(preferences.programId === 'rehab'
-          ? { rehabFocus: preferences.rehabFocus ?? 'custom' }
-          : {}),
+      ...(preferences.programId === 'rehab'
+        ? { rehabFocus: preferences.rehabFocus ?? 'custom' }
+        : {}),
 
-        checkins: {},
+      checkins: {},
 
-        date: toLocalDate(now),
+      date: toLocalDate(now),
 
-        startedAt: now.toISOString(),
+      startedAt: now.toISOString(),
 
-        status: 'in_progress',
+      status: 'in_progress',
 
-        programWeek: 1,
+      programWeek: 1,
 
-        plan: structuredClone(plan),
+      plan: structuredClone(plan),
 
-        feedback: {},
-      };
+      feedback: {},
+    };
 
-      await db.sessions.add(session);
+    await db.sessions.add(session);
 
-      return session;
-    },
-  );
+    return session;
+  });
 }
 
 export async function recordTrainingCheckin(
@@ -374,8 +361,9 @@ export async function deferAfterCheckin(
 ) {
   await db.transaction('rw', db.sessions, async () => {
     const session = await db.sessions.get(id);
+    // Only rehab asks an "after" question that can be answered later.
     if (
-      !session?.programId ||
+      session?.programId !== 'rehab' ||
       session.status !== 'in_progress' ||
       session.checkins?.after
     )
@@ -402,44 +390,40 @@ export async function saveRehabPlan(
       'Kontrollera övningar, antal, vikt och sidor innan du sparar.',
     );
 
-  await db.transaction(
-    'rw',
-    [db.sessions, db.meta, db.setLogs, db.painLogs],
-    async () => {
-      const active = await getActiveSession(db);
-      if (active && !(await canReplaceTrainingPreparation(db, active)))
-        throw new Error(
-          'Avsluta det pågående passet innan du ändrar programmet.',
-        );
+  await db.transaction('rw', [db.sessions, db.meta, db.setLogs], async () => {
+    const active = await getActiveSession(db);
+    if (active && !(await canReplaceTrainingPreparation(db, active)))
+      throw new Error(
+        'Avsluta det pågående passet innan du ändrar programmet.',
+      );
 
-      const preferences = (await db.meta.get('training'))?.value;
-      if (
-        !isTrainingPreferences(preferences) ||
-        preferences.programId !== 'rehab' ||
-        (preferences.rehabFocus ?? 'custom') !== focus ||
-        plan.some((p) => {
-          const variant = exerciseMetadata[p.exerciseId].variants.find(
-            (v) => v.id === p.variantId,
-          );
-          return (
-            !variant ||
-            !equipmentFits(variant.equipment, preferences) ||
-            (rehabGroupOf(focus) === 'aaos' &&
-              !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
-          );
-        })
-      )
-        throw new Error(
-          'Kontrollera rehabinriktning och tillgänglig utrustning.',
+    const preferences = (await db.meta.get('training'))?.value;
+    if (
+      !isTrainingPreferences(preferences) ||
+      preferences.programId !== 'rehab' ||
+      (preferences.rehabFocus ?? 'custom') !== focus ||
+      plan.some((p) => {
+        const variant = exerciseMetadata[p.exerciseId].variants.find(
+          (v) => v.id === p.variantId,
         );
-      const previous = (await db.meta.get('rehabPlans'))?.value as
-        | Partial<Record<RehabFocus, PlannedExercise[]>>
-        | undefined;
+        return (
+          !variant ||
+          !equipmentFits(variant.equipment, preferences) ||
+          (rehabGroupOf(focus) === 'aaos' &&
+            !kneeRehabExercises.some((ex) => ex.id === p.exerciseId))
+        );
+      })
+    )
+      throw new Error(
+        'Kontrollera rehabinriktning och tillgänglig utrustning.',
+      );
+    const previous = (await db.meta.get('rehabPlans'))?.value as
+      | Partial<Record<RehabFocus, PlannedExercise[]>>
+      | undefined;
 
-      await db.meta.put({
-        key: 'rehabPlans',
-        value: { ...previous, [focus]: structuredClone(plan) },
-      });
-    },
-  );
+    await db.meta.put({
+      key: 'rehabPlans',
+      value: { ...previous, [focus]: structuredClone(plan) },
+    });
+  });
 }

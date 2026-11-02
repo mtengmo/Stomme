@@ -6,8 +6,8 @@ describe('isTabActive', () => {
     expect(isTabActive('/', '/')).toBe(true);
     expect(isTabActive('/', '/historik')).toBe(false);
   });
-  it('treats the workout and pass previews as the Träning tab', () => {
-    for (const loc of ['/traning/A', '/pass/B']) {
+  it('treats the workout preview as the Träning tab', () => {
+    for (const loc of ['/traning/A', '/traning/B']) {
       expect(isTabActive('/', loc)).toBe(true);
       expect(isTabActive('/historik', loc)).toBe(false);
     }

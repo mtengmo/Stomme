@@ -1,15 +1,16 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { ExerciseId, PlannedExercise, Session } from '../domain/types';
-import { shouldPromptDayAfter } from '../rules/pain';
+import type {
+  ExerciseId,
+  PlannedExercise,
+  Session,
+  TrainingPreferences,
+} from '../domain/types';
+import { defaultPlan } from '../features/training/defaultPlan';
+import { trainingDayAfterDue } from '../rules/training';
+import { startSession } from '../test/legacySession';
 import { StommeDB } from './db';
-import {
-  addPainLog,
-  expireStaleSessions,
-  getActiveSession,
-  logSet,
-  startSession,
-} from './repo';
+import { expireStaleSessions, getActiveSession, logSet } from './repo';
 
 let db: StommeDB;
 let counter = 0;
@@ -99,18 +100,6 @@ describe('expireStaleSessions', () => {
     expect(await db.sessions.get(s.id)).toBeUndefined();
   });
 
-  it('counts a pain reading as activity and keeps a session with zero sets', async () => {
-    const s = await startSession(db, 'A', T0);
-    await addPainLog(
-      db,
-      { sessionId: s.id, timing: 'before', score: 2, redFlags: {} } as never,
-      min(10),
-    );
-    expect(await expireStaleSessions(db, min(99))).toEqual([]);
-    await expireStaleSessions(db, min(100));
-    expect((await db.sessions.get(s.id))?.abortReason).toBe('timeout');
-  });
-
   it('completes a programme session whose sets are all logged', async () => {
     await programmeSession();
     await db.setLogs.bulkAdd([setLog(1, min(20)), setLog(2, min(25))]);
@@ -160,6 +149,7 @@ describe('expireStaleSessions', () => {
   it('starting a session never reports a stale one as already running', async () => {
     const old = await startSession(db, 'A', T0);
     await logSet(db, old.id, goblet(1), min(5));
+    await expireStaleSessions(db, min(5 + 120));
     const next = await startSession(db, 'B', min(5 + 120));
     expect(next.id).not.toBe(old.id);
     expect((await db.sessions.get(old.id))?.abortReason).toBe('timeout');
@@ -188,9 +178,40 @@ describe('expireStaleSessions', () => {
     await logSet(db, s.id, goblet(1), min(5));
     await expireStaleSessions(db, min(200));
     const stored = (await db.sessions.get(s.id)) as Session;
-    expect(stored.abortReason).not.toBe('pain_stop');
-    expect(shouldPromptDayAfter(stored, [], '2026-10-13', [stored])).toBe(
-      false,
-    );
+    expect(stored.abortReason).toBe('timeout');
+  });
+});
+
+describe('a timeout is never a pain stop (rehab rule stays)', () => {
+  const ended = (abortReason: Session['abortReason']): Session => ({
+    id: 's',
+    templateId: 'A',
+    programId: 'general',
+    date: '2026-10-12',
+    startedAt: '2026-10-12T08:00:00.000Z',
+    finishedAt: '2026-10-12T08:20:00.000Z',
+    status: 'aborted',
+    abortReason,
+    programWeek: 1,
+    plan: [],
+    feedback: {},
+    checkins: {},
+  });
+  const prefs: TrainingPreferences = {
+    programId: 'general',
+    experience: 'regular',
+    equipment: ['bodyweight', 'chair', 'support'],
+  };
+
+  it('leaves the general plan the same after a timeout and after a pain stop', () => {
+    const ids = (sessions: Session[]) =>
+      defaultPlan(prefs, 'A', sessions, []).map((p) => p.exerciseId);
+    expect(ids([ended('pain_stop')])).toEqual(ids([ended('timeout')]));
+    expect(ids([ended('timeout')])).toEqual(ids([]));
+  });
+
+  it('asks for no rehab day-after answer', () => {
+    const rehab = { ...ended('timeout'), programId: 'rehab' as const };
+    expect(trainingDayAfterDue(rehab, '2026-10-13')).toBe(false);
   });
 });

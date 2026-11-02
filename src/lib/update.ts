@@ -28,7 +28,7 @@ export const UPDATE_THROTTLE = 60_000;
 /** Read the current route at activation time, including before React renders it. */
 export function updateIsUnsafe(): boolean {
   return (
-    /^#\/(session|smarta|stopp|ovning|kansla|traning)(\/|\?|$)/.test(
+    /^#\/(session|stopp|ovning|kansla|traning)(\/|\?|$)/.test(
       window.location.hash,
     ) || document.querySelector('[role="dialog"][aria-modal="true"]') !== null
   );

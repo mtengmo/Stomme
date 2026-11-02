@@ -1,5 +1,5 @@
 import { exercises } from '../content/exercises';
-import type { ExerciseId, PainLog, Session, SetLog } from '../domain/types';
+import type { ExerciseId, Session, SetLog } from '../domain/types';
 import { addDays, daysBetween, toLocalDate, weekStart } from '../lib/dates';
 
 /** Pure statistics for the history charts. No React, no Dexie. */
@@ -113,29 +113,4 @@ export function loadPerExercise(
 export function loggedExerciseIds(logs: readonly SetLog[]): ExerciseId[] {
   const seen = new Set(logs.map((l) => l.exerciseId));
   return (Object.keys(exercises) as ExerciseId[]).filter((id) => seen.has(id));
-}
-
-export interface PainPoint {
-  sessionId: string;
-  date: string;
-  score: number;
-}
-
-export type PainSeries = Record<PainLog['timing'], PainPoint[]>;
-
-/** Pain scores grouped by timing, each sorted by date (then creation time). */
-export function painSeries(painLogs: readonly PainLog[]): PainSeries {
-  const sorted = [...painLogs].sort(
-    (a, b) =>
-      a.date.localeCompare(b.date) || a.createdAt.localeCompare(b.createdAt),
-  );
-  const out: PainSeries = { before: [], after: [], dayAfter: [] };
-  for (const l of sorted) {
-    out[l.timing].push({
-      sessionId: l.sessionId,
-      date: l.date,
-      score: l.score,
-    });
-  }
-  return out;
 }

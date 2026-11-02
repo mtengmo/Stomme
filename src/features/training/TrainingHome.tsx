@@ -46,7 +46,6 @@ import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
-import { WeekView } from '../week/WeekView';
 import { startingFocus } from './focusModel';
 import { QuickStart } from './QuickStart';
 
@@ -296,10 +295,9 @@ export function TrainingSetup({
 }
 export function TrainingHome() {
   const data = useLiveQuery(async () => {
-    const [preferences, sessions, legacyProgramme] = await Promise.all([
+    const [preferences, sessions] = await Promise.all([
       getMeta(getDb(), 'training'),
       listSessions(getDb()),
-      getMeta(getDb(), 'program'),
     ]);
     const active = sessions.find((session) => session.status === 'in_progress');
     const preparationId =
@@ -313,7 +311,6 @@ export function TrainingHome() {
       schedule: await loadWeeklySchedule(),
       preferences,
       sessions,
-      legacyProgramme,
       preparationId,
       savedWorkouts,
     };
@@ -338,9 +335,7 @@ export function TrainingHome() {
   const due = data.sessions.filter((session) =>
     trainingDayAfterDue(session, toLocalDate(new Date())),
   );
-  const legacy =
-    !preferences && (data.sessions.length > 0 || !!data.legacyProgramme);
-  if (!preferences && !legacy && !editing) return <QuickStart />;
+  if (!preferences && !editing) return <QuickStart />;
   if (editing)
     return (
       <div className="mx-auto max-w-md px-5 pt-5 pb-[var(--app-nav-clear)]">
@@ -421,22 +416,6 @@ export function TrainingHome() {
           )
       : '';
   const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
-  if (legacy)
-    return (
-      <>
-        <div className="mx-auto max-w-md px-5 pt-3">
-          <button
-            type="button"
-            disabled={locked}
-            onClick={() => setEditing(true)}
-            className="min-h-12 text-base font-bold underline disabled:opacity-50"
-          >
-            Ändra träningsinriktning
-          </button>
-        </div>
-        <WeekView />
-      </>
-    );
   if (!preferences) return null;
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">

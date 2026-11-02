@@ -2,14 +2,13 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { BarChart } from '../../charts/BarChart';
-import { PainChart } from '../../charts/PainChart';
 import { StepLineChart } from '../../charts/StepLineChart';
 import { exercises } from '../../content/exercises';
 import { focusLabel } from '../../content/focusPresets';
 import { rehabGroupOf, trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { listSessions } from '../../db/repo';
-import type { PainLog, Session, SetLog } from '../../domain/types';
+import type { Session, SetLog } from '../../domain/types';
 import {
   addDays,
   formatShortDate,
@@ -34,8 +33,6 @@ interface HistoryData {
   sessions: Session[];
 
   setLogs: SetLog[];
-
-  painLogs: PainLog[];
 }
 
 async function load(): Promise<HistoryData> {
@@ -45,8 +42,6 @@ async function load(): Promise<HistoryData> {
     sessions: await listSessions(db),
 
     setLogs: await db.setLogs.toArray(),
-
-    painLogs: await db.painLogs.toArray(),
   };
 }
 
@@ -88,7 +83,7 @@ export function History() {
 
   if (!data) return null;
 
-  const { sessions, setLogs, painLogs } = data;
+  const { sessions, setLogs } = data;
 
   if (sessions.length === 0) {
     return (
@@ -137,8 +132,6 @@ export function History() {
 
   const legacyLogs = filteredLogs.filter((l) => legacyIds.has(l.sessionId));
 
-  const legacyPain = painLogs.filter((p) => legacyIds.has(p.sessionId));
-
   const weeks = weeklyVolume(filtered, filteredLogs, {
     through: today,
     weeks: 12,
@@ -153,8 +146,6 @@ export function History() {
 
     setsBySession.set(l.sessionId, set);
   }
-
-  const hasPain = legacyPain.length > 0;
 
   const activeFilters = [programme, status, period].filter(
     (value) => value !== 'all',
@@ -187,7 +178,7 @@ export function History() {
       <Link href="/historik/rapport" className={buttonClass('secondary')}>
         Sammanställning till fysioterapeuten
       </Link>
-      <HistorySummary sessions={sessions} painLogs={painLogs} today={today} />
+      <HistorySummary sessions={sessions} today={today} />
       <div className="flex flex-col gap-1">
         <details open={activeFilters > 0}>
           <summary className="min-h-12 cursor-pointer py-3 text-lg font-bold">
@@ -305,7 +296,7 @@ export function History() {
                           {sessionSetProgress(s, setLogs).total} hela set
                         </span>
                         <span className="mt-1 text-base text-ink-soft">
-                          {symptomSummary(s, painLogs)}
+                          {symptomSummary(s)}
                         </span>
                         {s.status === 'completed' &&
                         sessionSetProgress(s, setLogs).done <
@@ -384,7 +375,6 @@ export function History() {
           <StepLineChart logs={legacyLogs} exerciseIds={exerciseIds} />
         </section>
       ) : null}
-      {hasPain ? <PainChart painLogs={legacyPain} /> : null}
     </div>
   );
 }

@@ -19,7 +19,6 @@ describe('navVisible', () => {
   });
   it.each([
     '/session/abc',
-    '/smarta/abc/before',
     '/kansla/abc/dayAfter',
     '/stopp/abc',
     '/session/abc?x=1',

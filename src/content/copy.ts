@@ -1,10 +1,4 @@
-import type {
-  Effort,
-  Exercise,
-  PlannedExercise,
-  ReasonCode,
-  Unit,
-} from '../domain/types';
+import type { Effort, Exercise, PlannedExercise, Unit } from '../domain/types';
 import { exerciseSideCue } from './exerciseSideCues';
 
 export const UNIT_WORD: Record<Unit, string> = {
@@ -46,117 +40,21 @@ export function sideLetter(side: 'right' | 'left' | 'both'): string {
   return side === 'right' ? 'H' : side === 'left' ? 'V' : '';
 }
 
-/** Reason codes from the rules, as short Swedish lines (the rules never write text). */
-export const REASON_TEXT: Record<ReasonCode, string> = {
-  first_time: 'Första gången: startnivå.',
-  week1_bodyweight: 'Första veckan: kroppsvikt.',
-  start_load: 'Från vecka 2: startvikt.',
-  added_set: 'Från vecka 3: ett set till.',
-  increase_amount: 'Du klarade alla set. Mängden ökar lite denna gång.',
-  next_load: 'Alla set på högsta mängden kändes lätta. Nästa vikt föreslås.',
-  hold_incomplete:
-    'Du slutförde inte alla set sist. Samma mängd och vikt föreslås.',
-  hold_no_effort:
-    'Du svarade inte på hur ansträngande övningen var. Samma mängd och vikt föreslås.',
-  hold_hard: 'Övningen kändes tung. Samma mängd och vikt föreslås.',
-  hold_not_easy_at_max:
-    'Högsta mängden kändes inte lätt. Samma mängd och vikt föreslås.',
-  hold_waiting_for_3_sets: 'Tre set först, sedan tyngre vikt.',
-  max_level: 'Du har nått högsta mängden och vikten i programmet. Behåll dem.',
-  pain_hold: 'Du har rapporterat knäsmärta. Samma mängd och vikt föreslås.',
-  pain_stop_hold: 'Knäet gav stopp. Fråga fysioterapeuten.',
-};
-
-export const SEE_PHYSIO = 'Fråga fysioterapeuten';
-
-/** First programme week has a fixed plan; after a stop it is held as is. */
-export const WEEK1_PAIN_HOLD = 'Första veckan: oförändrad nivå efter smärta.';
-
-export function reasonText(code: ReasonCode): string {
-  return REASON_TEXT[code];
-}
-
-/** One line for the pass preview: reason code plus the week-1 pain case. */
-export function suggestionReason(
-  s: { reason: ReasonCode; seePhysio: boolean },
-  programWeek: number,
-): string {
-  if (s.seePhysio && programWeek <= 1) return WEEK1_PAIN_HOLD;
-  return reasonText(s.reason);
-}
-
-/** "2×8" */
-export function setsByAmount(sets: number, amount: number): string {
-  return `${sets}×${amount}`;
-}
-
-/** Short load: "Kroppsvikt", "2×5 kg" or "16 kg". */
-export function loadShort(
-  load: { kg: number; label: string } | undefined,
-): string {
-  if (!load) return '';
-  if (load.kg === 0) return 'Kroppsvikt';
-  return /^\d+×\d+ kg$/.test(load.label) ? load.label : `${load.kg} kg`;
-}
-
-/** "2×8 · 2×5 kg" for the Förra gången / Idag lines. */
-export function resultLine(
-  ex: Exercise,
-  sets: number,
-  amount: number,
-  loadIndex: number,
-): string {
-  return [setsByAmount(sets, amount), loadShort(ex.loadLadder[loadIndex])]
-    .filter(Boolean)
-    .join(' · ');
-}
-
 /* ---------- Pain ---------- */
 
 /** Shown when an idle session was ended automatically. */
 export const TIMEOUT_NOTICE =
   'Passet avslutades automatiskt eftersom inget loggats på 90 minuter. Det du hann logga är sparat.';
 
+/** Stop and abort texts. Rehab asks the physiotherapist; regular training points to care (1177). */
 export const PAIN_COPY = {
-  title: {
-    before: 'Hur känns högra knäet nu?',
-    after: 'Hur känns högra knäet efter passet?',
-    dayAfter: 'Hur känns högra knäet idag?',
-  },
-  scoreLabel: 'Smärta 0 till 10',
-  anchorLow: 'Ingen',
-  anchorHigh: 'Värsta',
-  flagsLabel: 'Något av detta?',
-  flags: {
-    sharp: 'Skarp smärta',
-    swelling: 'Svullnad',
-    locking: 'Knät låser sig',
-  },
-  yes: 'Ja',
-  no: 'Nej',
-  save: 'Spara',
-  pickFirst: 'Välj ett värde först',
   stopTitle: 'Avbryt passet.',
-  stopTitleDayAfter: 'Fråga fysioterapeuten innan nästa pass.',
-  stopTitleAfter: 'Passet är klart. Fråga fysioterapeuten innan nästa pass.',
   stopAbortPain: 'Avbryt – det gör ont',
   stopAbortPainHint: 'Vid skarp smärta, svullnad eller om en led låser sig.',
   stopBody: 'Fråga fysioterapeuten.',
+  stopBodyRegular:
+    'Vila och ta det lugnt. Vid skarp smärta, svullnad eller om en led låser sig: kontakta vården (1177).',
   stopDone: 'Till träningen',
-  warnTitle: 'Smärtan är över 3.',
-  warnTitleDayAfter: 'Knäet är värre än efter passet.',
-  warnBody: 'Fråga fysioterapeuten innan du ökar något.',
-  warnContinue: 'Fortsätt ändå',
-  warnEnd: 'Avsluta',
-  warnAfterContinue: 'Gå vidare',
-  warnBackHome: 'Till träningen',
-  wallSit: 'Lägg till väggsittning sist (3 × 30 s, valfri)',
-  banner:
-    'Senast avbröt du passet för att det gjorde ont. Fråga fysioterapeuten innan nästa pass.',
-  dayAfterCardTitle: 'Hur känns knäet idag?',
-  dayAfterAnswer: 'Svara',
-  dayAfterWarn: 'Knäet var värre dagen efter. Fråga fysioterapeuten.',
-  dayAfterWarnHigh: 'Knäet kändes av dagen efter. Fråga fysioterapeuten.',
   error: 'Något gick fel. Försök igen.',
 } as const;
 

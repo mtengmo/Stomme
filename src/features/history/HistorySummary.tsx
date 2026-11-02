@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import type { PainLog, Session } from '../../domain/types';
+import type { Session } from '../../domain/types';
 import { formatShortDate, formatWeekday } from '../../lib/dates';
 import { historySummary } from '../../rules/history';
 
@@ -10,14 +10,12 @@ function passText(count: number): string {
 /** Four plain facts about the user's own sessions, read before any list or chart. */
 export function HistorySummary({
   sessions,
-  painLogs,
   today,
 }: {
   sessions: readonly Session[];
-  painLogs: readonly PainLog[];
   today: string;
 }) {
-  const s = historySummary(sessions, painLogs, today);
+  const s = historySummary(sessions, today);
   const rows: { label: string; value: React.ReactNode }[] = [
     { label: 'Den här veckan', value: passText(s.weekCompleted) },
     {
@@ -40,11 +38,6 @@ export function HistorySummary({
           · {formatWeekday(s.last.date)} {formatShortDate(s.last.date)}
         </Link>
       ),
-    });
-  if (s.lastPainAfter !== undefined)
-    rows.push({
-      label: 'Smärta efter senaste passet',
-      value: `${s.lastPainAfter} av 10`,
     });
   return (
     <section aria-label="Sammanfattning" className="flex flex-col gap-1">

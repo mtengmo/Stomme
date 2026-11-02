@@ -4,7 +4,6 @@ import { PAIN_COPY } from '../../content/copy';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exercises } from '../../content/exercises';
 import { programmeNames } from '../../content/programmes';
-import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import {
   abortSession,
@@ -39,7 +38,7 @@ import { Summary } from './Summary';
 interface RunnerProps {
   session: Session;
   logs: SetLog[];
-  /** The 'after' pain reading is in; until then the end of the plan leads to it. */
+  /** The rehab 'after' check-in is in; until then the end of the plan leads to it. */
   hasAfter: boolean;
 }
 
@@ -158,7 +157,7 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
       session.customWorkoutName ??
       (session.programId
         ? `${session.workoutMode === 'short' ? 'Kortpass · ' : ''}${programmeNames[session.programId]} · ${session.templateId}`
-        : templates[session.templateId].name),
+        : `Pass ${session.templateId}`),
     stepId: cursor,
     clock: formatClock(seconds),
     tally,
@@ -249,18 +248,10 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
     );
   }
 
-  // Only rehab and the legacy programme ask how the session felt (the caller
-  // sets hasAfter for regular training); everything else ends in the summary.
+  // Only rehab asks how the session felt (the caller sets hasAfter for
+  // regular training); everything else ends in the summary.
   if (!step && !hasAfter) {
-    return (
-      <Redirect
-        to={
-          session.programId
-            ? `/kansla/${session.id}/after`
-            : `/smarta/${session.id}/after`
-        }
-      />
-    );
+    return <Redirect to={`/kansla/${session.id}/after`} />;
   }
 
   if (!step) {

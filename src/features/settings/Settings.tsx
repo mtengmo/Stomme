@@ -37,8 +37,8 @@ import {
   EquipmentInventory,
   type PendingWeight,
 } from '../training/EquipmentInventory';
-import { readBackupMeta } from '../week/BackupReminder';
 import { AppearancePicker } from './AppearancePicker';
+import { readBackupMeta } from './backupMeta';
 import { useUpdate } from './updateContext';
 
 type View =
@@ -293,7 +293,7 @@ export function Settings({ page }: { page?: string } = {}) {
       await restoreRepPrefs(getDb());
       leave();
       setStatus(
-        `Importerat: ${counts.sessions} pass, ${counts.setLogs} set och ${counts.painLogs} smärtvärden. Din tidigare data sparades först som en säkerhetskopia.`,
+        `Importerat: ${counts.sessions} pass och ${counts.setLogs} set. Din tidigare data sparades först som en säkerhetskopia.`,
       );
     } catch (e) {
       leave();
@@ -333,8 +333,8 @@ export function Settings({ page }: { page?: string } = {}) {
           Ersätta din data?
         </h1>
         <p className="m-0 text-xl">
-          Filen innehåller {c.sessions.length} pass, {c.setLogs.length} set och{' '}
-          {c.painLogs.length} smärtvärden. Filen skapades{' '}
+          Filen innehåller {c.sessions.length} pass och {c.setLogs.length} set.
+          Filen skapades{' '}
           {formatShortDate(toLocalDate(new Date(c.exportedAt))).replace(
             ' ',
             '\u00a0',
@@ -370,8 +370,8 @@ export function Settings({ page }: { page?: string } = {}) {
           Radera allt?
         </h1>
         <p className="m-0 text-xl">
-          Alla pass, set och smärtvärden tas bort från den här webbläsaren och
-          appen börjar om från början. Det går inte att ångra.
+          Alla pass och set tas bort från den här webbläsaren och appen börjar
+          om från början. Det går inte att ångra.
         </p>
         <p className="m-0 text-xl">Vill du ha en kopia? Exportera först.</p>
         <div className="flex flex-col gap-3">
