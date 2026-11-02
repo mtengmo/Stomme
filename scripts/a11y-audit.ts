@@ -243,23 +243,18 @@ async function theme(scheme: 'light' | 'dark') {
   await page.keyboard.press('Escape');
   await page.getByRole('heading', { name: 'Inställningar' }).waitFor();
 
-  // fresh session flow: preview, pain, set, rest, effort, pain after, summary
-  await page.goto(`${base}/#/pass/A`);
-  await page.getByRole('heading', { name: 'Pass A' }).waitFor();
+  // fresh session flow: first-use setup, preview, set, rest, effort, summary
+  await page.goto(base);
+  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
+  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Visa mitt pass', exact: true })
+    .click();
+  await page.getByRole('heading', { name: 'Pass A', exact: true }).waitFor();
   await audit(page, tag('pass preview'));
-  await page
-    .getByRole('button', { name: 'Byt övning', exact: true })
-    .first()
-    .click();
-  await audit(page, tag('exercise chooser'));
-  await page
-    .getByRole('button', { name: 'Stäng övningsval', exact: true })
-    .click();
-  await page.getByRole('button', { name: 'Starta pass' }).click();
-  await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
-  await audit(page, tag('pain screen'));
-  await page.getByRole('radio', { name: /^0(,|$)/ }).check({ force: true });
-  await page.getByRole('button', { name: 'Spara' }).click();
+  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
   await page.locator('[data-step]').waitFor();
   await audit(page, tag('session set'));
   // Inline technique leaves workout context visible, without a modal focus trap.
@@ -280,7 +275,7 @@ async function theme(scheme: 'light' | 'dark') {
   for (let g = 0; g < 80; g++) {
     const a = page
       .getByRole('button', {
-        name: /^(Klar set|Hoppa över vila|Spara|Starta – 5 s förberedelse)$/,
+        name: /^(Klar set|Hoppa över vila|Avsluta pass|Starta – 5 s förberedelse)$/,
       })
       .first();
     const finalEffort = page.getByRole('heading', {
@@ -340,18 +335,9 @@ async function theme(scheme: 'light' | 'dark') {
       }
       continue;
     }
-    if (n === 'Spara' && !seen.has('after')) {
-      seen.add('after');
-      await audit(page, tag('pain after'));
-      await page.getByRole('radio', { name: /^0(,|$)/ }).check({ force: true });
-    }
-    if (n === 'Spara') {
-      await a.click();
-      // Saving the 'after' reading finishes the session and shows the summary.
-      const home = page.getByRole('link', { name: 'Till träningen' });
-      await home.waitFor();
+    if (n === 'Avsluta pass') {
       await audit(page, tag('summary'));
-      await home.click();
+      await a.click();
       completed = true;
       break;
     }
@@ -482,32 +468,17 @@ async function theme(scheme: 'light' | 'dark') {
   await audit(training, tag('open workout row'));
   await training.getByLabel('Set', { exact: true }).fill('1');
   await training
-    .getByText('Besvär eller något att anpassa idag?', { exact: true })
-    .click();
-  await training
-    .getByRole('checkbox', { name: /Fråga hur kroppen känns före passet/ })
-    .check();
-  await training
     .getByRole('button', { name: 'Börja passet', exact: true })
     .click();
-  await training.getByRole('heading', { name: 'Hur känns kroppen?' }).waitFor();
-  await audit(training, tag('training readiness check'));
-  await training.getByRole('radio', { name: 'Redo att träna' }).check();
   await training
-    .getByRole('radio', { name: 'Ja, jag vill ange besvär' })
-    .check();
-  await audit(training, tag('training symptom fields'));
-  await training.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await training.getByRole('button', { name: 'Spara och fortsätt' }).click();
-  await training
-    .getByRole('button', { name: 'Rapportera smärta eller besvär' })
+    .getByRole('button', { name: 'Det gör ont', exact: true })
     .waitFor();
   await audit(training, tag('general training set'));
   await training
-    .getByRole('button', { name: 'Rapportera smärta eller besvär' })
+    .getByRole('button', { name: 'Det gör ont', exact: true })
     .click();
-  await audit(training, tag('exercise symptom report'));
-  await training.getByRole('button', { name: 'Avbryt rapport' }).click();
+  await audit(training, tag('pain valve'));
+  await training.getByRole('button', { name: 'Fortsätt ändå' }).click();
   const trainingEffort = training.getByRole('heading', {
     name: 'Hur ansträngande var övningen?',
   });
@@ -518,11 +489,6 @@ async function theme(scheme: 'light' | 'dark') {
     await training.waitForTimeout(150);
   }
   await training.getByRole('button', { name: 'Lagom', exact: true }).click();
-  await training.getByRole('heading', { name: 'Hur kändes passet?' }).waitFor();
-  await audit(training, tag('training after check'));
-  await training.getByRole('radio', { name: 'Bra', exact: true }).check();
-  await training.getByRole('radio', { name: 'Nej, inga besvär' }).check();
-  await training.getByRole('button', { name: 'Spara och fortsätt' }).click();
   await training
     .getByRole('heading', { name: 'Pass A klart', exact: true })
     .waitFor();

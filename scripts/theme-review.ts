@@ -1,19 +1,19 @@
 /**
  * Review captures for every theme and scheme (viewport shots only, nothing hidden
- * by fixed bars): seeded week screens, the Utseende picker, onboarding with the
+ * by fixed bars): home and preview screens, the Utseende picker, onboarding with the
  * colour chooser collapsed and expanded, and keyboard-focus close-ups.
  * Usage: npx tsx scripts/theme-review.ts <outDir>   (needs `npm run build`)
  *
  * Files (outDir):
- *   <theme>-<scheme>-week.png        360x1300 viewport, lead card above a Kommande card
- *   <theme>-<scheme>-week-klar.png   360x1300 viewport, Pass A done (Klar chip with pencil tick)
- *   <theme>-<scheme>-week-800.png    true 360x800 viewport (gap between action bar and nav is printed)
- *   pain-ja-<theme>-<scheme>.png     pain screen, score 5 and "Skarp smärta" set to Ja, before saving
- *   pain-warn-<theme>-<scheme>.png   warn screen after saving score 5 without red flags
+ *   <theme>-<scheme>-week.png        360x1300 viewport, home after first-use setup
+ *   <theme>-<scheme>-week-klar.png   360x1300 viewport, home with a finished session in the history
+ *   <theme>-<scheme>-week-800.png    true 360x800 viewport, the pass preview
+ *   valve-<theme>-<scheme>.png       "Det gör ont" screen of a running session
+ *   stop-<theme>-<scheme>.png        stop screen after "Avbryt – det gör ont"
  *   picker-set-<theme>-<scheme>.png  360x800, Settings Utseende scrolled into view
  *   picker-onb-<theme>-<scheme>-collapsed.png / -expanded.png  360 wide, onboarding (full page, no fixed bars there)
  *   focus-<theme>-<scheme>-<button|radio|nav|link>.png  keyboard Tab focus, 2x, padded close-up
- * Week uses 360x1300 so the sticky action bar and the nav do not cover the cards.
+ * Home uses 360x1300 so the nav does not cover the cards.
  */
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -24,6 +24,7 @@ import {
   type Page,
 } from '@playwright/test';
 import { SCHEMES, themes } from '../src/styles/themes/registry';
+import { abortForPain, quickStart } from '../tests/e2e/flow';
 
 const PORT = 4182;
 const url = `http://localhost:${PORT}/`;
@@ -43,37 +44,33 @@ async function waitForServer(): Promise<void> {
   throw new Error('preview did not start');
 }
 
-/** Runs in the page: program start (so the week view shows) and optionally Pass A done. */
-async function seed(page: Page, passADone: boolean): Promise<void> {
-  await page.evaluate(async (passADone) => {
+/** Runs in the page: a finished general-training session in the history. */
+async function seedDone(page: Page): Promise<void> {
+  await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((res, rej) => {
       const r = indexedDB.open('stomme');
       r.onsuccess = () => res(r.result);
       r.onerror = () => rej(r.error);
     });
-    const tx = db.transaction(['meta', 'sessions'], 'readwrite');
-    tx.objectStore('meta').put({
-      key: 'program',
-      value: { startDate: '2026-10-19' },
+    const tx = db.transaction(['sessions'], 'readwrite');
+    tx.objectStore('sessions').put({
+      id: 's-done',
+      date: '2026-10-20',
+      startedAt: '2026-10-20T09:00:00.000Z',
+      finishedAt: '2026-10-20T09:40:00.000Z',
+      programWeek: 1,
+      plan: [],
+      feedback: {},
+      templateId: 'A',
+      programId: 'general',
+      status: 'completed',
     });
-    if (passADone)
-      tx.objectStore('sessions').put({
-        id: 's-done',
-        date: '2026-10-20',
-        startedAt: '2026-10-20T09:00:00.000Z',
-        finishedAt: '2026-10-20T09:40:00.000Z',
-        programWeek: 1,
-        plan: [],
-        feedback: {},
-        templateId: 'A',
-        status: 'completed',
-      });
     await new Promise<void>((res, rej) => {
       tx.oncomplete = () => res();
       tx.onerror = () => rej(tx.error);
     });
     db.close();
-  }, passADone);
+  });
 }
 
 async function context(
@@ -142,7 +139,7 @@ try {
     for (const scheme of SCHEMES) {
       const tag = `${theme.id}-${scheme}`;
 
-      // Week, viewport only, two seeded states.
+      // Home, viewport only, with and without a finished session.
       for (const [suffix, done] of [
         ['week', false],
         ['week-klar', true],
@@ -150,9 +147,10 @@ try {
         const { ctx, page } = await context(browser, theme.id, scheme, 1300);
         await page.goto(url);
         await page.getByRole('button', { name: /Jag förstår/ }).click();
-        await seed(page, done);
-        await page.reload();
-        await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+        await quickStart(page, { goal: 'general' });
+        if (done) await seedDone(page);
+        await page.goto(url);
+        await page.getByRole('heading', { level: 1 }).first().waitFor();
         await page.evaluate(() => window.scrollTo(0, 0));
         await settle(page);
         await page.screenshot({
@@ -160,10 +158,16 @@ try {
           animations: 'disabled',
         });
         if (suffix === 'week') {
-          // Focus close-ups: primary button, nav item, link (keyboard only).
+          // Focus close-ups on the preview: first exercise link, primary button, nav item.
+          await page.goto(`${url}#/traning/A`);
+          const start = page.getByRole('button', {
+            name: 'Börja passet',
+            exact: true,
+          });
+          await start.waitFor();
           for (const [name, target] of [
-            ['link', page.getByRole('link', { name: /^Övningar/ })],
-            ['button', page.getByRole('link', { name: 'Starta pass' })],
+            ['link', page.locator('ol').getByRole('link').first()],
+            ['button', start],
             ['nav', page.getByRole('link', { name: 'Historik' })],
           ] as const) {
             await tabTo(page, target);
@@ -173,29 +177,16 @@ try {
         await ctx.close();
       }
 
-      // True 360x800 week: where does the sticky action bar sit relative to the nav?
+      // True 360x800: the pass preview.
       {
         const { ctx, page } = await context(browser, theme.id, scheme, 800);
         await page.goto(url);
         await page.getByRole('button', { name: /Jag förstår/ }).click();
-        await seed(page, false);
-        await page.reload();
-        await page.getByRole('link', { name: 'Starta pass' }).waitFor();
+        await quickStart(page, { goal: 'general' });
+        await page
+          .getByRole('button', { name: 'Börja passet', exact: true })
+          .waitFor();
         await settle(page);
-        const gap = await page.evaluate(() => {
-          const bar = [...document.querySelectorAll('div.sticky')].find((d) =>
-            d.textContent?.includes('Starta pass'),
-          );
-          const nav = document.querySelector('nav');
-          return {
-            barBottom: bar?.getBoundingClientRect().bottom ?? -1,
-            navTop: nav?.getBoundingClientRect().top ?? -1,
-            scrollY: window.scrollY,
-          };
-        });
-        console.log(
-          `${tag} week 360x800: bar bottom ${gap.barBottom}, nav top ${gap.navTop}, gap ${gap.navTop - gap.barBottom}`,
-        );
         await page.screenshot({
           path: `${out}/${tag}-week-800.png`,
           animations: 'disabled',
@@ -203,35 +194,30 @@ try {
         await ctx.close();
       }
 
-      // Pain screen with answers, and the warn screen it leads to.
-      for (const kind of ['ja', 'warn'] as const) {
+      // The pain valve of a running session, and the stop screen it leads to.
+      for (const kind of ['valve', 'stop'] as const) {
         const { ctx, page } = await context(browser, theme.id, scheme, 800);
+        await page.addInitScript(
+          `localStorage.setItem('stomme.repCount.manual', '1')`,
+        );
         await page.goto(url);
         await page.getByRole('button', { name: /Jag förstår/ }).click();
-        await page.goto(`${url}#/pass/A`);
-        await page.getByRole('button', { name: 'Starta pass' }).click();
-        await page.getByRole('heading', { name: /Hur känns/ }).waitFor();
+        await quickStart(page, { goal: 'general' });
         await page
-          .getByRole('radio', { name: /^5(,|$)/ })
-          .check({ force: true });
-        if (kind === 'ja') {
-          await page.getByRole('switch', { name: 'Skarp smärta' }).click();
-          await settle(page);
-          await page.screenshot({
-            path: `${out}/pain-ja-${tag}.png`,
-            animations: 'disabled',
-          });
+          .getByRole('button', { name: 'Börja passet', exact: true })
+          .click();
+        if (kind === 'valve') {
+          await page.getByRole('button', { name: 'Det gör ont' }).click();
+          await page.getByRole('button', { name: 'Fortsätt ändå' }).waitFor();
         } else {
-          await page.getByRole('button', { name: 'Spara' }).click();
-          await page
-            .getByRole('heading', { name: 'Smärtan är över 3.' })
-            .waitFor();
-          await settle(page);
-          await page.screenshot({
-            path: `${out}/pain-warn-${tag}.png`,
-            animations: 'disabled',
-          });
+          await page.getByRole('button', { name: 'Klar set' }).waitFor();
+          await abortForPain(page);
         }
+        await settle(page);
+        await page.screenshot({
+          path: `${out}/${kind}-${tag}.png`,
+          animations: 'disabled',
+        });
         await ctx.close();
       }
 

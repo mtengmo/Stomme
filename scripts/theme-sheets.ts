@@ -1,6 +1,6 @@
 /**
  * Labelled contact sheets from the theme captures.
- *   sheet-<theme>.png      6 screens x light/dark (week, set, rest, pain, stop, muscle-map)
+ *   sheet-<theme>.png      6 screens x light/dark (week, set, rest, valve, stop, muscle-map)
  *   sheet-all-light.png / sheet-all-dark.png   4 themes (rows) x week, set, stop
  * Usage: npx tsx scripts/theme-sheets.ts <dir>   (after theme-shots and theme-review)
  */
@@ -55,7 +55,7 @@ async function sheet(rows: { name: string; file: string }[][], path: string) {
   console.log(path);
 }
 
-const six = ['week', 'set', 'rest', 'pain', 'stop', 'muscle-map'];
+const six = ['week', 'set', 'rest', 'valve', 'stop', 'muscle-map'];
 for (const theme of themes) {
   await sheet(
     SCHEMES.map((scheme) =>
@@ -160,7 +160,7 @@ await grid(
 );
 await grid(
   combos.flatMap((c) =>
-    ['pain-ja', 'pain-warn'].map((k) => ({
+    ['valve', 'stop'].map((k) => ({
       name: `${k} ${c}`,
       file: `${dir}/${k}-${c}.png`,
     })),
@@ -168,7 +168,7 @@ await grid(
   4,
   270,
   600,
-  `${dir}/sheet-pain.png`,
+  `${dir}/sheet-valve-stop.png`,
 );
 await grid(
   combos.map((c) => ({

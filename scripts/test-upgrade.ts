@@ -132,10 +132,11 @@ async function seed(page: Page, includeTraining: boolean) {
       new Date(now - minutesAgo * 60_000).toISOString();
     const d = new Date(now);
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const transaction = db.transaction(
-      ['meta', 'sessions', 'setLogs', 'painLogs'],
-      'readwrite',
-    );
+    // The unmodified 0.1.74 bootstrap still has the painLogs table that the
+    // current schema (Dexie version 3) drops.
+    const stores = ['meta', 'sessions', 'setLogs'];
+    if (!withTraining) stores.push('painLogs');
+    const transaction = db.transaction(stores, 'readwrite');
     transaction.objectStore('meta').put({
       key: 'onboarding',
       value: { acceptedAt: '2026-10-01T00:00:00Z' },
@@ -180,16 +181,17 @@ async function seed(page: Page, includeTraining: boolean) {
       loadIndex: 0,
       loggedAt: stamp(1),
     });
-    transaction.objectStore('painLogs').put({
-      id: 'upgrade-pain',
-      sessionId: 'upgrade-session',
-      timing: 'before',
-      date: today,
-      score: 0,
-      location: 'right_knee',
-      redFlags: { sharp: false, swelling: false, locking: false },
-      createdAt: stamp(2),
-    });
+    if (!withTraining)
+      transaction.objectStore('painLogs').put({
+        id: 'upgrade-pain',
+        sessionId: 'upgrade-session',
+        timing: 'before',
+        date: today,
+        score: 0,
+        location: 'right_knee',
+        redFlags: { sharp: false, swelling: false, locking: false },
+        createdAt: stamp(2),
+      });
     await new Promise<void>((done, reject) => {
       transaction.oncomplete = () => done();
       transaction.onerror = () => reject(transaction.error);
@@ -205,6 +207,7 @@ async function snapshot(page: Page) {
     });
     const data: Record<string, unknown> = {};
     for (const name of ['sessions', 'setLogs', 'painLogs']) {
+      if (!db.objectStoreNames.contains(name)) continue;
       data[name] = await new Promise<unknown>((done) => {
         const r = db.transaction(name).objectStore(name).getAll();
         r.onsuccess = () => done(r.result);
@@ -386,7 +389,12 @@ try {
     await waiting(page);
     await page.getByRole('button', { name: 'Uppdatera', exact: true }).click();
     await expect(page.getByText('Bygge upgrade-B')).toBeVisible();
-    assert.deepEqual(await snapshot(page), data);
+    // Sessions and sets survive; the old pain readings are dropped by Dexie v3.
+    const { painLogs: dropped, ...kept } = await snapshot(page);
+    const { painLogs: before, ...expected } = data;
+    assert.ok(before, 'the old build had pain readings');
+    assert.equal(dropped, undefined, 'the painLogs table is gone');
+    assert.deepEqual(kept, expected);
     console.log('PASS unmodified 96f2913 installed-client bootstrap → B');
   }
 } finally {
