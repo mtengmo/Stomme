@@ -128,6 +128,13 @@ export const exerciseMuscles: Record<
     qualities: ['power', 'balance'],
   },
   'box-jump': { ...bodyweightDetails['box-jump'], qualities: ['power'] },
+  'fast-feet': { ...bodyweightDetails['fast-feet'], qualities: [] },
+  'in-and-out-jump': {
+    ...bodyweightDetails['in-and-out-jump'],
+    qualities: ['power'],
+  },
+  'lateral-shuffle': { ...bodyweightDetails['lateral-shuffle'], qualities: [] },
+  'knee-drive': { ...bodyweightDetails['knee-drive'], qualities: [] },
   'jumping-lunge': {
     ...bodyweightDetails['jumping-lunge'],
     qualities: ['power'],

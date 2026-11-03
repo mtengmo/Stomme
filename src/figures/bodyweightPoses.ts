@@ -634,6 +634,74 @@ function crunch(t: number): Pose {
   );
 }
 
+/**
+ * Running-style stance in side view. The legs are solved from the hip to each
+ * ankle, so thigh and shin keep their length. `swing` (-1..1) pendulates the
+ * arms: the right arm goes back while the right leg is lifted.
+ */
+function runStance(hip: Pt, ar: Pt, al: Pt, swing: number): Pose {
+  const neck: Pt = [hip[0], hip[1] - 43];
+  const arm = (side: number): [Pt, Pt] => {
+    const upper = Math.PI / 2 + 0.45 * swing * side;
+    const elbow = polar(neck, 22, upper);
+    return [elbow, polar(elbow, 20, upper - 0.8)];
+  };
+  const [eR, hR] = arm(1);
+  const [eL, hL] = arm(-1);
+  return pose(
+    [neck[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [eR, hR, eL, hL],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 34, -1),
+      al,
+      foot(al),
+    ],
+  );
+}
+/** 1 at the start of the first half of the loop, 0 from the middle on. */
+const firstHalf = (t: number) => Math.max(0, 1 - 2 * t);
+const secondHalf = (t: number) => Math.max(0, 2 * t - 1);
+
+/** Quick steps on the spot: each foot lifts a few centimetres in turn (t=0 right, t=1 left). */
+function fastFeet(t: number): Pose {
+  const r = firstHalf(t),
+    l = secondHalf(t);
+  return runStance([100, 108], [104, 174 - 8 * r], [96, 174 - 8 * l], r - l);
+}
+
+/** Alternating knee lifts on the spot: the thigh rises towards horizontal while the other foot stays down. */
+function kneeDrive(t: number): Pose {
+  const r = smooth(firstHalf(t)),
+    l = smooth(secondHalf(t));
+  return runStance(
+    [100, 108],
+    [mix(104, 110, r), mix(174, 148, r)],
+    [mix(96, 106, l), mix(174, 148, l)],
+    r - l,
+  );
+}
+
+/** Placeholder side view of the in-and-out jump: a small bounce on both feet. The front view carries the width. */
+function inAndOutJump(t: number): Pose {
+  const lift = 10 * Math.sin(Math.PI * t);
+  return runStance([100, 114 - lift], [104, 174 - lift], [96, 174 - lift], 0);
+}
+
+/** Placeholder side view of the lateral shuffle: a low stance where each foot lifts a little in turn. */
+function lateralShuffle(t: number): Pose {
+  return runStance(
+    [100, 116],
+    [104, 174 - 5 * firstHalf(t)],
+    [94, 174 - 5 * secondHalf(t)],
+    0,
+  );
+}
+
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'decline-push-up': declinePushUp,
   'diamond-push-up': diamondPushUp,
@@ -650,6 +718,10 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'squat-jump': squatJump,
   'single-leg-lateral-hop': lateralHop,
   'box-jump': boxJump,
+  'fast-feet': fastFeet,
+  'in-and-out-jump': inAndOutJump,
+  'lateral-shuffle': lateralShuffle,
+  'knee-drive': kneeDrive,
   'jumping-lunge': lunge,
   'mountain-climber': climber,
   'knee-push-up': kneePushUp,
@@ -676,7 +748,11 @@ export const bodyweightFigures = Object.fromEntries(
           ? 'hold'
           : id === 'burpee' || id === 'squat-jump' || id === 'box-jump'
             ? 'sequence'
-            : id === 'single-leg-lateral-hop'
+            : id === 'single-leg-lateral-hop' ||
+                id === 'fast-feet' ||
+                id === 'in-and-out-jump' ||
+                id === 'lateral-shuffle' ||
+                id === 'knee-drive'
               ? 'ballistic'
               : 'controlled',
       props:

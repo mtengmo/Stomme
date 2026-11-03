@@ -96,7 +96,11 @@ export type ExerciseId =
   | 'wall-tibialis-raise'
   | 'seated-tibial-rotation'
   | 'single-leg-lateral-hop'
-  | 'box-jump';
+  | 'box-jump'
+  | 'fast-feet'
+  | 'in-and-out-jump'
+  | 'lateral-shuffle'
+  | 'knee-drive';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

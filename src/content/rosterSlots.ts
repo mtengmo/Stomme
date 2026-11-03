@@ -107,6 +107,10 @@ export const rehabImpactExercises: ReadonlySet<ExerciseId> = new Set([
   'burpee',
   'single-leg-lateral-hop',
   'box-jump',
+  'fast-feet',
+  'in-and-out-jump',
+  'lateral-shuffle',
+  'knee-drive',
 ]);
 
 /** Explicit opt-in for daily focus. Library and clinician-only additions stay out. */

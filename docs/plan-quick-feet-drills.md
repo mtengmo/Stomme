@@ -10,7 +10,7 @@ Status: byggs
 - **Bara bibliotek och egna pass.** De läggs inte i `generalSlots`, `focusSlots`, `movementSlots` (`levelPolicy.ts`), `rehabAdditions`, `kneeRehab`/`kneeConditioningPlan` eller fysioplanen. Inget `harderExerciseId` pekar på dem. `pickFromSlot` väljer bara bland `slot.candidates`. Ska testas.
 - **Nivå `technical`, `kneeLoaded: true` och med i `rehabImpactExercises`** (`src/content/rosterSlots.ts`), som E62, E63, E99 och E100. Då döljer `pickableInProgramme` (`src/rules/pickerPolicy.ts`) dem i rehab. Inga globala smärtfilter (P1).
 - **Inga nya utrustningstyper.** Ingen `plate` i `EquipmentType`/`EquipmentChoice`. Alla fyra är `bodyweight`. Viktskivorna i videon blir tejp eller en linje på golvet; texten säger att man inte ska landa på föremål. Minibandet tas inte med i v1.
-- **Dosen är appens förslag, inte videons 45 s.** `exercise(..., 20, 'seconds')` ger `{start: 20, max: 30, step: 5}`. Set via `startingSets(experience, index)`, vila 60 s.
+- **Dosen är appens förslag, inte videons 45 s.** `{start: 20, max: 45, step: 5}` (valfri parameter `maxSeconds` i `exercise()`; övriga övningars intervall är oförändrade). Starttiden följer vald erfarenhet för alla tidsstyrda övningar via `startingSeconds(experience, range)` i `src/rules/levelPolicy.ts`: ny = start, någon = start + 2 steg, regelbunden = start + 4 steg, aldrig över `max`. För de fyra nya blir det 20 / 30 / 40 s. Gäller bara första målet utan historik (`basePlan`); rehab och reps-övningar är oförändrade. Set via `startingSets(experience, index)`, vila 60 s.
 - **Vyer:** E101 och E104 bara sidovy. E102 och E103 bara frontvy (som E99).
 - Instruktionerna är egna svenska sammanfattningar. Alla fyra redaktionella (utgivare `Stomme`, ingen `source`), noten börjar "Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag." Aldrig `orthoinfo.aaos.org`; `plyometrics.test.ts` kräver att ingen källa innehåller `aaos`.
 
@@ -99,7 +99,7 @@ Utan en post per katalog-id faller `exerciseAudit.test.ts`. Lägg fyra poster si
 
 ## Tester (urval)
 
-- Nytt `src/content/quickFeet.test.ts`: referenserna E101–E104 och att E85, E86, E89, E97 är oanvända; `kneeLoaded`, `rehabImpactExercises`, nivå `technical`; `unit 'seconds'`, `perSide false`, `{20,30,5}`, `repTempo === null`, `sidePolicy`; redaktionell källa (Stomme, ingen URL, "Avbryt vid smärta", inte `aaos`); `purposes.running` finns, `purposes.knee` saknas; cue innehåller "Tejp" för E102/E103; saknas i `generalSlots`, `focusSlots`, `movementSlots`, `rehabAdditionIds`, `kneeRehabExercises`, `physioKneeItems`, `kneeConditioningPlan`; inget `harderExerciseId` pekar på dem; rostersvep som i `plyometrics.test.ts`.
+- Nytt `src/content/quickFeet.test.ts`: referenserna E101–E104 och att E85, E86, E89, E97 är oanvända; `kneeLoaded`, `rehabImpactExercises`, nivå `technical`; `unit 'seconds'`, `perSide false`, `{20,45,5}`, `repTempo === null`, `sidePolicy`; redaktionell källa (Stomme, ingen URL, "Avbryt vid smärta", inte `aaos`); `purposes.running` finns, `purposes.knee` saknas; cue innehåller "Tejp" för E102/E103; saknas i `generalSlots`, `focusSlots`, `movementSlots`, `rehabAdditionIds`, `kneeRehabExercises`, `physioKneeItems`, `kneeConditioningPlan`; inget `harderExerciseId` pekar på dem; rostersvep som i `plyometrics.test.ts`.
 - `pickerPolicy.test.ts`: rehab + nytt id utesluts, general tillåts. Utöka id-listorna i `rehabImpactGuard.test.tsx` och `ballisticRender.test.tsx`. `ExerciseLibrary.test.tsx`: sökning på "snabba fötter", "höga knän", "knee drives", "plate shuffle". E2E: `IMPACT_IDS` i `start-focus.spec.ts` får de fyra id:na.
 
 ## Risker
@@ -116,7 +116,7 @@ Utan en post per katalog-id faller `exerciseAudit.test.ts`. Lägg fyra poster si
 2. Miniband runt anklarna? [Nej i v1 (snubbelrisk). Kräver andra variant, `FigureSpec.band` i sidovyn och bandbana i `FrontFigureFrame`; ca +1 d senare.]
 3. E101 "en fot uppe på skivan"? [Snabba steg på stället utan skiva.]
 4. E104 växelvis eller per ben? [Växelvisa höga knän utan medvetet hopp. Lättare: marsch.]
-5. Videons 2 × 45 s? [Nej. 20 s start, max 30 s, steg 5, vila 60 s.]
+5. Videons 2 × 45 s? [Delvis. Starttid efter erfarenhet 20 / 30 / 40 s, max 45 s, steg 5, vila 60 s. Beslut från användaren.]
 6. Rosters eller löpfokus? [Nej, bara bibliotek och egna pass.]
 7. Nivå? [`technical` för alla fyra.]
 8. Ny kvalitet "Snabbhet"? [Nej.]

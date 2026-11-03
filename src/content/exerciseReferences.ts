@@ -98,6 +98,10 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'seated-tibial-rotation': 'E98',
   'single-leg-lateral-hop': 'E99',
   'box-jump': 'E100',
+  'fast-feet': 'E101',
+  'in-and-out-jump': 'E102',
+  'lateral-shuffle': 'E103',
+  'knee-drive': 'E104',
 };
 
 /** Orders references numerically, so E99 comes before E100 and E10 before E11. */

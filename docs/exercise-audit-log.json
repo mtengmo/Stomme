@@ -2003,6 +2003,86 @@
     "fingerprint": "c404e34ae58a"
   },
   {
+    "id": "fast-feet",
+    "name": "Snabba fötter",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E101: text, metadata och sidofigur (ballistic). Redaktionell, ingen extern källa."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+    ],
+    "fingerprint": "34656180aa42"
+  },
+  {
+    "id": "in-and-out-jump",
+    "name": "Hopp in och ut",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E102: text, metadata och enkel sidofigur som reserv (ballistic); frontvy med golvmarkeringar följer. Redaktionell, ingen extern källa."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+    ],
+    "fingerprint": "f6b9d3965973"
+  },
+  {
+    "id": "lateral-shuffle",
+    "name": "Sidoförflyttning över linje",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E103: text, metadata och enkel sidofigur som reserv (ballistic); frontvy med linje följer. Redaktionell, ingen extern källa."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+    ],
+    "fingerprint": "0b476cdb6a75"
+  },
+  {
+    "id": "knee-drive",
+    "name": "Höga knän på stället",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E104: text, metadata och sidofigur (ballistic). Redaktionell, ingen extern källa."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+    ],
+    "fingerprint": "c80a99885d6a"
+  },
+  {
     "id": "squat-curl",
     "name": "Knäböj med bicepscurl",
     "group": "dumbbell",

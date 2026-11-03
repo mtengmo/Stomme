@@ -22,6 +22,20 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Sidohopp',
   ],
   'box-jump': ['Box jump', 'Box jumps', 'Lådhopp', 'Hopp upp på låda'],
+  'fast-feet': ['Fast feet', 'Quick feet', 'Snabba fotsteg', 'Trippning'],
+  'in-and-out-jump': [
+    'In and out jumps',
+    'In-out jumps',
+    'Plate in and out',
+    'Hopp brett och smalt',
+  ],
+  'lateral-shuffle': [
+    'Lateral shuffle',
+    'Plate shuffle',
+    'Shuffle',
+    'Sidosteg',
+  ],
+  'knee-drive': ['Knee drives', 'High knees', 'Knälyft', 'Knädriv'],
   'seated-tibial-rotation': [
     'Tibial rotation',
     'Skenbensrotation',

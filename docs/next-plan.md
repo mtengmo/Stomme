@@ -49,3 +49,4 @@ Use a feature branch, preserve the Swedish notebook design, and inspect real mob
 2026-11-03: Smärtfunktionen är bara för rehab (`docs/plan-pain-rehab-only.md`, P1–P4): globala smärtfilter borttagna för vanliga pass, "Det gör ont" per övning, incheckningar bara i rehab, gamla knäprogrammet och tabellen `PainLog` borttagna (Dexie v3, backup v4). P5 säkerhetsgranskning väntar.
 
 2026-11-03: Fyra löp- och fotarbetsövningar E101 Snabba fötter, E102 Hopp in och ut, E103 Sidoförflyttning över linje, E104 Höga knän på stället (redaktionella, tidsstyrda, knäbelastade, bara bibliotek och egna pass) samt korrekt timertext för tidsstyrd rörelse. Se `docs/plan-quick-feet-drills.md`.
+Starttiden för tidsstyrda övningar följer nu vald erfarenhet (`startingSeconds` i `levelPolicy.ts`: ny/någon/regelbunden = start, +2 och +4 steg, högst max); de fyra nya övningarna går 20/30/40 s med max 45 s. Rehab och historikbaserade mål påverkas inte.

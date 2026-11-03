@@ -139,6 +139,10 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'forward-lunge': 'Benstyrka och inbromsning av ett steg framåt.',
   'single-leg-lateral-hop': 'Landning och sidokontroll på ett ben.',
   'box-jump': 'Explosiv benstyrka med kontrollerad landning.',
+  'fast-feet': 'Snabba fotisättningar och rytm.',
+  'in-and-out-jump': 'Mjuka landningar och fotarbete i sidled.',
+  'lateral-shuffle': 'Fotarbete och riktningsbyten i sidled.',
+  'knee-drive': 'Knälyft och armföring som i löpsteget.',
 };
 type VariantSeed = [EquipmentType, number, number[], string, EquipmentType?];
 const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
@@ -1241,8 +1245,17 @@ export const exerciseMetadata = Object.fromEntries(
       reviewedAt:
         id === 'blast-off-push-up' ||
         id === 'single-leg-lateral-hop' ||
-        id === 'box-jump'
-          ? '2026-11-01'
+        id === 'box-jump' ||
+        id === 'fast-feet' ||
+        id === 'in-and-out-jump' ||
+        id === 'lateral-shuffle' ||
+        id === 'knee-drive'
+          ? id === 'fast-feet' ||
+            id === 'in-and-out-jump' ||
+            id === 'lateral-shuffle' ||
+            id === 'knee-drive'
+            ? '2026-11-03'
+            : '2026-11-01'
           : [
                 'bent-over-row',
                 'sumo-squat',
@@ -1343,7 +1356,13 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'knee-push-up') metadata.easierExerciseId = 'wall-push-up';
     if (id === 'single-leg-calf-raise')
       metadata.easierExerciseId = 'calf-raise';
-    if (id === 'jumping-lunge' || id === 'mountain-climber')
+    if (
+      id === 'jumping-lunge' ||
+      id === 'mountain-climber' ||
+      id === 'fast-feet' ||
+      id === 'knee-drive' ||
+      id === 'lateral-shuffle'
+    )
       metadata.sidePolicy = 'alternating';
     return [id, metadata];
   }),

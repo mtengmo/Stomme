@@ -9,6 +9,10 @@ const KNEE_LOADED_IDS: ReadonlySet<string> = new Set([
   'jumping-lunge',
   'single-leg-lateral-hop',
   'box-jump',
+  'fast-feet',
+  'in-and-out-jump',
+  'lateral-shuffle',
+  'knee-drive',
 ]);
 
 /** Library additions only. Doses are editable app proposals, not source prescriptions. */
@@ -23,6 +27,7 @@ function exercise(
   unit: Exercise['unit'] = 'reps',
   maxReps = 12,
   sideKind?: SideKind,
+  maxSeconds = 30,
 ): Exercise {
   return {
     id,
@@ -36,7 +41,7 @@ function exercise(
     ...(sideKind ? { sideKind } : {}),
     range: {
       start,
-      max: unit === 'seconds' ? 30 : maxReps,
+      max: unit === 'seconds' ? maxSeconds : maxReps,
       step: unit === 'seconds' ? 5 : 1,
     },
     loadLadder: [{ kg: 0, label: 'Kroppsvikt' }],
@@ -327,6 +332,74 @@ export const bodyweightExercises: Exercise[] = [
     'reps',
     5,
   ),
+  exercise(
+    'fast-feet',
+    'Snabba fötter',
+    ['Vader', 'Framsida lår', 'Höftböjare', 'Bål'],
+    [
+      'Stå med fötterna ungefär höftbrett, lätt böjda knän och vikten på framfötterna. Ha halkfritt underlag och fritt omkring dig.',
+      'Trippa snabbt på stället med korta, låga steg, en fot i taget. Lyft fötterna bara några centimeter och låt armarna pendla med.',
+      'Håll överkroppen upprätt och fortsätt i jämnt, snabbt tempo under tiden som visas. Sänk tempot om stegen blir tunga eller ojämna.',
+    ],
+    'Stegen blir höga och tunga, eller du landar på hälarna.',
+    'Trippa långsammare, eller gå på stället med fötterna nära golvet.',
+    20,
+    'seconds',
+    12,
+    undefined,
+    45,
+  ),
+  exercise(
+    'in-and-out-jump',
+    'Hopp in och ut',
+    ['Vader', 'Framsida lår', 'Säte', 'Sidan av höften', 'Insida lår', 'Bål'],
+    [
+      'Sätt två markeringar på golvet, till exempel tejp, en bit utanför höftbredd. Stå med fötterna ihop mellan dem på halkfritt underlag.',
+      'Hoppa lätt så att fötterna landar brett utanför markeringarna, och hoppa sedan tillbaka in mellan dem. Landa mjukt på framfötterna med knäna i samma riktning som tårna.',
+      'Fortsätt in och ut i jämn takt under tiden som visas. Hoppa inte upp på markeringarna och pausa om landningarna blir hårda.',
+    ],
+    'Knäna faller inåt när du landar brett, eller du landar med raka ben.',
+    'Kliv ut och in en fot i taget utan hopp, eller gör mindre hopp.',
+    20,
+    'seconds',
+    12,
+    undefined,
+    45,
+  ),
+  exercise(
+    'lateral-shuffle',
+    'Sidoförflyttning över linje',
+    ['Sidan av höften', 'Framsida lår', 'Säte', 'Vader', 'Insida lår', 'Bål'],
+    [
+      'Sätt en markering på golvet, till exempel en tejpbit, och ställ dig bredvid den i lätt knäböj med fötterna ungefär axelbrett och vikten på framfötterna.',
+      'Ta snabba sidosteg över markeringen. Kliv först med foten närmast rörelseriktningen och låt den andra följa efter, utan att fötterna korsar varandra.',
+      'Byt riktning på andra sidan och fortsätt fram och tillbaka under tiden som visas. Kliv över markeringen, inte upp på den.',
+    ],
+    'Fötterna korsar varandra eller knät faller inåt när du byter riktning.',
+    'Ta långsammare sidosteg utan studs och stanna kort vid varje riktningsbyte.',
+    20,
+    'seconds',
+    12,
+    undefined,
+    45,
+  ),
+  exercise(
+    'knee-drive',
+    'Höga knän på stället',
+    ['Höftböjare', 'Vader', 'Framsida lår', 'Säte', 'Bål'],
+    [
+      'Stå upprätt med fötterna höftbrett och armarna böjda som när du springer. Ha halkfritt underlag.',
+      'Lyft ett knä i taget framåt och uppåt mot höfthöjd i ett snabbt löpsteg och sätt ned foten under höften på framfoten. Armarna pendlar motsatt benen.',
+      'Växla ben i jämn takt under tiden som visas med överkroppen upprätt. Sänk knälyften om du lutar dig bakåt eller tappar rytmen.',
+    ],
+    'Överkroppen lutar bakåt, eller du landar tungt på hälen.',
+    'Gå på stället med höga knän utan studs, ett ben i taget.',
+    20,
+    'seconds',
+    12,
+    undefined,
+    45,
+  ),
 ];
 
 export type BodyweightId = (typeof bodyweightIds)[number];
@@ -336,6 +409,10 @@ export const bodyweightIds = [
   'blast-off-push-up',
   'single-leg-lateral-hop',
   'box-jump',
+  'fast-feet',
+  'in-and-out-jump',
+  'lateral-shuffle',
+  'knee-drive',
   'plank-arm-lift',
   'push-up',
   'pull-up',
@@ -400,6 +477,48 @@ export const bodyweightDetails: Record<
     publisher: 'NASM',
     note: 'Hopp upp, nedkliv. Steget ska vara lågt och stadigt. Vila fullt mellan hoppen och gå aldrig till utmattning; dosen är högst 5 repetitioner per set. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad.',
     cue: 'Ett lågt, stadigt steg eller en låda som inte kan glida, välta eller ge efter. Börja lågt.',
+  },
+  'fast-feet': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Snabba, korta fotisättningar kräver rytm och kontroll av fot och vad.',
+    primary: ['calves'],
+    secondary: ['quads', 'hip-flexors', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Korta, snabba steg på stället utan extra vikt. Tiden gäller båda benen tillsammans. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+  },
+  'in-and-out-jump': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Upprepade hopp mellan smal och bred fotställning kräver mjuka landningar och knäkontroll.',
+    primary: ['calves', 'quads', 'glutes'],
+    secondary: ['hip-abductors', 'hip-adductors', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Små hopp mellan smal och bred fotställning. Ingen extra vikt. Landa aldrig på föremål. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+    cue: 'Tejp eller en linje på golvet som markering. Lägg inga föremål där du landar.',
+  },
+  'lateral-shuffle': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Snabba riktningsbyten i sidled kräver balans och kontroll av knät.',
+    primary: ['hip-abductors', 'quads', 'glutes'],
+    secondary: ['calves', 'hip-adductors', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Sidosteg fram och tillbaka över en linje, alltid en fot i golvet. Ingen extra vikt. Kliv aldrig upp på föremål. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+    cue: 'Tejp eller en linje på golvet som markering. Lägg inga föremål där du landar.',
+  },
+  'knee-drive': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Snabba växelvisa knälyft kräver koordination, hållning och mjuka fotisättningar.',
+    primary: ['hip-flexors', 'calves'],
+    secondary: ['quads', 'glutes', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Växelvisa knälyft på stället utan extra vikt. Tiden gäller båda benen tillsammans. Avbryt vid smärta i knä, höft, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
   },
   'decline-push-up': {
     equipment: 'chair',

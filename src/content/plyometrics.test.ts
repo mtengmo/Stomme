@@ -312,11 +312,11 @@ describe('review ordering', () => {
     expect(
       ['E100', 'E11', 'E99', 'E10', 'E98'].sort(compareReferences),
     ).toEqual(['E10', 'E11', 'E98', 'E99', 'E100']);
-    expect(
-      exerciseList
-        .map((e) => exerciseReferences[e.id])
-        .sort(compareReferences)
-        .slice(-3),
-    ).toEqual(['E98', 'E99', 'E100']);
+    const sorted = exerciseList
+      .map((e) => exerciseReferences[e.id])
+      .sort(compareReferences);
+    expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
+    expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
+    expect(sorted.at(-1)).toBe('E104');
   });
 });
