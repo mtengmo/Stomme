@@ -91,13 +91,18 @@ describe.each([['fast-feet'], ['knee-drive']] as const)(
       expect(side(1).aR[1]).toBeCloseTo(174, 6);
     });
 
-    it('is the mirror image between the legs at t=0 and t=1', () => {
+    it('swaps the roles of the legs between t=0 and t=1', () => {
       const a = side(0),
         b = side(1);
+      // Foot heights mirror exactly (the knees depend on the foot's own x); the arms swap exactly.
       for (const [r, l] of [
-        ['kR', 'kL'],
         ['aR', 'aL'],
         ['tR', 'tL'],
+      ] as const) {
+        expect(a[r][1]).toBeCloseTo(b[l][1], 6);
+        expect(a[l][1]).toBeCloseTo(b[r][1], 6);
+      }
+      for (const [r, l] of [
         ['eR', 'eL'],
         ['hR', 'hL'],
       ] as const) {
@@ -106,6 +111,8 @@ describe.each([['fast-feet'], ['knee-drive']] as const)(
         expect(a[l][0]).toBeCloseTo(b[r][0], 6);
         expect(a[l][1]).toBeCloseTo(b[r][1], 6);
       }
+      // The lifted foot sits the same distance in front of its own stance foot.
+      expect(a.aR[0] - 103).toBeCloseTo(b.aL[0] - 97, 6);
     });
 
     it('swings the arms against the legs', () => {

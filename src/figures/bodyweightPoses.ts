@@ -637,9 +637,9 @@ function crunch(t: number): Pose {
 /**
  * Running-style stance in side view. The legs are solved from the hip to each
  * ankle, so thigh and shin keep their length. `swing` (-1..1) pendulates the
- * arms: the right arm goes back while the right leg is lifted. Both feet share
- * one x when they are down, so the pose at t=1 is the pose at t=0 with the
- * legs and arms swapped.
+ * arms: the right arm goes back while the right leg is lifted. The pose at t=1 is the
+ * pose at t=0 with the roles of the legs and arms swapped (heights and arms
+ * match exactly; the feet keep their own x).
  */
 function runStance(hip: Pt, ar: Pt, al: Pt, swing: number): Pose {
   const neck: Pt = [hip[0], hip[1] - 43];
@@ -676,23 +676,30 @@ function fastFeet(t: number): Pose {
     l = secondHalf(t);
   return runStance(
     [100, 108 - 2 * Math.max(r, l)],
-    [100 + 3 * r, 174 - 8 * r],
-    [100 + 3 * l, 174 - 8 * l],
+    [103 + 3 * r, 174 - 8 * r],
+    [97 + 3 * l, 174 - 8 * l],
     r - l,
   );
 }
 
 /** Foot position of a driven knee: forward and tucked under a near-horizontal thigh. */
-const KNEE_DRIVE_FOOT: Pt = [118, 140];
+const KNEE_DRIVE_REACH = 15;
+const KNEE_DRIVE_FOOT_Y = 140;
 /** Alternating knee lifts on the spot (t=0 right knee up, t=1 left knee up); the other foot stays down. */
 function kneeDrive(t: number): Pose {
   const r = smooth(firstHalf(t)),
     l = smooth(secondHalf(t));
-  const ankle = (k: number): Pt => [
-    mix(100, KNEE_DRIVE_FOOT[0], k),
-    mix(174, KNEE_DRIVE_FOOT[1], k),
+  // The feet stand 6 px apart so the two legs read as two legs from the side.
+  const ankle = (k: number, x: number): Pt => [
+    mix(x, x + KNEE_DRIVE_REACH, k),
+    mix(174, KNEE_DRIVE_FOOT_Y, k),
   ];
-  return runStance([100, 108 - 3 * Math.max(r, l)], ankle(r), ankle(l), r - l);
+  return runStance(
+    [100, 108 - 3 * Math.max(r, l)],
+    ankle(r, 103),
+    ankle(l, 97),
+    r - l,
+  );
 }
 
 /** Side-view fallback of the in-and-out jump (the front view carries the width): a small bounce, deeper at the end. */
