@@ -208,13 +208,15 @@ describe('overhead triceps extension figure geometry', () => {
       expect(pose.eR).toEqual(start.eR);
       expect(pose.eL).toEqual(start.eL);
       expect(pose.hR).toEqual(pose.hL);
-      expect(distance(pose.hR, pose.head)).toBeGreaterThan(30);
+      // Lowered, the weight sits behind the head, clear of the head circle.
+      expect(distance(pose.hR, pose.head)).toBeGreaterThan(17);
       for (const elbow of [pose.eR, pose.eL]) {
         const upperLength = distance(pose.neck, elbow);
         const forearmLength = distance(elbow, pose.hR);
         expect(forearmLength).toBeGreaterThan(18);
         expect(forearmLength).toBeLessThan(36);
-        expect(cross(pose.neck, elbow, pose.hR)).toBeGreaterThanOrEqual(-1);
+        // The forearm folds backwards, behind the head, never forwards.
+        expect(cross(pose.neck, elbow, pose.hR)).toBeLessThanOrEqual(1);
         if (frame === 20)
           expect(
             Math.abs(cross(pose.neck, elbow, pose.hR)) /

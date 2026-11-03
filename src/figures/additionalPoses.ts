@@ -674,26 +674,29 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'overhead-triceps-extension': {
+    // Upper arms stay fixed next to the head (elbows above the shoulders). The
+    // forearm swings from lowered behind the head (start) up to a straight arm
+    // with the weight overhead (end), so each rep shows the elbow bend.
     start: {
       ...stand,
-      eR: [124, 52],
-      hR: [136, 74],
-      eL: [125, 51],
-      hL: [136, 74],
+      eR: [104, 44],
+      hR: [81, 63],
+      eL: [104, 44],
+      hL: [81, 63],
     },
     middle: {
       ...stand,
-      eR: [124, 52],
-      hR: [152, 41],
-      eL: [125, 51],
-      hL: [152, 41],
+      eR: [104, 44],
+      hR: [84, 23],
+      eL: [104, 44],
+      hL: [84, 23],
     },
     end: {
       ...stand,
-      eR: [124, 52],
-      hR: [150, 30],
-      eL: [125, 51],
-      hL: [150, 30],
+      eR: [104, 44],
+      hR: [109.7, 15.5],
+      eL: [104, 44],
+      hL: [109.7, 15.5],
     },
     props: [],
     // Hands meet at one logical point so the shared dumbbell renders once.

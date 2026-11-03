@@ -616,23 +616,22 @@ export function Figure({
                     ? walkingLungeReducedFrames()
                     : exerciseId === 'russian-twist'
                       ? russianTwistReducedFrames()
-                      : exerciseId === 'squat-jump' ||
-                          exerciseId === 'mountain-climber' ||
-                          exerciseId === 'plank-arm-lift'
+                      : exerciseId === 'squat-jump'
                         ? [
                             ['Start', movementPose(exerciseId, 0)],
-                            [
-                              'Rörelse',
-                              movementPose(
-                                exerciseId,
-                                exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                              ),
-                            ],
+                            ['Hopp', movementPose(exerciseId, 0.575)],
+                            ['Landning', movementPose(exerciseId, 0.85)],
                           ]
-                        : [
-                            ['Start', spec.start],
-                            ['Slut', spec.end],
-                          ]));
+                        : exerciseId === 'mountain-climber' ||
+                            exerciseId === 'plank-arm-lift'
+                          ? [
+                              ['Start', movementPose(exerciseId, 0)],
+                              ['Rörelse', movementPose(exerciseId, 0.25)],
+                            ]
+                          : [
+                              ['Start', spec.start],
+                              ['Slut', spec.end],
+                            ]));
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (

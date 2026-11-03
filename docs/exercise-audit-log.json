@@ -1719,7 +1719,7 @@
     "name": "Chins med underhandsgrepp",
     "group": "bodyweight",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -1730,11 +1730,15 @@
         "notes": "E56: nio frysta frontfaser och reduced-motion Start/Slut granskade. Start visar tydligt böjda armbågar trots tipsens återgång till utsträckta armar; källans handavstånd till armroten är kortare än armkedjan även vid t=0. Händerna ligger på stången och hela figuren ryms. Bilateral kroppsvikt, inga sidoval/varianter; handflatsriktningen kan inte avläsas. Tips om fast stång, ingen sving och enklare rodd finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E56: I fas 0 och reduced-motion Start är båda armbågarna tydligt böjda utåt. Textens steg 3 säger att kroppen sänks tills armarna är utsträckta igen. Justera botten-/startposen så att axel–armbåge–hand är utsträckt på båda sidor, med händerna kvar på stången och fötterna fria; kontrollera att återgången når samma pose."
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "E56: hängläget startar nu med raka armar (halsen en armlängd under stången); knäna böjda i hängläget så fötterna hålls fria från golvet."
+      }
     ],
-    "fingerprint": "0b8857f6ed26"
+    "openIssues": [],
+    "fingerprint": "86a9cc9505b5"
   },
   {
     "id": "back-extension",
@@ -1752,7 +1756,7 @@
     "name": "Dips i parallella stänger",
     "group": "bodyweight",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -1763,11 +1767,15 @@
         "notes": "E58: nio frysta profilfaser och reduced-motion Start/Slut granskade. I Start är särskilt bortre armbågen tydligt böjd trots instruktionen om raka stödarmar. Händerna stannar på stängerna och fötterna är fria i stickproven; ramen räcker. Bilateral kroppsvikt utan sidoval/varianter. Tips om stabil ställning, bekvämt djup, kontrollerade axlar och enklare armhävning finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E58: I fas 0 och reduced-motion Start är den bortre armbågen tydligt böjd bakåt, och även främre armkedjan har en vinkel. Start-/toppläget ska visa raka stödarmar enligt tips 1 och 3. Justera topplägets axel–armbåge–hand för båda armarna med händerna kvar på stängerna och fötterna fria; kontrollera samma läge efter återgången."
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "E58: toppläget visar båda stödarmarna raka (halsen en armlängd över stängerna); bortre handen på samma stånglinje som den främre."
+      }
     ],
-    "fingerprint": "81fd4ec213b8"
+    "openIssues": [],
+    "fingerprint": "004580640e5f"
   },
   {
     "id": "lying-leg-raise",
@@ -1871,7 +1879,7 @@
     "name": "Knäböj med hopp",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -1882,10 +1890,14 @@
         "notes": "E62: nio frysta faser visar böj, flygfas och återgång via böjda knän; hela figuren ryms. Reduced-motion visar bara stående Start och luftburen Rörelse, ingen landning. Bilateral kroppsvikt, inga sidoval/varianter. Profilen visar höjd/djup men inte knänas sidriktning. Tips om mjuk landning, balans och knäböj utan hopp finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E62: Reduced-motion-rutorna Start/Rörelse saknar landningsläget; Rörelse visar figuren i luften. Lägg till en tydligt märkt Landning-ruta med båda fötter vid underlaget och böjda höfter/knän, så att textens inbromsning syns även utan animation."
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "E62: reduced-motion visar nu tre rutor: Start, Hopp och en ny Landning (fas 0.85, båda fötter i golvet, böjda höfter/knän)."
+      }
     ],
+    "openIssues": [],
     "fingerprint": "5ed09d953a78"
   },
   {
@@ -2508,7 +2520,16 @@
     "group": "dumbbell",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "56902cd",
+        "notes": "E77: nio profilfaser och reduced-motion 2/4 kg visar bäckenlyft med hanteln vid höften, händer vid vikten och fötter kvar. Hela figuren ryms; bilateral utan sidoval. Tips om kontrollerad vikt, undvik svank och obelastat/lägre lyft finns. Grepp och bäckenrotation kan inte säkert bedömas i profil; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
     "openIssues": [],
     "fingerprint": "48e8cd129c8d"
@@ -2518,11 +2539,26 @@
     "name": "Triceps över huvudet",
     "group": "dumbbell",
     "risk": "high",
-    "status": "unreviewed",
-    "reviews": [],
-    "fixes": [],
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "commit": "56902cd",
+        "notes": "E78: nio profilfaser och reduced-motion 1/2 kg visar armar snett framåt, med böjd start och rak slutpose. Vikten når inte bakom huvudet som texten beskriver. Bilateral utan sidoval; vikten ryms och bål/fötter står stilla. Tips om lätt vikt, fasta överarmar och undvik svank finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "E78: överarmarna fasta vid huvudet; underarmen svingar från sänkt bakom huvudet (start) till rak arm med hanteln ovanför huvudet (slut). Testet för armbågsböjningens riktning vändes så att bakåtvikning är rätt."
+      }
+    ],
     "openIssues": [],
-    "fingerprint": "4f014c01432d"
+    "fingerprint": "5d14936b0cff"
   },
   {
     "id": "dumbbell-pullover",

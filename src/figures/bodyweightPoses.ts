@@ -205,7 +205,9 @@ function plankArmLift(t: number): Pose {
   return forearmPlank(right, left);
 }
 function pull(t: number, chin: boolean): Pose {
-  const neck: Pt = [100, mix(80, 36, t)],
+  // Hang with straight arms: the neck sits one arm length (60) below the bar, so the
+  // narrower chin-up grip starts lower than the wide pull-up grip.
+  const neck: Pt = [100, mix(chin ? 87 : 80, 36, t)],
     hip: Pt = [100, neck[1] + 43];
   const hands: [Pt, Pt] = chin
     ? [
@@ -216,8 +218,10 @@ function pull(t: number, chin: boolean): Pose {
         [66, 31],
         [134, 31],
       ];
-  const rightAnkle: Pt = [90, hip[1] + 48],
-    leftAnkle: Pt = [112, hip[1] + 48];
+  // The chin-up hang starts lower, so the knees are bent and the feet stay clear of the floor.
+  const legDrop = chin ? 38 : 48;
+  const rightAnkle: Pt = [chin ? 78 : 90, hip[1] + legDrop],
+    leftAnkle: Pt = [chin ? 100 : 112, hip[1] + legDrop];
   return pose(
     [100, neck[1] - 14],
     neck,
@@ -229,20 +233,21 @@ function pull(t: number, chin: boolean): Pose {
       hands[1],
     ],
     [
-      [82, hip[1] + 25],
+      chin ? joint(hip, rightAnkle, 36, 34, 1) : [82, hip[1] + 25],
       rightAnkle,
       foot(rightAnkle),
-      [118, hip[1] + 25],
+      chin ? joint(hip, leftAnkle, 36, 34, 1) : [118, hip[1] + 25],
       leftAnkle,
       foot(leftAnkle),
     ],
   );
 }
 function dip(t: number): Pose {
-  const neck: Pt = [96, mix(64, 88, t)],
+  // Top position: both support arms straight (neck one arm length above the bars).
+  const neck: Pt = [96, mix(62, 88, t)],
     hip: Pt = [92, neck[1] + 41];
   const hand: Pt = [111, 117],
-    far: Pt = [101, 114];
+    far: Pt = [109, 117];
   return pose(
     [100, neck[1] - 14],
     neck,
