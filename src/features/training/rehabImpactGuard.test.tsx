@@ -42,6 +42,31 @@ describe('impact exercises in rehab', () => {
     expect(screen.queryByText(/Sidohopp på ett ben/)).toBeNull();
   });
 
+  it('hide the quick feet drills in the rehab picker and offer them outside rehab', async () => {
+    await setMeta(getDb(), 'training', rehab('custom'));
+    window.location.hash = '#/nytt-pass';
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole('heading', { name: 'Skapa eget pass' });
+    await user.type(
+      await screen.findByLabelText('Sök övning'),
+      'snabba fötter',
+    );
+    expect(
+      screen.queryByText(new RegExp(exercises['fast-feet'].name)),
+    ).toBeNull();
+    cleanup();
+    await setMeta(getDb(), 'training', general);
+    render(<App />);
+    await screen.findByRole('heading', { name: 'Skapa eget pass' });
+    const search = await screen.findByLabelText('Sök övning');
+    await user.clear(search);
+    await user.type(search, 'höga knän');
+    expect(
+      await screen.findByText(new RegExp(exercises['knee-drive'].name)),
+    ).toBeTruthy();
+  });
+
   it('are offered in the same picker outside rehab', async () => {
     await setMeta(getDb(), 'training', general);
     window.location.hash = '#/nytt-pass';

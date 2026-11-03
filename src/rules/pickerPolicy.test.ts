@@ -12,6 +12,18 @@ describe('pickableInProgramme', () => {
     ).toBe(false);
   });
 
+  it('hides the quick feet drills in rehab and offers them in general training', () => {
+    for (const id of [
+      'fast-feet',
+      'in-and-out-jump',
+      'lateral-shuffle',
+      'knee-drive',
+    ] as const) {
+      expect(pickableInProgramme(id, { programId: 'rehab' })).toBe(false);
+      expect(pickableInProgramme(id, { programId: 'general' })).toBe(true);
+    }
+  });
+
   it('allows ordinary exercises in rehab', () => {
     expect(pickableInProgramme('step-up', { programId: 'rehab' })).toBe(true);
     expect(pickableInProgramme('dead-bug', { programId: 'rehab' })).toBe(true);

@@ -76,6 +76,11 @@ describe('exercise library', () => {
   it.each([
     ['sidohopp', 'single-leg-lateral-hop'],
     ['boxhopp', 'box-jump'],
+    ['snabba fötter', 'fast-feet'],
+    ['höga knän', 'knee-drive'],
+    ['knee drives', 'knee-drive'],
+    ['plate shuffle', 'lateral-shuffle'],
+    ['in and out', 'in-and-out-jump'],
   ] as const)('finds %s by name', async (term, id) => {
     const user = userEvent.setup();
     render(<TestRoutes />);

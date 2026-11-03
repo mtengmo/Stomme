@@ -22,6 +22,10 @@ describe('ballistic exercises render without crashing', () => {
     'kettlebell-swing',
     'box-jump',
     'single-leg-lateral-hop',
+    'fast-feet',
+    'in-and-out-jump',
+    'lateral-shuffle',
+    'knee-drive',
   ])('guide page for %s', async (id) => {
     window.location.hash = `#/ovning/${id}`;
     render(<App />);
