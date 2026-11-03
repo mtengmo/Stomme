@@ -21,6 +21,7 @@ import {
   supportsFrontView,
   supportsObliqueView,
 } from './frontViews';
+import { hingeFamilyPose, isHingeFamily } from './hingeFamilyKeyframes';
 import { kneeStrengthMovementPose } from './kneeStrengthPoses';
 import { CYCLE_MS, cycleProgress, lerpPt, type Pt, TWEEN_MS } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
@@ -83,6 +84,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   if (exerciseId === 'step-up') return stepUpPose(t);
   if (isSquatFamily(exerciseId)) return squatFamilyPose(exerciseId, t);
+  if (isHingeFamily(exerciseId)) return hingeFamilyPose(exerciseId, t);
   const spec = figures[exerciseId];
   const interpolated = !spec.middle
     ? lerpPose(spec.start, spec.end, t)

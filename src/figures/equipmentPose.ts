@@ -1,12 +1,6 @@
 import type { ExerciseId } from '../domain/types';
-import { lerpPt, type Pt } from './lerp';
-import { figures, POSE_KEYS, type Pose } from './poses';
-
-function lerpPose(a: Pose, b: Pose, t: number): Pose {
-  const out = { ...a };
-  for (const k of POSE_KEYS) out[k] = lerpPt(a[k], b[k], t);
-  return out;
-}
+import type { Pt } from './lerp';
+import { figures, type Pose } from './poses';
 
 /**
  * The pose as it is drawn: with external load the renderer rewrites arm
@@ -58,14 +52,9 @@ export function applyEquipmentPose(
     ['dumbbell-rdl', 'reverse-lunge', 'forward-lunge'].includes(exerciseId);
   if (twoHandedBell) {
     if (exerciseId === 'dumbbell-rdl') {
-      // The bell hangs below the hands: leave room above the floor at the bottom.
-      p = lerpPose(spec.start, p, 0.8);
-      const hands: Pt = [(p.hR[0] + p.hL[0]) / 2, (p.hR[1] + p.hL[1]) / 2];
-      const elbow: Pt = [
-        (p.neck[0] + hands[0]) / 2,
-        (p.neck[1] + hands[1]) / 2,
-      ];
-      p = { ...p, eR: elbow, eL: elbow, hR: hands, hL: hands };
+      // Both hands share one handle: the near arm already hangs plumb at its
+      // exact length, so the far arm simply copies it (no blending).
+      p = { ...p, eL: p.eR, hL: p.hR };
     } else {
       const hands: Pt = [p.neck[0] + 13, p.neck[1] + 9];
       p = {

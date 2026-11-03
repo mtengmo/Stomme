@@ -1,3 +1,4 @@
+import { hingeFamilyPose } from './hingeFamilyKeyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
@@ -445,37 +446,19 @@ export const additionalFigures = {
     // single bell at their shared grip point, with its mass below the palms.
     held: oneBell,
   },
+  // Hip hinge family: fixed ankles, IK legs and plumb arms (hingeFamilyKeyframes).
   'kettlebell-deadlift': {
-    start: p(
-      [134, 106],
-      [121, 111],
-      [88, 132],
-      [
-        [119, 139],
-        [111, 157],
-        [111, 141],
-        [111, 157],
-      ],
-      [
-        [111, 149],
-        [108, 174],
-        [119, 177],
-        [89, 150],
-        [86, 174],
-        [97, 177],
-      ],
-    ),
-    end: {
-      ...stand,
-      hR: [102, 133],
-      hL: [102, 133],
-      eR: [101, 103],
-      eL: [99, 104],
-    },
+    start: hingeFamilyPose('kettlebell-deadlift', 0),
+    end: hingeFamilyPose('kettlebell-deadlift', 1),
     props: [],
     held: oneBell,
   },
-  'dumbbell-rdl': { start: stand, end: hinge, props: [], held: twoDumbbells },
+  'dumbbell-rdl': {
+    start: hingeFamilyPose('dumbbell-rdl', 0),
+    end: hingeFamilyPose('dumbbell-rdl', 1),
+    props: [],
+    held: twoDumbbells,
+  },
   'supported-row': {
     start: rowStart,
     end: { ...rowStart, eR: [101, 101], hR: [102, 124] },
