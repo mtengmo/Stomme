@@ -1119,6 +1119,13 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Press path and rack carry agree. E40 has front view and close-up. Safe roll-in/out for E39 explained in text only. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: nio frysta pressfaser samt H/V-reduced-motion visar vald blå arm med en kettlebell, vilande motsatt arm, böjda knän och fötter på underlaget. Vikten följer hand/underarm och ryms; startens överarm når golvet. Profilen visar pressen men kan inte bevisa frånvaro av bålrotation. Alla viktsteg använder samma kettlebellvariant. Texten beskriver sidliggande i-/urgång, fri hands hjälp, rak handled och mjuk golvkontakt; dessa förberedelser visas inte i pressens fasbilder. Nybörjartest, full loop och greppets säkerhetsacceptans är fortsatt öppna enligt tidigare openIssues. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -1283,7 +1290,7 @@
     "name": "Magliggande på underarmar",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1298,6 +1305,13 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Figure intentionally stays in the held position; text says hold for the displayed time, then lower. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio frysta faser är identiska, i överensstämmelse med källans statiska håll. Armbågarna är böjda och underarmarna ligger på underlaget; bäcken och ben ligger lågt och hela figuren ryms. Bilateral kroppsvikt/matta. Texten beskriver magliggande vila, uppstöd på underarmarna och avslutande sänkning, men reduced-motion skiljer inte dessa steg. Profilen visar överkroppsläget. Texten avråder från raka armar och erbjuder magliggande vila om stödet känns obekvämt. Ingen klinisk säkerhetsacceptans. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -1308,7 +1322,9 @@
         "notes": "Framing: toe clipped on both sides."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[cheap] Reduced-motion ”Start” och ”Slut” visar exakt samma upplyfta bröstkorg med stöd på böjda armbågar. Textens viloläge och avslutande sänkning framgår inte. Märk den befintliga statiska positionen ”Håll”; om Start/Slut behålls, komplettera med tydligt avspänt magliggande läge enligt tipsen."
+    ],
     "fingerprint": "9bfe63718244"
   },
   {
@@ -1331,6 +1347,13 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: frysta ?phase=0–1-bilder går inte att använda för rörelsen eftersom Figure.tsx skriver över forced pose med heelSlidePose(t). Därför granskades också 18 tidsstämplade skärmbilder från faktisk uppspelning under 11,7 s: höger häl glider fram och tillbaka, därefter vänster, med stilla bål och hälar längs underlaget. Reduced-motion visar böjda knän och en framgliden häl; figuren ryms. Bilateral kroppsvikt/matta utan sidoknapp. Tips om stilla bäcken, återgång/benbyte och kortare glidning stämmer med stickproven. Sidovyn visar glidningen men inte bäckenrotation säkert. Säkerhet och kontinuitet mellan stickproven är inte slutbedömda. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -1442,6 +1465,13 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: nio frysta faser samt reduced-motion H/V visar valt blått lår, knäets nedåtrörelse och mer uppdragna tår, med stilla bäcken i stickproven. Pil och muskelmarkering förtydligar spänningen; hela figuren ryms men små rutor gör skillnaden subtil. Sidoväxlingen speglar samma bengeometri. Bilateral viloställning med vald arbetssida, endast kroppsvikt/matta; det andra böjda knät är ett valfritt textalternativ och visas inte. Texten anger mjuk press, full avslappning, andning och mindre kraft som enklare variant. Källans repTempo lägger in 3 s håll; själva hållet och avslappningen har inte setts kontinuerligt. Ingen full säkerhetsacceptans. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -1994,7 +2024,7 @@
     "name": "Enarms knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -2002,6 +2032,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio frysta faser och reduced-motion på H/V jämförda med tips. Vald blå arm bär en hantel och motsatt arm vilar; sidoväxlingen speglar figuren. Vikten ryms ovanför huvudet och fötterna behåller golvkontakt i stickproven. Startetiketten avviker från texten. Profilen räcker för pressriktningen men inte för säker bedömning av sidolutning. Varning för sidolutning och lättare alternativ finns. Endast hantelvariant; ben-/armsamordningen behöver ses i rörelse. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -2012,7 +2049,9 @@
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[cheap] Reduced-motion ”Start”, både H och V, visar botten av knäböjen (fas 0) med böjda höfter och knän. Tips 1 anger stående med hanteln vid vald axel. Visa det stående axelgreppet som Start, eller märk bottenläget och komplettera med den beskrivna startposen."
+    ],
     "fingerprint": "3cdd31d0df7c"
   },
   {
@@ -2126,6 +2165,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: uppställning, knäböj med vikten nära bröstet och återgång stämmer med de nio frysta faserna och reduced-motion-lägena. Bilateral kettlebellvariant; inga sidoval. Båda händerna överlappar i profil så tvåhandsgreppet i hornen är inte visuellt verifierat i detalj. Vikten ryms och fötterna står kvar i stickproven. Profilen visar djup/höftfällning men inte knä–tå-riktning framifrån. Texten varnar för lyfta hälar och vikt långt från bröstet, samt erbjuder lättare eller obelastad övning. Ingen full animations- eller säkerhetsacceptans. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -2259,6 +2305,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Figure review behind docs/figure-fix-specs.md W2; fixes specified there."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: vald sida avser övre knät på bänken, vilket stämmer med blått ben och H/V i båda speglade reduced-motion-paren. Start/Håll visar bäckenlyft och undre ben fritt i hållet; underarm och bänk ryms. Nio frysta faser sedda, men källans motion: hold innebär att den vanliga visningen håller slutposen, inte spelar hela fasföljden. Endast kroppsvikt/bänk. Texten anger stadig vadderad bänk, stopp vid ljumske/insida-knä-smärta och avlastning med undre benet. Sidovyn visar stöden; bäckenrotation kan inte bedömas säkert. Ingen full säkerhets- eller rörelseacceptans. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
@@ -2307,6 +2360,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Figure review behind docs/figure-fix-specs.md W1; fixes specified there."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Begränsad textgranskning: rygg mot vägg, fasta hälar, tålyft och återgång stämmer med nio frysta faser och reduced-motion Start/Slut. Inga synliga glidande hälar eller lyft av hälarna i stickproven; vägg och fötter ryms. Bilateral kroppsvikt, ingen sidoknapp eller viktvariant. Sidovyn visar fotledsrörelsen och väggstödet. Varningen skiljer tålyft från tåhävning; enklare variant är kortare avstånd till väggen och mindre lyft. Återgångens hastighet och full säkerhetsbedömning återstår. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
       }
     ],
     "fixes": [
