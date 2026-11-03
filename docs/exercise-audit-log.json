@@ -1996,7 +1996,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "625518fe4a83"
+    "fingerprint": "625518fe4a83",
+    "notes": [
+      "2026-11-03: timertexten ändrad ('Börja hålla.' -> 'Börja rörelsen.', ny statusrad för rörelse, 'Klart. Vila.'); se src/content/timedMovement.ts och docs/plan-quick-feet-drills.md."
+    ]
   },
   {
     "id": "box-jump",
@@ -2060,6 +2063,12 @@
         "fixer": "claude-sonnet",
         "commit": "6b3bbe3",
         "notes": "Riktig frontvy E102: fötter ihop mellan två golvmarkeringar (t=0) och brett utanför (t=1), lyft 10 sin(pi t), knäna utåt över tårna. Sidovyn är en enkel reserv (visas inte, övningen är bara frontvy)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "b458077",
+        "notes": "Granskningsrättning: golvmarkeringarna är högre och i kontrastfärg (utrustningsfärgen). Tips 1 kompletterat med fritt omkring dig."
       }
     ],
     "openIssues": [],
@@ -2086,13 +2095,19 @@
         "fixer": "claude-sonnet",
         "commit": "6b3bbe3",
         "notes": "Riktig frontvy E103: ledande foten kliver över linjen i första halvan och den andra följer i andra, alltid en fot i golvet, fötterna korsar aldrig, 32-60 px mellan anklarna. Sidovyn är en enkel reserv (visas inte, övningen är bara frontvy)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "b458077",
+        "notes": "Granskningsrättning: figuren följer nu texten, två sidosteg per fot med båda fötterna över linjen vid t=1, höften 72 till 128, lätt böjda knän, en fot i taget i luften vid linjen. Tydligare linje. Tips 1 och noten kompletterade (halkfritt, fritt omkring dig, båda benen tillsammans)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
     ],
-    "fingerprint": "fa89c06d3818"
+    "fingerprint": "dad0d7d259f0"
   },
   {
     "id": "knee-drive",
@@ -2112,6 +2127,12 @@
         "fixer": "claude-sonnet",
         "commit": "5b85319",
         "notes": "Riktig sidofigur E104: växelvisa knälyft med låret nära vågrätt och underbenet hängande, stödfot på golvet, armar pendlar motsatt, cykel 900 ms."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "b458077",
+        "notes": "Granskningsrättning: tips 1 kompletterat med fritt omkring dig."
       }
     ],
     "openIssues": [],
