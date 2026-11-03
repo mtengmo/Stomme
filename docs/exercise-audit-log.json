@@ -1752,10 +1752,21 @@
     "name": "Dips i parallella stänger",
     "group": "bodyweight",
     "risk": "high",
-    "status": "unreviewed",
-    "reviews": [],
+    "status": "needs-fix",
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "commit": "810e160",
+        "notes": "E58: nio frysta profilfaser och reduced-motion Start/Slut granskade. I Start är särskilt bortre armbågen tydligt böjd trots instruktionen om raka stödarmar. Händerna stannar på stängerna och fötterna är fria i stickproven; ramen räcker. Bilateral kroppsvikt utan sidoval/varianter. Tips om stabil ställning, bekvämt djup, kontrollerade axlar och enklare armhävning finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
-    "openIssues": [],
+    "openIssues": [
+      "[cheap] E58: I fas 0 och reduced-motion Start är den bortre armbågen tydligt böjd bakåt, och även främre armkedjan har en vinkel. Start-/toppläget ska visa raka stödarmar enligt tips 1 och 3. Justera topplägets axel–armbåge–hand för båda armarna med händerna kvar på stängerna och fötterna fria; kontrollera samma läge efter återgången."
+    ],
     "fingerprint": "81fd4ec213b8"
   },
   {
@@ -1860,10 +1871,21 @@
     "name": "Knäböj med hopp",
     "group": "ballistic",
     "risk": "high",
-    "status": "unreviewed",
-    "reviews": [],
+    "status": "needs-fix",
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "commit": "810e160",
+        "notes": "E62: nio frysta faser visar böj, flygfas och återgång via böjda knän; hela figuren ryms. Reduced-motion visar bara stående Start och luftburen Rörelse, ingen landning. Bilateral kroppsvikt, inga sidoval/varianter. Profilen visar höjd/djup men inte knänas sidriktning. Tips om mjuk landning, balans och knäböj utan hopp finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
-    "openIssues": [],
+    "openIssues": [
+      "[cheap] E62: Reduced-motion-rutorna Start/Rörelse saknar landningsläget; Rörelse visar figuren i luften. Lägg till en tydligt märkt Landning-ruta med båda fötter vid underlaget och böjda höfter/knän, så att textens inbromsning syns även utan animation."
+    ],
     "fingerprint": "5ed09d953a78"
   },
   {
@@ -1871,10 +1893,21 @@
     "name": "Utfall med hopp och benbyte",
     "group": "ballistic",
     "risk": "high",
-    "status": "unreviewed",
-    "reviews": [],
+    "status": "needs-fix",
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "issues",
+        "commit": "810e160",
+        "notes": "E63: nio frysta faser och reduced-motion Start/Slut granskade. Bakre foten svävar tydligt över golvet i båda utfallsändlägena. Benen byter ordning i fasföljden, men identisk färg/profil gör bytet svårt att läsa i Start/Slut. Hela figuren ryms; bilateral kroppsvikt utan sidoval/varianter. Texten anger mjuk landning, bromsning och utfall utan hopp som alternativ; sidobredd/knäriktning kan inte bedömas i profil. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E63: I fas 0 och 1 samt reduced-motion Start/Slut ligger bakre foten flera bildpunkter ovanför golvlinjen; endast främre foten når underlaget. Visa stabil utfallsstart/landning med bakre framfot/tår i golvet och hälen tillåten upplyft. Anpassa höft/knä/fotgeometrin med fasta benlängder och kontrollera kontakterna vid båda benens landning."
+    ],
     "fingerprint": "362c9c4bec3d"
   },
   {
@@ -2033,7 +2066,16 @@
     "group": "ballistic",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "810e160",
+        "notes": "E95: nio frysta profilfaser och reduced-motion Start/Slut visar böjda knän ovanför golvet, höften bakåt och framåtrörelse till låg armhävningspose. Händer/tår ligger kvar i stickproven och hela figuren ryms. Bilateral kroppsvikt utan sidoval/varianter. Textens fasta händer/fötter, kortare rörelse och knäarmhävning som alternativ finns. Profilen visar rörelseriktningen men inte armbågarnas sidovinkel; axelns framåtläge mot handen behöver bedömas i rörelse innan säkerhetsacceptans. Inget säkert nytt textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
     "openIssues": [],
     "fingerprint": "d4aa38bc0b72"
@@ -2070,7 +2112,16 @@
     "group": "ballistic",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "810e160",
+        "notes": "E99: nio frysta frontfaser visar sidoförflyttning och flygfas med den grå foten kvar i luften. Reduced-motion H/V visar landningslägen på varsin sida av markeringen; vald blå stödlem och sidotext följer speglingen. Hela figuren ryms. Kroppsvikt utan viktvarianter. Fronten visar sidriktningen men inte framfot/häl i djupet. Tips anger halkfritt underlag, mjuk landning, balansavbrott och mindre hopp/tvåbenshopp/stillastående som alternativ; inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-01",
@@ -2091,7 +2142,16 @@
     "group": "ballistic",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "810e160",
+        "notes": "E100: nio frysta profilfaser visar hopp till lådan och stegvis nedgång; reduced-motion har separata Start/Hopp/Landa på steget/Kliv ned. I landningsrutan ligger båda fötterna på lådans ovansida med böjda knän; nedgångsrutan visar en fot på lådan och en vid golvet. Hela figur/rekvisita ryms. Bilateral kroppsvikt, inga sidoval/varianter. Tips om låg stadig halkfri låda, mjuk landning, kliv ned utan hopp och lättare uppsteg finns. Profilen kan inte visa knäriktning framifrån; fullt upprätt mellanläge och kontinuerliga fotkontakter ej slutbedömda. Inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-01",
@@ -2408,7 +2468,16 @@
     "group": "dumbbell",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "810e160",
+        "notes": "E75: nio frysta profilfaser och reduced-motion för 2×2/2×4 kg visar rodd mot höften med oförändrad bål/fotställning i stickproven. Hantlarna följer händerna och hela figuren ryms. Bilateral utan sidoval. Armarnas projektioner överlappar ben och bål, så armbågarnas läge nära kroppen och konstant lemlängd är inte säkert visuellt bedömda. Tips om naturlig rygg, stilla överkropp, nästan raka armar vid sänkning och lättare/stödd rodd finns; inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
     "openIssues": [],
     "fingerprint": "8cba90aa4789"
@@ -2419,7 +2488,16 @@
     "group": "dumbbell",
     "risk": "high",
     "status": "unreviewed",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "text",
+        "result": "ok",
+        "commit": "810e160",
+        "notes": "E76: nio frysta frontfaser och reduced-motion för 4/8 kg visar bred fotställning, knäböj och hantel som sänks mellan benen. Fötterna ligger kvar i stickproven, knän går utåt och hanteln ryms utan golvkontakt. Bilateral utan sidoval. Båda händerna möts vid hanteln; greppets djup och ryggens form kan inte säkert utläsas framifrån. Tips om hela fötter, knä–tå-riktning och grundare/lättare alternativ finns. Inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [],
     "openIssues": [],
     "fingerprint": "42cfefcfbd44"
