@@ -440,3 +440,28 @@ html.session-locked body {
     padding-inline: 0.5rem;
   }
 }
+
+/* Week done: a wide pencil stroke is wiped across the week strip, then the V-box tick follows. */
+.week-tick-new {
+  animation: week-tick-new 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes week-tick-new {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* The V-box tick waits for the stroke (--tick-delay set inline). */
+.tick-delayed .tick-new {
+  animation-delay: var(--tick-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .week-tick-new {
+    animation: none;
+  }
+}
