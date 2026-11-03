@@ -280,6 +280,33 @@ export function heelSlidePose(t: number, side: 'R' | 'L' = 'R'): Pose {
   );
 }
 
+/**
+ * Lying flat on the stomach with the arms resting by the sides: the relaxed
+ * start and the final lowering of prone-on-forearms. Same limb lengths as the
+ * supported hold (torso, upper arm 38, forearm 22).
+ */
+export function proneRelaxedPose(): Pose {
+  const hip: Pt = [108, 169];
+  const neck: Pt = [hip[0] - Math.hypot(46, 33), 169];
+  // The arms rest on the mat one unit lower than the torso line.
+  const elbowR: Pt = [neck[0] + Math.sqrt(38 * 38 - 1), 170];
+  const elbowL: Pt = [neck[0] + Math.sqrt(36 * 36 + 16 - 1), 170];
+  return skeleton(
+    [neck[0] - Math.hypot(13, 12), 169],
+    neck,
+    hip,
+    [elbowR, [elbowR[0] + 22, 170], elbowL, [elbowL[0] + 22, 173]],
+    [
+      [140, 171],
+      [172, 173],
+      [183, 175],
+      [138, 168],
+      [170, 170],
+      [181, 172],
+    ],
+  );
+}
+
 export function rehabMovementPose(id: ExerciseId, t: number): Pose | undefined {
   return handlers[id as RehabExerciseId]?.(Math.max(0, Math.min(1, t)));
 }

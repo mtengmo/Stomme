@@ -1,7 +1,7 @@
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
-import { squatFamilyPose } from './squatFamilyKeyframes';
+import { SQUAT_CURL_TOP, squatFamilyPose } from './squatFamilyKeyframes';
 
 type P = Pt;
 function p(
@@ -596,7 +596,10 @@ export const additionalFigures = {
   },
   'squat-curl': {
     start: squatFamilyPose('squat-curl', 0),
-    end: squatFamilyPose('squat-curl', 1),
+    end: squatFamilyPose('squat-curl', SQUAT_CURL_TOP),
+    // One way through the rep: squat with hanging arms, rise while curling,
+    // lower the dumbbells standing, back to the first frame.
+    motion: 'sequence',
     props: [],
     held: twoDumbbells,
   },

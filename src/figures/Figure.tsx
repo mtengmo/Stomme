@@ -34,8 +34,16 @@ import {
   type Prop,
 } from './poses';
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
-import { heelSlidePose, rehabMovementPose } from './rehabPoses';
-import { isSquatFamily, squatFamilyPose } from './squatFamilyKeyframes';
+import {
+  heelSlidePose,
+  proneRelaxedPose,
+  rehabMovementPose,
+} from './rehabPoses';
+import {
+  isSquatFamily,
+  squatFamilyPose,
+  squatFamilyStills,
+} from './squatFamilyKeyframes';
 import { stepUpPose } from './stepUpKeyframes';
 
 export type { FigureAngle } from './frontViews';
@@ -97,6 +105,27 @@ export function walkingLungeReducedFrames(): readonly [
     ['Utfall', movementPose('walking-lunge', 0)],
     ['Steg framåt', movementPose('walking-lunge', 0.25)],
   ];
+}
+
+/** Relaxed lying on the stomach, then the held forearm support. */
+export function proneOnForearmsReducedFrames(): readonly [
+  readonly [string, Pose],
+  readonly [string, Pose],
+] {
+  return [
+    ['Vila', proneRelaxedPose()],
+    ['Håll', figures['prone-on-forearms'].end],
+  ];
+}
+
+/** Labelled stills for the squat family, from its authored phases. */
+function stillsFor(
+  exerciseId: ExerciseId,
+): readonly (readonly [string, Pose])[] | undefined {
+  if (!isSquatFamily(exerciseId)) return undefined;
+  return squatFamilyStills(exerciseId)?.map(
+    ([label, phase]) => [label, movementPose(exerciseId, phase)] as const,
+  );
 }
 
 /** Opposite rotations make the seated trunk turn visible without motion. */
@@ -228,6 +257,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
 const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
   'squat-jump': 4500,
   'box-jump': 5000,
+  'squat-curl': 8000,
 };
 const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;
 
@@ -543,50 +573,53 @@ export function Figure({
               ['Ta emot', movementPose(exerciseId, 0.5)],
               ['Hjälp tillbaka', movementPose(exerciseId, 0.75)],
             ]
-          : exerciseId === 'burpee'
-            ? [
-                ['Stå', movementPose(exerciseId, BURPEE_STILL_PHASES[0])],
-                [
-                  'Händer i golvet',
-                  movementPose(exerciseId, BURPEE_STILL_PHASES[1]),
-                ],
-                [
-                  'Armhävning',
-                  movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
-                ],
-                [
-                  'Hopp och landning',
-                  movementPose(exerciseId, BURPEE_STILL_PHASES[3]),
-                ],
-              ]
-            : exerciseId === 'box-jump'
-              ? [
-                  ['Start', movementPose(exerciseId, 0)],
-                  ['Hopp', movementPose(exerciseId, 0.4)],
-                  ['Landa på steget', movementPose(exerciseId, 0.55)],
-                  ['Kliv ned', movementPose(exerciseId, 0.8)],
-                ]
-              : exerciseId === 'walking-lunge'
-                ? walkingLungeReducedFrames()
-                : exerciseId === 'russian-twist'
-                  ? russianTwistReducedFrames()
-                  : exerciseId === 'squat-jump' ||
-                      exerciseId === 'mountain-climber' ||
-                      exerciseId === 'plank-arm-lift'
-                    ? [
-                        ['Start', movementPose(exerciseId, 0)],
-                        [
-                          'Rörelse',
-                          movementPose(
-                            exerciseId,
-                            exerciseId === 'squat-jump' ? 0.575 : 0.25,
-                          ),
-                        ],
-                      ]
-                    : [
-                        ['Start', spec.start],
-                        ['Slut', spec.end],
-                      ];
+          : exerciseId === 'prone-on-forearms'
+            ? proneOnForearmsReducedFrames()
+            : (stillsFor(exerciseId) ??
+              (exerciseId === 'burpee'
+                ? [
+                    ['Stå', movementPose(exerciseId, BURPEE_STILL_PHASES[0])],
+                    [
+                      'Händer i golvet',
+                      movementPose(exerciseId, BURPEE_STILL_PHASES[1]),
+                    ],
+                    [
+                      'Armhävning',
+                      movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
+                    ],
+                    [
+                      'Hopp och landning',
+                      movementPose(exerciseId, BURPEE_STILL_PHASES[3]),
+                    ],
+                  ]
+                : exerciseId === 'box-jump'
+                  ? [
+                      ['Start', movementPose(exerciseId, 0)],
+                      ['Hopp', movementPose(exerciseId, 0.4)],
+                      ['Landa på steget', movementPose(exerciseId, 0.55)],
+                      ['Kliv ned', movementPose(exerciseId, 0.8)],
+                    ]
+                  : exerciseId === 'walking-lunge'
+                    ? walkingLungeReducedFrames()
+                    : exerciseId === 'russian-twist'
+                      ? russianTwistReducedFrames()
+                      : exerciseId === 'squat-jump' ||
+                          exerciseId === 'mountain-climber' ||
+                          exerciseId === 'plank-arm-lift'
+                        ? [
+                            ['Start', movementPose(exerciseId, 0)],
+                            [
+                              'Rörelse',
+                              movementPose(
+                                exerciseId,
+                                exerciseId === 'squat-jump' ? 0.575 : 0.25,
+                              ),
+                            ],
+                          ]
+                        : [
+                            ['Start', spec.start],
+                            ['Slut', spec.end],
+                          ]));
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (

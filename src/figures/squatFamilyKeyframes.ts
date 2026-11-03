@@ -40,6 +40,48 @@ const polar = (o: Pt, len: number, angle: number): Pt => [
 ];
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 
+const smooth = (u: number) => u * u * (3 - 2 * u);
+
+/**
+ * Squat-curl is a one-way sequence: stand with hanging arms, squat down with
+ * the arms hanging, rise while curling, then lower the dumbbells standing. The
+ * last frame equals the first so the loop has no seam.
+ */
+export const SQUAT_CURL_BOTTOM = 0.3;
+export const SQUAT_CURL_TOP = 0.65;
+export function squatCurlPhase(t: number): { depth: number; curl: number } {
+  if (t <= SQUAT_CURL_BOTTOM)
+    return { depth: smooth(t / SQUAT_CURL_BOTTOM), curl: 0 };
+  if (t <= SQUAT_CURL_TOP) {
+    const u = smooth(
+      (t - SQUAT_CURL_BOTTOM) / (SQUAT_CURL_TOP - SQUAT_CURL_BOTTOM),
+    );
+    return { depth: 1 - u, curl: u };
+  }
+  if (t <= 0.75) return { depth: 0, curl: 1 };
+  if (t <= 0.9) return { depth: 0, curl: 1 - smooth((t - 0.75) / 0.15) };
+  return { depth: 0, curl: 0 };
+}
+
+/** Labelled stills for reduced motion; the loop itself starts standing. */
+export function squatFamilyStills(
+  id: SquatFamilyId,
+): readonly (readonly [string, number])[] | undefined {
+  if (id === 'squat-curl')
+    return [
+      ['Start', 0],
+      ['Botten', SQUAT_CURL_BOTTOM],
+      ['Upp med curl', SQUAT_CURL_TOP],
+    ];
+  if (id === 'thruster' || id === 'single-arm-thruster')
+    return [
+      ['Start', 0.5],
+      ['Botten', 0],
+      ['Slut', 1],
+    ];
+  return undefined;
+}
+
 /** `depth` 0 = standing, 1 = bottom of the squat. */
 function body(depth: number) {
   const hip = lerpPt(STAND_HIP, BOTTOM_HIP, depth);
@@ -83,16 +125,16 @@ function arm(
 export function squatFamilyPose(id: SquatFamilyId, progress: number): Pose {
   const t = clamp(progress);
   if (id === 'squat-curl') {
-    const depth = 1 - t;
+    const { depth, curl } = squatCurlPhase(t);
     const { neck } = body(depth);
-    const curl = mix(1.52, -0.95, 1 - depth);
+    const angle = mix(1.52, -0.95, curl);
     const eR = polar(neck, 24, Math.PI / 2 - 0.1);
     const eL = polar(neck, 24, Math.PI / 2 + 0.05);
     return assemble(depth, {
       eR,
-      hR: polar(eR, 23, curl),
+      hR: polar(eR, 23, angle),
       eL,
-      hL: polar(eL, 23, curl),
+      hL: polar(eL, 23, angle),
     });
   }
   if (id === 'thruster' || id === 'single-arm-thruster') {
