@@ -370,7 +370,7 @@
     "name": "Marklyft med kettlebell",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -401,19 +401,23 @@
         "notes": "Start på golvet, lyftriktning, gemensamt kettlebellgrepp och reduced-motion-lägen jämförda med tips. Bilateral övning; ingen sidoväxling. Sidovyn visar höftfällningen och vikten ryms. Texten varnar för rundad rygg/ryck och erbjuder lättare vikt. Kvarstående längdförändring i benen bekräftas av ändpunkternas geometri; W9 är inte avklarad. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] W9 TODO: squat-family IK figure not applied yet (docs/figure-fix-specs.md, optional item)",
-      "[strong] Start jämfört med Slut (fas 0 respektive 1): bortre låret mellan höft och knä växer tydligt, från cirka 18 till 31 koordinatenheter i källans poser; även främre låret ändrar längd. Behåll samma lår- och underbenslängder genom lyftet och återgången, med båda fotlederna kvar på golvet. W9 kvarstår."
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "a566efc",
+        "notes": "W9 hip hinge family (hingeFamilyKeyframes.ts): fixed ankles, both legs and the arms via constant-length IK, bell low at start, standing with hand [102,121] at the end; 13 baseline rows removed."
+      }
     ],
-    "fingerprint": "d152ef71bf2a"
+    "openIssues": [],
+    "fingerprint": "7a59441e5632"
   },
   {
     "id": "dumbbell-rdl",
     "name": "Rumänskt marklyft",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -444,12 +448,16 @@
         "notes": "Tips, hantelvariant och kettlebellvariantens anpassade grepptext kontrollerade; båda reduced-motion-varianterna sedda. Bilateral övning. Sidovyn räcker för höftfällning; frontvyn har inte granskats. Vikt och fötter ryms. Varningen för djup knäböj/rundad rygg och den kortare/lättare varianten finns. W9 kvarstår. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] W9 TODO: squat-family IK figure not applied yet (docs/figure-fix-specs.md, optional item)",
-      "[strong] Start jämfört med Slut (fas 0 respektive 1): höft–knä-segmenten förkortas under höftfällningen (främre låret cirka 30,6 till 27,3 och bortre cirka 31,0 till 25,3 koordinatenheter i källan). Lös knäpositionerna med konstanta segmentlängder och fasta fotleder, för både två hantlar och en kettlebell, även på återvägen."
+    "fixes": [
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "a566efc",
+        "notes": "W9 hip hinge family: fixed ankles, constant thigh/shin/torso/arm lengths for two dumbbells and for the kettlebell variant (shared grip copies the near arm instead of blending), same path on the way back; 14 baseline rows removed."
+      }
     ],
-    "fingerprint": "3c499b8e8ccb"
+    "openIssues": [],
+    "fingerprint": "64974d6b63fb"
   },
   {
     "id": "supported-row",
@@ -1290,7 +1298,7 @@
     "name": "Magliggande på underarmar",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1320,11 +1328,15 @@
         "fixer": "claude-sonnet",
         "commit": "fea50ad",
         "notes": "Framing: toe clipped on both sides."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "56d07e3",
+        "notes": "Reduced-motion stills are now Vila (flat, relaxed lying pose, same limb lengths) and Håll (forearm support)."
       }
     ],
-    "openIssues": [
-      "[cheap] Reduced-motion ”Start” och ”Slut” visar exakt samma upplyfta bröstkorg med stöd på böjda armbågar. Textens viloläge och avslutande sänkning framgår inte. Märk den befintliga statiska positionen ”Håll”; om Start/Slut behålls, komplettera med tydligt avspänt magliggande läge enligt tipsen."
-    ],
+    "openIssues": [],
     "fingerprint": "9bfe63718244"
   },
   {
@@ -1675,7 +1687,7 @@
     "name": "Burpee med armhävning och hopp",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -1690,6 +1702,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio faser visar stående, huk, plankläge, armhävning och upphopp; faserna 0 och 1 ser lika ut men sömmen har inte setts i rörelse. Bilateral kroppsvikt, sidovy; reduced-motion även kontrollerad vid 390 px. Texten beskriver mjuk landning och alternativ utan hopp/armhävning. Onboardingens generella stoppregel vid skarp smärta, svullnad eller låsning läst i källan. Kontaktfelet i stillbilden hindrar acceptans. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "claude-sonnet",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Own check of the hands-down still (phase 0.125, both sides) rendered from the current code: hands on the floor in front of the feet, not behind them. The earlier finding did not reproduce at this commit. Only the hands-down still was checked; the rest of the loop is not re-reviewed."
       }
     ],
     "fixes": [
@@ -1704,12 +1723,15 @@
         "fixer": "claude-sonnet",
         "commit": "133062a",
         "notes": "M1+M2: feet low with piked hip, no joint jumps, safe reduced-motion frame."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "00bc586",
+        "notes": "Separate Hopp and Landning stills (phase 0.84 and 0.92). Hands-down still (phase 0.125) re-checked: both hands are at [134,174], 26 units in front of the ankles at [108,174] with exact arm lengths, so no geometry change was needed; locked by a test."
       }
     ],
-    "openIssues": [
-      "[strong] Reduced-motion-rutan ”Händer i golvet” (fas 0,125), även synlig i fasbladet: händerna/armändarna ligger bakom fötterna och ovanför golvlinjen i stället för att stödja framför fötterna. Anpassa hukens axel-/armgeometri så båda händerna når golvet framför fötterna med bibehållna armlängder, före bakåthoppet.",
-      "[cheap] Reduced-motion-rutan ”Hopp och landning” visar bara luftfasen (0,84), ingen landning med böjda höfter/knän. Visa en separat landningspose eller välj och märk rutorna så textens mjuka landning faktiskt framgår."
-    ],
+    "openIssues": [],
     "fingerprint": "224d78080eab"
   },
   {
@@ -1953,7 +1975,7 @@
     "name": "Knäböj med bicepscurl",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -1976,20 +1998,23 @@
         "fixer": "claude-sonnet",
         "commit": "6f58404",
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "56d07e3",
+        "notes": "One-way sequence (8 s): squat with hanging arms, rise while curling, lower the dumbbells standing, loop without a seam; reduced-motion stills Start (standing, hanging arms), Botten, Upp med curl."
       }
     ],
-    "openIssues": [
-      "[strong] Slut/fas 1 till Start/fas 0 på återvägen: källan reverserar samma poser, så armbågarna sträcks samtidigt som knäna böjs. Ingen fas visar stående med hantlarna nedsänkta. Tips 3 säger att hantlarna ska sänkas när man står, och tips 2 att nästa knäböj görs med hängande armar. Lägg in en stående sänkning av hantlarna före knäböjen och behåll konstanta segmentlängder genom hela sekvensen.",
-      "[cheap] Reduced-motion ”Start” visar botten av knäböjen, medan tips 1 beskriver stående med hängande armar. Visa det beskrivna startläget eller märk bottenläget tydligt och komplettera med den faktiska startposen."
-    ],
-    "fingerprint": "257dde077d81"
+    "openIssues": [],
+    "fingerprint": "c2157d157e80"
   },
   {
     "id": "thruster",
     "name": "Knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -2012,11 +2037,15 @@
         "fixer": "claude-sonnet",
         "commit": "6f58404",
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "56d07e3",
+        "notes": "Reduced-motion stills: Start is the standing shoulder rack (phase 0.5), plus Botten (phase 0) and Slut (overhead)."
       }
     ],
-    "openIssues": [
-      "[cheap] Reduced-motion ”Start” (fas 0) visar böjda höfter/knän i bottenläget, men tips 1 anger stående med hantlarna vid axlarna. Visa stående axelgrepp som Start, eller märk knäböjsrutan som bottenläge och lägg till det beskrivna startläget."
-    ],
+    "openIssues": [],
     "fingerprint": "7ee9533683e0"
   },
   {
@@ -2024,7 +2053,7 @@
     "name": "Enarms knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -2047,11 +2076,15 @@
         "fixer": "claude-sonnet",
         "commit": "6f58404",
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "56d07e3",
+        "notes": "Reduced-motion stills: Start is the standing shoulder rack (phase 0.5), plus Botten (phase 0) and Slut (overhead)."
       }
     ],
-    "openIssues": [
-      "[cheap] Reduced-motion ”Start”, både H och V, visar botten av knäböjen (fas 0) med böjda höfter och knän. Tips 1 anger stående med hanteln vid vald axel. Visa det stående axelgreppet som Start, eller märk bottenläget och komplettera med den beskrivna startposen."
-    ],
+    "openIssues": [],
     "fingerprint": "3cdd31d0df7c"
   },
   {
@@ -2245,7 +2278,7 @@
     "name": "Nedsteg från steg",
     "group": "rehab/knee-strength",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -2253,6 +2286,13 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Sidovy H/V i kontaktblad, nio faser för H och reduced-motion framifrån på båda sidor granskade. Vald blå stödfot står på steget och fri häl sänks; frontvyn hjälper att bedöma knäriktning. Sidovyns grå hand har räckeskontakt enligt källan, men frontvyn visar inget handstöd. Texten anger kontrollerad sänkning, 5–8 cm, enklare variant med mer stöd och råd att fråga fysioterapeut om steghöjd. Endast kroppsvikt. Tidigare väntan på full visuell granskning kvarstår. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "claude-sonnet",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Own visual check of rendered frames: side view start/end and front view start/end for both working sides show the support hand on the rail and the free foot above the floor. A second reviewer should still look at the loop."
       }
     ],
     "fixes": [
@@ -2273,13 +2313,16 @@
         "fixer": "claude-sonnet",
         "commit": "4ae63e0",
         "notes": "M3+L3: front view with 14 unit step and real depth; lowest heel about 6 cm under the step."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "4db6a48",
+        "notes": "Front view: the support hand (opposite the working leg) keeps hold of an upright railing through the lowering and return, constant arm lengths, both sides."
       }
     ],
-    "openIssues": [
-      "[strong] Waiting for visual review (docs/figure-audit-status.md)",
-      "[strong] Framifrån, Start och Slut, både H och V: båda händerna hänger fritt och räcket saknas, trots instruktionen att hålla i vägg/räcke och sidovyns stödkontakt. Visa ett stöd med samma stödhand i kontakt genom sänkning och återgång även i frontvyn."
-    ],
-    "fingerprint": "fe68d13f83b7"
+    "openIssues": [],
+    "fingerprint": "f881536bbd8d"
   },
   {
     "id": "bosu-squat",
