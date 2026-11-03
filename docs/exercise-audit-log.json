@@ -399,6 +399,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Start på golvet, lyftriktning, gemensamt kettlebellgrepp och reduced-motion-lägen jämförda med tips. Bilateral övning; ingen sidoväxling. Sidovyn visar höftfällningen och vikten ryms. Texten varnar för rundad rygg/ryck och erbjuder lättare vikt. Kvarstående längdförändring i benen bekräftas av ändpunkternas geometri; W9 är inte avklarad. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter a566efc: nio frysta faser och reduced-motion Start/Slut visar markkontakt i botten, upprätt slutläge och fötterna kvar på samma platser. Den tidigare synliga längdförändringen är åtgärdad i den nya IK-geometrin; källan använder fasta lår/underben och fotleder. Gemensamt kettlebellgrepp, viktens placering och sidovyn jämförda med tipsen. W9-fyndet kvarstår inte i det granskade underlaget. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -446,6 +454,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Tips, hantelvariant och kettlebellvariantens anpassade grepptext kontrollerade; båda reduced-motion-varianterna sedda. Bilateral övning. Sidovyn räcker för höftfällning; frontvyn har inte granskats. Vikt och fötter ryms. Varningen för djup knäböj/rundad rygg och den kortare/lättare varianten finns. W9 kvarstår. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter a566efc: nio frysta faser med hantlar och reduced-motion för två hantlar respektive en kettlebell granskade. Höftfällningen, hängande armar och fasta fötter stämmer med tipsen; den tidigare längdförändringen är ersatt av fasta IK-segment. Båda händerna delar samma grepp i kettlebellvarianten. Frontvy och kontinuerlig återgång är inte omgranskade. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1320,6 +1336,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio frysta faser är identiska, i överensstämmelse med källans statiska håll. Armbågarna är böjda och underarmarna ligger på underlaget; bäcken och ben ligger lågt och hela figuren ryms. Bilateral kroppsvikt/matta. Texten beskriver magliggande vila, uppstöd på underarmarna och avslutande sänkning, men reduced-motion skiljer inte dessa steg. Profilen visar överkroppsläget. Texten avråder från raka armar och erbjuder magliggande vila om stödet känns obekvämt. Ingen klinisk säkerhetsacceptans. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter 56d07e3: reduced-motion har nu två tydligt skilda rutor, Vila med sänkt överkropp och Håll på böjda armbågar. Det tidigare dubbla Start/Slut-fyndet är åtgärdat. De nio frysta faserna av själva hållposen är oförändrat statiska. Bäcken, underarmar och ben ryms i profil. Ingen ny klinisk säkerhetsbedömning. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1709,6 +1733,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Own check of the hands-down still (phase 0.125, both sides) rendered from the current code: hands on the floor in front of the feet, not behind them. The earlier finding did not reproduce at this commit. Only the hands-down still was checked; the rest of the loop is not re-reviewed."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Rättelse av min tidigare granskning: kontaktfyndet vid fas 0,125 var falskt positivt. I isolerad förstoring av den faktiska SVG-renderingen syns händerna framför fötterna; jag misstog den bakåtriktade armbågen för handen i den lilla bilden. Källan bekräftar handen [134,174] framför fotleden omkring [108,174]. Handgeometrin behövde inte ändras. Den separata Landning-rutan finns nu och visar markkontakt med böjda knän; det tidigare etikettfyndet är åtgärdat. Nio frysta faser och fem reduced-motion-rutor granskade. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1990,6 +2022,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio faser och reduced-motion jämförda med samtliga tips. Bilateral hantelvariant; vikterna och fasta fötter ryms i sidovyn, men de två hantlarna överlappar och frontvyn har inte granskats. Textens varning för sving och enklare separata övningar finns. Återgångens avvikelse nedan är slutsats från fasbilderna tillsammans med källans fram-och-tillbaka-interpolation, inte observerad kontinuerlig uppspelning. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter 56d07e3: nio frysta faser visar stående med hängande armar, knäböj, uppresning med curl och därefter sänkning av hantlarna medan benen förblir raka (0,75–1). Fas 0 och 1 visar samma startläge. Reduced-motion Start/Botten/Upp med curl överensstämmer med tipsen. Båda tidigare fynden är åtgärdade i fasbilderna; ingen slutsats om faktisk sömlös uppspelning. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2029,6 +2069,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio faser visar knäböj med vikter vid axlarna, upprätt läge och därefter axelpress; vikter och fötter ryms i sidovy. Bilateral hantelvariant, frontvyn inte granskad och två hantlar överlappar i profil. Texten varnar för bakåtlutning/svank och erbjuder separata lättare övningar. Reduced-motion-starten motsäger tipsens startläge. Samordningen mellan bensträckning och press måste dessutom bedömas i kontinuerlig uppspelning. Underlag: nygenererade kontaktblad (shots:exercises), nio frysta faser 0–1 i övningsvyn och faktiska reduced-motion-rutor. Jag har bara sett kontaktblad/stillbilder och läst källan, inte kontinuerlig animation; tempo, pauser och loopsöm är inte visuellt verifierade. Inget godkännande. Bilderna ligger lokalt under .impeccable/review/audit-2026-11-03 och är inte beständiga incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter 56d07e3: reduced-motion visar nu stående axelgrepp som Start, följt av Botten och Slut över huvudet. Det tidigare etikett-/startposefyndet är åtgärdat. Nio frysta faser med två hantlar visar oförändrad bensträckning och press, med vikter och fötter inom ramen. Dynamisk samordning mellan ben och press återstår att bedöma. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2068,6 +2116,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio frysta faser och reduced-motion på H/V jämförda med tips. Vald blå arm bär en hantel och motsatt arm vilar; sidoväxlingen speglar figuren. Vikten ryms ovanför huvudet och fötterna behåller golvkontakt i stickproven. Startetiketten avviker från texten. Profilen räcker för pressriktningen men inte för säker bedömning av sidolutning. Varning för sidolutning och lättare alternativ finns. Endast hantelvariant; ben-/armsamordningen behöver ses i rörelse. Kontaktblad genererade med shots:exercises; granskningen gjordes på kompletterande fasblad och reduced-motion-bilder från övningsvyn vid 390 px. Endast stillbilder/fasstickprov har setts, inte kontinuerlig animation; loopsöm, tempo och hålltider är inte visuellt slutbedömda. Inget godkännande. Lokala bilder i .impeccable/review/audit-2026-11-03-b är inte incheckade bevis."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter 56d07e3: reduced-motion Start/Botten/Slut på H och V visar korrekt stående axelgrepp som Start och vikt i vald blå hand. Det tidigare startposefyndet är åtgärdat. Nio frysta faser sedda; fria armen vilar. Sidovy verifierar inte sidolutning eller dynamisk ben-/armsamordning fullt ut. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2293,6 +2349,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Own visual check of rendered frames: side view start/end and front view start/end for both working sides show the support hand on the rail and the free foot above the floor. A second reviewer should still look at the loop."
+      },
+      {
+        "date": "2026-11-03",
+        "reviewer": "codex:gpt6astra",
+        "scope": "animation",
+        "result": "ok",
+        "commit": "1f8ef01",
+        "notes": "Omgranskning efter 4db6a48: reduced-motion Start/Slut från sidan och framifrån på H/V visar nu stödhanden mot räcket. I frontvyn håller motsatt hand från det blå stödbenet i det vertikala räcket; fri fot är ovan golv. Nio frysta sidofaser visar kontrollerad geometrisk sänkning och fast stödfot. Det tidigare fyndet om saknat frontstöd är åtgärdat i de sedda rutorna; mellanliggande frontfaser och loopsöm är inte visuellt slutbedömda. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
       }
     ],
     "fixes": [
