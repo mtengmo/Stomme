@@ -1,5 +1,6 @@
 import type { ExerciseId } from '../domain/types';
 import type { Equipment, Working } from './Figure';
+import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
 import type { Pose } from './poses';
 import { figures } from './poses';
@@ -80,6 +81,12 @@ export function supportsFrontView(
 const clamp = (t: number) => Math.max(0, Math.min(1, t));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 const point = (x: number, y: number): Pt => [x, y];
+
+/** Step-down front view: the upright railing the support hand holds. */
+export const STEP_DOWN_FRONT_RAIL_X = 136;
+export const STEP_DOWN_FRONT_GRIP_Y = 90;
+const FRONT_UPPER_ARM = Math.hypot(22, 22);
+const FRONT_FOREARM = Math.hypot(6, 22);
 
 function skeleton(
   head: Pt,
@@ -446,14 +453,40 @@ export function frontMovementPose(
         side === 'R' ? 100 - Math.abs(p[0] - 100) : 100 + Math.abs(p[0] - 100),
         p[1],
       );
+    // Step-down: the hand opposite the working leg keeps hold of the upright
+    // railing through the whole lowering and return (two-bone arm, constant
+    // lengths); the other hand hangs free as before.
+    const neckPt = point(100, neckY);
+    const grip = down
+      ? solveTwoBone(
+          neckPt,
+          point(STEP_DOWN_FRONT_RAIL_X, STEP_DOWN_FRONT_GRIP_Y),
+          FRONT_UPPER_ARM,
+          FRONT_FOREARM,
+          1,
+        )
+      : undefined;
+    const gripElbow = grip
+      ? place(grip.mid, working === 'left' ? 'R' : 'L')
+      : [0, 0];
+    const gripHand = grip
+      ? place(grip.end, working === 'left' ? 'R' : 'L')
+      : [0, 0];
+    const freeElbow = (side: 'R' | 'L'): Pt =>
+      side === 'R' ? point(78, neckY + 22) : point(122, neckY + 22);
+    const freeHand = (side: 'R' | 'L'): Pt =>
+      side === 'R' ? point(72, neckY + 44) : point(128, neckY + 44);
+    const gripSide = working === 'left' ? 'R' : 'L';
+    const armR = down && gripSide === 'R';
+    const armL = down && gripSide === 'L';
     return skeleton(
       point(100, neckY - 14),
-      point(100, neckY),
+      neckPt,
       point(100, hipY),
-      point(78, neckY + 22),
-      point(72, neckY + 44),
-      point(122, neckY + 22),
-      point(128, neckY + 44),
+      armR ? (gripElbow as Pt) : freeElbow('R'),
+      armR ? (gripHand as Pt) : freeHand('R'),
+      armL ? (gripElbow as Pt) : freeElbow('L'),
+      armL ? (gripHand as Pt) : freeHand('L'),
       place(right.knee, 'R'),
       place(right.ankle, 'R'),
       place(right.toe, 'R'),
@@ -865,6 +898,16 @@ export function FrontFigureFrame({
             rx="2"
           />
         </g>
+      ) : null}
+      {exerciseId === 'step-down' ? (
+        <path
+          data-support="rail"
+          d={`M${working === 'left' ? 200 - STEP_DOWN_FRONT_RAIL_X : STEP_DOWN_FRONT_RAIL_X} 60V164`}
+          fill="none"
+          stroke="var(--equipment)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
       ) : null}
       {exerciseId === 'half-squat' ? (
         <g

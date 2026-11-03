@@ -11,6 +11,8 @@ import {
   defaultViewFor,
   frontMovementPose,
   obliqueMovementPose,
+  STEP_DOWN_FRONT_GRIP_Y,
+  STEP_DOWN_FRONT_RAIL_X,
   supportedObliqueViews,
 } from './frontViews';
 import { figures } from './poses';
@@ -296,6 +298,74 @@ describe('step-down front view', () => {
       }
     },
   );
+});
+
+describe('step-down front view railing', () => {
+  it.each([
+    ['right', 'L', STEP_DOWN_FRONT_RAIL_X],
+    ['left', 'R', 200 - STEP_DOWN_FRONT_RAIL_X],
+  ] as const)(
+    'keeps the %s-side support hand (%s) on the railing with constant arm lengths',
+    (side, hand, railX) => {
+      const first = frontMovementPose('step-down', 0, side);
+      const upper = Math.hypot(
+        first.neck[0] - first[`e${hand}`][0],
+        first.neck[1] - first[`e${hand}`][1],
+      );
+      for (let i = 0; i <= 40; i++) {
+        const pose = frontMovementPose('step-down', i / 40, side);
+        expect(pose[`h${hand}`][0]).toBeCloseTo(railX, 6);
+        expect(pose[`h${hand}`][1]).toBeCloseTo(STEP_DOWN_FRONT_GRIP_Y, 6);
+        expect(
+          Math.hypot(
+            pose.neck[0] - pose[`e${hand}`][0],
+            pose.neck[1] - pose[`e${hand}`][1],
+          ),
+        ).toBeCloseTo(upper, 6);
+        expect(
+          Math.hypot(
+            pose[`e${hand}`][0] - pose[`h${hand}`][0],
+            pose[`e${hand}`][1] - pose[`h${hand}`][1],
+          ),
+        ).toBeCloseTo(Math.hypot(6, 22), 6);
+      }
+    },
+  );
+  it.each([
+    ['right', 0],
+    ['right', 1],
+    ['left', 0],
+    ['left', 1],
+  ] as const)(
+    'draws the railing in the %s front view at phase %s',
+    (side, phase) => {
+      const markup = renderToStaticMarkup(
+        <FigureFrame
+          exerciseId="step-down"
+          pose={figures['step-down'].start}
+          working={side}
+          view="front"
+          phase={phase}
+        />,
+      );
+      const railX =
+        side === 'right'
+          ? STEP_DOWN_FRONT_RAIL_X
+          : 200 - STEP_DOWN_FRONT_RAIL_X;
+      expect(markup).toContain(`data-support="rail"`);
+      expect(markup).toContain(`d="M${railX} 60V164"`);
+    },
+  );
+  it('leaves the other front views without a railing', () => {
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="step-up"
+        pose={figures['step-up'].start}
+        view="front"
+      />,
+    );
+    expect(markup).not.toContain('data-support="rail"');
+  });
 });
 
 describe('step-up front view proportions', () => {
