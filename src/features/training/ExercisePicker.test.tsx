@@ -85,6 +85,20 @@ afterEach(async () => {
 });
 
 describe('ExercisePicker', () => {
+  it('draws front-only exercises in their front view, not the side fallback', async () => {
+    const { container } = render(
+      <PickerRoutes allowedIds={['in-and-out-jump', 'lateral-shuffle']} />,
+    );
+    await screen.findByText(/Sidoförflyttning över linje/);
+    expect(container.querySelectorAll('svg[data-view="front"]')).toHaveLength(
+      2,
+    );
+    expect(
+      container.querySelectorAll('svg:not([data-view="front"])').length,
+    ).toBe(container.querySelectorAll('svg').length - 2);
+    expect(container.innerHTML).toContain('lateral-shuffle – front');
+    expect(container.innerHTML).toContain('in-and-out-jump – front');
+  });
   it('explains a restricted list with the default or the given note', async () => {
     const { unmount } = render(<PickerRoutes allowedIds={['dead-bug']} />);
     expect(

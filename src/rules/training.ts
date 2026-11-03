@@ -87,7 +87,8 @@ export function trainingPlanSuggestion(
           ...candidate,
           target: Math.min(
             candidate.target,
-            previousPlan?.target ?? plan.target,
+            // Without an earlier session a hurt mark falls back to the range start, not the experience-based start.
+            previousPlan?.target ?? exercises[plan.exerciseId].range.start,
           ),
           explanation: [
             candidate.explanation,

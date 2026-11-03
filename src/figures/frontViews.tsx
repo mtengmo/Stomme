@@ -153,21 +153,28 @@ function inAndOutPose(t: number): Pose {
   );
 }
 
-/** The line of the lateral shuffle (front view tick at the hip centre of the cycle). */
+/** The line of the lateral shuffle (a tick in the front view). */
 export const SHUFFLE_LINE_X = 100;
 /**
- * Side steps across a line: the leading (left) foot steps over it in the
- * first half and the other foot follows in the second. One foot is always on
- * the floor, the feet never cross and the ankles stay 32-60 px apart.
+ * Two side steps to the right: the left (leading) foot steps over the line
+ * and the right foot follows, then the same again. The legs move one at a
+ * time, so one foot is always on the floor; the ankles stay 32-60 px apart
+ * and never cross. At t=0 both feet are left of the line and at t=1 both are
+ * right of it; the hip travels from x 72 to 128. Invariant: a foot that is on
+ * the floor (less than 1 px up) has ankle and toe more than 4 px from the
+ * line, so a foot only passes the line while it is in the air. The knees stay
+ * slightly bent throughout.
  */
 function lateralShufflePose(t: number): Pose {
-  const first = clamp(2 * t),
-    second = clamp(2 * t - 1);
-  const xL = 88 + 28 * smooth(first),
-    xR = 56 + 28 * smooth(second);
-  const liftL = 10 * Math.sin(Math.PI * first);
-  const liftR = 10 * Math.sin(Math.PI * second);
-  const hip = point((xL + xR) / 2, 112);
+  const p1 = clamp(4 * t),
+    p2 = clamp(4 * t - 1),
+    p3 = clamp(4 * t - 2),
+    p4 = clamp(4 * t - 3);
+  const xL = 88 + 28 * smooth(p1) + 28 * smooth(p3),
+    xR = 56 + 28 * smooth(p2) + 28 * smooth(p4);
+  const liftL = 10 * (Math.sin(Math.PI * p1) + Math.sin(Math.PI * p3));
+  const liftR = 10 * (Math.sin(Math.PI * p2) + Math.sin(Math.PI * p4));
+  const hip = point((xL + xR) / 2, 116);
   return frontStance(hip, point(xR, 174 - liftR), point(xL, 174 - liftL), 6);
 }
 
@@ -910,26 +917,26 @@ export function FrontFigureFrame({
       {exerciseId === 'in-and-out-jump' ? (
         <g
           fill="none"
-          stroke="var(--edge)"
-          strokeWidth="2"
+          stroke="var(--equipment)"
+          strokeWidth="3"
           strokeLinecap="round"
         >
           <path
             data-support="floor-marker"
-            d={`M${100 - IN_OUT_MARKER_DX} 171v8`}
+            d={`M${100 - IN_OUT_MARKER_DX} 164v15`}
           />
           <path
             data-support="floor-marker"
-            d={`M${100 + IN_OUT_MARKER_DX} 171v8`}
+            d={`M${100 + IN_OUT_MARKER_DX} 164v15`}
           />
         </g>
       ) : null}
       {exerciseId === 'lateral-shuffle' ? (
         <path
           data-contact-plane="shuffle-line"
-          d={`M${SHUFFLE_LINE_X} 170v9`}
+          d={`M${SHUFFLE_LINE_X} 164v15`}
           fill="none"
-          stroke="var(--edge)"
+          stroke="var(--equipment)"
           strokeWidth="3"
           strokeLinecap="round"
         />

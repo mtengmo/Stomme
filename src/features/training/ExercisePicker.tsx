@@ -19,6 +19,7 @@ import { getDb } from '../../db/db';
 import { readFavourites, toggleFavourite } from '../../db/favourites';
 import type { ExerciseId, TrainingPreferences } from '../../domain/types';
 import { FigureFrame, movementPose } from '../../figures/Figure';
+import { defaultViewFor } from '../../figures/frontViews';
 import { equipmentFits } from '../../rules/equipment';
 import { movementSlots } from '../../rules/levelPolicy';
 import {
@@ -212,6 +213,8 @@ export function ExercisePicker({
             exerciseId={exercise.id}
             pose={movementPose(exercise.id, 0.5)}
             working={exercise.perSide ? 'right' : null}
+            view={defaultViewFor(exercise.id)}
+            phase={0.5}
           />
         </div>
         <div className="min-w-0">

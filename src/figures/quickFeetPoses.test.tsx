@@ -292,14 +292,64 @@ describe('lateral shuffle front figure', () => {
     }
   });
 
-  it('puts the feet on either side of the line mid-way and steps over it with the leading foot', () => {
+  it('starts with both feet before the line and ends with both feet past it', () => {
+    const start = front(0),
+      end = front(1);
+    for (const x of [start.aR[0], start.aL[0], start.tR[0], start.tL[0]])
+      expect(x).toBeLessThan(SHUFFLE_LINE_X - 4);
+    for (const x of [end.aR[0], end.aL[0], end.tR[0], end.tL[0]])
+      expect(x).toBeGreaterThan(SHUFFLE_LINE_X + 4);
+  });
+
+  it('puts the feet on either side of the line mid-way', () => {
     const mid = front(0.5);
     expect(mid.aR[0]).toBeLessThan(SHUFFLE_LINE_X);
     expect(mid.aL[0]).toBeGreaterThan(SHUFFLE_LINE_X);
-    expect(front(0).aL[0]).toBeLessThan(SHUFFLE_LINE_X);
-    expect(front(0.25).aL[1]).toBeLessThan(GROUNDED);
-    expect(front(0.75).aR[1]).toBeLessThan(GROUNDED);
-    expect(front(1).hip[0]).toBeGreaterThan(front(0).hip[0]);
+  });
+
+  it('steps both feet over the line, each while it is in the air, the leading foot first', () => {
+    const crossing = (foot: 'aR' | 'aL') => {
+      const at = ts.find((t) => front(t)[foot][0] > SHUFFLE_LINE_X) as number;
+      // The foot is clearly up when it passes the line.
+      expect(174 - front(at)[foot][1]).toBeGreaterThan(3);
+      return at;
+    };
+    const leading = crossing('aL'),
+      trailing = crossing('aR');
+    expect(leading).toBeLessThan(trailing);
+    expect(front(0.1).aL[1]).toBeLessThan(GROUNDED);
+    expect(front(0.4).aR[1]).toBeLessThan(GROUNDED);
+  });
+
+  it('moves one foot at a time, two steps each', () => {
+    let stepsL = 0,
+      stepsR = 0;
+    let wasL = false,
+      wasR = false;
+    for (let i = 1; i < ts.length; i++) {
+      const a = front(ts[i - 1] as number),
+        b = front(ts[i] as number);
+      const movedL = Math.abs(b.aL[0] - a.aL[0]) > 1e-9;
+      const movedR = Math.abs(b.aR[0] - a.aR[0]) > 1e-9;
+      expect(movedL && movedR).toBe(false);
+      if (movedL && !wasL) stepsL++;
+      if (movedR && !wasR) stepsR++;
+      wasL = movedL;
+      wasR = movedR;
+    }
+    expect(stepsL).toBe(2);
+    expect(stepsR).toBe(2);
+  });
+
+  it('travels the hip about 56 px and keeps the knees slightly bent', () => {
+    expect(front(1).hip[0] - front(0).hip[0]).toBeGreaterThanOrEqual(50);
+    for (const t of ts) {
+      const p = front(t);
+      // The stance leg is shorter than the straight 70 px of thigh and shin.
+      const stance = p.aR[1] >= GROUNDED ? p.aR : p.aL;
+      expect(distance(p.hip, stance)).toBeLessThan(68);
+      expect(distance(p.hip, stance)).toBeGreaterThan(55);
+    }
   });
 
   it('never has a grounded foot within 4 px of the line', () => {

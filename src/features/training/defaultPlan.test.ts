@@ -335,6 +335,25 @@ describe('starting time for timed exercises', () => {
     );
     expect(basePlan('quad-set', prefs).target).toBe(0);
   });
+  it('falls back to the range start after a hurt mark with no earlier session', () => {
+    const fresh = basePlan('fast-feet', general('regular'));
+    expect(fresh.target).toBe(40);
+    const hurt: Session = {
+      ...session('knee', 2),
+      programId: 'general',
+      status: 'aborted',
+      plan: [],
+      feedback: { 'fast-feet': { hurt: true } },
+    };
+    const [held] = customWorkoutPlan(
+      ['fast-feet'],
+      general('regular'),
+      [hurt],
+      [],
+    );
+    expect(held?.target).toBe(exercises['fast-feet'].range.start);
+    expect(held?.explanation).toMatch(/Ingen automatisk ökning/);
+  });
   it('does not override a target that comes from logged history', () => {
     const fresh = basePlan('plank', general('regular'));
     const prior: Session = {

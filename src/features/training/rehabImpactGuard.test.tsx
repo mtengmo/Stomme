@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from '../../App';
@@ -48,9 +48,18 @@ describe('impact exercises in rehab', () => {
     const user = userEvent.setup();
     render(<App />);
     await screen.findByRole('heading', { name: 'Skapa eget pass' });
-    await user.type(
-      await screen.findByLabelText('Sök övning'),
-      'snabba fötter',
+    const rehabSearch = await screen.findByLabelText('Sök övning');
+    // Positive control: a non-impact exercise is shown in rehab for a matching search.
+    await user.type(rehabSearch, 'nedsteg');
+    expect(
+      await screen.findByText(new RegExp(exercises['step-down'].name)),
+    ).toBeTruthy();
+    await user.clear(rehabSearch);
+    await user.type(rehabSearch, 'snabba fötter');
+    await waitFor(() =>
+      expect(
+        screen.queryByText(new RegExp(exercises['step-down'].name)),
+      ).toBeNull(),
     );
     expect(
       screen.queryByText(new RegExp(exercises['fast-feet'].name)),

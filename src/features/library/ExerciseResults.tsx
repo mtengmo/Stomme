@@ -8,6 +8,7 @@ import { exerciseReferences } from '../../content/exerciseReferences';
 import { bodyRegions, primaryMuscleLabel } from '../../content/muscles';
 import type { Exercise, TrainingPreferences } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
+import { defaultViewFor } from '../../figures/frontViews';
 import type { Inventory } from '../../rules/equipment';
 import {
   missingEquipment,
@@ -150,6 +151,8 @@ function Thumb({
               exerciseId={exercise.id}
               pose={movementPose(exercise.id, 0.5)}
               working={exercise.perSide ? 'right' : null}
+              view={defaultViewFor(exercise.id)}
+              phase={0.5}
             />
           )}
         </span>

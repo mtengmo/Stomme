@@ -354,7 +354,7 @@ export const bodyweightExercises: Exercise[] = [
     'Hopp in och ut',
     ['Vader', 'Framsida lår', 'Säte', 'Sidan av höften', 'Insida lår', 'Bål'],
     [
-      'Sätt två markeringar på golvet, till exempel tejp, en bit utanför höftbredd. Stå med fötterna ihop mellan dem på halkfritt underlag.',
+      'Sätt två markeringar på golvet, till exempel tejp, en bit utanför höftbredd. Stå med fötterna ihop mellan dem på halkfritt underlag och fritt omkring dig.',
       'Hoppa lätt så att fötterna landar brett utanför markeringarna, och hoppa sedan tillbaka in mellan dem. Landa mjukt på framfötterna med knäna i samma riktning som tårna.',
       'Fortsätt in och ut i jämn takt under tiden som visas. Hoppa inte upp på markeringarna och pausa om landningarna blir hårda.',
     ],
@@ -371,7 +371,7 @@ export const bodyweightExercises: Exercise[] = [
     'Sidoförflyttning över linje',
     ['Sidan av höften', 'Framsida lår', 'Säte', 'Vader', 'Insida lår', 'Bål'],
     [
-      'Sätt en markering på golvet, till exempel en tejpbit, och ställ dig bredvid den i lätt knäböj med fötterna ungefär axelbrett och vikten på framfötterna.',
+      'Sätt en markering på golvet, till exempel en tejpbit, och ställ dig bredvid den i lätt knäböj med fötterna ungefär axelbrett och vikten på framfötterna. Ha halkfritt underlag och fritt omkring dig.',
       'Ta snabba sidosteg över markeringen. Kliv först med foten närmast rörelseriktningen och låt den andra följa efter, utan att fötterna korsar varandra.',
       'Byt riktning på andra sidan och fortsätt fram och tillbaka under tiden som visas. Kliv över markeringen, inte upp på den.',
     ],
@@ -388,7 +388,7 @@ export const bodyweightExercises: Exercise[] = [
     'Höga knän på stället',
     ['Höftböjare', 'Vader', 'Framsida lår', 'Säte', 'Bål'],
     [
-      'Stå upprätt med fötterna höftbrett och armarna böjda som när du springer. Ha halkfritt underlag.',
+      'Stå upprätt med fötterna höftbrett och armarna böjda som när du springer. Ha halkfritt underlag och fritt omkring dig.',
       'Lyft ett knä i taget framåt och uppåt mot höfthöjd i ett snabbt löpsteg och sätt ned foten under höften på framfoten. Armarna pendlar motsatt benen.',
       'Växla ben i jämn takt under tiden som visas med överkroppen upprätt. Sänk knälyften om du lutar dig bakåt eller tappar rytmen.',
     ],
@@ -507,7 +507,7 @@ export const bodyweightDetails: Record<
     primary: ['hip-abductors', 'quads', 'glutes'],
     secondary: ['calves', 'hip-adductors', 'core'],
     publisher: 'Stomme',
-    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Sidosteg fram och tillbaka över en linje, alltid en fot i golvet. Ingen extra vikt. Kliv aldrig upp på föremål. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Sidosteg fram och tillbaka över en linje, alltid en fot i golvet. Tiden gäller båda benen tillsammans. Ingen extra vikt. Kliv aldrig upp på föremål. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
     cue: 'Tejp eller en linje på golvet som markering. Lägg inga föremål där du landar.',
   },
   'knee-drive': {

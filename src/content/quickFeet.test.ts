@@ -20,6 +20,7 @@ import {
   rehabAdditionIds,
   rehabImpactExercises,
 } from './rosterSlots';
+import { timedMovementCue } from './timedMovement';
 
 const ids = [
   'fast-feet',
@@ -202,14 +203,56 @@ describe('quick feet drills E101-E104', () => {
     }
   });
 
-  it('are never suggested as a favourite alternative', () => {
-    const preferences = {
-      programId: 'general' as const,
-      experience: 'regular' as const,
-      ...inventory(),
-    };
-    for (const id of ids)
-      expect(favouriteAlternatives(id, [...ids], [], preferences)).toEqual([]);
+  it('are never offered as a replacement for a favourite in any movement slot', () => {
+    const slotted = Object.keys(movementSlots) as ExerciseId[];
+    expect(slotted.length).toBeGreaterThan(10);
+    for (const experience of ['new', 'some', 'regular'] as const) {
+      const preferences = {
+        programId: 'general' as const,
+        experience,
+        ...inventory({
+          dumbbells: [[8, 2]],
+          kettlebells: [[12, 1]],
+          support: ['chair', 'support', 'step', 'band', 'pull-up-bar'],
+        }),
+      };
+      for (const slotId of slotted) {
+        const offered = favouriteAlternatives(
+          slotId,
+          [...ids],
+          [],
+          preferences,
+        );
+        expect(offered, `${experience} ${slotId}`).toEqual([]);
+      }
+    }
+    // Control: the same call does offer a genuine alternative from the same slot.
+    expect(
+      favouriteAlternatives('goblet-squat', ['goblet-chair-squat'], [], {
+        programId: 'general',
+        experience: 'regular',
+        ...inventory({ dumbbells: [[8, 2]], support: ['chair', 'support'] }),
+      }),
+    ).toEqual(['goblet-chair-squat']);
+  });
+
+  it('tell the user to use a non-slip surface with clear space around', () => {
+    for (const id of ids) {
+      const tips = exercises[id].tips.join(' ');
+      expect(tips, id).toContain('halkfritt');
+      expect(tips, id).toContain('fritt omkring');
+    }
+  });
+
+  it('state that the time covers both legs together where legs alternate', () => {
+    for (const id of ['fast-feet', 'lateral-shuffle', 'knee-drive'] as const) {
+      expect(exerciseMetadata[id].sources[0]?.note).toContain(
+        'Tiden gäller båda benen tillsammans.',
+      );
+      expect(timedMovementCue[id]?.status).toContain(
+        'Tiden gäller båda benen tillsammans.',
+      );
+    }
   });
 });
 

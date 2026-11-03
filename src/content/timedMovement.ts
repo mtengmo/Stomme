@@ -47,7 +47,7 @@ export const timedMovementCue: Partial<Record<ExerciseId, TimedMovementCue>> = {
     hint: HINT,
   },
   'lateral-shuffle': {
-    status: `Ta snabba sidosteg fram och tillbaka tills signalen. ${SAVED}`,
+    status: `Ta snabba sidosteg fram och tillbaka tills signalen. Tiden gäller båda benen tillsammans. ${SAVED}`,
     startVoice: 'Börja rörelsen.',
     hint: HINT,
   },

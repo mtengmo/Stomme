@@ -87,6 +87,20 @@ describe('exercise library', () => {
     await user.type(screen.getByLabelText('Sök övning'), term);
     expect(screen.getByRole('link', { name: exercises[id].name })).toBeTruthy();
   });
+  it.each(['in-and-out-jump', 'lateral-shuffle'] as const)(
+    'draws the front view in the thumbnail of %s',
+    async (id) => {
+      const user = userEvent.setup();
+      const { container } = render(<TestRoutes />);
+      await user.type(screen.getByLabelText('Sök övning'), exercises[id].name);
+      const row = screen
+        .getByRole('link', { name: exercises[id].name })
+        .closest('li') as HTMLElement;
+      expect(row.querySelector('svg[data-view="front"]')).toBeTruthy();
+      expect(row.innerHTML).toContain(`${id} – front`);
+      void container;
+    },
+  );
   it('shows compact rows by default: name, one meta line and a 48 px toggle, no extras', () => {
     render(<TestRoutes />);
     const row = screen
