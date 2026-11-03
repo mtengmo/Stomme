@@ -1987,7 +1987,14 @@
     "risk": "high",
     "status": "unreviewed",
     "reviews": [],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "2f55db0",
+        "notes": "Ny övning E99 (text, metadata och frontfigur). Byggd i commit 2f55db0; byggaren hämtad från commitens Co-Authored-By (Claude Sonnet)."
+      }
+    ],
     "openIssues": [],
     "fingerprint": "625518fe4a83"
   },
@@ -1998,7 +2005,14 @@
     "risk": "high",
     "status": "unreviewed",
     "reviews": [],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "2f55db0",
+        "notes": "Ny övning E100 (text, metadata och figur). Byggd i commit 2f55db0; byggaren hämtad från commitens Co-Authored-By (Claude Sonnet)."
+      }
+    ],
     "openIssues": [],
     "fingerprint": "c404e34ae58a"
   },
@@ -2014,13 +2028,19 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E101: text, metadata och sidofigur (ballistic). Redaktionell, ingen extern källa."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "6b3bbe3",
+        "notes": "Riktig sidofigur E101: fötterna lyfts växelvis 8 px, stödfot på golvet, armar pendlar motsatt, t=0 och t=1 speglade mellan benen, cykel 600 ms."
       }
     ],
     "openIssues": [],
     "notes": [
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
     ],
-    "fingerprint": "34656180aa42"
+    "fingerprint": "954cd04ee3eb"
   },
   {
     "id": "in-and-out-jump",
@@ -2034,13 +2054,19 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E102: text, metadata och enkel sidofigur som reserv (ballistic); frontvy med golvmarkeringar följer. Redaktionell, ingen extern källa."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "6b3bbe3",
+        "notes": "Riktig frontvy E102: fötter ihop mellan två golvmarkeringar (t=0) och brett utanför (t=1), lyft 10 sin(pi t), knäna utåt över tårna. Sidovyn är en enkel reserv (visas inte, övningen är bara frontvy)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
     ],
-    "fingerprint": "2878239112ab"
+    "fingerprint": "fcb5731ca183"
   },
   {
     "id": "lateral-shuffle",
@@ -2054,13 +2080,19 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E103: text, metadata och enkel sidofigur som reserv (ballistic); frontvy med linje följer. Redaktionell, ingen extern källa."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "6b3bbe3",
+        "notes": "Riktig frontvy E103: ledande foten kliver över linjen i första halvan och den andra följer i andra, alltid en fot i golvet, fötterna korsar aldrig, 32-60 px mellan anklarna. Sidovyn är en enkel reserv (visas inte, övningen är bara frontvy)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
     ],
-    "fingerprint": "0b476cdb6a75"
+    "fingerprint": "fa89c06d3818"
   },
   {
     "id": "knee-drive",
@@ -2074,13 +2106,19 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E104: text, metadata och sidofigur (ballistic). Redaktionell, ingen extern källa."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "commit": "6b3bbe3",
+        "notes": "Riktig sidofigur E104: växelvisa knälyft med låret nära vågrätt och underbenet hängande, stödfot på golvet, armar pendlar motsatt, cykel 900 ms."
       }
     ],
     "openIssues": [],
     "notes": [
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
     ],
-    "fingerprint": "c80a99885d6a"
+    "fingerprint": "e55fc163ccc4"
   },
   {
     "id": "squat-curl",
