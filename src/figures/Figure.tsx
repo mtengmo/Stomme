@@ -587,9 +587,10 @@ export function Figure({
                       'Armhävning',
                       movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
                     ],
+                    ['Hopp', movementPose(exerciseId, BURPEE_STILL_PHASES[3])],
                     [
-                      'Hopp och landning',
-                      movementPose(exerciseId, BURPEE_STILL_PHASES[3]),
+                      'Landning',
+                      movementPose(exerciseId, BURPEE_STILL_PHASES[4]),
                     ],
                   ]
                 : exerciseId === 'box-jump'

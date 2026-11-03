@@ -144,5 +144,5 @@ export function burpeePose(t: number): Pose {
   };
 }
 
-/** Phases of the four reduced-motion stills, in order. */
-export const BURPEE_STILL_PHASES = [0, 0.125, 0.375, 0.84] as const;
+/** Phases of the five reduced-motion stills: stand, hands down, push-up, jump, landing. */
+export const BURPEE_STILL_PHASES = [0, 0.125, 0.375, 0.84, 0.92] as const;

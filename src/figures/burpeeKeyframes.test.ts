@@ -78,4 +78,33 @@ describe('E60 burpee keyframes', () => {
         ).toBeGreaterThan(9);
     }
   });
+  it('puts both hands on the floor in front of the feet in the hands-down still', () => {
+    const p = burpeePose(BURPEE_STILL_PHASES[1]);
+    for (const [hand, ankle] of [
+      [p.hR, p.aR],
+      [p.hL, p.aL],
+    ] as const) {
+      expect(hand[0]).toBeGreaterThan(ankle[0] + 15);
+      expect(hand[1]).toBeGreaterThanOrEqual(ankle[1] - 3);
+      expect(hand[1]).toBeLessThanOrEqual(178);
+    }
+    // Arm lengths stay constant: shoulder to hand is exactly reached.
+    expect(Math.hypot(p.hR[0] - p.neck[0], p.hR[1] - p.neck[1])).toBeLessThan(
+      46.01,
+    );
+    expect(
+      Math.hypot(p.eR[0] - p.neck[0], p.eR[1] - p.neck[1]) +
+        Math.hypot(p.hR[0] - p.eR[0], p.hR[1] - p.eR[1]),
+    ).toBeCloseTo(46, 6);
+  });
+  it('shows a separate landing still with bent hips and knees', () => {
+    expect(BURPEE_STILL_PHASES).toHaveLength(5);
+    const jump = burpeePose(BURPEE_STILL_PHASES[3]);
+    const land = burpeePose(BURPEE_STILL_PHASES[4]);
+    expect(Math.min(land.aR[1], land.aL[1])).toBeGreaterThan(165);
+    expect(jump.aR[1]).toBeLessThan(165);
+    // Knee in front of hip and ankle: flexed rather than a straight leg.
+    expect(land.kR[0]).toBeGreaterThan(land.hip[0] + 10);
+    expect(land.hip[1]).toBeGreaterThan(jump.hip[1] + 20);
+  });
 });
