@@ -2032,7 +2032,7 @@
       {
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
-        "commit": "6b3bbe3",
+        "commit": "5b85319",
         "notes": "Riktig sidofigur E101: fötterna lyfts växelvis 8 px, stödfot på golvet, armar pendlar motsatt, t=0 och t=1 speglade mellan benen, cykel 600 ms."
       }
     ],
@@ -2110,7 +2110,7 @@
       {
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
-        "commit": "6b3bbe3",
+        "commit": "5b85319",
         "notes": "Riktig sidofigur E104: växelvisa knälyft med låret nära vågrätt och underbenet hängande, stödfot på golvet, armar pendlar motsatt, cykel 900 ms."
       }
     ],
