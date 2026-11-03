@@ -21,6 +21,7 @@ import {
   chooseStartingWeight,
   chooseVariant,
   heavyStartAllowed,
+  startingSeconds,
   startingSets,
 } from '../../rules/levelPolicy';
 
@@ -70,7 +71,11 @@ export function basePlan(
   return {
     exerciseId: id,
     sets: rehab ? 0 : startingSets(preferences.experience, options.index),
-    target: rehab ? 0 : exercise.range.start,
+    target: rehab
+      ? 0
+      : exercise.unit === 'seconds'
+        ? startingSeconds(preferences.experience, exercise.range)
+        : exercise.range.start,
     loadIndex: variant?.defaultLoadIndex ?? 0,
     weightKg: start.totalKg,
     restSec: 60,

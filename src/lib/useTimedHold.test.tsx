@@ -2,8 +2,13 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cue } from './beep';
+import { timerVoice } from './timerVoice';
 import { useTimedHold } from './useTimedHold';
 
+vi.mock('./timerVoice', () => ({
+  timerVoice: vi.fn(),
+  stopTimerVoice: vi.fn(),
+}));
 vi.mock('./beep', () => ({
   cue: {
     start: vi.fn(),
@@ -149,5 +154,40 @@ describe('hands-free timed holds', () => {
       configurable: true,
       get: () => false,
     });
+  });
+});
+
+describe('timer voice for moving and holding exercises', () => {
+  const run = (options: { moving?: boolean; startVoice?: string }) => {
+    vi.mocked(timerVoice).mockClear();
+    const { result } = renderHook(() =>
+      useTimedHold({
+        seconds: 5,
+        side: '',
+        autoStart: false,
+        onDone: () => {},
+        ...options,
+      }),
+    );
+    act(() => result.current.start());
+    act(() => vi.advanceTimersByTime(5_300));
+    act(() => vi.advanceTimersByTime(5_300));
+    return vi.mocked(timerVoice).mock.calls.map(([text]) => text);
+  };
+  it('holds say hold', () => {
+    const spoken = run({});
+    expect(spoken).toContain('Börja hålla.');
+    expect(spoken).toContain('Klart. Släpp positionen.');
+  });
+  it('moving exercises say start the movement and rest', () => {
+    const spoken = run({ moving: true });
+    expect(spoken).toContain('Börja rörelsen.');
+    expect(spoken).toContain('Klart. Vila.');
+    expect(spoken).not.toContain('Börja hålla.');
+  });
+  it('uses an exercise specific start line when given', () => {
+    expect(
+      run({ moving: true, startVoice: 'Börja rörelsen. Växla ben lugnt.' }),
+    ).toContain('Börja rörelsen. Växla ben lugnt.');
   });
 });

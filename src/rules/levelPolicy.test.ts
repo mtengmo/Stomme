@@ -5,6 +5,7 @@ import {
   chooseStartingWeight,
   chooseVariant,
   heavyStartAllowed,
+  startingSeconds,
   startingSets,
 } from './levelPolicy';
 import { variantWeights } from './weightInventory';
@@ -41,6 +42,20 @@ describe('level policy', () => {
     expect(startingSets('regular', 0)).toBe(4);
     expect(startingSets('regular', 1)).toBe(4);
     expect(startingSets('regular', 2)).toBe(3);
+  });
+
+  it('starts timed exercises higher with experience and clamps to the range', () => {
+    const drill = { start: 20, max: 45, step: 5 };
+    expect(startingSeconds('new', drill)).toBe(20);
+    expect(startingSeconds('some', drill)).toBe(30);
+    expect(startingSeconds('regular', drill)).toBe(40);
+    const short = { start: 10, max: 20, step: 5 };
+    expect(startingSeconds('some', short)).toBe(20);
+    expect(startingSeconds('regular', short)).toBe(20);
+    const fixed = { start: 30, max: 30, step: 5 };
+    expect(startingSeconds('regular', fixed)).toBe(30);
+    // A range whose start already exceeds its maximum never starts below range.start.
+    expect(startingSeconds('some', { start: 30, max: 20, step: 5 })).toBe(30);
   });
 
   it('starts new on the first variant and others on the heaviest loadable one', () => {

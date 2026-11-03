@@ -5,6 +5,7 @@ import {
   genericBodyweightCue,
 } from '../../content/exerciseMetadata';
 import { loadPresentation } from '../../content/loadPresentation';
+import { timedMovementCue } from '../../content/timedMovement';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
 import { formatClock } from '../../lib/format';
@@ -102,10 +103,11 @@ export function SetScreen({
   const takesWeight =
     presentation.equipment === 'dumbbell' ||
     presentation.equipment === 'kettlebell';
-  const movingTimed =
-    exercise.id === 'heel-slide' || exercise.id === 'mountain-climber';
+  const movementCue = timedMovementCue[exercise.id];
+  const movingTimed = movementCue !== undefined;
   const hold = useTimedHold({
     moving: movingTimed,
+    startVoice: movementCue?.startVoice,
     seconds: amount,
     side,
     autoStart: unit === 'seconds' && autoStartTimer,
@@ -313,8 +315,8 @@ export function SetScreen({
                 ? 'Övningstiden är klar. Setet sparas automatiskt.'
                 : 'Hålltiden är klar. Släpp positionen. Setet sparas automatiskt.'
               : hold.phase === 'hold'
-                ? movingTimed
-                  ? 'Växla ben lugnt tills signalen. Tiden gäller båda benen tillsammans. Setet sparas automatiskt.'
+                ? movementCue
+                  ? movementCue.status
                   : 'Håll tills signalen. Setet sparas och nästa steg börjar automatiskt.'
                 : hold.phase === 'prepare'
                   ? `Ta position${side ? ` · ${side}` : ''}. ${movingTimed ? 'Övningstiden' : 'Hålltiden'} börjar automatiskt.`
@@ -587,8 +589,8 @@ export function SetScreen({
                 : unit === 'laps'
                   ? 'Animationen visar tekniken. Räkna varven själv och tryck Klar set när du är klar.'
                   : unit === 'seconds'
-                    ? movingTimed
-                      ? 'Starta och gör dig redo under 5 sekunder. Växla ben lugnt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.'
+                    ? movementCue
+                      ? movementCue.hint
                       : 'Starta och ta position under 5 sekunder. Släpp vid signalen. Appen sparar och fortsätter automatiskt. Pausa om du behöver mer tid. Håll appen öppen; timern pausas om du lämnar den.'
                     : 'Animationen visar tekniken. Gå den angivna sträckan och tryck Klar set för att spara.'}
             </p>

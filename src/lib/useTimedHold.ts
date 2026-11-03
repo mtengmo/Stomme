@@ -13,8 +13,11 @@ export function useTimedHold({
   autoStart,
   onDone,
   moving = false,
+  startVoice,
 }: {
   moving?: boolean;
+  /** Spoken when the timed part starts; defaults to a neutral line for the kind of exercise. */
+  startVoice?: string;
   seconds: number;
   side: string;
   autoStart: boolean;
@@ -107,9 +110,7 @@ export function useTimedHold({
         lastTick.current = duration.current;
         timerDone();
         cue.go();
-        timerVoice(
-          moving ? 'Börja rörelsen. Växla ben lugnt.' : 'Börja hålla.',
-        );
+        timerVoice(startVoice ?? (moving ? 'Börja rörelsen.' : 'Börja hålla.'));
       } else {
         show('done', 0);
         timerDone();
@@ -129,7 +130,7 @@ export function useTimedHold({
       if (current.current !== 'done' && current.current !== 'idle')
         stopTimerVoice();
     };
-  }, [pause, show, moving]);
+  }, [pause, show, moving, startVoice]);
 
   return { phase, remaining, start, pause, resume, reset };
 }

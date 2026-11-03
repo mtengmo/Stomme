@@ -170,6 +170,22 @@ export function startingSets(experience: Experience, index?: number): number {
   return index !== undefined && index < 2 ? 4 : 3;
 }
 
+/**
+ * First target for a timed exercise: the start of its range for new
+ * trainees, two steps up for some experience and four for regular training,
+ * never above the range maximum. History-based targets do not use this.
+ */
+export function startingSeconds(
+  experience: Experience,
+  range: { start: number; max: number; step: number },
+): number {
+  const steps = experience === 'new' ? 0 : experience === 'some' ? 2 : 4;
+  return Math.max(
+    range.start,
+    Math.min(range.max, range.start + steps * range.step),
+  );
+}
+
 export interface StartingWeight {
   totalKg: number;
   /** True when the heaviest owned weight was chosen. */

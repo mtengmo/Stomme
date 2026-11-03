@@ -311,3 +311,59 @@ describe('customWorkoutPlan', () => {
     expect(item?.weightKg).toBe(0);
   });
 });
+
+describe('starting time for timed exercises', () => {
+  it('follows experience for a timed exercise, clamped to its range', () => {
+    const at = (
+      e: TrainingPreferences['experience'],
+      id: 'plank' | 'fast-feet',
+    ) => customWorkoutPlan([id], general(e), [], [])[0]?.target;
+    expect(
+      ['new', 'some', 'regular'].map((e) => at(e as never, 'plank')),
+    ).toEqual([15, 25, 30]);
+    expect(
+      ['new', 'some', 'regular'].map((e) => at(e as never, 'fast-feet')),
+    ).toEqual([20, 30, 40]);
+    expect(basePlan('fast-feet', general('regular')).target).toBe(40);
+    expect(
+      defaultPlan(general('some'), 'A', [], []).every((p) => p.target > 0),
+    ).toBe(true);
+  });
+  it('leaves reps targets and rehab untouched', () => {
+    expect(basePlan('dead-bug', general('regular')).target).toBe(
+      exercises['dead-bug'].range.start,
+    );
+    expect(basePlan('quad-set', prefs).target).toBe(0);
+  });
+  it('does not override a target that comes from logged history', () => {
+    const fresh = basePlan('plank', general('regular'));
+    const prior: Session = {
+      ...session('knee', 2),
+      programId: 'general',
+      plan: [{ ...fresh, target: 15, sides: ['both'] }],
+      feedback: { plank: { effort: 'hard' } },
+    };
+    const logs = [
+      {
+        id: 'plank-set',
+        sessionId: prior.id,
+        exerciseId: 'plank' as const,
+        setNumber: 1,
+        side: 'both' as const,
+        amount: 15,
+        loadIndex: 0,
+        weightKg: 0,
+        variantId: fresh.variantId,
+        loggedAt: prior.startedAt,
+      },
+    ];
+    const [item] = customWorkoutPlan(
+      ['plank'],
+      general('regular'),
+      [prior],
+      logs,
+    );
+    expect(fresh.target).toBe(30);
+    expect(item?.target).toBeLessThan(fresh.target);
+  });
+});
