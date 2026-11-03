@@ -356,6 +356,15 @@ function lunge(t: number): Pose {
 function climber(t: number): Pose {
   const p = pushUp(0);
   p.hip = [p.hip[0], p.hip[1] - 7];
+  // Both support arms straight: the far hand keeps its 4 unit offset but sits
+  // on the floor exactly one full arm length below the shoulder.
+  const reach = Math.hypot(p.neck[0] - p.hR[0], p.neck[1] - p.hR[1]);
+  const farHand: Pt = [
+    p.hR[0] + 4,
+    p.neck[1] + Math.sqrt(reach * reach - (p.hR[0] + 4 - p.neck[0]) ** 2),
+  ];
+  p.hL = farHand;
+  p.eL = joint(p.neck, farHand, reach / 2, reach / 2, -1);
   const phase = Math.sin(2 * Math.PI * t);
   const right = Math.max(0, phase),
     left = Math.max(0, -phase);

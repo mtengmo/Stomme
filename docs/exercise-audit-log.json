@@ -1819,7 +1819,7 @@
     "name": "Mountain climber",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -1850,12 +1850,15 @@
         "fixer": "claude-sonnet",
         "commit": "d585cb6",
         "notes": "L5: both legs via equal IK (34/34)."
+      },
+      {
+        "date": "2026-11-03",
+        "fixer": "claude-sonnet",
+        "notes": "E64: far support arm redrawn straight (shoulder-elbow-hand collinear, same arm length as the near arm) with the hand on the floor, in every phase; push-up and plank figures untouched. Test asserts both arms straight over 41 phases. Awaits review by codex or human."
       }
     ],
-    "openIssues": [
-      "[cheap] E64: I reduced-motion Start och Rörelse samt samtliga nio profilrutor böjer den bortre stödarmen ut armbågen tydligt åt höger, medan den främre är rak. Tips 1 kräver raka armar med händer under axlarna. Rita även den bortre axel–armbåge–hand-kedjan som en rak stödarm med handen kvar vid underlaget, och kontrollera att den förblir rak under benväxlingen."
-    ],
-    "fingerprint": "d5277a0a98f1"
+    "openIssues": [],
+    "fingerprint": "7b7891d4a8b4"
   },
   {
     "id": "knee-push-up",

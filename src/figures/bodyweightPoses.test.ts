@@ -139,6 +139,22 @@ describe('bodyweight movement paths', () => {
     expect(right.kR[0]).toBeLessThan(first.hip[0]);
     expect(left.kL[0]).toBeLessThan(first.hip[0]);
   });
+  it('keeps both climber support arms straight with the hands on the floor', () => {
+    for (let n = 0; n <= 40; n++) {
+      const p = movementPose('mountain-climber', n / 40);
+      for (const [e, h] of [
+        [p.eR, p.hR],
+        [p.eL, p.hL],
+      ] as const) {
+        expect(distance(p.neck, e) + distance(e, h)).toBeCloseTo(
+          distance(p.neck, h),
+          6,
+        );
+        expect(h[1]).toBeGreaterThan(170);
+        expect(h[1]).toBeLessThanOrEqual(174);
+      }
+    }
+  });
   it('knee push-up pivots on the knees as a rigid lever with fixed hands', () => {
     const start = movementPose('knee-push-up', 0);
     for (let n = 0; n <= 40; n++) {
