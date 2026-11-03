@@ -3,12 +3,16 @@ import type {
   ExerciseId,
   TemplateId,
   TrainingPreferences,
+  TrainingProgram,
 } from '../domain/types';
+import { missingCoverage } from '../rules/coverage';
 import {
   allowedLevels,
   chooseVariant,
   variantUsable,
 } from '../rules/levelPolicy';
+import { buildProgram } from '../rules/programPlan';
+import { buildRoster } from '../rules/programRosters';
 import { repTempo } from '../rules/repTempo';
 import { beginnerExerciseIds } from './beginnerSet';
 import { type AuditEntry, readAuditLog } from './exerciseAudit';
@@ -165,6 +169,7 @@ describe('beginner set (content/beginnerSet.ts)', () => {
  * above-level fallback, which would add a warning to the pass.
  */
 describe('beginner set coverage from roster slots', () => {
+  const inSet = (id: ExerciseId) => beginnerExerciseIds.has(id);
   type Experience = TrainingPreferences['experience'];
   const levels: Experience[] = ['new', 'some', 'regular'];
   const homeBase = ['bodyweight', 'chair', 'support'] as const;
@@ -294,12 +299,47 @@ describe('beginner set coverage from roster slots', () => {
     });
   });
 
-  // T2 fills this in once rules/programPlan.ts exists: for every level ×
-  // emphasis (full, run, upper) × 1-5 days per week, with the home base and
-  // with the PRODUCT weights, buildProgram(..., pool = beginnerExerciseIds)
-  // gives 4-6 exercises per pass, all from the set, and every whole-body pass
-  // covers legs, press, back and core by the muscle-based rules/coverage.ts.
-  it.todo(
-    'generates 4-6 set exercises per pass for every level × emphasis × 1-5 days',
-  );
+  // The programme generator draws from the set: every level × emphasis ×
+  // 1-5 days, with the home base and with the PRODUCT weights, gives 4-6 set
+  // exercises per pass and no warning. Whole-body passes cover legs, press,
+  // back and core by the muscle-based rules/coverage.ts.
+  describe.each(levels)('generated programmes · %s', (experience) => {
+    describe.each([
+      ['bodyweight, chair and wall', bodyweight],
+      ['PRODUCT weights', productWeights],
+    ] as const)('%s', (_name, prefsFor) => {
+      const p = prefsFor(experience);
+      for (const emphasis of ['full', 'run', 'upper'] as const)
+        for (const days of [1, 2, 3, 4, 5] as const)
+          it(`${emphasis} · ${days} days: 4-6 clean set exercises per pass`, () => {
+            const program = buildProgram({
+              preferences: p,
+              daysPerWeek: days,
+              emphasis,
+              startDate: '2026-11-03',
+              now: '2026-11-03T08:00:00.000Z',
+              id: 'matrix',
+              pool: beginnerExerciseIds,
+            });
+            expect(program).not.toBeNull();
+            for (const pass of (program as TrainingProgram).passes) {
+              const { exerciseIds } = pass;
+              expect(exerciseIds.length).toBeGreaterThanOrEqual(4);
+              expect(exerciseIds.length).toBeLessThanOrEqual(6);
+              expect(new Set(exerciseIds).size).toBe(exerciseIds.length);
+              expect(exerciseIds.filter((id) => !inSet(id))).toEqual([]);
+              // No above-level pick and no warning: the pass is in-level.
+              expect(exerciseIds.filter((id) => !inLevel(id, p))).toEqual([]);
+              if (pass.focus === 'full')
+                expect(missingCoverage(exerciseIds)).toEqual([]);
+              const roster = buildRoster(p, pass.template, {
+                focus: { id: pass.focus },
+                pool: beginnerExerciseIds,
+              });
+              expect(roster.notes).toEqual({});
+              expect(roster.note).toBeUndefined();
+            }
+          });
+    });
+  });
 });

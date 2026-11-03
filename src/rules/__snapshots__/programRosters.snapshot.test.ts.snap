@@ -1,0 +1,1294 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildRoster without a pool is unchanged 1`] = `
+{
+  "new/gear/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "step-up",
+      "calf-raise",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "step-up",
+      "calf-raise",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/pull": {
+    "ids": [
+      "back-extension",
+      "hammer-curl",
+      "farmer-carry",
+      "bird-dog",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/push": {
+    "ids": [
+      "floor-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "new/gear/A/upper": {
+    "ids": [
+      "floor-press",
+      "back-extension",
+      "lateral-raise",
+      "hammer-curl",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/default": {
+    "ids": [
+      "glute-bridge",
+      "step-up",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/full": {
+    "ids": [
+      "glute-bridge",
+      "step-up",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "step-up",
+      "calf-raise",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "step-up",
+      "calf-raise",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/pull": {
+    "ids": [
+      "bird-dog",
+      "biceps-curl",
+      "farmer-carry",
+      "back-extension",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/push": {
+    "ids": [
+      "knee-push-up",
+      "lateral-raise",
+      "triceps-kickback",
+      "floor-press",
+    ],
+    "notes": {},
+  },
+  "new/gear/B/upper": {
+    "ids": [
+      "knee-push-up",
+      "bird-dog",
+      "lateral-raise",
+      "biceps-curl",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "new/home/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "knee-push-up",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/home/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "knee-push-up",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/home/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "calf-raise",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "new/home/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "calf-raise",
+      "dead-bug",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "new/home/A/pull": {
+    "ids": [
+      "back-extension",
+      "bird-dog",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "new/home/A/push": {
+    "ids": [
+      "knee-push-up",
+      "dead-bug",
+      "plank",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "new/home/A/upper": {
+    "ids": [
+      "knee-push-up",
+      "back-extension",
+      "bird-dog",
+    ],
+    "notes": {},
+  },
+  "new/home/B/default": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "back-extension",
+      "plank",
+    ],
+    "notes": {
+      "split-squat": "Ingen övning på din nivå passar utrustningen. Den lättaste som finns är vald; kontrollera före start.",
+    },
+  },
+  "new/home/B/full": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "back-extension",
+      "plank",
+    ],
+    "notes": {
+      "split-squat": "Ingen övning på din nivå passar utrustningen. Den lättaste som finns är vald; kontrollera före start.",
+    },
+  },
+  "new/home/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "glute-bridge",
+      "calf-raise",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "new/home/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "glute-bridge",
+      "calf-raise",
+      "plank",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "new/home/B/pull": {
+    "ids": [
+      "bird-dog",
+      "back-extension",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "new/home/B/push": {
+    "ids": [
+      "knee-push-up",
+      "dead-bug",
+      "plank",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "new/home/B/upper": {
+    "ids": [
+      "knee-push-up",
+      "bird-dog",
+      "back-extension",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "calf-raise",
+      "goblet-squat",
+      "weighted-glute-bridge",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "calf-raise",
+      "dead-bug",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/pull": {
+    "ids": [
+      "back-extension",
+      "hammer-curl",
+      "farmer-carry",
+      "bird-dog",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/push": {
+    "ids": [
+      "floor-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "new/weights/A/upper": {
+    "ids": [
+      "floor-press",
+      "back-extension",
+      "lateral-raise",
+      "hammer-curl",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "new/weights/B/default": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {
+      "split-squat": "Ingen övning på din nivå passar utrustningen. Den lättaste som finns är vald; kontrollera före start.",
+    },
+  },
+  "new/weights/B/full": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {
+      "split-squat": "Ingen övning på din nivå passar utrustningen. Den lättaste som finns är vald; kontrollera före start.",
+    },
+  },
+  "new/weights/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "calf-raise",
+      "goblet-chair-squat",
+      "glute-bridge",
+    ],
+    "notes": {},
+  },
+  "new/weights/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "calf-raise",
+      "plank",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "new/weights/B/pull": {
+    "ids": [
+      "bird-dog",
+      "biceps-curl",
+      "farmer-carry",
+      "back-extension",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "new/weights/B/push": {
+    "ids": [
+      "knee-push-up",
+      "lateral-raise",
+      "triceps-kickback",
+      "floor-press",
+    ],
+    "notes": {},
+  },
+  "new/weights/B/upper": {
+    "ids": [
+      "knee-push-up",
+      "bird-dog",
+      "lateral-raise",
+      "biceps-curl",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/default": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "supported-row",
+      "floor-press",
+      "farmer-carry",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/full": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "supported-row",
+      "floor-press",
+      "farmer-carry",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/legs": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "split-squat",
+      "single-leg-calf-raise",
+      "sumo-squat",
+      "dumbbell-rdl",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/lower": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "split-squat",
+      "single-leg-calf-raise",
+      "lying-leg-raise",
+      "russian-twist",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/pull": {
+    "ids": [
+      "bent-over-row",
+      "chin-up",
+      "hammer-curl",
+      "farmer-carry",
+      "supported-row",
+      "pull-up",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/push": {
+    "ids": [
+      "floor-press",
+      "shoulder-press",
+      "lateral-raise",
+      "overhead-triceps-extension",
+      "decline-push-up",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "regular/gear/A/upper": {
+    "ids": [
+      "floor-press",
+      "bent-over-row",
+      "shoulder-press",
+      "chin-up",
+      "lateral-raise",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/default": {
+    "ids": [
+      "single-leg-hip-thrust",
+      "split-squat",
+      "shoulder-press",
+      "supported-row",
+      "hammer-curl",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/full": {
+    "ids": [
+      "single-leg-hip-thrust",
+      "split-squat",
+      "shoulder-press",
+      "supported-row",
+      "hammer-curl",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/legs": {
+    "ids": [
+      "sumo-squat",
+      "dumbbell-rdl",
+      "reverse-lunge",
+      "calf-raise",
+      "goblet-squat",
+      "single-leg-rdl",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/lower": {
+    "ids": [
+      "sumo-squat",
+      "dumbbell-rdl",
+      "reverse-lunge",
+      "calf-raise",
+      "mountain-climber",
+      "woodchop",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/pull": {
+    "ids": [
+      "supported-row",
+      "pull-up",
+      "biceps-curl",
+      "farmer-carry",
+      "bent-over-row",
+      "chin-up",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/push": {
+    "ids": [
+      "decline-push-up",
+      "shoulder-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "floor-press",
+      "overhead-triceps-extension",
+    ],
+    "notes": {},
+  },
+  "regular/gear/B/upper": {
+    "ids": [
+      "decline-push-up",
+      "supported-row",
+      "shoulder-press",
+      "pull-up",
+      "lateral-raise",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/default": {
+    "ids": [
+      "squat-jump",
+      "single-leg-rdl",
+      "back-extension",
+      "decline-push-up",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/full": {
+    "ids": [
+      "squat-jump",
+      "single-leg-rdl",
+      "back-extension",
+      "decline-push-up",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/legs": {
+    "ids": [
+      "squat-jump",
+      "single-leg-rdl",
+      "jumping-lunge",
+      "single-leg-calf-raise",
+      "goblet-chair-squat",
+      "glute-bridge",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/lower": {
+    "ids": [
+      "squat-jump",
+      "single-leg-rdl",
+      "jumping-lunge",
+      "single-leg-calf-raise",
+      "lying-leg-raise",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/pull": {
+    "ids": [
+      "back-extension",
+      "bird-dog",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "regular/home/A/push": {
+    "ids": [
+      "decline-push-up",
+      "diamond-push-up",
+      "push-up",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "regular/home/A/upper": {
+    "ids": [
+      "decline-push-up",
+      "back-extension",
+      "diamond-push-up",
+      "bird-dog",
+      "push-up",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/default": {
+    "ids": [
+      "glute-bridge",
+      "jumping-lunge",
+      "back-extension",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/full": {
+    "ids": [
+      "glute-bridge",
+      "jumping-lunge",
+      "back-extension",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "squat-jump",
+      "single-leg-rdl",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "mountain-climber",
+      "russian-twist",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/pull": {
+    "ids": [
+      "bird-dog",
+      "back-extension",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "regular/home/B/push": {
+    "ids": [
+      "diamond-push-up",
+      "decline-push-up",
+      "push-up",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "regular/home/B/upper": {
+    "ids": [
+      "diamond-push-up",
+      "bird-dog",
+      "decline-push-up",
+      "back-extension",
+      "push-up",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/default": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "supported-row",
+      "kettlebell-floor-press",
+      "kettlebell-rack-carry",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/full": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "supported-row",
+      "kettlebell-floor-press",
+      "kettlebell-rack-carry",
+      "burpee",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/legs": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "split-squat",
+      "single-leg-calf-raise",
+      "kettlebell-goblet-squat",
+      "kettlebell-swing",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/lower": {
+    "ids": [
+      "goblet-squat",
+      "single-leg-rdl",
+      "split-squat",
+      "single-leg-calf-raise",
+      "lying-leg-raise",
+      "russian-twist",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/pull": {
+    "ids": [
+      "bent-over-row",
+      "hammer-curl",
+      "farmer-carry",
+      "supported-row",
+      "biceps-curl",
+      "back-extension",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/push": {
+    "ids": [
+      "kettlebell-floor-press",
+      "kettlebell-press",
+      "lateral-raise",
+      "overhead-triceps-extension",
+      "floor-press",
+      "shoulder-press",
+    ],
+    "notes": {},
+  },
+  "regular/weights/A/upper": {
+    "ids": [
+      "kettlebell-floor-press",
+      "bent-over-row",
+      "kettlebell-press",
+      "lateral-raise",
+      "hammer-curl",
+      "overhead-triceps-extension",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/default": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "kettlebell-press",
+      "supported-row",
+      "hammer-curl",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/full": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "kettlebell-press",
+      "supported-row",
+      "hammer-curl",
+      "side-plank",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/legs": {
+    "ids": [
+      "kettlebell-goblet-squat",
+      "kettlebell-swing",
+      "reverse-lunge",
+      "calf-raise",
+      "goblet-squat",
+      "single-leg-rdl",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/lower": {
+    "ids": [
+      "kettlebell-goblet-squat",
+      "kettlebell-swing",
+      "reverse-lunge",
+      "calf-raise",
+      "mountain-climber",
+      "woodchop",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/pull": {
+    "ids": [
+      "supported-row",
+      "biceps-curl",
+      "farmer-carry",
+      "bent-over-row",
+      "hammer-curl",
+      "back-extension",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/push": {
+    "ids": [
+      "floor-press",
+      "shoulder-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "kettlebell-floor-press",
+      "kettlebell-press",
+    ],
+    "notes": {},
+  },
+  "regular/weights/B/upper": {
+    "ids": [
+      "floor-press",
+      "supported-row",
+      "shoulder-press",
+      "lateral-raise",
+      "biceps-curl",
+      "triceps-kickback",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "step-up",
+      "calf-raise",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "step-up",
+      "calf-raise",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/pull": {
+    "ids": [
+      "back-extension",
+      "hammer-curl",
+      "farmer-carry",
+      "bird-dog",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/push": {
+    "ids": [
+      "floor-press",
+      "shoulder-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "knee-push-up",
+    ],
+    "notes": {},
+  },
+  "some/gear/A/upper": {
+    "ids": [
+      "floor-press",
+      "back-extension",
+      "shoulder-press",
+      "lateral-raise",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/default": {
+    "ids": [
+      "glute-bridge",
+      "step-up",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/full": {
+    "ids": [
+      "glute-bridge",
+      "step-up",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "split-squat",
+      "single-leg-calf-raise",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "split-squat",
+      "single-leg-calf-raise",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/pull": {
+    "ids": [
+      "bird-dog",
+      "biceps-curl",
+      "farmer-carry",
+      "back-extension",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/push": {
+    "ids": [
+      "knee-push-up",
+      "shoulder-press",
+      "lateral-raise",
+      "overhead-triceps-extension",
+      "floor-press",
+    ],
+    "notes": {},
+  },
+  "some/gear/B/upper": {
+    "ids": [
+      "knee-push-up",
+      "bird-dog",
+      "shoulder-press",
+      "lateral-raise",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "some/home/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "knee-push-up",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/home/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "knee-push-up",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/home/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "some/home/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/home/A/pull": {
+    "ids": [
+      "back-extension",
+      "bird-dog",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "some/home/A/push": {
+    "ids": [
+      "knee-push-up",
+      "push-up",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "some/home/A/upper": {
+    "ids": [
+      "knee-push-up",
+      "back-extension",
+      "push-up",
+      "bird-dog",
+    ],
+    "notes": {},
+  },
+  "some/home/B/default": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "back-extension",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/home/B/full": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "back-extension",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/home/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "glute-bridge",
+      "reverse-lunge",
+      "single-leg-calf-raise",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "some/home/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "glute-bridge",
+      "reverse-lunge",
+      "single-leg-calf-raise",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/home/B/pull": {
+    "ids": [
+      "bird-dog",
+      "back-extension",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "some/home/B/push": {
+    "ids": [
+      "push-up",
+      "knee-push-up",
+      "dead-bug",
+    ],
+    "note": "Kompletterat med bålövningar eftersom få övningar passar vald kroppsdel och utrustning.",
+    "notes": {},
+  },
+  "some/home/B/upper": {
+    "ids": [
+      "push-up",
+      "bird-dog",
+      "knee-push-up",
+      "back-extension",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/default": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/full": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "back-extension",
+      "floor-press",
+      "farmer-carry",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/legs": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "goblet-squat",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/lower": {
+    "ids": [
+      "goblet-chair-squat",
+      "glute-bridge",
+      "split-squat",
+      "calf-raise",
+      "dead-bug",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/pull": {
+    "ids": [
+      "back-extension",
+      "hammer-curl",
+      "farmer-carry",
+      "bird-dog",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/push": {
+    "ids": [
+      "floor-press",
+      "shoulder-press",
+      "lateral-raise",
+      "triceps-kickback",
+      "kettlebell-floor-press",
+    ],
+    "notes": {},
+  },
+  "some/weights/A/upper": {
+    "ids": [
+      "floor-press",
+      "back-extension",
+      "shoulder-press",
+      "lateral-raise",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/default": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/full": {
+    "ids": [
+      "glute-bridge",
+      "split-squat",
+      "lateral-raise",
+      "back-extension",
+      "hammer-curl",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/legs": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "reverse-lunge",
+      "single-leg-calf-raise",
+      "goblet-chair-squat",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/lower": {
+    "ids": [
+      "goblet-squat",
+      "weighted-glute-bridge",
+      "reverse-lunge",
+      "single-leg-calf-raise",
+      "plank",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/pull": {
+    "ids": [
+      "bird-dog",
+      "biceps-curl",
+      "farmer-carry",
+      "back-extension",
+      "hammer-curl",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/push": {
+    "ids": [
+      "kettlebell-floor-press",
+      "shoulder-press",
+      "lateral-raise",
+      "overhead-triceps-extension",
+      "floor-press",
+    ],
+    "notes": {},
+  },
+  "some/weights/B/upper": {
+    "ids": [
+      "kettlebell-floor-press",
+      "bird-dog",
+      "shoulder-press",
+      "lateral-raise",
+      "biceps-curl",
+    ],
+    "notes": {},
+  },
+}
+`;

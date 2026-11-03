@@ -20,12 +20,18 @@ import { equipmentFits } from '../rules/equipment';
 import { validateCheckin } from '../rules/training';
 import { isWeeklySchedule } from '../rules/weeklySchedule';
 import type { StommeDB } from './db';
+import { trainingProgramSchema } from './program';
 import { setMeta } from './repo';
 import { validateTrainingPlan } from './training';
 import { isTrainingRoutines } from './trainingRoutines';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
-export const BACKUP_SCHEMA_VERSION = 4;
+export const BACKUP_SCHEMA_VERSION = 5;
+/** Version 5 only added fields (trainingProgram, session.programPass), so 4 still imports. */
+const SUPPORTED_SCHEMA_VERSIONS: readonly unknown[] = [
+  4,
+  BACKUP_SCHEMA_VERSION,
+];
 /** Import size limit (risk R12). */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -261,6 +267,13 @@ const sessionSchema = z
     status: z.enum(['in_progress', 'completed', 'aborted']),
     abortReason: z.enum(['pain_stop', 'user', 'timeout']).optional(),
     programWeek: z.number().int().min(1).max(1000),
+    programPass: z
+      .strictObject({
+        programId: id,
+        pass: z.number().int().min(1).max(5),
+        week: z.number().int().min(1).max(4),
+      })
+      .optional(),
     plan: z
       .array(plannedExercise)
       .max(30)
@@ -273,6 +286,14 @@ const sessionSchema = z
     note: z.string().max(5000).optional(),
   })
   .superRefine((session, ctx) => {
+    if (
+      session.programPass &&
+      (session.programId !== 'general' || session.customWorkoutId)
+    )
+      ctx.addIssue({
+        code: 'custom',
+        message: 'programPass only belongs to standard general sessions',
+      });
     if (
       (session.focus &&
         (session.programId !== 'general' || session.customWorkoutId)) ||
@@ -390,6 +411,10 @@ const routinePlans = z.strictObject({
   B: savedRehabPlan.optional(),
 });
 const metaSchema = z.discriminatedUnion('key', [
+  z.strictObject({
+    key: z.literal('trainingProgram'),
+    value: trainingProgramSchema,
+  }),
   z.strictObject({
     key: z.literal('trainingRoutines'),
     value: z
@@ -525,7 +550,7 @@ const metaSchema = z.discriminatedUnion('key', [
 ]);
 
 const backupSchema = z.strictObject({
-  schemaVersion: z.literal(BACKUP_SCHEMA_VERSION),
+  schemaVersion: z.union([z.literal(4), z.literal(BACKUP_SCHEMA_VERSION)]),
   exportedAt: instant,
   sessions: z.array(sessionSchema),
   setLogs: z.array(setLogSchema),
@@ -551,7 +576,7 @@ export function parseBackup(text: string): BackupFile {
     typeof raw === 'object' &&
     raw !== null &&
     'schemaVersion' in raw &&
-    raw.schemaVersion !== BACKUP_SCHEMA_VERSION
+    !SUPPORTED_SCHEMA_VERSIONS.includes(raw.schemaVersion)
   ) {
     throw new BackupError(
       'schema_version',
