@@ -4,7 +4,6 @@ import {
   exerciseMetadata,
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
-import { exerciseReferences } from '../../content/exerciseReferences';
 import { bodyRegions, primaryMuscleLabel } from '../../content/muscles';
 import type { Exercise, TrainingPreferences } from '../../domain/types';
 import { Figure, FigureFrame, movementPose } from '../../figures/Figure';
@@ -263,7 +262,6 @@ function DetailedRow({ exercise, inventory, experience, reason }: RowProps) {
           <Icon name="back" className="shrink-0 rotate-180" />
         </Link>
         <p className="m-0 mt-2 text-base">
-          {exerciseReferences[exercise.id]} ·{' '}
           {primaryMuscleLabel(exercise.id) ? (
             <>Tränar främst: {primaryMuscleLabel(exercise.id)}</>
           ) : (

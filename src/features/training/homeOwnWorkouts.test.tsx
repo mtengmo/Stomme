@@ -205,3 +205,15 @@ it('does not show the pain guidance for rehab', async () => {
   await screen.findByRole('navigation', { name: 'Huvudmeny' });
   expect(screen.queryByText(painLine)).toBeNull();
 });
+
+it('keeps the empty Mina pass text without a programme but hides it with one', async () => {
+  const { seedProgram } = await import('../program/programFixtures');
+  render(<App />);
+  await screen.findByText('Inga egna pass än.');
+  cleanup();
+  await seedProgram(3);
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: /Vecka 1 av 4/ });
+  expect(screen.queryByText('Inga egna pass än.')).toBeNull();
+  expect(screen.queryByRole('region', { name: 'Mina pass' })).toBeNull();
+});

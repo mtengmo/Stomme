@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -24,6 +25,7 @@ for (const { width, scheme } of cases) {
     });
     // Save one own workout from the library.
     await page.goto('/#/ovningar');
+    await openLibraryFilters(page);
     await page.getByLabel('Sök övning').fill('E39');
     await page
       .getByRole('button', { name: /^Välj: / })

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 test.use({ storageState: FRESH_STATE });
@@ -25,6 +26,7 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
+    await openLibraryFilters(page);
     await page.getByLabel('Sök övning').fill('E12');
     await page.getByRole('button', { name: /^Välj: / }).click();
     await page.getByRole('button', { name: 'Skapa pass', exact: true }).click();

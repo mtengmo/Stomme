@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding and training setup, so it starts from a first visit.
@@ -31,6 +32,7 @@ for (const width of [320, 360, 412]) {
 
       // Library: filter, then pick three. The bar never covers the last row.
       await page.goto('/#/ovningar');
+      await openLibraryFilters(page);
       await page.getByLabel('Sök övning').fill('kettlebell');
       const pickers = page.getByRole('button', { name: /^Välj: / });
       await expect(pickers.first()).toBeVisible();
@@ -131,6 +133,7 @@ for (const width of [320, 360, 412]) {
         .getByRole('link', { name: 'Lägg till fler från biblioteket' })
         .click();
       await expect(page).toHaveURL(/#\/ovningar\?till=/);
+      await openLibraryFilters(page);
       await expect(page.getByText('Redan i passet').first()).toBeVisible();
       await page.getByLabel('Sök övning').fill('kettlebell');
       await pickers

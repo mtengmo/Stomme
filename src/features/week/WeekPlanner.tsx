@@ -13,6 +13,7 @@ import {
   readCustomWorkouts,
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
 import type {
   Session,
@@ -38,10 +39,13 @@ export function WeekPlanner() {
       schedule: await loadWeeklySchedule(),
       workouts: readCustomWorkouts(await getMeta(getDb(), 'customWorkouts')),
       sessions: await listSessions(getDb()),
+      program: await readTrainingProgram(getDb()),
     }),
     [],
   );
   if (!data) return null;
+  // The programme owns the week; its strip lives on Home.
+  if (data.program) return <Redirect to="/" />;
   if (
     !isTrainingPreferences(data.preferences) ||
     data.preferences.programId === 'rehab'

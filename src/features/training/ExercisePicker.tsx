@@ -7,7 +7,6 @@ import {
   purposeLabels,
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
-import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
@@ -220,9 +219,6 @@ export function ExercisePicker({
         <div className="min-w-0">
           <div className="flex min-h-12 items-center justify-between gap-2">
             <h3 className="m-0 min-w-0 flex-1 break-words text-lg font-bold leading-snug">
-              <span className="mr-2 text-ink-soft">
-                {exerciseReferences[exercise.id]}
-              </span>
               {exercise.name}
             </h3>
             <Link

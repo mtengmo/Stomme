@@ -106,6 +106,16 @@ describe('Settings', () => {
     ).toBeTruthy();
   });
 
+  it('keeps the review link in a collapsed "Granskning (för testare)" at the bottom', () => {
+    render(<Settings />);
+    const summary = screen.getByText('Granskning (för testare)');
+    const details = summary.closest('details') as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    expect(
+      details.querySelector('a[href="/granska"]') ?? details.querySelector('a'),
+    ).toBeTruthy();
+  });
+
   it('a sub-page has a back link and its own h1', async () => {
     render(<Settings page="lagring" />);
     expect(

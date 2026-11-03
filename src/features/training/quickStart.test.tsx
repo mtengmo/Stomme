@@ -81,7 +81,7 @@ it('asks one question per screen and keeps answers through Back', async () => {
   ).toBe(true);
   await next(user);
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
     equipment: ['bodyweight', 'chair', 'support'],
@@ -111,7 +111,7 @@ it('saves bodyweight as body, chair and wall and a chosen body-part focus', asyn
   await user.click(screen.getByRole('checkbox', { name: 'Ben & säte' }));
   expect(button.disabled).toBe(false);
   await user.click(button);
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
     equipment: ['bodyweight', 'chair', 'support'],
@@ -131,7 +131,7 @@ it('always saves new for rehab and asks for the side at the equipment step', asy
     'right',
   );
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'rehab',
     experience: 'new',
@@ -208,7 +208,9 @@ it('starts ordinary strength without a mandatory before questionnaire', async ()
   window.location.hash = '#/traning/A';
   const user = userEvent.setup();
   render(<App />);
-  await user.click(await screen.findByRole('button', { name: 'Börja passet' }));
+  await user.click(
+    await screen.findByRole('button', { name: 'Starta passet' }),
+  );
   await screen.findByRole('button', { name: 'Klar set' });
   expect(
     screen.queryByRole('heading', { name: 'Hur känns kroppen?' }),
@@ -264,7 +266,7 @@ it('builds your own first workout: nothing is saved until Skapa pass', async () 
   expect(screen.getByText(/2 av 12 övningar/)).toBeTruthy();
 
   await user.click(screen.getByRole('button', { name: 'Skapa pass' }));
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect((await getDb().meta.get('training'))?.value).toMatchObject({
     programId: 'general',
     experience: 'some',

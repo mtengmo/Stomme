@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { exerciseList } from '../../content/exercises';
 import {
@@ -14,6 +14,7 @@ import {
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
+import { readTrainingProgram } from '../../db/program';
 import { getMeta } from '../../db/repo';
 import type { ExerciseId } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
@@ -36,11 +37,13 @@ import {
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
 import {
+  activeFilterCount,
   ExerciseFilterControls,
   SortSelect,
 } from '../exercise/ExerciseFilterControls';
 import { FavouritesProvider } from '../exercise/FavouriteButton';
 import { ResultList, ResultViewSwitch } from './ExerciseResults';
+import { ProgramSection } from './ProgramSection';
 import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
 
 export function ExerciseLibrary() {
@@ -50,6 +53,7 @@ export function ExerciseLibrary() {
   const query = new URLSearchParams(search);
   const training = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
+  const program = useLiveQuery(() => readTrainingProgram(getDb()), []);
   const preferences = isTrainingPreferences(training) ? training : undefined;
   const filters = filtersFromParams(query);
   const inventory = preferences ?? { equipment: defaultEquipment };
@@ -128,6 +132,10 @@ export function ExerciseLibrary() {
     navigate(keep.size ? `/ovningar?${keep}` : '/ovningar');
     document.getElementById('library-search')?.focus();
   };
+  // Open from the start when the URL already carries a filter or a sort.
+  const [filtersOpen, setFiltersOpen] = useState(
+    () => activeFilterCount(filters, '') > 0 || mode !== defaultSortMode,
+  );
   const invalid = query.has('muskel') && selected === null;
 
   useEffect(() => {
@@ -168,31 +176,52 @@ export function ExerciseLibrary() {
             Hela kroppen och knäfokus. Välj efter syfte, muskler och utrustning.
           </p>
         </header>
-        <Link
-          href="/ovningar?syfte=knee&kalla=aaos"
-          className="flex min-h-12 items-center self-start text-base font-bold underline"
-        >
-          AAOS knäövningar · källbaserad samling
-        </Link>
-        <Link
-          href="/granska"
-          className="flex min-h-12 items-center self-start text-base font-bold underline decoration-2 underline-offset-4"
-        >
-          Granska alla övningar
-        </Link>
         {filters.aaos ? (
           <p className="m-0 text-base font-bold">
             Visar bara källbaserade AAOS knäövningar.
           </p>
         ) : null}
-        <ExerciseFilterControls
-          value={filters}
-          onChange={changeFilters}
-          onClear={clearFilters}
-          defaultEquipment=""
-          idPrefix="library"
-          showMine
-        />
+        {program ? <ProgramSection program={program} /> : null}
+        <div className="flex flex-col gap-4">
+          <button
+            type="button"
+            aria-expanded={filtersOpen}
+            aria-controls="library-filters"
+            onClick={() => setFiltersOpen((open) => !open)}
+            className="flex min-h-12 items-center gap-2 self-start rounded-md border-[3px] border-edge bg-surface px-4 text-base font-bold text-ink"
+          >
+            Filtrera
+            <Icon
+              name="back"
+              size={18}
+              className={filtersOpen ? '-rotate-90' : 'rotate-90'}
+            />
+          </button>
+          {filtersOpen ? (
+            <div id="library-filters" className="flex flex-col gap-4">
+              <Link
+                href="/ovningar?syfte=knee&kalla=aaos"
+                className="flex min-h-12 items-center self-start text-base font-bold underline"
+              >
+                AAOS knäövningar · källbaserad samling
+              </Link>
+              <ExerciseFilterControls
+                value={filters}
+                onChange={changeFilters}
+                onClear={clearFilters}
+                defaultEquipment=""
+                idPrefix="library"
+                showMine
+              />
+              <SortSelect
+                value={mode}
+                onChange={changeSort}
+                idPrefix="library"
+              />
+              <ResultViewSwitch />
+            </div>
+          ) : null}
+        </div>
         {onlyBodyweight ? (
           <p className="m-0 text-base text-ink-soft">
             Du har inga vikter registrerade.{' '}
@@ -208,14 +237,12 @@ export function ExerciseLibrary() {
           <SelectionStatus
             resultText={`${count} ${count === 1 ? 'övning' : 'övningar'}${area ? ` för ${area.toLowerCase()}` : ''}`}
           />
-          <SortSelect value={mode} onChange={changeSort} idPrefix="library" />
           {noHistory ? (
             <p className="m-0 text-base text-ink-soft">
               Du har inte tränat något än, så övningarna visas i alfabetisk
               ordning.
             </p>
           ) : null}
-          <ResultViewSwitch />
           {count === 0 ? (
             <p className="m-0 text-xl">Inga övningar passar filtren.</p>
           ) : null}

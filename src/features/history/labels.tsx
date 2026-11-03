@@ -15,6 +15,13 @@ const UNIT_WORD: Record<Unit, string> = {
   laps: 'varv',
 };
 
+/** "Pass 2 · Vecka 1" for a programme pass; null for every other session. */
+export function programPassLabel(session: Session): string | null {
+  const p = session.programPass;
+  if (!p) return null;
+  return `Pass ${p.pass} · Vecka ${p.week}${session.workoutMode === 'short' ? ' · Kortpass' : ''}`;
+}
+
 export function amountText(amount: number, unit: Unit): string {
   return `${amount} ${UNIT_WORD[unit]}`;
 }

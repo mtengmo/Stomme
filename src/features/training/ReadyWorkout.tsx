@@ -3,7 +3,6 @@ import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
 import { kneeRehabSource } from '../../content/kneeRehab';
-import { exerciseMuscles } from '../../content/muscles';
 import {
   physioForm,
   physioHoldNote,
@@ -18,6 +17,7 @@ import {
 } from '../../content/physioKneeProgramme';
 import { rehabGroup } from '../../content/programmes';
 import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
+import { coverageLabels, missingCoverage } from '../../rules/coverage';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
 export function ReadyWorkout({
@@ -26,6 +26,8 @@ export function ReadyWorkout({
   onChange,
   short = false,
   fullBody = !preferences.bodyParts?.length,
+  programPass = false,
+  hasHistory = true,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
@@ -33,6 +35,10 @@ export function ReadyWorkout({
   onChange(index: number): void;
   short?: boolean;
   fullBody?: boolean;
+  /** A generated programme pass: no coverage warning, it is built to fit. */
+  programPass?: boolean;
+  /** At least one completed session; without it the doses are a starting guess. */
+  hasHistory?: boolean;
 }) {
   const knee =
     preferences.programId === 'rehab' && rehabGroup(preferences) === 'aaos';
@@ -42,35 +48,7 @@ export function ReadyWorkout({
     physio &&
     JSON.stringify(plan) === JSON.stringify(physioKneePlan(preferences));
   const ids = plan.map((item) => item.exerciseId);
-  const primary = new Set(
-    ids.flatMap((exerciseId) => exerciseMuscles[exerciseId].primary),
-  );
-  const missing = [
-    !['quads', 'hamstrings', 'glutes'].some((group) =>
-      primary.has(group as 'quads' | 'hamstrings' | 'glutes'),
-    )
-      ? 'ben och höft'
-      : '',
-    !ids.includes('supported-row') ? 'drag för överkroppen' : '',
-    !ids.some((exerciseId) =>
-      [
-        'floor-press',
-        'kettlebell-floor-press',
-        'shoulder-press',
-        'kettlebell-press',
-        'wall-push-up',
-        'knee-push-up',
-        'push-up',
-        'decline-push-up',
-        'diamond-push-up',
-        'blast-off-push-up',
-        'parallel-dip',
-      ].includes(exerciseId),
-    )
-      ? 'press för överkroppen'
-      : '',
-    !primary.has('core') ? 'bål' : '',
-  ].filter(Boolean);
+  const missing = missingCoverage(ids).map((area) => coverageLabels[area]);
   return (
     <section aria-labelledby="ready-workout" className="flex flex-col gap-3">
       <h2 id="ready-workout" className="m-0 text-2xl font-bold">
@@ -78,6 +56,7 @@ export function ReadyWorkout({
         {plan.length === 1 ? 'övning' : 'övningar'}
       </h2>
       {!short &&
+      !programPass &&
       fullBody &&
       preferences.programId === 'general' &&
       missing.length > 0 ? (
@@ -125,8 +104,14 @@ export function ReadyWorkout({
       ) : null}
       {!short && !knee && !physio && preferences.programId !== 'rehab' ? (
         <p className="m-0 text-base text-ink-soft">
-          Förslag nästa pass. Antal bygger på sparade resultat och hur passet
-          kändes. Granska och ändra före start.
+          {hasHistory
+            ? 'Förslag nästa pass. Antal bygger på sparade resultat och hur passet kändes. Granska och ändra före start.'
+            : 'Startförslag för din nivå. Ändra före start om det behövs.'}
+        </p>
+      ) : null}
+      {!physio && !knee && !hasHistory ? (
+        <p className="m-0 text-base text-ink-soft">
+          2 × 10 = 2 set med 10 repetitioner. 60 s vila mellan seten.
         </p>
       ) : null}
       <ol className="m-0 list-none p-0">
@@ -174,7 +159,10 @@ export function ReadyWorkout({
                   className="flex min-h-12 items-center text-xl font-bold underline"
                 >
                   {lead}
-                  {exerciseReferences[exercise.id]} · {exercise.name}
+                  {preferences.programId === 'rehab'
+                    ? `${exerciseReferences[exercise.id]} · `
+                    : ''}
+                  {exercise.name}
                 </Link>
                 <p className="m-0 text-base">
                   {item.sets} × {item.target}

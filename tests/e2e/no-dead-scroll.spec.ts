@@ -381,7 +381,7 @@ for (const size of INNER_SIZES) {
 // and nothing in the middle part scrolls.
 const REPRESENTATIVE = [
   'Sittande knästräckning med gummiband',
-  'Sitta ner och resa sig från stol (goblet)',
+  'Sitta ner och resa sig från stol',
   'Enbens bäckenlyft med ryggstöd',
   'Copenhagen-håll med knästöd',
   'Statisk tåhävning med böjt knä',

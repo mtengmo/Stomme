@@ -1,10 +1,10 @@
 [
   {
     "id": "goblet-chair-squat",
-    "name": "Sitta ner och resa sig från stol (goblet)",
+    "name": "Sitta ner och resa sig från stol",
     "group": "rehab/knee",
     "risk": "high",
-    "status": "unreviewed",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -21,7 +21,13 @@
         "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "Namnet förenklat för nybörjare: '(goblet)' borttaget ur övningsnamnet och kvar i belastningsetiketten (10 kg hantel mot bröstet (goblet)). Ingen figurändring. Behöver granskning med scope text av Codex-modell eller human."
+      }
+    ],
     "openIssues": [],
     "fingerprint": "c919e308688f"
   },

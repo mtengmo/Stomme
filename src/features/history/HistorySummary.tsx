@@ -2,6 +2,7 @@ import { Link } from 'wouter';
 import type { Session } from '../../domain/types';
 import { formatShortDate, formatWeekday } from '../../lib/dates';
 import { historySummary } from '../../rules/history';
+import { programPassLabel } from './labels';
 
 function passText(count: number): string {
   return `${count} pass`;
@@ -34,6 +35,7 @@ export function HistorySummary({
           className="inline-flex min-h-12 items-center font-bold text-ink underline"
         >
           {s.last.customWorkoutName ??
+            programPassLabel(s.last) ??
             `${s.last.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.last.templateId}`}{' '}
           · {formatWeekday(s.last.date)} {formatShortDate(s.last.date)}
         </Link>

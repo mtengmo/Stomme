@@ -14,7 +14,7 @@ const L = (kg: number, label: string): Load => ({ kg, label });
 const list: Exercise[] = [
   {
     id: 'goblet-chair-squat',
-    name: 'Sitta ner och resa sig från stol (goblet)',
+    name: 'Sitta ner och resa sig från stol',
     muscles: ['Framsida lår', 'Säte', 'Bål'],
     tips: [
       'Ställ en stadig stol bakom dig. Stå med fötterna ungefär höftbrett och armarna framför kroppen.',
@@ -29,7 +29,7 @@ const list: Exercise[] = [
     range: { start: 10, max: 12, step: 1 },
     loadLadder: [
       BW,
-      L(10, '10 kg hantel mot bröstet'),
+      L(10, '10 kg hantel mot bröstet (goblet)'),
       L(16, '16 kg kettlebell'),
     ],
     startLoadIndex: 1,

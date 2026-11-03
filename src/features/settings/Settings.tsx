@@ -542,11 +542,6 @@ export function Settings({ page }: { page?: string } = {}) {
         <MenuRow to="integritet" label="Integritet" />
         <MenuRow to="lagring" label="Lagring" />
         {!installed ? <MenuRow to="installera" label="Installera" /> : null}
-        <MenuRow
-          href="/granska"
-          label="Övningar"
-          value="Granska alla övningar"
-        />
         <MenuRow to="om" label="Om och säkerhet" />
         <MenuRow to="version" label="Version" value={APP_VERSION} />
       </ul>
@@ -563,6 +558,18 @@ export function Settings({ page }: { page?: string } = {}) {
           Radera all data
         </Button>
       </div>
+      <details className="mt-2">
+        <summary className="flex min-h-12 cursor-pointer items-center text-base font-bold underline underline-offset-4">
+          Granskning (för testare)
+        </summary>
+        <ul className="m-0 flex list-none flex-col p-0">
+          <MenuRow
+            href="/granska"
+            label="Övningar"
+            value="Granska alla övningar"
+          />
+        </ul>
+      </details>
     </div>
   );
 }

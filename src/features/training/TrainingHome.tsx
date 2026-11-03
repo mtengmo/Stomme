@@ -12,6 +12,7 @@ import {
 } from '../../content/programmes';
 import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
 import {
   canReplaceTrainingPreparation,
@@ -42,7 +43,9 @@ import {
 } from '../../rules/weeklySchedule';
 import { musclesForPlan } from '../../rules/weekSuggestion';
 import { Button, buttonClass } from '../../ui/Button';
+import { programPassLabel } from '../history/labels';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
+import { ProgramHome } from '../program/ProgramHome';
 import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
@@ -307,9 +310,16 @@ export function TrainingHome() {
     const savedWorkouts = readCustomWorkouts(
       await getMeta(getDb(), 'customWorkouts'),
     );
+    // Only a general programme reads the programme; rehab never loads it.
+    const program =
+      isTrainingPreferences(preferences) && preferences.programId === 'general'
+        ? await readTrainingProgram(getDb())
+        : null;
     return {
       schedule: await loadWeeklySchedule(),
       preferences,
+      program,
+      logs: program ? await getDb().setLogs.toArray() : [],
       sessions,
       preparationId,
       savedWorkouts,
@@ -360,6 +370,20 @@ export function TrainingHome() {
           (preferences?.rehabFocus ?? 'custom')) &&
       session.status !== 'in_progress',
   );
+  if (data.program && preferences?.programId === 'general')
+    return (
+      <ProgramHome
+        preferences={preferences}
+        program={data.program}
+        sessions={data.sessions}
+        logs={data.logs}
+        active={active}
+        prepared={prepared}
+        due={due}
+        recent={recent}
+        onChangeDirection={() => setEditing(true)}
+      />
+    );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
   const availability = preferences ? focusAvailable(preferences) : undefined;
@@ -587,7 +611,8 @@ export function TrainingHome() {
               {session.date} ·{' '}
               {session.customWorkoutId
                 ? (session.customWorkoutName ?? 'Eget pass')
-                : `${session.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${session.templateId}`}{' '}
+                : (programPassLabel(session) ??
+                  `${session.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${session.templateId}`)}{' '}
               · {session.status === 'completed' ? 'klart' : 'avbrutet'}
             </Link>
           ))}

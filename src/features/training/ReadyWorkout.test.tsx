@@ -40,3 +40,56 @@ it('omits the whole-body coverage warning for an intentional focus', () => {
   );
   expect(screen.queryByText(/Saknas:/)).toBeNull();
 });
+
+it('has no E-codes, shows the beginner note and the set legend without history', () => {
+  const plan = defaultPlan(preferences, 'A', [], []);
+  render(
+    <ReadyWorkout
+      plan={plan}
+      preferences={preferences}
+      hasHistory={false}
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.queryByText(/\bE\d{2}\b/)).toBeNull();
+  expect(
+    screen.getByText(
+      'Startförslag för din nivå. Ändra före start om det behövs.',
+    ),
+  ).toBeTruthy();
+  expect(screen.queryByText(/Antal bygger på/)).toBeNull();
+  expect(
+    screen.getByText(
+      '2 × 10 = 2 set med 10 repetitioner. 60 s vila mellan seten.',
+    ),
+  ).toBeTruthy();
+});
+
+it('keeps the old note when there is completed history', () => {
+  const plan = defaultPlan(preferences, 'A', [], []);
+  render(
+    <ReadyWorkout plan={plan} preferences={preferences} onChange={() => {}} />,
+  );
+  expect(screen.getByText(/Antal bygger på/)).toBeTruthy();
+  expect(screen.queryByText(/2 × 10 = /)).toBeNull();
+});
+
+it('warns about missing coverage for a free whole-body pass but not for a programme pass', () => {
+  const plan = defaultPlan(preferences, 'A', [], []).filter(
+    (item) =>
+      item.exerciseId === 'glute-bridge' || item.exerciseId === 'wall-sit',
+  );
+  const { rerender } = render(
+    <ReadyWorkout plan={plan} preferences={preferences} onChange={() => {}} />,
+  );
+  expect(screen.getByText(/Saknas:/)).toBeTruthy();
+  rerender(
+    <ReadyWorkout
+      plan={plan}
+      preferences={preferences}
+      programPass
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.queryByText(/Saknas:/)).toBeNull();
+});
