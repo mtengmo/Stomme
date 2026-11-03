@@ -1,0 +1,2254 @@
+[
+  {
+    "id": "goblet-chair-squat",
+    "name": "Sitta ner och resa sig från stol (goblet)",
+    "group": "rehab/knee",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c919e308688f"
+  },
+  {
+    "id": "step-up",
+    "name": "Uppsteg på låda (step-up)",
+    "group": "rehab/knee",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W3/W3b; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "cd7d4f9",
+        "notes": "W3: side view as keyframes + IK, 19 unit step."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "a971f09",
+        "notes": "W3b: front view with fixed shins, foreshortened thighs, 18 unit step."
+      }
+    ],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "ff388d06dc8b",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "single-leg-rdl",
+    "name": "Enbens rumänskt marklyft",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "61f149c0459a"
+  },
+  {
+    "id": "dead-bug",
+    "name": "Dead bug",
+    "group": "strength",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Opposite arm and leg move as the text says; selected arm and opposite leg coloured together. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Opposite arm and leg move as the text says; selected arm and opposite leg coloured together. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "911193812d0d",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "side-plank",
+    "name": "Sidoplanka",
+    "group": "strength",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "dfa0558cd828"
+  },
+  {
+    "id": "split-squat",
+    "name": "Stationärt utfall (split squat)",
+    "group": "rehab/knee",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c5c2eebcc088"
+  },
+  {
+    "id": "single-leg-hip-thrust",
+    "name": "Enbens bäckenlyft med ryggstöd",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "8a6850b1b916"
+  },
+  {
+    "id": "single-leg-calf-raise",
+    "name": "Enbens tåhävning",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Hold or repetition, support contact and working side agree. Profile is the clearest view. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "e7095b49a67b"
+  },
+  {
+    "id": "suitcase-carry",
+    "name": "Väskbärning (suitcase carry)",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Stepping loop, hand count and load placement agree. Front view would help judge side lean. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Stepping loop, hand count and load placement agree. Front view would help judge side lean. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "0d8246ea3f27",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "bird-dog",
+    "name": "Bird dog",
+    "group": "strength",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Opposite arm and leg move as the text says; selected arm and opposite leg coloured together. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Opposite arm and leg move as the text says; selected arm and opposite leg coloured together. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "e73c0b0ca7a6",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "wall-sit",
+    "name": "Väggsittning",
+    "group": "rehab/knee",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "85fe8393c575"
+  },
+  {
+    "id": "goblet-squat",
+    "name": "Gobletknäböj utan stol",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6f58404",
+        "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "e1fd1dbeee07"
+  },
+  {
+    "id": "kettlebell-deadlift",
+    "name": "Marklyft med kettlebell",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "needs-fix",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9 (optional item); fixes specified there."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "W9 TODO: squat-family IK figure not applied yet (docs/figure-fix-specs.md, optional item)"
+    ],
+    "fingerprint": "d152ef71bf2a"
+  },
+  {
+    "id": "dumbbell-rdl",
+    "name": "Rumänskt marklyft",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "needs-fix",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9 (optional item); fixes specified there."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "W9 TODO: squat-family IK figure not applied yet (docs/figure-fix-specs.md, optional item)"
+    ],
+    "fingerprint": "3c499b8e8ccb"
+  },
+  {
+    "id": "supported-row",
+    "name": "Enarmsrodd med stöd",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Not covered individually by any audit doc; only inside the E11-E17 group row of the 2026-10-23 audit"
+    ],
+    "fingerprint": "24ba5a5cbad9"
+  },
+  {
+    "id": "floor-press",
+    "name": "Hantelpress på golv",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W6; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "bececf3",
+        "notes": "W6: floor-press both arms on the pivot; shared floorBase far knee via IK (also affects pullover and kettlebell floor press)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "f547dfa3baf8"
+  },
+  {
+    "id": "shoulder-press",
+    "name": "Axelpress med hantlar",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Movement and equipment agree (audit covers the group E11-E17; no figure-specific check recorded). Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "2e197625bf6d"
+  },
+  {
+    "id": "farmer-carry",
+    "name": "Farmergång",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Stepping loop, hand count and load placement agree. Front view would help judge side lean. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Stepping loop, hand count and load placement agree. Front view would help judge side lean. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "f0c0c6020139"
+  },
+  {
+    "id": "biceps-curl",
+    "name": "Bicepscurl",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "d007c03f3bbb"
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Hammarcurl",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "ebfdb9bed68f"
+  },
+  {
+    "id": "lateral-raise",
+    "name": "Sidolyft",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "276c2e2b2bcf"
+  },
+  {
+    "id": "triceps-kickback",
+    "name": "Triceps kickback med stöd",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "48e3c286bf2e"
+  },
+  {
+    "id": "glute-bridge",
+    "name": "Bäckenlyft med båda benen",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Elbow/shoulder direction, support and bridge movement agree. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "f372ca4d89d5"
+  },
+  {
+    "id": "reverse-lunge",
+    "name": "Utfall bakåt",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "f41dc6fa1ff7"
+  },
+  {
+    "id": "forward-lunge",
+    "name": "Utfall framåt",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "51a47db2c234"
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "Kettlebellsving med två händer",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "60fe175afd60"
+  },
+  {
+    "id": "kettlebell-press",
+    "name": "Enarms axelpress med kettlebell",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "79a088ccf919",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "half-squat",
+    "name": "Halv knäböj",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "3ff4067ca947"
+  },
+  {
+    "id": "hamstring-curl",
+    "name": "Stående lårcurl",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "bf7091e8049b",
+    "notes": [
+      "Geometry audit flagged 1.0 unit below floor: false positive, no action (docs/figure-audit-status.md; date not recorded)."
+    ]
+  },
+  {
+    "id": "seated-knee-extension",
+    "name": "Sittande knästräckning",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "6f4229d4c7b3"
+  },
+  {
+    "id": "straight-leg-raise",
+    "name": "Rakt benlyft",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "8a113670805f"
+  },
+  {
+    "id": "prone-leg-raise",
+    "name": "Rakt benlyft på mage",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "fcdd48ef3a5a"
+  },
+  {
+    "id": "side-lying-hip-abduction",
+    "name": "Sidliggande benlyft utåt",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "badf122257f6"
+  },
+  {
+    "id": "side-lying-hip-adduction",
+    "name": "Sidliggande benlyft inåt",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "f49f27e7a3ce"
+  },
+  {
+    "id": "calf-stretch",
+    "name": "Vadstretch mot vägg",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "fe4a0460573d"
+  },
+  {
+    "id": "quadriceps-stretch",
+    "name": "Stående lårstretch",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c738776e417a"
+  },
+  {
+    "id": "hamstring-stretch",
+    "name": "Liggande stretch av baksida lår",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "ad6dbeb2c474"
+  },
+  {
+    "id": "band-leg-press",
+    "name": "Benpress med gummiband",
+    "group": "rehab/knee-aaos",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "b396aabd6a8d"
+  },
+  {
+    "id": "kettlebell-floor-press",
+    "name": "Enarms golvpress med kettlebell",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Press path and rack carry agree. E40 has front view and close-up. Safe roll-in/out for E39 explained in text only. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Press path and rack carry agree. E40 has front view and close-up. Safe roll-in/out for E39 explained in text only. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "bececf3",
+        "notes": "W6: floor-press both arms on the pivot; shared floorBase far knee via IK (also affects pullover and kettlebell floor press)."
+      }
+    ],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "5c295b0cb952",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "kettlebell-rack-carry",
+    "name": "Gång med kettlebell vid axeln",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Press path and rack carry agree. E40 has front view and close-up. Safe roll-in/out for E39 explained in text only. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Press path and rack carry agree. E40 has front view and close-up. Safe roll-in/out for E39 explained in text only. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "7444a1b3acc7"
+  },
+  {
+    "id": "rear-foot-split-squat",
+    "name": "Bulgariskt utfall på bänk",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+    ],
+    "fingerprint": "5c63b470424a",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "bench-side-plank-leg-lift",
+    "name": "Sidoplanka på bänk med benlyft",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W4; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6b16e75",
+        "notes": "Oblique view framing."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "1f8064f",
+        "notes": "W4: real bench, fixed leg length, symmetric arms; foot-in-prop collision fixed."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "8dcecdb",
+        "notes": "L4: symmetric framing and prop-fit check on both sides."
+      }
+    ],
+    "openIssues": [
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
+      "Exact lower-leg-lift variant has related research only, no source for this drawing"
+    ],
+    "fingerprint": "db916a9dae05",
+    "notes": [
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+    ]
+  },
+  {
+    "id": "kneeling-hip-flexor-stretch",
+    "name": "Höftböjarstretch i halvknästående",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Bench contact, working limb and direction agree with supplied movement descriptions. E42 is a specific variant (qualified research note). Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "8d4079028ada"
+  },
+  {
+    "id": "prone-on-forearms",
+    "name": "Magliggande på underarmar",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Figure intentionally stays in the held position; text says hold for the displayed time, then lower. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Figure intentionally stays in the held position; text says hold for the displayed time, then lower. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "fea50ad",
+        "notes": "Framing: toe clipped on both sides."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "9bfe63718244"
+  },
+  {
+    "id": "heel-slide",
+    "name": "Hälglidning med bålkontroll",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "2933cf4",
+        "notes": "Framing: clipped 2 units on the right."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "614c2bdbdceb"
+  },
+  {
+    "id": "balance-pendulum",
+    "name": "Balanspendel på ett ben",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "5fd97671a51c"
+  },
+  {
+    "id": "single-leg-chair-squat",
+    "name": "Enbensknäböj till stol",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "d1929a73f859"
+  },
+  {
+    "id": "single-leg-floor-bridge",
+    "name": "Enbens bäckenlyft på golv",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Alternation, hinge-to-knee-drive cycle, chair contact and raised-leg direction agree. E48 free foot follows the raised lower leg. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "73dcdbbbde68"
+  },
+  {
+    "id": "quad-set",
+    "name": "Lårmuskelspänning i ryggläge",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "9eca5d8",
+        "notes": "Framing: left toe clipped 7.4 units; viewBox widened."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "3401ee1f9cc2"
+  },
+  {
+    "id": "seated-knee-flexion",
+    "name": "Sittande knäböjning med fotglidning",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "e46062cd2bb5"
+  },
+  {
+    "id": "band-knee-extension",
+    "name": "Sittande knästräckning med gummiband",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "4e4caabf63ae"
+  },
+  {
+    "id": "band-hip-extension",
+    "name": "Stående höftsträckning med gummiband",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Subtle knee press, foot slide and band anchors agree. Contacts fixed, limb lengths continuous. E49 has a small press cue. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "6d595c04a840"
+  },
+  {
+    "id": "balance-clock",
+    "name": "Balansklocka på ett ben",
+    "group": "rehab/physio",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "text",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Profile shows standing-leg bend and reaches; separate overhead clock diagram shows five directions and the active foot. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-10-23",
+        "reviewer": "unknown-claude",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "docs/exercise-animation-audit.md: Profile shows standing-leg bend and reaches; separate overhead clock diagram shows five directions and the active foot. Static/source inspection, not full-loop certification."
+      }
+    ],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "5b81d6ef8fe3"
+  },
+  {
+    "id": "push-up",
+    "name": "Armhävning",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "05d9a4b",
+        "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "dc64f5a73070"
+  },
+  {
+    "id": "pull-up",
+    "name": "Pull-up med överhandsgrepp",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "44c9d7c8e5b6"
+  },
+  {
+    "id": "chin-up",
+    "name": "Chins med underhandsgrepp",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "0b8857f6ed26"
+  },
+  {
+    "id": "back-extension",
+    "name": "Rygglyft på golv",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "170c85a80fde"
+  },
+  {
+    "id": "parallel-dip",
+    "name": "Dips i parallella stänger",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "81fd4ec213b8"
+  },
+  {
+    "id": "lying-leg-raise",
+    "name": "Liggande benlyft med båda benen",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "2a822cc8753e"
+  },
+  {
+    "id": "burpee",
+    "name": "Burpee med armhävning och hopp",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W7; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "7aecd65",
+        "notes": "W7: keyframes + IK with constant segment lengths."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "133062a",
+        "notes": "M1+M2: feet low with piked hip, no joint jumps, safe reduced-motion frame."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "224d78080eab"
+  },
+  {
+    "id": "plank",
+    "name": "Planka på underarmar",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "05d9a4b",
+        "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "02b0d283569f"
+  },
+  {
+    "id": "squat-jump",
+    "name": "Knäböj med hopp",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "5ed09d953a78"
+  },
+  {
+    "id": "jumping-lunge",
+    "name": "Utfall med hopp och benbyte",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "362c9c4bec3d"
+  },
+  {
+    "id": "mountain-climber",
+    "name": "Mountain climber",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "d585cb6",
+        "notes": "L5: both legs via equal IK (34/34)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "d5277a0a98f1"
+  },
+  {
+    "id": "knee-push-up",
+    "name": "Armhävning på knä",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "5093fa23d54f"
+  },
+  {
+    "id": "wall-push-up",
+    "name": "Armhävning mot vägg",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "586321f7843a"
+  },
+  {
+    "id": "calf-raise",
+    "name": "Tåhävning på två ben",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "3aa88d572823"
+  },
+  {
+    "id": "crunch",
+    "name": "Magcrunch",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "786e32936d59"
+  },
+  {
+    "id": "decline-push-up",
+    "name": "Armhävning med fötterna upphöjda",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "05d9a4b",
+        "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "aafc0ac6f4a8"
+  },
+  {
+    "id": "diamond-push-up",
+    "name": "Smala armhävningar",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "05d9a4b",
+        "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "b4b7f6da3593"
+  },
+  {
+    "id": "blast-off-push-up",
+    "name": "Blast off-armhävning",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "d4aa38bc0b72"
+  },
+  {
+    "id": "plank-arm-lift",
+    "name": "Planka med armlyft",
+    "group": "bodyweight",
+    "risk": "normal",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W5; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "05d9a4b",
+        "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "2c96e757652a"
+  },
+  {
+    "id": "single-leg-lateral-hop",
+    "name": "Sidohopp på ett ben",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "625518fe4a83"
+  },
+  {
+    "id": "box-jump",
+    "name": "Boxhopp",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c404e34ae58a"
+  },
+  {
+    "id": "squat-curl",
+    "name": "Knäböj med bicepscurl",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6f58404",
+        "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "257dde077d81"
+  },
+  {
+    "id": "thruster",
+    "name": "Knäböj med axelpress",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6f58404",
+        "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "7ee9533683e0"
+  },
+  {
+    "id": "single-arm-thruster",
+    "name": "Enarms knäböj med axelpress",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6f58404",
+        "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "3cdd31d0df7c"
+  },
+  {
+    "id": "bent-over-row",
+    "name": "Hantelrodd, böjd framåt",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "8cba90aa4789"
+  },
+  {
+    "id": "sumo-squat",
+    "name": "Sumoknäböj med hantel",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "42cfefcfbd44"
+  },
+  {
+    "id": "weighted-glute-bridge",
+    "name": "Bäckenlyft med hantel",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "48e8cd129c8d"
+  },
+  {
+    "id": "overhead-triceps-extension",
+    "name": "Triceps över huvudet",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "4f014c01432d"
+  },
+  {
+    "id": "dumbbell-pullover",
+    "name": "Hantel-pullover",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "32a879a",
+        "notes": "Framing symmetric about mirror axis; left hand no longer clipped."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "bececf3",
+        "notes": "W6: floor-press both arms on the pivot; shared floorBase far knee via IK (also affects pullover and kettlebell floor press)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "9536e7ba1ca2"
+  },
+  {
+    "id": "side-lunge",
+    "name": "Sidoutfall",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c0270298d00e"
+  },
+  {
+    "id": "walking-lunge",
+    "name": "Utfallsgång med hantlar",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "5c46283be7cf"
+  },
+  {
+    "id": "kettlebell-goblet-squat",
+    "name": "Gobletknäböj med kettlebell",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W9; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "6f58404",
+        "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "b3bc992ca8f5"
+  },
+  {
+    "id": "one-arm-kettlebell-swing",
+    "name": "Enarms kettlebellsving",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "8e5d3ed55958"
+  },
+  {
+    "id": "kettlebell-halo",
+    "name": "Kettlebell halo",
+    "group": "kettlebell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "731821d79e48"
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian twist",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "ae670395cccc"
+  },
+  {
+    "id": "woodchop",
+    "name": "Woodchop",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "69a8d7adac64"
+  },
+  {
+    "id": "seated-tibial-rotation",
+    "name": "Sittande skenbensrotation",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "07216ff4fcee"
+  },
+  {
+    "id": "step-down",
+    "name": "Nedsteg från steg",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "b35f531",
+        "notes": "Promoted the E96 keyframe+IK pilot to the catalogue figure (19 cm step, railing)."
+      },
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "d21b054",
+        "notes": "Text: hold the wall or a railing for support."
+      },
+      {
+        "date": "2026-11-02",
+        "fixer": "claude-sonnet",
+        "commit": "4ae63e0",
+        "notes": "M3+L3: front view with 14 unit step and real depth; lowest heel about 6 cm under the step."
+      }
+    ],
+    "openIssues": [
+      "Waiting for visual review (docs/figure-audit-status.md)"
+    ],
+    "fingerprint": "fe68d13f83b7"
+  },
+  {
+    "id": "bosu-squat",
+    "name": "Knäböj på BOSU",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "6f4e44ecdc12"
+  },
+  {
+    "id": "copenhagen-hold",
+    "name": "Copenhagen-håll med knästöd",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W2; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "cd411a0",
+        "notes": "W2: straight body, knee on bench, foot clear of the plate."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "fd4dea8a6555"
+  },
+  {
+    "id": "nordic-hamstring-curl",
+    "name": "Nordic hamstring med handhjälp",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "12b9e32b3a5a"
+  },
+  {
+    "id": "bent-knee-calf-hold",
+    "name": "Statisk tåhävning med böjt knä",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "unreviewed",
+    "reviews": [],
+    "fixes": [],
+    "openIssues": [],
+    "fingerprint": "c5718798f44a"
+  },
+  {
+    "id": "wall-tibialis-raise",
+    "name": "Tålyft mot vägg (tibialis)",
+    "group": "rehab/knee-strength",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [
+      {
+        "date": "2026-11-01",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Figure review behind docs/figure-fix-specs.md W1; fixes specified there."
+      }
+    ],
+    "fixes": [
+      {
+        "date": "2026-11-01",
+        "fixer": "claude-sonnet",
+        "commit": "a723c4c",
+        "notes": "W1: head and arms clear of the wall."
+      }
+    ],
+    "openIssues": [],
+    "fingerprint": "c2bf5ef400ff"
+  }
+]
