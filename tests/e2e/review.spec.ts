@@ -1,4 +1,8 @@
 import { expect, test } from '@playwright/test';
+import {
+  compareReferences,
+  exerciseReferences,
+} from '../../src/content/exerciseReferences';
 
 for (const mode of [
   {
@@ -28,19 +32,7 @@ for (const mode of [
       await expect(
         page.getByRole('heading', { name: 'Granska övningar', exact: true }),
       ).toBeVisible();
-      const codes = [
-        ...Array.from(
-          { length: 84 },
-          (_, i) => `E${String(i + 1).padStart(2, '0')}`,
-        ),
-        'E87',
-        'E88',
-        'E90',
-        'E91',
-        'E92',
-        'E93',
-        'E94',
-      ];
+      const codes = Object.values(exerciseReferences).sort(compareReferences);
       if (mode.viewport.width < 1024) {
         const picker = page.getByLabel('Välj övning att granska');
         await expect(picker.getByRole('option')).toHaveCount(codes.length);
@@ -55,7 +47,9 @@ for (const mode of [
         });
         for (const code of codes)
           await expect(
-            catalogue.getByRole('link', { name: new RegExp(`^${code}`) }),
+            catalogue.getByRole('link', {
+              name: new RegExp(`^${code}(?!\\d)`),
+            }),
           ).toHaveCount(1);
         await catalogue.getByRole('link', { name: /^E03/ }).click();
       }
