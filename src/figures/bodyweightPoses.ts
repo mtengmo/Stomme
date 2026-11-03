@@ -689,7 +689,14 @@ function kneeDrive(t: number): Pose {
 /** Placeholder side view of the in-and-out jump: a small bounce on both feet. The front view carries the width. */
 function inAndOutJump(t: number): Pose {
   const lift = 10 * Math.sin(Math.PI * t);
-  return runStance([100, 114 - lift], [104, 174 - lift], [96, 174 - lift], 0);
+  // In (t=0): feet together; out (t=1): feet apart and a slightly deeper landing.
+  const half = mix(4, 10, t);
+  return runStance(
+    [100, 114 - lift + 6 * t],
+    [100 + half, 174 - lift],
+    [100 - half, 174 - lift],
+    0,
+  );
 }
 
 /** Placeholder side view of the lateral shuffle: a low stance where each foot lifts a little in turn. */
