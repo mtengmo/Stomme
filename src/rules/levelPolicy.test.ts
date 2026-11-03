@@ -49,12 +49,24 @@ describe('level policy', () => {
     expect(startingSeconds('new', drill)).toBe(20);
     expect(startingSeconds('some', drill)).toBe(30);
     expect(startingSeconds('regular', drill)).toBe(40);
+    // One progression step of headroom below the maximum.
     const short = { start: 10, max: 20, step: 5 };
-    expect(startingSeconds('some', short)).toBe(20);
-    expect(startingSeconds('regular', short)).toBe(20);
+    expect(startingSeconds('new', short)).toBe(10);
+    expect(startingSeconds('some', short)).toBe(15);
+    expect(startingSeconds('regular', short)).toBe(15);
+    const wide = { start: 10, max: 30, step: 5 };
+    expect(
+      [0, 1, 2].map((i) =>
+        startingSeconds(
+          (['new', 'some', 'regular'] as const)[i] as 'new',
+          wide,
+        ),
+      ),
+    ).toEqual([10, 20, 25]);
+    // Start already at the maximum: stays there.
     const fixed = { start: 30, max: 30, step: 5 };
     expect(startingSeconds('regular', fixed)).toBe(30);
-    // A range whose start already exceeds its maximum never starts below range.start.
+    // A range whose start exceeds its maximum never starts below range.start.
     expect(startingSeconds('some', { start: 30, max: 20, step: 5 })).toBe(30);
   });
 

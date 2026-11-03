@@ -320,7 +320,7 @@ describe('starting time for timed exercises', () => {
     ) => customWorkoutPlan([id], general(e), [], [])[0]?.target;
     expect(
       ['new', 'some', 'regular'].map((e) => at(e as never, 'plank')),
-    ).toEqual([15, 25, 30]);
+    ).toEqual([15, 25, 25]);
     expect(
       ['new', 'some', 'regular'].map((e) => at(e as never, 'fast-feet')),
     ).toEqual([20, 30, 40]);
@@ -363,7 +363,7 @@ describe('starting time for timed exercises', () => {
       [prior],
       logs,
     );
-    expect(fresh.target).toBe(30);
+    expect(fresh.target).toBe(25);
     expect(item?.target).toBeLessThan(fresh.target);
   });
 });
