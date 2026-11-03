@@ -10,6 +10,8 @@ import { joint } from './rehabPoses';
 export const supportedFrontViews = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
+  'in-and-out-jump',
+  'lateral-shuffle',
   'goblet-squat',
   'dumbbell-rdl',
   'kettlebell-rack-carry',
@@ -32,9 +34,11 @@ export const supportedObliqueViews = [
 ] as const satisfies readonly ExerciseId[];
 
 /** Front-only demonstrations: the movement cannot be read from the side. */
-const FRONT_ONLY: readonly ExerciseId[] = [
+export const FRONT_ONLY: readonly ExerciseId[] = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
+  'in-and-out-jump',
+  'lateral-shuffle',
 ];
 
 export type FigureAngle = 'side' | 'front' | 'oblique';
@@ -106,6 +110,67 @@ function skeleton(
   return { head, neck, hip, eR, hR, eL, hL, kR, aR, tR, kL, aL, tL };
 }
 
+/** A hair under the 36 px side-view thigh so rounding never exceeds the front-view limit. */
+const FRONT_THIGH = 35.9;
+/** Front stance from the hip and both ankles; the legs are solved so thigh and shin keep their length. */
+function frontStance(hip: Pt, aR: Pt, aL: Pt, toeDx: number): Pose {
+  const neck = point(hip[0], hip[1] - 43);
+  return skeleton(
+    point(hip[0], neck[1] - 14),
+    neck,
+    hip,
+    point(hip[0] - 18, neck[1] + 19),
+    point(hip[0] - 23, neck[1] + 41),
+    point(hip[0] + 18, neck[1] + 19),
+    point(hip[0] + 23, neck[1] + 41),
+    joint(hip, aR, FRONT_THIGH, 34, 1),
+    aR,
+    point(aR[0] - toeDx, aR[1] + 3),
+    joint(hip, aL, FRONT_THIGH, 34, -1),
+    aL,
+    point(aL[0] + toeDx, aL[1] + 3),
+  );
+}
+const smooth = (x: number) => x * x * (3 - 2 * x);
+
+/** Floor markers of the in-and-out jump sit this far from the body's centre line. */
+export const IN_OUT_MARKER_DX = 25;
+/**
+ * Feet together between the markers (t=0), a light jump, feet wide outside
+ * them (t=1). The knees follow the toes outwards and the landing is deeper.
+ */
+function inAndOutPose(t: number): Pose {
+  const s = smooth(t);
+  const lift = 10 * Math.sin(Math.PI * t);
+  const half = mix(5, 36, s);
+  const reach = mix(66, 56, s);
+  const hip = point(100, 174 - lift - reach);
+  return frontStance(
+    hip,
+    point(100 - half, 174 - lift),
+    point(100 + half, 174 - lift),
+    9,
+  );
+}
+
+/** The line of the lateral shuffle (front view tick at the hip centre of the cycle). */
+export const SHUFFLE_LINE_X = 100;
+/**
+ * Side steps across a line: the leading (left) foot steps over it in the
+ * first half and the other foot follows in the second. One foot is always on
+ * the floor, the feet never cross and the ankles stay 32-60 px apart.
+ */
+function lateralShufflePose(t: number): Pose {
+  const first = clamp(2 * t),
+    second = clamp(2 * t - 1);
+  const xL = 88 + 28 * smooth(first),
+    xR = 56 + 28 * smooth(second);
+  const liftL = 10 * Math.sin(Math.PI * first);
+  const liftR = 10 * Math.sin(Math.PI * second);
+  const hip = point((xL + xR) / 2, 112);
+  return frontStance(hip, point(xR, 174 - liftR), point(xL, 174 - liftL), 6);
+}
+
 /**
  * Hop from side to side on the working leg: the foot leaves the floor
  * mid-hop, the free foot stays beside the calf, and every segment keeps its
@@ -171,6 +236,8 @@ export function frontMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'in-and-out-jump') return inAndOutPose(t);
+  if (exerciseId === 'lateral-shuffle') return lateralShufflePose(t);
   if (exerciseId === 'single-leg-lateral-hop')
     return lateralHopPose(t, working);
   if (exerciseId === 'seated-tibial-rotation') {
@@ -837,6 +904,33 @@ export function FrontFigureFrame({
           fill="none"
           stroke="var(--edge)"
           strokeWidth="2"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {exerciseId === 'in-and-out-jump' ? (
+        <g
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <path
+            data-support="floor-marker"
+            d={`M${100 - IN_OUT_MARKER_DX} 171v8`}
+          />
+          <path
+            data-support="floor-marker"
+            d={`M${100 + IN_OUT_MARKER_DX} 171v8`}
+          />
+        </g>
+      ) : null}
+      {exerciseId === 'lateral-shuffle' ? (
+        <path
+          data-contact-plane="shuffle-line"
+          d={`M${SHUFFLE_LINE_X} 170v9`}
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="3"
           strokeLinecap="round"
         />
       ) : null}

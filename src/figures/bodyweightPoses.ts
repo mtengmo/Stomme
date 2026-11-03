@@ -637,7 +637,9 @@ function crunch(t: number): Pose {
 /**
  * Running-style stance in side view. The legs are solved from the hip to each
  * ankle, so thigh and shin keep their length. `swing` (-1..1) pendulates the
- * arms: the right arm goes back while the right leg is lifted.
+ * arms: the right arm goes back while the right leg is lifted. Both feet share
+ * one x when they are down, so the pose at t=1 is the pose at t=0 with the
+ * legs and arms swapped.
  */
 function runStance(hip: Pt, ar: Pt, al: Pt, swing: number): Pose {
   const neck: Pt = [hip[0], hip[1] - 43];
@@ -663,43 +665,48 @@ function runStance(hip: Pt, ar: Pt, al: Pt, swing: number): Pose {
     ],
   );
 }
-/** 1 at the start of the first half of the loop, 0 from the middle on. */
+/** 1 at t=0, falling to 0 at the middle of the loop. */
 const firstHalf = (t: number) => Math.max(0, 1 - 2 * t);
+/** 0 until the middle of the loop, rising to 1 at t=1. */
 const secondHalf = (t: number) => Math.max(0, 2 * t - 1);
 
 /** Quick steps on the spot: each foot lifts a few centimetres in turn (t=0 right, t=1 left). */
 function fastFeet(t: number): Pose {
   const r = firstHalf(t),
     l = secondHalf(t);
-  return runStance([100, 108], [104, 174 - 8 * r], [96, 174 - 8 * l], r - l);
-}
-
-/** Alternating knee lifts on the spot: the thigh rises towards horizontal while the other foot stays down. */
-function kneeDrive(t: number): Pose {
-  const r = smooth(firstHalf(t)),
-    l = smooth(secondHalf(t));
   return runStance(
-    [100, 108],
-    [mix(104, 110, r), mix(174, 148, r)],
-    [mix(96, 106, l), mix(174, 148, l)],
+    [100, 108 - 2 * Math.max(r, l)],
+    [100 + 3 * r, 174 - 8 * r],
+    [100 + 3 * l, 174 - 8 * l],
     r - l,
   );
 }
 
-/** Placeholder side view of the in-and-out jump: a small bounce on both feet. The front view carries the width. */
+/** Foot position of a driven knee: forward and tucked under a near-horizontal thigh. */
+const KNEE_DRIVE_FOOT: Pt = [118, 140];
+/** Alternating knee lifts on the spot (t=0 right knee up, t=1 left knee up); the other foot stays down. */
+function kneeDrive(t: number): Pose {
+  const r = smooth(firstHalf(t)),
+    l = smooth(secondHalf(t));
+  const ankle = (k: number): Pt => [
+    mix(100, KNEE_DRIVE_FOOT[0], k),
+    mix(174, KNEE_DRIVE_FOOT[1], k),
+  ];
+  return runStance([100, 108 - 3 * Math.max(r, l)], ankle(r), ankle(l), r - l);
+}
+
+/** Side-view fallback of the in-and-out jump (the front view carries the width): a small bounce, deeper at the end. */
 function inAndOutJump(t: number): Pose {
   const lift = 10 * Math.sin(Math.PI * t);
-  // In (t=0): feet together; out (t=1): feet apart and a slightly deeper landing.
-  const half = mix(4, 10, t);
   return runStance(
     [100, 114 - lift + 6 * t],
-    [100 + half, 174 - lift],
-    [100 - half, 174 - lift],
+    [104, 174 - lift],
+    [96, 174 - lift],
     0,
   );
 }
 
-/** Placeholder side view of the lateral shuffle: a low stance where each foot lifts a little in turn. */
+/** Side-view fallback of the lateral shuffle: a low stance where each foot lifts a little in turn. */
 function lateralShuffle(t: number): Pose {
   return runStance(
     [100, 116],

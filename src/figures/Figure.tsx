@@ -261,6 +261,12 @@ const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
   'box-jump': 5000,
   'squat-curl': 8000,
 };
+/** One ballistic cycle in milliseconds; running drills are quicker than hops. */
+const BALLISTIC_MS: Partial<Record<ExerciseId, number>> = {
+  'fast-feet': 600,
+  'knee-drive': 900,
+};
+const ballisticMs = (id: ExerciseId) => BALLISTIC_MS[id] ?? 1100;
 const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;
 
 /**
@@ -548,7 +554,11 @@ export function Figure({
             ? (elapsedMs.current % sequenceMs(exerciseId)) /
               sequenceMs(exerciseId)
             : spec.motion === 'ballistic'
-              ? (1 - Math.cos((elapsedMs.current / 1100) * Math.PI * 2)) / 2
+              ? (1 -
+                  Math.cos(
+                    (elapsedMs.current / ballisticMs(exerciseId)) * Math.PI * 2,
+                  )) /
+                2
               : cycleProgress(
                   elapsedMs.current,
                   demonstrationTiming(exerciseId).endHoldMs,

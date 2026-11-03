@@ -4,6 +4,7 @@ import type { ExerciseId } from '../domain/types';
 import { applyEquipmentPose } from './equipmentPose';
 import { FRAMING, movementPose } from './Figure';
 import {
+  FRONT_ONLY,
   frontMovementPose,
   obliqueMovementPose,
   supportedFrontViews,
@@ -19,10 +20,7 @@ import { heelSlidePose } from './rehabPoses';
  * and adds both sides and every equipment variant the metadata exposes.
  */
 const T_SAMPLES = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
-const NO_SIDE_VIEW: string[] = [
-  'seated-tibial-rotation',
-  'single-leg-lateral-hop',
-];
+const NO_SIDE_VIEW: readonly string[] = FRONT_ONLY;
 type Equipment = 'dumbbell' | 'kettlebell' | 'band' | null | undefined;
 const EQUIPMENT_KINDS = ['dumbbell', 'kettlebell', 'band'] as const;
 

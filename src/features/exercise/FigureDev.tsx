@@ -1,5 +1,6 @@
 import { exerciseList } from '../../content/exercises';
 import { FigureFrame, movementPose } from '../../figures/Figure';
+import { FRONT_ONLY } from '../../figures/frontViews';
 import { figures } from '../../figures/poses';
 
 const SEQUENCE_IDS: ReadonlySet<string> = new Set([
@@ -33,9 +34,7 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
 ]);
 
 const devView = (id: string) =>
-  id === 'seated-tibial-rotation' || id === 'single-leg-lateral-hop'
-    ? 'front'
-    : 'side';
+  (FRONT_ONLY as readonly string[]).includes(id) ? 'front' : 'side';
 
 /** DEV only: every start/mid/end pose, right then left, static, for review. */
 export function FigureDev() {

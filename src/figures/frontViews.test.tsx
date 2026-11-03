@@ -45,6 +45,8 @@ describe('authored frontal demonstrations', () => {
     expect(supportedFrontViews).toEqual([
       'seated-tibial-rotation',
       'single-leg-lateral-hop',
+      'in-and-out-jump',
+      'lateral-shuffle',
       'goblet-squat',
       'dumbbell-rdl',
       'kettlebell-rack-carry',

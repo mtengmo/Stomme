@@ -5,6 +5,7 @@ import type { ExerciseId } from '../domain/types';
 import { applyEquipmentPose } from './equipmentPose';
 import { movementPose } from './Figure';
 import {
+  FRONT_ONLY,
   frontMovementPose,
   obliqueMovementPose,
   supportedFrontViews,
@@ -28,10 +29,7 @@ const BASELINE_PATH = new URL(
 const TOLERANCE = 0.5;
 const STEPS = 100;
 const FRONT_THIGH_MAX = 36;
-const NO_SIDE_VIEW: string[] = [
-  'seated-tibial-rotation',
-  'single-leg-lateral-hop',
-];
+const NO_SIDE_VIEW: readonly string[] = FRONT_ONLY;
 
 type Pair = readonly [keyof Pose, keyof Pose];
 const SEGMENTS: readonly Pair[] = [
