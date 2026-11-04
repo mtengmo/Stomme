@@ -21,6 +21,7 @@ import { exerciseReferences } from './exerciseReferences';
 import { exercises } from './exercises';
 import { focusPresets, focusTargets } from './focusPresets';
 import { exerciseMuscles } from './muscles';
+import { programExcludedIds } from './programExclusions';
 import {
   focusSlots,
   generalSlots,
@@ -105,6 +106,7 @@ describe('beginner set (content/beginnerSet.ts)', () => {
       const n = Number(exerciseReferences[id].slice(1));
       return n >= 90 && n <= 98;
     };
+    expect(ids.filter((id) => programExcludedIds.has(id))).toEqual([]);
     expect(ids.filter((id) => rehabAdditionIds.has(id))).toEqual([]);
     expect(ids.filter((id) => rehabImpactExercises.has(id))).toEqual([]);
     expect(ids.filter((id) => entry(id).group === 'ballistic')).toEqual([]);
@@ -304,9 +306,27 @@ describe('beginner set coverage from roster slots', () => {
   // exercises per pass and no warning. Whole-body passes cover legs, press,
   // back and core by the muscle-based rules/coverage.ts.
   describe.each(levels)('generated programmes · %s', (experience) => {
+    const only =
+      (weights: NonNullable<TrainingPreferences['weights']>) =>
+      (experience: Experience): TrainingPreferences => ({
+        ...bodyweight(experience),
+        weights,
+      });
     describe.each([
       ['bodyweight, chair and wall', bodyweight],
       ['PRODUCT weights', productWeights],
+      [
+        'only 2×20 kg dumbbells',
+        only([{ type: 'dumbbell', kg: 20, count: 2 }]),
+      ],
+      [
+        'only 2×10 kg dumbbells',
+        only([{ type: 'dumbbell', kg: 10, count: 2 }]),
+      ],
+      [
+        'only a 16 kg kettlebell',
+        only([{ type: 'kettlebell', kg: 16, count: 1 }]),
+      ],
     ] as const)('%s', (_name, prefsFor) => {
       const p = prefsFor(experience);
       for (const emphasis of ['full', 'run', 'upper'] as const)

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { exerciseList } from '../content/exercises';
 import { routineFocusIds } from '../content/focusPresets';
+import { programExcludedIds } from '../content/programExclusions';
 import type { ExerciseId, TrainingProgram } from '../domain/types';
 import { isRealDate } from '../lib/dates';
 import type { StommeDB } from './db';
@@ -58,6 +59,13 @@ export const trainingProgramSchema = z
       });
     if (new Set(program.weekdays).size !== program.weekdays.length)
       ctx.addIssue({ code: 'custom', message: 'Duplicate weekday' });
+    for (const pass of program.passes)
+      for (const id of pass.exerciseIds)
+        if (programExcludedIds.has(id))
+          ctx.addIssue({
+            code: 'custom',
+            message: `Exercise ${id} is not allowed in a programme`,
+          });
   });
 
 export function isTrainingProgram(value: unknown): value is TrainingProgram {

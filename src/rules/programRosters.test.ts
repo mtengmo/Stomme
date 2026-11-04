@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { beginnerExerciseIds } from '../content/beginnerSet';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import {
   focusPresets,
@@ -410,5 +411,38 @@ describe('basic push-ups and calf raise in the rosters', () => {
           expect(ids).not.toContain('crunch');
           expect(ids).not.toContain('blast-off-push-up');
         }
+  });
+});
+
+describe('programme mode: beginner weight ceilings per hand', () => {
+  const heavy = (kg: number): TrainingPreferences => ({
+    programId: 'general',
+    experience: 'regular',
+    equipment: ['bodyweight', 'chair', 'support'],
+    weights: [{ type: 'dumbbell', kg, count: 2 }],
+  });
+  const pool = new Set(beginnerExerciseIds);
+  const all = (p: TrainingPreferences) =>
+    (['A', 'B'] as const).flatMap((t) =>
+      ['full', 'upper', 'pull', 'push'].flatMap(
+        (f) => buildRoster(p, t, { focus: { id: f as 'full' }, pool }).ids,
+      ),
+    );
+
+  it('skips lateral raise and kickback above 5 kg and curls above 10 kg', () => {
+    const ids = all(heavy(20));
+    for (const id of [
+      'lateral-raise',
+      'triceps-kickback',
+      'biceps-curl',
+      'hammer-curl',
+    ])
+      expect(ids).not.toContain(id);
+  });
+
+  it('keeps them within the ceiling', () => {
+    expect(all(heavy(5))).toContain('lateral-raise');
+    expect(all(heavy(10))).toContain('biceps-curl');
+    expect(all(heavy(10))).not.toContain('lateral-raise');
   });
 });

@@ -4,6 +4,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
+import { exercises } from '../../content/exercises';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
 import { createSession, listSessions, setMeta } from '../../db/repo';
@@ -88,4 +89,65 @@ it('without the parameter the ordinary preview is shown', async () => {
     await screen.findByRole('button', { name: 'Starta passet' }),
   ).toBeTruthy();
   expect(screen.queryByText(/Vecka \d av 4/)).toBeNull();
+});
+
+it('leaves out pass exercises that no longer fit the equipment and says so', async () => {
+  await saveTrainingProgram(
+    getDb(),
+    programFixture({
+      passes: [
+        {
+          focus: 'full',
+          template: 'A',
+          exerciseIds: [
+            'goblet-chair-squat',
+            'glute-bridge',
+            'back-extension',
+            'step-up',
+            'dead-bug',
+          ],
+        },
+        programFixture().passes[1] as never,
+      ],
+    }),
+  );
+  window.location.hash = '#/traning/A?program=1';
+  render(<App />);
+  expect(
+    await screen.findByText(/Borttaget ur dagens pass eftersom utrustningen/),
+  ).toBeTruthy();
+  expect(
+    screen.getByText(
+      (_, el) =>
+        el?.tagName === 'P' &&
+        !!el.textContent?.includes(
+          exercises['step-up'].name.toLocaleLowerCase('sv'),
+        ),
+    ),
+  ).toBeTruthy();
+  await userEvent
+    .setup()
+    .click(screen.getByRole('button', { name: 'Starta passet' }));
+  await waitFor(async () =>
+    expect((await listSessions(getDb())).length).toBe(1),
+  );
+  const [session] = await listSessions(getDb());
+  expect(session?.plan.map((p) => p.exerciseId)).not.toContain('step-up');
+  expect(session?.plan.length).toBe(4);
+});
+
+it('a rehab user opening ?program=1 gets the ordinary rehab preview', async () => {
+  await setMeta(getDb(), 'training', {
+    programId: 'rehab',
+    rehabFocus: 'custom',
+    experience: 'new',
+    equipment: ['bodyweight', 'chair', 'support'],
+  });
+  window.location.hash = '#/traning/A?program=1';
+  render(<App />);
+  await screen.findByRole('heading', { level: 1 });
+  expect(screen.queryByText(/Vecka \d av 4/)).toBeNull();
+  expect(
+    screen.queryByRole('heading', { level: 1, name: /^Pass 1 · / }),
+  ).toBeNull();
 });

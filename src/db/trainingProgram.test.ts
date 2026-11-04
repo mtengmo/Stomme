@@ -95,3 +95,25 @@ describe('startTrainingSession with a programme pass', () => {
     ).rejects.toThrow();
   });
 });
+
+describe('startTrainingSession with a programme pass while another session runs', () => {
+  it('returns the active session instead of starting a new one', async () => {
+    await saveTrainingProgram(db, programFixture());
+    const active = await start(undefined);
+    await db.setLogs.add({
+      id: 'l1',
+      sessionId: active.id,
+      exerciseId: plan.exerciseId,
+      setNumber: 1,
+      amount: 20,
+      loadIndex: 0,
+      weightKg: 0,
+      variantId: plan.variantId,
+      loggedAt: now.toISOString(),
+    } as never);
+    const again = await start({ programId: 'prog-1', pass: 1, week: 1 });
+    expect(again.id).toBe(active.id);
+    expect(again.programPass).toBeUndefined();
+    expect(await db.sessions.count()).toBe(1);
+  });
+});

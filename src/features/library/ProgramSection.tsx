@@ -12,7 +12,8 @@ export function ProgramSection({ program }: { program: TrainingProgram }) {
         Ditt program
       </h2>
       {program.passes.map((pass, index) => (
-        <div key={`${pass.template}-${pass.focus}`}>
+        // biome-ignore lint/suspicious/noArrayIndexKey: passes are a fixed-order list; template and focus can repeat
+        <div key={index}>
           <h3 className="m-0 mb-1 text-xl font-bold">
             Pass {index + 1} · {focusLabel(pass.focus as FocusId)}
           </h3>

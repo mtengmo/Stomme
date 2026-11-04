@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { beginnerExerciseIds } from '../../content/beginnerSet';
 import { exercises } from '../../content/exercises';
 import { focusLabel } from '../../content/focusPresets';
+import { programExcludedIds } from '../../content/programExclusions';
 import { trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
@@ -422,6 +423,7 @@ export function ProgramHome({
           sessions={sessions}
           logs={logs}
           onChoose={(from, to) => void swapExercise(from, to)}
+          exclude={programExcludedIds}
         />
         {error ? (
           <p role="alert" className="m-0 text-base font-bold">

@@ -20,7 +20,7 @@ export function StopScreen({
         <div className="flex flex-1 flex-col gap-4 pt-10">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-care">
             <Icon name="stop" size={64} />
-            <p className="m-0 text-[clamp(1.25rem,calc((100vw_-_3.5rem)/5.6),3.75rem)] leading-none font-extrabold">
+            <p className="m-0 text-[clamp(2rem,calc((100vw_-_3.5rem)/5.6),3.75rem)] leading-none font-extrabold break-words">
               Stopp
             </p>
           </div>

@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: crafted JSON mutations
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { rehabAdditionIds } from '../content/rosterSlots';
 import type { Session, TrainingPreferences } from '../domain/types';
 import { basePlan } from '../features/training/defaultPlan';
 import { programFixture } from '../test/programFixture';
@@ -120,6 +121,17 @@ describe('backup schema v5: training programme', () => {
     expect(
       await mutate((b) => b.meta.push({ key: 'program', value: {} })),
     ).toThrow();
+  });
+
+  it('rejects excluded exercises: rehab addition, impact and knee E90', async () => {
+    const [addition] = [...rehabAdditionIds];
+    for (const bad of [addition, 'burpee', 'blast-off-push-up']) {
+      const backup = await seeded();
+      backup.meta.find(
+        (m: any) => m.key === 'trainingProgram',
+      ).value.passes[0].exerciseIds[0] = bad;
+      expect(() => parseBackup(text(backup))).toThrow();
+    }
   });
 
   it('validates programPass on sessions', async () => {

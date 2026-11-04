@@ -44,7 +44,21 @@ export function passPlan(
   sessions: Session[],
   logs: SetLog[],
 ): PassPlan {
-  const ids = program.passes[passIndex]?.exerciseIds ?? [];
+  return planForIds(
+    program.passes[passIndex]?.exerciseIds ?? [],
+    preferences,
+    sessions,
+    logs,
+  );
+}
+
+/** Splits exercise ids into those that still fit the equipment and those that do not. */
+export function planForIds(
+  ids: readonly ExerciseId[],
+  preferences: TrainingPreferences,
+  sessions: Session[],
+  logs: SetLog[],
+): PassPlan {
   const all = customWorkoutPlan(ids, preferences, sessions, logs);
   return {
     plan: all.filter((item) => item.variantId !== undefined),

@@ -16,6 +16,7 @@ import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
 import { getDb } from '../../db/db';
 import { toggleFavourite } from '../../db/favourites';
 import { useAppHashLocation } from '../../lib/hashLocation';
+import { programFixture } from '../../test/programFixture';
 import { ExerciseLibrary } from './ExerciseLibrary';
 
 const muscleCount = (group: MuscleGroupId) =>
@@ -93,6 +94,14 @@ describe('exercise library', () => {
     render(<TestRoutes />);
     expect(screen.queryByRole('heading', { name: 'Ditt program' })).toBeNull();
     cleanup();
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight', 'chair', 'support'],
+      },
+    });
     const passes = [
       { focus: 'full', template: 'A', exerciseIds: programIds(0) },
       { focus: 'full', template: 'B', exerciseIds: programIds(1) },
@@ -127,6 +136,25 @@ describe('exercise library', () => {
       screen.getByRole('heading', { level: 2, name: 'Alla övningar' }),
     ).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/\bE\d{1,3}\b/);
+  });
+
+  it('hides a dormant programme from a rehab user', async () => {
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'rehab',
+        rehabFocus: 'custom',
+        experience: 'new',
+        equipment: ['bodyweight', 'chair', 'support'],
+      },
+    });
+    await getDb().meta.put({
+      key: 'trainingProgram',
+      value: programFixture(),
+    });
+    render(<TestRoutes />);
+    await screen.findByRole('heading', { level: 2, name: 'Alla övningar' });
+    expect(screen.queryByRole('heading', { name: 'Ditt program' })).toBeNull();
   });
 
   it('finds seated tibial rotation by its alias', async () => {

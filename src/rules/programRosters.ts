@@ -20,7 +20,9 @@ import type {
 } from '../domain/types';
 import {
   allowedLevels,
+  chooseStartingWeight,
   chooseVariant,
+  heavyStartAllowed,
   levelRankOf,
   variantsThatFit,
   variantUsable,
@@ -61,11 +63,8 @@ function poolSlot(slot: RosterSlot, pool: ReadonlySet<ExerciseId>): RosterSlot {
   const candidates = [...slot.candidates];
   for (const s of poolSupplements) {
     if (s.slot !== slot.id) continue;
-    candidates.splice(
-      s.after ? candidates.indexOf(s.after) + 1 : candidates.length,
-      0,
-      s.add,
-    );
+    const at = s.after ? candidates.indexOf(s.after) : -1;
+    candidates.splice(at >= 0 ? at + 1 : candidates.length, 0, s.add);
   }
   return { ...slot, candidates: candidates.filter((id) => pool.has(id)) };
 }
@@ -123,6 +122,34 @@ function usable(id: ExerciseId, preferences: TrainingPreferences): boolean {
   return !!variant && variantUsable(preferences, variant);
 }
 
+/**
+ * Programme mode: heaviest starting weight per hand a beginner pass accepts
+ * for the small-muscle arm and shoulder work. A slot whose only loaded variant
+ * would start heavier moves on to its next candidate.
+ */
+const programWeightCeilingKg: Partial<Record<ExerciseId, number>> = {
+  'lateral-raise': 5,
+  'triceps-kickback': 5,
+  'biceps-curl': 10,
+  'hammer-curl': 10,
+};
+
+function withinProgramCeiling(
+  id: ExerciseId,
+  preferences: TrainingPreferences,
+): boolean {
+  const ceiling = programWeightCeilingKg[id];
+  const variant = chooseVariant(id, preferences);
+  const tool = variant?.equipment.find(
+    (item) => item.type === 'dumbbell' || item.type === 'kettlebell',
+  );
+  if (ceiling === undefined || !variant || !tool) return true;
+  const { totalKg } = chooseStartingWeight(preferences, variant, {
+    heavyAllowed: heavyStartAllowed(id),
+  });
+  return totalKg / tool.count <= ceiling;
+}
+
 function isLoaded(id: ExerciseId, preferences: TrainingPreferences): boolean {
   const variant = chooseVariant(id, preferences);
   return (
@@ -141,11 +168,17 @@ function pickFromSlot(
   used: ReadonlySet<ExerciseId>,
   /** false: return only in-level picks, never the easiest above-level one. */
   allowFallback = true,
+  /** Programme mode: skip loaded variants that would start above the beginner ceiling. */
+  capWeights = false,
 ): { id: ExerciseId; note?: string } | undefined {
   const levels = allowedLevels(preferences.experience);
   // A weighted exercise without a registered weight is never suggested; the slot moves on.
   const base = slot.candidates.filter(
-    (id) => !used.has(id) && fits(id, preferences) && usable(id, preferences),
+    (id) =>
+      !used.has(id) &&
+      fits(id, preferences) &&
+      usable(id, preferences) &&
+      (!capWeights || withinProgramCeiling(id, preferences)),
   );
   const pool = base.filter((id) => levels.includes(levelOf(id, preferences)));
   if (!pool.length) {
@@ -181,6 +214,7 @@ function wholeBody(
       preferences,
       new Set(ids),
       !pool,
+      !!pool,
     );
     if (!pick) continue;
     ids.push(pick.id);
@@ -254,11 +288,17 @@ function focusRoster(
     for (const slot of slots) {
       if (ids.length >= limit) break;
       const used = new Set(ids);
-      const first = pickFromSlot(slot, preferences, used, false);
+      const first = pickFromSlot(slot, preferences, used, false, !!pool);
       if (template === 'B' && round === 0 && first) {
         used.add(first.id);
         // The alternative is taken only when it is an in-level pick.
-        const alternative = pickFromSlot(slot, preferences, used, false);
+        const alternative = pickFromSlot(
+          slot,
+          preferences,
+          used,
+          false,
+          !!pool,
+        );
         add(alternative ?? first);
       } else add(first);
     }

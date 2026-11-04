@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { rehabAdditionIds } from '../content/rosterSlots';
 import { programFixture } from '../test/programFixture';
 import { StommeDB } from './db';
 import {
@@ -16,6 +17,10 @@ afterEach(async () => {
   db.close();
   await db.delete();
 });
+
+const withIds = (exerciseIds: string[]) =>
+  ({ focus: 'full', template: 'A', exerciseIds }) as never;
+const rehabAdditionExample = [...rehabAdditionIds][0] as string;
 
 describe('isTrainingProgram', () => {
   const bad: [string, unknown][] = [
@@ -91,6 +96,33 @@ describe('isTrainingProgram', () => {
           programFixture().passes[1],
         ],
       },
+    ],
+    [
+      'a rehab addition',
+      programFixture({
+        passes: [
+          withIds(['plank', 'dead-bug', 'glute-bridge', rehabAdditionExample]),
+          programFixture().passes[1] as never,
+        ],
+      }),
+    ],
+    [
+      'a rehab impact exercise',
+      programFixture({
+        passes: [
+          withIds(['plank', 'dead-bug', 'glute-bridge', 'burpee']),
+          programFixture().passes[1] as never,
+        ],
+      }),
+    ],
+    [
+      'a knee exercise E90',
+      programFixture({
+        passes: [
+          withIds(['plank', 'dead-bug', 'glute-bridge', 'blast-off-push-up']),
+          programFixture().passes[1] as never,
+        ],
+      }),
     ],
     [
       'a custom focus',

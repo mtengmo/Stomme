@@ -29,6 +29,7 @@ import {
   physioKneeTotal,
   physioProgressionNotes,
 } from '../../content/physioKneeProgramme';
+import { programExcludedIds } from '../../content/programExclusions';
 import {
   experienceLabels,
   isTrainingPreferences,
@@ -88,6 +89,7 @@ import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { DeleteWorkoutButton } from '../library/CustomWorkoutList';
+import { planForIds } from '../program/programView';
 import { weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule } from '../week/WeeklyPlan';
 import { basePlan, customWorkoutPlan, defaultPlan } from './defaultPlan';
@@ -236,12 +238,8 @@ function PreviewEditor({
         logs,
       );
     if (programPass)
-      return customWorkoutPlan(
-        programPass.exerciseIds,
-        preferences,
-        sessions,
-        logs,
-      );
+      return planForIds(programPass.exerciseIds, preferences, sessions, logs)
+        .plan;
     return defaultPlan(
       preferences,
       id,
@@ -262,6 +260,11 @@ function PreviewEditor({
     }
   }, [draftKey, plan]);
 
+  const [programRemoved] = useState<ExerciseId[]>(() =>
+    programPass
+      ? planForIds(programPass.exerciseIds, preferences, sessions, logs).removed
+      : [],
+  );
   const [flags0] = useState(() => readFlags(draftKey));
   const [confirmed, setConfirmed] = useState(() => {
     if (!flags0.confirmed) return false;
@@ -528,6 +531,15 @@ function PreviewEditor({
         {programPass ? (
           <p className="m-0 mt-1 text-base text-ink-soft">
             Vecka {programPass.week} av {BLOCK_WEEKS}
+          </p>
+        ) : null}
+        {programRemoved.length ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Borttaget ur dagens pass eftersom utrustningen saknas:{' '}
+            {programRemoved
+              .map((rid) => exercises[rid].name.toLocaleLowerCase('sv'))
+              .join(', ')}
+            .
           </p>
         ) : null}
         {preferences.programId === 'general' &&
@@ -1451,6 +1463,7 @@ function PreviewEditor({
               preferences={preferences}
               sessions={sessions}
               logs={logs}
+              exclude={programPass ? programExcludedIds : undefined}
               onChoose={(from, to) => {
                 updatePlan((current) =>
                   current.map((item) =>

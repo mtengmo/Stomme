@@ -182,7 +182,9 @@ export function ExerciseLibrary() {
             Visar bara källbaserade AAOS knäövningar.
           </p>
         ) : null}
-        {program ? <ProgramSection program={program} /> : null}
+        {program && preferences?.programId === 'general' ? (
+          <ProgramSection program={program} />
+        ) : null}
         <div className="flex flex-col gap-4">
           <button
             type="button"

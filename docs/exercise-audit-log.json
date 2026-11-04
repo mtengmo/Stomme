@@ -19,6 +19,20 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Setup, support leg, direction and return agree with the animation. Profile view; a front knee-tracking view is only a future option. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "claude-opus",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E01 efter namnbytet till Sitta ner och resa sig från stol: namn, uppställning, sänkning, resning och knäriktning stämmer; (goblet) finns kvar i lastetiketten, alias hittas. Notering: tips 2 säger sänk på 3 sekunder men repTempo är 2 s ned och 2 s upp utan paus; lastetiketten för 16 kg saknar mot bröstet. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; en Codex-modell eller human bör granska om. Såg bara utvalda faser av utåtvägen i sidovy (kontaktblad och egna fasbilder för kroppsvikt, hantel, kettlebell), ingen live-loop, ingen frontvy, ej mörkt läge eller reducerade stillbilder. Inget godkännande."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "claude-opus",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "E01 figuren oförändrad. Samplade faser 0-1 för tre varianter: stolen fast, höften landar på sätets framkant, fötterna i golvet, överkropp upprätt, jämn längd på lemmar, last vid bröstet. Notering: loopens Start och reduced-motion-stillbilden är sittande, texten börjar stående; hanteln ritas horisontellt i en hand. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; en Codex-modell eller human bör granska om. Såg bara utvalda faser av utåtvägen i sidovy (kontaktblad och egna fasbilder för kroppsvikt, hantel, kettlebell), ingen live-loop, ingen frontvy, ej mörkt läge eller reducerade stillbilder. Inget godkännande."
       }
     ],
     "fixes": [
