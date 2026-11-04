@@ -1011,6 +1011,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E27: nio faser och reduced-motion H/V, 2/4 kg visar vald arm från axeln till över huvudet, stilla ben/bål, grepp vid handtaget och kula mot underarmens utsida. Spegling/sidocue och ram stämmer. Separat greppinstruktion och text om rak handled, fri hands hjälp vid upp-/nedtagning samt lättare hantel som förövning finns. Exakt handledsvinkel och svank är inte säkert avläsbara. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1042,6 +1050,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Step direction, planted foot, bell path and squat depth agree. Swing is deliberately faster. E27 rack position simplified. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E28: nio profilfaser samt reduced-motion profil/front visar grund bilateral knäböj med händer vid stöd och fötter kvar. Frontens fotleder är även fasta i källan (ankleDX 18); knäna rör sig utåt. Kroppsvikt utan sidoval/varianter, hela stödet och figuren ryms. Text om bröst lyft, hälar kvar, fem sekunders håll och grundare alternativ finns. Hålltiden är inte verifierad och exakt bållutning/knäriktning kräver fortsatt bedömning. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1068,6 +1084,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E29: nio profilfaser och reduced-motion H/V visar vald häl bakåt/upp genom knäböjning, stilla lår/bål och andra foten som stöd. Händer når stödet, spegling/sidocue stämmer och ramen räcker. Kroppsvikt utan ankelvikt. Tips om knän intill varandra, undvik höftböjning/svank, fem sekunders håll och mindre böjning finns. Hålltid och tidig tåfrigång behöver ses i rörelse; tidigare falskt positiv geometripunkt återöppnas inte från detta material. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1097,6 +1121,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E30: nio profilfaser och reduced-motion H/V visar valt underben från golvet till framåtsträckt, med låret vid sitsen, andra foten kvar och upprätt bål. Spegling/sidocue stämmer och stol/fot ryms. Kroppsvikt utan ankelvikt. Text om stabil stol, lugn sträckning, fem sekunders håll och kortare rörelse finns. Ingen säker textavvikelse; hålltid och sänkning inte verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1123,6 +1155,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E31: nio profilfaser och reduced-motion H/V visar valt rakt ben från golvet till lågt lyft, andra knäet böjt med foten kvar och underarmar vid mattan. Bål/stödkontakter stilla i stickproven, spegling/sidocue och ram stämmer. Kroppsvikt utan ankelvikt. Text om lårspänning, fem sekunders håll, undvik knäböjning/nackspänning och lägre lyft finns. Bäckensymmetri och hålltid ej verifierade; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1149,6 +1189,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E32: nio profilfaser och reduced-motion H/V visar litet lyft av valt rakt ben, andra benet kvar och huvud vilande vid armarna. Bål/bäcken ligger kvar i projektionen, spegling/sidocue och ram stämmer. Kroppsvikt utan ankelvikt. Text om undvik bäckenvridning/svank, fem sekunders håll, två sekunders vila och lägre lyft finns. Profilen bevisar inte bäckenrotation och tiderna är inte verifierade. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1175,6 +1223,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E33: nio faser och reduced-motion H/V visar valt rakt ben lyft från sidliggande, andra benet böjt för stöd, huvud/armar vid mattan och stilla bål. Sidocue anger valt ben överst och speglingen stämmer; ram räcker. Kroppsvikt utan ankelvikt. Text om undvik bakåtrullat bäcken/uppåtvända tår, fem sekunders håll, två sekunders vila och mindre lyft finns. Projektionen visar inte säkert bäckenets djuprotation eller tårotation. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1201,6 +1257,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E34: nio faser och reduced-motion H/V visar litet lyft av valt rakt undre ben; andra knäet är böjt med fot vid mattan och fri hand ger stöd framför bålen. Sidocue anger vald sida nedåt, spegling och ram stämmer. Kroppsvikt utan ankelvikt. Text om stilla kropp/rakt knä, fem sekunders håll, två sekunders vila och lägre lyft finns. Benens korsning gör djupordningen svårläst; att stödbenet står framför och att bäckenet inte rullar kan inte fullt verifieras. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1227,6 +1291,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E35: nio profilfaser och reduced-motion H/V visar valt bakre ben rakt, häl/fot kvar, främre knä böjt och händer mot väggen när höften förs framåt. Spegling/sidocue och ram stämmer. Kroppsvikt utan extra varianter. Text om bibehållen hälkontakt, undvik svank och kortare steg/mindre lutning finns. Hålltiden och exakt knä-/fotrotation går inte att verifiera från stillbilder. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
@@ -1253,6 +1325,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "docs/exercise-animation-audit.md: Working leg, hold direction and support agree (AAOS-style). E29/E30 use constrained knee motion. Band placement separate from body. Static/source inspection, not full-loop certification."
+      },
+      {
+        "date": "2026-11-04",
+        "reviewer": "codex:gpt6astra",
+        "commit": "88b0d96",
+        "scope": "text",
+        "result": "ok",
+        "notes": "E36: nio profilfaser och reduced-motion H/V visar valt knä böjt bakåt och handen närma sig fotleden till grepp i Slut; den fria handen ligger mot väggen. Stödfot/bål kvar, spegling/sidocue och ram stämmer. Start visar ännu inget grepp, förenligt med ordningen böj knäet och fatta sedan fotleden. Kroppsvikt utan extra varianter. Text om varsamt drag, undvik svank/knä utåt och mindre drag med stöd finns. Knäets sidriktning, statisk hålltid och lugn nedställning ej verifierade. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
