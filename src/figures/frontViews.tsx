@@ -593,7 +593,7 @@ export function frontMovementPose(
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
     const kneeDX = mix(18, 31, t);
-    const ankleDX = mix(18, 27, t);
+    const ankleDX = 18; // feet stay planted; only the knees travel outward
     const kneeY = mix(148, 150, t);
     return skeleton(
       point(100, neckY - 14),
@@ -759,16 +759,16 @@ export function obliqueMovementPose(
 
   const hip: Pt = [106, 136];
   const supportAnkle: Pt = [163, 122];
-  const angle = mix(1.15, -0.42, t);
-  const kneeDir: Pt = [32, 10];
-  const kneeLen = Math.hypot(kneeDir[0], kneeDir[1]);
-  const knee: Pt = [
-    hip[0] + (29.35 * kneeDir[0]) / kneeLen,
-    hip[1] + (29.35 * kneeDir[1]) / kneeLen,
-  ];
+  // The lifting leg is one straight 58.7 long leg swinging from the hip, as in
+  // the profile view; the knee is the midpoint so thigh and shin follow the lift.
+  const angle = mix(0.6, 0, t);
   const movingAnkle: Pt = [
-    knee[0] + 29.35 * Math.cos(angle),
-    knee[1] + 29.35 * Math.sin(angle),
+    hip[0] + 58.7 * Math.cos(angle),
+    hip[1] + 58.7 * Math.sin(angle),
+  ];
+  const knee: Pt = [
+    (hip[0] + movingAnkle[0]) / 2,
+    (hip[1] + movingAnkle[1]) / 2,
   ];
   const toe = (ankle: Pt): Pt => [ankle[0] + 10, ankle[1] + 3];
   const moving = { knee, ankle: movingAnkle, toe: toe(movingAnkle) };

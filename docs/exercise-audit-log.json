@@ -358,7 +358,7 @@
     "name": "Gobletknäböj utan stol",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -396,12 +396,15 @@
         "fixer": "claude-sonnet",
         "commit": "6f58404",
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      },
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E12: frontvyn låser fotleder och tår (ankleDX konstant 18) hela knäböjen; endast knäna rör sig utåt. Ingen sidoglidning vid nedgång eller återgång. Frontvyn ej visuellt granskad i kontaktblad, endast geometri/test."
       }
     ],
-    "openIssues": [
-      "[strong] E12: I frontvyns reduced-motion Start→Slut glider båda fotlederna och tårna utåt när knäböjen fördjupas (ankleDX 18→27 i frontViews.tsx); samma skillnad syns med kroppsvikt, hantel och kettlebell. Fötterna ska behålla samma stödposition genom hela knäböjen. Lås båda fotleder/tår mot golvet och lös höft/knägeometrin utan sidoglidning; kontrollera även återgången."
-    ],
-    "fingerprint": "e1fd1dbeee07"
+    "openIssues": [],
+    "fingerprint": "2a48327d74d5"
   },
   {
     "id": "kettlebell-deadlift",
@@ -1284,7 +1287,7 @@
     "name": "Sidoplanka på bänk med benlyft",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1334,14 +1337,18 @@
         "fixer": "claude-sonnet",
         "commit": "8dcecdb",
         "notes": "L4: symmetric framing and prop-fit check on both sides."
+      },
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E42: snedvyn lyfter nu hela raka benet från höften (knä = mittpunkt, benlängd 58,7 bevarad, vinkel 0.6 till 0), som profilvyn; bäcken och övre fot på bänken oförändrade. Snedvyn ej visuellt granskad i kontaktblad, endast geometri/test."
       }
     ],
     "openIssues": [
       "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
-      "Exact lower-leg-lift variant has related research only, no source for this drawing",
-      "[strong] E42: I Sned vinkel Start/Slut för både H och V är nedre knät kvar på samma plats och endast underbenet svänger från nedåt till uppåt. Profilvyn visar däremot hela raka benet som lyfts från höften. Anpassa snedvyn till samma höftledsrörelse som profilvyn/textens benlyft: låret och knät ska följa lyftet, med bibehållen benlängd, stabilt bäcken och övre fot kvar på bänken."
+      "Exact lower-leg-lift variant has related research only, no source for this drawing"
     ],
-    "fingerprint": "db916a9dae05",
+    "fingerprint": "7ff0246d8dfa",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
     ]
@@ -1925,7 +1932,7 @@
     "name": "Utfall med hopp och benbyte",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -1936,11 +1943,15 @@
         "notes": "E63: nio frysta faser och reduced-motion Start/Slut granskade. Bakre foten svävar tydligt över golvet i båda utfallsändlägena. Benen byter ordning i fasföljden, men identisk färg/profil gör bytet svårt att läsa i Start/Slut. Hela figuren ryms; bilateral kroppsvikt utan sidoval/varianter. Texten anger mjuk landning, bromsning och utfall utan hopp som alternativ; sidobredd/knäriktning kan inte bedömas i profil. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] E63: I fas 0 och 1 samt reduced-motion Start/Slut ligger bakre foten flera bildpunkter ovanför golvlinjen; endast främre foten når underlaget. Visa stabil utfallsstart/landning med bakre framfot/tår i golvet och hälen tillåten upplyft. Anpassa höft/knä/fotgeometrin med fasta benlängder och kontrollera kontakterna vid båda benens landning."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E63: bakre foten har nu tårna i golvet (hälen lyft) i utfallsändlägena: grundare bakre underben (vinkel 2.967) och brantare fotvinkel för bakre foten, fasta benlängder 36/34. Faserna nära hoppet ej separat granskade visuellt."
+      }
     ],
-    "fingerprint": "362c9c4bec3d"
+    "openIssues": [],
+    "fingerprint": "12c047bd38af"
   },
   {
     "id": "mountain-climber",

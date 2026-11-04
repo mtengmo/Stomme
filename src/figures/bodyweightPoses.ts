@@ -343,8 +343,14 @@ function lunge(t: number): Pose {
     neck: Pt = [100, hip[1] - 43];
   const kr = polar(hip, 36, mix(0.08, 2.38, t));
   const kl = polar(hip, 36, mix(2.38, 0.08, t));
-  const ar = polar(kr, 34, mix(1.32, 3.1, t));
-  const al = polar(kl, 34, mix(3.1, 1.32, t));
+  // The back shin ends shallow enough that the back forefoot reaches the floor
+  // (heel lifted); the front shin is near vertical with a flat foot.
+  const ar = polar(kr, 34, mix(1.32, 2.967, t));
+  const al = polar(kl, 34, mix(2.967, 1.32, t));
+  // Foot length stays 9.49 (as foot()); a steep foot angle puts only the toe on the floor.
+  const flat = Math.atan2(3, 9),
+    ball = 1.05;
+  const toe = (a: Pt, angle: number): Pt => polar(a, Math.hypot(9, 3), angle);
   return pose(
     [100, neck[1] - 14],
     neck,
@@ -355,7 +361,7 @@ function lunge(t: number): Pose {
       [84, neck[1] + 21],
       [79, neck[1] + 42],
     ],
-    [kr, ar, foot(ar), kl, al, foot(al)],
+    [kr, ar, toe(ar, mix(flat, ball, t)), kl, al, toe(al, mix(ball, flat, t))],
   );
 }
 function climber(t: number): Pose {
