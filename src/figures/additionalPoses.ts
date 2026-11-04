@@ -1,3 +1,4 @@
+import { farmerCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
@@ -548,32 +549,10 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   'farmer-carry': {
-    start: {
-      ...stand,
-      eR: [110, 97],
-      hR: [113, 122],
-      eL: [85, 97],
-      hL: [82, 122],
-      kR: [111, 149],
-      aR: [120, 174],
-      tR: [132, 177],
-      kL: [84, 148],
-      aL: [77, 174],
-      tL: [89, 177],
-    },
-    end: {
-      ...stand,
-      eR: [110, 97],
-      hR: [113, 122],
-      eL: [85, 97],
-      hL: [82, 122],
-      kR: [88, 148],
-      aR: [79, 174],
-      tR: [91, 177],
-      kL: [110, 149],
-      aL: [119, 174],
-      tL: [131, 177],
-    },
+    // One whole two-step cycle per loop: stance foot planted, swing foot lifts.
+    start: farmerCarryPose(0),
+    end: farmerCarryPose(0.5),
+    motion: 'sequence',
     props: [],
     held: twoDumbbells,
   },

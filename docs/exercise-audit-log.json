@@ -730,7 +730,7 @@
     "name": "Farmergång",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -755,11 +755,15 @@
         "notes": "E18: nio profilfaser samt reduced-motion profil/front med 2×2 kg hantlar/2×4 kg kettlebells. Profilens fötter glider längs golvet när benen växlar; frontens ändlägen visar däremot fotlyft. Två vikter hålls vid sidorna, bål upprätt och ramen räcker. Bilateral utan sidoval. Tips om lugna steg, säker upp-/nedtagning och kortare/lättare variant finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] E18: I profilfaser 0–1 byter fotleder/tår plats längs golvet utan fotlyft, även vid benpassagen i fas 0,5. Texten säger att gå. Visa växelvis fast stödfot och lyft svängfot med golvfrigång, konstanta benlängder och sammanhängande steg; synka profilens gång med frontvyn och kontrollera båda viktvarianterna."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E18: ny gångcykel (farmerCarryPose, återanvänder suitcaseCarryPose för benen): fast stödfot, svängfot lyfts ~10 enheter, konstanta benlängder, upprätt bål, armarna hänger med svag motsving, exakt loopsöm; motion sequence. Frontvyns lyfta fot följer profilens gång (vänster t<0.5, höger t>0.5). Sedd profil och front fas 0-0.75 med hantel; andra viktvarianten ej separat sedd."
+      }
     ],
-    "fingerprint": "f0c0c6020139"
+    "openIssues": [],
+    "fingerprint": "5008c8b189db"
   },
   {
     "id": "biceps-curl",
@@ -936,7 +940,7 @@
     "name": "Utfall bakåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -961,19 +965,22 @@
         "notes": "E24: nio profilfaser, reduced-motion H/V i profil/front och kroppsvikt/2×2 kg/KB 4/8/16 kg. Valda benet stannar fram och speglingen stämmer, ram räcker. Bakre foten förflyttas utan tydlig golvfrigång i profil. Frontvyns kettlebell svävar mitt framför bäckenet medan båda händerna hänger vid sidorna. Text om främre fot kvar, knäriktning och grundare/kortare variant finns. Frontens streckade linje är djupmarkering. Fas 0 har mer böjda knän än reduced-motion Start. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] E24: Frontvyns reduced-motion Start/Slut med 4/8/16 kg kettlebell visar vikten framför bäckenet utan kontakt med någon hand; båda händerna hänger vid sidorna. Rita ett tydligt grepp som följer variantens instruktion i båda ändlägen och hela rörelsen, även speglat.",
-      "[strong] E24: I profilfaser 0–0,5 förflyttas den bakre grå foten bakåt längs golvet utan synligt fotlyft. Texten beskriver ett steg bakåt. Visa lyft/frigång under steget och därefter fast bakre tåkontakt under sänkningen, med främre foten kvar och konstanta benlängder; kontrollera återsteget."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E24: (a) frontvy med kettlebell: båda händerna på handtaget vid bröstet (hold i x 95/105) och vikten följer greppet genom rörelsen, speglat; (b) profil: bakre foten lyfts ~14 enheter under steget bakåt och landar på tån med hälen uppe, därefter fast tå under sänkningen; bakre knät böjs nu framåt (var bakåt vid fas 0). Sedda fas 0, 0.25, 0.5 profil och fas 0-1 front med 16 kg; 4 och 8 kg samt separat återsteg ej sedda."
+      }
     ],
-    "fingerprint": "f41dc6fa1ff7"
+    "openIssues": [],
+    "fingerprint": "9448a09f3f4a"
   },
   {
     "id": "forward-lunge",
     "name": "Utfall framåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -998,10 +1005,14 @@
         "notes": "E25: nio profilfaser, reduced-motion H/V profil/front och kroppsvikt/2×2 kg/KB 4/8/16 kg. Valda benet kliver fram och spegling/sidocue stämmer. Frontvyns kettlebell saknar handkontakt i samtliga tre vikter. Ram räcker; streckad golvlinje tolkas som djupmarkering. Text om bromsning, hel främre fot och grundare obelastad variant finns. Fas 0 har mer böjda knän än reduced-motion Start; rörelsens övergångar behöver ses kontinuerligt. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] E25: Frontvyns reduced-motion Start/Slut med 4/8/16 kg kettlebell visar vikten svävande framför bäckenet, medan händerna hänger åtskilda vid sidorna. Placera händerna på handtaget enligt variantens grepp och låt vikten följa greppet genom hela utfallet, för båda valda sidor."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E25: samma frontvygrepp som E24: båda händerna på kettlebellens handtag, vikten följer greppet. Sedd front 16 kg fas 0, 0.5, 1 (vänster fas 0 och 1) och kroppsvikt fas 1; 4 och 8 kg ej sedda."
+      }
     ],
+    "openIssues": [],
     "fingerprint": "51a47db2c234"
   },
   {

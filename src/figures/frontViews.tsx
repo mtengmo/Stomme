@@ -334,8 +334,9 @@ export function frontMovementPose(
   }
   if (exerciseId === 'farmer-carry') {
     const stride = Math.sin(2 * Math.PI * t);
-    const liftR = Math.max(0, stride);
-    const liftL = Math.max(0, -stride);
+    // Same cycle as the profile gait: the left foot swings first (t<0.5).
+    const liftR = Math.max(0, -stride);
+    const liftL = Math.max(0, stride);
     return skeleton(
       point(100, 46),
       point(100, 60),
@@ -854,6 +855,31 @@ export function FrontFigureFrame({
   const splitSupported =
     angle === 'oblique' && exerciseId === 'split-squat' && kind === null;
   const pose: Pose = (() => {
+    if (
+      kind === 'kettlebell' &&
+      (exerciseId === 'reverse-lunge' || exerciseId === 'forward-lunge')
+    ) {
+      // Both hands share the kettlebell handle at the chest, as the variant
+      // says (goblet hold); the arm lengths stay those of the hanging arms.
+      const upper = Math.hypot(
+        basePose.eR[0] - basePose.neck[0],
+        basePose.eR[1] - basePose.neck[1],
+      );
+      const fore = Math.hypot(
+        basePose.hR[0] - basePose.eR[0],
+        basePose.hR[1] - basePose.eR[1],
+      );
+      const gripY = basePose.neck[1] + 10;
+      const armR = solveTwoBone(basePose.neck, [95, gripY], upper, fore, 1);
+      const armL = solveTwoBone(basePose.neck, [105, gripY], upper, fore, -1);
+      return {
+        ...basePose,
+        eR: armR.mid,
+        hR: armR.end,
+        eL: armL.mid,
+        hL: armL.end,
+      };
+    }
     if (!splitSupported) return basePose;
     const handAt = point(
       splitSupportX + (working === 'left' ? -4 : 4),

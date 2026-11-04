@@ -85,3 +85,24 @@ export function suitcaseCarryPose(progress: number): Pose {
     tL: toe(aL, tiltL),
   };
 }
+
+/**
+ * Two-handed farmer carry in profile: the same planted-stance / lifted-swing
+ * walking cycle as the suitcase carry (t=1 equals t=0), with both weights
+ * hanging at the sides and the torso upright. The hands only sway a few units
+ * opposite each other at a constant forearm length.
+ */
+export function farmerCarryPose(progress: number): Pose {
+  const t = ((progress % 1) + 1) % 1;
+  const legs = suitcaseCarryPose(t);
+  const sway = 3 * Math.cos(2 * Math.PI * t);
+  const forearm = (dx: number) =>
+    pt(HIP[0] + dx, 98 + Math.sqrt(400 - dx * dx));
+  return {
+    ...legs,
+    eR: [100, 98],
+    hR: forearm(-sway),
+    eL: [100, 98],
+    hL: forearm(sway),
+  };
+}
