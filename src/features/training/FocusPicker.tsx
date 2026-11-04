@@ -87,6 +87,7 @@ function Picker({
               <ChoiceCard
                 key={preset.id}
                 type="radio"
+                compact
                 name="daily-focus"
                 value={preset.id}
                 label={<span className="font-bold">{preset.label}</span>}

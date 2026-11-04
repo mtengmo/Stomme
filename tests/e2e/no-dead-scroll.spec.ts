@@ -3,6 +3,7 @@ import { exerciseReferences } from '../../src/content/exerciseReferences';
 import { exerciseList } from '../../src/content/exercises';
 import {
   addExercise,
+  endProgram,
   freezeClock,
   openPreview,
   playPassA,
@@ -112,7 +113,8 @@ for (const scheme of SCHEMES)
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
-        await page.goto('/#/');
+        // The focus row is on the Home of users without a programme.
+        await endProgram(page);
         await expect(
           page.getByRole('heading', { name: /pass/i }).first(),
         ).toBeVisible();
@@ -127,12 +129,76 @@ for (const scheme of SCHEMES)
         await expectNavClearance(page, 'home');
       });
 
+      test('/kom-igang first screen keeps its action in view', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await setScale(page, scale);
+        await expect(page).toHaveURL(/#\/kom-igang/);
+        await expect(
+          page.getByRole('button', { name: 'Bli starkare', exact: true }),
+        ).toBeVisible();
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+        // Onboarding hides the main navigation.
+        await expect(
+          page.getByRole('navigation', { name: 'Huvudmeny' }),
+        ).toHaveCount(0);
+      });
+
+      test('/program reveal keeps the start action in view', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general', reveal: true });
+        await setScale(page, scale);
+        await expect(page.getByText('Vecka 1 av 4')).toBeVisible();
+        await expect(
+          page
+            .getByRole('button', { name: 'Starta första passet' })
+            .or(page.getByRole('link', { name: 'Starta första passet' })),
+        ).toBeInViewport({ ratio: 1 });
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+      });
+
+      test('programme Home keeps the next-pass action in view above navigation', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general', reveal: true });
+        await page.goto('/#/');
+        await setScale(page, scale);
+        await expect(
+          page.getByRole('heading', { name: /^Vecka 1/ }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole('link', { name: 'Starta passet', exact: true }),
+        ).toBeInViewport({ ratio: 1 });
+        await expectNavClearance(page, 'programme home');
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+      });
+
       test('/fokus keeps the primary action visible above navigation', async ({
         page,
       }) => {
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
+        await endProgram(page);
         await page.goto('/#/fokus');
         await setScale(page, scale);
         await expect(
@@ -154,6 +220,7 @@ for (const scheme of SCHEMES)
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
+        await endProgram(page);
         await page.goto('/#/vecka');
         await setScale(page, scale);
         await expect(

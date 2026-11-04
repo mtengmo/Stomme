@@ -73,14 +73,14 @@ export function ProgramWeekStrip({
                   <Icon
                     name="sun"
                     size={16}
-                    className="absolute -top-2 -left-1 rounded-full bg-paper text-ink"
+                    className="absolute -top-4 -left-2 rounded-full bg-paper text-ink"
                   />
                 ) : null}
                 {done ? (
                   <PencilTick
-                    size={28}
+                    size={24}
                     variant={i}
-                    className="absolute -top-3 -right-2"
+                    className="absolute -top-5 -right-3"
                   />
                 ) : null}
               </span>

@@ -12,6 +12,8 @@ interface ChoiceCardProps {
   name?: string;
   value?: string;
   disabled?: boolean;
+  /** Tighter card for long lists that must fit one screen (min height 48 px). */
+  compact?: boolean;
   className?: string;
 }
 
@@ -29,13 +31,16 @@ export function ChoiceCard({
   name,
   value,
   disabled,
+  compact = false,
   className = '',
 }: ChoiceCardProps) {
   const hintId = useId();
   const labelId = useId();
   return (
     <label
-      className={`relative flex min-h-14 cursor-pointer items-center gap-3 rounded-md border-[3px] bg-surface px-4 py-3 text-lg has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-(--focus-outline) has-[:disabled]:opacity-50 ${
+      className={`relative flex cursor-pointer items-center gap-3 rounded-md border-[3px] bg-surface px-4 text-lg ${
+        compact ? 'min-h-12 py-1.5' : 'min-h-14 py-3'
+      } has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-(--focus-outline) has-[:disabled]:opacity-50 ${
         checked ? 'border-accent font-bold' : 'border-edge'
       } ${className}`}
     >

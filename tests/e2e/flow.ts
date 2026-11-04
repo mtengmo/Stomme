@@ -139,6 +139,17 @@ export async function playPassA(
   await page
     .getByRole('button', { name: 'Starta passet', exact: true })
     .click();
+  return playRunningSession(page, onStage);
+}
+
+/**
+ * Plays the session that was just started (the first set is on screen) to the summary and
+ * "Avsluta pass", using only the primary action on each screen. Ends on Home.
+ */
+export async function playRunningSession(
+  page: Page,
+  onStage: (stage: Stage) => Promise<void> = async () => {},
+): Promise<{ sets: number; planned: number }> {
   await expect(page.locator('[data-step]')).toBeVisible();
   const tally = await page
     .getByRole('img', { name: /set klara/ })
@@ -482,4 +493,21 @@ export async function addWeight(
     .getByRole('radio', { name: weight.count === 2 ? 'Par' : '1 st' })
     .check();
   await page.getByRole('button', { name: /^Lägg till .* kg \(/ }).click();
+}
+
+/**
+ * Ends the programme from the programme Home ("Ändra" > "Avsluta programmet"), so
+ * the user lands on the ordinary Home (pass A/B, focus picker, week planner) that
+ * users without a programme see. Everything else (sessions, workouts) stays.
+ */
+export async function endProgram(page: Page): Promise<void> {
+  await page.goto('/#/');
+  await page.getByText('Ändra', { exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Avsluta programmet', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Avsluta programmet nu', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: /^Vecka \d/ })).toHaveCount(0);
 }

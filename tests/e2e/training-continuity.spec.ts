@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { quickStart } from './flow';
+import { endProgram, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({ storageState: FRESH_STATE });
@@ -128,7 +128,8 @@ for (const width of [320, 360, 412]) {
       await expect(
         page.getByRole('link', { name: /Kortpass A/ }).first(),
       ).toBeVisible();
-      await page.goto('/');
+      // Weekly planning lives on the Home of users without a programme.
+      await endProgram(page);
       await expect(
         page.getByText('Allmän styrka', { exact: true }),
       ).toBeVisible();

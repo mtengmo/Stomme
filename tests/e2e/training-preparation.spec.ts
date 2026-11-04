@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { completeSets, keepFirstExercises, quickStart } from './flow';
+import {
+  completeSets,
+  endProgram,
+  keepFirstExercises,
+  quickStart,
+} from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -37,7 +42,8 @@ for (const width of [360, 1280]) {
     await page.screenshot({
       path: test.info().outputPath('preparation-context.png'),
     });
-    await page.goto('/#/');
+    // The pass A/B switch and the direction form belong to the Home of users without a programme.
+    await endProgram(page);
     await expect(
       page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
     ).toBeVisible();

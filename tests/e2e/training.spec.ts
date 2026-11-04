@@ -76,9 +76,12 @@ test('regular training setup starts directly and ends in the summary, with no ch
   expect(page.url()).not.toMatch(/kansla/);
   await page.getByRole('button', { name: 'Avsluta pass', exact: true }).click();
   await expect(page).toHaveURL(/#\/$/);
+  // A free pass (opened outside the programme) does not advance the programme:
+  // Home is the programme Home and still offers programme pass 1.
+  await expect(page.getByRole('heading', { name: /^Vecka 1/ })).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'Starta passet', exact: true }),
-  ).toHaveAttribute('href', /^#\/traning\/B(\?fokus=[a-z]+)?$/);
+  ).toHaveAttribute('href', /^#\/traning\/A\?program=1$/);
   await expect(
     page.getByRole('button', { name: 'Byt inriktning' }),
   ).toBeHidden();

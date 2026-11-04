@@ -28,6 +28,8 @@ for (const mode of [
       await page.setViewportSize(mode.viewport);
       await page.emulateMedia({ colorScheme: mode.colorScheme });
       await page.goto('/#/installningar');
+      // The review entry is folded away under "Granskning (för testare)".
+      await page.getByText('Granskning (för testare)', { exact: true }).click();
       await page.getByRole('link', { name: /^Övningar/ }).click();
       await expect(
         page.getByRole('heading', { name: 'Granska övningar', exact: true }),

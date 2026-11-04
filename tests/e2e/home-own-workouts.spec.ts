@@ -45,8 +45,10 @@ for (const { width, scheme } of cases) {
     await expect(page).toHaveURL(/#\/session\//);
 
     await page.goto('/#/');
+    // The programme Home (users with a programme) keeps the list reachable too.
+    await expect(page.getByRole('heading', { name: /^Vecka 1/ })).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
+      page.getByRole('link', { name: 'Fortsätt förberedelsen', exact: true }),
     ).toBeVisible();
     const list = page.getByRole('region', { name: 'Mina pass' });
     await expect(list).toBeVisible();
