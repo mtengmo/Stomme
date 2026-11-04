@@ -97,7 +97,7 @@ for (const width of [360, 1280]) {
     await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
     await expect(page.getByLabel('Meter per sida')).toHaveValue('12');
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
     await expect(

@@ -99,8 +99,11 @@ for (const scheme of SCHEMES)
         await expect(
           page.getByRole('radio', { name: /Viss vana/ }),
         ).toBeVisible();
-        await expect(next).toBeInViewport({ ratio: 1 });
-        await expectNavClearance(page, 'setup level');
+        await expect(
+          page.getByRole('button', { name: 'Visa mitt program' }),
+        ).toBeInViewport({ ratio: 1 });
+        // The setup hides the nav: the bar sits at the bottom edge.
+        if (scale === 100) await expectNoScroll(page, 'setup level');
       });
 
       test('Home focus row and next-pass action stay in view', async ({
@@ -119,7 +122,7 @@ for (const scheme of SCHEMES)
           page.getByRole('link', { name: 'Byt', exact: true }),
         ).toBeInViewport({ ratio: 1 });
         await expect(
-          page.getByRole('link', { name: 'Visa nästa pass' }),
+          page.getByRole('link', { name: 'Starta passet' }),
         ).toBeInViewport({ ratio: 1 });
         await expectNavClearance(page, 'home');
       });
@@ -316,7 +319,7 @@ for (const size of INNER_SIZES) {
       );
       await openPreview(page);
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       const start = page.getByRole('button', {
         name: 'Starta – 5 s förberedelse',
@@ -359,7 +362,7 @@ for (const size of INNER_SIZES) {
       await removeAllExercises(page);
       await addExercise(page, 'split-squat');
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       await setScale(page, scale);
       await expect(page.getByText(/Höger ben fram/).first()).toBeVisible();
@@ -450,7 +453,7 @@ for (const size of [
                 })
                 .click();
               await page
-                .getByRole('button', { name: 'Börja passet', exact: true })
+                .getByRole('button', { name: 'Starta passet', exact: true })
                 .click();
               await expect(page.locator('.session-content h1')).toHaveText(
                 name,

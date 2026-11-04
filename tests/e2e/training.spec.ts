@@ -20,25 +20,31 @@ test('regular training setup starts directly and ends in the summary, with no ch
   await expect(
     page.getByRole('heading', { name: 'Vad vill du träna?' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('navigation', { name: 'Huvudmeny' }),
-  ).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Huvudmeny' })).toHaveCount(
+    0,
+  );
   await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Hur många dagar i veckan?' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+  await expect(page.getByRole('radio', { name: 'Hela kroppen' })).toBeChecked();
+  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Vad tränar du med?' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('checkbox', { name: 'Stabil stol' }),
-  ).toBeChecked();
+  await expect(page.getByText(/Alltid med:/)).toBeVisible();
   await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await expect(
     page.getByRole('radio', { name: /Ny eller på väg tillbaka/ }),
   ).toBeChecked();
-  await page.getByRole('button', { name: 'Nästa', exact: true }).click();
-  await expect(page.getByRole('radio', { name: 'Hela kroppen' })).toBeChecked();
   await page
-    .getByRole('button', { name: 'Visa mitt pass', exact: true })
+    .getByRole('button', { name: 'Visa mitt program', exact: true })
     .click();
+  await expect(
+    page.getByRole('heading', { name: 'Ditt program' }),
+  ).toBeVisible();
+  await page.goto('/#/traning/A');
   await page.getByRole('heading', { name: 'Pass A', exact: true }).waitFor();
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
@@ -52,7 +58,9 @@ test('regular training setup starts directly and ends in the summary, with no ch
   await page.locator('ol').getByRole('link').first().click();
   await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
 
   await expect(page).toHaveURL(/#\/session\/[^/]+$/);
   await expect(page.getByRole('radio', { name: 'Redo att träna' })).toHaveCount(
@@ -69,7 +77,7 @@ test('regular training setup starts directly and ends in the summary, with no ch
   await page.getByRole('button', { name: 'Avsluta pass', exact: true }).click();
   await expect(page).toHaveURL(/#\/$/);
   await expect(
-    page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+    page.getByRole('link', { name: 'Starta passet', exact: true }),
   ).toHaveAttribute('href', /^#\/traning\/B(\?fokus=[a-z]+)?$/);
   await expect(
     page.getByRole('button', { name: 'Byt inriktning' }),
@@ -90,7 +98,9 @@ test('general direction has no check-ins; "Det gör ont" marks only that exercis
   ).toBeVisible();
   await keepFirstExercises(page);
   await page.getByLabel('Set', { exact: true }).fill('1');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   // Ordinary training starts directly: no questionnaire, no rehab symptom report.
   await expect(page).toHaveURL(/#\/session\//);
   await expect(page.getByRole('radio', { name: 'Redo att träna' })).toHaveCount(
@@ -157,9 +167,11 @@ test('rehab uses explicitly entered dose and selected left side through reload',
   await page.getByLabel('Repetitioner per sida', { exact: true }).fill('3');
   await page.getByLabel('Arbetande sida').selectOption('left');
   await expect(
-    page.getByRole('button', { name: 'Börja passet', exact: true }),
+    page.getByRole('button', { name: 'Starta passet', exact: true }),
   ).toBeEnabled();
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await page.getByRole('radio', { name: 'Redo att träna' }).check();
   await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
   await page.getByRole('button', { name: 'Spara och fortsätt' }).click();
@@ -245,7 +257,9 @@ test('knee rehab saves a reusable AAOS selection and connects actual sets to his
   await expect(
     page.getByLabel('Repetitioner per sida', { exact: true }),
   ).toHaveValue('3');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await page.getByRole('radio', { name: 'Redo att träna' }).check();
   await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
   await page.getByRole('button', { name: 'Spara och fortsätt' }).click();

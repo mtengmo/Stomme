@@ -17,6 +17,7 @@ import { estimateWorkoutMinutes } from '../../rules/shortWorkout';
 import { readWeeklySchedule } from '../../rules/weeklySchedule';
 import { groupOf } from '../../rules/workoutGroups';
 import { buttonClass } from '../../ui/Button';
+import { linkClass } from '../../ui/link';
 import { customWorkoutPlan } from '../training/defaultPlan';
 
 /** Delete with an inline confirmation; focus goes to the safe choice first. */
@@ -250,7 +251,7 @@ function WorkoutSettingsRow({
             <Link
               href={`/traning/A?workout=${workout.id}`}
               aria-label={`Visa och starta: ${workout.name}`}
-              className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+              className={`flex min-h-12 items-center text-base ${linkClass}`}
             >
               Visa och starta
             </Link>
@@ -327,7 +328,7 @@ export function CustomWorkoutList({
         </div>
         <Link
           href="/nytt-pass"
-          className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
+          className={`flex min-h-12 items-center self-start text-base ${linkClass}`}
         >
           Skapa eget pass
         </Link>
@@ -398,7 +399,7 @@ export function CustomWorkoutList({
           className={
             primaryCreate
               ? `${buttonClass('primary')} mt-3`
-              : 'flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4'
+              : `flex min-h-12 items-center self-start text-base ${linkClass}`
           }
         >
           {primaryCreate ? 'Skapa nytt pass' : 'Skapa eget pass'}

@@ -7,11 +7,26 @@ import type {
   AdjustableWeightItem,
   BodyRegionId,
   EquipmentChoice,
+  ProgramEmphasis,
   TrainingPreferences,
+  WeightInventoryItem,
 } from '../../domain/types';
+import type { DaysPerWeek } from '../../rules/programPlan';
 
 export type Goal = 'general' | 'build' | 'knee' | 'physio' | 'custom';
-export type Step = 'goal' | 'equipment' | 'level' | 'focus' | 'pick';
+export type Step =
+  | 'goal'
+  | 'rehab'
+  | 'days'
+  | 'emphasis'
+  | 'equipment'
+  | 'weights'
+  | 'level'
+  | 'pick';
+export type WeightKind = WeightInventoryItem['type'];
+export const DEFAULT_DAYS: DaysPerWeek = 2;
+export const DAY_OPTIONS: readonly DaysPerWeek[] = [1, 2, 3, 4, 5];
+export const EMPHASES: readonly ProgramEmphasis[] = ['full', 'run', 'upper'];
 export type Focus = 'all' | 'select';
 export type Side = 'both' | 'right' | 'left';
 type Experience = TrainingPreferences['experience'];
@@ -27,10 +42,25 @@ export const levelHints: Record<Experience, string> = {
 
 const goals: Goal[] = ['general', 'build', 'knee', 'physio', 'custom'];
 
-export function stepsFor(goal: Goal | null): Step[] {
-  if (goal === 'general') return ['goal', 'equipment', 'level', 'focus'];
+/**
+ * Steps of a goal. Strength ends with days, emphasis, equipment, an optional
+ * weights step (when dumbbells or kettlebells are ticked) and level.
+ */
+export function stepsFor(
+  goal: Goal | null,
+  draft?: Pick<Draft, 'weightKinds'>,
+): Step[] {
+  if (goal === 'general')
+    return [
+      'goal',
+      'days',
+      'emphasis',
+      'equipment',
+      ...(draft?.weightKinds.length ? (['weights'] as const) : []),
+      'level',
+    ];
   if (goal === 'build') return ['goal', 'equipment', 'level', 'pick'];
-  return goal ? ['goal', 'equipment'] : ['goal'];
+  return goal ? ['goal', 'rehab', 'equipment'] : ['goal'];
 }
 
 export function isRehabGoal(goal: Goal | null): boolean {
@@ -60,6 +90,11 @@ export interface Draft {
   weights: NonNullable<TrainingPreferences['weights']>;
   adjustableWeights: NonNullable<TrainingPreferences['adjustableWeights']>;
   side: Side;
+  /** Training days per week (strength programme). */
+  days: DaysPerWeek;
+  emphasis: ProgramEmphasis;
+  /** Ticked weight kinds; their weights are entered on the weights step. */
+  weightKinds: WeightKind[];
   focus: Focus;
   bodyParts: BodyRegionId[];
   /** Filters of the pick step as a query string (see rules/libraryFilters). */
@@ -74,6 +109,9 @@ export const emptyDraft: Draft = {
   weights: [],
   adjustableWeights: [],
   side: 'both',
+  days: DEFAULT_DAYS,
+  emphasis: 'full',
+  weightKinds: [],
   focus: 'all',
   bodyParts: [],
   pickFilters: '',
@@ -92,8 +130,6 @@ export function readDraft(raw: string | null): Draft {
     return { ...emptyDraft };
   }
   const goal = goals.find((item) => item === value.goal) ?? null;
-  const steps = stepsFor(goal);
-  const step = steps.find((item) => item === value.step);
   const equipment =
     Array.isArray(value.equipment) &&
     value.equipment.length <= Object.keys(equipmentChoices).length &&
@@ -107,6 +143,17 @@ export function readDraft(raw: string | null): Draft {
   const weights = Array.isArray(value.weights)
     ? (value.weights as Draft['weights'])
     : [];
+  const weightKinds = (['dumbbell', 'kettlebell'] as const).filter((kind) =>
+    Array.isArray(value.weightKinds)
+      ? value.weightKinds.includes(kind)
+      : weights.some((item) => item?.type === kind),
+  );
+  const steps = stepsFor(goal, { weightKinds });
+  // The rehab choice is also open before a goal is picked.
+  const step =
+    goal === null && value.step === 'rehab'
+      ? 'rehab'
+      : steps.find((item) => item === value.step);
   const adjustableWeights = Array.isArray(value.adjustableWeights)
     ? (value.adjustableWeights as AdjustableWeightItem[])
     : [];
@@ -142,6 +189,9 @@ export function readDraft(raw: string | null): Draft {
       ? adjustableWeights
       : [],
     side: value.side === 'right' || value.side === 'left' ? value.side : 'both',
+    days: DAY_OPTIONS.find((item) => item === value.days) ?? DEFAULT_DAYS,
+    emphasis: EMPHASES.find((item) => item === value.emphasis) ?? 'full',
+    weightKinds,
     focus: value.focus === 'select' ? 'select' : 'all',
     bodyParts,
     pickFilters:

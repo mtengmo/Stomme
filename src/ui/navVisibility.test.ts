@@ -22,6 +22,8 @@ describe('navVisible', () => {
     '/kansla/abc/dayAfter',
     '/stopp/abc',
     '/session/abc?x=1',
+    '/kom-igang',
+    '/kom-igang?steg=days',
   ])('hides the nav on %s', (location) => {
     expect(navVisible(location)).toBe(false);
   });

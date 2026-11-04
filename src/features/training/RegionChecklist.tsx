@@ -1,5 +1,6 @@
 import { bodyRegions } from '../../content/muscles';
 import type { BodyRegionId } from '../../domain/types';
+import { ChoiceCard } from '../../ui/ChoiceCard';
 
 export function RegionChecklist({
   value,
@@ -16,35 +17,23 @@ export function RegionChecklist({
       {bodyRegions.map((region) => {
         const enabled = available.includes(region.id);
         return (
-          <div key={region.id}>
-            <label
-              className={`flex min-h-12 items-center gap-3 text-lg ${enabled ? '' : 'text-ink-soft'}`}
-            >
-              <input
-                className="size-6"
-                type="checkbox"
-                disabled={!enabled}
-                aria-describedby={enabled ? undefined : `region-${region.id}`}
-                checked={enabled && value.includes(region.id)}
-                onChange={(event) =>
-                  onChange(
-                    event.target.checked
-                      ? [...new Set([...value, region.id])]
-                      : value.filter((part) => part !== region.id),
-                  )
-                }
-              />
-              {region.label}
-            </label>
-            {enabled ? null : (
-              <p
-                id={`region-${region.id}`}
-                className="m-0 pl-9 text-base text-ink-soft"
-              >
-                Inga övningar med din utrustning och vana.
-              </p>
-            )}
-          </div>
+          <ChoiceCard
+            key={region.id}
+            type="checkbox"
+            label={region.label}
+            hint={
+              enabled ? undefined : 'Inga övningar med din utrustning och vana.'
+            }
+            disabled={!enabled}
+            checked={enabled && value.includes(region.id)}
+            onChange={(checked) =>
+              onChange(
+                checked
+                  ? [...new Set([...value, region.id])]
+                  : value.filter((part) => part !== region.id),
+              )
+            }
+          />
         );
       })}
     </fieldset>

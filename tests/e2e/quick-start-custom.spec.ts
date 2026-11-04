@@ -50,22 +50,23 @@ for (const width of [320, 360, 412]) {
       await expect(page.getByLabel('Namn på passet')).toHaveValue(
         /^Eget pass /,
       );
-      await page.getByRole('button', { name: /Börja passet/ }).click();
+      await page.getByRole('button', { name: /Starta passet/ }).click();
       await expect(page).toHaveURL(/#\/session\//);
     });
   }
 }
 
 for (const width of [320, 412]) {
-  test(`/nytt-pass picks from Home without overflow (${width})`, async ({
+  test(`/nytt-pass picks from the programme Home without overflow (${width})`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await quickStart(page, { goal: 'general' });
-    await page.goto('/');
-    await expect(page.getByText('Inga egna pass än.')).toBeVisible();
+    // Home is the programme Home; "Skapa eget pass" sits under "Ändra".
+    await page.goto('/#/');
+    await page.getByText('Ändra', { exact: true }).click();
     await page.getByRole('link', { name: 'Skapa eget pass' }).click();
     await expect(
       page.getByRole('heading', { name: 'Skapa eget pass' }),

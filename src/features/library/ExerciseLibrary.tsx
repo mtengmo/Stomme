@@ -36,6 +36,7 @@ import {
 } from '../../rules/libraryFilters';
 import { initialTrainingRoster } from '../../rules/programRosters';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import {
   activeFilterCount,
   ExerciseFilterControls,
@@ -225,10 +226,7 @@ export function ExerciseLibrary() {
         {onlyBodyweight ? (
           <p className="m-0 text-base text-ink-soft">
             Du har inga vikter registrerade.{' '}
-            <Link
-              href="/installningar/utrustning"
-              className="font-bold text-accent underline underline-offset-4"
-            >
+            <Link href="/installningar/utrustning" className={`${linkClass}`}>
               Lägg till vikter i Min utrustning
             </Link>
           </p>

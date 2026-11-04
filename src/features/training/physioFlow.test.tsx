@@ -20,16 +20,23 @@ beforeEach(async () => {
 });
 afterEach(cleanup);
 
+/** Goal screen: "Knä- eller rehabprogram", then one of the three programmes. */
+async function chooseRehab(
+  user: ReturnType<typeof userEvent.setup>,
+  name: string,
+) {
+  await user.click(
+    await screen.findByRole('button', { name: 'Knä- eller rehabprogram' }),
+  );
+  await user.click(screen.getByRole('button', { name }));
+}
+
 async function openPhysio(
   user: ReturnType<typeof userEvent.setup>,
   band = true,
 ) {
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
-  );
+  await chooseRehab(user, 'Fysioterapeutens knäprogram');
   // Chair and support are ticked by default; the band is the user's choice.
   expect(
     (
@@ -96,7 +103,7 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
 it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(await screen.findByRole('button', { name: 'Knärehab' }));
+  await chooseRehab(user, 'Knärehab');
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
   await screen.findByRole('button', { name: 'Starta passet' });
   expect(screen.queryByRole('checkbox', { name: CONFIRM })).toBeNull();
@@ -120,11 +127,7 @@ it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving'
 it('asks no extra tick for a custom rehab programme and lets the user save', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har ett eget rehabprogram',
-    }),
-  );
+  await chooseRehab(user, 'Eget rehabprogram');
   await user.click(
     screen.getByRole('button', { name: 'Öppna mitt rehabprogram' }),
   );
@@ -397,11 +400,7 @@ it('lists what a missing band left out and lets the user fix it', async () => {
 it('explains the band at its checkbox and keeps explicit choices', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
-  );
+  await chooseRehab(user, 'Fysioterapeutens knäprogram');
   expect(
     screen.getByText('Träningsband behövs för övning 5 och 7.'),
   ).toBeTruthy();
@@ -416,9 +415,7 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
   await user.click(chair);
   await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(
-    screen.getByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
+    screen.getByRole('button', { name: 'Fysioterapeutens knäprogram' }),
   );
   expect(
     (

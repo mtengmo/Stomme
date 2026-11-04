@@ -16,7 +16,7 @@ interface ChoiceCardProps {
 }
 
 /**
- * A selectable card around a real, visually hidden checkbox or radio, so the role,
+ * A selectable card around a real checkbox or radio, laid transparently over the whole card so the card is the hit target, so the role,
  * name, keyboard handling and form behaviour stay native. Selection is shown by an
  * accent outline, a check icon and bold text: never by colour alone.
  */
@@ -35,7 +35,7 @@ export function ChoiceCard({
   const labelId = useId();
   return (
     <label
-      className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-md border-[3px] bg-surface px-4 py-3 text-lg has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-(--focus-outline) has-[:disabled]:opacity-50 ${
+      className={`relative flex min-h-14 cursor-pointer items-center gap-3 rounded-md border-[3px] bg-surface px-4 py-3 text-lg has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-(--focus-outline) has-[:disabled]:opacity-50 ${
         checked ? 'border-accent font-bold' : 'border-edge'
       } ${className}`}
     >
@@ -48,7 +48,7 @@ export function ChoiceCard({
         aria-labelledby={labelId}
         aria-describedby={hint ? hintId : undefined}
         onChange={(e) => onChange(e.currentTarget.checked)}
-        className="sr-only"
+        className="absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-default"
       />
       <span className="min-w-0 flex-1">
         <span id={labelId} className="block">

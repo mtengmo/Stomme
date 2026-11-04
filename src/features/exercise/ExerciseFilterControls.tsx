@@ -16,6 +16,7 @@ import {
   musclesOfRegions,
 } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 
 export interface ExerciseFilterControlsProps {
   value: ExerciseFilters;
@@ -355,7 +356,7 @@ export function ExerciseFilterControls({
         <button
           type="button"
           onClick={onClear}
-          className="min-h-12 text-base font-bold text-accent underline underline-offset-4"
+          className={`min-h-12 text-base ${linkClass}`}
         >
           Rensa filter
         </button>

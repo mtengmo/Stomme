@@ -155,7 +155,7 @@ for (const width of [320, 360, 412]) {
 
       // Start and finish it.
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       await expect(page).toHaveURL(/#\/session\//);
       const next = page
@@ -196,7 +196,9 @@ for (const width of [320, 360, 412]) {
         .getByRole('group', { name: 'Ta bort Mitt nya pass' })
         .getByRole('button', { name: 'Ta bort passet', exact: true })
         .click();
-      await expect(page.getByText('Inga egna pass än.')).toBeVisible();
+      await expect(
+        page.getByRole('group', { name: 'Ta bort Mitt nya pass' }),
+      ).toHaveCount(0);
       await page.goto('/#/historik');
       await expect(page.getByText('Mitt nya pass').first()).toBeVisible();
     });

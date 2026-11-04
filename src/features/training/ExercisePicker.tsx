@@ -27,6 +27,7 @@ import {
   filterExercises,
 } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
 
 interface PickerState {
@@ -224,7 +225,7 @@ export function ExercisePicker({
             <Link
               href={`/ovning/${exercise.id}`}
               aria-label={`Visa instruktion: ${exercise.name}`}
-              className="inline-flex min-h-12 shrink-0 items-center gap-1 text-base font-bold text-accent underline underline-offset-4"
+              className={`inline-flex min-h-12 shrink-0 items-center gap-1 text-base ${linkClass}`}
             >
               Guide <Icon name="back" size={18} className="rotate-180" />
             </Link>
@@ -305,7 +306,7 @@ export function ExercisePicker({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-12 px-2 text-base font-bold text-accent underline underline-offset-4"
+          className={`min-h-12 px-2 text-base ${linkClass}`}
         >
           Avbryt
         </button>
@@ -331,7 +332,7 @@ export function ExercisePicker({
               <button
                 type="button"
                 onClick={() => updateState({ broadened: true })}
-                className="min-h-12 font-bold text-accent underline underline-offset-4"
+                className={`min-h-12 ${linkClass}`}
               >
                 Visa alla övningar
               </button>
@@ -345,7 +346,7 @@ export function ExercisePicker({
               <button
                 type="button"
                 onClick={() => updateState({ broadened: false })}
-                className="min-h-12 font-bold text-accent underline underline-offset-4"
+                className={`min-h-12 ${linkClass}`}
               >
                 Visa granskade alternativ
               </button>

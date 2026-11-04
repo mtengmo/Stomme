@@ -107,6 +107,11 @@ const ProgramReveal = lazy(() =>
     default: m.ProgramReveal,
   })),
 );
+const QuickStartRoute = lazy(() =>
+  import('./features/training/QuickStartRoute').then((m) => ({
+    default: m.QuickStartRoute,
+  })),
+);
 const Checkin = lazy(() =>
   import('./features/training/Checkin').then((m) => ({ default: m.Checkin })),
 );
@@ -177,6 +182,7 @@ function Shell() {
         <Suspense fallback={null}>
           <Switch>
             <Route path="/">{() => <TrainingHome />}</Route>
+            <Route path="/kom-igang">{() => <QuickStartRoute />}</Route>
             <Route path="/program">{() => <ProgramReveal />}</Route>
             <Route path="/vecka">{() => <WeekPlanner />}</Route>
             <Route path="/fokus">{() => <FocusPicker />}</Route>

@@ -86,7 +86,7 @@ test.describe('@themes every registered theme and scheme', () => {
         // Preview: the primary button computes to its tokens.
         await openPreview(page, true);
         const start = page.getByRole('button', {
-          name: 'Börja passet',
+          name: 'Starta passet',
           exact: true,
         });
         await expect(start).toBeVisible();

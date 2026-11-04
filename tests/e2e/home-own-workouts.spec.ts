@@ -40,7 +40,7 @@ for (const { width, scheme } of cases) {
     // Open a standard pass and make a preparation without starting it.
     await page.goto('/#/traning/A');
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
 
@@ -67,7 +67,7 @@ for (const { width, scheme } of cases) {
     await list.getByRole('link').first().click();
     await expect(page).toHaveURL(/#\/traning\/A\?workout=/);
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
 

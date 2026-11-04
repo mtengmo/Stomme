@@ -17,7 +17,7 @@ async function openProgramme(
     side: 'left',
   });
   await expect(
-    page.getByRole('button', { name: 'Börja passet', exact: true }),
+    page.getByRole('button', { name: 'Starta passet', exact: true }),
   ).toBeVisible();
 }
 
@@ -42,7 +42,10 @@ test('physio programme: prefilled overview, confirmation gate, notes and navigat
   ).toBeVisible();
   await expect(page.getByText(/rekommenderad/i)).toHaveCount(0);
 
-  const start = page.getByRole('button', { name: 'Börja passet', exact: true });
+  const start = page.getByRole('button', {
+    name: 'Starta passet',
+    exact: true,
+  });
   await expect(start).toBeDisabled();
   await page.getByRole('checkbox', { name: CONFIRM }).check();
   await expect(start).toBeEnabled();
@@ -117,7 +120,9 @@ test('physio programme: seven items without a band, fixing it, saved plan wins, 
   }
   await expect(rows.first()).toContainText('E53');
   await page.getByRole('checkbox', { name: CONFIRM }).check();
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await page.getByRole('radio', { name: 'Redo att träna' }).check();
   await page.getByRole('radio', { name: 'Nej, inga besvär' }).check();
   await page.getByRole('button', { name: 'Spara och fortsätt' }).click();

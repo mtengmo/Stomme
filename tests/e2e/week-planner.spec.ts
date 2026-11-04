@@ -103,7 +103,7 @@ for (const scenario of CASES)
           fullPage: true,
         });
         await expect(
-          page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+          page.getByRole('link', { name: 'Starta passet', exact: true }),
         ).toHaveAttribute('href', /#\/traning\/[AB]\?fokus=push$/);
         await page.getByRole('link', { name: 'Byt', exact: true }).click();
         await expect(page.getByRole('radio', { name: /^Press/ })).toBeChecked();
