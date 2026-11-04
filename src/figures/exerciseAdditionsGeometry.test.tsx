@@ -669,16 +669,19 @@ describe('russian twist oblique geometry', () => {
 });
 
 describe('woodchop figure geometry', () => {
-  it('moves one shared-grip weight diagonally up with fixed feet and attached arms', () => {
+  it('moves one shared-grip weight diagonally up, pivoting the near foot on its ball while the far foot stays put, with attached arms', () => {
     const start = movementPose('woodchop', 0);
     const end = movementPose('woodchop', 1);
     expect(figures.woodchop.held).toEqual({ kind: 'dumbbell', hands: ['hR'] });
     expect(end.hR[1]).toBeLessThan(start.hR[1] - 80);
     expect(end.hR[0]).toBeGreaterThan(start.hR[0]);
+    // The near heel turns up on the ball of the foot and the knee follows.
+    expect(end.aR[1]).toBeLessThan(start.aR[1] - 2);
+    expect(end.kR[0]).toBeGreaterThan(start.kR[0] + 5);
     for (let frame = 0; frame <= 20; frame++) {
       const pose = movementPose('woodchop', frame / 20);
       expect(pose.hR).toEqual(pose.hL);
-      expect(pose.aR).toEqual(start.aR);
+      expect(pose.tR).toEqual(start.tR);
       expect(pose.tL).toEqual(start.tL);
       expect(distance(pose.neck, pose.eR)).toBeGreaterThan(15);
       expect(distance(pose.neck, pose.eR)).toBeLessThan(34);

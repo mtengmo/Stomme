@@ -12,6 +12,7 @@ import {
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
+import { suitcaseCarryPose } from './carryPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
 import { applyEquipmentPose } from './equipmentPose';
 import type { FigureAngle } from './frontViews';
@@ -82,6 +83,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'floor-press') return floorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
+  if (exerciseId === 'suitcase-carry') return suitcaseCarryPose(t);
   if (exerciseId === 'step-up') return stepUpPose(t);
   if (isSquatFamily(exerciseId)) return squatFamilyPose(exerciseId, t);
   if (isHingeFamily(exerciseId)) return hingeFamilyPose(exerciseId, t);
@@ -486,6 +488,12 @@ export function FigureFrame({
                 kind={heldKind}
                 at={at}
                 vertical={exerciseId === 'hammer-curl'}
+                // Halo: held upside down, ball above the two-hand grip.
+                angle={
+                  exerciseId === 'kettlebell-halo' && heldKind === 'kettlebell'
+                    ? 180
+                    : undefined
+                }
               />
             ))}
           </g>

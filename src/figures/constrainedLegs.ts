@@ -60,13 +60,20 @@ export function constrainLegInterpolation(
       'reverse-lunge',
       'forward-lunge',
       'single-leg-rdl',
+      'goblet-chair-squat',
+      'wall-sit',
     ].includes(exerciseId)
   )
     return pose;
 
   const out = { ...pose };
+  // Feet stay planted through these; only hip and knee move.
+  const plantedFeet =
+    exerciseId === 'split-squat' ||
+    exerciseId === 'goblet-chair-squat' ||
+    exerciseId === 'wall-sit';
   const anchor =
-    exerciseId === 'step-down' || exerciseId === 'split-squat'
+    exerciseId === 'step-down' || exerciseId === 'split-squat' || plantedFeet
       ? referencePoses[0]
       : exerciseId === 'single-leg-rdl'
         ? referencePoses.at(-1)
@@ -74,8 +81,7 @@ export function constrainLegInterpolation(
   if (!anchor) return pose;
   for (const side of ['R', 'L'] as const) {
     const { knee, ankle, toe } = keys[side];
-    const fixedAnkle =
-      exerciseId === 'split-squat' ? referencePoses[0]?.[ankle] : undefined;
+    const fixedAnkle = plantedFeet ? referencePoses[0]?.[ankle] : undefined;
     if (fixedAnkle) {
       out[ankle] = fixedAnkle;
       out[toe] = referencePoses[0]?.[toe] ?? out[toe];

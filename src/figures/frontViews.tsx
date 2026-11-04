@@ -132,6 +132,9 @@ function frontStance(hip: Pt, aR: Pt, aL: Pt, toeDx: number): Pose {
   );
 }
 const smooth = (x: number) => x * x * (3 - 2 * x);
+/** Oblique bodyweight split squat: the wall in front of a right / left front leg. */
+const SPLIT_WALL_X_LEFT = 56;
+const SPLIT_WALL_X_RIGHT = 144;
 
 /** Floor markers of the in-and-out jump sit this far from the body's centre line. */
 export const IN_OUT_MARKER_DX = 25;
@@ -358,6 +361,9 @@ export function frontMovementPose(
     const selectedAnkleStartX = 100 + side * 10;
     const selectedAnkleEndX = 100 + side * 30;
     const selectedAnkleX = mix(selectedAnkleStartX, selectedAnkleEndX, step);
+    // The stepping foot leaves the floor on its way out (and in on the return)
+    // and is planted again before the knee bends.
+    const stepLift = 9 * Math.sin(Math.PI * step);
     const otherAnkleX = 100 - side * 30;
     const hipX = mix(100, 100 + side * 18, depth);
     const hipY = mix(116, 136, depth);
@@ -371,10 +377,10 @@ export function frontMovementPose(
           selectedAnkleX + side * 2,
           depth,
         ),
-        mix(148, 153, depth),
+        mix(148, 153, depth) - stepLift * 0.5,
       ),
-      ankle: point(selectedAnkleX, 174),
-      toe: point(selectedAnkleX + side * 10, 177),
+      ankle: point(selectedAnkleX, 174 - stepLift),
+      toe: point(selectedAnkleX + side * 10, 177 - stepLift),
     };
     const otherKneeY = mix(148, 151, depth);
     const other = {
@@ -829,7 +835,7 @@ export function FrontFigureFrame({
   viewBox?: string;
   angle?: 'front' | 'oblique';
 }) {
-  const pose =
+  const basePose =
     angle === 'oblique'
       ? obliqueMovementPose(exerciseId as ObliqueViewExercise, phase, working)
       : frontMovementPose(exerciseId as FrontViewExercise, phase, working);
@@ -841,6 +847,33 @@ export function FrontFigureFrame({
       : equipment === undefined
         ? (figures[exerciseId].held?.kind ?? null)
         : equipment;
+  // Bodyweight split squat: both hands rest on a wall in front of the
+  // person, as in the profile view; with a weight the hands carry it instead.
+  const splitSupportX =
+    working === 'left' ? SPLIT_WALL_X_RIGHT : SPLIT_WALL_X_LEFT;
+  const splitSupported =
+    angle === 'oblique' && exerciseId === 'split-squat' && kind === null;
+  const pose: Pose = (() => {
+    if (!splitSupported) return basePose;
+    const handAt = point(
+      splitSupportX + (working === 'left' ? -4 : 4),
+      basePose.neck[1] + 30,
+    );
+    const arm = solveTwoBone(
+      basePose.neck,
+      handAt,
+      31,
+      27,
+      working === 'left' ? 1 : -1,
+    );
+    return {
+      ...basePose,
+      eR: arm.mid,
+      hR: arm.end,
+      eL: arm.mid,
+      hL: arm.end,
+    };
+  })();
   const rackSide: 'R' | 'L' = working === 'left' ? 'L' : 'R';
   const heldAt: Pt[] =
     kind === null
@@ -935,6 +968,16 @@ export function FrontFigureFrame({
         <path
           data-contact-plane="shuffle-line"
           d={`M${SHUFFLE_LINE_X} 164v15`}
+          fill="none"
+          stroke="var(--equipment)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {splitSupported ? (
+        <path
+          data-support="wall"
+          d={`M${splitSupportX} 40V176`}
           fill="none"
           stroke="var(--equipment)"
           strokeWidth="3"

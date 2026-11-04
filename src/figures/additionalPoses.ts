@@ -824,6 +824,8 @@ export const additionalFigures = {
       head: [101, 62],
       neck: [99, 76],
       kR: [105, 148],
+      // Start-side foot flat; it then pivots on the ball of the foot (heel
+      // turns up, segment lengths kept) and the knee follows the chop.
       kL: [91, 148],
       eR: [100, 100],
       hR: [104, 124],
@@ -832,6 +834,9 @@ export const additionalFigures = {
     },
     middle: {
       ...stand,
+      kR: [110.1, 146.1],
+      aR: [108.6, 172.4],
+      tR: [119, 177],
       eR: [120, 76],
       hR: [142, 76],
       eL: [120, 76],
@@ -840,6 +845,9 @@ export const additionalFigures = {
     end: {
       ...stand,
       head: [97, 60],
+      kR: [113.2, 144.6],
+      aR: [109.5, 170.6],
+      tR: [119, 177],
       eR: [106, 50],
       hR: [112, 28],
       eL: [106, 50],
