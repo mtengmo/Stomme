@@ -176,7 +176,7 @@ Four themes ship, each in a light and a dark scheme, chosen on the device (see C
 - One done colour per theme, used for nothing else; the pencil-tick shape is constant.
 - Care screens (pain, stop) are a heavy `--care` frame plus warning icon plus a bold word.
 - Condensed heavy numerals for headings and counts; plain platform sans for everything else.
-- Flat, no elevation; one authored motion (a tick drawing on).
+- Flat, no elevation; two authored motions (a tick drawing on, and the week tick stroke across the week strip).
 
 ## Colors
 
@@ -269,14 +269,27 @@ Squared like graph paper: 6 px corners on buttons, cards and banners; 4 px on ch
 - **Pass card:** 6 px corners, 3 px outline. Lead: ink outline, `surface-tint` fill, 20 px padding, 4rem-class title, "Nästa pass" in accent, large count. Receding: edge outline, `surface` fill, 16 px padding.
 - **Banner:** `surface` fill, 2 px outline (accent for info, ink for warn, `care` for care tone), icon plus text, 16 px padding.
 
+### Program pass cards
+`PassCard` uses the lead and receding pair above. The lead card lists its exercises as 64 px links, each with an `ExerciseThumb`: a framed 64 px figure that animates on the lead card only. Receding cards show no figures. Thumbnails stop off screen, in a hidden tab, or when the viewer pauses them with `PauseFiguresButton` (a 48 px "Pausa figurerna" / "Spela figurerna" button, stored on the device); under reduced motion they show the start frame.
+
 ### Tally (signature)
 A row of set circles per pass: one circle per exercise, 3 px outline (ink on the lead card, edge otherwise), 48 px lead and 36 px receding, 6 px gap. A circle shows the sets left as a condensed digit; when finished it holds a pencil tick in `done-mark`. A newly completed set draws its tick on (480 ms, clip-path wipe, `cubic-bezier(0.16, 1, 0.3, 1)`); under reduced motion it appears without animation. Exposed to assistive tech as one image with a text label.
 
 ### Week strip
 Seven 44 px squares with 2 px edge outlines holding day abbreviation and count-style number; today is `today` with an ink outline; a completed day carries a pencil tick offset at its top-right corner.
 
+### Program week strip and block progress
+- **Program week strip** (`ProgramWeekStrip`): the calendar week, Monday first, as seven 44 px squares. Planned days have a 3 px accent outline; today has an ink outline and the sun icon; a finished day holds the pencil tick. A "Nästa" chip sits under the next planned day, and a line gives the suggested weekdays ("Förslag: tor · lör. Träna när det passar.").
+- **Block progress** (`BlockProgress`, V1-V4): four 44 px boxes for the four block weeks. Finished weeks hold a pencil tick; the current week has a 3 px ink outline and the word "Nu"; later weeks have an edge outline. The "x av y pass" count uses `.count`.
+
+### Week tick (second authored motion)
+When the last pass of a programme week is done, `WeekTick` lays a wide, tapered pencil stroke over the week strip, then shows a "Vecka N klar" chip in the done-fill tokens.
+- **Motion:** a 720 ms clip-path wipe (`week-tick-new`, left to right) with the same easing as the tick draw-on, `cubic-bezier(0.16, 1, 0.3, 1)`. The week's V-box tick in BlockProgress follows after the stroke.
+- **Once per programme and week:** the flag is stored on the device (`stomme.program.weekTick`, keyed `${program.id}:${week}`), so a later visit shows the stroke static.
+- **Reduced motion:** the stroke appears without animation; no other effect.
+
 ### Navigation
-Fixed bottom bar, `surface-tint` fill, 3 px ink top rule, three equal tabs (Vecka, Historik, Inställningar), each 64 px tall with a 24 px icon above a 16 px label. Active: bold ink text and a 4 px ink underline, since the done colour means done only; inactive: `ink-soft` with transparent underline. Current page is flagged with `aria-current`. Its focus ring uses `--focus-ring-inset`.
+Fixed bottom bar, `surface-tint` fill, 3 px ink top rule, three equal tabs (Vecka, Historik, Inställningar), each 64 px tall with a 24 px icon above a 16 px label. Active: bold ink text and a 4 px ink underline, since the done colour means done only; inactive: `ink-soft` with transparent underline. Current page is flagged with `aria-current`. Its focus ring uses `--focus-ring-inset`. The bar is hidden on `/session/`, `/kansla/`, `/stopp/` and on the first-use setup `/kom-igang`, so onboarding has no competing nav and one primary action.
 
 ### Stop frame (care screen)
 The stop screen is paper inside a 6 px `--care` frame, with the 56 px warning icon, the bold word "Stopp", and a sticky bottom bar (`surface-tint`, 3 px `--care` top rule) holding a `--care` button. In Rutat care is graphite, so this replaces the older graphite-filled screen. The pain scale marks the chosen level with a 3 px `--care` outline and bold text.
@@ -290,6 +303,12 @@ Settings is plain ruled paper, not cards: each section opens with a 3 px ink rul
 ### Inputs / Fields
 Fields sit on `surface`. Focus treatment is global: `:focus-visible` 3 px outline in `--focus-outline`, 3 px offset, 4 px radius, plus `--focus-ring`.
 
+### Choice cards
+`ChoiceCard` replaces native checkboxes and radios with an outlined card: 3 px border on `surface`, 56 px minimum height (48 px in compact lists). A real checkbox or radio sits transparently over the whole card, so the card is the hit target while role, name and keyboard handling stay native. Selected: accent border, bold text and a check icon; never colour alone.
+
+### Text links
+`linkClass` (`src/ui/link.ts`): links are ink, bold and underlined (2 px, 4 px offset). Accent is reserved for selection, next and info, so links never use it, and `--done` never marks a link.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -301,7 +320,7 @@ Fields sit on `surface`. Focus treatment is global: `:focus-visible` 3 px outlin
 - **Do** pair every state colour with an icon and a Swedish word, or the pencil-tick shape.
 - **Do** keep text at 1rem or larger and primary targets at 56-64 px.
 - **Do** use `.count` (Barlow Condensed 800, tabular) for any number that is a quantity.
-- **Do** honour `prefers-reduced-motion` for any new animation; the tick draw-on is the single authored motion.
+- **Do** honour `prefers-reduced-motion` for any new animation; the tick draw-on and the week tick are the only authored motions.
 - **Do** run `npm test` (the contrast and deltaE gate) after touching `src/styles/themes/`.
 
 ### Don't:

@@ -24,6 +24,8 @@ Home workouts with 2×5 kg and 2×10 kg dumbbells, a 16 kg kettlebell, a chair o
 ## Capabilities and Constraints
 MVP: week view, session mode (set counter, rest timer, big buttons), exercise cards with SVG illustrations, pain log (0–10 before/after/day after), progression suggestions, history and charts, offline PWA, JSON export/import. Muscle guidance adds a library filtered by training area, primary/supporting muscle labels, front/back region maps and a three-exercise animated-overlay prototype. Users can choose defined alternatives before starting A/B; choices preserve exercise-specific progression and pain checks. The A/B programme remains the foundation. Not in v1: accounts, server, sync, Garmin, social. All UI text Swedish. See docs/spec.md, docs/plan.md and docs/muscle-guidance-plan.md.
 
+Onboarding builds a 4-week program (1-5 days a week, emphasis, a curated beginner set of 22 exercises) shown on Home as a week strip and the next pass; rehab flows are unchanged.
+
 ## Brand Commitments
 Name "Stomme" (Swedish for frame / core structure) is fixed. Visual world is open.
 
