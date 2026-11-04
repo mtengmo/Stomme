@@ -17,7 +17,7 @@
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
-  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "linter": { "enabled": true, "rules": { "preset": "recommended" } },
   "overrides": [
     {
       "includes": ["src/rules/**"],
