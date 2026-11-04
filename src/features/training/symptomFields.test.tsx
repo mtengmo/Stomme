@@ -8,20 +8,20 @@ import type { SymptomReport } from '../../domain/types';
 import { ExerciseSymptoms, SymptomFields } from './Checkin';
 
 afterEach(cleanup);
+function Fields() {
+  const [value, setValue] = useState<SymptomReport>({
+    area: 'Knä',
+    side: 'left',
+    score: 0,
+  });
+  return (
+    <>
+      <SymptomFields value={value} onChange={setValue} />
+      <output aria-label="Sparat värde">{value.score}</output>
+    </>
+  );
+}
 it('changes zero directly to 2 or 10 without a number field or leading zero', async () => {
-  function Fields() {
-    const [value, setValue] = useState<SymptomReport>({
-      area: 'Knä',
-      side: 'left',
-      score: 0,
-    });
-    return (
-      <>
-        <SymptomFields value={value} onChange={setValue} />
-        <output aria-label="Sparat värde">{value.score}</output>
-      </>
-    );
-  }
   const user = userEvent.setup();
   render(<Fields />);
   const picker = screen.getByRole('group', {
