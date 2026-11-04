@@ -177,24 +177,14 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
       freeKnee[0] + 29 * Math.cos(shinAngle),
       freeKnee[1] + 29 * Math.sin(shinAngle),
     ];
-    // Reach below the head in both phases, with constant upper-arm and
-    // forearm lengths so the arms stay forward without crossing the face.
-    const elbowR: Pt = [
-      neck[0] + 18 * Math.cos(1.0),
-      neck[1] + 18 * Math.sin(1.0),
+    // Straight arms (upper arm 18, forearm 21, both constant) reach forward
+    // and dip with the lean, so they stay clear of the head and in the frame.
+    const reach = (a: number): [Pt, Pt] => [
+      [neck[0] + 18 * Math.cos(a), neck[1] + 18 * Math.sin(a)],
+      [neck[0] + 39 * Math.cos(a), neck[1] + 39 * Math.sin(a)],
     ];
-    const handR: Pt = [
-      elbowR[0] + 21 * Math.cos(-0.05),
-      elbowR[1] + 21 * Math.sin(-0.05),
-    ];
-    const elbowL: Pt = [
-      neck[0] + 18 * Math.cos(1.1),
-      neck[1] + 18 * Math.sin(1.1),
-    ];
-    const handL: Pt = [
-      elbowL[0] + 21 * Math.cos(0.05),
-      elbowL[1] + 21 * Math.sin(0.05),
-    ];
+    const [elbowR, handR] = reach(mix(0, 1.2, t));
+    const [elbowL, handL] = reach(mix(0.08, 1.28, t));
     return skeleton(
       head,
       neck,

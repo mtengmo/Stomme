@@ -12,7 +12,11 @@ import {
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
-import { farmerCarryPose, suitcaseCarryPose } from './carryPoses';
+import {
+  farmerCarryPose,
+  rackCarryPose,
+  suitcaseCarryPose,
+} from './carryPoses';
 import { constrainLegInterpolation } from './constrainedLegs';
 import { applyEquipmentPose } from './equipmentPose';
 import type { FigureAngle } from './frontViews';
@@ -86,6 +90,7 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   if (exerciseId === 'suitcase-carry') return suitcaseCarryPose(t);
   if (exerciseId === 'farmer-carry') return farmerCarryPose(t);
+  if (exerciseId === 'kettlebell-rack-carry') return rackCarryPose(t);
   if (exerciseId === 'step-up') return stepUpPose(t);
   if (isSquatFamily(exerciseId)) return squatFamilyPose(exerciseId, t);
   if (isHingeFamily(exerciseId)) return hingeFamilyPose(exerciseId, t);
@@ -249,6 +254,8 @@ export function bandShape(
 export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'plank-arm-lift': '0 20 200 168',
   'decline-push-up': '14 20 182 168',
+  'knee-push-up': '14 20 182 168',
+  'overhead-triceps-extension': '14 0 164 188',
   'pull-up': '10 0 180 188',
   'chin-up': '10 0 180 188',
   burpee: '0 -30 200 218',

@@ -1426,7 +1426,7 @@
     "name": "Liggande stretch av baksida lår",
     "group": "rehab/knee-aaos",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1451,11 +1451,15 @@
         "notes": "E37: nio profilfaser och reduced-motion H/V visar valt knä sträckas med andra foten kvar och rygg/huvud vid mattan. Spegling/sidocue och ram stämmer. I Start och tidiga faser finns en synlig lucka mellan händerna och det valda låret, trots instruktionen om grepp bakom låret. Kroppsvikt; text varnar för drag i knäleden/kraftig sträckning och erbjuder mer böjt knä. Hålltid och återgång ej verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E37: I reduced-motion Start för H/V samt faser 0–0,5 slutar händerna fritt framför det upplyfta låret. Texten säger att fatta bakom låret och hålla där när knäet rätas. Justera armposen så händerna tydligt når lårets baksida, nedanför knäleden, och följer låret under sträckningen."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E37: händerna ligger nu på lårets baksida och följer låret från start till slut (4 enheter bakom låret, 0.38/0.34 av lårlängden från höften), armbågar upp, konstanta armlängder. Handen når mitten av låret, inte nedanför knäleden (axelräckvidd). Sedd H och V fas 0-1."
+      }
     ],
-    "fingerprint": "ad6dbeb2c474"
+    "openIssues": [],
+    "fingerprint": "5191cab85529"
   },
   {
     "id": "band-leg-press",
@@ -1549,7 +1553,7 @@
     "name": "Gång med kettlebell vid axeln",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1574,12 +1578,15 @@
         "notes": "E40: nio profilfaser, reduced-motion H/V profil/front samt 4/8/16 kg granskade. Profilgreppet håller kulan vid vald axel, men fötterna glider längs golvet. Front med V valt visar vikten vid höften och tom andra hand vid axeln; H fungerar i stickproven. Ram räcker. Detaljerad grepptext, fri hands hjälp, andning och lättare/kortare alternativ finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[strong] E40: Profilfaser 0–1 visar båda fötter glida längs golvet när benen byter plats, utan lyft svängfot. Visa växelvis stöd och fotlyft med golvfrigång och konstanta benlängder; kontrollera hela gångloopen i båda sidor och alla vikter.",
-      "[cheap] E40: Frontvyn med V valt, reduced-motion Start/Slut, placerar den blå vänsterhanden och kettlebellen vid höften medan den tomma andra handen hålls vid axeln. Valt vänsterarms grepp ska vara vid övre bröst/axel med armbåge nedåt, enligt sidocue och profilvyn. Rätta armval/spegling och kontrollera 4/8/16 kg."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E40: profil: ny gångcykel (rackCarryPose, benen från suitcaseCarryPose) med fast stödfot och lyft svängfot, rackgreppet vid axeln med armbåge nedåt, fria armen hänger och svänger; motion sequence, exakt loopsöm. Frontvy: med V valt ligger kettlebellen nu vid vänster axel/övre bröst med armbåge nedåt (armvalet var bytt). Sedd profil och front fas 0-1; vikterna 4/8/16 kg ej separat sedda; frontvyn har ingen gångcykel (bara höger ben lyfts som förut)."
+      }
     ],
-    "fingerprint": "7444a1b3acc7"
+    "openIssues": [],
+    "fingerprint": "ecaaf5fea77c"
   },
   {
     "id": "rear-foot-split-squat",
@@ -1824,7 +1831,7 @@
     "name": "Balanspendel på ett ben",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1849,18 +1856,22 @@
         "notes": "E46: nio profilfaser och reduced-motion H/V visar balans på valt ben, fritt knä fram till fritt ben bakåt under höftfällning. Stödfot kvar och sidocue/spegling stämmer. Armbågarna hålls tydligt böjda trots textens sträckta armar framåt; händerna når nära ramkanten i Slut. Endast kroppsvikt; text erbjuder mindre fällning och vägg/stol. Profilen döljer bäckenrotation, återgång inte verifierad. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E46: I reduced-motion Start/Slut för H/V och samtliga fasbilder är båda armbågarna tydligt böjda. Steg 1 säger armarna sträckta framåt. Gör armposen konsekvent med instruktionen eller justera texten till den avsedda böjda armpositionen; säkra att händerna ryms i ramen i full fällning."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E46: armarna är nu raka framåt (armbåge och hand kolinjära 18+21), sänks med lutningen (0-1.2 rad); händerna ryms i ramen vid full lutning. Pilen/riktningen är mitt val. Sedd H och V fas 0-1."
+      }
     ],
-    "fingerprint": "5fd97671a51c"
+    "openIssues": [],
+    "fingerprint": "8e63bf398cec"
   },
   {
     "id": "single-leg-chair-squat",
     "name": "Enbensknäböj till stol",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1885,10 +1896,14 @@
         "notes": "E47: nio profilfaser och reduced-motion H/V profil/front visar sänkning mot stol på valt ben, fri fot lyft och stödbenets fot kvar. Spegling och ram fungerar; höften når sitsen i Slut. Endast kroppsvikt. Tips om stadig/högre stol, lätt kontakt, knäriktning och extra handstöd finns. Den generiska sidocuen beskriver däremot det andra benet som det rörliga. Full återgång och bäckenrotation ej verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E47: Sidocuen för H/V säger 'Stå på det högra benet; det andra benet rör sig'. Här ska valt stödben böjas/sträckas och den fria foten hållas lyft utan att hjälpa till. Skriv detta uttryckligen för båda sidor så cue och steg 1–3 beskriver samma uppgift."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E47: sidocuen skriver nu uttryckligen för höger och vänster att stödbenet böjs och sträcks mot stolen och att det andra benet hålls lyft och inte hjälper till (exerciseSideCues.ts). Figuren var redan i överensstämmelse och är oförändrad. Textändring: behöver granskning med scope text."
+      }
     ],
+    "openIssues": [],
     "fingerprint": "d1929a73f859"
   },
   {
@@ -2476,7 +2491,7 @@
     "name": "Armhävning på knä",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -2487,18 +2502,22 @@
         "notes": "E65: nio profilfaser och reduced-motion visar bröstsänkning med böjda knän och armar mot golvet. De upplyfta fötterna kapas vid höger ramkant i både Start och Slut. Knä-/handkontakterna ligger nära mattan; stödets exakta tjocklek och djup överlappar. Bilateral kroppsvikt. Text om handduk, rak linje knä–huvud, undvik höftförskjutning och väggalternativ finns. Greppbredd/armbågarnas sidriktning syns inte i profil. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E65: Höger bildkant kapar de upplyfta fötterna/tårna i alla nio profilfaser och reduced-motion Start/Slut. Utöka eller flytta figurens ram så båda fötterna syns helt med marginal även under sänkningen."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E65: egen ram (FRAMING 14 20 182 168) så att de upplyfta fötterna syns helt med marginal i alla faser. Sedd fas 0, 0.5, 0.875 och 1."
+      }
     ],
-    "fingerprint": "5093fa23d54f"
+    "openIssues": [],
+    "fingerprint": "8958294d8f02"
   },
   {
     "id": "wall-push-up",
     "name": "Armhävning mot vägg",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -2509,11 +2528,15 @@
         "notes": "E66: nio profilfaser och reduced-motion visar kropp mot vägg, händer vid vägg och hälar kvar. Armbågarna är redan tydligt böjda i yttre Startläget trots instruktionen att pressa till raka armar. Vägg/figur ryms. Bilateral kroppsvikt; text om rak kropp, hälar kvar och närmare vägg som förenkling finns. Handbredd och sidriktning ej bedömbara i profil. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
-    "openIssues": [
-      "[cheap] E66: Fas 0/reduced-motion Start visar knäckta armbågar i det yttersta från-väggen-läget. Steg 3 säger pressa tills armarna är raka. Anpassa Start-/topposen så axel–armbåge–hand är sträckta medan händerna når väggen och hälarna står kvar."
+    "fixes": [
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E66: starten har nu helt raka armar i från-väggen-läget (startvinkel 1.241 i stället för 1.222), handen kvar på väggen och hälarna kvar; bortre vristen flyttad ett steg för att hålla ratchet. Sedd fas 0, 0.5, 0.875 och 1."
+      }
     ],
-    "fingerprint": "586321f7843a"
+    "openIssues": [],
+    "fingerprint": "e57fca9f2073"
   },
   {
     "id": "calf-raise",
@@ -2594,7 +2617,7 @@
     "name": "Smala armhävningar",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -2618,12 +2641,15 @@
         "fixer": "claude-sonnet",
         "commit": "05d9a4b",
         "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      },
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E70: händerna står under bröstet i toppläget och armarna är raka där (konstant segmentlängd (174-halsen)/2); sänkningen viker armbågarna. Sedd fas 0, 0.5, 0.875 och 1."
       }
     ],
-    "openIssues": [
-      "[cheap] E70: Fas 0 och reduced-motion Start (övre läget) visar båda armbågarna tydligt vinklade i stället för raka. Steg 3 kräver att armarna rätas ut. Justera topplägets arm-/axelpose så pressen når sträckta armbågar med händerna kvar under bröstet; kontrollera att sänkningen fortfarande fungerar."
-    ],
-    "fingerprint": "b4b7f6da3593"
+    "openIssues": [],
+    "fingerprint": "f6321974f460"
   },
   {
     "id": "blast-off-push-up",
@@ -3100,7 +3126,7 @@
     "name": "Triceps över huvudet",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -3124,12 +3150,15 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "E78: överarmarna fasta vid huvudet; underarmen svingar från sänkt bakom huvudet (start) till rak arm med hanteln ovanför huvudet (slut). Testet för armbågsböjningens riktning vändes så att bakåtvikning är rätt."
+      },
+      {
+        "date": "2026-11-04",
+        "fixer": "claude-sonnet",
+        "notes": "E78: egen ram (FRAMING 14 0 164 188, extra utrymme upptill) så att hela hanteln och händerna syns i toppläget; armgeometrin oförändrad. Sedd fas 0, 0.5, 0.875 och 1."
       }
     ],
-    "openIssues": [
-      "[cheap] E78: I fas 1 och reduced-motion Slut för både 1 och 2 kg kapas hantelns överdel av figurens övre kant; redan fas 0,875 har mycket liten marginal. Utöka/flytta ramen så hela hanteln och händerna ryms med marginal genom toppläget utan att beskära fötterna."
-    ],
-    "fingerprint": "5d14936b0cff"
+    "openIssues": [],
+    "fingerprint": "40ca41d267dd"
   },
   {
     "id": "dumbbell-pullover",

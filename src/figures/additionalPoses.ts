@@ -1,4 +1,4 @@
-import { farmerCarryPose } from './carryPoses';
+import { farmerCarryPose, rackCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
@@ -408,28 +408,10 @@ export const additionalFigures = {
     held: oneBell,
   },
   'kettlebell-rack-carry': {
-    start: {
-      ...stand,
-      eR: [105, 103],
-      hR: [108, 78],
-      kR: [111, 149],
-      aR: [120, 174],
-      tR: [132, 177],
-      kL: [84, 148],
-      aL: [77, 174],
-      tL: [89, 177],
-    },
-    end: {
-      ...stand,
-      eR: [105, 103],
-      hR: [108, 78],
-      kR: [88, 148],
-      aR: [79, 174],
-      tR: [91, 177],
-      kL: [110, 149],
-      aL: [119, 174],
-      tL: [131, 177],
-    },
+    // One whole two-step cycle per loop: stance foot planted, swing foot lifts.
+    start: rackCarryPose(0),
+    end: rackCarryPose(0.5),
+    motion: 'sequence',
     props: [],
     held: oneBell,
   },
@@ -1171,10 +1153,10 @@ export const additionalFigures = {
       [54, 170],
       [99, 171],
       [
-        [77, 151],
-        [102, 145],
-        [73, 149],
-        [99, 143],
+        [82, 159.7],
+        [107.6, 160.3],
+        [81.6, 158.7],
+        [107.1, 161.6],
       ],
       [
         [112, 139],
@@ -1190,10 +1172,10 @@ export const additionalFigures = {
       [54, 170],
       [99, 171],
       [
-        [78, 150],
-        [101, 142],
-        [73, 148],
-        [98, 140],
+        [80.5, 156.4],
+        [105.9, 160.2],
+        [80.4, 156.2],
+        [105.6, 161.5],
       ],
       [
         [107, 140],

@@ -645,14 +645,20 @@ export function frontMovementPose(
   const rackX = movingRight ? 78 : 122;
   const oppositeX = movingRight ? 122 : 78;
   const lift = Math.sin(Math.PI * t);
+  const rackElbow = point(rackX + (movingRight ? 9 : -9), 88);
+  const rackHand = point(rackX, 65);
+  const hangElbow = point(oppositeX + (movingRight ? -4 : 4), 88);
+  const hangHand = point(oppositeX, 105);
   return skeleton(
     point(100, 46),
     point(100, 60),
     point(100, 104),
-    point(rackX + (movingRight ? 9 : -9), 88),
-    point(rackX, 65),
-    point(oppositeX + (movingRight ? -4 : 4), 88),
-    point(oppositeX, 105),
+    // The selected side holds the rack grip: the person's right arm is on the
+    // viewer's left, so a left selection puts the grip in the L slot.
+    movingRight ? rackElbow : hangElbow,
+    movingRight ? rackHand : hangHand,
+    movingRight ? hangElbow : rackElbow,
+    movingRight ? hangHand : rackHand,
     point(82, 137 - 7 * lift),
     point(80, 174 - 10 * lift),
     point(70, 177 - 10 * lift),

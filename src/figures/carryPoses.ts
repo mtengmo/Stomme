@@ -106,3 +106,28 @@ export function farmerCarryPose(progress: number): Pose {
     hL: forearm(sway),
   };
 }
+
+/**
+ * Kettlebell rack carry in profile: the same planted-stance / lifted-swing
+ * walking legs as the suitcase carry (t=1 equals t=0). The right hand holds
+ * the bell at the shoulder with the elbow down (upper arm 29.8, forearm 25.2,
+ * both constant); the left arm hangs and swings as the free arm (same lengths).
+ */
+export function rackCarryPose(progress: number): Pose {
+  const t = ((progress % 1) + 1) % 1;
+  const swing = Math.cos(2 * Math.PI * t);
+  const neck: Pt = [100, 78];
+  const upper = 0.2 * swing;
+  const fore = 0.35 * swing + 0.1;
+  const eL = pt(
+    neck[0] - 29.8 * Math.sin(upper),
+    neck[1] + 29.8 * Math.cos(upper),
+  );
+  return {
+    ...suitcaseCarryPose(progress),
+    eR: [107, 107],
+    hR: [110, 82],
+    eL,
+    hL: pt(eL[0] - 25.2 * Math.sin(fore), eL[1] + 25.2 * Math.cos(fore)),
+  };
+}

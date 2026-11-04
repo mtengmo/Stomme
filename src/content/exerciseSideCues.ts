@@ -155,7 +155,10 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     explanation: `Det ${sideAdjective(side)} knäet är i golvet och höftböjaren på den sidan sträcks.`,
   }),
   'balance-pendulum': plantedFoot,
-  'single-leg-chair-squat': plantedFoot,
+  'single-leg-chair-squat': (side) => ({
+    label: `Stå på ${sideWord(side)} ben`,
+    explanation: `Det ${sideAdjective(side)} stödbenet böjs och sträcks när du sänker dig mot stolen och reser dig; det ${otherAdjective(side)} benet hålls lyft och hjälper inte till.`,
+  }),
   'single-leg-floor-bridge': bridgeFoot,
   'quad-set': (side) => ({
     label: `${sideWord(side)} lår spänns`,

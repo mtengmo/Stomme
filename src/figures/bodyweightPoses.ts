@@ -147,15 +147,18 @@ function declinePushUp(t: number): Pose {
 
 function diamondPushUp(t: number): Pose {
   const p = pushUp(t);
-  // Both hands meet under the chest; elbows fold back alongside the trunk.
-  const hand: Pt = [68, 174],
-    farHand: Pt = [70, 172];
+  // Both hands meet directly under the chest; the arms are straight at the top
+  // and the elbows fold back alongside the trunk while lowering.
+  const top = pushUp(0).neck;
+  const hand: Pt = [top[0], 174],
+    farHand: Pt = [top[0] + 1.4, 173];
+  const arm = (174 - top[1]) / 2;
   return {
     ...p,
     hR: hand,
     hL: farHand,
-    eR: joint(p.neck, hand, 25, 25, -1),
-    eL: joint(p.neck, farHand, 25, 25, -1),
+    eR: joint(p.neck, hand, arm, arm, -1),
+    eL: joint(p.neck, farHand, arm, arm, -1),
   };
 }
 
@@ -561,12 +564,12 @@ function kneePushUp(t: number): Pose {
 /** Standing lean against a wall: hands fixed on the wall, feet planted. */
 function wallPushUp(t: number): Pose {
   const ankle: Pt = [72, 174];
-  const angle = -mix(1.222, 0.942, t);
+  const angle = -mix(1.241, 0.942, t);
   const neck = polar(ankle, 108, angle),
     hip = polar(ankle, 63, angle);
   const hand: Pt = [155, 76],
     farHand: Pt = [155, 79];
-  const farAnkle: Pt = [68, 174];
+  const farAnkle: Pt = [69, 174];
   return pose(
     polar(neck, 14, angle),
     neck,
