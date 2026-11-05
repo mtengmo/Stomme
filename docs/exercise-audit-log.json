@@ -348,6 +348,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E07: fria grå foten sammanfaller fortfarande med stödfoten vid golvet i fas 0 och reduced-motion Start för H/V. Befintlig [cheap]-punkt kvarstår även i viktvarianternas startbilder. Slut visar lyft fri fot, stöd vid övre ryggen och händer vid vikten i 10/16 kg; kroppen ryms. Sidovy räcker inte för att bedöma jämnt bäcken. Text om stadigt stöd, undvik svank och tvåbensalternativ läst. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E07: fria foten är nu tydligt lyft i fas 0 och genom nio profilfaser, samt reduced-motion H/V och kroppsvikt/10 kg/16 kg. Tidigare sammanfallande fotkontakt i start är åtgärdad. Övre ryggen vid stödet, vikthållning och full ram kontrollerade i ändlägen. Text om stadig bänk, jämnt bäcken och tvåbensalternativ läst. Ok avser fria fotens startläge; sidovy räcker inte för bäckenrotation och samtliga viktvariantmellanlägen är inte sedda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -396,6 +404,14 @@
         "scope": "text",
         "result": "issues",
         "notes": "Omgranskning E08: sidocuen säger fortfarande att det andra benet rör sig, medan instruktion och fasbilder visar hällyft på stödbenet. Befintlig [cheap]-punkt kvarstår. Reduced-motion H/V visar fri fot lyft och hand vid väggen; 10 kg-varianten visar hantel i den andra handen och ryms. Sidovyn gör hällyftet läsbart. Råd om långsam sänkning, inga studsar och tvåbensalternativ lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Textomgranskning E08: sidocuen anger nu att valt stödben lyfter hälen och andra foten hålls lyft. H/V-formuleringen kontrollerad i exerciseSideCues.ts och H i övningsvyn; överensstämmer med steg 1–3 och reduced-motion H/V. Tidigare felaktiga cue är rättad. Nio faser visar hällyft; stödhand, hantelvariant och ram granskade i stillbilder. Långsam sänkning, undvik studsar och tvåbensalternativ anges. Ok avser texten, inte full rörelseacceptans. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -623,6 +639,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E12: frontens fotavstånd ökar fortfarande mellan reduced-motion Start/Slut i kroppsvikt, 4 kg hantel och 8 kg kettlebell. Befintlig [strong]-punkt kvarstår. Profilens nio faser visar höft-/knäböj; vikternas grepp syns och ramen räcker. Bilateral övning utan sidoväljare. Text om hela fötter i golv, undvik hällyft och grundare djup läst. Frontvyn hjälper knäriktning men visar det kvarstående kontaktfelet. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E12: nio frontfaser visar nu samma fotleds-/tåposition medan knän och höft ändrar läge. Tidigare sidoglidning är åtgärdad i granskat underlag. Reduced-motion kroppsvikt, 4 kg hantel och 8 kg kettlebell visar fasta fötter, grepp och full ram. Bilateral utan sidoval. Text om hela fötterna i golv och grundare djup läst. Ok avser fotlåsningen; knä-/höftgeometrins samtliga aspekter och återgång är inte fullständigt bedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1641,6 +1665,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E37: händerna når fortfarande inte det upplyfta låret i tidiga faser och reduced-motion Start H/V. Befintlig [cheap]-punkt kvarstår; slutbilden visar kontakt längre ned på låret. Vald knästräckning och spegling är läsbara, kroppen ryms, ingen utrustningsvariant. Textens varsamma sträckning, grepp utanför knäleden och mer böjt knä som förenkling lästa. Ingång från båda fötterna i golvet och hålltiden kan inte verifieras här. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning av handkontakten: nio profilrutor 0–1 samt reduced-motion Start/Slut H och V visar händerna intill lårets baksida nära höften, inte vid knäleden; det tidigare glappet syns inte. Benets gradvisa sträckning ryms i vyn och stämmer med läst instruktion om grepp bakom låret och mjuk sträckning. Inga utrustningsvarianter. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1776,6 +1808,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E40: profilens fötter glider fortfarande och frontens V-läge placerar vikten vid höften medan tomma armen böjs upp. Befintliga [strong]/[cheap]-punkter kvarstår. Profilens H/V visar rackgrepp vid axeln; frontens H visar grepp vid axeln i 4/8/16 kg, allt ryms. Text om underarmsstöd, neutral handled, andning och hjälp av fri hand vid upptagning/nedsättning läst. V med samtliga vikter och greppets djupkontakt genom rörelsen inte fullständigt verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad kontroll av rättad profilgång och sidval: nio profilrutor visar växelvis lyft svingfot och markkontakt hos stödbenet. Reduced-motion H/V visar rackarmen på vald sida även framifrån; 4/8/16 kg ryms. Lästa instruktioner beskriver korta steg, upprätt bål och hjälp av fri hand vid upp-/nedtagning. Frontens Start/Slut visar inte gångförloppet; rackkontaktens djup kan inte säkert bedömas i dessa projektioner. Detta ok gäller enbart synligt fotlyft och armens sidval. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1870,6 +1910,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E42: sneda reduced-motion H/V visar fortsatt knät på samma plats medan underbenet svänger; profilens raka ben lyfts från höften. Befintlig [strong]-punkt kvarstår. Övre fot vid bänk, stödarm under axel och ramen kontrollerade i bilderna. Text om stabil bänk, stabil höft, kontrollerad sänkning och förenkling läst; ingen viktvariant. Nybörjaracceptans och den exakta variantens källstöd inte verifierade, befintliga öppna punkter behålls. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning av snedvyns bengeometri: nio profil- och nio snedrutor samt reduced-motion H/V granskade. Det nedre benet förblir rakt genom knäet och roterar från höften; den tidigare synliga förkortningen syns inte. Övre fotens bänkstöd och underarmsstödet ligger kvar i de visade rutorna. Textens nedre benlyft stämmer med vald sida. Ok avser denna geometrirättning, inte full säkerhetsacceptans; befintliga frågor om nybörjarförståelse och källstöd kvarstår oförändrade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2078,6 +2126,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E46: armbågarna är fortsatt böjda i alla fasbilder och reduced-motion H/V trots steg 1:s sträckta armar. Befintlig [cheap]-punkt kvarstår. Stödbenet är blått, fri fot passerar över golvet och höftfällningen syns; händerna har mycket liten rammarginal i full fällning. Ingen viktvariant. Textens stilla bäcken och vägg/stol som förenkling lästa; bäckenrotation kan inte bedömas säkert i sidovy. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad kontroll av rättad armställning i nio profilrutor och reduced-motion H/V: armbågarna är sträckta, händerna pekar framåt i upprätt läge och sänks med fällningen; hela figuren ryms. Vald blå stödfot ligger kvar medan det andra benet förs bakåt. Läst text beskriver sträckta armar i start och stöd av stol/vägg som lättare variant; stödet visas inte. Profilen räcker för armrättningen men inte bäckenrotation. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2126,6 +2182,14 @@
         "scope": "text",
         "result": "issues",
         "notes": "Omgranskning E47: sidocuen säger fortfarande att andra benet rör sig; befintlig [cheap]-punkt kvarstår eftersom instruktionen kräver böjning/sträckning av valt stödben och lyft fri fot. Profil/front och H/V reduced-motion visar stödbenet blått och fria foten över golv; stolen nås i botten, allt ryms. Text om stadig stol, knä i linje med fot och högre stol/handstöd läst. Ingen viktvariant; dynamisk knäriktning och kontrollerad stolkontakt inte verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Läst aktuell instruktion, vanligt fel, lättare variant och rättad sidocue samt H/V-mallen i exerciseSideCues.ts. Cuen anger nu att valt stödben böjs/sträcks och att motsatt ben hålls lyft utan att hjälpa till; detta stämmer med nio profilrutor och reduced-motion H/V i profil/front. Texten anger stadig stol, kontrollerad lätt kontakt, knä i fotens riktning och högre stol/handstöd som förenkling. Ok gäller textändringen; figurens hela rörelse är inte accepterad. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2692,6 +2756,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E63: bakre framfoten saknar fortfarande golvkontakt i fas 0/1 och reduced-motion Start/Slut. Befintlig [strong]-punkt kvarstår, ingen dubblett tillagd. Hopp/benpassage syns i mellanbilderna; kroppen ryms. Textens mjuka landning och alternativ utan hopp lästa, sidovy ensam räcker inte för knäriktning. Kroppsvikt, ingen sidoväljare. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f1d517b",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E63 på f1d517b: bakre framfoten når nu golvet i fas 0/1 och reduced-motion Start/Slut, med hälen lyft. Tidigare kontaktfel är åtgärdat i dessa rutor. Nio fasbilder visar också luftfas och benpassage; figuren ryms. Bilateral kroppsvikt utan sidoväljare. Text om mjuk bromsad landning, knäriktning och alternativ utan hopp läst. Ok avser ändlägenas fotkontakt; sidovy kan inte avgöra landningens knäriktning och dynamiska kvalitet. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2921,7 +2993,7 @@
     "name": "Smala armhävningar",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -2937,6 +3009,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "E70: nio profilfaser och reduced-motion visar bröstsänkning med händer/tår kvar och sammanhängande bål/ben. Toppläget har tydligt böjda armbågar trots instruktionen att räta ut dem. Profilen visar inte handdiamanten/greppbredden; fotänden ligger nära ramkant. Bilateral kroppsvikt. Text om kontrollerad rörelse, bekvämt diamantgrepp och bredare vanlig armhävning finns. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio profilrutor och reduced-motion Start/Slut granskade mot aktuell text. Händerna ligger nu under bröstet och den närmaste armen är rak i Start, men den bortre armbågen bildar fortfarande en tydlig utbuktning där. Lästa poser bekräftar att bortre handen är förskjuten medan samma armlängd används. Sänkningens böjning och kvarliggande händer syns; profilvyn kan inte verifiera handbredd/diamant eller armbågarnas rörelse i sidled. Inga vikt- eller sidval. Textens bekvämlighetsförbehåll och bredare handplacering som förenkling lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2952,7 +3032,9 @@
         "notes": "E70: händerna står under bröstet i toppläget och armarna är raka där (konstant segmentlängd (174-halsen)/2); sänkningen viker armbågarna. Sedd fas 0, 0.5, 0.875 och 1."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[cheap] E70, fas 0 och reduced-motion Start: den bortre armbågen sticker bakåt och armen är synligt böjd samtidigt som den närmaste armen är rak. Justera topposen så att båda axel–armbåge–handled ligger på raka linjer enligt textens 'räta ut armarna', med bibehållen handkontakt och konsekventa armlängder under sänkningen."
+    ],
     "fingerprint": "f6321974f460"
   },
   {
@@ -3487,6 +3569,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E78: hanteln kapas fortfarande upptill i fas 1 och reduced-motion Slut vid 1/2 kg; befintlig [cheap]-punkt om ramen kvarstår. Böjt läge är bakom huvudet och armbågssträckning syns. Fötterna ryms; ingen sidoväljare. Text om överarmar nära huvudet, undvik svank och lättare alternativ läst; sidovyn kan inte säkra armbågarnas sidledsläge. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f1d517b",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E78 på f1d517b: hela hanteln och händerna ryms nu med marginal upptill i nio fasbilder och reduced-motion Slut för 1/2 kg; fötterna ryms också. Tidigare beskärningsfel är åtgärdat. Böjt läge bakom huvudet och armbågssträckning syns. Text om överarmar nära huvudet, undvik svank och lättare alternativ läst. Ok avser ramrättningen; sidovy kan inte avgöra armbågarnas sidledsläge eller exakt tvåhandsgrepp. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3574,6 +3664,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E80: foten förflyttas fortfarande utåt längs golvet i fas 0–0,5; befintlig [strong]-punkt kvarstår. Reduced-motion H/V visar böjning på vald sida. Frontvyn gör sidoförskjutningen läsbar, kropp och hantlar ryms och greppet syns i 2/4 kg-stillbilder. Text om knä över tå och bromsat steg läst. Inte alla kombinationer av vikt/sida/vy genom hela rörelsen verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f1d517b",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E80 på f1d517b: nio frontfaser visar nu vald fot lyft under utsteget (0,125–0,375), följt av kontakt och fast läge under knäböjen från 0,5. Tidigare glidande utsteg är åtgärdat i sedda faser. Reduced-motion H/V och kroppsvikt/2/4 kg visar vald sida, grepp och full ram. Text om bromsat steg, knä över tå och grundare alternativ läst. Ok avser fotlyftsrättningen; viktvarianternas mellanlägen och återsteget är inte fullständigt visuellt verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3689,6 +3787,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E84: handtaget ligger fortfarande ovanför kulan i nio faser samt reduced-motion 4/8 kg, i strid med textens upp-och-ned-grepp. Befintlig [cheap]-punkt kvarstår. Figuren ryms; ingen sidoväljare. Sidovyn överlappar huvud/vikt och räcker inte för att säkert bedöma frigång runt huvudet. Textens lugna cirkel, riktningsbyte och avbryt vid nack-/axelbesvär lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f1d517b",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E84 på f1d517b: kulan ritas nu ovanför handtaget/händerna i samtliga nio faser och reduced-motion 4/8 kg. Tidigare felvänd kettlebell är åtgärdad och motsvarar textens upp-och-ned-orientering. Figuren ryms, ingen sidoväljare. Text om lugn cirkel, riktningsbyte och stopp vid nack-/axelbesvär läst. Ok avser orienteringen; sidoprojektionens huvudöverlappning gör att frigång och exakt tvåhandsgrepp i hornen inte kan slutbedömas. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3726,7 +3832,7 @@
     "name": "Woodchop",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -3743,6 +3849,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E88: fot/tår förblir riktade likadant genom fasbilderna trots textens medvridning; befintlig [strong]-punkt kvarstår. H/V speglas i reduced-motion och samtliga fyra viktval ryms. Sidovy ger fortfarande otillräckligt stöd för att läsa diagonalen över motsatt axel och bålrotation. Greppet överlappar rekvisitan, dess djupkontakt kan inte säkert bedömas här. Råd om kontrollerad sänkning och ryggsmärta lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "60a5b5f",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio profilrutor, reduced-motion H/V och alla fyra viktval granskade mot texten. Hälen lyfts nu medan tån ligger kvar; detta verifierar inte rotation i golvplanet. Diagonalen från vald höft över motsatt axel går fortfarande inte att läsa: den enda vyn visar ett lyft framför kroppen. Figurer och vikter ryms, sidorna speglas, och textens råd om lugn rörelse/lättare vikt och avbrott vid ryggsmärta finns. Greppets djup kan inte säkert bedömas. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3752,7 +3866,9 @@
         "notes": "E88: närmaste foten vrids på trampdynan: tån står kvar, hälen lyfts och knät följer med (additionalPoses.ts). Figuren saknar sned/frontvy, så diagonalen syns inte. Sedd sida H fas 0 och 1."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E88, profilrutorna 0–1 och reduced-motion Slut H/V: axlar/händer och startbenets knä/fot visar inte den beskrivna diagonalen till motsatt axel eller medvridningen i golvplanet. Hällyftet ensamt gör inte rotationen läsbar. Lägg till en front-/snedvy eller annan tydlig geometri där höft-till-motsatt-axel-banan och knäets/fotens gemensamma medvridning kan verifieras."
+    ],
     "fingerprint": "8823b6e30eb1"
   },
   {
