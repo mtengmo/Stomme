@@ -467,10 +467,16 @@ it('opens the days step for an existing user and remakes the programme, keeping 
   render(<App />);
   await screen.findByRole('heading', { name: 'Hur många dagar i veckan?' });
   expect(radio('3 dagar').checked).toBe(true);
-  expect(screen.getByText('Steg 1 av 2')).toBeTruthy();
+  expect(screen.getByText('Steg 1 av 3')).toBeTruthy();
   await user.click(radio('4 dagar'));
   await next(user);
   await user.click(radio('Ben & bål för löpning'));
+  await next(user);
+  // The level step starts on the saved level.
+  await screen.findByRole('heading', {
+    name: 'Hur van är du vid styrketräning?',
+  });
+  expect(radio('Ny eller på väg tillbaka').checked).toBe(true);
   await user.click(screen.getByRole('button', { name: 'Gör om programmet' }));
   await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
   expect(window.location.hash).toBe('#/program?ny=1');
@@ -478,10 +484,40 @@ it('opens the days step for an existing user and remakes the programme, keeping 
     id: string;
     daysPerWeek: number;
     emphasis: string;
+    seed?: number;
   };
-  expect(program).toMatchObject({ daysPerWeek: 4, emphasis: 'run' });
+  expect(program).toMatchObject({
+    daysPerWeek: 4,
+    emphasis: 'run',
+    level: 'new',
+    curated: true,
+  });
+  expect(typeof program.seed).toBe('number');
   expect(program.id).not.toBe(old.id);
   expect((await getDb().meta.get('training'))?.value).toEqual(before);
+});
+
+it('lets the programme change pick a level and saves it with the preferences', async () => {
+  const { seedProgram } = await import('../program/programFixtures');
+  await seedProgram(3);
+  window.location.hash = '#/kom-igang?steg=days';
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Hur många dagar i veckan?' });
+  await next(user);
+  await next(user);
+  await user.click(radio('Viss vana'));
+  await user.click(screen.getByRole('button', { name: 'Gör om programmet' }));
+  await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
+  const program = (await getDb().meta.get('trainingProgram'))?.value as {
+    level: string;
+    curated: boolean;
+  };
+  expect(program).toMatchObject({ level: 'some', curated: false });
+  expect(
+    (await getDb().meta.get('training'))?.value as { experience: string },
+  ).toMatchObject({ experience: 'some' });
+  expect(screen.getByText(/^Nivå: Viss vana/)).toBeTruthy();
 });
 
 it('does not open the programme change for rehab', async () => {

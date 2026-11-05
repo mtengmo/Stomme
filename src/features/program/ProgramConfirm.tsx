@@ -1,11 +1,20 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
-import { beginnerExerciseIds } from '../../content/beginnerSet';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { exercises } from '../../content/exercises';
+import { focusLabel } from '../../content/focusPresets';
+import { experienceLabels } from '../../content/programmes';
+import { isCuratedLevel, programPool } from '../../content/widePool';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
+import { saveTrainingPreferences } from '../../db/training';
 import type { TrainingPreferences, TrainingProgram } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
+import { randomSeed } from '../../lib/seed';
 import { buildProgram } from '../../rules/programPlan';
 import { Button } from '../../ui/Button';
+import { ChoiceCard } from '../../ui/ChoiceCard';
+import { levelHints } from '../training/quickStartModel';
+import { ExerciseThumb } from './ExerciseThumb';
+import { programLevel } from './programView';
 
 /** A full-screen confirmation: the safe choice first, the action as the heavier button. */
 export function Confirm({
@@ -40,7 +49,11 @@ export function Confirm({
   }, []);
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
-      <h1 ref={heading} tabIndex={-1} className="m-0 text-5xl font-extrabold">
+      <h1
+        ref={heading}
+        tabIndex={-1}
+        className="m-0 text-5xl font-extrabold [overflow-wrap:anywhere]"
+      >
         {title}
       </h1>
       {children}
@@ -63,6 +76,60 @@ export function Confirm({
 
 type Mode = 'redo' | 'end';
 
+type Level = TrainingPreferences['experience'];
+const levels: Level[] = ['new', 'some', 'regular'];
+
+/** Same days and emphasis as the programme, rebuilt for a level, a seed and the equipment in the preferences. */
+export function rebuildProgram(
+  program: TrainingProgram,
+  preferences: TrainingPreferences,
+  level: Level,
+  seed: number | undefined,
+  id: string,
+): TrainingProgram | null {
+  return buildProgram({
+    preferences: { ...preferences, experience: level },
+    daysPerWeek: program.daysPerWeek,
+    emphasis: program.emphasis,
+    startDate: toLocalDate(new Date()),
+    now: new Date().toISOString(),
+    id,
+    block: program.block,
+    pool: programPool(level, program.emphasis),
+    curated: isCuratedLevel(level),
+    ...(seed !== undefined ? { seed } : {}),
+  });
+}
+
+/** The new passes with a still figure per exercise, so the choice is seen before it is saved. */
+function PassPreview({ program }: { program: TrainingProgram }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {program.passes.map((pass, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: passes are a fixed-order list; focus can repeat
+        <section key={index} aria-labelledby={`redo-pass-${index}`}>
+          <h3 id={`redo-pass-${index}`} className="m-0 mb-1 text-xl font-bold">
+            Pass {index + 1} · {focusLabel(pass.focus)}
+          </h3>
+          <ul className="m-0 list-none p-0">
+            {pass.exerciseIds.map((id) => (
+              <li
+                key={id}
+                className="flex min-h-14 items-center gap-3 border-t-2 border-edge py-2 text-base font-bold"
+              >
+                <ExerciseThumb exerciseId={id} animate={false} />
+                <span className="min-w-0 break-words">
+                  {exercises[id].name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 /** Rebuild or end the programme. Shared by Home (equipment changed) and "Mitt program". */
 export function ProgramRedoEnd({
   mode,
@@ -79,33 +146,42 @@ export function ProgramRedoEnd({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [level, setLevel] = useState<Level>(programLevel(program, preferences));
+  const [shuffle, setShuffle] = useState(true);
+  const [freshSeed, setFreshSeed] = useState(randomSeed);
+  const id = useRef(crypto.randomUUID());
   const keep = () => {
     setError('');
     onKeep();
   };
 
+  // Shuffle on: a fresh seed. Off: the seed of the current programme.
+  const seed = shuffle ? freshSeed : program.seed;
+  const next = useMemo(
+    () => rebuildProgram(program, preferences, level, seed, id.current),
+    [program, preferences, level, seed],
+  );
+
   const rebuild = async () => {
+    if (!next) return;
     setBusy(true);
     setError('');
     try {
-      const next = buildProgram({
-        preferences,
-        daysPerWeek: program.daysPerWeek,
-        emphasis: program.emphasis,
-        startDate: toLocalDate(new Date()),
-        now: new Date().toISOString(),
-        id: crypto.randomUUID(),
-        block: program.block,
-        ...(program.curated ? { pool: beginnerExerciseIds } : {}),
-      });
-      if (!next) {
-        setError('Det gick inte att bygga ett program med din utrustning.');
-        return;
-      }
-      await saveTrainingProgram(getDb(), next);
+      const db = getDb();
+      if (level === preferences.experience) await saveTrainingProgram(db, next);
+      else
+        await saveTrainingPreferences(
+          db,
+          { ...preferences, experience: level },
+          () => saveTrainingProgram(db, next),
+        );
       onRebuilt();
-    } catch {
-      setError('Kunde inte spara. Försök igen.');
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'Kunde inte spara. Försök igen.',
+      );
     } finally {
       setBusy(false);
     }
@@ -128,7 +204,7 @@ export function ProgramRedoEnd({
         title="Göra om programmet?"
         keepLabel="Behåll programmet"
         confirmLabel="Gör om programmet nu"
-        busy={busy}
+        busy={busy || !next}
         error={error}
         onKeep={keep}
         onConfirm={() => void rebuild()}
@@ -138,6 +214,49 @@ export function ProgramRedoEnd({
           din utrustning nu. Blockets räknare börjar om. Sparade pass i
           historiken finns kvar.
         </p>
+        <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+          <legend className="mb-2 text-base font-bold">Nivå</legend>
+          {levels.map((value) => (
+            <ChoiceCard
+              key={value}
+              type="radio"
+              name="redo-level"
+              value={value}
+              label={experienceLabels[value]}
+              hint={levelHints[value]}
+              checked={level === value}
+              onChange={() => setLevel(value)}
+            />
+          ))}
+        </fieldset>
+        <ChoiceCard
+          type="checkbox"
+          label="Blanda om övningarna"
+          hint="Nya övningar för samma ändamål. Av: samma urval som nu."
+          checked={shuffle}
+          onChange={setShuffle}
+        />
+        {shuffle ? (
+          <Button
+            variant="secondary"
+            disabled={busy}
+            onClick={() => setFreshSeed(randomSeed())}
+          >
+            Blanda igen
+          </Button>
+        ) : null}
+        <section aria-labelledby="redo-preview" className="flex flex-col gap-3">
+          <h2 id="redo-preview" className="m-0 text-3xl font-bold">
+            Så här blir passen
+          </h2>
+          {next ? (
+            <PassPreview program={next} />
+          ) : (
+            <p role="alert" className="m-0 text-base font-bold">
+              Det gick inte att bygga ett program med din utrustning.
+            </p>
+          )}
+        </section>
       </Confirm>
     );
   return (

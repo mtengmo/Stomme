@@ -22,6 +22,14 @@ export const emphasisLabels: Record<ProgramEmphasis, string> = {
   upper: 'Mer överkropp',
 };
 
+/** The level a programme was built for; older programmes follow the saved preferences. */
+export function programLevel(
+  program: TrainingProgram,
+  preferences: TrainingPreferences,
+): TrainingPreferences['experience'] {
+  return program.level ?? preferences.experience;
+}
+
 const ABBR = ['mån', 'tis', 'ons', 'tor', 'fre', 'lör', 'sön'];
 
 /** Short weekday for an ISO weekday (1 = Monday), e.g. "lör". */

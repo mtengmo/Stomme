@@ -1,7 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { type ReactNode, useState } from 'react';
 import { Link, Redirect, useLocation } from 'wouter';
-import { isTrainingPreferences, trainingName } from '../../content/programmes';
+import {
+  experienceLabels,
+  isTrainingPreferences,
+  trainingName,
+} from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
@@ -9,6 +13,7 @@ import { canReplaceTrainingPreparation } from '../../db/training';
 import { nextTemplateId } from '../../rules/schedule';
 import { Icon } from '../../ui/Icon';
 import { ProgramRedoEnd } from './ProgramConfirm';
+import { programLevel } from './programView';
 
 const rowClass =
   'flex min-h-14 w-full items-center gap-3 border-b-2 border-edge py-2 text-left text-ink no-underline focus-visible:outline-offset-[-4px]';
@@ -105,6 +110,11 @@ export function MyProgram() {
           ? ` · block ${program.block}, ${program.daysPerWeek} pass i veckan`
           : ''}
       </p>
+      {program ? (
+        <p className="m-0 text-base text-ink-soft">
+          Nivå: {experienceLabels[programLevel(program, preferences)]}
+        </p>
+      ) : null}
       <ul className="m-0 flex list-none flex-col border-t-[3px] border-ink p-0">
         <li>
           <Link

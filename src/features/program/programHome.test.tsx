@@ -1,13 +1,23 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
+import { beginnerExerciseIds } from '../../content/beginnerSet';
+import { exercises } from '../../content/exercises';
 import { getDb } from '../../db/db';
-import { readTrainingProgram } from '../../db/program';
+import { readTrainingProgram, saveTrainingProgram } from '../../db/program';
 import { setMeta } from '../../db/repo';
-import { programSession, seedProgram } from './programFixtures';
+import { toLocalDate } from '../../lib/dates';
+import { buildProgram } from '../../rules/programPlan';
+import { programPrefs, programSession, seedProgram } from './programFixtures';
 
 beforeEach(async () => {
   window.localStorage.clear();
@@ -196,6 +206,134 @@ it('rebuilds the programme only after a confirmation', async () => {
   );
   // Back on Idag with the new block.
   await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
+});
+
+const openRedo = async (user: ReturnType<typeof userEvent.setup>) => {
+  await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
+  await openMyProgram(user);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  await user.click(screen.getByRole('button', { name: /^Gör om programmet/ }));
+  await screen.findByRole('heading', { name: 'Göra om programmet?' });
+};
+
+/** The exercise names of the preview, per pass. */
+const previewNames = () =>
+  screen.getAllByRole('heading', { level: 3 }).map((h) =>
+    within(h.closest('section') as HTMLElement)
+      .getAllByRole('listitem')
+      .map((li) => (li.textContent ?? '').trim()),
+  );
+
+const saved = async () =>
+  (await readTrainingProgram(getDb())) as NonNullable<
+    Awaited<ReturnType<typeof readTrainingProgram>>
+  >;
+
+it('redo screen offers the three levels (current preselected), shuffle on, and a preview', async () => {
+  await seedProgram(3);
+  const user = userEvent.setup();
+  render(<App />);
+  await openRedo(user);
+  const level = screen.getByRole('group', { name: 'Nivå' });
+  expect(within(level).getAllByRole('radio')).toHaveLength(3);
+  expect(
+    (
+      within(level).getByRole('radio', {
+        name: 'Ny eller på väg tillbaka',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(true);
+  expect(
+    (
+      screen.getByRole('checkbox', {
+        name: 'Blanda om övningarna',
+      }) as HTMLInputElement
+    ).checked,
+  ).toBe(true);
+  expect(
+    screen.getByRole('heading', { level: 2, name: 'Så här blir passen' }),
+  ).toBeTruthy();
+  expect(previewNames()).toHaveLength(3);
+  expect(previewNames().every((pass) => pass.length >= 4)).toBe(true);
+});
+
+it('saves exactly the previewed passes, a seed and the new level with the preferences', async () => {
+  await seedProgram(3);
+  const user = userEvent.setup();
+  render(<App />);
+  await openRedo(user);
+  await user.click(screen.getByRole('radio', { name: 'Viss vana' }));
+  const shown = previewNames();
+  await user.click(
+    screen.getByRole('button', { name: 'Gör om programmet nu' }),
+  );
+  await waitFor(async () =>
+    expect((await readTrainingProgram(getDb()))?.id).not.toBe('prog-1'),
+  );
+  const program = await saved();
+  expect(program).toMatchObject({ level: 'some', curated: false });
+  expect(typeof program.seed).toBe('number');
+  expect(shown).toHaveLength(program.passes.length);
+  program.passes.forEach((pass, i) => {
+    expect(shown[i]).toHaveLength(pass.exerciseIds.length);
+    for (const [j, id] of pass.exerciseIds.entries())
+      expect(shown[i]?.[j]?.endsWith(exercises[id].name)).toBe(true);
+  });
+  const stored = await getDb().meta.get('training');
+  expect(stored?.value).toMatchObject({ experience: 'some' });
+});
+
+it('shuffle off rebuilds from the seed of the programme', async () => {
+  const old = await seedProgram(3);
+  await saveTrainingProgram(getDb(), { ...old, seed: 4242, level: 'new' });
+  const user = userEvent.setup();
+  render(<App />);
+  await openRedo(user);
+  await user.click(
+    screen.getByRole('checkbox', { name: 'Blanda om övningarna' }),
+  );
+  expect(screen.queryByRole('button', { name: 'Blanda igen' })).toBeNull();
+  await user.click(
+    screen.getByRole('button', { name: 'Gör om programmet nu' }),
+  );
+  await waitFor(async () =>
+    expect((await readTrainingProgram(getDb()))?.id).not.toBe('prog-1'),
+  );
+  const program = await saved();
+  expect(program.seed).toBe(4242);
+  expect(program.level).toBe('new');
+  const expected = buildProgram({
+    preferences: programPrefs,
+    daysPerWeek: 3,
+    emphasis: 'full',
+    startDate: toLocalDate(new Date()),
+    now: new Date().toISOString(),
+    id: 'x',
+    pool: beginnerExerciseIds,
+    seed: 4242,
+  });
+  expect(program.passes).toEqual(expected?.passes);
+});
+
+it('keeping the programme leaves programme and preferences untouched', async () => {
+  const old = await seedProgram(3);
+  const prefs = (await getDb().meta.get('training'))?.value;
+  const user = userEvent.setup();
+  render(<App />);
+  await openRedo(user);
+  await user.click(screen.getByRole('radio', { name: 'Tränar regelbundet' }));
+  await user.click(screen.getByRole('button', { name: 'Behåll programmet' }));
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  expect(await readTrainingProgram(getDb())).toEqual(old);
+  expect((await getDb().meta.get('training'))?.value).toEqual(prefs);
+});
+
+it('shows the level on Mitt program', async () => {
+  await seedProgram(3);
+  window.location.hash = '#/mitt-program';
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  expect(screen.getByText('Nivå: Ny eller på väg tillbaka')).toBeTruthy();
 });
 
 it('ends the programme after a confirmation and falls back to the plain Home', async () => {
