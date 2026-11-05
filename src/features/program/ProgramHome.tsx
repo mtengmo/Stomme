@@ -1,6 +1,5 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'wouter';
-import { beginnerExerciseIds } from '../../content/beginnerSet';
 import { exercises } from '../../content/exercises';
 import { focusLabel } from '../../content/focusPresets';
 import { programExcludedIds } from '../../content/programExclusions';
@@ -15,10 +14,11 @@ import type {
   TrainingProgram,
 } from '../../domain/types';
 import { toLocalDate, weekdayIndex } from '../../lib/dates';
-import { buildProgram, weekdaysFor } from '../../rules/programPlan';
+import { weekdaysFor } from '../../rules/programPlan';
 import { BLOCK_WEEKS, programProgress } from '../../rules/programProgress';
 import { recentMuscles, recoveryNote } from '../../rules/recovery';
 import { Button, buttonClass } from '../../ui/Button';
+import { Icon } from '../../ui/Icon';
 import { linkClass } from '../../ui/link';
 import { programPassLabel } from '../history/labels';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
@@ -28,6 +28,7 @@ import { NextLevelSuggestions } from '../training/NextLevelSuggestions';
 import { BlockProgress } from './BlockProgress';
 import { PauseFiguresButton } from './ExerciseThumb';
 import { PassCard } from './PassCard';
+import { ProgramRedoEnd } from './ProgramConfirm';
 import { ProgramWeekStrip } from './ProgramWeekStrip';
 import {
   cardExercises,
@@ -52,67 +53,13 @@ interface ProgramHomeProps {
   due: Session[];
   /** Finished or aborted general sessions, newest first. */
   recent: Session[];
-  onChangeDirection(): void;
 }
 
-type View = 'home' | 'redo' | 'end';
+type View = 'home' | 'redo';
 
 const stickyBar =
   'sticky bottom-[var(--app-nav-height)] z-10 -mx-5 border-t-[3px] border-ink bg-surface-tint px-5 py-3';
-const menuItem = 'flex min-h-12 items-center text-base';
-
-function Confirm({
-  title,
-  children,
-  keepLabel,
-  confirmLabel,
-  busy,
-  error,
-  onKeep,
-  onConfirm,
-}: {
-  title: string;
-  children: ReactNode;
-  keepLabel: string;
-  confirmLabel: string;
-  busy: boolean;
-  error: string;
-  onKeep(): void;
-  onConfirm(): void;
-}) {
-  const heading = useRef<HTMLHeadingElement>(null);
-  const keep = useRef(onKeep);
-  keep.current = onKeep;
-  useEffect(() => {
-    heading.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') keep.current();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
-  return (
-    <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
-      <h1 ref={heading} tabIndex={-1} className="m-0 text-5xl font-extrabold">
-        {title}
-      </h1>
-      {children}
-      <div className="flex flex-col gap-3">
-        <Button variant="secondary" disabled={busy} onClick={onKeep}>
-          {keepLabel}
-        </Button>
-        {error ? (
-          <p role="alert" className="m-0 text-base font-bold">
-            {error}
-          </p>
-        ) : null}
-        <Button disabled={busy} onClick={onConfirm}>
-          {confirmLabel}
-        </Button>
-      </div>
-    </div>
-  );
-}
+const quietRow = `flex min-h-12 items-center text-base font-bold ${linkClass}`;
 
 /** Home while a general programme exists: this week, the next pass, then the rest. */
 export function ProgramHome({
@@ -124,7 +71,6 @@ export function ProgramHome({
   prepared,
   due,
   recent,
-  onChangeDirection,
 }: ProgramHomeProps) {
   const [view, setView] = useState<View>('home');
   const [busy, setBusy] = useState(false);
@@ -136,44 +82,6 @@ export function ProgramHome({
   const n = program.daysPerWeek;
   const total = n * BLOCK_WEEKS;
   const completedWeeks = Math.min(BLOCK_WEEKS, Math.floor(progress.done / n));
-
-  const rebuild = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      const next = buildProgram({
-        preferences,
-        daysPerWeek: program.daysPerWeek,
-        emphasis: program.emphasis,
-        startDate: today,
-        now: new Date().toISOString(),
-        id: crypto.randomUUID(),
-        block: program.block,
-        ...(program.curated ? { pool: beginnerExerciseIds } : {}),
-      });
-      if (!next) {
-        setError('Det gick inte att bygga ett program med din utrustning.');
-        return;
-      }
-      await saveTrainingProgram(getDb(), next);
-      setView('home');
-    } catch {
-      setError('Kunde inte spara. Försök igen.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const endProgram = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      await getDb().meta.delete('trainingProgram');
-    } catch {
-      setError('Kunde inte avsluta programmet. Försök igen.');
-      setBusy(false);
-    }
-  };
 
   const nextBlock = async () => {
     setBusy(true);
@@ -217,44 +125,13 @@ export function ProgramHome({
 
   if (view === 'redo')
     return (
-      <Confirm
-        title="Göra om programmet?"
-        keepLabel="Behåll programmet"
-        confirmLabel="Gör om programmet nu"
-        busy={busy}
-        error={error}
-        onKeep={() => {
-          setError('');
-          setView('home');
-        }}
-        onConfirm={() => void rebuild()}
-      >
-        <p className="m-0 text-xl">
-          Du får ett nytt block med samma antal pass och tyngdpunkt, byggt på
-          din utrustning nu. Blockets räknare börjar om. Sparade pass i
-          historiken finns kvar.
-        </p>
-      </Confirm>
-    );
-  if (view === 'end')
-    return (
-      <Confirm
-        title="Avsluta programmet?"
-        keepLabel="Behåll programmet"
-        confirmLabel="Avsluta programmet nu"
-        busy={busy}
-        error={error}
-        onKeep={() => {
-          setError('');
-          setView('home');
-        }}
-        onConfirm={() => void endProgram()}
-      >
-        <p className="m-0 text-xl">
-          Programmet tas bort från hemskärmen. Sparade pass i historiken finns
-          kvar, och du kan skapa ett nytt program senare.
-        </p>
-      </Confirm>
+      <ProgramRedoEnd
+        mode="redo"
+        preferences={preferences}
+        program={program}
+        onKeep={() => setView('home')}
+        onRebuilt={() => setView('home')}
+      />
     );
 
   const nextIndex = progress.nextPass - 1;
@@ -292,60 +169,6 @@ export function ProgramHome({
     ? `/session/${active.id}`
     : `/traning/A?program=${progress.nextPass}`;
 
-  const menu = (
-    <details>
-      <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-        Ändra
-      </summary>
-      <div className="flex flex-col">
-        <Link
-          href="/installningar/utrustning?tillbaka=traning"
-          className={`${menuItem} ${linkClass}`}
-        >
-          Min utrustning
-        </Link>
-        <Link href="/nytt-pass" className={`${menuItem} ${linkClass}`}>
-          Skapa eget pass
-        </Link>
-        <Link href="/fokus" className={`${menuItem} ${linkClass}`}>
-          Träna något annat idag
-        </Link>
-        <button
-          type="button"
-          disabled={locked}
-          onClick={() => setView('redo')}
-          className={`${menuItem} ${linkClass} self-start disabled:opacity-50`}
-        >
-          Gör om programmet
-        </button>
-        <Link href="/ovningar" className={`${menuItem} ${linkClass}`}>
-          Bläddra bland övningar
-        </Link>
-        <button
-          type="button"
-          disabled={locked}
-          onClick={onChangeDirection}
-          className={`${menuItem} ${linkClass} self-start disabled:opacity-50`}
-        >
-          Byt inriktning
-        </button>
-        <button
-          type="button"
-          disabled={locked}
-          onClick={() => setView('end')}
-          className={`${menuItem} ${linkClass} self-start disabled:opacity-50`}
-        >
-          Avsluta programmet
-        </button>
-        {locked ? (
-          <p className="m-0 text-base text-ink-soft">
-            Avsluta eller avbryt passet innan du ändrar programmet.
-          </p>
-        ) : null}
-      </div>
-    </details>
-  );
-
   const tail = (
     <>
       {due.map((session) => (
@@ -357,7 +180,6 @@ export function ProgramHome({
           Hur känns det dagen efter {trainingName(session)}?
         </Link>
       ))}
-      {menu}
       <CustomWorkoutList
         headingId="home-own-workouts"
         variant="home"
@@ -435,6 +257,14 @@ export function ProgramHome({
             Starta block {program.block + 1}
           </Button>
         </div>
+        <div className="-mt-3 flex flex-col">
+          <Link href="/fokus" className={quietRow}>
+            Träna något annat idag
+          </Link>
+          <Link href="/mitt-program" className={quietRow}>
+            Mitt program
+          </Link>
+        </div>
         {tail}
       </div>
     );
@@ -443,7 +273,17 @@ export function ProgramHome({
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
       <h1 className="count m-0 text-5xl leading-none">
-        Vecka {progress.week} <span className="text-3xl">av {BLOCK_WEEKS}</span>
+        <Link
+          href="/mitt-program"
+          className="flex min-h-12 items-center justify-between gap-2 text-ink no-underline"
+        >
+          <span>
+            Vecka {progress.week}{' '}
+            <span className="text-3xl whitespace-nowrap">av {BLOCK_WEEKS}</span>
+            <span className="sr-only"> – Mitt program</span>
+          </span>
+          <Icon name="back" size={28} className="shrink-0 rotate-180" />
+        </Link>
       </h1>
       <BlockProgress
         done={progress.done}
@@ -492,6 +332,11 @@ export function ProgramHome({
             dayLabel={dayLabel}
             isToday={isTodayNext}
             showLegend={progress.done === 0}
+            swapHref={
+              active
+                ? undefined
+                : (id) => `/traning/A?program=${progress.nextPass}&byt=${id}`
+            }
           />
           {removed.length ? (
             <p className="m-0 text-base text-ink-soft">
@@ -530,6 +375,21 @@ export function ProgramHome({
                 : 'Starta passet'}
           </Link>
         )}
+      </div>
+      <div className="-mt-3 flex flex-col">
+        {!locked ? (
+          <Link href="/fokus" className={quietRow}>
+            Träna något annat idag
+          </Link>
+        ) : null}
+        {!active && !equipmentChanged && nextPass ? (
+          <Link href={`${startHref}&byt=alla`} className={quietRow}>
+            Byt övning
+          </Link>
+        ) : null}
+        <Link href="/mitt-program" className={quietRow}>
+          Mitt program
+        </Link>
       </div>
       {tail}
     </div>

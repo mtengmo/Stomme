@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
@@ -108,3 +114,53 @@ it('returns to the picker after changing setup, and ignores other targets', asyn
   );
   await screen.findByRole('heading', { name: 'Pass A' });
 });
+
+it('the builder links back to Övningar', async () => {
+  await setMeta(getDb(), 'training', prefs);
+  window.location.hash = '#/nytt-pass';
+  render(<App />);
+  const back = await screen.findByRole('link', { name: 'Till övningar' });
+  expect(back.getAttribute('href')).toBe('#/ovningar');
+});
+
+it('the Övningar hub locks the own workouts while a session runs, not for a preparation', async () => {
+  await setMeta(getDb(), 'training', prefs);
+  await setMeta(getDb(), 'customWorkouts', [
+    { id: 'one', name: 'Mitt presspass', exerciseIds: ['push-up'] },
+  ]);
+  window.location.hash = '#/ovningar';
+  render(<App />);
+  const own = () => screen.getByRole('region', { name: 'Egna pass' });
+  await screen.findByRole('region', { name: 'Egna pass' }, { timeout: 10_000 });
+  expect(
+    await within(own()).findByRole(
+      'link',
+      { name: /Mitt presspass/ },
+      { timeout: 10_000 },
+    ),
+  ).toBeTruthy();
+  cleanup();
+  await getDb().sessions.add({
+    id: 'running',
+    templateId: 'A',
+    programId: 'general',
+    date: new Date().toISOString().slice(0, 10),
+    startedAt: new Date().toISOString(),
+    status: 'in_progress',
+    plan: [],
+    feedback: {},
+    checkins: {},
+    note: 'pågår',
+  } as never);
+  render(<App />);
+  await screen.findByRole('region', { name: 'Egna pass' }, { timeout: 10_000 });
+  await waitFor(
+    () => {
+      expect(within(own()).getByText(/Mitt presspass/)).toBeTruthy();
+      expect(
+        within(own()).queryByRole('link', { name: /Mitt presspass/ }),
+      ).toBeNull();
+    },
+    { timeout: 10_000 },
+  );
+}, 30_000);

@@ -18,8 +18,8 @@ for (const [width, scheme] of [
     await quickStart(page, { goal: 'general' });
     const openSetup = async () => {
       await page.goto('/#/');
-      await page.getByText('Ändra', { exact: true }).click();
-      await page.getByRole('button', { name: 'Byt inriktning' }).click();
+      await page.getByRole('link', { name: /^Vecka \d av 4/ }).click();
+      await page.getByRole('link', { name: /^Byt inriktning/ }).click();
     };
     await openSetup();
     await page.getByRole('radio', { name: 'Egna pass' }).check();

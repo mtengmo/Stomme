@@ -11,6 +11,8 @@ describe('navVisible', () => {
     '/historik/abc',
     '/installningar',
     '/ovningar',
+    '/mitt-program',
+    '/nytt-pass',
     '/ovning/e12',
     '/granska',
     '/okand-sida',

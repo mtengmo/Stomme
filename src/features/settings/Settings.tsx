@@ -94,9 +94,11 @@ export function returnTarget(search: string): string | undefined {
   const value = new URLSearchParams(search).get('tillbaka');
   return value === 'nytt-pass'
     ? '/nytt-pass'
-    : value === 'traning'
-      ? '/traning/A'
-      : undefined;
+    : value === 'mitt-program'
+      ? '/mitt-program'
+      : value === 'traning'
+        ? '/traning/A'
+        : undefined;
 }
 
 function EquipmentInventorySettings() {

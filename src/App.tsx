@@ -107,6 +107,11 @@ const ProgramReveal = lazy(() =>
     default: m.ProgramReveal,
   })),
 );
+const MyProgram = lazy(() =>
+  import('./features/program/MyProgram').then((m) => ({
+    default: m.MyProgram,
+  })),
+);
 const QuickStartRoute = lazy(() =>
   import('./features/training/QuickStartRoute').then((m) => ({
     default: m.QuickStartRoute,
@@ -184,6 +189,7 @@ function Shell() {
             <Route path="/">{() => <TrainingHome />}</Route>
             <Route path="/kom-igang">{() => <QuickStartRoute />}</Route>
             <Route path="/program">{() => <ProgramReveal />}</Route>
+            <Route path="/mitt-program">{() => <MyProgram />}</Route>
             <Route path="/vecka">{() => <WeekPlanner />}</Route>
             <Route path="/fokus">{() => <FocusPicker />}</Route>
             <Route path="/traning/:id">

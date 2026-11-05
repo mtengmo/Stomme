@@ -44,6 +44,8 @@ import {
 import { musclesForPlan } from '../../rules/weekSuggestion';
 import { Button, buttonClass } from '../../ui/Button';
 import { ChoiceCard } from '../../ui/ChoiceCard';
+import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import { programPassLabel } from '../history/labels';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { ProgramHome } from '../program/ProgramHome';
@@ -51,6 +53,8 @@ import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
 import { startingFocus } from './focusModel';
+
+const quietRow = `flex min-h-12 items-center text-base font-bold ${linkClass}`;
 
 const inputClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
@@ -320,8 +324,13 @@ export function TrainingHome() {
   const homeSearch = new URLSearchParams(useHashSearch());
   const wantsSetup = homeSearch.get('andra') === 'utrustning';
   // Only a known page may be returned to after the setup.
+  const back = homeSearch.get('tillbaka');
   const backTo =
-    homeSearch.get('tillbaka') === 'nytt-pass' ? '/nytt-pass' : '/traning/A';
+    back === 'nytt-pass'
+      ? '/nytt-pass'
+      : back === 'mitt-program'
+        ? '/mitt-program'
+        : '/traning/A';
   const [editing, setEditing] = useState(wantsSetup);
   if (!data) return null;
   const preferences = isTrainingPreferences(data.preferences)
@@ -343,7 +352,8 @@ export function TrainingHome() {
           current={preferences}
           onSaved={() => {
             setEditing(false);
-            if (wantsSetup) navigate(backTo);
+            // A changed direction shows on Idag; cancelling returns to Mitt program.
+            if (wantsSetup) navigate(back === 'mitt-program' ? '/' : backTo);
           }}
           onCancel={() => {
             setEditing(false);
@@ -371,7 +381,6 @@ export function TrainingHome() {
         prepared={prepared}
         due={due}
         recent={recent}
-        onChangeDirection={() => setEditing(true)}
       />
     );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
@@ -429,7 +438,11 @@ export function TrainingHome() {
             new Date(),
           )
       : '';
-  const alternateId = (active?.templateId ?? nextId) === 'A' ? 'B' : 'A';
+  const startHref = active
+    ? `/session/${active.id}`
+    : todayPlan
+      ? planHref(todayPlan, data.savedWorkouts, nextId)
+      : `/traning/${nextId}${dailyFocus && preferences?.programId === 'general' ? `?${focusQuery(dailyFocus.focus)}` : ''}`;
   if (!preferences) return null;
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
@@ -480,16 +493,7 @@ export function TrainingHome() {
         </p>
       ) : null}
       <TimeoutNotice />
-      <Link
-        href={
-          active
-            ? `/session/${active.id}`
-            : todayPlan
-              ? planHref(todayPlan, data.savedWorkouts, nextId)
-              : `/traning/${nextId}${dailyFocus && preferences.programId === 'general' ? `?${focusQuery(dailyFocus.focus)}` : ''}`
-        }
-        className={buttonClass('primary')}
-      >
+      <Link href={startHref} className={buttonClass('primary')}>
         {prepared
           ? 'Fortsätt förberedelsen'
           : active
@@ -498,6 +502,19 @@ export function TrainingHome() {
               ? 'Visa nästa pass'
               : 'Starta passet'}
       </Link>
+      {!active && preferences.programId !== 'rehab' ? (
+        <div className="-mt-3 flex flex-col">
+          <Link href="/fokus" className={quietRow}>
+            Träna något annat idag
+          </Link>
+          <Link
+            href={`${startHref}${startHref.includes('?') ? '&' : '?'}byt=alla`}
+            className={quietRow}
+          >
+            Byt övning
+          </Link>
+        </div>
+      ) : null}
       {!active && !todayPlan && nextDate && nextPlan ? (
         <p className="m-0 -mt-3 text-base text-ink-soft">
           Nästa planerade:{' '}
@@ -527,65 +544,27 @@ export function TrainingHome() {
       {preferences.programId !== 'rehab' ? (
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-            Plan framåt och utveckling
+            Plan framåt
           </summary>
           <p className="m-0 text-base">
             Nästa ordinarie pass: {nextId}. Därefter:{' '}
             {nextId === 'A' ? 'B' : 'A'}. Du kan byta innan du börjar.
           </p>
-          <p className="mt-2 text-base">
+          <p className="mt-2 mb-0 text-base">
             Nästa dos bygger på dina sparade set och svar om ansträngning. Ett
             lätt, komplett pass kan ge en extra repetition, men inte för en
             övning där det gjorde ont. Vikt ändrar du själv. Förslaget räknas om
             efter nästa pass.
           </p>
-          <Link
-            href="/historik"
-            className="flex min-h-12 items-center text-base font-bold underline"
-          >
-            Se din utveckling
-          </Link>
         </details>
       ) : null}
-      <details>
-        <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-          Ändra
-        </summary>
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            disabled={locked}
-            onClick={() => setEditing(true)}
-            className="min-h-12 self-start text-base font-bold underline disabled:opacity-50"
-          >
-            Byt inriktning
-          </button>
-          <Link
-            href="/installningar/utrustning?tillbaka=traning"
-            className="flex min-h-12 items-center text-base font-bold underline"
-          >
-            Min utrustning
-          </Link>
-          {locked ? (
-            <p className="m-0 text-base text-ink-soft">
-              Avsluta eller avbryt passet innan du byter inriktning.
-            </p>
-          ) : preferences.programId !== 'rehab' ? (
-            <Link
-              href={`/traning/${alternateId}`}
-              className="flex min-h-12 items-center text-base underline"
-            >
-              Visa pass {alternateId} i stället
-            </Link>
-          ) : null}
-          <Link
-            href="/ovningar"
-            className="flex min-h-12 items-center text-base underline"
-          >
-            Bläddra bland övningar
-          </Link>
-        </div>
-      </details>
+      <Link
+        href="/mitt-program"
+        className="flex min-h-14 items-center justify-between gap-2 border-y-2 border-edge py-2 text-lg font-bold text-ink no-underline"
+      >
+        <span>Mitt program</span>
+        <Icon name="back" className="shrink-0 rotate-180" />
+      </Link>
       {recent.length ? (
         <section
           aria-labelledby="recent-training"

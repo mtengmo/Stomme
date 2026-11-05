@@ -37,6 +37,8 @@ export type PassCardProps =
       showLegend?: boolean;
       /** Optional block-week hint, e.g. "Vecka 2 av 4". */
       weekLabel?: string;
+      /** Where a row's "Byt" goes; omitted while a session is running. */
+      swapHref?(exerciseId: ExerciseId): string;
     })
   | (CommonProps & { variant: 'receding' });
 
@@ -137,10 +139,10 @@ export function PassCard(props: PassCardProps) {
       ) : null}
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
         {exercises.map((e) => (
-          <li key={e.exerciseId}>
+          <li key={e.exerciseId} className="flex items-center gap-1">
             <Link
               href={`/ovning/${e.exerciseId}`}
-              className={`${linkClass} flex min-h-16 items-center gap-3 no-underline`}
+              className={`${linkClass} flex min-h-16 min-w-0 flex-1 items-center gap-3 no-underline`}
             >
               <ExerciseThumb exerciseId={e.exerciseId} />
               <span className="flex min-w-0 flex-col">
@@ -152,6 +154,15 @@ export function PassCard(props: PassCardProps) {
                 </span>
               </span>
             </Link>
+            {props.swapHref ? (
+              <Link
+                href={props.swapHref(e.exerciseId)}
+                aria-label={`Byt ${e.name}`}
+                className={`${linkClass} flex min-h-12 min-w-12 shrink-0 items-center justify-center px-1 text-base font-bold`}
+              >
+                Byt
+              </Link>
+            ) : null}
           </li>
         ))}
       </ul>

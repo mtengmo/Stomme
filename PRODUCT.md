@@ -26,6 +26,8 @@ MVP: week view, session mode (set counter, rest timer, big buttons), exercise ca
 
 Onboarding builds a 4-week program (1-5 days a week, emphasis, a curated beginner set of 22 exercises) shown on Home as a week strip and the next pass; rehab flows are unchanged.
 
+Navigation is four tabs: Idag (the training flow), Övningar (own workouts, ready-made workouts, the library), Historik and Mer (settings). Programme-level actions live in "Mitt program"; per-day actions sit under the start button.
+
 ## Brand Commitments
 Name "Stomme" (Swedish for frame / core structure) is fixed. Visual world is open.
 

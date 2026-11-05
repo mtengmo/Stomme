@@ -7,6 +7,9 @@ export type IconName =
   | 'week'
   | 'history'
   | 'settings'
+  | 'today'
+  | 'exercises'
+  | 'more'
   | 'info'
   | 'warning'
   | 'stop'
@@ -49,6 +52,24 @@ const paths: Record<IconName, ReactNode> = {
       <path d="M4 7h10M18 7h2M4 17h2M10 17h10" />
       <circle cx="16" cy="7" r="2" />
       <circle cx="8" cy="17" r="2" />
+    </>
+  ),
+  today: (
+    <>
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M15 3v4h4M9.5 12h6M9.5 16h4" />
+    </>
+  ),
+  exercises: (
+    <>
+      <path d="M7 7v10M17 7v10M3.5 10v4M20.5 10v4M7 12h10" />
+    </>
+  ),
+  more: (
+    <>
+      <circle cx="5" cy="12" r="1.4" />
+      <circle cx="12" cy="12" r="1.4" />
+      <circle cx="19" cy="12" r="1.4" />
     </>
   ),
   info: (

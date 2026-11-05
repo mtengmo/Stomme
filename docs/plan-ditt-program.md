@@ -190,7 +190,7 @@ Nya filer i `features/program/`: `ProgramReveal.tsx`, `ProgramHome.tsx`, `PassCa
   5. Receding-kortet för passet därefter.
   6. Vilotext (`muscleRecoveryNote` på passets fokus, rådgivande).
   7. Fast primärknapp "Starta passet" i tumhöjd.
-  8. "Ändra":
+  8. "Ändra" (superseded: the drawer is replaced by "Mitt program", the Övningar tab and quiet per-day rows; see DESIGN.md "Navigation"):
      - Min utrustning
      - Skapa eget pass (`/nytt-pass`)
      - Träna något annat idag (`/fokus`, räknas inte i programmet)

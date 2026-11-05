@@ -16,7 +16,7 @@
 :root {
   /* Layout, not theme. Colour tokens live in themes/<id>.css. */
   --grid: 24px;
-  --app-nav-height: calc(4rem + 3px + env(safe-area-inset-bottom));
+  --app-nav-height: calc(4rem + env(safe-area-inset-bottom));
   /* Page bottom padding: clears the fixed bottom nav plus a little air. */
   --app-nav-clear: calc(var(--app-nav-height) + 1rem);
 
@@ -56,6 +56,7 @@
   --color-equipment: var(--equipment);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-count: "Barlow Condensed", sans-serif-condensed, sans-serif;
+  --font-display: var(--font-count);
 }
 
 html {
@@ -69,7 +70,7 @@ html {
   scrollbar-color: var(--ink-soft) var(--paper);
   scrollbar-width: thin;
   /* Keep focused and scrolled-to controls clear of the fixed bottom navigation. */
-  scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(var(--app-nav-height) + 5.5rem);
 }
 
 body {

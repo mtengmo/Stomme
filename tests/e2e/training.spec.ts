@@ -85,6 +85,8 @@ test('regular training setup starts directly and ends in the summary, with no ch
   await expect(
     page.getByRole('button', { name: 'Byt inriktning' }),
   ).toBeHidden();
+  // The programme actions live in Mitt program, not in a drawer on Home.
+  await expect(page.getByText('Ändra', { exact: true })).toHaveCount(0);
 });
 
 test('general direction has no check-ins; "Det gör ont" marks only that exercise for that session', async ({
