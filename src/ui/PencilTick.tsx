@@ -47,3 +47,25 @@ export function PencilTick({
     </svg>
   );
 }
+
+/**
+ * A hand-drawn pencil stroke laid under a label (the active nav tab). Same
+ * tapered, slightly uneven hand as the tick, but in the text colour: the done
+ * colour means done. Stretches to the width of its box.
+ */
+const UNDERLINE =
+  'M2 5C10 3 22 4 34 3.5C46 3 56 3.8 62 2.5C63 3.5 62.5 4.8 60 5.4C48 6.6 30 6.2 14 6.6C8 6.8 4 6.9 2 6.3C1 5.8 1.2 5.2 2 5Z';
+
+export function PencilStroke({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 64 8"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+      className={`block h-2 w-full fill-current ${className}`}
+    >
+      <path d={UNDERLINE} />
+    </svg>
+  );
+}

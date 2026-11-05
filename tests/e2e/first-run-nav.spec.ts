@@ -32,11 +32,11 @@ test('the first-use setup hides the nav; it shows once the programme is saved', 
   await expect(
     page.getByRole('heading', { name: 'Ditt program' }),
   ).toBeVisible();
-  for (const name of ['Träning', 'Historik', 'Inställningar'])
+  for (const name of ['Idag', 'Övningar', 'Historik', 'Mer'])
     await expect(nav.getByRole('link', { name })).toBeVisible();
 });
 
-test('Inställningar is one tap from a fresh start through the import link', async ({
+test('Mer (settings) is one tap from a fresh start through the import link', async ({
   page,
 }) => {
   await accept(page);
@@ -64,7 +64,7 @@ test('the answers survive leaving the setup and coming back', async ({
   await expect(
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Träning' }).click();
+  await page.getByRole('link', { name: 'Idag' }).click();
   await expect(page.getByText('Hantel 5 kg · par')).toBeVisible();
 });
 
@@ -98,7 +98,7 @@ test('preview edits survive leaving via the nav; starting clears them', async ({
     .first()
     .click();
   await page.getByLabel('Set', { exact: true }).first().fill('4');
-  const trainingTab = page.getByRole('link', { name: 'Träning', exact: true });
+  const trainingTab = page.getByRole('link', { name: 'Idag', exact: true });
   await expect(trainingTab).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Historik' }).click();
   await expect(page.getByRole('heading', { name: 'Historik' })).toBeVisible();
@@ -128,7 +128,7 @@ test('picks and filters in the pick step survive leaving and coming back', async
     .click();
   await expect(page.getByRole('status')).toContainText('1 av 12 övningar');
   await page.goto('/#/installningar');
-  await page.getByRole('link', { name: 'Träning' }).click();
+  await page.getByRole('link', { name: 'Idag' }).click();
   await expect(
     page.getByRole('heading', { name: 'Välj dina övningar' }),
   ).toBeVisible();
