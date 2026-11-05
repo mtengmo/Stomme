@@ -499,6 +499,32 @@ function PreviewEditor({
       </div>
     );
 
+  const removedBanner = removed ? (
+    <div
+      role="status"
+      className="flex items-center justify-between gap-3 border-2 border-edge px-3"
+    >
+      <span className="text-base">
+        Tog bort {exercises[removed.item.exerciseId].name}.
+      </span>
+      <button
+        type="button"
+        className="min-h-12 min-w-16 px-3 text-base font-bold underline"
+        onClick={() => {
+          const back = removed;
+          updatePlan((current) => {
+            const next = [...current];
+            next.splice(back.index, 0, back.item);
+            return next;
+          });
+          setExpandedIndex(back.index);
+        }}
+      >
+        Ångra
+      </button>
+    </div>
+  ) : null;
+
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-4 pb-[calc(var(--app-nav-height)+12rem)]">
       <Link
@@ -836,31 +862,7 @@ function PreviewEditor({
                 </p>
               ) : null}
 
-              {removed ? (
-                <div
-                  role="status"
-                  className="flex items-center justify-between gap-3 border-2 border-edge px-3"
-                >
-                  <span className="text-base">
-                    Tog bort {exercises[removed.item.exerciseId].name}.
-                  </span>
-                  <button
-                    type="button"
-                    className="min-h-12 min-w-16 px-3 text-base font-bold underline"
-                    onClick={() => {
-                      const back = removed;
-                      updatePlan((current) => {
-                        const next = [...current];
-                        next.splice(back.index, 0, back.item);
-                        return next;
-                      });
-                      setExpandedIndex(back.index);
-                    }}
-                  >
-                    Ångra
-                  </button>
-                </div>
-              ) : null}
+              {removedBanner}
               <ol className="m-0 list-none p-0">
                 {plan.map((item, index) => {
                   const exercise = exercises[item.exerciseId];
@@ -1411,6 +1413,36 @@ function PreviewEditor({
             <ReadyWorkout
               plan={workoutPlan}
               short={short}
+              onSwap={
+                customWorkout && preferences.programId !== 'rehab' && !short
+                  ? (from, to) =>
+                      updatePlan((current) =>
+                        current.map((item) =>
+                          item.exerciseId === from
+                            ? basePlan(to, preferences)
+                            : item,
+                        ),
+                      )
+                  : undefined
+              }
+              onRemove={
+                customWorkout && preferences.programId !== 'rehab' && !short
+                  ? (exerciseId) => {
+                      const index = plan.findIndex(
+                        (item) => item.exerciseId === exerciseId,
+                      );
+                      const gone = plan[index];
+                      if (!gone) return;
+                      updatePlan((current) =>
+                        current.filter(
+                          (item) => item.exerciseId !== exerciseId,
+                        ),
+                      );
+                      setRemoved({ item: gone, index });
+                    }
+                  : undefined
+              }
+              undoBanner={removedBanner}
               fullBody={!customWorkout && focus.id === 'full'}
               programPass={Boolean(programPass)}
               hasHistory={sessions.some(

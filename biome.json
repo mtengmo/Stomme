@@ -14,7 +14,9 @@
       "!**/package-lock.json",
       "!**/docs/exercise-audit-log.json",
       "!**/screenshots",
-      "!**/.impeccable"
+      "!**/.impeccable",
+      "!**/.claude",
+      "!**/.worktrees"
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },

@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { exercises } from '../../content/exercises';
 import {
   experienceLabels,
   isTrainingPreferences,
@@ -12,11 +11,11 @@ import { getDb } from '../../db/db';
 import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
 import { inventorySummary } from '../../rules/equipment';
-import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { linkClass } from '../../ui/link';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { CustomPicker } from './CustomPicker';
+import { RunningProposals } from './RunningProposals';
 
 const SELECTION_KEY = 'stomme.new-workout.selection';
 
@@ -92,39 +91,23 @@ export function NewWorkout() {
             Färdiga pass
           </h2>
           {readyWorkouts.map((workout) => (
-            <div key={workout.id} className="flex flex-col gap-2">
-              <p className="m-0 text-xl font-bold">{workout.name}</p>
-              <p className="m-0 text-base">{workout.summary}</p>
-              <ol className="m-0 pl-6 text-base">
-                {workout.exerciseIds.map((id) => (
-                  <li key={id}>{exercises[id].name}</li>
-                ))}
-              </ol>
-              <p className="m-0 text-base text-ink-soft">{workout.caution}</p>
-              <button
-                type="button"
-                disabled={busy}
-                aria-label={`Lägg till färdigt pass: ${workout.name}`}
-                className={buttonClass('secondary')}
-                onClick={async () => {
-                  setBusy(true);
-                  setError('');
-                  try {
-                    const id = await addReadyWorkout(
-                      workout.name,
-                      [...workout.exerciseIds],
-                      workout.group,
-                    );
-                    navigate(`/traning/A?workout=${id}`);
-                  } catch {
-                    setError('Kunde inte lägga till passet. Försök igen.');
-                    setBusy(false);
-                  }
-                }}
-              >
-                Lägg till och visa
-              </button>
-            </div>
+            <RunningProposals
+              key={workout.id}
+              workout={workout}
+              preferences={preferences}
+              busy={busy}
+              onAdd={async (name, ids) => {
+                setBusy(true);
+                setError('');
+                try {
+                  const id = await addReadyWorkout(name, ids, workout.group);
+                  navigate(`/traning/A?workout=${id}`);
+                } catch {
+                  setError('Kunde inte lägga till passet. Försök igen.');
+                  setBusy(false);
+                }
+              }}
+            />
           ))}
           {error ? (
             <p role="alert" className="m-0 text-base font-bold">

@@ -19,7 +19,7 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
     name: 'Löpstyrka',
     group: 'legs',
     summary:
-      'Åtta övningar för ben och höfter som liknar kraven i löpsteget: enbensstyrka, hållning och mjuka landningar.',
+      'Ben och höfter som liknar kraven i löpsteget: enbensstyrka, hållning och mjuka landningar. Välj ett av tre förslag eller slumpa ett nytt.',
     caution:
       'Pogohopp är ett hopp och hoppövningar passar inte vid knä-, fot- eller vadbesvär. Hoppa över dem och avbryt vid smärta. Ändra utrustning, antal och vikt i passet före start.',
     exerciseIds: [

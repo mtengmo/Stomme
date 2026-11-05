@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
@@ -16,7 +17,12 @@ import {
   physioSwapNote,
 } from '../../content/physioKneeProgramme';
 import { rehabGroup } from '../../content/programmes';
-import type { PlannedExercise, TrainingPreferences } from '../../domain/types';
+import { neighbour } from '../../content/runningProposals';
+import type {
+  ExerciseId,
+  PlannedExercise,
+  TrainingPreferences,
+} from '../../domain/types';
 import { coverageLabels, missingCoverage } from '../../rules/coverage';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 
@@ -24,6 +30,9 @@ export function ReadyWorkout({
   plan,
   preferences,
   onChange,
+  onSwap,
+  onRemove,
+  undoBanner,
   short = false,
   fullBody = !preferences.bodyParts?.length,
   programPass = false,
@@ -33,6 +42,12 @@ export function ReadyWorkout({
   preferences: TrainingPreferences;
   /** Opens the editor with this exercise's row open. */
   onChange(index: number): void;
+  /** Custom workouts: swap an exercise for an easier or harder one. Shows the Lättare/Svårare controls. */
+  onSwap?(from: ExerciseId, to: ExerciseId): void;
+  /** Custom workouts: remove an exercise. Shows a visible Ta bort. */
+  onRemove?(exerciseId: ExerciseId): void;
+  /** The "Tog bort ... Ångra" notice. */
+  undoBanner?: ReactNode;
   short?: boolean;
   fullBody?: boolean;
   /** A generated programme pass: no coverage warning, it is built to fit. */
@@ -114,6 +129,7 @@ export function ReadyWorkout({
           2 × 10 = 2 set med 10 repetitioner. 60 s vila mellan seten.
         </p>
       ) : null}
+      {undoBanner}
       <ol className="m-0 list-none p-0">
         {plan.map((item, index) => {
           const exercise = exercises[item.exerciseId];
@@ -148,6 +164,12 @@ export function ReadyWorkout({
             !(physio && item.explanation.startsWith('Förifyllt'))
               ? item.explanation
               : '';
+          const easier = onSwap
+            ? neighbour(item.exerciseId, 'easier', preferences, ids)
+            : undefined;
+          const harder = onSwap
+            ? neighbour(item.exerciseId, 'harder', preferences, ids)
+            : undefined;
           return (
             <li
               key={item.exerciseId}
@@ -188,14 +210,46 @@ export function ReadyWorkout({
                   />
                 ) : null}
               </div>
-              <button
-                type="button"
-                onClick={() => onChange(index)}
-                aria-label={`Ändra ${exercise.name}`}
-                className="min-h-12 min-w-12 shrink-0 text-base font-bold underline"
-              >
-                Ändra
-              </button>
+              <div className="flex shrink-0 flex-col items-end">
+                <button
+                  type="button"
+                  onClick={() => onChange(index)}
+                  aria-label={`Ändra ${exercise.name}`}
+                  className="min-h-12 min-w-12 text-base font-bold underline"
+                >
+                  Ändra
+                </button>
+                {onSwap && easier ? (
+                  <button
+                    type="button"
+                    onClick={() => onSwap(item.exerciseId, easier)}
+                    aria-label={`Lättare än ${exercise.name}: ${exercises[easier].name}`}
+                    className="min-h-12 min-w-12 text-base font-bold underline"
+                  >
+                    Lättare
+                  </button>
+                ) : null}
+                {onSwap && harder ? (
+                  <button
+                    type="button"
+                    onClick={() => onSwap(item.exerciseId, harder)}
+                    aria-label={`Svårare än ${exercise.name}: ${exercises[harder].name}`}
+                    className="min-h-12 min-w-12 text-base font-bold underline"
+                  >
+                    Svårare
+                  </button>
+                ) : null}
+                {onRemove && plan.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => onRemove(item.exerciseId)}
+                    aria-label={`Ta bort ${exercise.name}`}
+                    className="min-h-12 min-w-12 text-base font-bold underline"
+                  >
+                    Ta bort
+                  </button>
+                ) : null}
+              </div>
             </li>
           );
         })}
