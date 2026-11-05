@@ -278,8 +278,11 @@ function PreviewEditor({
       return false;
     }
   });
+  // "?byt=alla" or "?byt=<övning>" (from Home): open the editor, and that row.
+  const bytParam = new URLSearchParams(useHashSearch()).get('byt');
   const [editing, setEditing] = useState(() => {
     if (
+      bytParam ||
       customWorkout ||
       !validateTrainingPlan(plan) ||
       (preferences.programId === 'rehab' &&
@@ -373,6 +376,8 @@ function PreviewEditor({
     }
   }, [draftKey, picker]);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(() => {
+    const requested = plan.findIndex((item) => item.exerciseId === bytParam);
+    if (requested >= 0) return requested;
     try {
       const raw = sessionStorage.getItem(`${draftKey}.open`);
       const stored = raw === null ? Number.NaN : Number(raw);

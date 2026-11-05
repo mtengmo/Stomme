@@ -26,7 +26,7 @@ it('shows week 1, pass 1 and the start button on a fresh programme', async () =>
   await seedProgram(3);
   render(<App />);
   expect(
-    await screen.findByRole('heading', { level: 1, name: 'Vecka 1 av 4' }),
+    await screen.findByRole('heading', { level: 1, name: /^Vecka 1 av 4/ }),
   ).toBeTruthy();
   expect(screen.getByText('0 av 12 pass')).toBeTruthy();
   expect(
@@ -42,6 +42,19 @@ it('shows week 1, pass 1 and the start button on a fresh programme', async () =>
   expect(screen.queryByText(/Har du ont eller en skada/)).toBeNull();
   expect(screen.queryByText(/Dagens fokus/)).toBeNull();
   expect(screen.queryByText('Plan framåt och utveckling')).toBeNull();
+  // The "Ändra" drawer is gone: the programme actions live under the week header.
+  expect(screen.queryByText('Ändra')).toBeNull();
+  expect(
+    screen.getByRole('link', { name: /^Vecka 1 av 4/ }).getAttribute('href'),
+  ).toBe('#/mitt-program');
+  expect(
+    screen.getByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole('link', { name: 'Byt övning' }).getAttribute('href'),
+  ).toBe('#/traning/A?program=1&byt=alla');
+  expect(screen.queryByText('Se din utveckling')).toBeNull();
+  expect(screen.queryByText('Bläddra bland övningar')).toBeNull();
   // No exercise carries an E-code.
   expect(document.body.textContent).not.toMatch(/\bE\d{2}\b/);
 });
@@ -65,7 +78,7 @@ it('moves to the next pass after a finished one, ignoring an aborted pass', asyn
   await programSession(program, 1, 1, 'completed');
   await programSession(program, 2, 1, 'aborted');
   render(<App />);
-  await screen.findByRole('heading', { level: 1, name: 'Vecka 1 av 4' });
+  await screen.findByRole('heading', { level: 1, name: /^Vecka 1 av 4/ });
   expect(
     screen.getByRole('region', { name: /^Nästa pass: Pass 2,/ }),
   ).toBeTruthy();
@@ -87,7 +100,7 @@ it('advances to week 2 and draws the week tick only once', async () => {
   await programSession(program, 2, 1);
   render(<App />);
   expect(
-    await screen.findByRole('heading', { level: 1, name: 'Vecka 2 av 4' }),
+    await screen.findByRole('heading', { level: 1, name: /^Vecka 2 av 4/ }),
   ).toBeTruthy();
   expect(screen.getByText('Vecka 1 klar')).toBeTruthy();
   expect(screen.getByTestId('week-tick').getAttribute('data-animated')).toBe(
@@ -122,7 +135,7 @@ it('shows the block end and starts block 2 with the same passes', async () => {
   ).toBeTruthy();
   expect(screen.getByText('Block 2')).toBeTruthy();
   await user.click(screen.getByRole('button', { name: 'Starta block 2' }));
-  await screen.findByRole('heading', { level: 1, name: 'Vecka 1 av 4' });
+  await screen.findByRole('heading', { level: 1, name: /^Vecka 1 av 4/ });
   const next = await readTrainingProgram(getDb());
   expect(next?.block).toBe(2);
   expect(next?.id).not.toBe('prog-1');
@@ -152,27 +165,31 @@ it('says the equipment changed when the next pass keeps fewer than three exercis
   expect(screen.queryByRole('link', { name: 'Starta passet' })).toBeNull();
 });
 
+const openMyProgram = (user: ReturnType<typeof userEvent.setup>) =>
+  user.click(screen.getByRole('link', { name: /^Vecka \d av 4/ }));
+
 it('rebuilds the programme only after a confirmation', async () => {
   await seedProgram(3);
   const user = userEvent.setup();
   render(<App />);
   await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
-  await user.click(screen.getByText('Ändra'));
-  await user.click(screen.getByRole('button', { name: 'Gör om programmet' }));
+  await openMyProgram(user);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  await user.click(screen.getByRole('button', { name: /^Gör om programmet/ }));
   expect(
     screen.getByRole('heading', { name: 'Göra om programmet?' }),
   ).toBeTruthy();
   await user.click(screen.getByRole('button', { name: 'Behåll programmet' }));
-  await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
   expect((await readTrainingProgram(getDb()))?.id).toBe('prog-1');
-  await user.click(screen.getByText('Ändra'));
-  await user.click(screen.getByRole('button', { name: 'Gör om programmet' }));
+  await user.click(screen.getByRole('button', { name: /^Gör om programmet/ }));
   await user.click(
     screen.getByRole('button', { name: 'Gör om programmet nu' }),
   );
   await waitFor(async () =>
     expect((await readTrainingProgram(getDb()))?.id).not.toBe('prog-1'),
   );
+  // Back on Idag with the new block.
   await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
 });
 
@@ -181,7 +198,8 @@ it('ends the programme after a confirmation and falls back to the plain Home', a
   const user = userEvent.setup();
   render(<App />);
   await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
-  await user.click(screen.getByText('Ändra'));
+  await openMyProgram(user);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
   await user.click(screen.getByRole('button', { name: 'Avsluta programmet' }));
   expect(
     screen.getByRole('heading', { name: 'Avsluta programmet?' }),
@@ -191,6 +209,50 @@ it('ends the programme after a confirmation and falls back to the plain Home', a
   );
   await screen.findByRole('heading', { level: 1, name: 'Nästa pass' });
   expect(await readTrainingProgram(getDb())).toBeNull();
+});
+
+it('offers equipment and change of direction in Mitt program', async () => {
+  await seedProgram(3);
+  window.location.hash = '#/mitt-program';
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  expect(
+    screen.getByRole('link', { name: /^Min utrustning/ }).getAttribute('href'),
+  ).toBe('#/installningar/utrustning?tillbaka=traning');
+  expect(
+    screen.getByRole('link', { name: /^Byt inriktning/ }).getAttribute('href'),
+  ).toBe('#/?andra=utrustning&tillbaka=mitt-program');
+});
+
+it('locks the programme actions while a session runs', async () => {
+  const program = await seedProgram(3);
+  await programSession(program, 1, 1, 'in_progress');
+  // A note means the session is really under way, not just a preparation.
+  const [running] = await getDb().sessions.toArray();
+  await getDb().sessions.update(running?.id ?? '', { note: 'pågår' });
+  window.location.hash = '#/mitt-program';
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  for (const name of [/^Gör om programmet/, /^Avsluta programmet/])
+    expect(
+      (screen.getByRole('button', { name }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+  expect(
+    screen.getByText('Avsluta eller avbryt passet innan du ändrar programmet.'),
+  ).toBeTruthy();
+});
+
+it('gives each exercise on the lead card a Byt link to the preview editor', async () => {
+  await seedProgram(3);
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
+  const swaps = screen.getAllByRole('link', { name: /^Byt .+/ });
+  const rows = swaps.filter((link) =>
+    /#\/traning\/A\?program=1&byt=[\w-]+$/.test(
+      link.getAttribute('href') ?? '',
+    ),
+  );
+  expect(rows.length).toBeGreaterThan(2);
 });
 
 it('redirects /vecka to Home while a programme is active', async () => {

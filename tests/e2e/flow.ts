@@ -496,13 +496,13 @@ export async function addWeight(
 }
 
 /**
- * Ends the programme from the programme Home ("Ändra" > "Avsluta programmet"), so
+ * Ends the programme from "Mitt program" (week header > "Avsluta programmet"), so
  * the user lands on the ordinary Home (pass A/B, focus picker, week planner) that
  * users without a programme see. Everything else (sessions, workouts) stays.
  */
 export async function endProgram(page: Page): Promise<void> {
   await page.goto('/#/');
-  await page.getByText('Ändra', { exact: true }).click();
+  await page.getByRole('link', { name: /^Vecka \d av 4/ }).click();
   await page
     .getByRole('button', { name: 'Avsluta programmet', exact: true })
     .click();

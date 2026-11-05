@@ -151,3 +151,19 @@ it('a rehab user opening ?program=1 gets the ordinary rehab preview', async () =
     screen.queryByRole('heading', { level: 1, name: /^Pass 1 · / }),
   ).toBeNull();
 });
+
+it('opens the row editor of the exercise named by ?byt=', async () => {
+  const target = programFixture().passes[0]?.exerciseIds[1];
+  window.location.hash = `#/traning/A?program=1&byt=${target}`;
+  render(<App />);
+  const open = await screen.findByRole('button', { name: /Stäng/ });
+  expect(open.getAttribute('aria-expanded')).toBe('true');
+  expect(screen.getByRole('button', { name: 'Byt övning' })).toBeTruthy();
+});
+
+it('opens the editor without a row for ?byt=alla', async () => {
+  window.location.hash = '#/traning/A?program=1&byt=alla';
+  render(<App />);
+  await screen.findByRole('button', { name: 'Visa passöversikt' });
+  expect(screen.queryByRole('button', { name: 'Byt övning' })).toBeNull();
+});

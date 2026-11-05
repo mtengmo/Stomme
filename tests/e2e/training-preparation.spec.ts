@@ -47,10 +47,11 @@ for (const width of [360, 1280]) {
     await expect(
       page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
     ).toBeVisible();
-    await page.getByText('Ändra', { exact: true }).click();
+    await expect(page.getByText('Ändra', { exact: true })).toHaveCount(0);
+    await page.getByRole('link', { name: /^Mitt program/ }).click();
     await expect(
-      page.getByRole('button', { name: 'Byt inriktning' }),
-    ).toBeEnabled();
+      page.getByRole('link', { name: /^Byt inriktning/ }),
+    ).toBeVisible();
     await page
       .getByRole('link', { name: 'Visa pass B i stället', exact: true })
       .click();
@@ -61,11 +62,11 @@ for (const width of [360, 1280]) {
       page.getByRole('button', { name: 'Klar set', exact: true }),
     ).toBeVisible();
     await page.goto('/#/');
-    await page.getByText('Ändra', { exact: true }).click();
+    await page.getByRole('link', { name: /^Mitt program/ }).click();
     await expect(
       page.getByRole('link', { name: 'Visa pass A i stället', exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Byt inriktning' }).click();
+    await page.getByRole('link', { name: /^Byt inriktning/ }).click();
     await page
       .getByRole('radio', { name: 'Allmän styrka', exact: true })
       .check();
@@ -120,10 +121,12 @@ for (const width of [360, 1280]) {
     ).toBeVisible();
     await page.getByRole('button', { name: 'Klar set', exact: true }).click();
     await page.goto('/#/');
-    await page.getByText('Ändra', { exact: true }).click();
+    await page.getByRole('link', { name: /^Mitt program/ }).click();
+    // Locked while a session is under way: shown, but not a link.
+    await expect(page.getByText('Byt inriktning')).toBeVisible();
     await expect(
-      page.getByRole('button', { name: 'Byt inriktning' }),
-    ).toBeDisabled();
+      page.getByRole('link', { name: /^Byt inriktning/ }),
+    ).toHaveCount(0);
   });
 }
 

@@ -317,14 +317,13 @@ it('preserves a returning user’s active session and makes resuming the primary
   expect(
     screen.queryByRole('heading', { name: 'Vad vill du träna?' }),
   ).toBeNull();
-  await user.click(screen.getByText('Ändra', { exact: true }));
+  expect(screen.queryByText('Ändra', { exact: true })).toBeNull();
+  await user.click(screen.getByRole('link', { name: /^Mitt program/ }));
+  // Locked: change of direction is shown but is not a link.
+  expect((await screen.findByText('Byt inriktning')).closest('a')).toBeNull();
   expect(
-    (
-      screen.getByRole('button', {
-        name: 'Byt inriktning',
-      }) as HTMLButtonElement
-    ).disabled,
-  ).toBe(true);
+    screen.getByText('Avsluta eller avbryt passet innan du byter inriktning.'),
+  ).toBeTruthy();
   expect(await getDb().sessions.get(session.id)).toMatchObject({
     status: 'in_progress',
     programId: 'general',
@@ -358,7 +357,7 @@ it('keeps first-use answers when leaving through the import link and coming back
   window.location.hash = '#/installningar/sakerhetskopia';
   await screen.findByRole('heading', { name: 'Säkerhetskopia' });
   expect(screen.queryByText('Hantel 5 kg · par')).toBeNull();
-  await user.click(screen.getByRole('link', { name: 'Träning' }));
+  await user.click(screen.getByRole('link', { name: 'Idag' }));
   await screen.findByText('Hantel 5 kg · par');
   expect(window.location.hash).toBe('#/kom-igang');
 });
