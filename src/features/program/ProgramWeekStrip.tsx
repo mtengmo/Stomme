@@ -65,7 +65,10 @@ export function ProgramWeekStrip({
                       : 'border-2 border-edge bg-surface text-ink'
                 }`}
               >
-                <span className="text-base">{ABBR[i]}</span>
+                {/* Shrinks with the column so "mån" and "tors" stay inside the square at large text sizes. */}
+                <span className="text-[min(1rem,calc((100vw-84px)/14.7))]">
+                  {ABBR[i]}
+                </span>
                 <span className="count text-xl">
                   {Number(date.slice(8, 10))}
                 </span>

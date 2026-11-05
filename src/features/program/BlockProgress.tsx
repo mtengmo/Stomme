@@ -28,10 +28,10 @@ export function BlockProgress({
   tickDelayMs = 0,
 }: BlockProgressProps) {
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex flex-wrap items-start gap-x-4 gap-y-1">
       <ol
         aria-label={`Blockets framsteg: ${completedWeeks} av ${weeks} veckor klara`}
-        className="m-0 flex list-none gap-2 p-0"
+        className="m-0 flex list-none flex-wrap gap-2 p-0"
       >
         {Array.from({ length: weeks }, (_, i) => {
           const week = i + 1;
