@@ -147,15 +147,18 @@ function declinePushUp(t: number): Pose {
 
 function diamondPushUp(t: number): Pose {
   const p = pushUp(t);
-  // Both hands meet under the chest; elbows fold back alongside the trunk.
-  const hand: Pt = [68, 174],
-    farHand: Pt = [70, 172];
+  // Both hands meet directly under the chest; the arms are straight at the top
+  // and the elbows fold back alongside the trunk while lowering.
+  const top = pushUp(0).neck;
+  const hand: Pt = [top[0], 174],
+    farHand: Pt = [top[0] + 1.4, 173];
+  const arm = (174 - top[1]) / 2;
   return {
     ...p,
     hR: hand,
     hL: farHand,
-    eR: joint(p.neck, hand, 25, 25, -1),
-    eL: joint(p.neck, farHand, 25, 25, -1),
+    eR: joint(p.neck, hand, arm, arm, -1),
+    eL: joint(p.neck, farHand, arm, arm, -1),
   };
 }
 
@@ -205,7 +208,9 @@ function plankArmLift(t: number): Pose {
   return forearmPlank(right, left);
 }
 function pull(t: number, chin: boolean): Pose {
-  const neck: Pt = [100, mix(80, 36, t)],
+  // Hang with straight arms: the neck sits one arm length (60) below the bar, so the
+  // narrower chin-up grip starts lower than the wide pull-up grip.
+  const neck: Pt = [100, mix(chin ? 87 : 80, 36, t)],
     hip: Pt = [100, neck[1] + 43];
   const hands: [Pt, Pt] = chin
     ? [
@@ -216,8 +221,10 @@ function pull(t: number, chin: boolean): Pose {
         [66, 31],
         [134, 31],
       ];
-  const rightAnkle: Pt = [90, hip[1] + 48],
-    leftAnkle: Pt = [112, hip[1] + 48];
+  // The chin-up hang starts lower, so the knees are bent and the feet stay clear of the floor.
+  const legDrop = chin ? 38 : 48;
+  const rightAnkle: Pt = [chin ? 78 : 90, hip[1] + legDrop],
+    leftAnkle: Pt = [chin ? 100 : 112, hip[1] + legDrop];
   return pose(
     [100, neck[1] - 14],
     neck,
@@ -229,20 +236,21 @@ function pull(t: number, chin: boolean): Pose {
       hands[1],
     ],
     [
-      [82, hip[1] + 25],
+      chin ? joint(hip, rightAnkle, 36, 34, 1) : [82, hip[1] + 25],
       rightAnkle,
       foot(rightAnkle),
-      [118, hip[1] + 25],
+      chin ? joint(hip, leftAnkle, 36, 34, 1) : [118, hip[1] + 25],
       leftAnkle,
       foot(leftAnkle),
     ],
   );
 }
 function dip(t: number): Pose {
-  const neck: Pt = [96, mix(64, 88, t)],
+  // Top position: both support arms straight (neck one arm length above the bars).
+  const neck: Pt = [96, mix(62, 88, t)],
     hip: Pt = [92, neck[1] + 41];
   const hand: Pt = [111, 117],
-    far: Pt = [101, 114];
+    far: Pt = [109, 117];
   return pose(
     [100, neck[1] - 14],
     neck,
@@ -338,8 +346,14 @@ function lunge(t: number): Pose {
     neck: Pt = [100, hip[1] - 43];
   const kr = polar(hip, 36, mix(0.08, 2.38, t));
   const kl = polar(hip, 36, mix(2.38, 0.08, t));
-  const ar = polar(kr, 34, mix(1.32, 3.1, t));
-  const al = polar(kl, 34, mix(3.1, 1.32, t));
+  // The back shin ends shallow enough that the back forefoot reaches the floor
+  // (heel lifted); the front shin is near vertical with a flat foot.
+  const ar = polar(kr, 34, mix(1.32, 2.967, t));
+  const al = polar(kl, 34, mix(2.967, 1.32, t));
+  // Foot length stays 9.49 (as foot()); a steep foot angle puts only the toe on the floor.
+  const flat = Math.atan2(3, 9),
+    ball = 1.05;
+  const toe = (a: Pt, angle: number): Pt => polar(a, Math.hypot(9, 3), angle);
   return pose(
     [100, neck[1] - 14],
     neck,
@@ -350,7 +364,7 @@ function lunge(t: number): Pose {
       [84, neck[1] + 21],
       [79, neck[1] + 42],
     ],
-    [kr, ar, foot(ar), kl, al, foot(al)],
+    [kr, ar, toe(ar, mix(flat, ball, t)), kl, al, toe(al, mix(ball, flat, t))],
   );
 }
 function climber(t: number): Pose {
@@ -550,12 +564,12 @@ function kneePushUp(t: number): Pose {
 /** Standing lean against a wall: hands fixed on the wall, feet planted. */
 function wallPushUp(t: number): Pose {
   const ankle: Pt = [72, 174];
-  const angle = -mix(1.222, 0.942, t);
+  const angle = -mix(1.241, 0.942, t);
   const neck = polar(ankle, 108, angle),
     hip = polar(ankle, 63, angle);
   const hand: Pt = [155, 76],
     farHand: Pt = [155, 79];
-  const farAnkle: Pt = [68, 174];
+  const farAnkle: Pt = [69, 174];
   return pose(
     polar(neck, 14, angle),
     neck,

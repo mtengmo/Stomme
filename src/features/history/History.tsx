@@ -23,7 +23,7 @@ import { Icon } from '../../ui/Icon';
 import { isoWeekNumber } from '../week/passState';
 import { HistorySummary } from './HistorySummary';
 import { HistoryTrends } from './HistoryTrends';
-import { StatusChip } from './labels';
+import { programPassLabel, StatusChip } from './labels';
 import { ProgressOverview } from './ProgressOverview';
 
 /** The newest sessions shown before the full list is opened. */
@@ -285,6 +285,7 @@ export function History() {
                       <span className="flex flex-col">
                         <span className="count text-3xl leading-none">
                           {s.customWorkoutName ??
+                            programPassLabel(s) ??
                             `${s.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${s.templateId}${s.focus ? ` · ${focusLabel(s.focus)}` : ''}`}
                         </span>
                         <span className="mt-1 text-base font-bold">

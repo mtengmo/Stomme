@@ -135,11 +135,11 @@ for (const width of [320, 360, 412]) {
       await next
         .getByRole('button', { name: 'Byt till armhävning', exact: true })
         .click();
-      await expect(rows.first()).toContainText('E54');
+      await expect(rows.first()).toContainText(/Armhävning(?! på knä)/);
       await expect(rows.first()).toContainText('3 × 6');
       await expect(next).toHaveCount(0);
       await page.reload();
-      await expect(rows.first()).toContainText('E54');
+      await expect(rows.first()).toContainText(/Armhävning(?! på knä)/);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,

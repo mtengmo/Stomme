@@ -13,7 +13,7 @@ Programmet börjar försiktigt och följer smärtan i höger knä (se smärtrege
 Pass A
 | Övning | Set × reps | Vikt | Tänk på |
 |---|---|---|---|
-| Sitta ner och resa sig från stol (goblet) | 2×10 | 10 kg hantel mot bröstet | Sätt dig på stolen, knäna följer tårnas riktning |
+| Sitta ner och resa sig från stol | 2×10 | 10 kg hantel mot bröstet | Sätt dig på stolen, knäna följer tårnas riktning |
 | Step-up (20–30 cm) | 2×8 per ben | 2×5 kg | Höger ben jobbar hela vägen upp, sänk långsamt |
 | Enbens rumänskt marklyft | 2×8 per ben | 1×10 kg | Rak rygg, höften bakåt, lätt böjt knä |
 | Dead bug | 2×8 per sida | kroppsvikt | Ländryggen kvar i golvet |

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { quickStart } from './flow';
+import { endProgram, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({ storageState: FRESH_STATE });
@@ -84,7 +84,7 @@ for (const width of [320, 360, 412]) {
       await expect(routine).toBeVisible();
       await shortButton.click();
       await page
-        .getByRole('button', { name: 'Börja kortpasset', exact: true })
+        .getByRole('button', { name: 'Starta kortpasset', exact: true })
         .click();
       await expect(page.locator('[data-step]')).toBeVisible();
       await expect(
@@ -128,12 +128,13 @@ for (const width of [320, 360, 412]) {
       await expect(
         page.getByRole('link', { name: /Kortpass A/ }).first(),
       ).toBeVisible();
-      await page.goto('/');
+      // Weekly planning lives on the Home of users without a programme.
+      await endProgram(page);
       await expect(
         page.getByText('Allmän styrka', { exact: true }),
       ).toBeVisible();
       await expect(
-        page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+        page.getByRole('link', { name: 'Starta passet', exact: true }),
       ).toHaveAttribute('href', /#\/traning\/A(?:\?|$)/);
       const weekly = page.getByRole('region', {
         name: 'Veckoplan',
@@ -192,7 +193,7 @@ for (const width of [320, 360, 412]) {
         page.getByRole('heading', { name: 'Idag: Press', exact: true }),
       ).toBeVisible();
       await expect(
-        page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+        page.getByRole('link', { name: 'Starta passet', exact: true }),
       ).toHaveAttribute('href', /#\/traning\/[AB]\?fokus=push$/);
       await weekly.getByText('Ändra veckoplan', { exact: true }).click();
       await page.reload();

@@ -16,6 +16,7 @@ import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
 import { getDb } from '../../db/db';
 import { toggleFavourite } from '../../db/favourites';
 import { useAppHashLocation } from '../../lib/hashLocation';
+import { programFixture } from '../../test/programFixture';
 import { ExerciseLibrary } from './ExerciseLibrary';
 
 const muscleCount = (group: MuscleGroupId) =>
@@ -41,6 +42,17 @@ function TestRoutes() {
   );
 }
 
+function openFilters() {
+  const button = screen.getByRole('button', { name: 'Filtrera' });
+  if (button.getAttribute('aria-expanded') === 'false') fireEvent.click(button);
+}
+
+const programIds = (offset: number) =>
+  exerciseList
+    .filter((e) => !e.optional)
+    .slice(offset * 4, offset * 4 + 4)
+    .map((e) => e.id);
+
 const detailed = () => localStorage.setItem('stomme.library-view', 'detailed');
 
 beforeEach(async () => {
@@ -52,9 +64,103 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('exercise library', () => {
+  it('keeps the filters behind a collapsed Filtrera button and has no review link', () => {
+    render(<TestRoutes />);
+    const button = screen.getByRole('button', { name: 'Filtrera' });
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByLabelText('Sök övning')).toBeNull();
+    expect(screen.queryByLabelText('Sortera')).toBeNull();
+    expect(screen.queryByRole('link', { name: /AAOS/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Granska/ })).toBeNull();
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByLabelText('Sök övning')).toBeTruthy();
+    expect(screen.getByLabelText('Sortera')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Kompakt' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /AAOS/ })).toBeTruthy();
+  });
+
+  it('opens the panel when the URL already has a filter', () => {
+    window.history.replaceState(null, '', '/#/ovningar?omrade=legs');
+    render(<TestRoutes />);
+    expect(
+      screen
+        .getByRole('button', { name: 'Filtrera' })
+        .getAttribute('aria-expanded'),
+    ).toBe('true');
+  });
+
+  it('shows Ditt program, grouped per pass, only when there is a programme', async () => {
+    render(<TestRoutes />);
+    expect(screen.queryByRole('heading', { name: 'Ditt program' })).toBeNull();
+    cleanup();
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight', 'chair', 'support'],
+      },
+    });
+    const passes = [
+      { focus: 'full', template: 'A', exerciseIds: programIds(0) },
+      { focus: 'full', template: 'B', exerciseIds: programIds(1) },
+    ];
+    await getDb().meta.put({
+      key: 'trainingProgram',
+      value: {
+        id: 'p1',
+        block: 1,
+        createdAt: '2026-10-01T10:00:00.000Z',
+        startDate: '2026-10-05',
+        daysPerWeek: 2,
+        emphasis: 'full',
+        weekdays: [1, 4],
+        passes,
+        curated: true,
+      },
+    });
+    render(<TestRoutes />);
+    const section = (
+      await screen.findByRole('heading', { name: 'Ditt program' })
+    ).closest('section') as HTMLElement;
+    expect(
+      within(section)
+        .getAllByRole('heading', { level: 3 })
+        .map((h) => h.textContent),
+    ).toEqual(['Pass 1 · Helkropp', 'Pass 2 · Helkropp']);
+    const first = exercises[passes[0]?.exerciseIds[0] as 'wall-sit'];
+    const link = within(section).getByRole('link', { name: first.name });
+    expect(link.getAttribute('href')).toBe(`#/ovning/${first.id}`);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Alla övningar' }),
+    ).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/\bE\d{1,3}\b/);
+  });
+
+  it('hides a dormant programme from a rehab user', async () => {
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'rehab',
+        rehabFocus: 'custom',
+        experience: 'new',
+        equipment: ['bodyweight', 'chair', 'support'],
+      },
+    });
+    await getDb().meta.put({
+      key: 'trainingProgram',
+      value: programFixture(),
+    });
+    render(<TestRoutes />);
+    await screen.findByRole('heading', { level: 2, name: 'Alla övningar' });
+    expect(screen.queryByRole('heading', { name: 'Ditt program' })).toBeNull();
+  });
+
   it('finds seated tibial rotation by its alias', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.type(screen.getByLabelText('Sök övning'), 'tibiarotation');
     expect(
       screen.getByRole('link', {
@@ -65,6 +171,7 @@ describe('exercise library', () => {
   it('finds step-down by its Swedish alias', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.type(screen.getByLabelText('Sök övning'), 'nedsteg');
     expect(
       screen.getByRole('link', { name: exercises['step-down'].name }),
@@ -84,6 +191,7 @@ describe('exercise library', () => {
   ] as const)('finds %s by name', async (term, id) => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.type(screen.getByLabelText('Sök övning'), term);
     expect(screen.getByRole('link', { name: exercises[id].name })).toBeTruthy();
   });
@@ -92,6 +200,8 @@ describe('exercise library', () => {
     async (id) => {
       const user = userEvent.setup();
       const { container } = render(<TestRoutes />);
+      openFilters();
+      openFilters();
       await user.type(screen.getByLabelText('Sök övning'), exercises[id].name);
       const row = screen
         .getByRole('link', { name: exercises[id].name })
@@ -103,6 +213,7 @@ describe('exercise library', () => {
   );
   it('shows compact rows by default: name, one meta line and a 48 px toggle, no extras', () => {
     render(<TestRoutes />);
+    openFilters();
     const row = screen
       .getByRole('link', { name: exercises['wall-sit'].name })
       .closest('li') as HTMLElement;
@@ -123,11 +234,13 @@ describe('exercise library', () => {
   it('switches to detailed rows and remembers it', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.click(screen.getByRole('button', { name: 'Detaljerad' }));
     expect(localStorage.getItem('stomme.library-view')).toBe('detailed');
     expect(screen.getAllByText('Valfri övning').length).toBeGreaterThan(0);
     cleanup();
     render(<TestRoutes />);
+    openFilters();
     expect(
       screen
         .getByRole('button', { name: 'Detaljerad' })
@@ -138,6 +251,7 @@ describe('exercise library', () => {
   it('shows all exercises, equipment and optional status, without links into the removed programme', () => {
     detailed();
     render(<TestRoutes />);
+    openFilters();
     expect(screen.getByRole('status').textContent).toBe(
       `${exerciseList.length} övningar`,
     );
@@ -167,6 +281,7 @@ describe('exercise library', () => {
   it('separates primary and supporting matches from a directly opened URL', () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=hamstrings');
     render(<TestRoutes />);
+    openFilters();
     expect(screen.getByRole('status').textContent).toBe(
       `${muscleCount('hamstrings')} övningar för baksida lår`,
     );
@@ -188,6 +303,7 @@ describe('exercise library', () => {
   it('preserves the selected filter through a detail visit and browser Back', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.click(screen.getByRole('button', { name: 'Vader' }));
     expect(window.location.hash).toBe('#/ovningar?muskel=calves');
     expect(window.location.search).toBe('');
@@ -222,6 +338,7 @@ describe('exercise library', () => {
   it('resets an invalid URL filter without leaving a dead end', async () => {
     window.history.replaceState(null, '', '/#/ovningar?muskel=constructor');
     render(<TestRoutes />);
+    openFilters();
     expect(screen.getByRole('status').textContent).toBe(
       `${exerciseList.length} övningar`,
     );
@@ -231,6 +348,7 @@ describe('exercise library', () => {
   it('selects several body regions and shows their count', async () => {
     window.history.replaceState(null, '', '/#/ovningar?omrade=arms,legs');
     render(<TestRoutes />);
+    openFilters();
     for (const name of ['Ben & säte', 'Armar'])
       expect(
         screen.getByRole('button', { name }).getAttribute('aria-pressed'),
@@ -248,6 +366,7 @@ describe('exercise library', () => {
   it('filters on a body region from the URL and keeps old muscle links working', () => {
     window.history.replaceState(null, '', '/#/ovningar?omrade=legs');
     render(<TestRoutes />);
+    openFilters();
     expect(screen.getByRole('status').textContent).toMatch(/för ben & säte$/);
     expect(
       screen
@@ -257,6 +376,7 @@ describe('exercise library', () => {
     cleanup();
     window.history.replaceState(null, '', '/#/ovningar?muskel=calves');
     render(<TestRoutes />);
+    openFilters();
     expect(
       screen
         .getByRole('button', { name: 'Vader' })
@@ -267,6 +387,7 @@ describe('exercise library', () => {
   it('writes type, execution and one-side filters to the URL', async () => {
     const user = userEvent.setup();
     render(<TestRoutes />);
+    openFilters();
     await user.selectOptions(
       screen.getByLabelText('Typ av övning'),
       'mobility',
@@ -283,6 +404,7 @@ describe('exercise library', () => {
     const user = userEvent.setup();
     window.history.replaceState(null, '', '/#/ovningar?redskap=band');
     render(<TestRoutes />);
+    openFilters();
     expect(screen.getAllByText(/Saknar utrustning:/).length).toBeGreaterThan(0);
     await user.type(screen.getByLabelText('Sök övning'), 'qqqqzzzz');
     expect(screen.getByText(/Inga övningar passar filtren\./)).toBeTruthy();
@@ -308,6 +430,7 @@ describe('exercise library', () => {
 
     it('is a labelled native select that defaults to "Passar mig"', () => {
       render(<TestRoutes />);
+      openFilters();
       const select = screen.getByLabelText('Sortera') as HTMLSelectElement;
       expect(select.tagName).toBe('SELECT');
       expect(select.value).toBe('fit');
@@ -324,6 +447,7 @@ describe('exercise library', () => {
       const user = userEvent.setup();
       window.history.replaceState(null, '', '/#/ovningar?sok=utfall');
       render(<TestRoutes />);
+      openFilters();
       await user.selectOptions(screen.getByLabelText('Sortera'), 'name');
       expect(window.location.hash).toBe('#/ovningar?sok=utfall&sort=name');
       const names = rowNames();
@@ -353,6 +477,7 @@ describe('exercise library', () => {
         '/#/ovningar?sort=liked&typ=mobility',
       );
       render(<TestRoutes />);
+      openFilters();
       await user.click(screen.getByLabelText('Bara övningar en sida i taget'));
       expect(window.location.hash).toContain('sort=liked');
       await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
@@ -367,6 +492,7 @@ describe('exercise library', () => {
         '/#/ovningar?sok=utfall&sort=liked',
       );
       render(<TestRoutes />);
+      openFilters();
       await screen.findAllByRole('link', { name: /utfall/i });
       const before = rowNames();
       const last = before[before.length - 1] as string;
@@ -385,6 +511,7 @@ describe('exercise library', () => {
         '/#/ovningar?sok=utfall&sort=recent',
       );
       render(<TestRoutes />);
+      openFilters();
       await screen.findByText(/Du har inte tränat något än/);
       const before = rowNames();
       const last = before[before.length - 1] as string;
@@ -407,6 +534,7 @@ describe('exercise library', () => {
     it('treats an unknown value as the default', () => {
       window.history.replaceState(null, '', '/#/ovningar?sort=popular');
       render(<TestRoutes />);
+      openFilters();
       expect(
         (screen.getByLabelText('Sortera') as HTMLSelectElement).value,
       ).toBe('fit');
@@ -415,6 +543,7 @@ describe('exercise library', () => {
     it('explains an alphabetical list when there is no training history', async () => {
       window.history.replaceState(null, '', '/#/ovningar?sort=recent');
       render(<TestRoutes />);
+      openFilters();
       expect(
         await screen.findByText(/Du har inte tränat något än/),
       ).toBeTruthy();

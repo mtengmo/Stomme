@@ -1,17 +1,33 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'wouter';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { beginnerExerciseIds } from '../../content/beginnerSet';
 import { experienceLabels } from '../../content/programmes';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { saveTrainingProgram } from '../../db/program';
 import { saveTrainingPreferences } from '../../db/training';
-import type { ExerciseId, TrainingPreferences } from '../../domain/types';
-import { focusAvailable } from '../../rules/programRosters';
+import type {
+  ExerciseId,
+  TrainingPreferences,
+  TrainingProgram,
+} from '../../domain/types';
+import { toLocalDate } from '../../lib/dates';
+import { buildProgram } from '../../rules/programPlan';
 import { Button } from '../../ui/Button';
+import { ChoiceCard } from '../../ui/ChoiceCard';
+import { linkClass } from '../../ui/link';
+import { DisclaimerText } from '../onboarding/Onboarding';
+import { emphasisLabels } from '../program/programView';
 import { CustomPicker } from './CustomPicker';
 import { customWorkoutPlan } from './defaultPlan';
-import { EquipmentInventory, type PendingWeight } from './EquipmentInventory';
+import {
+  EquipmentInventory,
+  type PendingWeight,
+  WeightFields,
+} from './EquipmentInventory';
 import {
   allowedEquipment,
+  DAY_OPTIONS,
   type Draft,
   type Goal,
   isRehabGoal,
@@ -22,19 +38,12 @@ import {
   showsWeights,
   stepsFor,
 } from './quickStartModel';
-import { RegionChecklist } from './RegionChecklist';
+import { StartEquipment } from './StartEquipment';
 
 const fieldClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
-const optionClass =
-  'flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-2 text-lg';
-const goals: { id: Goal; label: string }[] = [
-  { id: 'general', label: 'Bli starkare' },
-  { id: 'build', label: 'Skapa eget pass' },
-  { id: 'knee', label: 'Knärehab' },
-];
 
-/** Answers survive leaving via the bottom nav (kept per tab, cleared on save). */
+/** Answers survive leaving the flow (kept per tab, cleared on save). */
 const DRAFT_KEY = 'stomme.quickstart.draft';
 function loadDraft(): Draft {
   try {
@@ -63,15 +72,84 @@ function clearDraft(): void {
 
 const headings: Record<Step, string> = {
   goal: 'Vad vill du träna?',
+  rehab: 'Vilket knäprogram följer du?',
+  days: 'Hur många dagar i veckan?',
+  emphasis: 'Vad vill du få ut mest av?',
   equipment: 'Vad tränar du med?',
+  weights: 'Vilka vikter har du?',
   level: 'Hur van är du vid styrketräning?',
-  focus: 'Vad vill du träna först?',
   pick: 'Välj dina övningar',
 };
 
-export function QuickStart() {
+const dayHints: Record<(typeof DAY_OPTIONS)[number], string> = {
+  1: 'Ett pass i veckan är en bra start.',
+  2: 'Två pass med minst två dagars mellanrum. Passar bra bredvid löpning.',
+  3: 'Tre pass med vilodagar emellan. Ett jämnt och vanligt upplägg.',
+  4: 'Fyra pass i veckan. Passen delas upp så att samma muskler får vila.',
+  5: 'Fem pass ger mycket träning. Välj det om det passar din vecka.',
+};
+
+const emphasisCards = [
+  { id: 'full', label: emphasisLabels.full, hint: 'Ben, press, drag och bål.' },
+  {
+    id: 'run',
+    label: emphasisLabels.run,
+    hint: 'Mer för ben och bål, för dig som springer.',
+  },
+  {
+    id: 'upper',
+    label: emphasisLabels.upper,
+    hint: 'Extra för rygg, bröst och armar.',
+  },
+] as const;
+
+/** A big tappable choice that moves on: a button, not a tick. */
+function StepCard({
+  label,
+  hint,
+  onClick,
+}: {
+  label: string;
+  hint: string;
+  onClick(): void;
+}) {
+  const hintId = useId();
+  const labelId = useId();
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-labelledby={labelId}
+      aria-describedby={hintId}
+      className="flex min-h-16 w-full flex-col items-start rounded-md border-[3px] border-ink bg-surface px-4 py-3 text-left text-xl font-bold"
+    >
+      <span id={labelId}>{label}</span>
+      <span id={hintId} className="text-base font-normal text-ink-soft">
+        {hint}
+      </span>
+    </button>
+  );
+}
+
+/** What "Gör om programmet" starts from: the saved preferences and programme. */
+export interface RedoStart {
+  preferences: TrainingPreferences;
+  program: TrainingProgram | null;
+}
+
+export function QuickStart({ redo }: { redo?: RedoStart }) {
   const [, navigate] = useLocation();
-  const [draft, setDraft] = useState(loadDraft);
+  const [draft, setDraft] = useState<Draft>(() =>
+    redo
+      ? {
+          ...readDraft(null),
+          goal: 'general',
+          step: 'days',
+          days: redo.program?.daysPerWeek ?? readDraft(null).days,
+          emphasis: redo.program?.emphasis ?? 'full',
+        }
+      : loadDraft(),
+  );
   const {
     goal,
     step,
@@ -80,21 +158,26 @@ export function QuickStart() {
     weights,
     adjustableWeights,
     side,
-    focus,
+    days,
+    emphasis,
+    weightKinds,
   } = draft;
   const update = (patch: Partial<Draft>) =>
     setDraft((current) => ({ ...current, ...patch }));
   useEffect(() => {
+    if (redo) return;
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     } catch {
       /* Draft is a convenience only. */
     }
-  }, [draft]);
+  }, [draft, redo]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [adjustableValid, setAdjustableValid] = useState(true);
   const [pending, setPending] = useState<PendingWeight | null>(null);
+  // "Vet inte" is the same programme as "Hela kroppen"; only the card differs.
+  const [unsure, setUnsure] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(step !== 'goal');
   useEffect(() => {
@@ -104,24 +187,15 @@ export function QuickStart() {
     }
   }, [step]);
 
-  const steps = stepsFor(goal);
+  const steps: Step[] = redo ? ['days', 'emphasis'] : stepsFor(goal, draft);
   const position = Math.max(0, steps.indexOf(step));
   const last = position === steps.length - 1;
   const rehab = isRehabGoal(goal);
-  // Regions with no exercise for the chosen equipment and level are shown but disabled.
-  const available = useMemo(
-    () =>
-      goal === 'general'
-        ? focusAvailable(preferencesFromDraft({ ...draft, focus: 'all' }))
-            .regions
-        : [],
-    [goal, draft],
-  );
-  const chosenParts = draft.bodyParts.filter((part) =>
-    available.includes(part),
-  );
-  const needsParts =
-    goal === 'general' && focus === 'select' && !chosenParts.length;
+  const hasTools = showsWeights(goal);
+  const allowed = allowedEquipment(goal);
+  const strength = goal === 'general';
+  // The step that hosts the adjustable-weight fields.
+  const weightHost: Step = strength ? 'weights' : 'equipment';
 
   const goTo = (next: Step) => {
     setError('');
@@ -129,10 +203,8 @@ export function QuickStart() {
   };
   const choose = (next: Goal) => {
     if (next !== goal) clearSelection();
-    update({ goal: next, step: 'equipment' });
+    update({ goal: next, step: next === 'general' ? 'days' : 'equipment' });
   };
-  const hasTools = showsWeights(goal);
-  const allowed = allowedEquipment(goal);
   const sideField = (
     <label className="flex flex-col gap-2 text-base font-bold">
       Arbetande sida
@@ -164,12 +236,49 @@ export function QuickStart() {
     setBusy(true);
     setError('');
     try {
+      if (redo) {
+        const next = buildProgram({
+          preferences: redo.preferences,
+          daysPerWeek: days,
+          emphasis,
+          startDate: toLocalDate(new Date()),
+          now: new Date().toISOString(),
+          id: crypto.randomUUID(),
+          block: redo.program?.block ?? 1,
+          ...(!redo.program || redo.program.curated
+            ? { pool: beginnerExerciseIds }
+            : {}),
+        });
+        if (!next) {
+          setError('Det gick inte att bygga ett program med din utrustning.');
+          setBusy(false);
+          return;
+        }
+        await saveTrainingProgram(getDb(), next);
+        navigate('/program?ny=1');
+        return;
+      }
+      const preferences = preferencesFromDraft(draft);
+      // Strength users get a four-week programme saved with their answers, in one transaction.
+      const program =
+        goal === 'general'
+          ? buildProgram({
+              preferences,
+              daysPerWeek: days,
+              emphasis,
+              startDate: toLocalDate(new Date()),
+              now: new Date().toISOString(),
+              id: crypto.randomUUID(),
+              pool: beginnerExerciseIds,
+            })
+          : null;
       await saveTrainingPreferences(
         getDb(),
-        preferencesFromDraft(draft, available),
+        preferences,
+        program ? () => saveTrainingProgram(getDb(), program) : undefined,
       );
       clearDraft();
-      navigate('/traning/A');
+      navigate(program ? '/program?ny=1' : '/traning/A');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Kunde inte spara. Försök igen.',
@@ -189,16 +298,29 @@ export function QuickStart() {
     navigate(`/traning/A?workout=${id}`);
   }
 
+  const lastLabel = redo
+    ? 'Gör om programmet'
+    : goal === 'custom'
+      ? 'Öppna mitt rehabprogram'
+      : goal === 'physio'
+        ? 'Visa mitt program'
+        : goal === 'general'
+          ? 'Visa mitt program'
+          : goal === 'build'
+            ? 'Visa mitt pass'
+            : 'Visa mitt pass';
+  const showFooter = step !== 'goal' && step !== 'rehab' && step !== 'pick';
+
   return (
     <div
-      className={`mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 pb-[var(--app-nav-height)] ${step === 'pick' ? 'pt-8' : 'pt-5'}`}
+      className={`mx-auto flex min-h-dvh max-w-md flex-col gap-6 px-5 ${step === 'pick' ? 'pt-8 pb-[var(--app-nav-clear)]' : 'pt-5'}`}
     >
       {step === 'pick' ? (
         <div className="sticky top-0 z-10 -mx-5 -mt-8 flex items-center justify-between bg-surface px-5">
           <button
             type="button"
             onClick={() => goTo(steps[position - 1] ?? 'goal')}
-            className="min-h-12 text-base font-bold underline"
+            className={`min-h-12 text-base ${linkClass}`}
           >
             Tillbaka
           </button>
@@ -219,64 +341,200 @@ export function QuickStart() {
       {step === 'goal' ? (
         <>
           <p className="m-0 text-lg">
-            Välj ett fokus så gör vi ett pass åt dig, eller välj övningarna
-            själv.
-          </p>
-          <p className="m-0 text-base text-ink-soft">
-            Har du ont eller en skada? Välj Knärehab eller följ din vårdgivare.
+            Vi bygger ett program som passar din vecka och din utrustning.
           </p>
           <div className="flex flex-col gap-3">
-            {goals.map((item) => (
-              <Button
-                key={item.id}
-                variant="secondary"
-                onClick={() => choose(item.id)}
-              >
-                {item.label}
-              </Button>
-            ))}
+            <StepCard
+              label="Bli starkare"
+              hint="Ett färdigt program på 4 veckor"
+              onClick={() => choose('general')}
+            />
+            <StepCard
+              label="Knä- eller rehabprogram"
+              hint="Har du ont eller en skada? Följ din vårdgivare."
+              onClick={() => goTo('rehab')}
+            />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col pb-[max(1rem,env(safe-area-inset-bottom))]">
             <button
               type="button"
-              onClick={() => choose('custom')}
-              className="min-h-12 self-start text-left text-base underline"
+              onClick={() => choose('build')}
+              className={`min-h-12 self-start text-left text-base ${linkClass}`}
             >
-              Jag har ett eget rehabprogram
+              Skapa eget pass
             </button>
-            <button
-              type="button"
+            <Link
+              href="/installningar/sakerhetskopia"
+              className={`flex min-h-12 items-center self-start text-base ${linkClass}`}
+            >
+              Har du en säkerhetskopia? Importera
+            </Link>
+          </div>
+        </>
+      ) : step === 'rehab' ? (
+        <>
+          <div className="flex flex-col gap-3">
+            <StepCard
+              label="Knärehab"
+              hint="Byggt på AAOS:s knäprogram"
+              onClick={() => choose('knee')}
+            />
+            <StepCard
+              label="Fysioterapeutens knäprogram"
+              hint="De 9 övningarna från din fysioterapeut"
               onClick={() => choose('physio')}
-              className="min-h-12 self-start text-left text-base underline"
-            >
-              Jag har fysioterapeutens knäprogram (9 övningar)
-            </button>
-            <p className="m-0 text-base text-ink-soft">
-              Annat papper? Välj eget rehabprogram ovan.
-            </p>
+            />
+            <StepCard
+              label="Eget rehabprogram"
+              hint="Du lägger in övningarna själv"
+              onClick={() => choose('custom')}
+            />
           </div>
+          <DisclaimerText className="m-0 text-base" />
+          <button
+            type="button"
+            onClick={() => goTo('goal')}
+            className={`min-h-12 self-start pb-[max(1rem,env(safe-area-inset-bottom))] text-base ${linkClass}`}
+          >
+            Tillbaka
+          </button>
         </>
       ) : (
         <>
+          {step === 'days' ? (
+            <>
+              <div
+                role="radiogroup"
+                aria-labelledby="days-label"
+                className="flex justify-between gap-2"
+              >
+                <span id="days-label" className="sr-only">
+                  Dagar i veckan
+                </span>
+                {DAY_OPTIONS.map((count) => (
+                  <label
+                    key={count}
+                    className={`relative flex h-14 min-w-0 max-w-14 flex-1 cursor-pointer flex-col items-center justify-center rounded-md border-[3px] bg-surface has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-(--focus-outline) ${days === count ? 'border-accent' : 'border-edge'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="days"
+                      value={count}
+                      checked={days === count}
+                      aria-label={count === 1 ? '1 dag' : `${count} dagar`}
+                      onChange={() => update({ days: count })}
+                      className="absolute inset-0 size-full cursor-pointer opacity-0"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="count text-4xl leading-none"
+                    >
+                      {count}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={`mt-1 h-1 w-6 ${days === count ? 'bg-accent' : 'bg-transparent'}`}
+                    />
+                  </label>
+                ))}
+              </div>
+              <p className="m-0 text-lg" aria-live="polite">
+                {dayHints[days]}
+              </p>
+              <p className="m-0 text-base text-ink-soft">
+                Dagarna är förslag. Du tränar när det passar.
+              </p>
+            </>
+          ) : null}
+          {step === 'emphasis' ? (
+            <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+              <legend className="sr-only">Tyngdpunkt</legend>
+              {emphasisCards.map((card) => (
+                <ChoiceCard
+                  key={card.id}
+                  type="radio"
+                  name="emphasis"
+                  value={card.id}
+                  label={card.label}
+                  hint={card.hint}
+                  checked={emphasis === card.id && !unsure}
+                  onChange={() => {
+                    setUnsure(false);
+                    update({ emphasis: card.id });
+                  }}
+                />
+              ))}
+              <ChoiceCard
+                type="radio"
+                name="emphasis"
+                value="unsure"
+                label="Vet inte – välj åt mig"
+                hint="Vi väljer Hela kroppen."
+                checked={unsure}
+                onChange={() => {
+                  setUnsure(true);
+                  update({ emphasis: 'full' });
+                }}
+              />
+            </fieldset>
+          ) : null}
           {step === 'equipment' ? (
             <>
-              <EquipmentInventory
+              {strength ? (
+                <StartEquipment
+                  value={{ equipment, weightKinds, weights }}
+                  onChange={(next) =>
+                    update({
+                      equipment: next.equipment,
+                      weightKinds: next.weightKinds,
+                      weights: next.weights,
+                    })
+                  }
+                />
+              ) : (
+                <EquipmentInventory
+                  idPrefix="start"
+                  value={{ equipment, weights, adjustableWeights }}
+                  onChange={(next) =>
+                    update({
+                      equipment: next.equipment,
+                      weights: next.weights ?? [],
+                      adjustableWeights: next.adjustableWeights ?? [],
+                    })
+                  }
+                  onValidityChange={setAdjustableValid}
+                  onPendingChange={setPending}
+                  inlineAdd={false}
+                  supportItems={allowed}
+                  showWeights={hasTools}
+                />
+              )}
+              {rehab ? sideField : null}
+              <p className="m-0 text-base text-ink-soft">
+                Du kan ändra det här senare i Inställningar › Min utrustning.
+              </p>
+            </>
+          ) : null}
+          {step === 'weights' ? (
+            <>
+              <WeightFields
                 idPrefix="start"
-                value={{ equipment, weights, adjustableWeights }}
-                onChange={(next) =>
-                  update({
-                    equipment: next.equipment,
-                    weights: next.weights ?? [],
-                    adjustableWeights: next.adjustableWeights ?? [],
-                  })
+                weights={weights}
+                adjustableWeights={adjustableWeights}
+                onWeightsChange={(next) => update({ weights: next })}
+                onAdjustableChange={(next) =>
+                  update({ adjustableWeights: next })
                 }
+                kinds={weightKinds}
                 onValidityChange={setAdjustableValid}
                 onPendingChange={setPending}
                 inlineAdd={false}
-                supportItems={allowed}
-                showWeights={hasTools}
+                buildValue={(next) => ({
+                  equipment,
+                  weights: next,
+                  adjustableWeights,
+                })}
               />
-              {rehab ? sideField : null}
               <p className="m-0 text-base text-ink-soft">
                 Du kan ändra det här senare i Inställningar › Min utrustning.
               </p>
@@ -290,72 +548,23 @@ export function QuickStart() {
                   experienceLabels,
                 ) as TrainingPreferences['experience'][]
               ).map((value) => (
-                <label
+                <ChoiceCard
                   key={value}
-                  className={`${optionClass} ${experience === value ? 'border-accent' : 'border-edge'}`}
-                >
-                  <input
-                    className="size-6 shrink-0"
-                    type="radio"
-                    name="experience"
-                    checked={experience === value}
-                    aria-describedby={`level-${value}`}
-                    onChange={() => update({ experience: value })}
-                  />
-                  <span className="flex flex-col">
-                    <span className="font-bold">{experienceLabels[value]}</span>
-                    <span
-                      id={`level-${value}`}
-                      className="text-base text-ink-soft"
-                    >
-                      {levelHints[value]}
-                    </span>
-                  </span>
-                </label>
-              ))}
-              <p className="m-0 text-base text-ink-soft">
-                {goal === 'build'
-                  ? 'Styr vilka övningar vi visar, antal set och startvikt.'
-                  : 'Gäller styrketräning.'}
-              </p>
-            </fieldset>
-          ) : null}
-          {step === 'focus' ? (
-            <>
-              <p className="m-0 text-lg">
-                Du väljer fokus inför varje pass på träningssidan.
-              </p>
-              <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
-                <legend className="sr-only">Fokus</legend>
-                {(
-                  [
-                    ['all', 'Hela kroppen'],
-                    ['select', 'Välj kroppsdelar'],
-                  ] as const
-                ).map(([value, label]) => (
-                  <label
-                    key={value}
-                    className={`${optionClass} ${focus === value ? 'border-accent' : 'border-edge'}`}
-                  >
-                    <input
-                      className="size-6 shrink-0"
-                      type="radio"
-                      name="focus"
-                      checked={focus === value}
-                      onChange={() => update({ focus: value })}
-                    />
-                    {label}
-                  </label>
-                ))}
-              </fieldset>
-              {focus === 'select' ? (
-                <RegionChecklist
-                  value={draft.bodyParts}
-                  available={available}
-                  onChange={(bodyParts) => update({ bodyParts })}
+                  type="radio"
+                  name="experience"
+                  value={value}
+                  label={experienceLabels[value]}
+                  hint={levelHints[value]}
+                  checked={experience === value}
+                  onChange={() => update({ experience: value })}
                 />
+              ))}
+              {goal === 'build' ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Styr vilka övningar vi visar, antal set och startvikt.
+                </p>
               ) : null}
-            </>
+            </fieldset>
           ) : null}
           {step === 'pick' ? (
             <>
@@ -376,19 +585,15 @@ export function QuickStart() {
                 idPrefix="pick"
               />
             </>
-          ) : (
-            <div className="sticky bottom-[var(--app-nav-height)] z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 py-2">
+          ) : null}
+          {showFooter ? (
+            <div className="sticky bottom-0 z-10 -mx-5 mt-auto flex flex-col gap-2 border-t-[3px] border-ink bg-surface-tint px-5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
               <p className="m-0 text-base leading-none text-ink-soft">
                 Steg {position + 1} av {steps.length}
               </p>
               {error ? (
                 <p role="alert" className="m-0 text-base font-bold">
                   {error}
-                </p>
-              ) : null}
-              {last && needsParts ? (
-                <p id="focus-blocked" className="m-0 text-base font-bold">
-                  Välj minst en kroppsdel, eller välj Hela kroppen.
                 </p>
               ) : null}
               {pending && !pending.canSubmit ? (
@@ -400,27 +605,28 @@ export function QuickStart() {
                 <Button
                   variant="secondary"
                   className="w-auto! shrink-0 px-4!"
-                  onClick={() => goTo(steps[position - 1] ?? 'goal')}
+                  onClick={() => {
+                    if (redo && position === 0) navigate('/program');
+                    else goTo(steps[position - 1] ?? 'goal');
+                  }}
                 >
                   Tillbaka
                 </Button>
                 <Button
-                  disabled={
-                    busy ||
-                    (last && needsParts) ||
-                    (!!pending && !pending.canSubmit)
-                  }
+                  disabled={busy || (!!pending && !pending.canSubmit)}
                   aria-describedby={
-                    pending && !pending.canSubmit
-                      ? 'weight-hint'
-                      : last && needsParts
-                        ? 'focus-blocked'
-                        : undefined
+                    pending && !pending.canSubmit ? 'weight-hint' : undefined
                   }
                   onClick={() => {
                     if (pending) return pending.submit();
                     const next = steps[position + 1];
-                    if (next === 'pick' && hasTools && !adjustableValid)
+                    if (
+                      next &&
+                      !last &&
+                      hasTools &&
+                      !adjustableValid &&
+                      step === weightHost
+                    )
                       setError(
                         'Kontrollera de justerbara vikterna innan du fortsätter.',
                       );
@@ -428,19 +634,11 @@ export function QuickStart() {
                     else void save();
                   }}
                 >
-                  {pending
-                    ? pending.label
-                    : !last
-                      ? 'Nästa'
-                      : goal === 'custom'
-                        ? 'Öppna mitt rehabprogram'
-                        : goal === 'physio'
-                          ? 'Visa mitt program'
-                          : 'Visa mitt pass'}
+                  {pending ? pending.label : !last ? 'Nästa' : lastLabel}
                 </Button>
               </div>
             </div>
-          )}
+          ) : null}
         </>
       )}
     </div>

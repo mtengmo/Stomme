@@ -14,12 +14,80 @@ describe('quick start model', () => {
     expect(stepsFor(null)).toEqual(['goal']);
     expect(stepsFor('general')).toEqual([
       'goal',
+      'days',
+      'emphasis',
       'equipment',
       'level',
-      'focus',
     ]);
     for (const goal of ['knee', 'physio', 'custom'] as const)
-      expect(stepsFor(goal)).toEqual(['goal', 'equipment']);
+      expect(stepsFor(goal)).toEqual(['goal', 'rehab', 'equipment']);
+  });
+
+  it('adds the weights step only when dumbbells or kettlebells are ticked', () => {
+    expect(stepsFor('general', { weightKinds: ['dumbbell'] })).toEqual([
+      'goal',
+      'days',
+      'emphasis',
+      'equipment',
+      'weights',
+      'level',
+    ]);
+    expect(stepsFor('general', { weightKinds: [] })).not.toContain('weights');
+    for (const goal of ['build', 'knee', 'physio', 'custom'] as const)
+      expect(stepsFor(goal, { weightKinds: ['kettlebell'] })).not.toContain(
+        'weights',
+      );
+  });
+
+  it('defaults to two days and the whole body, and validates both', () => {
+    expect(emptyDraft).toMatchObject({ days: 2, emphasis: 'full' });
+    const read = (value: object) =>
+      readDraft(JSON.stringify({ goal: 'general', ...value }));
+    for (const days of [1, 2, 3, 4, 5]) expect(read({ days }).days).toBe(days);
+    for (const days of [0, 6, 2.5, '3', null])
+      expect(read({ days }).days).toBe(2);
+    for (const emphasis of ['full', 'run', 'upper'])
+      expect(read({ emphasis }).emphasis).toBe(emphasis);
+    for (const emphasis of ['legs', 7, null])
+      expect(read({ emphasis }).emphasis).toBe('full');
+  });
+
+  it('reads the ticked weight kinds, or derives them from stored weights', () => {
+    expect(
+      readDraft(
+        JSON.stringify({ goal: 'general', weightKinds: ['kettlebell', 'x'] }),
+      ).weightKinds,
+    ).toEqual(['kettlebell']);
+    expect(
+      readDraft(
+        JSON.stringify({
+          goal: 'general',
+          weights: [{ type: 'dumbbell', kg: 5, count: 2 }],
+        }),
+      ).weightKinds,
+    ).toEqual(['dumbbell']);
+    expect(
+      readDraft(
+        JSON.stringify({
+          goal: 'general',
+          step: 'weights',
+          weightKinds: ['dumbbell'],
+        }),
+      ).step,
+    ).toBe('weights');
+    expect(
+      readDraft(JSON.stringify({ goal: 'general', step: 'weights' })).step,
+    ).toBe('equipment');
+  });
+
+  it('keeps the rehab choice step before a goal is picked, and only then', () => {
+    expect(readDraft(JSON.stringify({ step: 'rehab' })).step).toBe('rehab');
+    expect(
+      readDraft(JSON.stringify({ goal: 'knee', step: 'rehab' })).step,
+    ).toBe('rehab');
+    expect(
+      readDraft(JSON.stringify({ goal: 'general', step: 'rehab' })).step,
+    ).toBe('equipment');
   });
 
   it('falls back to defaults for missing or damaged drafts', () => {
@@ -29,7 +97,7 @@ describe('quick start model', () => {
     const draft = readDraft(
       JSON.stringify({
         goal: 'unknown',
-        step: 'focus',
+        step: 'level',
         equipment: ['laser'],
         experience: 9,
         bodyParts: ['legs', 'legs'],
@@ -54,8 +122,10 @@ describe('quick start model', () => {
     const draft = {
       ...emptyDraft,
       goal: 'general' as const,
-      step: 'focus' as const,
+      step: 'level' as const,
       equipment: ['chair' as const, 'band' as const],
+      days: 4 as const,
+      emphasis: 'run' as const,
       experience: 'regular' as const,
       focus: 'select' as const,
       bodyParts: ['legs' as const],

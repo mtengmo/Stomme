@@ -9,6 +9,8 @@ import {
   EquipmentInventory,
   type PendingWeight,
   parseKg,
+  SupportToggles,
+  WeightFields,
 } from './EquipmentInventory';
 
 afterEach(cleanup);
@@ -235,5 +237,50 @@ describe('EquipmentInventory', () => {
     expect(json().equipment).toContain('band');
     await user.click(screen.getByRole('checkbox', { name: 'Stabil stol' }));
     expect(json().equipment).not.toContain('chair');
+  });
+});
+
+describe('the split parts', () => {
+  it('SupportToggles keeps checkbox roles and reports the next list', async () => {
+    const user = userEvent.setup();
+    const seen: string[][] = [];
+    render(
+      <SupportToggles
+        equipment={['chair']}
+        items={['chair', 'band']}
+        onChange={(next) => seen.push(next)}
+      />,
+    );
+    expect(
+      (
+        screen.getByRole('checkbox', {
+          name: 'Stabil stol',
+        }) as HTMLInputElement
+      ).checked,
+    ).toBe(true);
+    await user.click(screen.getByRole('checkbox', { name: 'Träningsband' }));
+    expect(seen.at(-1)).toEqual(['chair', 'band']);
+    await user.click(screen.getByRole('checkbox', { name: 'Stabil stol' }));
+    expect(seen.at(-1)).toEqual([]);
+  });
+
+  it('WeightFields shows a block only for the given kinds', async () => {
+    const user = userEvent.setup();
+    const seen: unknown[] = [];
+    render(
+      <WeightFields
+        idPrefix="w"
+        weights={[]}
+        adjustableWeights={[]}
+        kinds={['kettlebell']}
+        onWeightsChange={(next) => seen.push(next)}
+        onAdjustableChange={() => {}}
+        buildValue={(weights) => ({ equipment: ['bodyweight'], weights })}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: 'Hantel 5 kg' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Kettlebell 16 kg' }));
+    expect(seen.at(-1)).toEqual([{ type: 'kettlebell', kg: 16, count: 1 }]);
+    expect(screen.getByText(/Inga vikter\? Gå vidare/)).toBeTruthy();
   });
 });

@@ -29,13 +29,20 @@ for (const width of WIDTHS)
         colorScheme: scheme,
       });
 
-      test('the start step asks once, with no Egenvikt/Utrustning choice', async ({
-        page,
-      }) => {
+      /** Goal, days and emphasis with their defaults: on to the equipment step. */
+      async function toEquipmentStep(page: import('@playwright/test').Page) {
         await page.goto('/');
         await page
           .getByRole('button', { name: 'Bli starkare', exact: true })
           .click();
+        await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+        await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+      }
+
+      test('the start step asks once, with no Egenvikt/Utrustning choice', async ({
+        page,
+      }) => {
+        await toEquipmentStep(page);
         const heading = page.getByRole('heading', {
           name: 'Vad tränar du med?',
         });
@@ -45,20 +52,21 @@ for (const width of WIDTHS)
           page.getByRole('radio', { name: 'Utrustning' }),
         ).toHaveCount(0);
         await expect(page.getByText(/Antal hantlar/)).toHaveCount(0);
+        // Chair and wall are always included; they are no longer ticks.
+        await expect(page.getByText(/Alltid med:/)).toBeVisible();
+        await expect(
+          page.getByRole('checkbox', { name: 'Stabil stol' }),
+        ).toHaveCount(0);
+        await expect(
+          page.getByRole('button', { name: 'Hantel 5 kg' }),
+        ).toHaveCount(0);
+        await page.getByRole('checkbox', { name: 'Hantlar' }).check();
+        await page.getByRole('button', { name: 'Nästa', exact: true }).click();
         await expect(
           page.getByText(
             /Inga vikter\? Gå vidare, passet byggs med kroppsvikt/,
           ),
         ).toBeVisible();
-        for (const name of ['Stabil stol', 'Vägg eller stabilt stöd'])
-          await expect(page.getByRole('checkbox', { name })).toBeChecked();
-        await expect(
-          page.getByRole('checkbox', { name: 'Bara kroppsvikt' }),
-        ).toBeChecked();
-        await expect(
-          page.getByRole('button', { name: 'Hantel 5 kg' }),
-        ).toHaveCount(0);
-        await page.getByRole('checkbox', { name: 'Hantlar' }).check();
         await minTarget(page, ['Hantel 5 kg', 'Annan vikt, hantel']);
         await noHorizontalScroll(page);
         await page.screenshot({
@@ -69,18 +77,16 @@ for (const width of WIDTHS)
         await page.evaluate(() =>
           window.scrollTo(0, document.body.scrollHeight),
         );
-        await expect(page.getByText(/^Steg 2 av 4$/)).toBeInViewport();
+        await expect(page.getByText(/^Steg 5 av 6$/)).toBeInViewport();
       });
 
       test('chips add a pair or one, Annan vikt uses the fixed button and Nästa never drops it', async ({
         page,
       }) => {
-        await page.goto('/');
-        await page
-          .getByRole('button', { name: 'Bli starkare', exact: true })
-          .click();
+        await toEquipmentStep(page);
         await page.getByRole('checkbox', { name: 'Hantlar' }).check();
         await page.getByRole('checkbox', { name: 'Kettlebell' }).check();
+        await page.getByRole('button', { name: 'Nästa', exact: true }).click();
         const five = page.getByRole('button', {
           name: 'Hantel 5 kg',
           exact: true,
@@ -168,10 +174,9 @@ for (const width of WIDTHS)
           .click();
         await expect(page.getByText('Kettlebell 12,5 kg')).toHaveCount(0);
         await page.getByRole('button', { name: 'Nästa', exact: true }).click();
-        await page.getByRole('button', { name: 'Nästa', exact: true }).click();
-        await page.getByRole('button', { name: 'Visa mitt pass' }).click();
+        await page.getByRole('button', { name: 'Visa mitt program' }).click();
         await expect(
-          page.getByRole('button', { name: 'Börja passet' }),
+          page.getByRole('link', { name: 'Starta första passet' }),
         ).toBeVisible();
       });
 

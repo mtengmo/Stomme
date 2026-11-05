@@ -12,6 +12,7 @@ import {
 
 import type {
   PlannedExercise,
+  ProgramPass,
   RehabFocus,
   Session,
   TemplateId,
@@ -27,6 +28,7 @@ import { equipmentFits } from '../rules/equipment';
 import { trainingDayAfterDue, validateCheckin } from '../rules/training';
 
 import type { StommeDB } from './db';
+import { isTrainingProgram } from './program';
 
 import { expireStaleSessions, getActiveSession } from './repo';
 
@@ -143,6 +145,8 @@ export async function startTrainingSession(
     fullPlan?: PlannedExercise[];
     equipmentOverride?: WorkoutEquipment;
     focus?: import('../content/focusPresets').WorkoutFocus;
+    /** A pass of the active training programme; checked against the stored programme. */
+    programPass?: NonNullable<Session['programPass']>;
   } = {},
 ): Promise<Session> {
   const fullPlan = options.fullPlan;
@@ -194,7 +198,32 @@ export async function startTrainingSession(
   )
     throw new Error('Kontrollera övningar, antal, vikt och sidor.');
 
+  const programPass = options.programPass;
+  const badProgramPass =
+    programPass !== undefined &&
+    (preferences.programId !== 'general' ||
+      !!customWorkout ||
+      typeof programPass.programId !== 'string' ||
+      !Number.isInteger(programPass.pass) ||
+      !Number.isInteger(programPass.week) ||
+      programPass.pass < 1 ||
+      programPass.week < 1 ||
+      programPass.week > 4);
+
   return db.transaction('rw', [db.sessions, db.meta, db.setLogs], async () => {
+    // Additive to the checks above: the pass must exist in the stored programme.
+    let programmePass: ProgramPass | undefined;
+    if (programPass) {
+      const stored = (await db.meta.get('trainingProgram'))?.value;
+      if (
+        badProgramPass ||
+        !isTrainingProgram(stored) ||
+        stored.id !== programPass.programId ||
+        programPass.pass > stored.passes.length
+      )
+        throw new Error('Kontrollera övningar, antal, vikt och sidor.');
+      programmePass = stored.passes[programPass.pass - 1];
+    }
     await expireStaleSessions(db, now);
     const active = await getActiveSession(db);
     if (active) {
@@ -205,7 +234,7 @@ export async function startTrainingSession(
     const session: Session = {
       id: crypto.randomUUID(),
 
-      templateId,
+      templateId: programmePass?.template ?? templateId,
       ...(customWorkout
         ? {
             customWorkoutId: customWorkout.id,
@@ -236,15 +265,18 @@ export async function startTrainingSession(
       ...(preferences.programId === 'general' && !customWorkout
         ? {
             focus:
+              programmePass?.focus ??
               options.focus?.id ??
               (preferences.bodyParts?.length
                 ? ('custom' as const)
                 : ('full' as const)),
-            ...((options.focus?.id === 'custom'
-              ? options.focus.regions
-              : !options.focus
-                ? preferences.bodyParts
-                : undefined
+            ...((programmePass
+              ? undefined
+              : options.focus?.id === 'custom'
+                ? options.focus.regions
+                : !options.focus
+                  ? preferences.bodyParts
+                  : undefined
             )?.length
               ? {
                   regions: [
@@ -271,6 +303,8 @@ export async function startTrainingSession(
       status: 'in_progress',
 
       programWeek: 1,
+
+      ...(programPass ? { programPass: { ...programPass } } : {}),
 
       plan: structuredClone(plan),
 

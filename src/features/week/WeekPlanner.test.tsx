@@ -141,9 +141,9 @@ it('routes today assignments through preview and ignores the weekly planner for 
   render(<App />);
   await screen.findByRole('heading', { name: 'Idag: Press' });
   expect(
-    screen.getByRole('link', { name: 'Visa nästa pass' }).getAttribute('href'),
+    screen.getByRole('link', { name: 'Starta passet' }).getAttribute('href'),
   ).toContain('fokus=push');
-  await user.click(screen.getByRole('link', { name: 'Visa nästa pass' }));
+  await user.click(screen.getByRole('link', { name: 'Starta passet' }));
   await screen.findByRole('heading', { name: 'Fokus: Press' });
   expect(await getDb().sessions.count()).toBe(0);
 });

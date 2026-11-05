@@ -1,5 +1,5 @@
 import { devices, expect, test } from '@playwright/test';
-import { quickStart } from './flow';
+import { endProgram, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({ ...devices['Pixel 7'], storageState: FRESH_STATE });
@@ -45,7 +45,8 @@ for (const scenario of CASES)
           await page.addStyleTag({
             content: `html{font-size:${scenario.scale}%}`,
           });
-        await page.goto('/#/');
+        // The week planner belongs to the Home of users without a programme.
+        await endProgram(page);
         await expect(
           page.getByRole('heading', { name: 'Nästa pass' }),
         ).toBeVisible();
@@ -103,7 +104,7 @@ for (const scenario of CASES)
           fullPage: true,
         });
         await expect(
-          page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+          page.getByRole('link', { name: 'Starta passet', exact: true }),
         ).toHaveAttribute('href', /#\/traning\/[AB]\?fokus=push$/);
         await page.getByRole('link', { name: 'Byt', exact: true }).click();
         await expect(page.getByRole('radio', { name: /^Press/ })).toBeChecked();

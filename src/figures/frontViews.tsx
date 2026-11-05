@@ -132,6 +132,9 @@ function frontStance(hip: Pt, aR: Pt, aL: Pt, toeDx: number): Pose {
   );
 }
 const smooth = (x: number) => x * x * (3 - 2 * x);
+/** Oblique bodyweight split squat: the wall in front of a right / left front leg. */
+const SPLIT_WALL_X_LEFT = 56;
+const SPLIT_WALL_X_RIGHT = 144;
 
 /** Floor markers of the in-and-out jump sit this far from the body's centre line. */
 export const IN_OUT_MARKER_DX = 25;
@@ -331,8 +334,9 @@ export function frontMovementPose(
   }
   if (exerciseId === 'farmer-carry') {
     const stride = Math.sin(2 * Math.PI * t);
-    const liftR = Math.max(0, stride);
-    const liftL = Math.max(0, -stride);
+    // Same cycle as the profile gait: the left foot swings first (t<0.5).
+    const liftR = Math.max(0, -stride);
+    const liftL = Math.max(0, stride);
     return skeleton(
       point(100, 46),
       point(100, 60),
@@ -358,6 +362,9 @@ export function frontMovementPose(
     const selectedAnkleStartX = 100 + side * 10;
     const selectedAnkleEndX = 100 + side * 30;
     const selectedAnkleX = mix(selectedAnkleStartX, selectedAnkleEndX, step);
+    // The stepping foot leaves the floor on its way out (and in on the return)
+    // and is planted again before the knee bends.
+    const stepLift = 9 * Math.sin(Math.PI * step);
     const otherAnkleX = 100 - side * 30;
     const hipX = mix(100, 100 + side * 18, depth);
     const hipY = mix(116, 136, depth);
@@ -371,10 +378,10 @@ export function frontMovementPose(
           selectedAnkleX + side * 2,
           depth,
         ),
-        mix(148, 153, depth),
+        mix(148, 153, depth) - stepLift * 0.5,
       ),
-      ankle: point(selectedAnkleX, 174),
-      toe: point(selectedAnkleX + side * 10, 177),
+      ankle: point(selectedAnkleX, 174 - stepLift),
+      toe: point(selectedAnkleX + side * 10, 177 - stepLift),
     };
     const otherKneeY = mix(148, 151, depth);
     const other = {
@@ -593,7 +600,7 @@ export function frontMovementPose(
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
     const kneeDX = mix(18, 31, t);
-    const ankleDX = mix(18, 27, t);
+    const ankleDX = 18; // feet stay planted; only the knees travel outward
     const kneeY = mix(148, 150, t);
     return skeleton(
       point(100, neckY - 14),
@@ -638,14 +645,20 @@ export function frontMovementPose(
   const rackX = movingRight ? 78 : 122;
   const oppositeX = movingRight ? 122 : 78;
   const lift = Math.sin(Math.PI * t);
+  const rackElbow = point(rackX + (movingRight ? 9 : -9), 88);
+  const rackHand = point(rackX, 65);
+  const hangElbow = point(oppositeX + (movingRight ? -4 : 4), 88);
+  const hangHand = point(oppositeX, 105);
   return skeleton(
     point(100, 46),
     point(100, 60),
     point(100, 104),
-    point(rackX + (movingRight ? 9 : -9), 88),
-    point(rackX, 65),
-    point(oppositeX + (movingRight ? -4 : 4), 88),
-    point(oppositeX, 105),
+    // The selected side holds the rack grip: the person's right arm is on the
+    // viewer's left, so a left selection puts the grip in the L slot.
+    movingRight ? rackElbow : hangElbow,
+    movingRight ? rackHand : hangHand,
+    movingRight ? hangElbow : rackElbow,
+    movingRight ? hangHand : rackHand,
     point(82, 137 - 7 * lift),
     point(80, 174 - 10 * lift),
     point(70, 177 - 10 * lift),
@@ -759,16 +772,16 @@ export function obliqueMovementPose(
 
   const hip: Pt = [106, 136];
   const supportAnkle: Pt = [163, 122];
-  const angle = mix(1.15, -0.42, t);
-  const kneeDir: Pt = [32, 10];
-  const kneeLen = Math.hypot(kneeDir[0], kneeDir[1]);
-  const knee: Pt = [
-    hip[0] + (29.35 * kneeDir[0]) / kneeLen,
-    hip[1] + (29.35 * kneeDir[1]) / kneeLen,
-  ];
+  // The lifting leg is one straight 58.7 long leg swinging from the hip, as in
+  // the profile view; the knee is the midpoint so thigh and shin follow the lift.
+  const angle = mix(0.6, 0, t);
   const movingAnkle: Pt = [
-    knee[0] + 29.35 * Math.cos(angle),
-    knee[1] + 29.35 * Math.sin(angle),
+    hip[0] + 58.7 * Math.cos(angle),
+    hip[1] + 58.7 * Math.sin(angle),
+  ];
+  const knee: Pt = [
+    (hip[0] + movingAnkle[0]) / 2,
+    (hip[1] + movingAnkle[1]) / 2,
   ];
   const toe = (ankle: Pt): Pt => [ankle[0] + 10, ankle[1] + 3];
   const moving = { knee, ankle: movingAnkle, toe: toe(movingAnkle) };
@@ -829,7 +842,7 @@ export function FrontFigureFrame({
   viewBox?: string;
   angle?: 'front' | 'oblique';
 }) {
-  const pose =
+  const basePose =
     angle === 'oblique'
       ? obliqueMovementPose(exerciseId as ObliqueViewExercise, phase, working)
       : frontMovementPose(exerciseId as FrontViewExercise, phase, working);
@@ -841,6 +854,58 @@ export function FrontFigureFrame({
       : equipment === undefined
         ? (figures[exerciseId].held?.kind ?? null)
         : equipment;
+  // Bodyweight split squat: both hands rest on a wall in front of the
+  // person, as in the profile view; with a weight the hands carry it instead.
+  const splitSupportX =
+    working === 'left' ? SPLIT_WALL_X_RIGHT : SPLIT_WALL_X_LEFT;
+  const splitSupported =
+    angle === 'oblique' && exerciseId === 'split-squat' && kind === null;
+  const pose: Pose = (() => {
+    if (
+      kind === 'kettlebell' &&
+      (exerciseId === 'reverse-lunge' || exerciseId === 'forward-lunge')
+    ) {
+      // Both hands share the kettlebell handle at the chest, as the variant
+      // says (goblet hold); the arm lengths stay those of the hanging arms.
+      const upper = Math.hypot(
+        basePose.eR[0] - basePose.neck[0],
+        basePose.eR[1] - basePose.neck[1],
+      );
+      const fore = Math.hypot(
+        basePose.hR[0] - basePose.eR[0],
+        basePose.hR[1] - basePose.eR[1],
+      );
+      const gripY = basePose.neck[1] + 10;
+      const armR = solveTwoBone(basePose.neck, [95, gripY], upper, fore, 1);
+      const armL = solveTwoBone(basePose.neck, [105, gripY], upper, fore, -1);
+      return {
+        ...basePose,
+        eR: armR.mid,
+        hR: armR.end,
+        eL: armL.mid,
+        hL: armL.end,
+      };
+    }
+    if (!splitSupported) return basePose;
+    const handAt = point(
+      splitSupportX + (working === 'left' ? -4 : 4),
+      basePose.neck[1] + 30,
+    );
+    const arm = solveTwoBone(
+      basePose.neck,
+      handAt,
+      31,
+      27,
+      working === 'left' ? 1 : -1,
+    );
+    return {
+      ...basePose,
+      eR: arm.mid,
+      hR: arm.end,
+      eL: arm.mid,
+      hL: arm.end,
+    };
+  })();
   const rackSide: 'R' | 'L' = working === 'left' ? 'L' : 'R';
   const heldAt: Pt[] =
     kind === null
@@ -935,6 +1000,16 @@ export function FrontFigureFrame({
         <path
           data-contact-plane="shuffle-line"
           d={`M${SHUFFLE_LINE_X} 164v15`}
+          fill="none"
+          stroke="var(--equipment)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {splitSupported ? (
+        <path
+          data-support="wall"
+          d={`M${splitSupportX} 40V176`}
           fill="none"
           stroke="var(--equipment)"
           strokeWidth="3"

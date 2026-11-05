@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link, Redirect, useLocation } from 'wouter';
 import { focusLabel } from '../../content/focusPresets';
 import { bodyRegions } from '../../content/muscles';
 import {
@@ -12,6 +12,7 @@ import {
 } from '../../content/programmes';
 import { readCustomWorkouts } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
+import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
 import {
   canReplaceTrainingPreparation,
@@ -42,12 +43,14 @@ import {
 } from '../../rules/weeklySchedule';
 import { musclesForPlan } from '../../rules/weekSuggestion';
 import { Button, buttonClass } from '../../ui/Button';
+import { ChoiceCard } from '../../ui/ChoiceCard';
+import { programPassLabel } from '../history/labels';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
+import { ProgramHome } from '../program/ProgramHome';
 import { TimeoutNotice } from '../session/TimeoutNotice';
 import { planHref, planLabel, weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule, WeeklyPlan } from '../week/WeeklyPlan';
 import { startingFocus } from './focusModel';
-import { QuickStart } from './QuickStart';
 
 const inputClass =
   'min-h-12 w-full rounded-sm border-2 border-edge bg-surface px-3 text-base text-ink';
@@ -95,38 +98,28 @@ export function TrainingSetup({
       <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
         <legend className="sr-only">Träningsinriktning</legend>
         {(Object.keys(programmeNames) as ProgramId[]).map((id) => (
-          <label
+          <ChoiceCard
             key={id}
-            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${!own && programId === id ? 'border-accent' : 'border-edge'}`}
-          >
-            <input
-              type="radio"
-              name="programId"
-              value={id}
-              checked={!own && programId === id}
-              onChange={() => {
-                setOwn(false);
-                setProgramId(id);
-              }}
-              className="size-6"
-            />
-            {programmeNames[id]}
-          </label>
+            type="radio"
+            name="programId"
+            value={id}
+            label={<span className="font-bold">{programmeNames[id]}</span>}
+            checked={!own && programId === id}
+            onChange={() => {
+              setOwn(false);
+              setProgramId(id);
+            }}
+          />
         ))}
         {current ? (
-          <label
-            className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-3 text-lg font-bold ${own ? 'border-accent' : 'border-edge'}`}
-          >
-            <input
-              type="radio"
-              name="programId"
-              value="own"
-              checked={own}
-              onChange={() => setOwn(true)}
-              className="size-6"
-            />
-            Egna pass
-          </label>
+          <ChoiceCard
+            type="radio"
+            name="programId"
+            value="own"
+            label={<span className="font-bold">Egna pass</span>}
+            checked={own}
+            onChange={() => setOwn(true)}
+          />
         ) : null}
       </fieldset>
       {own ? (
@@ -307,9 +300,16 @@ export function TrainingHome() {
     const savedWorkouts = readCustomWorkouts(
       await getMeta(getDb(), 'customWorkouts'),
     );
+    // Only a general programme reads the programme; rehab never loads it.
+    const program =
+      isTrainingPreferences(preferences) && preferences.programId === 'general'
+        ? await readTrainingProgram(getDb())
+        : null;
     return {
       schedule: await loadWeeklySchedule(),
       preferences,
+      program,
+      logs: program ? await getDb().setLogs.toArray() : [],
       sessions,
       preparationId,
       savedWorkouts,
@@ -335,7 +335,7 @@ export function TrainingHome() {
   const due = data.sessions.filter((session) =>
     trainingDayAfterDue(session, toLocalDate(new Date())),
   );
-  if (!preferences && !editing) return <QuickStart />;
+  if (!preferences && !editing) return <Redirect to="/kom-igang" />;
   if (editing)
     return (
       <div className="mx-auto max-w-md px-5 pt-5 pb-[var(--app-nav-clear)]">
@@ -360,6 +360,20 @@ export function TrainingHome() {
           (preferences?.rehabFocus ?? 'custom')) &&
       session.status !== 'in_progress',
   );
+  if (data.program && preferences?.programId === 'general')
+    return (
+      <ProgramHome
+        preferences={preferences}
+        program={data.program}
+        sessions={data.sessions}
+        logs={data.logs}
+        active={active}
+        prepared={prepared}
+        due={due}
+        recent={recent}
+        onChangeDirection={() => setEditing(true)}
+      />
+    );
   // Custom workouts count in the weekly plan but never move the A/B sequence.
   const nextId = nextTemplateId(recent, preferences?.programId);
   const availability = preferences ? focusAvailable(preferences) : undefined;
@@ -480,7 +494,9 @@ export function TrainingHome() {
           ? 'Fortsätt förberedelsen'
           : active
             ? 'Fortsätt passet'
-            : 'Visa nästa pass'}
+            : preferences.programId === 'rehab'
+              ? 'Visa nästa pass'
+              : 'Starta passet'}
       </Link>
       {!active && !todayPlan && nextDate && nextPlan ? (
         <p className="m-0 -mt-3 text-base text-ink-soft">
@@ -587,7 +603,8 @@ export function TrainingHome() {
               {session.date} ·{' '}
               {session.customWorkoutId
                 ? (session.customWorkoutName ?? 'Eget pass')
-                : `${session.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${session.templateId}`}{' '}
+                : (programPassLabel(session) ??
+                  `${session.workoutMode === 'short' ? 'Kortpass' : 'Pass'} ${session.templateId}`)}{' '}
               · {session.status === 'completed' ? 'klart' : 'avbrutet'}
             </Link>
           ))}

@@ -11,6 +11,7 @@ import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
 import { inventorySummary } from '../../rules/equipment';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { CustomPicker } from './CustomPicker';
 
@@ -34,7 +35,7 @@ export function NewWorkout() {
         <h1 className="m-0 text-5xl font-extrabold">Skapa eget pass</h1>
         <Link
           href="/"
-          className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+          className={`flex min-h-12 items-center text-base ${linkClass}`}
         >
           Välj träningsinriktning först
         </Link>
@@ -73,7 +74,7 @@ export function NewWorkout() {
       <p className="m-0 text-base text-ink-soft">{summary}</p>
       <Link
         href="/installningar/utrustning?tillbaka=nytt-pass"
-        className="flex min-h-12 items-center self-start text-base font-bold text-accent underline underline-offset-4"
+        className={`flex min-h-12 items-center self-start text-base ${linkClass}`}
       >
         Ändra utrustning
       </Link>

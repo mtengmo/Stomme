@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -50,6 +51,7 @@ for (const width of [360, 1280]) {
     ).toHaveAttribute('aria-pressed', 'false');
     await second.getByRole('button', { name: /^Välj: / }).click();
     await first.getByRole('button', { name: /^Välj: / }).click();
+    await openLibraryFilters(page);
     await page.getByLabel('Sök övning').fill('E39');
     const bar = page.getByRole('region', { name: 'Valda övningar' });
     await expect(page.getByRole('status')).toContainText('2 av 12 övningar');
@@ -95,7 +97,7 @@ for (const width of [360, 1280]) {
     await expect(page.getByLabel('Set', { exact: true })).toHaveValue('1');
     await expect(page.getByLabel('Meter per sida')).toHaveValue('12');
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
     await expect(

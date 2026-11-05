@@ -22,6 +22,7 @@ import {
 } from '../../rules/weeklySchedule';
 import { Banner } from '../../ui/Banner';
 import { Button } from '../../ui/Button';
+import { linkClass } from '../../ui/link';
 
 /** Persists only a user's preferred days and an explicit one-date move. */
 export async function saveWeeklySchedule(
@@ -176,7 +177,9 @@ export function WeeklyPlan({
       ) : null}
       {stored !== undefined && (
         <details className="border-t-2 border-edge pt-2">
-          <summary className="flex min-h-12 cursor-pointer items-center font-bold text-accent underline underline-offset-4">
+          <summary
+            className={`flex min-h-12 cursor-pointer items-center ${linkClass}`}
+          >
             {schedule ? 'Ändra veckoplan' : 'Veckoplanering'}
           </summary>
           <div className="space-y-4 pt-3">
@@ -219,7 +222,7 @@ export function WeeklyPlan({
                       type="button"
                       onClick={() => void resetMove()}
                       disabled={busy}
-                      className="min-h-12 px-2 text-base font-bold text-accent underline underline-offset-4 disabled:opacity-50"
+                      className={`min-h-12 px-2 text-base ${linkClass} disabled:opacity-50`}
                     >
                       Återställ flytt
                     </button>

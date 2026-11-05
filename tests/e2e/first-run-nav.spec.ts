@@ -19,29 +19,39 @@ async function accept(page: import('@playwright/test').Page) {
   ).toBeVisible();
 }
 
-test('after onboarding the first-use screen shows the three nav items', {
+test('the first-use setup hides the nav; it shows once the programme is saved', {
   tag: '@smoke',
 }, async ({ page }) => {
   await accept(page);
   const nav = page.getByRole('navigation', { name: 'Huvudmeny' });
+  await expect(page).toHaveURL(/#\/kom-igang$/);
+  await expect(nav).toHaveCount(0);
+  await quickStart(page, { goal: 'general', finish: false });
+  await expect(nav).toHaveCount(0);
+  await page.getByRole('button', { name: 'Visa mitt program' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Ditt program' }),
+  ).toBeVisible();
   for (const name of ['Träning', 'Historik', 'Inställningar'])
     await expect(nav.getByRole('link', { name })).toBeVisible();
 });
 
-test('Inställningar is one tap from a fresh start (after accepting)', async ({
+test('Inställningar is one tap from a fresh start through the import link', async ({
   page,
 }) => {
   await accept(page);
-  await page.getByRole('link', { name: 'Inställningar' }).click();
+  await page
+    .getByRole('link', { name: 'Har du en säkerhetskopia? Importera' })
+    .click();
   await expect(
-    page.getByRole('heading', { name: 'Inställningar' }),
+    page.getByRole('heading', { name: 'Säkerhetskopia' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('link', { name: /^Säkerhetskopia/ }),
+    page.getByRole('navigation', { name: 'Huvudmeny' }),
   ).toBeVisible();
 });
 
-test('nav tabs are keyboard reachable and the answers survive leaving', async ({
+test('the answers survive leaving the setup and coming back', async ({
   page,
 }) => {
   await accept(page);
@@ -50,12 +60,7 @@ test('nav tabs are keyboard reachable and the answers survive leaving', async ({
     onEquipment: (p) => addWeight(p, { type: 'dumbbell', count: 2, kg: 5 }),
     finish: 'equipment',
   });
-  const tab = page.getByRole('link', { name: 'Historik' });
-  await tab.focus();
-  await expect(tab).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: 'Inställningar' })).toBeFocused();
-  await page.keyboard.press('Enter');
+  await page.goto('/#/installningar');
   await expect(
     page.getByRole('heading', { name: 'Inställningar' }),
   ).toBeVisible();
@@ -71,7 +76,7 @@ test('workout preview shows the nav above the start bar; the session hides it', 
   await expect(page.getByRole('heading', { name: 'Pass A' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: 'Huvudmeny' });
   await expect(nav).toBeVisible();
-  const start = page.getByRole('button', { name: 'Börja passet' });
+  const start = page.getByRole('button', { name: 'Starta passet' });
   await expect(start).toBeVisible();
   const [n, s] = await Promise.all([nav.boundingBox(), start.boundingBox()]);
   expect(s && n && s.y + s.height <= n.y).toBe(true);
@@ -102,7 +107,7 @@ test('preview edits survive leaving via the nav; starting clears them', async ({
   await expect(page.getByLabel('Set', { exact: true }).first()).toHaveValue(
     '4',
   );
-  await page.getByRole('button', { name: 'Börja passet' }).click();
+  await page.getByRole('button', { name: 'Starta passet' }).click();
   await page.waitForURL(/#\/session\//);
   const stored = await page.evaluate(() =>
     Object.keys(sessionStorage).filter((k) =>
@@ -122,7 +127,7 @@ test('picks and filters in the pick step survive leaving and coming back', async
     .first()
     .click();
   await expect(page.getByRole('status')).toContainText('1 av 12 övningar');
-  await page.getByRole('link', { name: 'Inställningar' }).click();
+  await page.goto('/#/installningar');
   await page.getByRole('link', { name: 'Träning' }).click();
   await expect(
     page.getByRole('heading', { name: 'Välj dina övningar' }),

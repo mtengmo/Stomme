@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { completeSets, keepFirstExercises, quickStart } from './flow';
+import {
+  completeSets,
+  endProgram,
+  keepFirstExercises,
+  quickStart,
+} from './flow';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -27,7 +32,7 @@ for (const width of [360, 1280]) {
     });
     // Ordinary training starts directly, with no question first.
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
     await expect(
@@ -37,7 +42,8 @@ for (const width of [360, 1280]) {
     await page.screenshot({
       path: test.info().outputPath('preparation-context.png'),
     });
-    await page.goto('/#/');
+    // The pass A/B switch and the direction form belong to the Home of users without a programme.
+    await endProgram(page);
     await expect(
       page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
     ).toBeVisible();
@@ -49,7 +55,7 @@ for (const width of [360, 1280]) {
       .getByRole('link', { name: 'Visa pass B i stället', exact: true })
       .click();
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(
       page.getByRole('button', { name: 'Klar set', exact: true }),
@@ -104,10 +110,10 @@ for (const width of [360, 1280]) {
       ),
     ).toBe(0);
     await page
-      .getByRole('link', { name: 'Visa nästa pass', exact: true })
+      .getByRole('link', { name: 'Starta passet', exact: true })
       .click();
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(
       page.getByRole('button', { name: 'Klar set', exact: true }),
@@ -172,7 +178,9 @@ test('a removed exercise can be restored and a regular session ends without an a
   await expect(rows).toHaveCount(count);
   await keepFirstExercises(page);
   await page.getByLabel('Set', { exact: true }).fill('1');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await completeSets(page);
   await page.getByRole('button', { name: 'Lagom', exact: true }).click();
   await expect(page.getByRole('heading', { name: /klart/ })).toBeVisible();

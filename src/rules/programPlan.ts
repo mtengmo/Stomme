@@ -1,0 +1,170 @@
+import type { RoutineFocus } from '../content/focusPresets';
+import type {
+  ExerciseId,
+  ProgramEmphasis,
+  ProgramPass,
+  TemplateId,
+  TrainingPreferences,
+  TrainingProgram,
+} from '../domain/types';
+import { addDays, weekdayIndex } from '../lib/dates';
+import { buildRoster, MIN_PASS_EXERCISES } from './programRosters';
+
+export type DaysPerWeek = TrainingProgram['daysPerWeek'];
+
+interface PassSpec {
+  focus: RoutineFocus;
+  template: TemplateId;
+}
+const spec = (focus: RoutineFocus, template: TemplateId = 'A'): PassSpec => ({
+  focus,
+  template,
+});
+const full = (template: TemplateId) => spec('full', template);
+
+/** Day offsets from the start date; same gaps as the weekSuggestion templates. */
+const offsets: Record<DaysPerWeek, readonly number[]> = {
+  1: [0],
+  2: [0, 3],
+  3: [0, 2, 4],
+  4: [0, 1, 3, 4],
+  5: [0, 1, 2, 4, 5],
+};
+
+/**
+ * Plan table: emphasis x days per week. "Underkropp" is the `lower` preset,
+ * "Helkropp" is `full`. Adjacent offsets never share a primary muscle but core,
+ * and the running row has at most two leg passes.
+ */
+export const programFocusPlan: Record<
+  ProgramEmphasis,
+  Record<DaysPerWeek, readonly PassSpec[]>
+> = {
+  full: {
+    1: [full('A')],
+    2: [full('A'), full('B')],
+    3: [full('A'), full('B'), full('A')],
+    4: [
+      spec('upper', 'A'),
+      spec('lower', 'A'),
+      spec('upper', 'B'),
+      spec('lower', 'B'),
+    ],
+    5: [spec('push'), spec('pull'), spec('legs'), spec('upper'), spec('lower')],
+  },
+  run: {
+    1: [full('A')],
+    2: [spec('lower', 'A'), full('B')],
+    3: [spec('lower', 'A'), spec('upper', 'A'), spec('lower', 'B')],
+    4: [
+      spec('lower', 'A'),
+      spec('upper', 'A'),
+      spec('lower', 'B'),
+      spec('upper', 'B'),
+    ],
+    5: [
+      spec('lower', 'A'),
+      spec('push'),
+      spec('pull'),
+      spec('lower', 'B'),
+      spec('upper'),
+    ],
+  },
+  upper: {
+    1: [full('A')],
+    2: [spec('upper', 'A'), full('B')],
+    3: [spec('upper', 'A'), spec('lower', 'A'), spec('upper', 'B')],
+    4: [spec('push'), spec('pull'), spec('lower', 'A'), spec('upper', 'A')],
+    5: [spec('push'), spec('pull'), spec('legs'), spec('upper'), spec('lower')],
+  },
+};
+
+/** ISO weekday (1 = Monday) per pass, with pass 1 on the start date. */
+export function weekdaysFor(
+  startDate: string,
+  daysPerWeek: DaysPerWeek,
+): number[] {
+  return offsets[daysPerWeek].map(
+    (o) => weekdayIndex(addDays(startDate, o)) + 1,
+  );
+}
+
+/** Reserve 1: alternate upper and lower body, upper first at five days. */
+function upperLowerRow(daysPerWeek: DaysPerWeek): PassSpec[] {
+  const firstUpper = daysPerWeek === 5;
+  const seen: Record<string, number> = {};
+  return offsets[daysPerWeek].map((_, i) => {
+    const focus: RoutineFocus =
+      (i % 2 === 0) === firstUpper ? 'upper' : 'lower';
+    const n = seen[focus] ?? 0;
+    seen[focus] = n + 1;
+    return spec(focus, n % 2 === 0 ? 'A' : 'B');
+  });
+}
+
+/** Reserve 2: whole body, A and B in turn. */
+function wholeBodyRow(daysPerWeek: DaysPerWeek): PassSpec[] {
+  return offsets[daysPerWeek].map((_, i) => full(i % 2 === 0 ? 'A' : 'B'));
+}
+
+function rosterRow(
+  row: readonly PassSpec[],
+  preferences: TrainingPreferences,
+  pool: ReadonlySet<ExerciseId> | undefined,
+): ProgramPass[] | null {
+  const passes: ProgramPass[] = [];
+  for (const { focus, template } of row) {
+    const { ids } = buildRoster(preferences, template, {
+      focus: { id: focus },
+      ...(pool ? { pool } : {}),
+    });
+    if (ids.length < MIN_PASS_EXERCISES) return null;
+    passes.push({ focus, template, exerciseIds: ids });
+  }
+  return passes;
+}
+
+export interface BuildProgramInput {
+  preferences: TrainingPreferences;
+  daysPerWeek: DaysPerWeek;
+  emphasis: ProgramEmphasis;
+  /** Local date of pass 1. */
+  startDate: string;
+  /** ISO instant. */
+  now: string;
+  id: string;
+  block?: number;
+  /** Candidate pool; block 1 passes the beginner set. Absent: the whole library. */
+  pool?: ReadonlySet<ExerciseId>;
+}
+
+/**
+ * A fixed programme, or null for rehab and when no row gives every pass at
+ * least four exercises. Reserve chain (plan rule 4): the table, then upper and
+ * lower body in turn, then whole body A/B in turn.
+ */
+export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
+  const { preferences, daysPerWeek, emphasis, pool } = input;
+  if (preferences.programId === 'rehab') return null;
+  const rows = [
+    programFocusPlan[emphasis][daysPerWeek],
+    upperLowerRow(daysPerWeek),
+    wholeBodyRow(daysPerWeek),
+  ];
+  for (const row of rows) {
+    const passes = rosterRow(row, preferences, pool);
+    if (passes)
+      return {
+        id: input.id,
+        block: input.block ?? 1,
+        createdAt: input.now,
+        startDate: input.startDate,
+        daysPerWeek,
+        emphasis,
+        weekdays: weekdaysFor(input.startDate, daysPerWeek),
+        passes,
+        curated: pool !== undefined,
+      };
+  }
+  return null;
+}

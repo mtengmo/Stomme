@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 // Covers onboarding or training setup, so it starts from a first visit.
@@ -24,6 +25,7 @@ for (const { width, scheme } of cases) {
     });
     // Save one own workout from the library.
     await page.goto('/#/ovningar');
+    await openLibraryFilters(page);
     await page.getByLabel('Sök övning').fill('E39');
     await page
       .getByRole('button', { name: /^Välj: / })
@@ -38,13 +40,15 @@ for (const { width, scheme } of cases) {
     // Open a standard pass and make a preparation without starting it.
     await page.goto('/#/traning/A');
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
 
     await page.goto('/#/');
+    // The programme Home (users with a programme) keeps the list reachable too.
+    await expect(page.getByRole('heading', { name: /^Vecka 1/ })).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Förbered ditt pass', exact: true }),
+      page.getByRole('link', { name: 'Fortsätt förberedelsen', exact: true }),
     ).toBeVisible();
     const list = page.getByRole('region', { name: 'Mina pass' });
     await expect(list).toBeVisible();
@@ -65,7 +69,7 @@ for (const { width, scheme } of cases) {
     await list.getByRole('link').first().click();
     await expect(page).toHaveURL(/#\/traning\/A\?workout=/);
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await expect(page).toHaveURL(/#\/session\//);
 

@@ -86,7 +86,9 @@ test('a single 16 kg kettlebell floor press survives planning, reload and loggin
   ).toHaveValue('4');
   await page.getByRole('spinbutton', { name: /^Total vikt \(kg\)/ }).fill('16');
   await page.getByLabel('Set', { exact: true }).fill('1');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await expect(page).toHaveURL(/#\/session\//);
   await page.reload();
   await expect(page.getByText(/1 × 16 kg/).first()).toBeVisible();

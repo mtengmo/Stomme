@@ -122,7 +122,7 @@ describe('catalogue equipment and contacts', () => {
           />,
         );
         expect(markup).toContain('data-grip="rack"');
-        expect(markup).toContain('rotate(-55 108 78)');
+        expect(markup).toContain('rotate(-55 110 82)');
         expect(markup.indexOf('data-grip="rack"')).toBeLessThan(
           markup.indexOf('data-body-side="near"'),
         );

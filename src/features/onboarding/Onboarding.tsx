@@ -39,26 +39,19 @@ export function Onboarding() {
         Välkommen till Stomme
       </h1>
       <p className="m-0 text-xl">
-        Färdiga pass för styrka och knäträning. Välj ett fokus så hjälper vi dig
-        att komma igång.
-      </p>
-      <p className="m-0 text-base text-ink-soft">
-        Stomme är ett träningsstöd. Vid skada eller efter operation: stäm av
-        övningarna med din fysioterapeut.
+        Korta styrkepass hemma, anpassade efter din utrustning.
       </p>
       <p className="m-0 text-lg font-bold">
-        Avbryt vid skarp smärta, svullnad eller om knät låser sig.
+        Avbryt vid skarp smärta, svullnad eller om en led låser sig.
       </p>
       <div className="flex flex-col">
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
-            Så läser du antal
+            Om Stomme och säkerhet
           </summary>
-          <p className="m-0 pb-2 text-base">
-            Ett set är en omgång. 3 × 10 betyder tre omgångar med tio
-            repetitioner. Per sida betyder att du gör antalet för varje vald
-            sida.
-          </p>
+          <div className="flex flex-col gap-3 pb-2">
+            <DisclaimerText className="m-0 text-base" />
+          </div>
         </details>
         <details>
           <summary className="min-h-12 cursor-pointer py-3 text-base font-bold">
@@ -66,8 +59,8 @@ export function Onboarding() {
           </summary>
           <PrivacyNotice />
           <p className="mt-3 mb-0 text-base">
-            Har du en säkerhetskopia från förut? När du gått vidare importerar
-            du den under Inställningar.
+            Har du en säkerhetskopia från förut? Du kan importera den på nästa
+            skärm.
           </p>
         </details>
         <details>

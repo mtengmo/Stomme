@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
@@ -29,15 +29,29 @@ describe('onboarding gating', () => {
       await screen.findByRole('heading', { name: /Välkommen till Stomme/ }),
     ).toBeTruthy();
     expect(screen.queryByRole('navigation')).toBeNull();
+    expect(
+      screen.getByText(
+        'Korta styrkepass hemma, anpassade efter din utrustning.',
+      ),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Avbryt vid skarp smärta, svullnad eller om en led låser sig.',
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByText('Så läser du antal')).toBeNull();
+    const about = screen
+      .getByText('Om Stomme och säkerhet')
+      .closest('details') as HTMLDetailsElement;
+    expect(about.open).toBe(false);
+    expect(about.textContent).toMatch(/träningsstöd, inte sjukvård/);
     await userEvent.click(screen.getByRole('button', { name: /Jag förstår/ }));
     expect(
       await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
     ).toBeTruthy();
-    expect(
-      within(screen.getByRole('navigation', { name: 'Huvudmeny' }))
-        .getAllByRole('link')
-        .map((l) => l.textContent),
-    ).toEqual(['Träning', 'Historik', 'Inställningar']);
+    // The first-use setup hides the nav; the importing link replaces it.
+    expect(screen.queryByRole('navigation', { name: 'Huvudmeny' })).toBeNull();
+    expect(window.location.hash).toBe('#/kom-igang');
     const stored = await getMeta<{ acceptedAt: string }>(getDb(), 'onboarding');
     expect(stored?.acceptedAt).toBeTruthy();
   });
@@ -48,11 +62,9 @@ describe('onboarding gating', () => {
     expect(
       await screen.findByRole('heading', { name: 'Vad vill du träna?' }),
     ).toBeTruthy();
-    expect(
-      within(screen.getByRole('navigation', { name: 'Huvudmeny' }))
-        .getAllByRole('link')
-        .map((l) => l.textContent),
-    ).toEqual(['Träning', 'Historik', 'Inställningar']);
+    // The first-use setup hides the nav; the importing link replaces it.
+    expect(screen.queryByRole('navigation', { name: 'Huvudmeny' })).toBeNull();
+    expect(window.location.hash).toBe('#/kom-igang');
     expect(screen.queryByText(/Välkommen till Stomme/)).toBeNull();
     expect(screen.queryByRole('heading', { name: /Vecka/ })).toBeNull();
   });

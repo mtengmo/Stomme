@@ -36,7 +36,7 @@ describe('appearance is a device preference, not data', () => {
   it('a backup never contains the appearance and its uses the current schema', async () => {
     setAppearance({ scheme: 'dark' });
     const backup = await exportAll(db, new Date('2026-10-20T10:00:00Z'));
-    expect(BACKUP_SCHEMA_VERSION).toBe(4);
+    expect(BACKUP_SCHEMA_VERSION).toBe(5);
     expect(Object.keys(backup).sort()).toEqual([
       'exportedAt',
       'meta',

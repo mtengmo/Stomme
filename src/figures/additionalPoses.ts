@@ -1,3 +1,4 @@
+import { farmerCarryPose, rackCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
@@ -407,28 +408,10 @@ export const additionalFigures = {
     held: oneBell,
   },
   'kettlebell-rack-carry': {
-    start: {
-      ...stand,
-      eR: [105, 103],
-      hR: [108, 78],
-      kR: [111, 149],
-      aR: [120, 174],
-      tR: [132, 177],
-      kL: [84, 148],
-      aL: [77, 174],
-      tL: [89, 177],
-    },
-    end: {
-      ...stand,
-      eR: [105, 103],
-      hR: [108, 78],
-      kR: [88, 148],
-      aR: [79, 174],
-      tR: [91, 177],
-      kL: [110, 149],
-      aL: [119, 174],
-      tL: [131, 177],
-    },
+    // One whole two-step cycle per loop: stance foot planted, swing foot lifts.
+    start: rackCarryPose(0),
+    end: rackCarryPose(0.5),
+    motion: 'sequence',
     props: [],
     held: oneBell,
   },
@@ -548,32 +531,10 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   'farmer-carry': {
-    start: {
-      ...stand,
-      eR: [110, 97],
-      hR: [113, 122],
-      eL: [85, 97],
-      hL: [82, 122],
-      kR: [111, 149],
-      aR: [120, 174],
-      tR: [132, 177],
-      kL: [84, 148],
-      aL: [77, 174],
-      tL: [89, 177],
-    },
-    end: {
-      ...stand,
-      eR: [110, 97],
-      hR: [113, 122],
-      eL: [85, 97],
-      hL: [82, 122],
-      kR: [88, 148],
-      aR: [79, 174],
-      tR: [91, 177],
-      kL: [110, 149],
-      aL: [119, 174],
-      tL: [131, 177],
-    },
+    // One whole two-step cycle per loop: stance foot planted, swing foot lifts.
+    start: farmerCarryPose(0),
+    end: farmerCarryPose(0.5),
+    motion: 'sequence',
     props: [],
     held: twoDumbbells,
   },
@@ -674,26 +635,29 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'overhead-triceps-extension': {
+    // Upper arms stay fixed next to the head (elbows above the shoulders). The
+    // forearm swings from lowered behind the head (start) up to a straight arm
+    // with the weight overhead (end), so each rep shows the elbow bend.
     start: {
       ...stand,
-      eR: [124, 52],
-      hR: [136, 74],
-      eL: [125, 51],
-      hL: [136, 74],
+      eR: [104, 44],
+      hR: [81, 63],
+      eL: [104, 44],
+      hL: [81, 63],
     },
     middle: {
       ...stand,
-      eR: [124, 52],
-      hR: [152, 41],
-      eL: [125, 51],
-      hL: [152, 41],
+      eR: [104, 44],
+      hR: [84, 23],
+      eL: [104, 44],
+      hL: [84, 23],
     },
     end: {
       ...stand,
-      eR: [124, 52],
-      hR: [150, 30],
-      eL: [125, 51],
-      hL: [150, 30],
+      eR: [104, 44],
+      hR: [109.7, 15.5],
+      eL: [104, 44],
+      hL: [109.7, 15.5],
     },
     props: [],
     // Hands meet at one logical point so the shared dumbbell renders once.
@@ -821,6 +785,8 @@ export const additionalFigures = {
       head: [101, 62],
       neck: [99, 76],
       kR: [105, 148],
+      // Start-side foot flat; it then pivots on the ball of the foot (heel
+      // turns up, segment lengths kept) and the knee follows the chop.
       kL: [91, 148],
       eR: [100, 100],
       hR: [104, 124],
@@ -829,6 +795,9 @@ export const additionalFigures = {
     },
     middle: {
       ...stand,
+      kR: [110.1, 146.1],
+      aR: [108.6, 172.4],
+      tR: [119, 177],
       eR: [120, 76],
       hR: [142, 76],
       eL: [120, 76],
@@ -837,6 +806,9 @@ export const additionalFigures = {
     end: {
       ...stand,
       head: [97, 60],
+      kR: [113.2, 144.6],
+      aR: [109.5, 170.6],
+      tR: [119, 177],
       eR: [106, 50],
       hR: [112, 28],
       eL: [106, 50],
@@ -1181,10 +1153,10 @@ export const additionalFigures = {
       [54, 170],
       [99, 171],
       [
-        [77, 151],
-        [102, 145],
-        [73, 149],
-        [99, 143],
+        [82, 159.7],
+        [107.6, 160.3],
+        [81.6, 158.7],
+        [107.1, 161.6],
       ],
       [
         [112, 139],
@@ -1200,10 +1172,10 @@ export const additionalFigures = {
       [54, 170],
       [99, 171],
       [
-        [78, 150],
-        [101, 142],
-        [73, 148],
-        [98, 140],
+        [80.5, 156.4],
+        [105.9, 160.2],
+        [80.4, 156.2],
+        [105.6, 161.5],
       ],
       [
         [107, 140],

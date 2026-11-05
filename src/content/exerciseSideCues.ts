@@ -70,7 +70,10 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     explanation: `Det ${sideAdjective(side)} benet står fram och böjs under rörelsen.`,
   }),
   'single-leg-hip-thrust': bridgeFoot,
-  'single-leg-calf-raise': plantedFoot,
+  'single-leg-calf-raise': (side) => ({
+    label: `Stå på ${sideWord(side)} ben`,
+    explanation: `Stå på det ${sideAdjective(side)} benet och lyft hälen på det benet; håll den andra foten lyft från golvet.`,
+  }),
   'suitcase-carry': (side) => ({
     label: `Vikt i ${sideWord(side)} hand`,
     explanation: `Håll vikten i ${sideWord(side)} hand och gå upprätt.`,
@@ -152,7 +155,10 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     explanation: `Det ${sideAdjective(side)} knäet är i golvet och höftböjaren på den sidan sträcks.`,
   }),
   'balance-pendulum': plantedFoot,
-  'single-leg-chair-squat': plantedFoot,
+  'single-leg-chair-squat': (side) => ({
+    label: `Stå på ${sideWord(side)} ben`,
+    explanation: `Det ${sideAdjective(side)} stödbenet böjs och sträcks när du sänker dig mot stolen och reser dig; det ${otherAdjective(side)} benet hålls lyft och hjälper inte till.`,
+  }),
   'single-leg-floor-bridge': bridgeFoot,
   'quad-set': (side) => ({
     label: `${sideWord(side)} lår spänns`,

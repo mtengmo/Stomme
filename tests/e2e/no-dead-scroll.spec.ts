@@ -3,6 +3,7 @@ import { exerciseReferences } from '../../src/content/exerciseReferences';
 import { exerciseList } from '../../src/content/exercises';
 import {
   addExercise,
+  endProgram,
   freezeClock,
   openPreview,
   playPassA,
@@ -99,8 +100,11 @@ for (const scheme of SCHEMES)
         await expect(
           page.getByRole('radio', { name: /Viss vana/ }),
         ).toBeVisible();
-        await expect(next).toBeInViewport({ ratio: 1 });
-        await expectNavClearance(page, 'setup level');
+        await expect(
+          page.getByRole('button', { name: 'Visa mitt program' }),
+        ).toBeInViewport({ ratio: 1 });
+        // The setup hides the nav: the bar sits at the bottom edge.
+        if (scale === 100) await expectNoScroll(page, 'setup level');
       });
 
       test('Home focus row and next-pass action stay in view', async ({
@@ -109,7 +113,8 @@ for (const scheme of SCHEMES)
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
-        await page.goto('/#/');
+        // The focus row is on the Home of users without a programme.
+        await endProgram(page);
         await expect(
           page.getByRole('heading', { name: /pass/i }).first(),
         ).toBeVisible();
@@ -119,9 +124,72 @@ for (const scheme of SCHEMES)
           page.getByRole('link', { name: 'Byt', exact: true }),
         ).toBeInViewport({ ratio: 1 });
         await expect(
-          page.getByRole('link', { name: 'Visa nästa pass' }),
+          page.getByRole('link', { name: 'Starta passet' }),
         ).toBeInViewport({ ratio: 1 });
         await expectNavClearance(page, 'home');
+      });
+
+      test('/kom-igang first screen keeps its action in view', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await setScale(page, scale);
+        await expect(page).toHaveURL(/#\/kom-igang/);
+        await expect(
+          page.getByRole('button', { name: 'Bli starkare', exact: true }),
+        ).toBeVisible();
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+        // Onboarding hides the main navigation.
+        await expect(
+          page.getByRole('navigation', { name: 'Huvudmeny' }),
+        ).toHaveCount(0);
+      });
+
+      test('/program reveal keeps the start action in view', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general', reveal: true });
+        await setScale(page, scale);
+        await expect(page.getByText('Vecka 1 av 4')).toBeVisible();
+        await expect(
+          page
+            .getByRole('button', { name: 'Starta första passet' })
+            .or(page.getByRole('link', { name: 'Starta första passet' })),
+        ).toBeInViewport({ ratio: 1 });
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+      });
+
+      test('programme Home keeps the next-pass action in view above navigation', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: /Jag förstår/ }).click();
+        await quickStart(page, { goal: 'general', reveal: true });
+        await page.goto('/#/');
+        await setScale(page, scale);
+        await expect(
+          page.getByRole('heading', { name: /^Vecka 1/ }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole('link', { name: 'Starta passet', exact: true }),
+        ).toBeInViewport({ ratio: 1 });
+        await expectNavClearance(page, 'programme home');
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
       });
 
       test('/fokus keeps the primary action visible above navigation', async ({
@@ -130,6 +198,7 @@ for (const scheme of SCHEMES)
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
+        await endProgram(page);
         await page.goto('/#/fokus');
         await setScale(page, scale);
         await expect(
@@ -151,6 +220,7 @@ for (const scheme of SCHEMES)
         await page.goto('/');
         await page.getByRole('button', { name: /Jag förstår/ }).click();
         await quickStart(page, { goal: 'general' });
+        await endProgram(page);
         await page.goto('/#/vecka');
         await setScale(page, scale);
         await expect(
@@ -316,7 +386,7 @@ for (const size of INNER_SIZES) {
       );
       await openPreview(page);
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       const start = page.getByRole('button', {
         name: 'Starta – 5 s förberedelse',
@@ -359,7 +429,7 @@ for (const size of INNER_SIZES) {
       await removeAllExercises(page);
       await addExercise(page, 'split-squat');
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       await setScale(page, scale);
       await expect(page.getByText(/Höger ben fram/).first()).toBeVisible();
@@ -381,7 +451,7 @@ for (const size of INNER_SIZES) {
 // and nothing in the middle part scrolls.
 const REPRESENTATIVE = [
   'Sittande knästräckning med gummiband',
-  'Sitta ner och resa sig från stol (goblet)',
+  'Sitta ner och resa sig från stol',
   'Enbens bäckenlyft med ryggstöd',
   'Copenhagen-håll med knästöd',
   'Statisk tåhävning med böjt knä',
@@ -450,7 +520,7 @@ for (const size of [
                 })
                 .click();
               await page
-                .getByRole('button', { name: 'Börja passet', exact: true })
+                .getByRole('button', { name: 'Starta passet', exact: true })
                 .click();
               await expect(page.locator('.session-content h1')).toHaveText(
                 name,

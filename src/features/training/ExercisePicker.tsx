@@ -7,7 +7,6 @@ import {
   purposeLabels,
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
-import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
@@ -28,6 +27,7 @@ import {
   filterExercises,
 } from '../../rules/libraryFilters';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import { ExerciseFilterControls } from '../exercise/ExerciseFilterControls';
 
 interface PickerState {
@@ -220,15 +220,12 @@ export function ExercisePicker({
         <div className="min-w-0">
           <div className="flex min-h-12 items-center justify-between gap-2">
             <h3 className="m-0 min-w-0 flex-1 break-words text-lg font-bold leading-snug">
-              <span className="mr-2 text-ink-soft">
-                {exerciseReferences[exercise.id]}
-              </span>
               {exercise.name}
             </h3>
             <Link
               href={`/ovning/${exercise.id}`}
               aria-label={`Visa instruktion: ${exercise.name}`}
-              className="inline-flex min-h-12 shrink-0 items-center gap-1 text-base font-bold text-accent underline underline-offset-4"
+              className={`inline-flex min-h-12 shrink-0 items-center gap-1 text-base ${linkClass}`}
             >
               Guide <Icon name="back" size={18} className="rotate-180" />
             </Link>
@@ -309,7 +306,7 @@ export function ExercisePicker({
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-12 px-2 text-base font-bold text-accent underline underline-offset-4"
+          className={`min-h-12 px-2 text-base ${linkClass}`}
         >
           Avbryt
         </button>
@@ -335,7 +332,7 @@ export function ExercisePicker({
               <button
                 type="button"
                 onClick={() => updateState({ broadened: true })}
-                className="min-h-12 font-bold text-accent underline underline-offset-4"
+                className={`min-h-12 ${linkClass}`}
               >
                 Visa alla övningar
               </button>
@@ -349,7 +346,7 @@ export function ExercisePicker({
               <button
                 type="button"
                 onClick={() => updateState({ broadened: false })}
-                className="min-h-12 font-bold text-accent underline underline-offset-4"
+                className={`min-h-12 ${linkClass}`}
               >
                 Visa granskade alternativ
               </button>

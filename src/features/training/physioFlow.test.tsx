@@ -20,16 +20,23 @@ beforeEach(async () => {
 });
 afterEach(cleanup);
 
+/** Goal screen: "Knä- eller rehabprogram", then one of the three programmes. */
+async function chooseRehab(
+  user: ReturnType<typeof userEvent.setup>,
+  name: string,
+) {
+  await user.click(
+    await screen.findByRole('button', { name: 'Knä- eller rehabprogram' }),
+  );
+  await user.click(screen.getByRole('button', { name }));
+}
+
 async function openPhysio(
   user: ReturnType<typeof userEvent.setup>,
   band = true,
 ) {
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
-  );
+  await chooseRehab(user, 'Fysioterapeutens knäprogram');
   // Chair and support are ticked by default; the band is the user's choice.
   expect(
     (
@@ -45,7 +52,7 @@ async function openPhysio(
     'left',
   );
   await user.click(screen.getByRole('button', { name: 'Visa mitt program' }));
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
 }
 
 const rows = () =>
@@ -81,7 +88,7 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
   expect(screen.queryByText(/rekommenderad/i)).toBeNull();
 
   const start = screen.getByRole('button', {
-    name: 'Börja passet',
+    name: 'Starta passet',
   }) as HTMLButtonElement;
   expect(start.disabled).toBe(true);
   expect(start.getAttribute('aria-describedby')).toBe('start-blocked');
@@ -96,12 +103,12 @@ it('routes from the QuickStart link to a prefilled overview that needs confirmat
 it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(await screen.findByRole('button', { name: 'Knärehab' }));
+  await chooseRehab(user, 'Knärehab');
   await user.click(screen.getByRole('button', { name: 'Visa mitt pass' }));
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(screen.queryByRole('checkbox', { name: CONFIRM })).toBeNull();
   expect(
-    (screen.getByRole('button', { name: 'Börja passet' }) as HTMLButtonElement)
+    (screen.getByRole('button', { name: 'Starta passet' }) as HTMLButtonElement)
       .disabled,
   ).toBe(false);
   await user.click(screen.getByRole('button', { name: 'Anpassa passet' }));
@@ -120,15 +127,11 @@ it('asks no extra tick for the AAOS knee pass and keeps its guidance and saving'
 it('asks no extra tick for a custom rehab programme and lets the user save', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har ett eget rehabprogram',
-    }),
-  );
+  await chooseRehab(user, 'Eget rehabprogram');
   await user.click(
     screen.getByRole('button', { name: 'Öppna mitt rehabprogram' }),
   );
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(screen.queryByRole('checkbox', { name: CONFIRM })).toBeNull();
   expect(
     screen.getByText(
@@ -172,7 +175,7 @@ it('clears the confirmation on any edit and keeps it across a reload', async () 
   await user.click(screen.getByRole('checkbox', { name: CONFIRM }));
   cleanup();
   render(<App />);
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(
     (screen.getByRole('checkbox', { name: CONFIRM }) as HTMLInputElement)
       .checked,
@@ -189,7 +192,7 @@ it('clears the confirmation on any edit and keeps it across a reload', async () 
       .checked,
   ).toBe(false);
   expect(
-    (screen.getByRole('button', { name: 'Börja passet' }) as HTMLButtonElement)
+    (screen.getByRole('button', { name: 'Starta passet' }) as HTMLButtonElement)
       .disabled,
   ).toBe(true);
 });
@@ -212,7 +215,7 @@ it('lets a saved plan win over the prefill and resets to the start values', asyn
   cleanup();
   sessionStorage.clear();
   render(<App />);
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(rows()).toHaveLength(8);
 
   await user.click(screen.getByRole('button', { name: 'Anpassa passet' }));
@@ -250,7 +253,7 @@ async function startOnly(
     await user.click(await screen.findByRole('button', { name: /^Ta bort / }));
   }
   await user.click(screen.getByRole('checkbox', { name: CONFIRM }));
-  await user.click(screen.getByRole('button', { name: 'Börja passet' }));
+  await user.click(screen.getByRole('button', { name: 'Starta passet' }));
   await user.click(
     await screen.findByRole('radio', { name: 'Redo att träna' }),
   );
@@ -342,7 +345,7 @@ it('drops a stale tick when the draft it belonged to is gone', async () => {
     )
       sessionStorage.removeItem(key);
   render(<App />);
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(box().checked).toBe(false);
 });
 
@@ -389,7 +392,7 @@ it('lists what a missing band left out and lets the user fix it', async () => {
   await user.click(
     screen.getByRole('button', { name: 'Spara min utrustning' }),
   );
-  await screen.findByRole('button', { name: 'Börja passet' });
+  await screen.findByRole('button', { name: 'Starta passet' });
   expect(rows()).toHaveLength(9);
   expect(screen.queryByText(/Saknas:/)).toBeNull();
 });
@@ -397,11 +400,7 @@ it('lists what a missing band left out and lets the user fix it', async () => {
 it('explains the band at its checkbox and keeps explicit choices', async () => {
   const user = userEvent.setup();
   render(<App />);
-  await user.click(
-    await screen.findByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
-  );
+  await chooseRehab(user, 'Fysioterapeutens knäprogram');
   expect(
     screen.getByText('Träningsband behövs för övning 5 och 7.'),
   ).toBeTruthy();
@@ -416,9 +415,7 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
   await user.click(chair);
   await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
   await user.click(
-    screen.getByRole('button', {
-      name: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-    }),
+    screen.getByRole('button', { name: 'Fysioterapeutens knäprogram' }),
   );
   expect(
     (
@@ -427,4 +424,25 @@ it('explains the band at its checkbox and keeps explicit choices', async () => {
       }) as HTMLInputElement
     ).checked,
   ).toBe(false);
+});
+
+it('never shows the programme Home or reveal to rehab, even with a dormant programme', async () => {
+  const { seedProgram } = await import('../program/programFixtures');
+  await seedProgram(3);
+  await setMeta(getDb(), 'training', {
+    programId: 'rehab',
+    equipment: ['bodyweight', 'chair', 'support'],
+    experience: 'new',
+    rehabFocus: 'knee-physio',
+    rehabSide: 'both',
+  });
+  render(<App />);
+  await screen.findByRole('link', { name: 'Visa nästa pass' });
+  expect(screen.queryByRole('heading', { name: /Vecka \d av 4/ })).toBeNull();
+  expect(screen.queryByText('Ändra programmet')).toBeNull();
+  cleanup();
+  window.location.hash = '#/program?ny=1';
+  render(<App />);
+  await screen.findByRole('link', { name: 'Visa nästa pass' });
+  expect(screen.queryByRole('heading', { name: 'Ditt program' })).toBeNull();
 });

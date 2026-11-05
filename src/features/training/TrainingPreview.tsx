@@ -29,6 +29,7 @@ import {
   physioKneeTotal,
   physioProgressionNotes,
 } from '../../content/physioKneeProgramme';
+import { programExcludedIds } from '../../content/programExclusions';
 import {
   experienceLabels,
   isTrainingPreferences,
@@ -46,6 +47,7 @@ import {
 } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
+import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
 import {
   canReplaceTrainingPreparation,
@@ -67,9 +69,11 @@ import type {
 } from '../../domain/types';
 import { defaultFocus, parseFocus } from '../../lib/focus';
 import { useHashSearch } from '../../lib/hashLocation';
+import { parseProgramPass } from '../../lib/programQuery';
 import { equipmentFits } from '../../rules/equipment';
 import { favouriteAlternatives } from '../../rules/favouriteSuggestions';
 import { pickableInProgramme } from '../../rules/pickerPolicy';
+import { BLOCK_WEEKS } from '../../rules/programProgress';
 import {
   estimateWorkoutMinutes,
   shortWorkoutPlan,
@@ -85,6 +89,7 @@ import { Banner } from '../../ui/Banner';
 import { Button, buttonClass } from '../../ui/Button';
 import { ExerciseDifficulty } from '../exercise/ExerciseDifficulty';
 import { DeleteWorkoutButton } from '../library/CustomWorkoutList';
+import { planForIds } from '../program/programView';
 import { weekdayNames } from '../week/planModel';
 import { loadWeeklySchedule } from '../week/WeeklyPlan';
 import { basePlan, customWorkoutPlan, defaultPlan } from './defaultPlan';
@@ -128,11 +133,19 @@ function PreviewEditor({
   focus,
   preparationId,
   savedRoutines,
+  programPass,
   homePreferences,
   equipmentOverride,
   onEquipmentChange,
   onStarted,
 }: {
+  /** A pass of the active programme: plan, focus and template come from it. */
+  programPass?: {
+    programId: string;
+    pass: number;
+    week: number;
+    exerciseIds: readonly ExerciseId[];
+  };
   preferences: TrainingPreferences;
   homePreferences?: TrainingPreferences;
   equipmentOverride?: WorkoutEquipment;
@@ -158,12 +171,14 @@ function PreviewEditor({
   );
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
 
-  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${focus.id}.${(focus.regions ?? []).join(',')}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}`;
+  const draftKey = `stomme.training-draft.${preferences.programId}.${preferences.rehabFocus ?? 'custom'}.${preferences.rehabSide ?? 'both'}.${id}.${focus.id}.${(focus.regions ?? []).join(',')}.${[...preferences.equipment].sort().join(',')}.${JSON.stringify(preferences.weights ?? [])}.${JSON.stringify(preferences.adjustableWeights ?? [])}.${equipmentOverride ? 'temporary' : 'home'}.${preferences.experience}.${(preferences.bodyParts ?? []).join(',')}${customWorkout ? `.${customWorkout.id}` : ''}${programPass ? `.program.${programPass.programId}.${programPass.pass}` : ''}`;
   const preparation = sessions.find(
     (session) =>
       session.id === preparationId &&
       session.templateId === id &&
       session.customWorkoutId === customWorkout?.id &&
+      session.programPass?.programId === programPass?.programId &&
+      session.programPass?.pass === programPass?.pass &&
       (customWorkout ||
         preferences.programId === 'rehab' ||
         (session.focus === focus.id &&
@@ -222,6 +237,9 @@ function PreviewEditor({
         sessions,
         logs,
       );
+    if (programPass)
+      return planForIds(programPass.exerciseIds, preferences, sessions, logs)
+        .plan;
     return defaultPlan(
       preferences,
       id,
@@ -242,6 +260,11 @@ function PreviewEditor({
     }
   }, [draftKey, plan]);
 
+  const [programRemoved] = useState<ExerciseId[]>(() =>
+    programPass
+      ? planForIds(programPass.exerciseIds, preferences, sessions, logs).removed
+      : [],
+  );
   const [flags0] = useState(() => readFlags(draftKey));
   const [confirmed, setConfirmed] = useState(() => {
     if (!flags0.confirmed) return false;
@@ -488,11 +511,13 @@ function PreviewEditor({
       <header>
         <h1 className="m-0 break-words text-5xl font-extrabold">
           {customWorkout?.name ??
-            (preferences.programId === 'rehab'
-              ? 'Mitt rehabpass'
-              : focus.id === 'full'
-                ? `Pass ${id}`
-                : `Fokus: ${focusLabel(focus.id)}`)}
+            (programPass
+              ? `Pass ${programPass.pass} · ${focusLabel(focus.id)}`
+              : preferences.programId === 'rehab'
+                ? 'Mitt rehabpass'
+                : focus.id === 'full'
+                  ? `Pass ${id}`
+                  : `Fokus: ${focusLabel(focus.id)}`)}
         </h1>
 
         <p className="m-0 mt-2 text-lg font-bold">
@@ -503,7 +528,23 @@ function PreviewEditor({
             Träningsvana: {experienceLabels[preferences.experience]}
           </p>
         ) : null}
-        {preferences.programId === 'general' && !customWorkout ? (
+        {programPass ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Vecka {programPass.week} av {BLOCK_WEEKS}
+          </p>
+        ) : null}
+        {programRemoved.length ? (
+          <p className="m-0 mt-1 text-base text-ink-soft">
+            Borttaget ur dagens pass eftersom utrustningen saknas:{' '}
+            {programRemoved
+              .map((rid) => exercises[rid].name.toLocaleLowerCase('sv'))
+              .join(', ')}
+            .
+          </p>
+        ) : null}
+        {preferences.programId === 'general' &&
+        !customWorkout &&
+        !programPass ? (
           <p className="m-0 mt-1 text-base text-ink-soft">
             Fokus:{' '}
             {focus.id === 'custom'
@@ -848,7 +889,10 @@ function PreviewEditor({
                                 ? `${paperNo}. `
                                 : ''
                               : `${index + 1}. `}
-                            {exerciseReferences[exercise.id]} · {exercise.name}
+                            {preferences.programId === 'rehab'
+                              ? `${exerciseReferences[exercise.id]} · `
+                              : ''}
+                            {exercise.name}
                           </span>
                           <span className="block text-base font-normal">
                             {item.sets || '–'} × {item.target || '–'}
@@ -1368,6 +1412,10 @@ function PreviewEditor({
               plan={workoutPlan}
               short={short}
               fullBody={!customWorkout && focus.id === 'full'}
+              programPass={Boolean(programPass)}
+              hasHistory={sessions.some(
+                (session) => session.status === 'completed',
+              )}
               preferences={preferences}
               onChange={(index) => {
                 setExpandedIndex(
@@ -1384,6 +1432,7 @@ function PreviewEditor({
           {!equipmentOverride &&
           !short &&
           !customWorkout &&
+          !programPass &&
           preferences.programId !== 'rehab' &&
           focus.id !== 'custom' ? (
             <RoutineControls
@@ -1414,6 +1463,7 @@ function PreviewEditor({
               preferences={preferences}
               sessions={sessions}
               logs={logs}
+              exclude={programPass ? programExcludedIds : undefined}
               onChoose={(from, to) => {
                 updatePlan((current) =>
                   current.map((item) =>
@@ -1615,6 +1665,15 @@ function PreviewEditor({
                           : {}),
                         ...(equipmentOverride ? { equipmentOverride } : {}),
                         focus,
+                        ...(programPass
+                          ? {
+                              programPass: {
+                                programId: programPass.programId,
+                                pass: programPass.pass,
+                                week: programPass.week,
+                              },
+                            }
+                          : {}),
                       },
                     );
 
@@ -1647,7 +1706,7 @@ function PreviewEditor({
                   }
                 }}
               >
-                {short ? 'Börja kortpasset' : 'Börja passet'}
+                {short ? 'Starta kortpasset' : 'Starta passet'}
               </Button>
             </div>
           </div>
@@ -1683,6 +1742,7 @@ export function TrainingPreview({ id }: { id: string }) {
         | Partial<Record<RehabFocus, PlannedExercise[]>>
         | undefined,
       savedRoutines: await getTrainingRoutines(getDb()),
+      program: await readTrainingProgram(getDb()),
     };
   }, []);
 
@@ -1711,26 +1771,44 @@ export function TrainingPreview({ id }: { id: string }) {
         </Link>
       </div>
     );
-  const focus = requestedFocus ?? defaultFocus(data.preferences);
+  const request =
+    !customWorkout && data.preferences.programId === 'general'
+      ? parseProgramPass(search, data.program, data.sessions)
+      : null;
+  const passSpec = request && data.program?.passes[request.pass - 1];
+  const programPass =
+    request && data.program && passSpec
+      ? {
+          programId: data.program.id,
+          pass: request.pass,
+          week: request.week,
+          exerciseIds: passSpec.exerciseIds,
+        }
+      : undefined;
+  const focus: WorkoutFocus = passSpec
+    ? { id: passSpec.focus }
+    : (requestedFocus ?? defaultFocus(data.preferences));
+  const templateId: TemplateId = passSpec ? passSpec.template : id;
   return (
     <EquipmentPreview
-      key={`${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${id}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
+      key={`${programPass ? `p${programPass.programId}-${programPass.pass}-` : ''}${focus.id}-${(focus.regions ?? []).join(',')}-${data.preferences.programId}-${data.preferences.rehabFocus ?? 'custom'}-${templateId}-${customWorkout?.id ?? 'standard'}-${data.preferences.experience}-${(data.preferences.bodyParts ?? []).join(',')}-${JSON.stringify([data.preferences.equipment, data.preferences.weights, data.preferences.adjustableWeights])}`}
       customWorkout={customWorkout}
       focus={focus}
       preparationId={data.preparationId}
       preferences={data.preferences}
-      id={id}
+      id={templateId}
+      programPass={programPass}
       sessions={data.sessions}
       logs={data.logs}
       savedPlans={data.savedPlans}
-      savedRoutines={data.savedRoutines}
+      savedRoutines={programPass ? undefined : data.savedRoutines}
     />
   );
 }
 
 function EquipmentPreview(props: Parameters<typeof PreviewEditor>[0]) {
   const home = props.preferences;
-  const storageKey = `stomme.workout-equipment.${home.programId}.${props.id}.${props.customWorkout?.id ?? 'standard'}.${JSON.stringify(home)}`;
+  const storageKey = `stomme.workout-equipment.${home.programId}.${props.id}.${props.customWorkout?.id ?? 'standard'}${props.programPass ? `.program.${props.programPass.programId}.${props.programPass.pass}` : ''}.${JSON.stringify(home)}`;
   const preparation = props.sessions.find(
     (session) => session.id === props.preparationId,
   );

@@ -95,7 +95,7 @@ for (const width of [320, 360, 412]) {
         page.getByRole('spinbutton', { name: /^Total vikt \(kg\)/ }),
       ).toHaveValue('8');
       await page
-        .getByRole('button', { name: 'Börja passet', exact: true })
+        .getByRole('button', { name: 'Starta passet', exact: true })
         .click();
       await expect(
         page.getByRole('button', { name: 'Klar set', exact: true }),

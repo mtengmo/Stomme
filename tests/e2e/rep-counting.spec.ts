@@ -16,7 +16,9 @@ test('a rep exercise starts hands-free, pauses and can switch to manual', async 
   page,
 }) => {
   await openPreview(page, true);
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
 
   const start = page.getByRole('button', { name: 'Starta – 5 s förberedelse' });
   await expect(start).toBeVisible();
@@ -34,7 +36,9 @@ test('a rep exercise starts hands-free, pauses and can switch to manual', async 
 
 test('Räkna själv brings back Klar set and is remembered', async ({ page }) => {
   await openPreview(page, true);
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await page.getByText('Ändra set', { exact: true }).click();
   await page.getByRole('switch', { name: 'Räkna själv: av' }).click();
   await expect(page.getByRole('button', { name: 'Klar set' })).toBeVisible();

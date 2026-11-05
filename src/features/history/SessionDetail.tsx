@@ -17,7 +17,13 @@ import { ShortWorkoutNotice } from '../session/ShortWorkoutNotice';
 import { TimeoutBanner } from '../session/TimeoutNotice';
 import { WorkoutEquipmentNotice } from '../session/WorkoutEquipmentNotice';
 import { CheckinHistory } from './CheckinHistory';
-import { amountText, EFFORT_LABEL, kgText, StatusChip } from './labels';
+import {
+  amountText,
+  EFFORT_LABEL,
+  kgText,
+  programPassLabel,
+  StatusChip,
+} from './labels';
 
 const SIDE: Record<SetLog['side'], string> = {
   right: 'höger',
@@ -97,7 +103,9 @@ export function SessionDetail({ id }: { id: string }) {
       <BackLink />
       <header className="flex flex-col gap-2">
         <h1 className="m-0 text-5xl font-extrabold">
-          {session.customWorkoutName ?? `Pass ${session.templateId}`}
+          {session.customWorkoutName ??
+            programPassLabel(session) ??
+            `Pass ${session.templateId}`}
         </h1>
         {session.programId ? (
           <p className="m-0 text-lg font-bold">{trainingName(session)}</p>

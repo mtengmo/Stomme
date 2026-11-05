@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link } from 'wouter';
 import { exercises } from '../../content/exercises';
+import { programExcludedIds } from '../../content/programExclusions';
 import { isTrainingPreferences } from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { getMeta, listSessions } from '../../db/repo';
@@ -20,16 +21,20 @@ export function NextLevelSuggestions({
   sessions,
   logs,
   onChoose,
+  exclude,
 }: {
   plan: PlannedExercise[];
   preferences: TrainingPreferences;
   sessions: Session[];
   logs: SetLog[];
   onChoose?: (from: ExerciseId, to: ExerciseId) => void;
+  /** Exercises never offered, e.g. those a programme may not contain. */
+  exclude?: ReadonlySet<ExerciseId>;
 }) {
   const suggestions = plan.flatMap((item) =>
     harderExerciseSuggestions(item.exerciseId, preferences, sessions, logs)
       .filter((id) => !plan.some((entry) => entry.exerciseId === id))
+      .filter((id) => !exclude?.has(id))
       .map((id) => ({ from: item.exerciseId, to: id })),
   );
   if (!suggestions.length) return null;
@@ -104,6 +109,7 @@ export function SummaryNextLevel({ session }: { session: Session }) {
       preferences={data.preferences}
       sessions={data.sessions}
       logs={data.logs}
+      exclude={session.programPass ? programExcludedIds : undefined}
     />
   );
 }

@@ -159,6 +159,20 @@ describe('programme-specific progression', () => {
         .explanation,
     ).toMatch(/Ingen automatisk ökning/);
   });
+  it('gives a programme pass no automatic increase after a hurt mark', () => {
+    const programPass = { programId: 'prog-1', pass: 1, week: 1 };
+    const clean = session({ programPass });
+    expect(
+      trainingPlanSuggestion(plan, preferences, [clean], logs()).target,
+    ).toBe(9);
+    const hurt = session({
+      programPass,
+      feedback: { 'single-leg-rdl': { effort: 'easy', hurt: true } },
+    });
+    const blocked = trainingPlanSuggestion(plan, preferences, [hurt], logs());
+    expect(blocked.target).toBe(8);
+    expect(blocked.explanation).toMatch(/Ingen automatisk ökning/);
+  });
   it('holds only the exercise that hurt, never other exercises or the whole session', () => {
     const other: PlannedExercise = {
       ...plan,

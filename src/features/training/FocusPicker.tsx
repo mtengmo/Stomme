@@ -12,6 +12,8 @@ import { focusAvailable } from '../../rules/programRosters';
 import { recentMuscles, recoveryNote } from '../../rules/recovery';
 import { nextTemplateId } from '../../rules/schedule';
 import { Button } from '../../ui/Button';
+import { ChoiceCard } from '../../ui/ChoiceCard';
+import { linkClass } from '../../ui/link';
 import { startingFocus } from './focusModel';
 import { RegionChecklist } from './RegionChecklist';
 
@@ -82,44 +84,37 @@ function Picker({
               preset.id !== 'custom' &&
               recoveryNote(recent, { id: preset.id }, now);
             return (
-              <label
+              <ChoiceCard
                 key={preset.id}
-                className={`flex min-h-12 items-center gap-3 rounded-sm border-2 px-3 py-2 ${focus.id === preset.id ? 'border-accent' : 'border-edge'} ${enabled ? '' : 'text-ink-soft'}`}
-              >
-                <input
-                  className="size-6 shrink-0"
-                  type="radio"
-                  name="daily-focus"
-                  value={preset.id}
-                  checked={focus.id === preset.id}
-                  disabled={!enabled}
-                  onChange={() =>
-                    setFocus({
-                      id: preset.id,
-                      ...(preset.id === 'custom'
-                        ? {
-                            regions:
-                              focus.regions ?? preferences.bodyParts ?? [],
-                          }
-                        : {}),
-                    })
-                  }
-                />
-                <span className="text-lg font-bold">
-                  {preset.label}
-                  <span className="block text-base font-normal">
-                    {!enabled
-                      ? 'Inga övningar med din utrustning'
-                      : trained
-                        ? 'Tränat senaste 48 timmarna · förslag kan ändras'
-                        : preset.id === 'push'
-                          ? 'Bröst, axlar, triceps'
-                          : preset.id === 'pull'
-                            ? 'Rygg, biceps, grepp'
-                            : ''}
-                  </span>
-                </span>
-              </label>
+                type="radio"
+                compact
+                name="daily-focus"
+                value={preset.id}
+                label={<span className="font-bold">{preset.label}</span>}
+                hint={
+                  !enabled
+                    ? 'Inga övningar med din utrustning'
+                    : trained
+                      ? 'Tränat senaste 48 timmarna · förslag kan ändras'
+                      : preset.id === 'push'
+                        ? 'Bröst, axlar, triceps'
+                        : preset.id === 'pull'
+                          ? 'Rygg, biceps, grepp'
+                          : undefined
+                }
+                checked={focus.id === preset.id}
+                disabled={!enabled}
+                onChange={() =>
+                  setFocus({
+                    id: preset.id,
+                    ...(preset.id === 'custom'
+                      ? {
+                          regions: focus.regions ?? preferences.bodyParts ?? [],
+                        }
+                      : {}),
+                  })
+                }
+              />
             );
           })}
         </fieldset>
@@ -135,7 +130,7 @@ function Picker({
         <div className="mx-auto flex max-w-md gap-3">
           <Link
             href="/"
-            className="flex min-h-14 items-center px-3 text-base font-bold underline"
+            className={`flex min-h-14 items-center px-3 text-base ${linkClass}`}
           >
             Tillbaka
           </Link>

@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto';
 import { expect, it } from 'vitest';
+import { programFixture } from '../test/programFixture';
 import { StommeDB } from './db';
+import { readTrainingProgram, saveTrainingProgram } from './program';
 import { setMeta } from './repo';
 import { deleteAllData } from './wipe';
 
@@ -19,6 +21,16 @@ it('deletes sessions, logs and meta', async () => {
   });
   await deleteAllData(db);
   expect(await db.sessions.count()).toBe(0);
+  expect(await db.meta.count()).toBe(0);
+  db.close();
+  await db.delete();
+});
+
+it('deletes a training programme with the rest of meta', async () => {
+  const db = new StommeDB(`stomme-wipe-${Math.random()}`);
+  await saveTrainingProgram(db, programFixture());
+  await deleteAllData(db);
+  expect(await readTrainingProgram(db)).toBeNull();
   expect(await db.meta.count()).toBe(0);
   db.close();
   await db.delete();

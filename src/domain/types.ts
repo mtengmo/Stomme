@@ -280,6 +280,8 @@ export interface Session {
   status: SessionStatus;
   abortReason?: 'pain_stop' | 'user' | 'timeout';
   programWeek: number;
+  /** Set when the session is a pass of the active training programme. */
+  programPass?: { programId: string; pass: number; week: number };
   plan: PlannedExercise[];
   feedback: Partial<Record<ExerciseId, ExerciseFeedback>>;
   note?: string;
@@ -314,7 +316,8 @@ export interface MetaEntry {
     | 'favourites'
     | 'repCountPrefs'
     | 'trainingRoutines'
-    | 'weeklySchedule';
+    | 'weeklySchedule'
+    | 'trainingProgram';
   value: unknown;
 }
 
@@ -331,4 +334,32 @@ export type WeeklyDayPlan =
 export interface WeeklySchedule {
   days: { day: number; plan: WeeklyDayPlan }[];
   moved?: { from: string; to: string };
+}
+
+export type ProgramEmphasis = 'full' | 'run' | 'upper';
+export interface ProgramPass {
+  /** Label and muscles for rest. */
+  focus: RoutineFocus;
+  /** The A/B variant used when the pass was generated. */
+  template: TemplateId;
+  /** 4-6 unique exercises, fixed during the block. */
+  exerciseIds: ExerciseId[];
+}
+export interface TrainingProgram {
+  /** uuid; sessions point here. */
+  id: string;
+  /** 1, 2, ... */
+  block: number;
+  /** ISO instant. */
+  createdAt: string;
+  /** Local date of pass 1. */
+  startDate: string;
+  daysPerWeek: 1 | 2 | 3 | 4 | 5;
+  emphasis: ProgramEmphasis;
+  /** ISO weekday per pass (length = daysPerWeek, unique); suggestions only. */
+  weekdays: number[];
+  /** Length = daysPerWeek. */
+  passes: ProgramPass[];
+  /** true = drawn only from the beginner set. */
+  curated: boolean;
 }

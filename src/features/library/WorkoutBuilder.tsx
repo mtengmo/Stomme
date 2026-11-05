@@ -34,6 +34,7 @@ import {
 } from '../../rules/selectionSummary';
 import { Button } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
+import { linkClass } from '../../ui/link';
 import { customWorkoutPlan } from '../training/defaultPlan';
 import { CustomWorkoutList } from './CustomWorkoutList';
 
@@ -368,7 +369,7 @@ export function WorkoutBuilder({
               aria-expanded={open}
               onClick={() => setOpen(!open)}
               disabled={!ids.length}
-              className="min-h-12 shrink-0 px-2 text-base font-bold text-accent underline underline-offset-4 disabled:opacity-50"
+              className={`min-h-12 shrink-0 px-2 text-base ${linkClass} disabled:opacity-50`}
             >
               {open ? 'Dölj valda' : 'Visa valda'}
             </button>
@@ -381,7 +382,7 @@ export function WorkoutBuilder({
           {!preferences && data ? (
             <Link
               href="/"
-              className="flex min-h-12 items-center text-base font-bold text-accent underline underline-offset-4"
+              className={`flex min-h-12 items-center text-base ${linkClass}`}
             >
               Välj träningsinriktning för att skapa pass
             </Link>

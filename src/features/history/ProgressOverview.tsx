@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { exerciseReferences } from '../../content/exerciseReferences';
 import { exercises } from '../../content/exercises';
 import { programmeNames, trainingName } from '../../content/programmes';
 import type {
@@ -268,7 +267,7 @@ export function ProgressOverview({
             >
               {ids.map((id) => (
                 <option key={id} value={id}>
-                  {exerciseReferences[id]} · {exercises[id].name}
+                  {exercises[id].name}
                 </option>
               ))}
             </select>

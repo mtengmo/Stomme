@@ -1,6 +1,6 @@
 import { devices, expect, test } from '@playwright/test';
 import { exerciseReferences } from '../../src/content/exerciseReferences';
-import { quickStart } from './flow';
+import { endProgram, quickStart } from './flow';
 import { FRESH_STATE } from './state';
 
 test.use({ ...devices['Pixel 7'], storageState: FRESH_STATE });
@@ -28,7 +28,8 @@ async function prepareGeneral(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /Jag förstår/ }).click();
   await quickStart(page, { goal: 'general' });
-  await page.goto('/#/');
+  // The focus picker's "Byt" link is on the Home of users without a programme.
+  await endProgram(page);
 }
 
 async function openFocus(page: import('@playwright/test').Page) {

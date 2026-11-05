@@ -188,7 +188,7 @@ test('personal low-back rehab requires the user to enter a dose', async ({
     await expect(page.getByLabel('Set', { exact: true })).toHaveValue('');
   }
   await expect(
-    page.getByRole('button', { name: 'Börja passet', exact: true }),
+    page.getByRole('button', { name: 'Starta passet', exact: true }),
   ).toBeDisabled();
 });
 

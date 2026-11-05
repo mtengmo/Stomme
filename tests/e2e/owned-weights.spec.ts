@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { addWeight, quickStart } from './flow';
+import { openLibraryFilters } from './library';
 import { FRESH_STATE } from './state';
 
 test.use({ storageState: FRESH_STATE });
@@ -16,15 +17,18 @@ for (const width of [360, 1280]) {
       },
       finish: 'equipment',
     });
-    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+    // The weights step is on screen; level is next, then the programme.
     await page.getByRole('button', { name: 'Nästa', exact: true }).click();
     await page
-      .getByRole('button', { name: 'Visa mitt pass', exact: true })
+      .getByRole('button', { name: 'Visa mitt program', exact: true })
       .click();
+    await expect(page).toHaveURL(/#\/program/);
+    await page.goto('/#/traning/A');
     await expect(
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
+    await openLibraryFilters(page);
     await page.getByLabel('Sök övning').fill('E12');
     await page.getByRole('button', { name: /^Välj: / }).click();
     await page.getByRole('button', { name: 'Skapa pass', exact: true }).click();

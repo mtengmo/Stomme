@@ -45,10 +45,10 @@ export function musclesForPlan(
   }
   return [];
 }
-function adjacent(a: number, b: number): boolean {
+export function adjacent(a: number, b: number): boolean {
   return Math.abs(a - b) === 1 || Math.abs(a - b) === 6;
 }
-function overlaps(
+export function overlaps(
   a: readonly MuscleGroupId[],
   b: readonly MuscleGroupId[],
 ): boolean {

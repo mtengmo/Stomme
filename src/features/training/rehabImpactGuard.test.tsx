@@ -91,6 +91,7 @@ describe('impact exercises in rehab', () => {
     window.location.hash = '#/ovningar';
     const user = userEvent.setup();
     render(<App />);
+    await user.click(await screen.findByRole('button', { name: 'Filtrera' }));
     await user.type(await screen.findByLabelText('Sök övning'), 'boxhopp');
     expect(await screen.findByText('Hopp visas inte i rehab')).toBeTruthy();
   });

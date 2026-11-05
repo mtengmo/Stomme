@@ -1,6 +1,7 @@
 import { devices, expect, test } from '@playwright/test';
 import { exerciseList } from '../../src/content/exercises';
 import { exerciseMuscles } from '../../src/content/muscles';
+import { openLibraryFilters } from './library';
 
 const calfCount = Object.values(exerciseMuscles).filter(
   (tags) =>
@@ -13,6 +14,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   page,
 }) => {
   await page.goto('/#/ovningar');
+  await openLibraryFilters(page);
   await page.getByRole('button', { name: 'Ben & säte', exact: true }).click();
   await expect(page).toHaveURL(/#\/ovningar\?omrade=legs$/);
   await page.getByRole('button', { name: 'Armar', exact: true }).click();

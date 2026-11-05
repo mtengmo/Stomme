@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { quickStart } from './flow';
+import { openLibraryFilters } from './library';
 
 for (const width of [360, 1280]) {
   test(`new bodyweight exercises can be browsed and saved (${width})`, async ({
@@ -12,6 +13,7 @@ for (const width of [360, 1280]) {
       page.getByRole('heading', { name: 'Pass A', exact: true }),
     ).toBeVisible();
     await page.goto('/#/ovningar');
+    await openLibraryFilters(page);
     const search = page.getByLabel('Sök övning');
     for (const number of [
       'E54',

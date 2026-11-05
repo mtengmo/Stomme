@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { exerciseReferences } from '../../src/content/exerciseReferences';
+import { exercises } from '../../src/content/exercises';
 import type { ExerciseId } from '../../src/domain/types';
 
 /** Pick an exercise through the searchable editor chooser. */
@@ -7,11 +7,14 @@ export async function addExercise(page: Page, exerciseId: ExerciseId) {
   await page
     .getByRole('button', { name: 'Lägg till övning', exact: true })
     .click();
-  await page.getByLabel('Sök övning', { exact: true }).fill(exerciseId);
+  await page
+    .getByLabel('Sök övning', { exact: true })
+    .fill(exercises[exerciseId].name);
   await page
     .getByRole('listitem')
-    .filter({ hasText: exerciseReferences[exerciseId] })
+    .filter({ hasText: exercises[exerciseId].name })
     .getByRole('button', { name: 'Lägg till övningen', exact: true })
+    .first()
     .click();
 }
 
@@ -77,14 +80,18 @@ export async function startOnlyExercise(
   await addExercise(page, exerciseId);
   if (options.sets !== undefined)
     await page.getByLabel('Set', { exact: true }).fill(String(options.sets));
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await expect(page.locator('[data-step]')).toBeVisible();
 }
 
 /** Opens the preview of Pass A and starts it: no questions, straight to the first set. */
 export async function startPassA(page: Page, onboarded = false): Promise<void> {
   await openPreview(page, onboarded);
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
   await expect(page.locator('[data-step]')).toBeVisible();
 }
 
@@ -129,7 +136,20 @@ export async function playPassA(
 ): Promise<{ sets: number; planned: number }> {
   await openPreview(page);
   await onStage('preview');
-  await page.getByRole('button', { name: 'Börja passet', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Starta passet', exact: true })
+    .click();
+  return playRunningSession(page, onStage);
+}
+
+/**
+ * Plays the session that was just started (the first set is on screen) to the summary and
+ * "Avsluta pass", using only the primary action on each screen. Ends on Home.
+ */
+export async function playRunningSession(
+  page: Page,
+  onStage: (stage: Stage) => Promise<void> = async () => {},
+): Promise<{ sets: number; planned: number }> {
   await expect(page.locator('[data-step]')).toBeVisible();
   const tally = await page
     .getByRole('img', { name: /set klara/ })
@@ -214,7 +234,7 @@ export async function playPassA(
 
   await expect(page).toHaveURL(/#\/$/);
   await expect(
-    page.getByRole('link', { name: 'Visa nästa pass', exact: true }),
+    page.getByRole('link', { name: 'Starta passet', exact: true }),
   ).toBeVisible();
   return { sets: await storedSetCount(page), planned };
 }
@@ -293,8 +313,8 @@ const GOAL_BUTTON: Record<QuickStartGoal, string> = {
   general: 'Bli starkare',
   build: 'Skapa eget pass',
   knee: 'Knärehab',
-  physio: 'Jag har fysioterapeutens knäprogram (9 övningar)',
-  custom: 'Jag har ett eget rehabprogram',
+  physio: 'Fysioterapeutens knäprogram',
+  custom: 'Eget rehabprogram',
 };
 const LEVEL_LABEL = {
   new: /Ny eller på väg tillbaka/,
@@ -302,18 +322,30 @@ const LEVEL_LABEL = {
   regular: /Tränar regelbundet/,
 };
 const FINISH: Record<QuickStartGoal, string> = {
-  general: 'Visa mitt pass',
+  general: 'Visa mitt program',
   build: 'Skapa pass',
   knee: 'Visa mitt pass',
   physio: 'Visa mitt program',
   custom: 'Öppna mitt rehabprogram',
 };
+const EMPHASIS_LABEL = {
+  full: 'Hela kroppen',
+  run: 'Ben & bål för löpning',
+  upper: 'Mer överkropp',
+  unsure: 'Vet inte – välj åt mig',
+};
 
 /**
- * Walks the one-question-per-screen first-use flow. The equipment step starts with
- * chair and wall ticked; `equipment` lists extra checkbox labels to tick, `without`
- * labels to untick, and `onEquipment` runs on that screen (weights). `finish: false`
- * stops before the last button.
+ * Walks the one-question-per-screen first-use flow at /kom-igang.
+ * General (strength): goal, days (default 2), emphasis (default whole body), equipment,
+ * weights (only when dumbbells or kettlebells are ticked) and level. Chair and wall are
+ * always included; `equipment` lists extra checkbox labels to tick, `without` labels to
+ * untick (own and rehab programmes only), and `onEquipment` runs on that screen (weights).
+ * `finish: false` stops before the last button, 'equipment' after the equipment screen.
+ *
+ * Finishing a strength flow lands on the programme reveal (/program); for the many specs
+ * that predate it the helper then opens the ordinary Pass A preview (#/traning/A).
+ * With `reveal: true` it stays on the reveal instead.
  */
 export async function quickStart(
   page: Page,
@@ -323,17 +355,40 @@ export async function quickStart(
     without?: string[];
     onEquipment?: (page: Page) => Promise<void>;
     level?: keyof typeof LEVEL_LABEL;
-    focus?: string[];
+    days?: 1 | 2 | 3 | 4 | 5;
+    emphasis?: keyof typeof EMPHASIS_LABEL;
     side?: 'both' | 'right' | 'left';
     /** 'equipment' stops after the equipment screen; false stops on the last screen. */
     finish?: boolean | 'equipment';
+    /** Stay on the programme reveal after a strength flow. */
+    reveal?: boolean;
   },
 ): Promise<void> {
-  const { goal, equipment = [], without = [], level, focus, side } = options;
+  const { goal, equipment = [], without = [], level, side } = options;
   const finish = options.finish ?? true;
+  const rehab = goal === 'knee' || goal === 'physio' || goal === 'custom';
+  if (rehab)
+    await page
+      .getByRole('button', { name: 'Knä- eller rehabprogram', exact: true })
+      .click();
   await page
     .getByRole('button', { name: GOAL_BUTTON[goal], exact: true })
     .click();
+  const next = page.getByRole('button', { name: 'Nästa', exact: true });
+  if (goal === 'general') {
+    if (options.days)
+      await page
+        .getByRole('radio', {
+          name: options.days === 1 ? '1 dag' : `${options.days} dagar`,
+        })
+        .check();
+    await next.click();
+    if (options.emphasis)
+      await page
+        .getByRole('radio', { name: EMPHASIS_LABEL[options.emphasis] })
+        .check();
+    await next.click();
+  }
   for (const label of equipment)
     await page.getByRole('checkbox', { name: label, exact: true }).check();
   for (const label of without)
@@ -345,11 +400,20 @@ export async function quickStart(
       .getByRole('combobox', { name: /Arbetande sida/ })
       .selectOption(side);
   if (goal === 'general' || goal === 'build') {
-    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+    await next.click();
+    if (goal === 'general') {
+      // The weights step shows only when dumbbells or kettlebells were ticked.
+      const weights = page.getByRole('heading', {
+        name: 'Vilka vikter har du?',
+      });
+      const levelStep = page.getByRole('group', { name: 'Träningsvana' });
+      await weights.or(levelStep).first().waitFor();
+      if (await weights.count()) await next.click();
+    }
     if (level)
       await page.getByRole('radio', { name: LEVEL_LABEL[level] }).check();
     if (goal === 'build') {
-      await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+      await next.click();
       // The pick step: tick the first exercise so the final button is enabled.
       if (finish)
         await page
@@ -357,20 +421,20 @@ export async function quickStart(
           .first()
           .click();
     }
-    if (goal === 'general') {
-      await page.getByRole('button', { name: 'Nästa', exact: true }).click();
-      if (focus?.length) {
-        await page.getByRole('radio', { name: 'Välj kroppsdelar' }).check();
-        for (const part of focus)
-          await page.getByRole('checkbox', { name: part, exact: true }).check();
-      }
-    }
   }
   if (finish) {
     await page.getByRole('button', { name: FINISH[goal], exact: true }).click();
     // Setup saves asynchronously before navigation. Callers may now navigate
     // onward without a late setup navigation overwriting their destination.
-    await expect(page).toHaveURL(/#\/traning\/A(?:\?|$)/);
+    if (goal === 'general') {
+      await expect(page).toHaveURL(/#\/program(?:\?|$)/);
+      if (!options.reveal) {
+        await page.goto('/#/traning/A');
+        await expect(page).toHaveURL(/#\/traning\/A(?:\?|$)/);
+      }
+    } else {
+      await expect(page).toHaveURL(/#\/traning\/A(?:\?|$)/);
+    }
   }
 }
 
@@ -380,7 +444,7 @@ const CHIP_KG = {
 };
 
 /**
- * Registers one owned weight on the equipment step: a quick-pick chip for listed weights
+ * Registers one owned weight on the equipment step (the weights step of the strength start flow): a quick-pick chip for listed weights
  * (a dumbbell chip is a pair, a kettlebell chip is one), the "Annan vikt" form otherwise.
  * A different count than the chip gives is switched with "Ändra till".
  */
@@ -391,7 +455,21 @@ export async function addWeight(
   const noun = weight.type === 'dumbbell' ? 'hantel' : 'kettlebell';
   const kind = weight.type === 'dumbbell' ? 'Hantlar' : 'Kettlebell';
   const tick = page.getByRole('checkbox', { name: kind, exact: true });
+  // On the weights step the ticks are gone: step back to the equipment step first.
+  if (!(await tick.count()))
+    await page.getByRole('button', { name: 'Tillbaka', exact: true }).click();
   if (!(await tick.isChecked())) await tick.check();
+  // In the strength start flow the weights live on their own step.
+  const weightsHeading = page.getByRole('heading', {
+    name: 'Vilka vikter har du?',
+  });
+  const onEquipmentStep = page.getByRole('heading', {
+    name: 'Vad tränar du med?',
+  });
+  if (await onEquipmentStep.count()) {
+    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+    await expect(weightsHeading).toBeVisible();
+  }
   const kgLabel = String(weight.kg).replace('.', ',');
   const name = `${noun[0]?.toUpperCase()}${noun.slice(1)} ${kgLabel} kg`;
   const chip = page.getByRole('button', { name, exact: true });
@@ -415,4 +493,21 @@ export async function addWeight(
     .getByRole('radio', { name: weight.count === 2 ? 'Par' : '1 st' })
     .check();
   await page.getByRole('button', { name: /^Lägg till .* kg \(/ }).click();
+}
+
+/**
+ * Ends the programme from the programme Home ("Ändra" > "Avsluta programmet"), so
+ * the user lands on the ordinary Home (pass A/B, focus picker, week planner) that
+ * users without a programme see. Everything else (sessions, workouts) stays.
+ */
+export async function endProgram(page: Page): Promise<void> {
+  await page.goto('/#/');
+  await page.getByText('Ändra', { exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Avsluta programmet', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Avsluta programmet nu', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: /^Vecka \d/ })).toHaveCount(0);
 }

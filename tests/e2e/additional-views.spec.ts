@@ -98,7 +98,7 @@ test('an oblique view is available during the workout', async ({ browser }) => {
     await removeAllExercises(page);
     await addExercise(page, 'split-squat');
     await page
-      .getByRole('button', { name: 'Börja passet', exact: true })
+      .getByRole('button', { name: 'Starta passet', exact: true })
       .click();
     await page
       .getByRole('button', { name: 'Visa från sned vinkel', exact: true })

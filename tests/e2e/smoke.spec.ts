@@ -31,7 +31,7 @@ test.describe('offline', () => {
     context,
   }) => {
     await openPreview(page);
-    await page.getByRole('button', { name: 'Börja passet' }).waitFor();
+    await page.getByRole('button', { name: 'Starta passet' }).waitFor();
     // wait for the service worker to take control, then cut the network
     await page.evaluate(async () => {
       await navigator.serviceWorker.ready;
@@ -40,7 +40,7 @@ test.describe('offline', () => {
     await page.evaluate(() => navigator.serviceWorker.controller !== null);
     await context.setOffline(true);
     await page.reload();
-    await page.getByRole('button', { name: 'Börja passet' }).click();
+    await page.getByRole('button', { name: 'Starta passet' }).click();
     await page.getByRole('button', { name: 'Klar set' }).click();
     await expect(
       page.getByRole('status').filter({ hasText: 'Set 1 loggat' }),

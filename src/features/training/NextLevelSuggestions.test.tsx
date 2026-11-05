@@ -2,6 +2,7 @@
 import 'fake-indexeddb/auto';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { programExcludedIds } from '../../content/programExclusions';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
 import type { Session, SetLog, TrainingPreferences } from '../../domain/types';
@@ -75,6 +76,25 @@ describe('impact progression suggestions', () => {
     expect(
       screen.getByRole('button', { name: 'Byt till blast off-armhävning' }),
     ).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Byt till smala armhävningar' }),
+    ).toBeTruthy();
+  });
+
+  it('never offers excluded exercises when asked to exclude them', () => {
+    render(
+      <NextLevelSuggestions
+        plan={sessions[0]?.plan ?? []}
+        preferences={preferences}
+        sessions={sessions}
+        logs={logs}
+        onChoose={() => {}}
+        exclude={programExcludedIds}
+      />,
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Byt till blast off-armhävning' }),
+    ).toBeNull();
     expect(
       screen.getByRole('button', { name: 'Byt till smala armhävningar' }),
     ).toBeTruthy();

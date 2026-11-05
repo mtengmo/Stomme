@@ -208,13 +208,15 @@ describe('overhead triceps extension figure geometry', () => {
       expect(pose.eR).toEqual(start.eR);
       expect(pose.eL).toEqual(start.eL);
       expect(pose.hR).toEqual(pose.hL);
-      expect(distance(pose.hR, pose.head)).toBeGreaterThan(30);
+      // Lowered, the weight sits behind the head, clear of the head circle.
+      expect(distance(pose.hR, pose.head)).toBeGreaterThan(17);
       for (const elbow of [pose.eR, pose.eL]) {
         const upperLength = distance(pose.neck, elbow);
         const forearmLength = distance(elbow, pose.hR);
         expect(forearmLength).toBeGreaterThan(18);
         expect(forearmLength).toBeLessThan(36);
-        expect(cross(pose.neck, elbow, pose.hR)).toBeGreaterThanOrEqual(-1);
+        // The forearm folds backwards, behind the head, never forwards.
+        expect(cross(pose.neck, elbow, pose.hR)).toBeLessThanOrEqual(1);
         if (frame === 20)
           expect(
             Math.abs(cross(pose.neck, elbow, pose.hR)) /
@@ -667,16 +669,19 @@ describe('russian twist oblique geometry', () => {
 });
 
 describe('woodchop figure geometry', () => {
-  it('moves one shared-grip weight diagonally up with fixed feet and attached arms', () => {
+  it('moves one shared-grip weight diagonally up, pivoting the near foot on its ball while the far foot stays put, with attached arms', () => {
     const start = movementPose('woodchop', 0);
     const end = movementPose('woodchop', 1);
     expect(figures.woodchop.held).toEqual({ kind: 'dumbbell', hands: ['hR'] });
     expect(end.hR[1]).toBeLessThan(start.hR[1] - 80);
     expect(end.hR[0]).toBeGreaterThan(start.hR[0]);
+    // The near heel turns up on the ball of the foot and the knee follows.
+    expect(end.aR[1]).toBeLessThan(start.aR[1] - 2);
+    expect(end.kR[0]).toBeGreaterThan(start.kR[0] + 5);
     for (let frame = 0; frame <= 20; frame++) {
       const pose = movementPose('woodchop', frame / 20);
       expect(pose.hR).toEqual(pose.hL);
-      expect(pose.aR).toEqual(start.aR);
+      expect(pose.tR).toEqual(start.tR);
       expect(pose.tL).toEqual(start.tL);
       expect(distance(pose.neck, pose.eR)).toBeGreaterThan(15);
       expect(distance(pose.neck, pose.eR)).toBeLessThan(34);
