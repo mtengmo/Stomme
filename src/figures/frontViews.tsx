@@ -25,6 +25,7 @@ export const supportedFrontViews = [
   'single-leg-chair-squat',
   'side-lunge',
   'farmer-carry',
+  'woodchop',
 ] as const satisfies readonly ExerciseId[];
 
 export const supportedObliqueViews = [
@@ -46,7 +47,7 @@ export type FigureAngle = 'side' | 'front' | 'oblique';
 /** Start with the angle that explains each movement most clearly. */
 export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
   if (FRONT_ONLY.includes(exerciseId)) return 'front';
-  if (exerciseId === 'side-lunge') return 'front';
+  if (exerciseId === 'side-lunge' || exerciseId === 'woodchop') return 'front';
   if (exerciseId === 'russian-twist') return 'oblique';
   return 'side';
 }
@@ -239,6 +240,72 @@ function lateralHopPose(t: number, working: Working | null): Pose {
   };
 }
 
+/** Mirrors a pose authored for the right side about the body's centre line (x = 100). */
+function mirrorPose(pose: Pose): Pose {
+  const flip = (pt: Pt): Pt => point(200 - pt[0], pt[1]);
+  return {
+    head: flip(pose.head),
+    neck: flip(pose.neck),
+    hip: flip(pose.hip),
+    eR: flip(pose.eL),
+    hR: flip(pose.hL),
+    eL: flip(pose.eR),
+    hL: flip(pose.hR),
+    kR: flip(pose.kL),
+    aR: flip(pose.aL),
+    tR: flip(pose.tL),
+    kL: flip(pose.kR),
+    aL: flip(pose.aR),
+    tL: flip(pose.tR),
+  };
+}
+
+/**
+ * Woodchop from the front, authored for the right start side (viewer's left):
+ * both hands share one grip and travel the straight diagonal from the right
+ * hip, across the chest, to above the left shoulder. The trunk and hips turn
+ * with it (hip and neck shift towards the finish side), and the right foot
+ * turns on the floor: the toe swings from pointing out to pointing across
+ * while the heel rises, with the knee following. The left foot stays planted. Thigh, shin and arm segments keep their lengths (IK).
+ */
+export const WOODCHOP_FRONT_FIXED_FOOT_X = 118;
+function woodchopFrontPose(t: number): Pose {
+  const s = smooth(t);
+  const hip = point(mix(96, 104, s), mix(121, 117, s));
+  const neck = point(mix(93, 107, s), hip[1] - 43);
+  const head = point(neck[0] + mix(-1, 2, s), neck[1] - 14);
+  // The shared grip: right hip, up across the chest, over the left shoulder.
+  // The arc bows out and down in the middle, as the arms reach forward.
+  const bow = Math.sin(Math.PI * s);
+  const grip = point(mix(86, 122, s) + 10 * bow, mix(120, 36, s) + 20 * bow);
+  // Both hands hold one weight, so both arms follow the same chain.
+  const arm = solveTwoBone(neck, grip, 24, 24, -1);
+  // Right (pivot) foot: the toe stays on the floor and the foot turns about
+  // it, from pointing outwards to pointing across; as it turns the heel rises
+  // (ankle y = 177 - foot length * sin) with the foot length constant.
+  const footLength = Math.hypot(9, 3);
+  const angle = mix(Math.atan2(3, -9), Math.atan2(6.5, 6.9), s);
+  const aR = point(82, 177 - footLength * Math.sin(angle));
+  const tR = point(aR[0] + footLength * Math.cos(angle), 177);
+  const aL = point(WOODCHOP_FRONT_FIXED_FOOT_X, 174);
+  const tL = point(aL[0] + 9, 177);
+  return skeleton(
+    head,
+    neck,
+    hip,
+    arm.mid,
+    arm.end,
+    arm.mid,
+    arm.end,
+    joint(hip, aR, FRONT_THIGH, 34, 1),
+    aR,
+    tR,
+    joint(hip, aL, FRONT_THIGH, 34, -1),
+    aL,
+    tL,
+  );
+}
+
 /** Purpose-drawn frontal geometry for the small set of readable front views. */
 export function frontMovementPose(
   exerciseId: FrontViewExercise,
@@ -246,6 +313,10 @@ export function frontMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (exerciseId === 'woodchop')
+    return working === 'left'
+      ? mirrorPose(woodchopFrontPose(t))
+      : woodchopFrontPose(t);
   if (exerciseId === 'in-and-out-jump') return inAndOutPose(t);
   if (exerciseId === 'lateral-shuffle') return lateralShufflePose(t);
   if (exerciseId === 'single-leg-lateral-hop')
@@ -916,7 +987,7 @@ export function FrontFigureFrame({
           ? [pose.hR, pose.hL]
           : exerciseId === 'side-lunge'
             ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
-            : exerciseId === 'russian-twist'
+            : exerciseId === 'russian-twist' || exerciseId === 'woodchop'
               ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
               : exerciseId === 'kettlebell-rack-carry' ||
                   exerciseId === 'suitcase-carry'

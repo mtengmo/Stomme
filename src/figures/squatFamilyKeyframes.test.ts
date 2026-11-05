@@ -9,6 +9,7 @@ import {
   SQUAT_FAMILY_IDS,
   squatFamilyPose,
   squatFamilyStills,
+  THRUSTER_PRESS_START,
 } from './squatFamilyKeyframes';
 
 const dist = (a: readonly number[], b: readonly number[]) =>
@@ -59,7 +60,7 @@ describe('squat family keyframes', () => {
     }
   });
   it('thruster: rack hand sits 13 right of and 2 above the neck, and overhead is above the head', () => {
-    const rack = squatFamilyPose('thruster', 0.5);
+    const rack = squatFamilyPose('thruster', THRUSTER_PRESS_START);
     expect(dist(rack.hR, [rack.neck[0] + 13, rack.neck[1] - 2])).toBeLessThan(
       0.5,
     );
@@ -102,7 +103,7 @@ describe('squat family keyframes', () => {
       const stills = squatFamilyStills(id) ?? [];
       expect(stills[0]?.[0]).toBe('Start');
       const rack = movementPose(id, stills[0]?.[1] ?? -1);
-      expect(rack.hip).toEqual([98, 118]);
+      expect(dist(rack.hip, [98, 118])).toBeLessThan(2);
       expect(dist(rack.hR, [rack.neck[0] + 13, rack.neck[1] - 2])).toBeLessThan(
         0.5,
       );

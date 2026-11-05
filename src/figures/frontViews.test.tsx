@@ -60,6 +60,7 @@ describe('authored frontal demonstrations', () => {
       'single-leg-chair-squat',
       'side-lunge',
       'farmer-carry',
+      'woodchop',
     ]);
     expect(supportedObliqueViews).toEqual([
       'split-squat',
@@ -446,4 +447,40 @@ describe('front pilot support contacts', () => {
       }
     },
   );
+});
+
+describe('woodchop front view', () => {
+  it('shows the diagonal from the start hip to above the opposite shoulder, mirrored per side', () => {
+    expect(defaultViewFor('woodchop')).toBe('front');
+    const dist = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+    const start = frontMovementPose('woodchop', 0, 'right');
+    const end = frontMovementPose('woodchop', 1, 'right');
+    // Starts low by the right hip (viewer's left), finishes above the left shoulder.
+    expect(start.hR[0]).toBeLessThan(start.hip[0]);
+    expect(start.hR[1]).toBeGreaterThan(start.hip[1] - 8);
+    expect(end.hR[0]).toBeGreaterThan(end.neck[0] + 8);
+    expect(end.hR[1]).toBeLessThan(end.head[1] - 15);
+    // The pivot foot's heel lifts and swings across; the far foot stays put.
+    expect(end.aR[1]).toBeLessThan(start.aR[1] - 2);
+    expect(end.tR[0]).toBeGreaterThan(start.tR[0] + 10);
+    expect(end.tR[1]).toBeCloseTo(start.tR[1], 5);
+    expect(end.aL).toEqual(start.aL);
+    expect(end.hip[0]).toBeGreaterThan(start.hip[0] + 5);
+    for (let i = 0; i <= 20; i++) {
+      const p = frontMovementPose('woodchop', i / 20, 'right');
+      expect(p.hR).toEqual(p.hL);
+      expect(dist(p.neck, p.eR) + dist(p.eR, p.hR)).toBeGreaterThan(
+        dist(p.neck, p.hR) - 0.01,
+      );
+      expect(dist(p.neck, p.eR)).toBeCloseTo(24, 0);
+      expect(dist(p.eR, p.hR)).toBeCloseTo(24, 0);
+      expect(dist(p.hip, p.kR)).toBeCloseTo(35.9, 0);
+      expect(dist(p.kR, p.aR)).toBeCloseTo(34, 0);
+      expect(dist(p.aR, p.tR)).toBeCloseTo(Math.hypot(9, 3), 1);
+      const mirrored = frontMovementPose('woodchop', i / 20, 'left');
+      expect(mirrored.hR[0]).toBeCloseTo(200 - p.hL[0], 5);
+      expect(mirrored.aL[0]).toBeCloseTo(200 - p.aR[0], 5);
+    }
+  });
 });
