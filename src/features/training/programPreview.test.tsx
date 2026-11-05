@@ -167,3 +167,39 @@ it('opens the editor without a row for ?byt=alla', async () => {
   await screen.findByRole('button', { name: 'Visa passöversikt' });
   expect(screen.queryByRole('button', { name: 'Byt övning' })).toBeNull();
 });
+
+/** The draft key prefix of the programme pass preview, found from what it stores. */
+async function draftPrefix(): Promise<string> {
+  window.location.hash = '#/traning/A?program=1';
+  render(<App />);
+  await screen.findByRole('button', { name: 'Starta passet' });
+  await waitFor(() =>
+    expect(
+      Object.keys(sessionStorage).some((key) => key.endsWith('.short')),
+    ).toBe(true),
+  );
+  const key = Object.keys(sessionStorage).find((k) => k.endsWith('.short'));
+  cleanup();
+  return (key as string).slice(0, -'.short'.length);
+}
+
+it('?byt= opens the editor even when Kortpass was chosen earlier', async () => {
+  const prefix = await draftPrefix();
+  sessionStorage.setItem(`${prefix}.short`, 'true');
+  const target = programFixture().passes[0]?.exerciseIds[1];
+  window.location.hash = `#/traning/A?program=1&byt=${target}`;
+  render(<App />);
+  const open = await screen.findByRole('button', { name: /Stäng/ });
+  expect(open.getAttribute('aria-expanded')).toBe('true');
+  expect(sessionStorage.getItem(`${prefix}.short`)).toBe('false');
+});
+
+it('?byt= for an exercise that is not in the draft opens no other row', async () => {
+  const prefix = await draftPrefix();
+  sessionStorage.setItem(`${prefix}.open`, '0');
+  window.location.hash = '#/traning/A?program=1&byt=finns-inte';
+  render(<App />);
+  await screen.findByRole('button', { name: 'Visa passöversikt' });
+  expect(screen.queryByRole('button', { name: /Stäng/ })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Byt övning' })).toBeNull();
+});

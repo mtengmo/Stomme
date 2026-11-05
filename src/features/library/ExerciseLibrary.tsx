@@ -15,7 +15,8 @@ import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import { readTrainingProgram } from '../../db/program';
-import { getMeta } from '../../db/repo';
+import { getMeta, listSessions } from '../../db/repo';
+import { canReplaceTrainingPreparation } from '../../db/training';
 import type { ExerciseId } from '../../domain/types';
 import { useHashSearch } from '../../lib/hashLocation';
 import {
@@ -57,6 +58,13 @@ export function ExerciseLibrary() {
   const training = useLiveQuery(() => getMeta(getDb(), 'training'), []);
   const favourites = useLiveQuery(() => readFavourites(getDb()), []);
   const program = useLiveQuery(() => readTrainingProgram(getDb()), []);
+  // A running workout locks the own-workout rows, as on Home; a prepared one does not.
+  const locked = useLiveQuery(async () => {
+    const active = (await listSessions(getDb())).find(
+      (session) => session.status === 'in_progress',
+    );
+    return !!active && !(await canReplaceTrainingPreparation(getDb(), active));
+  }, []);
   const preferences = isTrainingPreferences(training) ? training : undefined;
   const filters = filtersFromParams(query);
   const inventory = preferences ?? { equipment: defaultEquipment };
@@ -167,7 +175,9 @@ export function ExerciseLibrary() {
     <FavouritesProvider>
       <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
         <header>
-          <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
+          <h1 className="m-0 text-5xl leading-none font-extrabold [overflow-wrap:anywhere]">
+            Övningar
+          </h1>
           <p className="m-0 mt-3 text-base text-ink-soft">
             Dina pass, färdiga pass och hela övningsbiblioteket.
           </p>
@@ -177,6 +187,7 @@ export function ExerciseLibrary() {
           variant="home"
           title="Egna pass"
           alwaysShow
+          disabled={!!locked}
         />
         {preferences ? (
           <ReadyWorkoutsSection

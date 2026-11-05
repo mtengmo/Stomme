@@ -63,11 +63,11 @@ export function NewWorkout() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-[var(--app-nav-height)]">
       <Link
-        href="/"
+        href="/ovningar"
         className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
       >
         <Icon name="back" />
-        Till träningen
+        Till övningar
       </Link>
       <h1 className="m-0 text-5xl leading-none font-extrabold">
         Skapa eget pass

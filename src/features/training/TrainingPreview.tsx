@@ -305,6 +305,8 @@ function PreviewEditor({
   const problems = startProblems(plan, preferences);
   const ready = problems.length === 0;
   const [shortSelected, setShortSelected] = useState(() => {
+    // The editor is not shown for Kortpass, so ?byt= always starts on the full pass.
+    if (bytParam) return false;
     try {
       const stored = sessionStorage.getItem(`${draftKey}.short`);
       return stored === null
@@ -378,6 +380,8 @@ function PreviewEditor({
   const [expandedIndex, setExpandedIndex] = useState<number | null>(() => {
     const requested = plan.findIndex((item) => item.exerciseId === bytParam);
     if (requested >= 0) return requested;
+    // A specific exercise that is no longer in the draft opens no other row.
+    if (bytParam && bytParam !== 'alla') return null;
     try {
       const raw = sessionStorage.getItem(`${draftKey}.open`);
       const stored = raw === null ? Number.NaN : Number(raw);
