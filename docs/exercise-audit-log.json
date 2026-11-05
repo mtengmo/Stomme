@@ -2479,7 +2479,7 @@
     "name": "Chins med underhandsgrepp",
     "group": "bodyweight",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -2519,12 +2519,18 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "E56: hängläget startar nu med raka armar (halsen en armlängd under stången); knäna böjda i hängläget så fötterna hålls fria från golvet."
+      },
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "commit": "ce92e90",
+        "notes": "E56: hängläget (fas 0 och reduced-motion Start) startar nu exakt en armlängd (2 x 30) från varje hand (hals y = 31 + sqrt(60^2 - 20^2)), så axel-armbåge-handled-linjerna är helt raka utan knäck; händerna kvar på stången, konstanta lemlängder, fötterna fria. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.5 och 1."
       }
     ],
     "openIssues": [
       "[cheap] E56, fas 0 och reduced-motion Start: båda armbågarna har en synlig knäck mellan handen på stången och axel/hals-punkten. Visa ett tydligt utsträckt hängläge enligt instruktionen, med raka axel–armbåge–handled-linjer, bibehållen kontakt med stången och fötterna fria från golvet."
     ],
-    "fingerprint": "86a9cc9505b5"
+    "fingerprint": "98f27bb33227"
   },
   {
     "id": "back-extension",
@@ -3019,7 +3025,7 @@
     "name": "Smala armhävningar",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3056,12 +3062,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E70: händerna står under bröstet i toppläget och armarna är raka där (konstant segmentlängd (174-halsen)/2); sänkningen viker armbågarna. Sedd fas 0, 0.5, 0.875 och 1."
+      },
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "commit": "ce92e90",
+        "notes": "E70: bägge armarna får samma halva längd (hypot till den bortre handen, som nu står på samma golvhöjd 174), så båda axel-armbåge-handled-linjerna är raka i topplägret och den bortre armbågen sticker inte längre bakåt; handkontakt kvar och konstant armlängd under sänkningen. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.5 och 1."
       }
     ],
     "openIssues": [
       "[cheap] E70, fas 0 och reduced-motion Start: den bortre armbågen sticker bakåt och armen är synligt böjd samtidigt som den närmaste armen är rak. Justera topposen så att båda axel–armbåge–handled ligger på raka linjer enligt textens 'räta ut armarna', med bibehållen handkontakt och konsekventa armlängder under sänkningen."
     ],
-    "fingerprint": "f6321974f460"
+    "fingerprint": "5b5ed0f88dab"
   },
   {
     "id": "blast-off-push-up",
@@ -3456,7 +3468,7 @@
     "name": "Knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3501,19 +3513,25 @@
         "fixer": "claude-sonnet",
         "commit": "56d07e3",
         "notes": "Reduced-motion stills: Start is the standing shoulder rack (phase 0.5), plus Botten (phase 0) and Slut (overhead)."
+      },
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "commit": "ce92e90",
+        "notes": "E73: benen blir raka vid fas 0.46 (mjuk avslutning) och pressen börjar redan vid 0.40 och pågår över hela resten av loopen, så armarna börjar pressa under slutet av bensträckningen; reduced-motion Start är fas 0.40 (stående rack, knappt synlig höftskillnad). Test i thrusterGeometry.test.ts uppdaterat. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.2, 0.4, 0.43, 0.46, 0.55, 0.7, 1."
       }
     ],
     "openIssues": [
       "[strong] E73, fas 0.375–0.625: höft och knä sträcks färdigt medan händerna ligger kvar vid axlarna; armpressen börjar först med raka ben. Samordna armarnas press med slutet av bensträckningen enligt instruktionen 'När höfter och knän sträcks, pressa', så huvudövningen inte visar den separata knäböj-plus-press som anges som enklare variant."
     ],
-    "fingerprint": "7ee9533683e0"
+    "fingerprint": "488bebd66757"
   },
   {
     "id": "single-arm-thruster",
     "name": "Enarms knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3558,12 +3576,18 @@
         "fixer": "claude-sonnet",
         "commit": "56d07e3",
         "notes": "Reduced-motion stills: Start is the standing shoulder rack (phase 0.5), plus Botten (phase 0) and Slut (overhead)."
+      },
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "commit": "ce92e90",
+        "notes": "E74: samma tidsändring som E73 (gemensam squatFamilyPose): pressen med vald arm börjar vid 0.40 när benen avslutar sträckningen (klara 0.46); spegling och handkontakt med hantel oförändrade. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.4, 0.43, 0.46, 0.55, 1 (H)."
       }
     ],
     "openIssues": [
       "[strong] E74, profilfas 0.375–0.625: höft/knä når fullt stående innan vald arms press börjar. Samordna armpressen med slutet av bensträckningen enligt textens 'När höfter och knän sträcks, pressa', med motsvarande sekvens på båda sidor och bibehållen kontakt mellan hand och hantel."
     ],
-    "fingerprint": "3cdd31d0df7c"
+    "fingerprint": "9795b24e3575"
   },
   {
     "id": "bent-over-row",
@@ -3918,7 +3942,7 @@
     "name": "Woodchop",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -3950,12 +3974,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E88: närmaste foten vrids på trampdynan: tån står kvar, hälen lyfts och knät följer med (additionalPoses.ts). Figuren saknar sned/frontvy, så diagonalen syns inte. Sedd sida H fas 0 och 1."
+      },
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "commit": "ce92e90",
+        "notes": "E88: ny frontvy (Framifrån, standardvy) i frontViews.tsx med spegling för V: den delade greppvikten går diagonalt från startsidans höft över bröstet till ovanför motsatt axel; höft och hals skiftar mot slutsidan och startsidans fot vrids i golvplanet (tån sveper från utåt till tvärs, hälen lyfts, konstant fotlängd) medan knät följer med; andra foten står kvar. Sidovyn oförändrad. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd H fas 0, 0.25, 0.5, 0.75, 1; V täcks av test (spegling)."
       }
     ],
     "openIssues": [
       "[strong] E88, profilrutorna 0–1 och reduced-motion Slut H/V: axlar/händer och startbenets knä/fot visar inte den beskrivna diagonalen till motsatt axel eller medvridningen i golvplanet. Hällyftet ensamt gör inte rotationen läsbar. Lägg till en front-/snedvy eller annan tydlig geometri där höft-till-motsatt-axel-banan och knäets/fotens gemensamma medvridning kan verifieras."
     ],
-    "fingerprint": "8823b6e30eb1"
+    "fingerprint": "c6d9d996a7bb"
   },
   {
     "id": "seated-tibial-rotation",

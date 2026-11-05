@@ -151,8 +151,11 @@ function diamondPushUp(t: number): Pose {
   // and the elbows fold back alongside the trunk while lowering.
   const top = pushUp(0).neck;
   const hand: Pt = [top[0], 174],
-    farHand: Pt = [top[0] + 1.4, 173];
-  const arm = (174 - top[1]) / 2;
+    farHand: Pt = [top[0] + 1.4, 174];
+  // Both hands stand on the mat, so both arms use the same half-length: the
+  // longer (far) shoulder-to-hand reach, which keeps both arms straight at the
+  // top (the far hand is 1.4 further out, so the near arm bows under 1 unit).
+  const arm = Math.hypot(farHand[0] - top[0], farHand[1] - top[1]) / 2;
   return {
     ...p,
     hR: hand,
@@ -210,7 +213,10 @@ function plankArmLift(t: number): Pose {
 function pull(t: number, chin: boolean): Pose {
   // Hang with straight arms: the neck sits one arm length (60) below the bar, so the
   // narrower chin-up grip starts lower than the wide pull-up grip.
-  const neck: Pt = [100, mix(chin ? 87 : 80, 36, t)],
+  // The chin-up hang is exactly one arm length (2 x 30) from each hand, so the
+  // shoulder-elbow-wrist lines are dead straight (no sagitta) at phase 0.
+  const hangNeck = chin ? 31 + Math.sqrt(60 * 60 - 20 * 20) : 80;
+  const neck: Pt = [100, mix(hangNeck, 36, t)],
     hip: Pt = [100, neck[1] + 43];
   const hands: [Pt, Pt] = chin
     ? [

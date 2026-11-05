@@ -63,6 +63,15 @@ export function squatCurlPhase(t: number): { depth: number; curl: number } {
   return { depth: 0, curl: 0 };
 }
 
+/**
+ * Thrusters: the legs drive up over t = 0..THRUSTER_LEGS_DONE and the press
+ * starts at THRUSTER_PRESS_START, while the last part of the leg extension is
+ * still under way ('När höfter och knän sträcks, pressa'). The standing rack
+ * (hands at the shoulders, legs straight) is the Start still.
+ */
+export const THRUSTER_LEGS_DONE = 0.46;
+export const THRUSTER_PRESS_START = 0.4;
+
 /** Labelled stills for reduced motion; the loop itself starts standing. */
 export function squatFamilyStills(
   id: SquatFamilyId,
@@ -75,7 +84,7 @@ export function squatFamilyStills(
     ];
   if (id === 'thruster' || id === 'single-arm-thruster')
     return [
-      ['Start', 0.5],
+      ['Start', THRUSTER_PRESS_START],
       ['Botten', 0],
       ['Slut', 1],
     ];
@@ -138,8 +147,10 @@ export function squatFamilyPose(id: SquatFamilyId, progress: number): Pose {
     });
   }
   if (id === 'thruster' || id === 'single-arm-thruster') {
-    const depth = t <= 0.5 ? 1 - t / 0.5 : 0;
-    const press = t <= 0.5 ? 0 : (t - 0.5) / 0.5;
+    const depth = 1 - smooth(clamp(t / THRUSTER_LEGS_DONE));
+    const press = clamp(
+      (t - THRUSTER_PRESS_START) / (1 - THRUSTER_PRESS_START),
+    );
     const { neck } = body(depth);
     const reach = lerpPt([13, -2], [8, -43], press);
     const near = arm(neck, add(neck, reach), 23, 22);
