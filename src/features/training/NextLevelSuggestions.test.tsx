@@ -63,7 +63,7 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe('impact progression suggestions', () => {
-  it('keeps the non-impact blast off push-up swap regardless of pain history', () => {
+  it('no longer offers the retired blast off push-up swap, only the remaining non-impact one', () => {
     render(
       <NextLevelSuggestions
         plan={sessions[0]?.plan ?? []}
@@ -74,8 +74,8 @@ describe('impact progression suggestions', () => {
       />,
     );
     expect(
-      screen.getByRole('button', { name: 'Byt till blast off-armhävning' }),
-    ).toBeTruthy();
+      screen.queryByRole('button', { name: 'Byt till blast off-armhävning' }),
+    ).toBeNull();
     expect(
       screen.getByRole('button', { name: 'Byt till smala armhävningar' }),
     ).toBeTruthy();
@@ -108,13 +108,10 @@ describe('impact progression suggestions', () => {
     await getDb().setLogs.bulkAdd(logs);
     render(<SummaryNextLevel session={session} />);
     expect(
-      await screen.findByRole('link', { name: 'Blast off-armhävning' }),
+      await screen.findByRole('link', { name: 'Smala armhävningar' }),
     ).toBeTruthy();
     expect(
-      screen.getByRole('link', { name: 'Blast off-armhävning' }),
-    ).toBeTruthy();
-    expect(
-      screen.getByRole('link', { name: 'Smala armhävningar' }),
-    ).toBeTruthy();
+      screen.queryByRole('link', { name: 'Blast off-armhävning' }),
+    ).toBeNull();
   });
 });

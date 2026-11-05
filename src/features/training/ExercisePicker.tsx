@@ -7,13 +7,13 @@ import {
   purposeLabels,
   technicalLevelLabels,
 } from '../../content/exerciseMetadata';
-import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
   exerciseMuscles,
   muscleGroups,
   primaryMuscleLabel,
 } from '../../content/muscles';
+import { activeExerciseList } from '../../content/retiredExercises';
 import { getDb } from '../../db/db';
 import { readFavourites, toggleFavourite } from '../../db/favourites';
 import type { ExerciseId, TrainingPreferences } from '../../domain/types';
@@ -160,12 +160,12 @@ export function ExercisePicker({
   const candidates = useMemo(() => {
     if (replacingId && !state.broadened) {
       if (!slot) return [];
-      return exerciseList.filter(
+      return activeExerciseList.filter(
         (exercise) =>
           exercise.id !== replacingId && movementSlots[exercise.id] === slot,
       );
     }
-    return exerciseList;
+    return activeExerciseList;
   }, [replacingId, slot, state.broadened]);
 
   const scopedCandidates = candidates.filter(
@@ -197,7 +197,7 @@ export function ExercisePicker({
     }
   }
 
-  function renderRow(exercise: (typeof exerciseList)[number]) {
+  function renderRow(exercise: (typeof activeExerciseList)[number]) {
     const alreadySelected = selectedIds.includes(exercise.id);
     const current = exercise.id === replacingId;
     const disabled = alreadySelected;

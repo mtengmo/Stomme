@@ -4,7 +4,7 @@ import { Link, useLocation } from 'wouter';
 import { exerciseMetadata } from '../../content/exerciseMetadata';
 import { exerciseReferences } from '../../content/exerciseReferences';
 import { exerciseSideCue } from '../../content/exerciseSideCues';
-import { exerciseList, exercises } from '../../content/exercises';
+import { exercises } from '../../content/exercises';
 import {
   focusLabel,
   type WorkoutFocus,
@@ -38,6 +38,7 @@ import {
   trainingName,
   withWorkoutEquipment,
 } from '../../content/programmes';
+import { activeExerciseList } from '../../content/retiredExercises';
 import {
   type CustomWorkout,
   createNamedCustomWorkout,
@@ -112,7 +113,7 @@ import { WorkoutEquipmentControls } from './WorkoutEquipmentControls';
 export { defaultPlan };
 
 function available(preferences: TrainingPreferences) {
-  return exerciseList.filter((exercise) =>
+  return activeExerciseList.filter((exercise) =>
     exerciseMetadata[exercise.id].variants.some((variant) =>
       equipmentFits(variant.equipment, preferences),
     ),
@@ -443,7 +444,7 @@ function PreviewEditor({
             preferences.programId === 'rehab'
               ? (rehabGroup(preferences) === 'aaos'
                   ? kneeRehabExercises
-                  : exerciseList
+                  : activeExerciseList
                 )
                   .map((exercise) => exercise.id)
                   .filter((exerciseId) =>

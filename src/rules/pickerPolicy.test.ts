@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { retiredExerciseIds } from '../content/retiredExercises';
 import { rehabImpactExercises } from '../content/rosterSlots';
 import { pickableInProgramme } from './pickerPolicy';
 
@@ -14,7 +15,6 @@ describe('pickableInProgramme', () => {
 
   it('hides the quick feet drills in rehab and offers them in general training', () => {
     for (const id of [
-      'fast-feet',
       'in-and-out-jump',
       'lateral-shuffle',
       'knee-drive',
@@ -32,6 +32,12 @@ describe('pickableInProgramme', () => {
     expect(pickableInProgramme('plate-pogos', { programId: 'general' })).toBe(
       true,
     );
+  });
+
+  it('never offers a retired exercise, in any programme', () => {
+    for (const id of retiredExerciseIds)
+      for (const programId of ['general', 'rehab'] as const)
+        expect(pickableInProgramme(id, { programId })).toBe(false);
   });
 
   it('allows ordinary exercises in rehab', () => {

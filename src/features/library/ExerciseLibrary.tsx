@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { exerciseList } from '../../content/exercises';
 import {
   bodyRegions,
   muscleGroups,
@@ -11,6 +10,7 @@ import {
   defaultEquipment,
   isTrainingPreferences,
 } from '../../content/programmes';
+import { activeExerciseList } from '../../content/retiredExercises';
 import { templates } from '../../content/templates';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
@@ -95,7 +95,7 @@ export function ExerciseLibrary() {
     [],
   );
   const mode = parseSortMode(query.get(sortParamName));
-  const filtered = filterExercises(exerciseList, filters, {
+  const filtered = filterExercises(activeExerciseList, filters, {
     inventory,
     mine,
     favourites,

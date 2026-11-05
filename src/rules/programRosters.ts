@@ -6,6 +6,7 @@ import {
   type WorkoutFocus,
 } from '../content/focusPresets';
 import { bodyRegions, exerciseMuscles } from '../content/muscles';
+import { isRetiredExercise } from '../content/retiredExercises';
 import {
   focusSlots,
   generalSlots,
@@ -108,7 +109,9 @@ const EASIEST_NOTE =
 
 function fits(id: ExerciseId, preferences: TrainingPreferences): boolean {
   return (
-    !rehabAdditionIds.has(id) && variantsThatFit(id, preferences).length > 0
+    !rehabAdditionIds.has(id) &&
+    !isRetiredExercise(id) &&
+    variantsThatFit(id, preferences).length > 0
   );
 }
 
