@@ -135,6 +135,14 @@ export const exerciseMuscles: Record<
   },
   'lateral-shuffle': { ...bodyweightDetails['lateral-shuffle'], qualities: [] },
   'knee-drive': { ...bodyweightDetails['knee-drive'], qualities: [] },
+  'isometric-lunge-hold': {
+    ...bodyweightDetails['isometric-lunge-hold'],
+    qualities: ['balance'],
+  },
+  'plate-pogos': {
+    ...bodyweightDetails['plate-pogos'],
+    qualities: ['power'],
+  },
   'jumping-lunge': {
     ...bodyweightDetails['jumping-lunge'],
     qualities: ['power'],

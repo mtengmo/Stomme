@@ -2,7 +2,7 @@ import type { Exercise, SideKind } from '../domain/types';
 import type { EquipmentType, TechnicalLevel } from './exerciseMetadata';
 import type { MuscleGroupId } from './muscles';
 
-/** Impact exercises that load the knee (burpee and the jumping additions). */
+/** Exercises that load the knee: impact additions, plus the static lunge hold. */
 const KNEE_LOADED_IDS: ReadonlySet<string> = new Set([
   'burpee',
   'squat-jump',
@@ -13,6 +13,8 @@ const KNEE_LOADED_IDS: ReadonlySet<string> = new Set([
   'in-and-out-jump',
   'lateral-shuffle',
   'knee-drive',
+  'plate-pogos',
+  'isometric-lunge-hold',
 ]);
 
 /** Library additions only. Doses are editable app proposals, not source prescriptions. */
@@ -400,6 +402,40 @@ export const bodyweightExercises: Exercise[] = [
     undefined,
     45,
   ),
+  exercise(
+    'isometric-lunge-hold',
+    'Isometrisk utfallshållning',
+    ['Framsida lår', 'Säte', 'Baksida lår', 'Vader', 'Bål'],
+    [
+      'Stå med ena foten långt fram och den andra bakom dig, med händerna på höfterna. Ha halkfritt underlag och något stabilt att ta stöd mot om du tappar balansen.',
+      'Sänk dig rakt ned tills det främre låret är ungefär parallellt med golvet och det bakre knät svävar strax ovanför golvet. Främre knät följer tårnas riktning, överkroppen är upprätt och vikten ligger mest på främre foten.',
+      'Håll positionen stilla under tiden som visas, andas lugnt och stå sedan upp. Byt ben och gör lika länge på andra sidan.',
+    ],
+    'Främre knät faller inåt eller skjuts långt framför tårna, eller överkroppen lutar framåt.',
+    'Sänk dig bara en bit, ta stöd mot en vägg eller stol, eller korta tiden.',
+    30,
+    'seconds',
+    12,
+    'ben',
+    60,
+  ),
+  exercise(
+    'plate-pogos',
+    'Pogohopp',
+    ['Vader', 'Framsida lår', 'Säte', 'Bål'],
+    [
+      'Stå med fötterna ungefär höftbrett på halkfritt underlag med fritt omkring dig. En viktskiva på golvet bredvid dig kan vara en markering; du ska aldrig hoppa över eller upp på den.',
+      'Hoppa lågt och snabbt med nästan raka ben och stela fotleder, så att det är fotlederna som fjädrar. Landa tyst på framfoten med knäna i samma riktning som tårna och tryck direkt upp igen.',
+      'Fortsätt i jämn takt under tiden som visas med överkroppen upprätt. Pausa om landningarna blir tunga eller ljudliga.',
+    ],
+    'Du landar på hälarna eller böjer knäna djupt i stället för att fjädra i fotlederna.',
+    'Gör mycket små hopp, eller stå på tå och studsa lätt med fotlederna utan att lämna golvet.',
+    20,
+    'seconds',
+    12,
+    undefined,
+    45,
+  ),
 ];
 
 export type BodyweightId = (typeof bodyweightIds)[number];
@@ -413,6 +449,8 @@ export const bodyweightIds = [
   'in-and-out-jump',
   'lateral-shuffle',
   'knee-drive',
+  'isometric-lunge-hold',
+  'plate-pogos',
   'plank-arm-lift',
   'push-up',
   'pull-up',
@@ -519,6 +557,28 @@ export const bodyweightDetails: Record<
     secondary: ['quads', 'glutes', 'core'],
     publisher: 'Stomme',
     note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Växelvisa knälyft på stället utan extra vikt. Tiden gäller båda benen tillsammans. Avbryt vid smärta i knä, höft, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+  },
+  'isometric-lunge-hold': {
+    equipment: 'bodyweight',
+    level: 'practiced',
+    reason:
+      'Ett långt hållande utfall belastar knät och kräver bäckenkontroll och balans.',
+    primary: ['quads', 'glutes'],
+    secondary: ['hamstrings', 'calves', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Statisk position i delad fotställning, ungefär 30 sekunder per ben. Ingen extra vikt. Gå inte djupare än du kan hålla kontrollerat. Avbryt vid smärta i knä, höft eller fot. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+    cue: 'Ha en vägg eller stabil stol inom räckhåll för balansen.',
+  },
+  'plate-pogos': {
+    equipment: 'bodyweight',
+    level: 'technical',
+    reason:
+      'Upprepade snabba hopp kräver stela fotleder och mjuka landningar, och belastar fot, vad och knä.',
+    primary: ['calves'],
+    secondary: ['quads', 'glutes', 'core'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Låga, snabba hopp på två ben med stela fotleder. Viktskivan är bara en markering på golvet; hoppa aldrig över eller upp på den. Ingen extra vikt. Avbryt vid smärta i knä, fot eller vad. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+    cue: 'Lägg en viktskiva på golvet som markering, bredvid där du landar. Hoppa inte på den.',
   },
   'decline-push-up': {
     equipment: 'chair',

@@ -111,6 +111,7 @@ export const rehabImpactExercises: ReadonlySet<ExerciseId> = new Set([
   'in-and-out-jump',
   'lateral-shuffle',
   'knee-drive',
+  'plate-pogos',
 ]);
 
 /** Explicit opt-in for daily focus. Library and clinician-only additions stay out. */

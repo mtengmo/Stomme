@@ -3975,5 +3975,45 @@
     ],
     "openIssues": [],
     "fingerprint": "c2bf5ef400ff"
+  },
+  {
+    "id": "isometric-lunge-hold",
+    "name": "Isometrisk utfallshållning",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E105: statisk delad fotställning, främre lår parallellt, bakre knä strax ovanför golvet, händer på höfterna, upprätt bål. Sidovy (hold) med planterade fötter och konstanta lemlängder; Start är ett högre läge, Håll är bottenläget. Redaktionell, ingen extern källa. Risk high eftersom knät belastas (kneeLoaded)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Ny övning från en löpstyrkevideo. Väntar på korsgranskning av Astra (codex:gpt6astra). Godkänns aldrig av byggaren. Dos 30 s per ben, ej i någon roster."
+    ],
+    "fingerprint": "dbebee19ac5d"
+  },
+  {
+    "id": "plate-pogos",
+    "name": "Pogohopp",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-05",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E106: låga, snabba tvåbenshopp med stela fotleder och landning på framfoten, viktskiva som golvmarkering (ny rekvisita 'plate', ej att hoppa på). Ballistisk: varning, smärtgräns, ej vid knäbesvär, ingår i rehabImpactExercises (utesluts ur rehab, nybörjarprogram och beginnerSet via programExclusions). Reducerad rörelse: Start och Slut. Redaktionell, ingen extern källa."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Ny övning från en löpstyrkevideo. Väntar på korsgranskning av Astra (codex:gpt6astra). Godkänns aldrig av byggaren. Dos 20-45 s, ej i någon roster."
+    ],
+    "fingerprint": "5ecba7c91027"
   }
 ]

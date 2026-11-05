@@ -22,6 +22,7 @@ const IMPACT_IDS = [
   'in-and-out-jump',
   'lateral-shuffle',
   'knee-drive',
+  'plate-pogos',
 ] as const;
 
 async function prepareGeneral(page: import('@playwright/test').Page) {

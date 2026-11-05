@@ -236,6 +236,44 @@ export async function createNamedCustomWorkout(
   return id;
 }
 
+/**
+ * Adds a ready-made workout as an ordinary saved workout. Idempotent: the same
+ * name with the same exercises returns the existing id; a name taken by a
+ * different workout gets " (2)" and so on instead of failing.
+ */
+export async function addReadyWorkout(
+  name: string,
+  exerciseIds: ExerciseId[],
+  group: WorkoutGroup,
+): Promise<string> {
+  let id: string = crypto.randomUUID();
+  await updateWorkouts((current) => {
+    const same = current.find(
+      (item) =>
+        nameKey(item.name) === nameKey(name) &&
+        item.exerciseIds.join() === exerciseIds.join(),
+    );
+    if (same) {
+      id = same.id;
+      return current;
+    }
+    if (current.length >= maxCustomWorkouts) throw new Error('limit');
+    return [
+      ...current,
+      {
+        id,
+        name: uniqueWorkoutName(
+          name,
+          current.map((item) => item.name),
+        ),
+        exerciseIds,
+        group,
+      },
+    ];
+  });
+  return id;
+}
+
 /** Renames and saves a workout; the clash check runs inside the transaction. */
 export async function renameCustomWorkout(
   id: string,

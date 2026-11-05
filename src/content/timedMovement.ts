@@ -51,6 +51,11 @@ export const timedMovementCue: Partial<Record<ExerciseId, TimedMovementCue>> = {
     startVoice: 'Börja rörelsen.',
     hint: HINT,
   },
+  'plate-pogos': {
+    status: `Hoppa lågt och snabbt med stela fotleder tills signalen och landa tyst på framfoten. Tiden gäller båda benen tillsammans. ${SAVED}`,
+    startVoice: 'Börja rörelsen.',
+    hint: HINT,
+  },
   'knee-drive': {
     status: `Lyft knäna växelvis i jämn takt tills signalen. Tiden gäller båda benen tillsammans. ${SAVED}`,
     startVoice: 'Börja rörelsen.',
