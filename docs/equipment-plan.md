@@ -24,7 +24,7 @@ Starting-weight rules unchanged (limited exercises never heaviest, experience-ba
 
 ## One place to edit
 
-Settings › Min utrustning (`/installningar/utrustning`) uses the shared component with one "Spara min utrustning". Home "Ändra": "Byt inriktning" (no equipment fieldset any more) + separate link "Min utrustning" → `/installningar/utrustning?tillbaka=traning`. Whitelisted `?tillbaka=nytt-pass|traning`. Repoint `/?andra=utrustning` links (`NewWorkout`, `ReadyWorkout`, physio flow, `TrainingPreview.tsx:~1313`, `ExerciseLibrary.tsx:~152`, `RehabCollection.tsx`).
+Settings › Min utrustning (`/installningar/utrustning`) uses the shared component with one "Spara min utrustning". (Superseded: the "Ändra" drawer is gone; these actions are in "Mitt program" (`/mitt-program`), which returns with `tillbaka=mitt-program`.) Home "Ändra": "Byt inriktning" (no equipment fieldset any more) + separate link "Min utrustning" → `/installningar/utrustning?tillbaka=traning`. Whitelisted `?tillbaka=nytt-pass|traning`. Repoint `/?andra=utrustning` links (`NewWorkout`, `ReadyWorkout`, physio flow, `TrainingPreview.tsx:~1313`, `ExerciseLibrary.tsx:~152`, `RehabCollection.tsx`).
 
 ## Milestones
 

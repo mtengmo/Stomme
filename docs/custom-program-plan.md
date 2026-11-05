@@ -12,6 +12,8 @@ Planned 2026-10-29 (architect-einstein, from reading the code). About 70 % alrea
 
 ## Gaps
 
+> Superseded in part: the "Ändra" drawer and the three-tab nav are gone. Navigation is now four tabs (Idag, Övningar, Historik, Mer); own workouts live in the Övningar hub and programme actions in "Mitt program". See DESIGN.md "Navigation".
+
 1. Hard to find: Home → "Ändra" → "Bläddra bland övningar". Saved workouts only at top of the library, never on Home.
 2. Two filter systems; no movement-type, reps/time or one-side filter; muscle chips take several screens at 320 px.
 3. Select → name → save → tap link → dose is split; no reorder or time estimate while choosing.
@@ -88,7 +90,7 @@ Review M0 (safety) and M4 (backup) with the reviewer agent. One owner for `Train
 3. Above your level: allow and label. Starting weight follows the user's experience, not always the lightest: reuse the roster rule (`chooseStartingWeight`), so an experienced user starts heavier. Limited exercises (overhead, one-sided, rotation, ballistic, bent-over row, etc.) stay below the heaviest weight, and any pain on record still means the lightest. This replaces the "always lightest" rule in the Safety section; update M0 tests accordingly.
 4. Scheduling (M4): out of scope for now. (It would let a custom workout sit on a weekday in the weekly plan.)
 5. A completed custom workout counts as that day's training in the weekly plan (so it is not shown as missed), but it does not advance the A/B sequence or progression.
-6. Bottom-nav tab: no. Keep three tabs; "Mina pass" is a section on Home.
+6. Bottom-nav tab: no. Keep three tabs; "Mina pass" is a section on Home. (Superseded: four tabs now, with Övningar as the hub for own workouts.)
 7. Limits: 12 exercises per workout, 30 saved workouts.
 8. Saved workouts can be deleted (with a confirmation) from Home, from the library list and from the preview.
 9. Backups: there are no users with older backups, so no migration or old-client compatibility work is needed. Prefer simple schema changes over versioned ones; M4 can add its field without a version bump if it is ever built.
