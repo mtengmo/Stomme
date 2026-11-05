@@ -163,6 +163,11 @@ it('says the equipment changed when the next pass keeps fewer than three exercis
     screen.getAllByRole('button', { name: 'Gör om programmet' }).length,
   ).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: 'Starta passet' })).toBeNull();
+  // "Träna något annat idag" stays reachable, and so does Mitt program.
+  expect(
+    screen.getByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeTruthy();
+  expect(screen.getByRole('link', { name: 'Mitt program' })).toBeTruthy();
 });
 
 const openMyProgram = (user: ReturnType<typeof userEvent.setup>) =>
@@ -218,7 +223,7 @@ it('offers equipment and change of direction in Mitt program', async () => {
   await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
   expect(
     screen.getByRole('link', { name: /^Min utrustning/ }).getAttribute('href'),
-  ).toBe('#/installningar/utrustning?tillbaka=traning');
+  ).toBe('#/installningar/utrustning?tillbaka=mitt-program');
   expect(
     screen.getByRole('link', { name: /^Byt inriktning/ }).getAttribute('href'),
   ).toBe('#/?andra=utrustning&tillbaka=mitt-program');
@@ -270,4 +275,94 @@ it('labels a programme session in the history as Pass 2 · Vecka 1', async () =>
   expect(
     (await screen.findAllByText(/Pass 2 · Vecka 1/)).length,
   ).toBeGreaterThan(0);
+});
+
+it('keeps "Träna något annat idag" and a Mitt program row on the active Home', async () => {
+  await seedProgram(3);
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: /Vecka 1/ });
+  expect(
+    screen.getByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole('link', { name: 'Mitt program' }).getAttribute('href'),
+  ).toBe('#/mitt-program');
+});
+
+it('offers "Träna något annat idag" for a prepared pass but not while a session runs', async () => {
+  const program = await seedProgram(3);
+  await programSession(program, 1, 1, 'in_progress');
+  render(<App />);
+  await screen.findByRole('link', { name: 'Fortsätt förberedelsen' });
+  expect(
+    screen.getByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeTruthy();
+  cleanup();
+  const [session] = await getDb().sessions.toArray();
+  await getDb().sessions.update(session?.id ?? '', { note: 'pågår' });
+  render(<App />);
+  await screen.findByRole('link', { name: 'Fortsätt passet' });
+  expect(
+    screen.queryByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeNull();
+});
+
+it('offers "Träna något annat idag" when the block is done', async () => {
+  const program = await seedProgram(1);
+  for (let week = 1; week <= 4; week++) await programSession(program, 1, week);
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Blocket klart' });
+  expect(
+    screen.getByRole('link', { name: 'Träna något annat idag' }),
+  ).toBeTruthy();
+});
+
+it('returns from Min utrustning to Mitt program after saving or cancelling', async () => {
+  await seedProgram(3);
+  window.location.hash = '#/mitt-program';
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole('link', { name: /^Min utrustning/ }),
+  );
+  await user.click(
+    await screen.findByRole('button', { name: 'Spara min utrustning' }),
+  );
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  await user.click(screen.getByRole('link', { name: /^Min utrustning/ }));
+  await user.click(
+    await screen.findByRole('link', { name: 'Tillbaka utan att spara' }),
+  );
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+});
+
+it('returns from Byt inriktning to Mitt program when cancelled', async () => {
+  await seedProgram(3);
+  window.location.hash = '#/mitt-program';
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(
+    await screen.findByRole('link', { name: /^Byt inriktning/ }),
+  );
+  await user.click(
+    await screen.findByRole('button', { name: 'Avbryt ändring' }),
+  );
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+});
+
+it('shows a locked Byt inriktning as a disabled button', async () => {
+  const program = await seedProgram(3);
+  await programSession(program, 1, 1, 'in_progress');
+  const [running] = await getDb().sessions.toArray();
+  await getDb().sessions.update(running?.id ?? '', { note: 'pågår' });
+  window.location.hash = '#/mitt-program';
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Mitt program' });
+  expect(
+    (
+      screen.getByRole('button', {
+        name: /^Byt inriktning/,
+      }) as HTMLButtonElement
+    ).disabled,
+  ).toBe(true);
 });

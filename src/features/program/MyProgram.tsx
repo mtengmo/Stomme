@@ -96,7 +96,9 @@ export function MyProgram() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
-      <h1 className="m-0 text-5xl leading-none font-extrabold">Mitt program</h1>
+      <h1 className="m-0 text-5xl leading-none font-extrabold [overflow-wrap:anywhere]">
+        Mitt program
+      </h1>
       <p className="m-0 text-lg font-bold">
         {trainingName(preferences)}
         {program
@@ -106,7 +108,7 @@ export function MyProgram() {
       <ul className="m-0 flex list-none flex-col border-t-[3px] border-ink p-0">
         <li>
           <Link
-            href="/installningar/utrustning?tillbaka=traning"
+            href="/installningar/utrustning?tillbaka=mitt-program"
             className={rowClass}
           >
             <Row label="Min utrustning" hint="Vad du tränar med hemma" />
@@ -114,9 +116,13 @@ export function MyProgram() {
         </li>
         <li>
           {locked ? (
-            <span aria-disabled="true" className={`${rowClass} opacity-50`}>
+            <button
+              type="button"
+              disabled
+              className={`${rowClass} disabled:opacity-50`}
+            >
               <Row label="Byt inriktning" />
-            </span>
+            </button>
           ) : (
             <Link
               href="/?andra=utrustning&tillbaka=mitt-program"

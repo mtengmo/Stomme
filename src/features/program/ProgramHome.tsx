@@ -257,9 +257,14 @@ export function ProgramHome({
             Starta block {program.block + 1}
           </Button>
         </div>
-        <Link href="/mitt-program" className={`${quietRow} -mt-3`}>
-          Mitt program
-        </Link>
+        <div className="-mt-3 flex flex-col">
+          <Link href="/fokus" className={quietRow}>
+            Träna något annat idag
+          </Link>
+          <Link href="/mitt-program" className={quietRow}>
+            Mitt program
+          </Link>
+        </div>
         {tail}
       </div>
     );
@@ -371,16 +376,21 @@ export function ProgramHome({
           </Link>
         )}
       </div>
-      {!active && !equipmentChanged && nextPass ? (
-        <div className="-mt-3 flex flex-col">
+      <div className="-mt-3 flex flex-col">
+        {!locked ? (
           <Link href="/fokus" className={quietRow}>
             Träna något annat idag
           </Link>
+        ) : null}
+        {!active && !equipmentChanged && nextPass ? (
           <Link href={`${startHref}&byt=alla`} className={quietRow}>
             Byt övning
           </Link>
-        </div>
-      ) : null}
+        ) : null}
+        <Link href="/mitt-program" className={quietRow}>
+          Mitt program
+        </Link>
+      </div>
       {tail}
     </div>
   );
