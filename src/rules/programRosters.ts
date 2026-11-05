@@ -13,7 +13,7 @@ import {
   type RosterSlot,
   rehabAdditionIds,
 } from '../content/rosterSlots';
-import { runningSlots } from '../content/runningProposals';
+import { type RunningSlot, runningSlots } from '../content/runningProposals';
 import type {
   BodyRegionId,
   ExerciseId,
@@ -318,7 +318,9 @@ export function focusAvailable(preferences: TrainingPreferences): {
  */
 function runningRosterSlots(seed: number | undefined, plyo: boolean) {
   const options = (id: string) => {
-    const found = [...(runningSlots.find((s) => s.id === id)?.options ?? [])];
+    const found = [
+      ...(runningSlots.find((s) => s.id === id) as RunningSlot).options,
+    ];
     return id === 'hold' ? (['wall-sit', ...found] as ExerciseId[]) : found;
   };
   const tail = rotated(
