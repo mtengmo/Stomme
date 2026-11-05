@@ -89,24 +89,16 @@ describe('optional harder exercises', () => {
       if (where === 'older') symptomatic.startedAt = '2026-10-01T08:00:00Z';
       else symptomatic.programId = 'rehab';
       data.sessions.push(symptomatic);
-      expect(suggest(data)).toEqual([
-        'decline-push-up',
-        'diamond-push-up',
-        'blast-off-push-up',
-      ]);
+      expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
     },
   );
   it('offers harder push-ups after the latest two successes without changing history', () => {
     const data = fixture();
     const before = structuredClone(data);
-    expect(suggest(data)).toEqual([
-      'decline-push-up',
-      'diamond-push-up',
-      'blast-off-push-up',
-    ]);
+    expect(suggest(data)).toEqual(['decline-push-up', 'diamond-push-up']);
     expect(data).toEqual(before);
     expect(suggest(data, 'push-up', { ...preferences, equipment: [] })).toEqual(
-      ['diamond-push-up', 'blast-off-push-up'],
+      ['diamond-push-up'],
     );
   });
   it('does not count a short success, and a short session never blocks older full successes', () => {
@@ -126,7 +118,7 @@ describe('optional harder exercises', () => {
     };
     expect(
       suggest({ ...data, sessions: [...data.sessions, symptomatic] }),
-    ).toHaveLength(3);
+    ).toHaveLength(2);
   });
   it('offers step-down after step-up', () => {
     const data = fixture('step-up');
@@ -248,7 +240,7 @@ describe('optional harder exercises', () => {
       expect(suggest(data)).toEqual([]);
       const other = fixture();
       required(other.sessions[index]).feedback.plank = { hurt: true };
-      expect(suggest(other)).toHaveLength(3);
+      expect(suggest(other)).toHaveLength(2);
     },
   );
   it('ignores an old hurt mark and session-wide signals; the after answer is not needed', () => {
@@ -263,7 +255,7 @@ describe('optional harder exercises', () => {
       session.feedback.plank = { symptoms };
     }
     required(data.sessions[1]).abortReason = 'pain_stop';
-    expect(suggest(data)).toHaveLength(3);
+    expect(suggest(data)).toHaveLength(2);
   });
   it('supports legacy missing sides/variants and ignores unrelated logs', () => {
     const data = fixture();
@@ -279,7 +271,7 @@ describe('optional harder exercises', () => {
       exerciseId: 'plank',
       id: 'unrelated',
     });
-    expect(suggest(data)).toHaveLength(3);
+    expect(suggest(data)).toHaveLength(2);
   });
   it('requires all sides when the plan asks for them', () => {
     const data = fixture('calf-raise');

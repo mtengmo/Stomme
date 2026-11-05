@@ -1,6 +1,6 @@
 import { devices, expect, test } from '@playwright/test';
-import { exerciseList } from '../../src/content/exercises';
 import { exerciseMuscles } from '../../src/content/muscles';
+import { activeExerciseList } from '../../src/content/retiredExercises';
 import { openLibraryFilters } from './library';
 
 const calfCount = Object.values(exerciseMuscles).filter(
@@ -43,7 +43,7 @@ test('muscle filters survive exercise navigation and browser Back', async ({
   await page.goto('/#/ovningar?muskel=constructor');
   await expect(page).toHaveURL(/#\/ovningar$/);
   await expect(page.getByRole('status')).toHaveText(
-    `${exerciseList.length} övningar`,
+    `${activeExerciseList.length} övningar`,
   );
   await expect(page.getByRole('link', { name: 'Fortsätt passet' })).toHaveCount(
     0,

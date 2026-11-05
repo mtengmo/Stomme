@@ -1,4 +1,5 @@
 import { exerciseMetadata } from '../content/exerciseMetadata';
+import { isRetiredExercise } from '../content/retiredExercises';
 import type { ExerciseId, TrainingPreferences } from '../domain/types';
 import { equipmentFits } from './equipment';
 import { allowedLevels, movementSlots } from './levelPolicy';
@@ -14,6 +15,7 @@ export function favouriteAlternatives(
   return [...new Set(favourites)].filter(
     (candidate) =>
       candidate !== id &&
+      !isRetiredExercise(candidate) &&
       !selected.includes(candidate) &&
       movementSlots[candidate] === movementSlots[id] &&
       exerciseMetadata[candidate]?.variants.some(

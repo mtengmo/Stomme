@@ -70,3 +70,7 @@ Ta en sats på cirka 8-10 övningar per session. Varje sats avslutas med att log
 Loggen seedades 2026-11-03 från `docs/exercise-animation-audit.md` (granskning 2026-10-23 av E01-E53, granskare okänd: `unknown-claude`, stickprov av statisk källa, inte fullständig loop), `docs/figure-audit-status.md` och `docs/figure-fix-specs.md` (rättningar med commit av `claude-sonnet`; specen kommer från en Opus-granskning 2026-11-01: `claude-opus`) samt `docs/animation-fix-handoff.md`. Ingen övning är `approved`.
 
 Kända öppna punkter: `supported-row` (E15) är bara täckt av gruppraden E11-E17; övningarna i handoffen 2026-10-24 saknar nybörjartest. W8 och W10-W12 i `figure-fix-specs.md` (global interpolation, bryggor, benlyft, sidoutfall) är inte påbörjade och är inte kopplade till enskilda poster. `hamstring-curl` (E29): falskt positivt i geometrigranskningen, ingen åtgärd.
+
+## Utgångna övningar (retired)
+
+`src/content/retiredExercises.ts` listar övningar som tagits ur nyanvändning eftersom en annan övning täcker samma rörelse (nu `blast-off-push-up`, `squat-curl`, `fast-feet`). De tas inte bort: id:t finns kvar i katalogen, figurerna och den här loggen (testet kräver en post per katalogövning), och de fungerar i historik, sparade pass, favoriter, säkerhetskopior och på detaljsidan via direktlänk. De visas inte i biblioteket, väljarna, förslag, rosters, fokus, snabbstart och programgenerering. Granska och rätta dem som vanligt om figuren eller texten ändras.

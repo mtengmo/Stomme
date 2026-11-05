@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { exerciseList } from '../../content/exercises';
 import { bodyRegions, muscleGroups } from '../../content/muscles';
+import { activeExerciseList } from '../../content/retiredExercises';
 import { getDb } from '../../db/db';
 import { readFavourites } from '../../db/favourites';
 import type {
@@ -44,7 +44,7 @@ export function CustomPicker({
   const rehab = preferences.programId === 'rehab';
   const filters = pickFiltersFrom(query, !rehab);
   const { primary, supporting } = filterExercises(
-    exerciseList.filter((exercise) =>
+    activeExerciseList.filter((exercise) =>
       pickableInProgramme(exercise.id, preferences),
     ),
     filters,

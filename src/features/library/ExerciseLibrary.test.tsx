@@ -13,16 +13,24 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Link, Route, Router, Switch } from 'wouter';
 import { exerciseList, exercises } from '../../content/exercises';
 import { exerciseMuscles, type MuscleGroupId } from '../../content/muscles';
+import {
+  activeExerciseList,
+  retiredExerciseIds,
+} from '../../content/retiredExercises';
 import { getDb } from '../../db/db';
 import { toggleFavourite } from '../../db/favourites';
+import type { ExerciseId } from '../../domain/types';
 import { useAppHashLocation } from '../../lib/hashLocation';
 import { programFixture } from '../../test/programFixture';
 import { ExerciseLibrary } from './ExerciseLibrary';
 
 const muscleCount = (group: MuscleGroupId) =>
-  Object.values(exerciseMuscles).filter(
-    (tags) => tags.primary.includes(group) || tags.secondary.includes(group),
-  ).length;
+  Object.entries(exerciseMuscles)
+    .filter(([id]) => !retiredExerciseIds.has(id as ExerciseId))
+    .map(([, tags]) => tags)
+    .filter(
+      (tags) => tags.primary.includes(group) || tags.secondary.includes(group),
+    ).length;
 
 function TestRoutes() {
   return (
@@ -183,7 +191,6 @@ describe('exercise library', () => {
   it.each([
     ['sidohopp', 'single-leg-lateral-hop'],
     ['boxhopp', 'box-jump'],
-    ['snabba fötter', 'fast-feet'],
     ['höga knän', 'knee-drive'],
     ['knee drives', 'knee-drive'],
     ['plate shuffle', 'lateral-shuffle'],
@@ -194,6 +201,23 @@ describe('exercise library', () => {
     openFilters();
     await user.type(screen.getByLabelText('Sök övning'), term);
     expect(screen.getByRole('link', { name: exercises[id].name })).toBeTruthy();
+  });
+  it('does not list retired exercises, by name or alias', async () => {
+    const user = userEvent.setup();
+    render(<TestRoutes />);
+    openFilters();
+    for (const [term, id] of [
+      ['snabba fötter', 'fast-feet'],
+      ['blast off', 'blast-off-push-up'],
+      ['knäböj med bicepscurl', 'squat-curl'],
+    ] as const) {
+      expect(retiredExerciseIds.has(id)).toBe(true);
+      await user.clear(screen.getByLabelText('Sök övning'));
+      await user.type(screen.getByLabelText('Sök övning'), term);
+      expect(
+        screen.queryByRole('link', { name: exercises[id].name }),
+      ).toBeNull();
+    }
   });
   it.each(['in-and-out-jump', 'lateral-shuffle'] as const)(
     'draws the front view in the thumbnail of %s',
@@ -253,7 +277,7 @@ describe('exercise library', () => {
     render(<TestRoutes />);
     openFilters();
     expect(screen.getByRole('status').textContent).toBe(
-      `${exerciseList.length} övningar`,
+      `${activeExerciseList.length} övningar`,
     );
     expect(
       screen.getByRole('button', { name: 'Alla' }).getAttribute('aria-pressed'),
@@ -265,7 +289,7 @@ describe('exercise library', () => {
         (a.getAttribute('aria-label') ?? a.textContent ?? '').trim(),
       ),
     );
-    for (const exercise of Object.values(exercises)) {
+    for (const exercise of activeExerciseList) {
       expect(linkNames.has(exercise.name), exercise.name).toBe(true);
     }
     expect(screen.queryByRole('link', { name: /^Ingår i Pass/ })).toBeNull();
@@ -327,7 +351,7 @@ describe('exercise library', () => {
     window.history.back();
     await waitFor(() =>
       expect(screen.getByRole('status').textContent).toBe(
-        `${exerciseList.length} övningar`,
+        `${activeExerciseList.length} övningar`,
       ),
     );
     expect(
@@ -340,7 +364,7 @@ describe('exercise library', () => {
     render(<TestRoutes />);
     openFilters();
     expect(screen.getByRole('status').textContent).toBe(
-      `${exerciseList.length} övningar`,
+      `${activeExerciseList.length} övningar`,
     );
     await waitFor(() => expect(window.location.hash).toBe('#/ovningar'));
   });
@@ -411,7 +435,7 @@ describe('exercise library', () => {
     await user.click(screen.getByRole('button', { name: 'Rensa filter' }));
     await waitFor(() =>
       expect(screen.getByRole('status').textContent).toBe(
-        `${exerciseList.length} övningar`,
+        `${activeExerciseList.length} övningar`,
       ),
     );
   });
