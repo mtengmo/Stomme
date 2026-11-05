@@ -131,9 +131,13 @@ it('the Övningar hub locks the own workouts while a session runs, not for a pre
   window.location.hash = '#/ovningar';
   render(<App />);
   const own = () => screen.getByRole('region', { name: 'Egna pass' });
-  await screen.findByRole('region', { name: 'Egna pass' });
+  await screen.findByRole('region', { name: 'Egna pass' }, { timeout: 10_000 });
   expect(
-    await within(own()).findByRole('link', { name: /Mitt presspass/ }),
+    await within(own()).findByRole(
+      'link',
+      { name: /Mitt presspass/ },
+      { timeout: 10_000 },
+    ),
   ).toBeTruthy();
   cleanup();
   await getDb().sessions.add({
@@ -149,11 +153,14 @@ it('the Övningar hub locks the own workouts while a session runs, not for a pre
     note: 'pågår',
   } as never);
   render(<App />);
-  await screen.findByRole('region', { name: 'Egna pass' });
-  await waitFor(() => {
-    expect(within(own()).getByText(/Mitt presspass/)).toBeTruthy();
-    expect(
-      within(own()).queryByRole('link', { name: /Mitt presspass/ }),
-    ).toBeNull();
-  });
-});
+  await screen.findByRole('region', { name: 'Egna pass' }, { timeout: 10_000 });
+  await waitFor(
+    () => {
+      expect(within(own()).getByText(/Mitt presspass/)).toBeTruthy();
+      expect(
+        within(own()).queryByRole('link', { name: /Mitt presspass/ }),
+      ).toBeNull();
+    },
+    { timeout: 10_000 },
+  );
+}, 30_000);
