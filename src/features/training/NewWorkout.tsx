@@ -5,8 +5,7 @@ import {
   experienceLabels,
   isTrainingPreferences,
 } from '../../content/programmes';
-import { readyWorkouts } from '../../content/readyWorkouts';
-import { addReadyWorkout, createCustomWorkout } from '../../db/customWorkouts';
+import { createCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
@@ -15,7 +14,7 @@ import { Icon } from '../../ui/Icon';
 import { linkClass } from '../../ui/link';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
 import { CustomPicker } from './CustomPicker';
-import { RunningProposals } from './RunningProposals';
+import { ReadyWorkoutsSection } from './ReadyWorkoutsSection';
 
 const SELECTION_KEY = 'stomme.new-workout.selection';
 
@@ -27,8 +26,6 @@ export function NewWorkout() {
     [],
   );
   const [filters, setFilters] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
   if (!training) return null;
   const preferences = isTrainingPreferences(training.value)
     ? training.value
@@ -82,40 +79,7 @@ export function NewWorkout() {
       >
         Ändra utrustning
       </Link>
-      {preferences.programId === 'rehab' ? null : (
-        <section
-          aria-labelledby="ready-workouts"
-          className="flex flex-col gap-3 border-y-2 border-edge py-3"
-        >
-          <h2 id="ready-workouts" className="m-0 text-2xl font-bold">
-            Färdiga pass
-          </h2>
-          {readyWorkouts.map((workout) => (
-            <RunningProposals
-              key={workout.id}
-              workout={workout}
-              preferences={preferences}
-              busy={busy}
-              onAdd={async (name, ids) => {
-                setBusy(true);
-                setError('');
-                try {
-                  const id = await addReadyWorkout(name, ids, workout.group);
-                  navigate(`/traning/A?workout=${id}`);
-                } catch {
-                  setError('Kunde inte lägga till passet. Försök igen.');
-                  setBusy(false);
-                }
-              }}
-            />
-          ))}
-          {error ? (
-            <p role="alert" className="m-0 text-base font-bold">
-              {error}
-            </p>
-          ) : null}
-        </section>
-      )}
+      <ReadyWorkoutsSection preferences={preferences} />
       <p className="m-0 text-lg">
         Välj upp till 12. Ordning, set och vikt ändrar du sedan.
       </p>

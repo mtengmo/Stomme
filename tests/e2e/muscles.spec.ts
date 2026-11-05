@@ -1,11 +1,16 @@
 import { devices, expect, test } from '@playwright/test';
 import { exerciseMuscles } from '../../src/content/muscles';
-import { activeExerciseList } from '../../src/content/retiredExercises';
+import {
+  activeExerciseList,
+  retiredExerciseIds,
+} from '../../src/content/retiredExercises';
+import type { ExerciseId } from '../../src/domain/types';
 import { openLibraryFilters } from './library';
 
-const calfCount = Object.values(exerciseMuscles).filter(
-  (tags) =>
-    tags.primary.includes('calves') || tags.secondary.includes('calves'),
+const calfCount = Object.entries(exerciseMuscles).filter(
+  ([id, tags]) =>
+    !retiredExerciseIds.has(id as ExerciseId) &&
+    (tags.primary.includes('calves') || tags.secondary.includes('calves')),
 ).length;
 
 test.use({ ...devices['Pixel 7'], viewport: { width: 360, height: 800 } });

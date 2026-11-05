@@ -64,9 +64,11 @@ for (const width of [320, 412]) {
     await page.goto('/');
     await page.getByRole('button', { name: /Jag förstår/ }).click();
     await quickStart(page, { goal: 'general' });
-    // Home is the programme Home; "Skapa eget pass" sits under "Ändra".
-    await page.goto('/#/');
-    await page.getByText('Ändra', { exact: true }).click();
+    // "Skapa eget pass" sits in the Övningar hub (tab), under "Egna pass".
+    await page
+      .getByRole('navigation', { name: 'Huvudmeny' })
+      .getByRole('link', { name: 'Övningar' })
+      .click();
     await page.getByRole('link', { name: 'Skapa eget pass' }).click();
     await expect(
       page.getByRole('heading', { name: 'Skapa eget pass' }),

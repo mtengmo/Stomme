@@ -43,6 +43,8 @@ import {
   SortSelect,
 } from '../exercise/ExerciseFilterControls';
 import { FavouritesProvider } from '../exercise/FavouriteButton';
+import { ReadyWorkoutsSection } from '../training/ReadyWorkoutsSection';
+import { CustomWorkoutList } from './CustomWorkoutList';
 import { ResultList, ResultViewSwitch } from './ExerciseResults';
 import { ProgramSection } from './ProgramSection';
 import { SelectionStatus, WorkoutBuilder } from './WorkoutBuilder';
@@ -163,20 +165,31 @@ export function ExerciseLibrary() {
 
   return (
     <FavouritesProvider>
-      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-3 pb-[var(--app-nav-height)]">
-        <Link
-          href="/"
-          className="-ml-2 flex min-h-12 items-center gap-1 self-start px-2 text-base font-bold"
-        >
-          <Icon name="back" />
-          Till träningen
-        </Link>
+      <div className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-6 pb-[var(--app-nav-clear)]">
         <header>
           <h1 className="m-0 text-5xl leading-none font-extrabold">Övningar</h1>
           <p className="m-0 mt-3 text-base text-ink-soft">
-            Hela kroppen och knäfokus. Välj efter syfte, muskler och utrustning.
+            Dina pass, färdiga pass och hela övningsbiblioteket.
           </p>
         </header>
+        <CustomWorkoutList
+          headingId="hub-own-workouts"
+          variant="home"
+          title="Egna pass"
+          alwaysShow
+        />
+        {preferences ? (
+          <ReadyWorkoutsSection
+            preferences={preferences}
+            headingId="hub-ready-workouts"
+          />
+        ) : null}
+        <h2
+          id="hub-all-exercises"
+          className="m-0 border-t-[3px] border-ink pt-4 text-3xl leading-none font-bold"
+        >
+          Alla övningar
+        </h2>
         {filters.aaos ? (
           <p className="m-0 text-base font-bold">
             Visar bara källbaserade AAOS knäövningar.
@@ -247,7 +260,7 @@ export function ExerciseLibrary() {
             <p className="m-0 text-xl">Inga övningar passar filtren.</p>
           ) : null}
           <ResultList
-            title={area ? 'Tränar främst' : 'Alla övningar'}
+            title={area ? 'Tränar främst' : 'Resultat'}
             items={primary}
             id="primary-results"
             inventory={inventory}

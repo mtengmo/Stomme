@@ -88,6 +88,58 @@ describe('exercise library', () => {
     expect(screen.getByRole('link', { name: /AAOS/ })).toBeTruthy();
   });
 
+  it('is a hub: Egna pass, Färdiga pass and Alla övningar, with no back link', async () => {
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'general',
+        experience: 'new',
+        equipment: ['bodyweight'],
+      },
+    });
+    await getDb().meta.put({
+      key: 'customWorkouts',
+      value: [{ id: 'w1', name: 'Mitt pass', exerciseIds: ['single-leg-rdl'] }],
+    });
+    render(<TestRoutes />);
+    await screen.findByRole('heading', { level: 2, name: 'Färdiga pass' });
+    await screen.findByRole('heading', { level: 2, name: 'Egna pass' });
+    const names = screen
+      .getAllByRole('heading', { level: 2 })
+      .map((h) => h.textContent);
+    expect(names.indexOf('Egna pass')).toBeGreaterThan(-1);
+    expect(names.indexOf('Färdiga pass')).toBeGreaterThan(
+      names.indexOf('Egna pass'),
+    );
+    expect(names.indexOf('Alla övningar')).toBeGreaterThan(
+      names.indexOf('Färdiga pass'),
+    );
+    const own = screen.getByRole('region', { name: 'Egna pass' });
+    expect(within(own).getByText('Mitt pass', { exact: false })).toBeTruthy();
+    expect(
+      within(own)
+        .getByRole('link', { name: 'Skapa eget pass' })
+        .getAttribute('href'),
+    ).toBe('#/nytt-pass');
+    expect(screen.getByText('Löpstyrka')).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Till träningen' })).toBeNull();
+  });
+
+  it('hides Färdiga pass for rehab', async () => {
+    await getDb().meta.put({
+      key: 'training',
+      value: {
+        programId: 'rehab',
+        rehabFocus: 'custom',
+        experience: 'new',
+        equipment: ['bodyweight'],
+      },
+    });
+    render(<TestRoutes />);
+    await screen.findByRole('heading', { level: 2, name: 'Egna pass' });
+    expect(screen.queryByRole('heading', { name: 'Färdiga pass' })).toBeNull();
+  });
+
   it('opens the panel when the URL already has a filter', () => {
     window.history.replaceState(null, '', '/#/ovningar?omrade=legs');
     render(<TestRoutes />);
