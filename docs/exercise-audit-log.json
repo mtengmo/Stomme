@@ -1139,6 +1139,22 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E24: frontens reduced-motion 4/8/16 kg visar fortsatt kettlebell utan handkontakt; profilfaserna visar fortsatt bakre fotens glidning under utsteget. Båda befintliga [strong]-punkterna kvarstår. H/V kroppsvikt speglas, hantlar har grepp och hela figuren ryms. Textens främre stödfot, bakåtsteg, knäriktning och grundare alternativ lästa. Alla vikt/sida/vy-kombinationer genom hela rörelsen har inte verifierats. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "a94db12",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Textomgranskning E24 på a94db12: valt ben stannar fram, andra benet kliver bakåt, båda knän böjs och främre foten driver återsteget. Sidocue och kroppsvikts-/kettlebellinstruktion stämmer; kettlebellen hålls med båda händerna nära bröstet. Knäriktning, undvik smal linje samt kortare/grundare kroppsviktsalternativ anges. Inget textfel funnet. Avser text, inte full säkerhetsacceptans."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "a94db12",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E24 på a94db12: profilens nio faser visar bakre foten lyft i utsteget (0,125–0,375) och tåkontakt från fas 0,5 under sänkningen, med främre foten kvar. Frontens kettlebellgrepp når nu handtaget vid bröstet i H/V reduced-motion för 4/8/16 kg; kompletterande nio frontfaser med 4 kg och växlande H/V visar bibehållet grepp. Kroppsvikt/hantlar, spegling och ram kontrollerade i ändlägen. De två tidigare felpunkterna är åtgärdade i granskat underlag. Ok avser dessa rättningar. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1187,6 +1203,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Omgranskning E25: kettlebellen saknar fortfarande handkontakt i frontens reduced-motion för 4/8/16 kg; befintlig [strong]-punkt kvarstår. Profilbilderna visar valt ben fram och speglade ändlägen; kroppsvikt/hantlar samt hela ramen kontrollerade. Textens bromsat steg, främre fot i golv och grundare alternativ lästa. Frontvyns streckade linje tolkas som djupplan, inte som svävande stöd. Fullständig fotkontakt och återsteg kan inte säkras från stillbilderna. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-05",
+        "reviewer": "codex:gpt6astra",
+        "commit": "a94db12",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad omgranskning E25 på a94db12: frontens kettlebell har nu tvåhandskontakt med handtaget nära bröstet i nio 4 kg-fasbilder med växlande H/V, samt reduced-motion H/V. V-sidans 4/8/16 kg-ändlägen visar samma grepp. Händerna hänger alltså inte längre fritt från vikten. Hantel/kroppsviktsändlägen och ram kontrollerade. Kettlebelltexten anger motsvarande tvåhandsgrepp. Ok avser frontgreppets rättning; profilens fotarbete och samtliga vikt/sida-kombinationers mellanlägen ingår inte i denna riktade omgranskning. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
