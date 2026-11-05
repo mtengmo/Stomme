@@ -59,6 +59,16 @@ describe('isTabActive', () => {
   it('ignores a query string', () => {
     expect(activeFor('/ovningar?muskel=ben')).toEqual(['/ovningar']);
   });
+  it('puts /granska under Mer', () => {
+    expect(activeFor('/granska')).toEqual(['/installningar']);
+  });
+  it('puts an exercise page under Övningar', () => {
+    expect(activeFor('/ovning/abc')).toEqual(['/ovningar']);
+  });
+  it('highlights Idag on an unknown route, which renders the training Home', () => {
+    expect(activeFor('/finns-inte')).toEqual(['/']);
+    expect(activeFor('/finns-inte/alls')).toEqual(['/']);
+  });
   it('does not match a similarly prefixed path', () => {
     expect(isTabActive('/historik', '/historikx')).toBe(false);
     expect(isTabActive('/ovningar', '/ovningarx')).toBe(false);

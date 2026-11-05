@@ -46,7 +46,7 @@ export const tabs: Tab[] = [
     href: '/installningar',
     label: 'Mer',
     icon: 'more',
-    routes: ['/installningar'],
+    routes: ['/installningar', '/granska'],
   },
 ];
 
@@ -55,6 +55,12 @@ export function isTabActive(href: string, location: string): boolean {
   const path = location.split('?')[0] ?? location;
   const tab = tabs.find((t) => t.href === href);
   if (!tab) return false;
+  // An unknown route renders the training Home, so Idag owns it.
+  if (href === '/' && !tabs.some((t) => ownsPath(t, path))) return true;
+  return ownsPath(tab, path);
+}
+
+function ownsPath(tab: Tab, path: string): boolean {
   return tab.routes.some((route) =>
     route === '/'
       ? path === '/'
@@ -82,14 +88,14 @@ export function BottomNav() {
               <Link
                 href={t.href}
                 aria-current={active ? 'page' : undefined}
-                className={`-mt-0.5 flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-t-md border-2 border-b-0 px-2 font-display text-base leading-none no-underline focus-visible:outline-offset-[-6px] focus-visible:[box-shadow:var(--focus-ring-inset)] ${
+                className={`-mt-0.5 flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-t-md border-2 border-b-0 px-1 font-display text-base leading-none no-underline focus-visible:outline-offset-[-6px] focus-visible:[box-shadow:var(--focus-ring-inset)] ${
                   active
                     ? 'border-ink bg-paper font-extrabold text-ink'
                     : 'border-transparent font-bold text-ink-soft'
                 }`}
               >
                 <Icon name={t.icon} />
-                <span className="whitespace-nowrap text-center tracking-[-0.02em]">
+                <span className="min-w-0 text-center tracking-[-0.02em] [overflow-wrap:anywhere]">
                   {t.label}
                 </span>
                 <span className="block w-[80%]" aria-hidden="true">

@@ -227,3 +227,99 @@ for (const { width, height, scale } of [
     expect(start && bar && start.y + start.height <= bar.y + 0.5).toBe(true);
   });
 }
+
+test('at 200 % text on 320x640 no tab label overlaps a neighbour or leaves the screen', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await onProgrammeHome(page);
+  await page.addStyleTag({ content: 'html{font-size:200%}' });
+  for (const route of ['/', '/ovningar', '/historik', '/installningar']) {
+    await page.goto(`/#${route}`);
+    await expect(nav(page)).toBeVisible();
+    const boxes = await page.evaluate(() =>
+      [...document.querySelectorAll('nav[aria-label="Huvudmeny"] a')].map(
+        (link) => {
+          const label = link.querySelector('span');
+          const r = link.getBoundingClientRect();
+          const l = (label as HTMLElement).getBoundingClientRect();
+          return {
+            name: link.textContent,
+            link: { left: r.left, right: r.right },
+            label: { left: l.left, right: l.right },
+            clipped:
+              (label as HTMLElement).scrollWidth >
+              (label as HTMLElement).clientWidth + 1,
+            vw: innerWidth,
+            overflow: document.documentElement.scrollWidth - innerWidth,
+          };
+        },
+      ),
+    );
+    expect(boxes).toHaveLength(4);
+    boxes.forEach((b, i) => {
+      for (const side of ['link', 'label'] as const) {
+        expect(b[side].left, `${b.name} ${side} left`).toBeGreaterThanOrEqual(
+          -0.5,
+        );
+        expect(b[side].right, `${b.name} ${side} right`).toBeLessThanOrEqual(
+          b.vw + 0.5,
+        );
+      }
+      expect(b.label.left).toBeGreaterThanOrEqual(b.link.left - 0.5);
+      expect(b.label.right).toBeLessThanOrEqual(b.link.right + 0.5);
+      expect(b.clipped, `${b.name} label clipped`).toBe(false);
+      expect(b.overflow, `${route}: horizontal overflow`).toBeLessThanOrEqual(
+        0,
+      );
+      const next = boxes[i + 1];
+      if (next) {
+        expect(b.link.right).toBeLessThanOrEqual(next.link.left + 0.5);
+        expect(b.label.right).toBeLessThanOrEqual(next.label.left + 0.5);
+      }
+    });
+  }
+});
+
+test('the programme Home clips no text at 320x640 and 130 %', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await onProgrammeHome(page);
+  await page.addStyleTag({ content: 'html{font-size:130%}' });
+  await expect(page.getByText(/^\d+ av \d+ pass$/)).toBeVisible();
+  const result = await page.evaluate(() => {
+    const problems: string[] = [];
+    const main = document.querySelector('main');
+    if (!main) return ['no main'];
+    // Every visible text run stays inside the viewport.
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const text = node.textContent?.trim();
+      const parent = node.parentElement;
+      if (!text || !parent || parent.closest('.sr-only')) continue;
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      for (const r of range.getClientRects())
+        if (r.width > 0 && (r.right > innerWidth + 0.5 || r.left < -0.5))
+          problems.push(`"${text}" leaves the screen`);
+    }
+    // The day labels fit inside their squares.
+    for (const square of document.querySelectorAll(
+      'ul[aria-label="Veckan"] > li > span',
+    )) {
+      const box = square.getBoundingClientRect();
+      for (const child of square.querySelectorAll(':scope > span')) {
+        const range = document.createRange();
+        range.selectNodeContents(child);
+        const r = range.getBoundingClientRect();
+        if (r.left < box.left - 0.5 || r.right > box.right + 0.5)
+          problems.push(`day "${child.textContent}" wider than its square`);
+      }
+    }
+    if (document.documentElement.scrollWidth > innerWidth)
+      problems.push('horizontal overflow');
+    return problems;
+  });
+  expect(result).toEqual([]);
+});
