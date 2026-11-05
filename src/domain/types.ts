@@ -364,4 +364,12 @@ export interface TrainingProgram {
   passes: ProgramPass[];
   /** true = drawn only from the beginner set. */
   curated: boolean;
+  /**
+   * Variation seed (uint32). The same seed and inputs give the same passes;
+   * another seed rotates among equivalent exercises. Absent on programmes
+   * made before the seed existed.
+   */
+  seed?: number;
+  /** The level the programme was built for. Absent on older programmes: read preferences.experience. */
+  level?: TrainingPreferences['experience'];
 }

@@ -140,6 +140,55 @@ describe('isTrainingProgram', () => {
     expect(isTrainingProgram(programFixture())).toBe(true);
   });
 
+  it('accepts a programme without seed and level (made before they existed)', () => {
+    const old = programFixture();
+    expect('seed' in old).toBe(false);
+    expect('level' in old).toBe(false);
+    expect(isTrainingProgram(old)).toBe(true);
+  });
+
+  it('accepts a seed and a level, and rejects bad ones', () => {
+    expect(
+      isTrainingProgram(programFixture({ seed: 4294967295, level: 'some' })),
+    ).toBe(true);
+    expect(isTrainingProgram(programFixture({ seed: 0 }))).toBe(true);
+    for (const seed of [-1, 1.5, 4294967296, Number.NaN])
+      expect(isTrainingProgram(programFixture({ seed }))).toBe(false);
+    expect(isTrainingProgram({ ...programFixture(), level: 'expert' })).toBe(
+      false,
+    );
+    expect(isTrainingProgram({ ...programFixture(), seed: '7' })).toBe(false);
+  });
+
+  it('allows the jump exercise only in a wide running programme above beginner level', () => {
+    const pass = (ids: string[]) => [withIds(ids), withIds(ids)];
+    const ids = ['split-squat', 'glute-bridge', 'calf-raise', 'plate-pogos'];
+    const wide = {
+      curated: false,
+      emphasis: 'run' as const,
+      level: 'regular' as const,
+      passes: pass(ids),
+    };
+    expect(isTrainingProgram(programFixture(wide))).toBe(true);
+    expect(isTrainingProgram(programFixture({ ...wide, level: 'some' }))).toBe(
+      true,
+    );
+    expect(isTrainingProgram(programFixture({ ...wide, level: 'new' }))).toBe(
+      false,
+    );
+    expect(isTrainingProgram(programFixture({ ...wide, curated: true }))).toBe(
+      false,
+    );
+    expect(
+      isTrainingProgram(programFixture({ ...wide, emphasis: 'full' })),
+    ).toBe(false);
+    expect(
+      isTrainingProgram(
+        programFixture((({ level: _l, ...rest }) => rest)(wide)),
+      ),
+    ).toBe(false);
+  });
+
   it.each(bad)('rejects %s', (_name, value) => {
     expect(isTrainingProgram(value)).toBe(false);
   });

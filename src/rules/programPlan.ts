@@ -8,7 +8,11 @@ import type {
   TrainingProgram,
 } from '../domain/types';
 import { addDays, weekdayIndex } from '../lib/dates';
-import { buildRoster, MIN_PASS_EXERCISES } from './programRosters';
+import {
+  buildRoster,
+  MIN_PASS_EXERCISES,
+  type RosterContext,
+} from './programRosters';
 
 export type DaysPerWeek = TrainingProgram['daysPerWeek'];
 
@@ -110,13 +114,13 @@ function wholeBodyRow(daysPerWeek: DaysPerWeek): PassSpec[] {
 function rosterRow(
   row: readonly PassSpec[],
   preferences: TrainingPreferences,
-  pool: ReadonlySet<ExerciseId> | undefined,
+  context: Omit<RosterContext, 'focus'>,
 ): ProgramPass[] | null {
   const passes: ProgramPass[] = [];
   for (const { focus, template } of row) {
     const { ids } = buildRoster(preferences, template, {
+      ...context,
       focus: { id: focus },
-      ...(pool ? { pool } : {}),
     });
     if (ids.length < MIN_PASS_EXERCISES) return null;
     passes.push({ focus, template, exerciseIds: ids });
@@ -134,8 +138,12 @@ export interface BuildProgramInput {
   now: string;
   id: string;
   block?: number;
-  /** Candidate pool; block 1 passes the beginner set. Absent: the whole library. */
+  /** Candidate pool; the beginner set or the wide pool (content/widePool.ts). Absent: the whole library. */
   pool?: ReadonlySet<ExerciseId>;
+  /** true (default with a pool): `pool` is the beginner set. false: the wide pool. */
+  curated?: boolean;
+  /** Variation seed (uint32). Absent: the first candidate of every slot. */
+  seed?: number;
 }
 
 /**
@@ -144,15 +152,29 @@ export interface BuildProgramInput {
  * lower body in turn, then whole body A/B in turn.
  */
 export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
-  const { preferences, daysPerWeek, emphasis, pool } = input;
+  const { preferences, daysPerWeek, emphasis, pool, seed } = input;
   if (preferences.programId === 'rehab') return null;
+  const curated = pool !== undefined && input.curated !== false;
+  const context: Omit<RosterContext, 'focus'> = {
+    ...(pool ? { pool } : {}),
+    ...(seed !== undefined ? { seed } : {}),
+    ...(pool && !curated ? { ceilings: false } : {}),
+    ...(pool && emphasis === 'run' ? { running: true } : {}),
+    // Jumps: running only, wide pool only, never for a beginner.
+    ...(pool &&
+    !curated &&
+    emphasis === 'run' &&
+    preferences.experience !== 'new'
+      ? { plyo: true }
+      : {}),
+  };
   const rows = [
     programFocusPlan[emphasis][daysPerWeek],
     upperLowerRow(daysPerWeek),
     wholeBodyRow(daysPerWeek),
   ];
   for (const row of rows) {
-    const passes = rosterRow(row, preferences, pool);
+    const passes = rosterRow(row, preferences, context);
     if (passes)
       return {
         id: input.id,
@@ -163,7 +185,9 @@ export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
         emphasis,
         weekdays: weekdaysFor(input.startDate, daysPerWeek),
         passes,
-        curated: pool !== undefined,
+        curated,
+        ...(seed !== undefined ? { seed } : {}),
+        level: preferences.experience,
       };
   }
   return null;

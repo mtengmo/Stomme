@@ -81,6 +81,35 @@ describe('backup schema v5: training programme', () => {
     }
   });
 
+  it('round trips a programme with a seed and a level, and one without', async () => {
+    for (const over of [{ seed: 123456, level: 'some' as const }, {}]) {
+      const other = new StommeDB(`stomme-backup-seed-${Math.random()}`);
+      try {
+        await db.meta.clear();
+        await saveTrainingProgram(db, programFixture(over));
+        const backup = JSON.parse(serializeBackup(await exportAll(db)));
+        const parsed = parseBackup(text(backup));
+        expect(
+          parsed.meta.find((m) => m.key === 'trainingProgram')?.value,
+        ).toEqual(programFixture(over));
+        await importAll(other, text(backup));
+        expect(await other.meta.get('trainingProgram')).toMatchObject({
+          value: programFixture(over),
+        });
+      } finally {
+        other.close();
+        await other.delete();
+      }
+    }
+  });
+
+  it('rejects a bad seed in a backup', async () => {
+    const backup = await seeded();
+    const entry = backup.meta.find((m: any) => m.key === 'trainingProgram');
+    entry.value.seed = -5;
+    expect(() => parseBackup(text(backup))).toThrow();
+  });
+
   it('still imports version 4', async () => {
     const backup = await seeded();
     backup.schemaVersion = 4;
