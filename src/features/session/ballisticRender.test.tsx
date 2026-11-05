@@ -26,6 +26,8 @@ describe('ballistic exercises render without crashing', () => {
     'in-and-out-jump',
     'lateral-shuffle',
     'knee-drive',
+    'plate-pogos',
+    'isometric-lunge-hold',
   ])('guide page for %s', async (id) => {
     window.location.hash = `#/ovning/${id}`;
     render(<App />);

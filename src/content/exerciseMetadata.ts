@@ -143,6 +143,9 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'in-and-out-jump': 'Mjuka landningar och fotarbete i sidled.',
   'lateral-shuffle': 'Fotarbete och riktningsbyten i sidled.',
   'knee-drive': 'Knälyft och armföring som i löpsteget.',
+  'isometric-lunge-hold':
+    'Statisk benstyrka och bäckenkontroll i löpsteget, ett ben i taget.',
+  'plate-pogos': 'Stela fotleder och snabb, mjuk fotisättning som i löpsteget.',
 };
 type VariantSeed = [EquipmentType, number, number[], string, EquipmentType?];
 const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
@@ -1249,13 +1252,17 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'fast-feet' ||
         id === 'in-and-out-jump' ||
         id === 'lateral-shuffle' ||
-        id === 'knee-drive'
-          ? id === 'fast-feet' ||
-            id === 'in-and-out-jump' ||
-            id === 'lateral-shuffle' ||
-            id === 'knee-drive'
-            ? '2026-11-03'
-            : '2026-11-01'
+        id === 'knee-drive' ||
+        id === 'isometric-lunge-hold' ||
+        id === 'plate-pogos'
+          ? id === 'isometric-lunge-hold' || id === 'plate-pogos'
+            ? '2026-11-05'
+            : id === 'fast-feet' ||
+                id === 'in-and-out-jump' ||
+                id === 'lateral-shuffle' ||
+                id === 'knee-drive'
+              ? '2026-11-03'
+              : '2026-11-01'
           : [
                 'bent-over-row',
                 'sumo-squat',

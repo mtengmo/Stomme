@@ -100,7 +100,9 @@ export type ExerciseId =
   | 'fast-feet'
   | 'in-and-out-jump'
   | 'lateral-shuffle'
-  | 'knee-drive';
+  | 'knee-drive'
+  | 'isometric-lunge-hold'
+  | 'plate-pogos';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';

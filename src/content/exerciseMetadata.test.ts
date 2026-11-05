@@ -33,6 +33,8 @@ describe('expanded library integrity', () => {
       'E102',
       'E103',
       'E104',
+      'E105',
+      'E106',
     ]);
     expect(
       exercises['goblet-chair-squat'].loadLadder.map((load) => load.kg),

@@ -24,6 +24,16 @@ describe('pickableInProgramme', () => {
     }
   });
 
+  it('hides pogo hops in rehab and leaves the static lunge hold out of the impact set', () => {
+    expect(pickableInProgramme('plate-pogos', { programId: 'rehab' })).toBe(
+      false,
+    );
+    expect(rehabImpactExercises.has('isometric-lunge-hold')).toBe(false);
+    expect(pickableInProgramme('plate-pogos', { programId: 'general' })).toBe(
+      true,
+    );
+  });
+
   it('allows ordinary exercises in rehab', () => {
     expect(pickableInProgramme('step-up', { programId: 'rehab' })).toBe(true);
     expect(pickableInProgramme('dead-bug', { programId: 'rehab' })).toBe(true);

@@ -111,6 +111,20 @@ export function PropShape({ prop }: { prop: Prop }) {
           {...PROP}
         />
       );
+    case 'plate':
+      // A weight plate seen edge on: a low, flat disc resting on the floor.
+      return (
+        <rect
+          x={prop.x1}
+          y={FLOOR_Y - 6}
+          width={prop.x2 - prop.x1}
+          height="9"
+          rx="3"
+          {...PROP}
+          stroke="var(--equipment)"
+          fill="var(--paper)"
+        />
+      );
     case 'mat':
       return (
         <rect

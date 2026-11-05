@@ -250,6 +250,13 @@ export function bandShape(
   };
 }
 
+/** Holds whose reduced-motion stills are Start and Håll, and that rest on the final pose. */
+const HOLD_STILLS: ReadonlySet<ExerciseId> = new Set([
+  'copenhagen-hold',
+  'bent-knee-calf-hold',
+  'isometric-lunge-hold',
+]);
+
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
 export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'plank-arm-lift': '0 20 200 168',
@@ -268,6 +275,8 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'prone-on-forearms': '4 20 184 168',
   'heel-slide': '6 20 180 168',
   'bench-side-plank-leg-lift': '4 20 184 168',
+  'isometric-lunge-hold': '0 0 200 188',
+  'plate-pogos': '0 0 200 188',
 };
 
 /** One whole repetition per cycle for sequence figures, in milliseconds. */
@@ -280,6 +289,7 @@ const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
 const BALLISTIC_MS: Partial<Record<ExerciseId, number>> = {
   'fast-feet': 600,
   'knee-drive': 900,
+  'plate-pogos': 800,
 };
 const ballisticMs = (id: ExerciseId) => BALLISTIC_MS[id] ?? 1100;
 const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;
@@ -594,65 +604,66 @@ export function Figure({
   }, [reduced, paused, forced, spec.motion, exerciseId]);
 
   if (reduced && !stillOnly) {
-    const frames: readonly (readonly [string, Pose])[] =
-      exerciseId === 'copenhagen-hold' || exerciseId === 'bent-knee-calf-hold'
+    const frames: readonly (readonly [string, Pose])[] = HOLD_STILLS.has(
+      exerciseId,
+    )
+      ? [
+          ['Start', spec.start],
+          ['Håll', spec.end],
+        ]
+      : exerciseId === 'nordic-hamstring-curl'
         ? [
-            ['Start', spec.start],
-            ['Håll', spec.end],
+            ['Knästående', movementPose(exerciseId, 0)],
+            ['Ta emot', movementPose(exerciseId, 0.5)],
+            ['Hjälp tillbaka', movementPose(exerciseId, 0.75)],
           ]
-        : exerciseId === 'nordic-hamstring-curl'
-          ? [
-              ['Knästående', movementPose(exerciseId, 0)],
-              ['Ta emot', movementPose(exerciseId, 0.5)],
-              ['Hjälp tillbaka', movementPose(exerciseId, 0.75)],
-            ]
-          : exerciseId === 'prone-on-forearms'
-            ? proneOnForearmsReducedFrames()
-            : (stillsFor(exerciseId) ??
-              (exerciseId === 'burpee'
+        : exerciseId === 'prone-on-forearms'
+          ? proneOnForearmsReducedFrames()
+          : (stillsFor(exerciseId) ??
+            (exerciseId === 'burpee'
+              ? [
+                  ['Stå', movementPose(exerciseId, BURPEE_STILL_PHASES[0])],
+                  [
+                    'Händer i golvet',
+                    movementPose(exerciseId, BURPEE_STILL_PHASES[1]),
+                  ],
+                  [
+                    'Armhävning',
+                    movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
+                  ],
+                  ['Hopp', movementPose(exerciseId, BURPEE_STILL_PHASES[3])],
+                  [
+                    'Landning',
+                    movementPose(exerciseId, BURPEE_STILL_PHASES[4]),
+                  ],
+                ]
+              : exerciseId === 'box-jump'
                 ? [
-                    ['Stå', movementPose(exerciseId, BURPEE_STILL_PHASES[0])],
-                    [
-                      'Händer i golvet',
-                      movementPose(exerciseId, BURPEE_STILL_PHASES[1]),
-                    ],
-                    [
-                      'Armhävning',
-                      movementPose(exerciseId, BURPEE_STILL_PHASES[2]),
-                    ],
-                    ['Hopp', movementPose(exerciseId, BURPEE_STILL_PHASES[3])],
-                    [
-                      'Landning',
-                      movementPose(exerciseId, BURPEE_STILL_PHASES[4]),
-                    ],
+                    ['Start', movementPose(exerciseId, 0)],
+                    ['Hopp', movementPose(exerciseId, 0.4)],
+                    ['Landa på steget', movementPose(exerciseId, 0.55)],
+                    ['Kliv ned', movementPose(exerciseId, 0.8)],
                   ]
-                : exerciseId === 'box-jump'
-                  ? [
-                      ['Start', movementPose(exerciseId, 0)],
-                      ['Hopp', movementPose(exerciseId, 0.4)],
-                      ['Landa på steget', movementPose(exerciseId, 0.55)],
-                      ['Kliv ned', movementPose(exerciseId, 0.8)],
-                    ]
-                  : exerciseId === 'walking-lunge'
-                    ? walkingLungeReducedFrames()
-                    : exerciseId === 'russian-twist'
-                      ? russianTwistReducedFrames()
-                      : exerciseId === 'squat-jump'
+                : exerciseId === 'walking-lunge'
+                  ? walkingLungeReducedFrames()
+                  : exerciseId === 'russian-twist'
+                    ? russianTwistReducedFrames()
+                    : exerciseId === 'squat-jump'
+                      ? [
+                          ['Start', movementPose(exerciseId, 0)],
+                          ['Hopp', movementPose(exerciseId, 0.575)],
+                          ['Landning', movementPose(exerciseId, 0.85)],
+                        ]
+                      : exerciseId === 'mountain-climber' ||
+                          exerciseId === 'plank-arm-lift'
                         ? [
                             ['Start', movementPose(exerciseId, 0)],
-                            ['Hopp', movementPose(exerciseId, 0.575)],
-                            ['Landning', movementPose(exerciseId, 0.85)],
+                            ['Rörelse', movementPose(exerciseId, 0.25)],
                           ]
-                        : exerciseId === 'mountain-climber' ||
-                            exerciseId === 'plank-arm-lift'
-                          ? [
-                              ['Start', movementPose(exerciseId, 0)],
-                              ['Rörelse', movementPose(exerciseId, 0.25)],
-                            ]
-                          : [
-                              ['Start', spec.start],
-                              ['Slut', spec.end],
-                            ]));
+                        : [
+                            ['Start', spec.start],
+                            ['Slut', spec.end],
+                          ]));
     return (
       <div className="grid grid-cols-2 gap-2">
         {frames.map(([label, pose]) => (
@@ -675,7 +686,7 @@ export function Figure({
     );
   }
   const pose = reduced
-    ? exerciseId === 'copenhagen-hold' || exerciseId === 'bent-knee-calf-hold'
+    ? HOLD_STILLS.has(exerciseId)
       ? spec.end
       : spec.start
     : forced !== undefined

@@ -36,6 +36,20 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Sidosteg',
   ],
   'knee-drive': ['Knee drives', 'High knees', 'Knälyft', 'Knädriv'],
+  'isometric-lunge-hold': [
+    'Isometric lunge hold',
+    'Lunge hold',
+    'Split squat hold',
+    'Utfallshållning',
+    'Statiskt utfall',
+  ],
+  'plate-pogos': [
+    'Plate pogos',
+    'Pogo hops',
+    'Pogo jumps',
+    'Pogohopp',
+    'Stela ankelhopp',
+  ],
   'seated-tibial-rotation': [
     'Tibial rotation',
     'Skenbensrotation',

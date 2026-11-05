@@ -1,15 +1,18 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { exercises } from '../../content/exercises';
 import {
   experienceLabels,
   isTrainingPreferences,
 } from '../../content/programmes';
-import { createCustomWorkout } from '../../db/customWorkouts';
+import { readyWorkouts } from '../../content/readyWorkouts';
+import { addReadyWorkout, createCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { getMeta } from '../../db/repo';
 import type { ExerciseId, PlannedExercise } from '../../domain/types';
 import { inventorySummary } from '../../rules/equipment';
+import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { linkClass } from '../../ui/link';
 import { CustomWorkoutList } from '../library/CustomWorkoutList';
@@ -25,6 +28,8 @@ export function NewWorkout() {
     [],
   );
   const [filters, setFilters] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   if (!training) return null;
   const preferences = isTrainingPreferences(training.value)
     ? training.value
@@ -78,6 +83,56 @@ export function NewWorkout() {
       >
         Ändra utrustning
       </Link>
+      {preferences.programId === 'rehab' ? null : (
+        <section
+          aria-labelledby="ready-workouts"
+          className="flex flex-col gap-3 border-y-2 border-edge py-3"
+        >
+          <h2 id="ready-workouts" className="m-0 text-2xl font-bold">
+            Färdiga pass
+          </h2>
+          {readyWorkouts.map((workout) => (
+            <div key={workout.id} className="flex flex-col gap-2">
+              <p className="m-0 text-xl font-bold">{workout.name}</p>
+              <p className="m-0 text-base">{workout.summary}</p>
+              <ol className="m-0 pl-6 text-base">
+                {workout.exerciseIds.map((id) => (
+                  <li key={id}>{exercises[id].name}</li>
+                ))}
+              </ol>
+              <p className="m-0 text-base text-ink-soft">{workout.caution}</p>
+              <button
+                type="button"
+                disabled={busy}
+                aria-label={`Lägg till färdigt pass: ${workout.name}`}
+                className={buttonClass('secondary')}
+                onClick={async () => {
+                  setBusy(true);
+                  setError('');
+                  try {
+                    const id = await addReadyWorkout(
+                      workout.name,
+                      [...workout.exerciseIds],
+                      workout.group,
+                    );
+                    navigate(`/traning/A?workout=${id}`);
+                  } catch {
+                    setError('Kunde inte lägga till passet. Försök igen.');
+                    setBusy(false);
+                  }
+                }}
+              >
+                Lägg till och visa
+              </button>
+            </div>
+          ))}
+          {error ? (
+            <p role="alert" className="m-0 text-base font-bold">
+              {error}
+            </p>
+          ) : null}
+        </section>
+      )}
       <p className="m-0 text-lg">
         Välj upp till 12. Ordning, set och vikt ändrar du sedan.
       </p>

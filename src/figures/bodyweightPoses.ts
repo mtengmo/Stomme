@@ -746,6 +746,90 @@ function lateralShuffle(t: number): Pose {
   );
 }
 
+/**
+ * Isometric lunge hold, side view, right leg forward. Both feet stay planted
+ * (the front flat, the back on its forefoot with the heel up); only the hip
+ * lowers from a high split stance (t=0) to the held bottom (t=1): front thigh
+ * horizontal over a vertical shin, back knee just above the floor. Hands on hips.
+ */
+const LUNGE_FRONT_ANKLE: Pt = [128, 174];
+const LUNGE_BACK_ANKLE: Pt = [35.4, 168.8];
+function lungeHold(t: number): Pose {
+  const hip: Pt = [mix(90, 92, t), mix(129, 140, t)];
+  const neck: Pt = [hip[0], hip[1] - 43];
+  const front = joint(hip, LUNGE_FRONT_ANKLE, 36, 34, -1);
+  const back = joint(hip, LUNGE_BACK_ANKLE, 36, 34, -1);
+  const handR: Pt = [hip[0] + 4, hip[1] - 4];
+  const handL: Pt = [hip[0] + 1, hip[1] - 5];
+  const toeBack = polar(LUNGE_BACK_ANKLE, Math.hypot(9, 3), 1.05);
+  return pose(
+    [hip[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [
+      joint(neck, handR, 23, 21, -1),
+      handR,
+      joint(neck, handL, 23, 21, -1),
+      handL,
+    ],
+    [
+      front,
+      LUNGE_FRONT_ANKLE,
+      foot(LUNGE_FRONT_ANKLE),
+      back,
+      LUNGE_BACK_ANKLE,
+      toeBack,
+    ],
+  );
+}
+
+/** Weight plate on the floor beside the pogo hops (a marker only). */
+export const POGO_PLATE = { x1: 132, x2: 166 } as const;
+/**
+ * Pogo hops, side view: stiff legs, only the ankles spring. The forefoot meets
+ * the floor (heel raised) at both ends of the loop, the body lifts 12 px in
+ * the air and the knee bend stays at about 3 px; t=1 lands a touch deeper than t=0.
+ */
+function plateHop(t: number): Pose {
+  const ground = 0.12;
+  const air = t > ground && t < 1 - ground;
+  const lift = air
+    ? 12 * Math.sin((Math.PI * (t - ground)) / (1 - 2 * ground))
+    : 0;
+  const sink = t >= 1 - ground ? 4 * smooth((t - (1 - ground)) / ground) : 0;
+  // Forefoot contact: toe at the floor (177), heel raised by the foot angle.
+  const angle = air ? 0.62 : 0.9;
+  const length = Math.hypot(9, 3);
+  const toeY = 177 - lift;
+  const ankle = (toeX: number): Pt => [
+    toeX - length * Math.cos(angle),
+    toeY - length * Math.sin(angle),
+  ];
+  const ar = ankle(110),
+    al = ankle(102);
+  const hip: Pt = [(ar[0] + al[0]) / 2 - 2, Math.min(ar[1], al[1]) - 68 + sink];
+  const neck: Pt = [hip[0], hip[1] - 43];
+  return pose(
+    [neck[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [
+      joint(neck, [neck[0] + 15, neck[1] + 34], 23, 21, 1),
+      [neck[0] + 15, neck[1] + 34],
+      joint(neck, [neck[0] + 12, neck[1] + 34], 23, 21, 1),
+      [neck[0] + 12, neck[1] + 34],
+    ],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      [110, toeY],
+      joint(hip, al, 36, 34, -1),
+      al,
+      [102, toeY],
+    ],
+  );
+}
+
 const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'decline-push-up': declinePushUp,
   'diamond-push-up': diamondPushUp,
@@ -766,6 +850,8 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'in-and-out-jump': inAndOutJump,
   'lateral-shuffle': lateralShuffle,
   'knee-drive': kneeDrive,
+  'isometric-lunge-hold': lungeHold,
+  'plate-pogos': plateHop,
   'jumping-lunge': lunge,
   'mountain-climber': climber,
   'knee-push-up': kneePushUp,
@@ -788,7 +874,7 @@ export const bodyweightFigures = Object.fromEntries(
       start: handler(0),
       end: handler(id === 'plank-arm-lift' ? 0.25 : 1),
       motion:
-        id === 'plank'
+        id === 'plank' || id === 'isometric-lunge-hold'
           ? 'hold'
           : id === 'burpee' || id === 'squat-jump' || id === 'box-jump'
             ? 'sequence'
@@ -796,7 +882,8 @@ export const bodyweightFigures = Object.fromEntries(
                 id === 'fast-feet' ||
                 id === 'in-and-out-jump' ||
                 id === 'lateral-shuffle' ||
-                id === 'knee-drive'
+                id === 'knee-drive' ||
+                id === 'plate-pogos'
               ? 'ballistic'
               : 'controlled',
       props:
@@ -810,7 +897,9 @@ export const bodyweightFigures = Object.fromEntries(
                 ? [{ type: 'wall', x: 157 }]
                 : id === 'box-jump'
                   ? [{ type: 'step', ...BOX_PROP }]
-                  : [{ type: 'mat', x1: 18, x2: 187 }],
+                  : id === 'plate-pogos'
+                    ? [{ type: 'plate', ...POGO_PLATE }]
+                    : [{ type: 'mat', x1: 18, x2: 187 }],
     },
   ]),
 ) as Record<BodyweightId, FigureSpec>;
