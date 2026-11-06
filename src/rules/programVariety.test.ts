@@ -1,17 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import { beginnerExerciseIds } from '../content/beginnerSet';
 import { readAuditLog } from '../content/exerciseAudit';
+import { exerciseReferences } from '../content/exerciseReferences';
+import { exerciseList } from '../content/exercises';
+import { exerciseMuscles } from '../content/muscles';
 import { programExcludedIds } from '../content/programExclusions';
 import { plyometricIds, runningSlots } from '../content/runningProposals';
-import { ballisticIds, programPool, widePool } from '../content/widePool';
+import {
+  ballisticIds,
+  programPool,
+  unresolvedFigureIssueIds,
+  widePool,
+} from '../content/widePool';
 import type {
   ExerciseId,
   ProgramEmphasis,
   TrainingPreferences,
   TrainingProgram,
 } from '../domain/types';
-import { allowedLevels, chooseVariant, variantUsable } from './levelPolicy';
+import { missingCoverage } from './coverage';
+import {
+  allowedLevels,
+  chooseStartingWeight,
+  chooseVariant,
+  heavyStartAllowed,
+  variantUsable,
+} from './levelPolicy';
 import { buildProgram, type DaysPerWeek } from './programPlan';
+import { programWeightCeilingKg } from './programRosters';
+import { adjacent } from './weekSuggestion';
 
 type Experience = TrainingPreferences['experience'];
 const levels: Experience[] = ['new', 'some', 'regular'];
@@ -32,6 +49,7 @@ const setups: [string, Partial<TrainingPreferences>][] = [
       ],
     },
   ],
+  ['bodyweight only, no chair or wall', { equipment: ['bodyweight'] }],
   [
     'only 2x20 kg dumbbells',
     { weights: [{ type: 'dumbbell', kg: 20, count: 2 }] },
@@ -68,6 +86,16 @@ function build(
 
 const signature = (p: TrainingProgram | null) =>
   JSON.stringify(p?.passes.map((x) => x.exerciseIds));
+/** Order inside a pass does not count as variety: compare the sets. */
+const setSignature = (p: TrainingProgram | null) =>
+  JSON.stringify(p?.passes.map((x) => [...x.exerciseIds].sort()));
+
+/** Share of combinations whose seeds give different exercise sets (floors, with headroom). */
+const minVariedShare: Record<Experience, number> = {
+  new: 0.3,
+  some: 0.6,
+  regular: 0.6,
+};
 
 const inLevel = (id: ExerciseId, p: TrainingPreferences) => {
   const variant = chooseVariant(id, p);
@@ -77,6 +105,46 @@ const inLevel = (id: ExerciseId, p: TrainingPreferences) => {
     allowedLevels(p.experience).includes(variant.technicalLevel)
   );
 };
+
+/** Per-hand start weight of every ceiling-listed exercise stays within its ceiling (M1). */
+function expectCeilings(program: TrainingProgram, p: TrainingPreferences) {
+  for (const pass of program.passes)
+    for (const id of pass.exerciseIds) {
+      const ceiling = programWeightCeilingKg[id];
+      const variant = chooseVariant(id, p);
+      const tool = variant?.equipment.find(
+        (item) => item.type === 'dumbbell' || item.type === 'kettlebell',
+      );
+      if (ceiling === undefined || !variant || !tool) continue;
+      const { totalKg } = chooseStartingWeight(p, variant, {
+        heavyAllowed: heavyStartAllowed(id),
+      });
+      expect(totalKg / tool.count, id).toBeLessThanOrEqual(ceiling);
+    }
+}
+
+/** Passes on adjacent days share no primary muscle but core, exercise by exercise (S2). */
+function expectAdjacency(program: TrainingProgram) {
+  const muscles = program.passes.map(
+    (pass) =>
+      new Set(
+        pass.exerciseIds.flatMap((id) =>
+          exerciseMuscles[id].primary.filter((m) => m !== 'core'),
+        ),
+      ),
+  );
+  for (let i = 0; i < muscles.length; i++)
+    for (let j = i + 1; j < muscles.length; j++)
+      if (
+        adjacent(program.weekdays[i] as number, program.weekdays[j] as number)
+      )
+        expect(
+          [...(muscles[i] as Set<string>)].filter((m) =>
+            (muscles[j] as Set<string>).has(m),
+          ),
+          `${program.emphasis} ${program.daysPerWeek} d: ${program.passes[i]?.focus}${program.passes[i]?.template} / ${program.passes[j]?.focus}${program.passes[j]?.template} ${program.passes[i]?.exerciseIds} | ${program.passes[j]?.exerciseIds}`,
+        ).toEqual([]);
+}
 
 describe('seeded programme variation', () => {
   it('builds the same programme for the same seed and another for another seed', () => {
@@ -102,7 +170,6 @@ describe('seeded programme variation', () => {
   });
 
   describe.each(levels)('matrix · %s', (experience) => {
-    const differing: boolean[] = [];
     describe.each(setups)('%s', (_name, extra) => {
       const p = prefs(experience, extra);
       for (const emphasis of emphases)
@@ -120,6 +187,11 @@ describe('seeded programme variation', () => {
               expect(curated).toBe(experience === 'new');
               expect(program?.level).toBe(experience);
               const allowed = programPool(experience, emphasis);
+              expectCeilings(program as TrainingProgram, p);
+              expectAdjacency(program as TrainingProgram);
+              for (const pass of (program as TrainingProgram).passes)
+                if (pass.focus === 'full')
+                  expect(missingCoverage(pass.exerciseIds)).toEqual([]);
               for (const pass of (program as TrainingProgram).passes) {
                 const ids = pass.exerciseIds;
                 expect(ids.length).toBeGreaterThanOrEqual(4);
@@ -150,22 +222,37 @@ describe('seeded programme variation', () => {
                 }
               }
             }
-            differing.push(sigs.size > 1);
+            expect(sigs.size).toBeGreaterThan(0);
           });
     });
-    it('varies for a majority of day/emphasis/equipment combinations', () => {
-      const share = differing.filter(Boolean).length / differing.length;
-      expect(differing.length).toBe(
-        setups.length * emphases.length * days.length,
-      );
-      // A one-day beginner programme has few interchangeable exercises; most others vary.
-      expect(share).toBeGreaterThan(0.6);
+    it('varies for a share of day/emphasis/equipment combinations that depends on the level', () => {
+      let differing = 0;
+      let total = 0;
+      for (const [, extra] of setups)
+        for (const emphasis of emphases)
+          for (const d of days) {
+            const sets = new Set(
+              seeds.map((seed) =>
+                setSignature(
+                  build(prefs(experience, extra), emphasis, d, seed),
+                ),
+              ),
+            );
+            total += 1;
+            if (sets.size > 1) differing += 1;
+          }
+      expect(total).toBe(setups.length * emphases.length * days.length);
+      // Beginners have few interchangeable exercises; wider pools vary more.
+      expect(differing / total).toBeGreaterThan(minVariedShare[experience]);
     });
   });
 
   it('keeps A and B passes of the same focus different for every seed', () => {
+    // Bare bodyweight leaves a beginner too few lower-body options to differ.
     for (const experience of levels)
-      for (const [, extra] of setups)
+      for (const [, extra] of setups.filter(
+        ([name]) => !name.startsWith('bodyweight only'),
+      ))
         for (const seed of seeds) {
           const program = build(prefs(experience, extra), 'run', 3, seed);
           const [lowerA, , lowerB] = (program as TrainingProgram).passes;
@@ -185,14 +272,17 @@ describe('Löpning emphasis', () => {
   it.each(levels)(
     'draws lower passes from the running slots · %s',
     (experience) => {
-      for (const [, extra] of setups)
+      for (const [name, extra] of setups)
         for (const seed of [undefined, ...seeds]) {
           const program = build(prefs(experience, extra), 'run', 4, seed);
           for (const pass of (program as TrainingProgram).passes.filter(
             (x) => x.focus === 'lower',
           )) {
             const hits = pass.exerciseIds.filter((id) => runningIds.has(id));
-            expect(hits.length).toBeGreaterThanOrEqual(4);
+            // Bare bodyweight has no squat or hinge variant without a chair or weights.
+            expect(hits.length).toBeGreaterThanOrEqual(
+              name.startsWith('bodyweight only') ? 3 : 4,
+            );
           }
         }
     },
@@ -270,6 +360,39 @@ describe('wide pool (content/widePool.ts)', () => {
     }
     expect(widePool(false).has('plate-pogos')).toBe(false);
     expect(widePool(true).has('plate-pogos')).toBe(true);
+  });
+
+  it('holds no exercise whose audit entry still lists a factual figure or text error', () => {
+    // Same rule as beginnerSet.test.ts: process gaps are not factual errors.
+    const processGaps = [
+      /^Beginner comprehension check and full-loop visual acceptance outstanding/,
+      /^Not covered individually by any audit doc/,
+    ];
+    const unresolved = log
+      .filter((e) =>
+        e.openIssues.some((i) => !processGaps.some((p) => p.test(i))),
+      )
+      .map((e) => e.id);
+    expect(unresolved.length).toBeGreaterThan(0);
+    for (const plyo of [false, true])
+      expect(
+        unresolved.filter((id) => widePool(plyo).has(id as ExerciseId)),
+      ).toEqual([]);
+    // The static list names no exercise the log no longer flags.
+    for (const id of unresolvedFigureIssueIds)
+      expect(unresolved, id).toContain(id);
+  });
+
+  it('keeps the AAOS knee group E28-E38 out', () => {
+    const knee = exerciseList
+      .map((e) => e.id)
+      .filter((id) => {
+        const n = Number(exerciseReferences[id].slice(1));
+        return n >= 28 && n <= 38;
+      });
+    expect(knee.length).toBe(11);
+    for (const plyo of [false, true])
+      expect(knee.filter((id) => widePool(plyo).has(id))).toEqual([]);
   });
 
   it('is only used for levels past the beginner', () => {

@@ -44,8 +44,6 @@ export interface RosterContext {
    * demanding candidate, as before the seed existed.
    */
   seed?: number;
-  /** Programme mode: false skips the beginner weight ceilings (wide pool). Default true. */
-  ceilings?: boolean;
   /** Programme mode: lower-body passes draw from the running slot model. */
   running?: boolean;
   /** Running mode: the jump exercise may enter template B passes. */
@@ -107,6 +105,16 @@ function poolSlot(slot: RosterSlot, pool: ReadonlySet<ExerciseId>): RosterSlot {
 }
 
 /** Core-only filler for a pass that came out short; valid without any note. */
+function coreOnlyCandidates(): ExerciseId[] {
+  return [
+    ...new Set(
+      [...generalSlots.A, ...generalSlots.B]
+        .flatMap((slot) => slot.candidates)
+        .filter((id) => exerciseMuscles[id].primary.every((m) => m === 'core')),
+    ),
+  ];
+}
+
 function coreFill(
   ids: ExerciseId[],
   preferences: TrainingPreferences,
@@ -114,17 +122,7 @@ function coreFill(
   seed?: number,
 ): void {
   const filler = rotated(
-    [
-      ...new Set(
-        [...generalSlots.A, ...generalSlots.B]
-          .flatMap((slot) => slot.candidates)
-          .filter(
-            (id) =>
-              pool.has(id) &&
-              exerciseMuscles[id].primary.every((m) => m === 'core'),
-          ),
-      ),
-    ],
+    coreOnlyCandidates().filter((id) => pool.has(id)),
     seed,
     `core-fill:${ids.join()}`,
   );
@@ -176,7 +174,7 @@ function usable(id: ExerciseId, preferences: TrainingPreferences): boolean {
  * for the small-muscle arm and shoulder work. A slot whose only loaded variant
  * would start heavier moves on to its next candidate.
  */
-const programWeightCeilingKg: Partial<Record<ExerciseId, number>> = {
+export const programWeightCeilingKg: Partial<Record<ExerciseId, number>> = {
   'lateral-raise': 5,
   'triceps-kickback': 5,
   'biceps-curl': 10,
@@ -266,7 +264,6 @@ function wholeBody(
   template: TemplateId,
   pool?: ReadonlySet<ExerciseId>,
   seed?: number,
-  ceilings = true,
 ): Roster {
   const ids: ExerciseId[] = [];
   const notes: Roster['notes'] = {};
@@ -276,7 +273,7 @@ function wholeBody(
       preferences,
       new Set(ids),
       !pool,
-      !!pool && ceilings,
+      !!pool,
       pool && seed !== undefined ? { seed, key: `wb${template}` } : undefined,
     );
     if (!pick) continue;
@@ -321,6 +318,10 @@ function runningRosterSlots(seed: number | undefined, plyo: boolean) {
     const found = [
       ...(runningSlots.find((s) => s.id === id) as RunningSlot).options,
     ];
+    if (id === 'core')
+      // Core-only exercises as well, so A and B lower passes can differ when
+      // the back exercise (bird-dog) is not allowed next to an upper pass.
+      return [...new Set([...found, ...coreOnlyCandidates()])];
     return id === 'hold' ? (['wall-sit', ...found] as ExerciseId[]) : found;
   };
   const tail = rotated(
@@ -340,7 +341,7 @@ function focusRoster(
   context: RosterContext,
 ): Roster {
   const { pool, seed } = context;
-  const capWeights = !!pool && context.ceilings !== false;
+  const capWeights = !!pool;
   const targets = focusTargets(focus);
   const preset = focusPresets.find(
     (p) => p.id === focus.id,
@@ -350,9 +351,16 @@ function focusRoster(
     !!context.running &&
     (focus.id === 'lower' || focus.id === 'legs');
   const slots: RosterSlot[] = runningLower
-    ? runningRosterSlots(seed, !!context.plyo && template === 'B').map((slot) =>
-        poolSlot(slot, pool as ReadonlySet<ExerciseId>),
-      )
+    ? runningRosterSlots(seed, !!context.plyo && template === 'B')
+        .map((slot) => poolSlot(slot, pool as ReadonlySet<ExerciseId>))
+        // Every primary muscle must belong to the focus, so a lower pass never
+        // trains the back (bird-dog) the day before an upper pass.
+        .map((slot) => ({
+          ...slot,
+          candidates: slot.candidates.filter((id) =>
+            exerciseMuscles[id].primary.every((m) => targets.includes(m)),
+          ),
+        }))
     : (preset.slots.length
         ? preset.slots.map(
             (id) =>
@@ -456,13 +464,7 @@ export function buildRoster(
       ? { id: 'custom' as const, regions: preferences.bodyParts }
       : { id: 'full' as const });
   return focus.id === 'full'
-    ? wholeBody(
-        preferences,
-        template,
-        context.pool,
-        context.seed,
-        context.ceilings !== false,
-      )
+    ? wholeBody(preferences, template, context.pool, context.seed)
     : focusRoster(preferences, template, focus, context);
 }
 export function initialTrainingRoster(

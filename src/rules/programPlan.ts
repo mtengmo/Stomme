@@ -158,7 +158,6 @@ export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
   const context: Omit<RosterContext, 'focus'> = {
     ...(pool ? { pool } : {}),
     ...(seed !== undefined ? { seed } : {}),
-    ...(pool && !curated ? { ceilings: false } : {}),
     ...(pool && emphasis === 'run' ? { running: true } : {}),
     // Jumps: running only, wide pool only, never for a beginner.
     ...(pool &&
