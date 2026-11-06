@@ -191,7 +191,9 @@ it('?byt= opens the editor even when Kortpass was chosen earlier', async () => {
   render(<App />);
   const open = await screen.findByRole('button', { name: /Stäng/ });
   expect(open.getAttribute('aria-expanded')).toBe('true');
-  expect(sessionStorage.getItem(`${prefix}.short`)).toBe('false');
+  await waitFor(() =>
+    expect(sessionStorage.getItem(`${prefix}.short`)).toBe('false'),
+  );
 });
 
 it('?byt= for an exercise that is not in the draft opens no other row', async () => {
