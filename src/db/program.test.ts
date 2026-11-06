@@ -18,8 +18,9 @@ afterEach(async () => {
   await db.delete();
 });
 
-const withIds = (exerciseIds: string[]) =>
-  ({ focus: 'full', template: 'A', exerciseIds }) as never;
+const passOf = (exerciseIds: string[], focus = 'full', template = 'A') =>
+  ({ focus, template, exerciseIds }) as never;
+const withIds = (exerciseIds: string[]) => passOf(exerciseIds);
 const rehabAdditionExample = [...rehabAdditionIds][0] as string;
 
 describe('isTrainingProgram', () => {
@@ -161,7 +162,10 @@ describe('isTrainingProgram', () => {
   });
 
   it('allows the jump exercise only in a wide running programme above beginner level', () => {
-    const pass = (ids: string[]) => [withIds(ids), withIds(ids)];
+    const pass = (ids: string[]) => [
+      passOf(ids, 'lower', 'B'),
+      passOf(ids, 'lower', 'B'),
+    ];
     const ids = ['split-squat', 'glute-bridge', 'calf-raise', 'plate-pogos'];
     const wide = {
       curated: false,
@@ -187,6 +191,44 @@ describe('isTrainingProgram', () => {
         programFixture((({ level: _l, ...rest }) => rest)(wide)),
       ),
     ).toBe(false);
+  });
+
+  it('allows the jump exercise only in a template B lower or legs pass', () => {
+    const ids = ['split-squat', 'glute-bridge', 'calf-raise', 'plate-pogos'];
+    const wide = {
+      curated: false,
+      emphasis: 'run' as const,
+      level: 'regular' as const,
+    };
+    const pass = (focus: string, template: string) =>
+      passOf(ids, focus, template);
+    const other = passOf(
+      ['split-squat', 'glute-bridge', 'calf-raise', 'dead-bug'],
+      'lower',
+      'A',
+    );
+    const make = (focus: string, template: string) =>
+      programFixture({ ...wide, passes: [pass(focus, template), other] });
+    expect(isTrainingProgram(make('lower', 'B'))).toBe(true);
+    expect(isTrainingProgram(make('legs', 'B'))).toBe(true);
+    expect(isTrainingProgram(make('lower', 'A'))).toBe(false);
+    expect(isTrainingProgram(make('upper', 'B'))).toBe(false);
+    expect(isTrainingProgram(make('full', 'B'))).toBe(false);
+  });
+
+  it('rejects ballistic and retired exercises that no exclusion list covers', () => {
+    for (const bad of ['kettlebell-swing', 'mountain-climber', 'fast-feet'])
+      expect(
+        isTrainingProgram(
+          programFixture({
+            passes: [
+              withIds(['split-squat', 'glute-bridge', 'calf-raise', bad]),
+              withIds(['split-squat', 'glute-bridge', 'calf-raise', 'plank']),
+            ],
+          }),
+        ),
+        bad,
+      ).toBe(false);
   });
 
   it.each(bad)('rejects %s', (_name, value) => {

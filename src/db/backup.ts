@@ -26,10 +26,15 @@ import { validateTrainingPlan } from './training';
 import { isTrainingRoutines } from './trainingRoutines';
 
 /** Bump together with a Dexie version and add a migration test (risk R13). */
-export const BACKUP_SCHEMA_VERSION = 5;
-/** Version 5 only added fields (trainingProgram, session.programPass), so 4 still imports. */
+export const BACKUP_SCHEMA_VERSION = 6;
+/**
+ * Versions 5 and 6 only added fields (5: trainingProgram, session.programPass;
+ * 6: programme seed and level), so 4 and 5 still import. The bump makes an
+ * older app say 'unsupported version' on a new export instead of 'invalid'.
+ */
 const SUPPORTED_SCHEMA_VERSIONS: readonly unknown[] = [
   4,
+  5,
   BACKUP_SCHEMA_VERSION,
 ];
 /** Import size limit (risk R12). */
@@ -550,7 +555,11 @@ const metaSchema = z.discriminatedUnion('key', [
 ]);
 
 const backupSchema = z.strictObject({
-  schemaVersion: z.union([z.literal(4), z.literal(BACKUP_SCHEMA_VERSION)]),
+  schemaVersion: z.union([
+    z.literal(4),
+    z.literal(5),
+    z.literal(BACKUP_SCHEMA_VERSION),
+  ]),
   exportedAt: instant,
   sessions: z.array(sessionSchema),
   setLogs: z.array(setLogSchema),
