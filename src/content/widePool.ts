@@ -29,7 +29,7 @@ export const ballisticIds: ReadonlySet<ExerciseId> = new Set<ExerciseId>([
 
 /**
  * Exercises whose audit-log entry still lists a factual figure or text error
- * in `openIssues` (fixed, awaiting re-review). Kept out of a wide programme
+ * in `openIssues` (needs-fix, or fixed and awaiting re-review). Kept out of a wide programme
  * until the review closes them; programVariety.test.ts fails when a pool member has
  * such an issue, so a new entry in the log cannot slip in unnoticed. Remove an
  * id here only after the re-review (Astra) has cleared its openIssues.
@@ -41,6 +41,9 @@ export const unresolvedFigureIssueIds: ReadonlySet<ExerciseId> =
     'woodchop',
     'thruster',
     'single-arm-thruster',
+    'pull-up',
+    'dumbbell-pullover',
+    'kettlebell-goblet-squat',
   ]);
 
 /** The AAOS knee range E28-E38 (half-squat, seated knee extension, ...). */

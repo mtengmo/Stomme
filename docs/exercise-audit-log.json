@@ -80,7 +80,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "6c68ea04b029"
+    "fingerprint": "6c68ea04b029",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: goblet-squat, half-squat. Stolkontakten och möjligheten till högre sits/armstöd ger en egen ingång. Behåll även den fria knäböjen som nästa steg; samma muskler gör dem inte till dubletter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/squat; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "step-up",
@@ -117,6 +120,14 @@
         "result": "ok",
         "commit": "29bab7d",
         "notes": "E02: nio frysta profilfaser visar uppsteg med vald blå fot kvar på steget och fri fot som följer. Reduced-motion H/V granskade i profil/front; sida och markering stämmer, rekvisita och huvud ryms. Kroppsvikt samt 2×5/2×10 kg granskade i frontens ändlägen: hantlar vid händerna, stöd på rätt steg. Profil med vikter och dynamisk knäriktning ej verifierade. Tips om hela foten, kontrollerad sänkning, lägre steg/väggstöd och fysioterapeutens steghöjdsråd finns. Inget säkert textfel i stickproven; tidigare nybörjartest kvarstår. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Läst steg, sidocue, vanligt fel och lättare variant mot nio profilrutor samt reduced-motion H/V profil/front och kroppsvikt/2×5/2×10 kg. Vald fot ligger på steget medan andra följer med upp; vikterna ligger i händerna och hela figuren ryms. Texten beskriver kvarliggande stödfot, inget frånskjut och lägre steg/handstöd. Exakt kraftfördelning, knäriktning över hela rörelsen och handstödets variant är inte verifierade. Befintlig punkt om nybörjarförståelse och full loopacceptans kvarstår. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -138,7 +149,8 @@
     ],
     "fingerprint": "ff388d06dc8b",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: step-down, split-squat, box-jump. Uppsteg med hela foten på stödet skiljer sig från nedsteg, stationärt utfall och hopp. Behåll som eget rörelsemönster. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -173,7 +185,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "61f149c0459a"
+    "fingerprint": "61f149c0459a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: balance-pendulum, dumbbell-rdl. Enbens höftfällning med kroppsvikt eller last ger en egen progression. Balanspendelns knäframföring är ett annat moment och behöver inte ersätta denna. Kodkopplingar: allmänna kandidatplatser A/hinge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "dead-bug",
@@ -211,7 +226,8 @@
     ],
     "fingerprint": "911193812d0d",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: heel-slide, bird-dog, lying-leg-raise. Ryggliggande motsatt arm/ben skiljer sig från hälglidning, fyrfota arbete och samtidiga benlyft. Behåll som grundalternativ. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -246,7 +262,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "dfa0558cd828"
+    "fingerprint": "dfa0558cd828",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: plank, copenhagen-hold, bench-side-plank-leg-lift. Vanlig sidoplanka kräver ingen bänk och har en egen roll jämfört med framsidesplanka och adduktorvarianter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/core, B/side-core; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "split-squat",
@@ -310,7 +329,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "c5c2eebcc088"
+    "fingerprint": "c5c2eebcc088",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, rear-foot-split-squat. Fötterna står kvar och handstöd kan användas. Behåll detta enklare stationsbundna steg även om någon dynamisk utfallsvariant tas bort. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-leg-hip-thrust",
@@ -366,7 +388,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "ece043c9ef91"
+    "fingerprint": "ece043c9ef91",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: single-leg-floor-bridge, glute-bridge. Ryggstöd och last på höften skiljer denna från golvvarianterna. Inte direkt utbytbar mot rehabens enbenslyft på golv. Kodkopplingar: allmänna kandidatplatser B/bridge; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-leg-calf-raise",
@@ -422,7 +447,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "e7095b49a67b"
+    "fingerprint": "e7095b49a67b",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: calf-raise, bent-knee-calf-hold. Enbens dynamiskt hällyft med möjlig hantel är en egen progression från två ben. Böjt knä och statiskt håll är en annan variant. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser calf; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "suitcase-carry",
@@ -490,7 +518,8 @@
     ],
     "fingerprint": "5fa166eaf280",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: farmer-carry, kettlebell-rack-carry. Ensidig bärning med armen längs sidan har annan lastfördelning än tvåhandsbärning och enklare greppbeskrivning än rackgång. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/carry; fokusplatser carry; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -529,7 +558,8 @@
     ],
     "fingerprint": "e73c0b0ca7a6",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dead-bug, plank-arm-lift, back-extension. Fyrfota motsatt arm/ben ger en egen stödposition. Liknande bålmål innebär inte att den kan ersättas med rygglyft eller planka. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/pull, B/pull; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -594,7 +624,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "da2c4362bdcc"
+    "fingerprint": "da2c4362bdcc",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: half-squat, goblet-chair-squat. Statiskt vägghåll med självvalt djup är inte samma uppgift som dynamisk knäböj eller kort paus i halv knäböj. Kodkopplingar: nybörjarurval; allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "goblet-squat",
@@ -663,7 +696,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "2a48327d74d5"
+    "fingerprint": "2a48327d74d5",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDPOST. Jämför: kettlebell-goblet-squat, sumo-squat, goblet-chair-squat. Samlar redan kroppsvikt, hantel och kettlebell utan stol. Låt kettlebell-goblet-squat bli variant här, med dess 4 kg-val och greppinstruktion bevarade. Kodkopplingar: allmänna kandidatplatser A/squat; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-deadlift",
@@ -718,7 +754,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "7a59441e5632"
+    "fingerprint": "7a59441e5632",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dumbbell-rdl, kettlebell-swing. Start och återplacering på golvet skiljer sig från RDL:s stående start och svingens ballistik. Behåll för kettlebellutrustning. Kodkopplingar: allmänna kandidatplatser A/hinge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "dumbbell-rdl",
@@ -773,7 +812,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "64974d6b63fb"
+    "fingerprint": "64974d6b63fb",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: kettlebell-deadlift, single-leg-rdl. Stående höftfällning med hantlar eller kettlebell fyller en egen roll mellan golvmarklyft och enbensvarianten. Kodkopplingar: allmänna kandidatplatser A/hinge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "supported-row",
@@ -809,7 +851,10 @@
     "openIssues": [
       "Not covered individually by any audit doc; only inside the E11-E17 group row of the 2026-10-23 audit"
     ],
-    "fingerprint": "24ba5a5cbad9"
+    "fingerprint": "24ba5a5cbad9",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BAS. Jämför: bent-over-row. Handstöd, enarm och både hantel-/kettlebellval ger bredare utrustningstäckning. Prioritera denna framför ostödd rodd om urvalet måste minskas. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/pull, B/pull; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "floor-press",
@@ -846,6 +891,14 @@
         "result": "ok",
         "commit": "29bab7d",
         "notes": "E16: nio frysta profilfaser samt reduced-motion för 2×2/2×4 kg visar press från böjda till utsträckta armar, ryggläge och böjda knän; bål/fötter stilla och vikter vid händerna i stickproven. Hela figuren ryms. Bilateral utan sidoval. Armar/vikter överlappar i profil: sidavståndet mellan hantlarna och båda överarmarnas golvkontakt kan inte säkert bedömas. Tips om varsam bottenkontakt, mindre vikt, att undvika svank och lägga ned vikterna före uppresning finns; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Läst instruktion om start, press, sänkning och nedläggning mot nio profilrutor och reduced-motion 2×2/2×4 kg. Texten stämmer med böjda knän, press uppåt och bottenläge nära golvet; anger ingen studs och lugn paus/lättare vikt. Hantlar och figur ryms. Armar och hantlar överlappar i profil, så avståndet mellan vikterna och båda överarmarnas exakta golvkontakt är inte verifierade. In-/ur-position visas inte. Bilateral övning utan sidval; ok gäller texten. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -857,7 +910,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "f547dfa3baf8"
+    "fingerprint": "f547dfa3baf8",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: kettlebell-floor-press, push-up. Två hantlar och golvets begränsning av sänkningen ger en annan utrustningsväg än kroppsviktsarmhävning och enarms kettlebellpress. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "shoulder-press",
@@ -891,7 +947,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "2e197625bf6d"
+    "fingerprint": "2e197625bf6d",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: kettlebell-press, thruster, single-arm-thruster. Ren bilateral hantelpress är ett tydligt basmoment; kombinationsövningarna bör inte ersätta den. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/overhead; fokusplatser overhead; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "farmer-carry",
@@ -955,7 +1014,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "5008c8b189db"
+    "fingerprint": "5008c8b189db",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: suitcase-carry, kettlebell-rack-carry. Bärning i båda händerna skiljer sig från ensidig last. Behåll som enkel huvudvariant för två vikter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/carry; fokusplatser carry; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "biceps-curl",
@@ -989,7 +1051,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "d007c03f3bbb"
+    "fingerprint": "d007c03f3bbb",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG VARIANT, P3. Jämför: hammer-curl. Samma samtidiga armbågsböjning och viktstege; greppet är huvudskillnaden. Om en separat post ska bort föreslås denna som greppvariant under hammer-curl, men båda används uttryckligen för variation i nybörjarprogrammets B-pass. Inte en kvalitetsdom om supinerat grepp. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/arms; fokusplatser curl; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "hammer-curl",
@@ -1023,7 +1088,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "ebfdb9bed68f"
+    "fingerprint": "ebfdb9bed68f",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM MÖJLIG HUVUDPOST. Jämför: biceps-curl. Samma utrustning och rörelse som biceps-curl men neutralt grepp. Välj denna huvudpost vid sammanslagning; bevara handflator-framåt som val och hantera B-passets variationskrav. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/arms; fokusplatser curl; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "lateral-raise",
@@ -1057,7 +1125,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "276c2e2b2bcf"
+    "fingerprint": "276c2e2b2bcf",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: shoulder-press. Armarna förs utåt i stället för press över huvudet. Eget rörelsemönster trots samma axelgrupp. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/overhead; fokusplatser lateral-raise; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "triceps-kickback",
@@ -1091,7 +1162,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "48e3c286bf2e"
+    "fingerprint": "48e3c286bf2e",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BAS. Jämför: overhead-triceps-extension, diamond-push-up. Stödd enarms armbågssträckning är en tydlig grundvariant. Den ersätter inte alla överhuvud-/pressvarianters egenskaper men bör prioriteras i ett litet grundutbud. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/arms; fokusplatser arm-extension; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "glute-bridge",
@@ -1125,7 +1199,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "f372ca4d89d5"
+    "fingerprint": "f372ca4d89d5",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDPOST. Jämför: weighted-glute-bridge, single-leg-floor-bridge. Har redan kroppsvikt och 2 kg hantel. Slå på sikt in weighted-glute-bridge här med 4 kg och instruktionen om att hålla vikten; behåll enbensvarianten separat. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/hinge, B/bridge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "reverse-lunge",
@@ -1189,7 +1266,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "9448a09f3f4a"
+    "fingerprint": "9448a09f3f4a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BAS. Jämför: forward-lunge, walking-lunge, split-squat. Bakåtsteg med främre foten kvar ger ett tydligt dynamiskt komplement till split-squat och ingår i nybörjarurvalet. Prioritera framför utfallsgång vid förenkling. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "forward-lunge",
@@ -1245,7 +1325,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "51a47db2c234"
+    "fingerprint": "51a47db2c234",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: reverse-lunge, walking-lunge. Framåtstegets inbromsning tillför något eget; inte en ren dublett. Om endast ett dynamiskt utfall ska finnas, behåll reverse-lunge som redan ligger i nybörjarurvalet. Ta först bort walking-lunge före denna. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-swing",
@@ -1279,7 +1362,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "60fe175afd60"
+    "fingerprint": "60fe175afd60",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDVARIANT. Jämför: one-arm-kettlebell-swing, kettlebell-deadlift. Tvåhands höftdriven sving är huvudvarianten. Enarm kan döljas i ett smalare utbud; marklyft behöver vara kvar som separat kontrollerat moment. Kodkopplingar: allmänna kandidatplatser A/hinge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-press",
@@ -1317,7 +1403,8 @@
     ],
     "fingerprint": "79a088ccf919",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: shoulder-press, single-arm-thruster. En kettlebell, ensidig press och rackgrepp skiljer sig från två hantlar. Att ta bort den skulle minska täckningen för användare med bara en kettlebell. Kodkopplingar: allmänna kandidatplatser B/overhead; fokusplatser overhead; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -1352,7 +1439,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "3ff4067ca947"
+    "fingerprint": "3ff4067ca947",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: goblet-chair-squat, goblet-squat, wall-sit. Handstöd, grund rörelse och femsekundershåll är en särskild doserad variant. Inte kandidat enbart för att den liknar vanlig knäböj. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "hamstring-curl",
@@ -1388,7 +1478,8 @@
     "openIssues": [],
     "fingerprint": "bf7091e8049b",
     "notes": [
-      "Geometry audit flagged 1.0 unit below floor: false positive, no action (docs/figure-audit-status.md; date not recorded)."
+      "Geometry audit flagged 1.0 unit below floor: false positive, no action (docs/figure-audit-status.md; date not recorded).",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: nordic-hamstring-curl, seated-knee-flexion. Stående aktiv knäböjning med femsekundershåll är en annan uppgift än fotglidning eller fixerad Nordic-sänkning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -1423,7 +1514,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "6f4229d4c7b3"
+    "fingerprint": "6f4229d4c7b3",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: band-knee-extension, quad-set. Obelastad knästräckning med femsekundershåll behövs som separat dosering; bandmotstånd och isometrisk lårspänning är inte likvärdiga ersättningar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "straight-leg-raise",
@@ -1457,7 +1551,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "8a113670805f"
+    "fingerprint": "8a113670805f",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: lying-leg-raise, quad-set. Ett ben lyfts med understödd överkropp och föreskrivet håll. Ska inte slås ihop med bålövningens samtidiga tvåbenslyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "prone-leg-raise",
@@ -1491,7 +1588,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "fcdd48ef3a5a"
+    "fingerprint": "fcdd48ef3a5a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: band-hip-extension, back-extension. Benlyft på mage med bäckenet kvar skiljer sig från bröstlyft och stående bandmotstånd. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "side-lying-hip-abduction",
@@ -1525,7 +1625,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "badf122257f6"
+    "fingerprint": "badf122257f6",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: side-lunge, balance-clock. Sidliggande isolerat benlyft med håll är inte utbytbart mot stående utfall eller balansnuddar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "side-lying-hip-adduction",
@@ -1559,7 +1662,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "f49f27e7a3ce"
+    "fingerprint": "f49f27e7a3ce",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: copenhagen-hold, bench-side-plank-leg-lift. Sidliggande lyft av undre benet utan bänk är ett eget enklare upplägg; behåll även om bänkvarianten gallras. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "calf-stretch",
@@ -1593,7 +1699,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "fe4a0460573d"
+    "fingerprint": "fe4a0460573d",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: calf-raise, bent-knee-calf-hold. Stretch med hälen nere skiljer sig från hällyft och statiskt hälhåll. Ingen tydlig dublett i katalogen. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "quadriceps-stretch",
@@ -1627,7 +1736,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "c738776e417a"
+    "fingerprint": "c738776e417a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: hamstring-curl, kneeling-hip-flexor-stretch. Grepp om fotleden och hållen lårstretch är inte samma moment som aktiv lårcurl eller höftböjarstretch. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "hamstring-stretch",
@@ -1683,7 +1795,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "5191cab85529"
+    "fingerprint": "5191cab85529",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: straight-leg-raise, lying-leg-raise. Handassisterad hållen stretch skiljer sig från aktiva benlyft. Ingen rimlig direkt ersättare bland dem. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "band-leg-press",
@@ -1717,7 +1832,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "b396aabd6a8d"
+    "fingerprint": "b396aabd6a8d",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: band-knee-extension, kettlebell-deadlift. Liggande press mot band omfattar annan kroppsposition och rörelse än sittande knästräckning eller stående marklyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-floor-press",
@@ -1754,6 +1872,14 @@
         "result": "ok",
         "commit": "29bab7d",
         "notes": "E39: nio frysta H-faser och reduced-motion H/V samt 4/8/16 kg visar enarms press med rätt blå arm, vila i andra armen och kettlebell intill underarmen. Bål/fötter stilla i stickproven, båda sidor ryms. Sidotext följer speglingen. Grepptexten anger rak handled och hjälp med fria handen; tips beskriver sidliggande start/avslut, mjuk golvkontakt och lättare vikt. Dessa in-/ursteg ingår inte i fasbilderna. Ingen säker textavvikelse; greppdetaljernas tredimensionella kontakt och tidigare nybörjartest är inte slutbedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Läst greppguide, sidocue och instruktion om sidliggande start/avslut mot nio H-profilfaser, reduced-motion H/V och 4/8/16 kg. Vald arm pressar och vikten följer handen; andra armen vilar. Figuren ryms. Texten anger rak handled, stöd av fria handen, mjuk golvkontakt och lättare vikt. In-/ur-position och underarmens djupkontakt med kulan är inte verifierade; profilen räcker inte för bålrotation. Befintlig punkt om nybörjarförståelse/full loopacceptans kvarstår. Ok avser texten. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -1769,7 +1895,8 @@
     ],
     "fingerprint": "5c295b0cb952",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: floor-press. Enarm och en kettlebell kräver särskilt grepp och in-/ur-position. Behåll utrustningstäckningen; en sammanslagning kräver verkligt variantstöd, inte bara namnbyte. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -1826,7 +1953,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "ecaaf5fea77c"
+    "fingerprint": "ecaaf5fea77c",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: suitcase-carry, farmer-carry. Samma gångmoment men mer omfattande rackinstruktion. Svagast av tre bärningar för ett litet basutbud; suitcase-carry täcker ensidig gång med samma enskilda vikt. Rackträning är dock ett eget skäl att behålla den. Kodkopplingar: allmänna kandidatplatser A/carry; fokusplatser carry; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "rear-foot-split-squat",
@@ -1864,7 +1994,8 @@
     ],
     "fingerprint": "5c63b470424a",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: split-squat, single-leg-chair-squat. Upphöjd bakfot ger ett eget upplägg. Redan utanför allmänna program; inte automatisk ersättning för stationärt utfall eller enbens stolknäböj. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -1951,7 +2082,8 @@
     ],
     "fingerprint": "7ff0246d8dfa",
     "notes": [
-      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc."
+      "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: copenhagen-hold, side-lying-hip-adduction. Svagast dokumenterad i bänk-/adduktorfamiljen: loggen har kvar lucka för källa till exakt benlyftsvariant och nybörjarförståelse. Överväg att dölja denna före alternativen. Dynamiskt långt ben och statiskt knästöd är olika doseringar; byt inte automatiskt i ett rehabpass. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -1986,7 +2118,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "8d4079028ada"
+    "fingerprint": "8d4079028ada",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: quadriceps-stretch. Halvknästående höftböjarstretch har annan position och instruktion än stående lårstretch. Ingen direkt dublett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "prone-on-forearms",
@@ -2023,6 +2158,14 @@
         "result": "ok",
         "commit": "1f8ef01",
         "notes": "Omgranskning efter 56d07e3: reduced-motion har nu två tydligt skilda rutor, Vila med sänkt överkropp och Håll på böjda armbågar. Det tidigare dubbla Start/Slut-fyndet är åtgärdat. De nio frysta faserna av själva hållposen är oförändrat statiska. Bäcken, underarmar och ben ryms i profil. Ingen ny klinisk säkerhetsbedömning. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Riktad kontroll av reduced-motion Vila/Håll: Vila visar sänkt bröstkorg, Håll visar böjda armbågar under axlarna och underarmsstöd i stället för press på raka armar. Nio tvingade fasrutor visar samma hållposition och ger inget underlag om övergång/återgång. Ben och bäcken ligger lågt; figuren ryms med liten marginal vid fötterna. Inga sid-/viktval. Läst text anger bekvämt läge, lugn andning och vila som alternativ. Ok avser stillrutornas rättade etiketter/poser, inte full uppspelning. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2040,7 +2183,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "9bfe63718244"
+    "fingerprint": "9bfe63718244",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: back-extension. Passivt understött hållet läge skiljer sig från aktivt upprepat bröstlyft. Slå inte ihop utifrån liknande silhuett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "heel-slide",
@@ -2088,7 +2234,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "614c2bdbdceb"
+    "fingerprint": "614c2bdbdceb",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: dead-bug, seated-knee-flexion. Ryggliggande glidning med bäckenkontroll och tidsdosering är inte samma uppgift som motsatt arm/ben eller sittande knärörlighet. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "balance-pendulum",
@@ -2144,7 +2293,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "8e63bf398cec"
+    "fingerprint": "8e63bf398cec",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-rdl, balance-clock. Stor överlappning med obelastad enbens-RDL, men knäframföring och balanssekvens ger ett eget upplägg. Prioritera inte inaktivering utan att rehabens användning klarlagts. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-leg-chair-squat",
@@ -2200,7 +2352,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "d1929a73f859"
+    "fingerprint": "d1929a73f859",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: goblet-chair-squat, split-squat. Stolkontakt på ett stödben skiljer sig från två ben och delad fotställning. Egen progression, redan utanför allmänna program. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-leg-floor-bridge",
@@ -2234,7 +2389,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "73dcdbbbde68"
+    "fingerprint": "73dcdbbbde68",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-hip-thrust, glute-bridge. Enbenslyft på golv med tvåsekundershåll kräver inget ryggstöd. Bevara separat från belastad hip-thrust och tvåbenslyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "quad-set",
@@ -2271,6 +2429,14 @@
         "scope": "text",
         "result": "ok",
         "notes": "Begränsad omgranskning E49: utsträckt valt ben, knäets lilla nedåtgående förändring och tådrag mot kroppen är förenliga med texten i fasbilder/reduced-motion H/V. Muskelmarkering och pil skiljer spänning från start; figuren ryms. Ingen utrustningsvariant, andra knäets böjning är frivillig i texten. Råd om mjukt tryck, lugn andning, stilla bäcken/säte och mindre kraft lästa; inget nytt säkert textfel. Stillbilder kan inte visa faktisk muskelspänning eller full avslappning mellan repetitioner. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Avgränsad kontroll av ramen och sidvisningen: nio H-profilrutor samt reduced-motion H/V visar hela foten inklusive tårna med marginal. Vald blå sida, lårmarkering och nedåtpil speglas tillsammans; knät sänks lätt och tårna dras upp utan synligt höftlyft. Texten anger mjuk spänning, avslappning, andning och mindre kraft som förenkling. Ingen utrustning. Ok gäller synliga markörer/poser och tidigare ramrättning; faktisk muskelspänning och växling mellan spänning/vila kan inte bedömas från stillbilder. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2282,7 +2448,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "3401ee1f9cc2"
+    "fingerprint": "3401ee1f9cc2",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: seated-knee-extension, straight-leg-raise. Isometrisk lårspänning utan benlyft eller stor knärörelse är en egen uppgift. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "seated-knee-flexion",
@@ -2316,7 +2485,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "e46062cd2bb5"
+    "fingerprint": "e46062cd2bb5",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: heel-slide, hamstring-curl. Sittande fotglidning under stolen skiljer sig från ryggliggande bålkontroll och stående hällyft. Behåll position och dosering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "band-knee-extension",
@@ -2350,7 +2522,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "4e4caabf63ae"
+    "fingerprint": "4e4caabf63ae",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: seated-knee-extension. Samma grundrörelse men bandmotstånd, säkrat fäste och annan hållinstruktion. Eventuell framtida gemensam post måste bevara båda doseringarna; ingen inaktivering nu. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "band-hip-extension",
@@ -2384,7 +2559,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "6d595c04a840"
+    "fingerprint": "6d595c04a840",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: prone-leg-raise, glute-bridge. Stående höftsträckning mot band med handstöd skiljer sig från magliggande benlyft och ryggliggande bäckenlyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "balance-clock",
@@ -2418,7 +2596,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "5b81d6ef8fe3"
+    "fingerprint": "5b81d6ef8fe3",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: balance-pendulum, single-leg-rdl. Fem riktade tånuddspositioner med stöd och varvräkning ger en annan balansuppgift än framåtfällning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "push-up",
@@ -2452,14 +2633,17 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "dc64f5a73070"
+    "fingerprint": "dc64f5a73070",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDVARIANT. Jämför: knee-push-up, wall-push-up, decline-push-up, diamond-push-up, blast-off-push-up. Behåll normal tåarmhävning samt vägg/knä som progression. Gallra i första hand specialvarianter, inte de lättare ingångarna. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "pull-up",
     "name": "Pull-up med överhandsgrepp",
     "group": "bodyweight",
     "risk": "high",
-    "status": "unreviewed",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -2468,11 +2652,24 @@
         "result": "ok",
         "commit": "29bab7d",
         "notes": "E55: nio frysta frontfaser och reduced-motion Start/Slut visar kroppen upp mot fast stång med händerna kvar. Bilateral kroppsvikt utan sidoval/utrustningsalternativ; hela stången och figuren ryms. Startens fötter är mycket nära golvlinjen, vilket ger svag visuell signal om fritt häng; greppets handflatsriktning kan inte utläsas ur streckfiguren. Tips anger kroppsviktsgodkänd fast stång, fritt häng, ingen sving och kontrollerad sänkning samt enklare rodd. Ingen säker textavvikelse i materialet. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio frontrutor och reduced-motion Start/Slut granskade mot text. Händerna ligger kvar på stången och kroppen stiger inom ramen. Startarmarna är synligt vinklade vid armbågarna trots instruktionens utsträckta armar. Fötterna är mycket nära golvet men ett litet mellanrum syns. Överhandsgreppets handflatsriktning kan inte utläsas. Fast stång, kontrollerad sänkning och rodd som alternativ beskrivs; inga sid-/viktval. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
-    "openIssues": [],
-    "fingerprint": "44c9d7c8e5b6"
+    "openIssues": [
+      "[cheap] E55, fas 0 och reduced-motion Start: armbågarna har en synlig knäck i stället för ett tydligt utsträckt hängläge. Visa raka axel–armbåge–handled-linjer enligt texten, med händerna kvar på stången och tydligt fria fötter."
+    ],
+    "fingerprint": "44c9d7c8e5b6",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM MÖJLIG HUVUDPOST. Jämför: chin-up. Samma stång och vertikala dragfamilj. Om greppen samlas under en post, bevara underhandsgrepp som val; avsaknad av öppet fel här betyder inte att animationen är fullständigt godkänd. Kodkopplingar: allmänna kandidatplatser A/pull, B/pull; fokusplatser vertical-pull; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "chin-up",
@@ -2530,7 +2727,10 @@
     "openIssues": [
       "[cheap] E56, fas 0 och reduced-motion Start: båda armbågarna har en synlig knäck mellan handen på stången och axel/hals-punkten. Visa ett tydligt utsträckt hängläge enligt instruktionen, med raka axel–armbåge–handled-linjer, bibehållen kontakt med stången och fötterna fria från golvet."
     ],
-    "fingerprint": "98f27bb33227"
+    "fingerprint": "98f27bb33227",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG VARIANT, P3. Jämför: pull-up. Greppet är huvudskillnaden i samma stångdrag. Om bara en post ska finnas är denna nu svagare pedagogiskt med öppet fel om böjda startarmar; föreslå underhandsgrepp som variant under pull-up efter rättning. Inte ett påstående att övningen fysiologiskt är sämre. Kodkopplingar: allmänna kandidatplatser A/pull, B/pull; fokusplatser vertical-pull; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "back-extension",
@@ -2550,7 +2750,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "170c85a80fde"
+    "fingerprint": "170c85a80fde",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: bird-dog, prone-on-forearms. Aktivt kort bröstlyft utan armstöd är inte samma rörelse som bird-dog eller understött statiskt magläge. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/pull, B/pull; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "parallel-dip",
@@ -2600,7 +2803,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "004580640e5f"
+    "fingerprint": "004580640e5f",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: push-up, diamond-push-up. Stöd på parallella stänger med kroppen mellan dem är ett annat rörelsemönster. Utrustningskrav ensamt gör den inte till dublett. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "lying-leg-raise",
@@ -2620,7 +2826,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "2a822cc8753e"
+    "fingerprint": "2a822cc8753e",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dead-bug, straight-leg-raise, crunch. Två ben samtidigt och bålstabilisering skiljer sig från enbens rehablyft, dead-bug och bålflexion. Kodkopplingar: allmänna kandidatplatser A/core, B/side-core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "burpee",
@@ -2680,7 +2889,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "224d78080eab"
+    "fingerprint": "224d78080eab",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: squat-jump, push-up, mountain-climber. Sammansatt följd med golvövergång, armhävning och hopp ger egen konditionssekvens. Komplexitet eller tidigare figurproblem räcker inte som dublettskäl. Kodkopplingar: allmänna kandidatplatser A/core; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "plank",
@@ -2714,7 +2926,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "02b0d283569f"
+    "fingerprint": "02b0d283569f",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDVARIANT. Jämför: plank-arm-lift, side-plank. Statiskt underarmsstöd är basen; armlyft och sidoplanka har andra stöd-/rörelsekrav. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/core, B/side-core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "squat-jump",
@@ -2764,7 +2979,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "5ed09d953a78"
+    "fingerprint": "5ed09d953a78",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HOPPBAS. Jämför: box-jump, jumping-lunge, in-and-out-jump. Vertikalt tvåbenshopp på samma golv kräver ingen låda och skiljer sig från benbyte eller sidledes breddväxling. Kodkopplingar: allmänna kandidatplatser A/squat; fokusplatser squat; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "jumping-lunge",
@@ -2806,7 +3024,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "12c047bd38af"
+    "fingerprint": "12c047bd38af",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: squat-jump, reverse-lunge. Benbyte i luften och utfallslandning tillför annat än tvåbens knäböjshopp. Redan utesluten från allmänna program; inte dublett på grund av samma benmuskler. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "mountain-climber",
@@ -2860,7 +3081,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "7b7891d4a8b4"
+    "fingerprint": "7b7891d4a8b4",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: knee-drive, plank, burpee. Växlande knäframföring i handstöd skiljer sig från upprätt löpsteg och statisk planka. Kodkopplingar: allmänna kandidatplatser A/core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "knee-push-up",
@@ -2902,7 +3126,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "8958294d8f02"
+    "fingerprint": "8958294d8f02",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: wall-push-up, push-up. Mellansteget med knästöd behövs i progressionen. Gallra inte detta som en sämre normal armhävning. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "wall-push-up",
@@ -2944,7 +3171,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "e57fca9f2073"
+    "fingerprint": "e57fca9f2073",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: knee-push-up, push-up. Stående väggstöd är en egen tillgänglig ingång utan golvposition. Behåll även om avancerade pressvarianter tas bort. Kodkopplingar: nybörjarurval; allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "calf-raise",
@@ -2964,7 +3194,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "3aa88d572823"
+    "fingerprint": "3aa88d572823",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BAS. Jämför: single-leg-calf-raise, bent-knee-calf-hold. Tvåbens dynamisk tåhävning är grundalternativet. Enbens och böjt-knä-håll är progression/specialisering, inte ersättare för basen. Kodkopplingar: nybörjarurval; allmänna kandidatplatser inga; fokusplatser calf; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "crunch",
@@ -2984,7 +3217,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "786e32936d59"
+    "fingerprint": "786e32936d59",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dead-bug, lying-leg-raise. Kort aktiv bålflexion är ett annat moment än benrörelse med stilla bål. Ingen direkt dublett i katalogen. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "decline-push-up",
@@ -3018,7 +3254,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "aafc0ac6f4a8"
+    "fingerprint": "aafc0ac6f4a8",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM PROGRESSION. Jämför: push-up, diamond-push-up, blast-off-push-up. Upphöjda fötter ger en tydligt beskriven ändring av stödpositionen. Behåll framför mer sammansatt blast-off om en avancerad armhävning ska finnas. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "diamond-push-up",
@@ -3073,7 +3312,10 @@
     "openIssues": [
       "[cheap] E70, fas 0 och reduced-motion Start: den bortre armbågen sticker bakåt och armen är synligt böjd samtidigt som den närmaste armen är rak. Justera topposen så att båda axel–armbåge–handled ligger på raka linjer enligt textens 'räta ut armarna', med bibehållen handkontakt och konsekventa armlängder under sänkningen."
     ],
-    "fingerprint": "5b5ed0f88dab"
+    "fingerprint": "5b5ed0f88dab",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: push-up, decline-push-up, triceps-kickback. Smalt grepp tillför en variant snarare än en ny grundrörelse, och loggen har öppet startarmsfel. Svagare separat katalogpost än vanlig armhävning; överväg att dölja eller senare samla som greppvariant. Triceps kickback är kompletterande, inte identisk ersättning. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "blast-off-push-up",
@@ -3089,11 +3331,22 @@
         "result": "ok",
         "commit": "810e160",
         "notes": "E95: nio frysta profilfaser och reduced-motion Start/Slut visar böjda knän ovanför golvet, höften bakåt och framåtrörelse till låg armhävningspose. Händer/tår ligger kvar i stickproven och hela figuren ryms. Bilateral kroppsvikt utan sidoval/varianter. Textens fasta händer/fötter, kortare rörelse och knäarmhävning som alternativ finns. Profilen visar rörelseriktningen men inte armbågarnas sidovinkel; axelns framåtläge mot handen behöver bedömas i rörelse innan säkerhetsacceptans. Inget säkert nytt textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Avgränsad kontroll av nio profilrutor och reduced-motion: höften börjar bakåt, knäna är böjda ovanför golvet, kroppen förs fram till låg armhävningspose. Händer och tår har kvar samma platser i de visade rutorna; figuren ryms. Ok gäller riktning och stickprov på stödpositioner. Bilateral kroppsvikt utan sid-/viktval. Textens kortare rörelse och knäarmhävning som alternativ lästa. Armbågarnas sidovinkel, axelns belastning och återpressen kan inte slutbedömas i dessa bilder. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "d4aa38bc0b72"
+    "fingerprint": "d4aa38bc0b72",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: push-up, knee-push-up, decline-push-up. Mer sammansatt höft-/knäförflyttning i en redan stor armhävningsfamilj. Svagare katalognytta i ett kompakt utbud än tydlig vägg–knä–tå-progression; inte en tekniskt identisk rörelse. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "plank-arm-lift",
@@ -3127,7 +3380,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "2c96e757652a"
+    "fingerprint": "2c96e757652a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM PROGRESSION. Jämför: plank, bird-dog. Armlyft från tå-/underarmsplanka ger annan stödposition än fyrfota bird-dog. Behåll som avgränsat tillägg till statisk planka. Kodkopplingar: allmänna kandidatplatser A/core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-leg-lateral-hop",
@@ -3143,6 +3399,14 @@
         "result": "ok",
         "commit": "810e160",
         "notes": "E99: nio frysta frontfaser visar sidoförflyttning och flygfas med den grå foten kvar i luften. Reduced-motion H/V visar landningslägen på varsin sida av markeringen; vald blå stödlem och sidotext följer speglingen. Hela figuren ryms. Kroppsvikt utan viktvarianter. Fronten visar sidriktningen men inte framfot/häl i djupet. Tips anger halkfritt underlag, mjuk landning, balansavbrott och mindre hopp/tvåbenshopp/stillastående som alternativ; inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio frontrutor samt reduced-motion H/V visar flygfas, sidoförflyttning och landning på vald blå fot; andra foten förblir lyft. Spegling och ram fungerar. Ok avser dessa synliga lägen. Ingen belastningsvariant. Textens halkfria fria yta, balansavbrott och mindre/tvåbenshopp lästa. Framfotskontakt i djup, bromsningens kvalitet och återhoppets timing kan inte avgöras från bilderna. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3156,7 +3420,8 @@
     "openIssues": [],
     "fingerprint": "625518fe4a83",
     "notes": [
-      "2026-11-03: timertexten ändrad ('Börja hålla.' -> 'Börja rörelsen.', ny statusrad för rörelse, 'Klart. Vila.'); se src/content/timedMovement.ts och docs/plan-quick-feet-drills.md."
+      "2026-11-03: timertexten ändrad ('Börja hålla.' -> 'Börja rörelsen.', ny statusrad för rörelse, 'Klart. Vila.'); se src/content/timedMovement.ts och docs/plan-quick-feet-drills.md.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: in-and-out-jump, lateral-shuffle. Enbenslandning med upprepade sidohopp skiljer sig från tvåbens breddhopp och sidosteg. Ingen direkt ersättare. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
   },
   {
@@ -3173,6 +3438,14 @@
         "result": "ok",
         "commit": "810e160",
         "notes": "E100: nio frysta profilfaser visar hopp till lådan och stegvis nedgång; reduced-motion har separata Start/Hopp/Landa på steget/Kliv ned. I landningsrutan ligger båda fötterna på lådans ovansida med böjda knän; nedgångsrutan visar en fot på lådan och en vid golvet. Hela figur/rekvisita ryms. Bilateral kroppsvikt, inga sidoval/varianter. Tips om låg stadig halkfri låda, mjuk landning, kliv ned utan hopp och lättare uppsteg finns. Profilen kan inte visa knäriktning framifrån; fullt upprätt mellanläge och kontinuerliga fotkontakter ej slutbedömda. Inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Avgränsad kontroll av nio profilfaser och fyra reduced-motion-rutor: Start/Hopp/Landa på steget/Kliv ned visar olika moment, båda fötter på lådan vid landning och stegvis nedgång. Figur och låda ryms; kroppsvikt utan sidval. Ok gäller stillbildssekvensen. Läst råd om låg stadig halkfri låda, helt upprest läge, balans och nedklivning utan hopp. Full uppresning mellan landning/nedklivning, armsving och mjuk landning är inte verifierade av dessa stickprov; knäriktning i sidled syns inte. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3184,7 +3457,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "c404e34ae58a"
+    "fingerprint": "c404e34ae58a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: squat-jump, step-up. Överlappande upphopp men landning på låda och nedklivning är egna moment. Vid litet hemmabibliotek är detta svagare än golvhopp genom extra utrustning/sekvens; inte en ren dublett och inte en ersättare för step-up. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "fast-feet",
@@ -3233,7 +3509,8 @@
     ],
     "openIssues": [],
     "notes": [
-      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: knee-drive. Båda är tidsstyrda växelsteg på stället utan utrustning. Föreslå att behålla knee-drive om bara ett sådant konditionskort ska finnas: knälyftet ger tydligare skillnad från vanlig gång i instruktionen. Låga snabba steg är dock en egen variant; valet är redaktionellt, inte en effektivitetsrangordning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
     "fingerprint": "eb9e2eb93c33"
   },
@@ -3290,7 +3567,8 @@
     ],
     "openIssues": [],
     "notes": [
-      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: squat-jump, lateral-shuffle, single-leg-lateral-hop. Tvåbenshopp mellan smal och bred position skiljer sig från vertikalt hopp, sidosteg och enbenshopp. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
     "fingerprint": "fcb5731ca183"
   },
@@ -3347,7 +3625,8 @@
     ],
     "openIssues": [],
     "notes": [
-      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: in-and-out-jump, fast-feet. Sidoförflyttning med ledande/följande fot tillför riktning och stegordning som saknas i hopp in/ut och tripp på stället. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
     "fingerprint": "dad0d7d259f0"
   },
@@ -3404,7 +3683,8 @@
     ],
     "openIssues": [],
     "notes": [
-      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren."
+      "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM MÖJLIG HUVUDVARIANT. Jämför: fast-feet, mountain-climber. Prioritera om bara ett upprätt växelstegskort ska finnas. Mountain climber har annan stödposition och bör inte slås ihop med denna. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
     "fingerprint": "a2a1b8b43b95"
   },
@@ -3461,7 +3741,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "c2157d157e80"
+    "fingerprint": "c2157d157e80",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: goblet-squat, biceps-curl. Kombinerar två redan täckta grundmoment med samma par lätta hantlar. Svagare separat post om katalogen ska bli tydligare; separata övningar tillåter egna vikter/doseringar. Kombinationens koordination försvinner och ska inte beskrivas som identisk ersättning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "thruster",
@@ -3524,7 +3807,10 @@
     "openIssues": [
       "[strong] E73, fas 0.375–0.625: höft och knä sträcks färdigt medan händerna ligger kvar vid axlarna; armpressen börjar först med raka ben. Samordna armarnas press med slutet av bensträckningen enligt instruktionen 'När höfter och knän sträcks, pressa', så huvudövningen inte visar den separata knäböj-plus-press som anges som enklare variant."
     ],
-    "fingerprint": "488bebd66757"
+    "fingerprint": "488bebd66757",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT SOM KOMBINATIONSBAS. Jämför: single-arm-thruster, goblet-squat, shoulder-press. Om knäböj–press-kombinationen ska finnas, prioritera tvåarmsvarianten framför enarms. Behåll inte på bekostnad av grundmomenten. Det öppna samordningsfelet måste fortfarande rättas; detta är inget animationsgodkännande. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "single-arm-thruster",
@@ -3587,7 +3873,10 @@
     "openIssues": [
       "[strong] E74, profilfas 0.375–0.625: höft/knä når fullt stående innan vald arms press börjar. Samordna armpressen med slutet av bensträckningen enligt textens 'När höfter och knän sträcks, pressa', med motsvarande sekvens på båda sidor och bibehållen kontakt mellan hand och hantel."
     ],
-    "fingerprint": "9795b24e3575"
+    "fingerprint": "9795b24e3575",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: thruster, kettlebell-press. Ytterligare ensidig variant av samma kombinationssekvens, med öppet samordningsfel och egen sidhantering. Svagare separat post än tvåarms-thruster i ett kompakt utbud. Beakta att endast en hantel krävs; användare med en vikt kan inte automatiskt bytas till tvåarmsvarianten. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "bent-over-row",
@@ -3603,11 +3892,22 @@
         "result": "ok",
         "commit": "810e160",
         "notes": "E75: nio frysta profilfaser och reduced-motion för 2×2/2×4 kg visar rodd mot höften med oförändrad bål/fotställning i stickproven. Hantlarna följer händerna och hela figuren ryms. Bilateral utan sidoval. Armarnas projektioner överlappar ben och bål, så armbågarnas läge nära kroppen och konstant lemlängd är inte säkert visuellt bedömda. Tips om naturlig rygg, stilla överkropp, nästan raka armar vid sänkning och lättare/stödd rodd finns; inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilfaser samt reduced-motion 2×2/2×4 kg visar hantlarna föras upp/bak mot höfterna medan bål och fötter behåller läget. Hantlarna följer händerna och ryms. Ok avser rörelseriktning och inramning; armarna överlappar ben/bål så armbågsvinkel, full rörelselängd och greppdjup är inte säkert verifierade. Inget sidval. Text om stilla naturlig rygg, ingen ryckning och stödd/lättare rodd läst. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "8cba90aa4789"
+    "fingerprint": "8cba90aa4789",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: supported-row. Samma dragfamilj men två hantlar och ostödd framåtfällning. Prioritera supported-row i ett basutbud tack vare handstöd och val mellan hantel/kettlebell. Bilateralt ostött arbete är ett eget skäl att behålla denna. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "sumo-squat",
@@ -3623,11 +3923,22 @@
         "result": "ok",
         "commit": "810e160",
         "notes": "E76: nio frysta frontfaser och reduced-motion för 4/8 kg visar bred fotställning, knäböj och hantel som sänks mellan benen. Fötterna ligger kvar i stickproven, knän går utåt och hanteln ryms utan golvkontakt. Bilateral utan sidoval. Båda händerna möts vid hanteln; greppets djup och ryggens form kan inte säkert utläsas framifrån. Tips om hela fötter, knä–tå-riktning och grundare/lättare alternativ finns. Inget säkert textfel i stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio frontrutor samt reduced-motion 4/8 kg visar bred stans, knän som förs utåt och hanteln mellan benen utan synlig golvkollision. Händerna möts vid vikten och hela figuren ryms. Ok gäller dessa synliga poser. Bilateral övning utan sidval; ryggform och greppdjup kan inte säkert avgöras framifrån. Textens hela fötter, knä–tå-riktning och grundare/lättare alternativ lästa. Kontinuerligt fasta fotleder och återresning är inte slutverifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "42cfefcfbd44"
+    "fingerprint": "42cfefcfbd44",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: goblet-squat, kettlebell-goblet-squat. Bredare stans och hängande hantel ger variation, men en stor del av knäböjsutbudet överlappar. Svagare prioritet än den breda goblet-posten; inte exakt samma grepp eller fotställning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "weighted-glute-bridge",
@@ -3643,11 +3954,22 @@
         "result": "ok",
         "commit": "56902cd",
         "notes": "E77: nio profilfaser och reduced-motion 2/4 kg visar bäckenlyft med hanteln vid höften, händer vid vikten och fötter kvar. Hela figuren ryms; bilateral utan sidoval. Tips om kontrollerad vikt, undvik svank och obelastat/lägre lyft finns. Grepp och bäckenrotation kan inte säkert bedömas i profil; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilrutor och reduced-motion 2/4 kg visar bäckenet höjas med hanteln kvar vid höften och händerna intill vikten. Fötterna ligger kvar i stickproven och hela figuren ryms; inget sidval. Ok avser dessa lägen och viktens följsamhet, inte verifiering av grepp i djup eller bäckenrotation. Textens lugna sänkning, kontroll av hanteln, svankvarning och obelastat/lägre lyft lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "48e8cd129c8d"
+    "fingerprint": "48e8cd129c8d",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: glute-bridge. Samma tvåbens golvlyft och redan överlappande 2 kg-hantelval. Svagare separat post eftersom glute-bridge även täcker kroppsvikt. Flytta över 4 kg-val och vikt-/handinstruktion innan denna post inaktiveras. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "overhead-triceps-extension",
@@ -3702,14 +4024,17 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "40ca41d267dd"
+    "fingerprint": "40ca41d267dd",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM VARIANT. Jämför: triceps-kickback. Samma armbågssträckning men två händer över huvudet i stället för enarm med stöd. Annan position/utrustningshantering motiverar att inte kalla den dublett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser arm-extension; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "dumbbell-pullover",
     "name": "Hantel-pullover",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -3733,6 +4058,14 @@
         "scope": "text",
         "result": "ok",
         "notes": "Begränsad omgranskning E79: fasbilderna visar hanteln från ovan bröstet bakåt, med böjda knän och fötter i golv; reduced-motion 1/2 kg visar motsvarande ändlägen. Hanteln följer händerna men har mycket liten vänstermarginal i slutläget; inte ett säkert nytt beskärningsfel i underlaget. Ingen sidoväljare. Text om axlarnas rörelsegräns, undvik svank, bibehållet tvåhandsgrepp och nedläggning före uppresning läst; inget nytt säkert textfel. Överlappande armar begränsar greppbedömningen och avslutet visas inte. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio profilfaser och reduced-motion för 1/2 kg granskade mot instruktionen. Vikten förs från ovanför bröstet bakåt, knän/fötter ligger kvar och händerna följer vikten. I slutläget kapas hantelns vänstra ytterkant av bildramen. Inga sidval. Textens kortare rörelse, svankvarning och kontrollerad nedläggning lästa; greppdjup och nedläggning inte verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3749,8 +4082,13 @@
         "notes": "W6: floor-press both arms on the pivot; shared floorBase far knee via IK (also affects pullover and kettlebell floor press)."
       }
     ],
-    "openIssues": [],
-    "fingerprint": "9536e7ba1ca2"
+    "openIssues": [
+      "[cheap] E79, fas 1 och reduced-motion Slut för 1 och 2 kg: hantelns vänstra viktskiva ligger mot/kapas av vänster bildkant. Vidga ramen åt vänster så att hela hanteln och handen syns med marginal även längst bakom huvudet."
+    ],
+    "fingerprint": "9536e7ba1ca2",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: floor-press, overhead-triceps-extension. Armarna förs bakåt med lätt böjda armbågar; varken bröstpress eller armbågssträckning bakom huvudet är samma moment. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "side-lunge",
@@ -3792,7 +4130,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "d0cdb57ead1c"
+    "fingerprint": "d0cdb57ead1c",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, sumo-squat. Steg och återgång i sidled är ett eget rörelsemönster som framåt-/bakåtutfall och stationär bred knäböj inte täcker. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "walking-lunge",
@@ -3808,18 +4149,29 @@
         "result": "ok",
         "commit": "b0c05f9",
         "notes": "E81: nio faser och reduced-motion Utfall/Steg framåt med 2×2/2×4 kg visar växlande ben, fotlyft och upprätt bål. Hantlar vid händerna och hela figuren ryms. Bilateral utan sidoval. Tips om fri gångsträcka, bromsning och obelastat utfall på plats finns. Profilen bevisar inte knäriktning/sidobredd; kontinuerlig framåtförflyttning och stödväxling behöver granskas i rörelse. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Avgränsad kontroll av nio profilfaser samt reduced-motion Utfall/Steg framåt med 2×2/2×4 kg. Benen växlar, den fria foten lyfts och hantlarna följer händerna; hela figuren ryms. Ok gäller synligt fotlyft, viktkontakt och stillrutornas olika moment. Inget sidval. Profilen verifierar inte knäriktning/sidobredd och visar inte säkert stödets kontinuitet eller gångens framåtförflyttning. Läst text om fri gångsträcka, bromsning och obelastat utfall på plats. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "5c46283be7cf"
+    "fingerprint": "5c46283be7cf",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: forward-lunge, reverse-lunge. Framåtutfall finns redan med samma grundläggande knä-/höftböjning och fler utrustningsval. Gångsträcka och kontinuerlig benväxling ger extra plats-/instruktionskrav för begränsad ny katalogtäckning. Behåll forward-lunge om denna döljs; gångvarianten är inte repetitionsmässigt utbytbar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-goblet-squat",
     "name": "Gobletknäböj med kettlebell",
     "group": "kettlebell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3842,6 +4194,14 @@
         "result": "ok",
         "commit": "f16acb8",
         "notes": "Begränsad E82-granskning: nio frysta profilfaser och reduced-motion för 4/8 kg visar höft-/knäböjning med kettlebellen nära bröstet och fötter kvar vid golvet. Hela figuren ryms. Tipsens kontrollerade djup, nära vikt och lättare alternativ stämmer med de sedda poserna. Bilateral, inget sidoval; ingen frontvy erbjuds, så knänas riktning mot tårna och tvåhandsfattningen i hornen kan inte säkert bedömas i profilen. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; grepp, återgång, tempo och loopsöm ej fullt visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Bilder: shots:exercises samt .impeccable/review/audit-sequential/kettlebell-goblet-squat-*.png (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "animation",
+        "result": "issues",
+        "notes": "Nio profilrutor samt reduced-motion för 4/8 kg granskade. Fötterna ligger kvar, vikten hålls nära bröstet och ramen räcker. Hand/underarm slutar däremot vid kulans nedre sida medan horn/handtag ovanför kulan saknar synlig handkontakt; instruktionen anger grepp i hornen. Ingen frontvy eller sidval, så knäriktning i sidled och greppets djup är inte verifierade. Textens kontrollerade djup och lättare alternativ lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3852,8 +4212,13 @@
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
       }
     ],
-    "openIssues": [],
-    "fingerprint": "b3bc992ca8f5"
+    "openIssues": [
+      "[strong] E82, profilfas 0–1 samt reduced-motion Start/Slut vid 4 och 8 kg: synlig hand/underarm ligger vid kulans nedre sida och inte vid handtagets horn. Visa tydlig kontakt mellan båda händerna och hornen enligt instruktionen, vid behov med sned-/frontvy; bevara kontakten genom knäböjen."
+    ],
+    "fingerprint": "b3bc992ca8f5",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: goblet-squat. Samma fria gobletknäböj; huvudposten har redan kettlebell på 8 kg samt hantel/kroppsvikt. Svagare separat post. Bevara denna posts 4 kg-val och instruktion om grepp i hornen som kettlebellvariant innan inaktivering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "one-arm-kettlebell-swing",
@@ -3869,11 +4234,22 @@
         "result": "ok",
         "commit": "b0c05f9",
         "notes": "E83: nio profilfaser och reduced-motion H/V, 4/8 kg visar höftfällning till upprätt ställning och vikt fram till brösthöjd. Rätt blå arm håller vikten, andra armen hänger; spegling och ram fungerar. Tips om höftdrivning, rak bål, tvåhandsvariant samt säker start/avslut finns. Stillbilder kan inte avgöra höftens timing mot armen, bålrotation eller kraft; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio H-profilfaser och reduced-motion H/V samt 4/8 kg visar höftfällning till upprätt läge, vald blå hand vid handtaget och den fria armen hängande. Vikten stannar ungefär vid brösthöjd och ryms. Ok gäller sidval, synlig handkontakt och inramning. Höftdrivning kontra armlyft, bålrotation och ballistisk timing kan inte verifieras från dessa poser. Läst text om tvåhandsvariant, lätt vikt samt start/nedläggning; dessa övergångar inte visuellt verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "8e5d3ed55958"
+    "fingerprint": "8e5d3ed55958",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: kettlebell-swing. Samma höftdrivna sving och samma kettlebellvikter, men ensidigt grepp och extra sidhantering. Prioritera tvåhandsvarianten i ett smalare utbud; den ensidiga utmaningen är ett medvetet bortval, inte en identisk ersättning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "kettlebell-halo",
@@ -3915,7 +4291,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "731821d79e48"
+    "fingerprint": "731821d79e48",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: overhead-triceps-extension, dumbbell-pullover. Cirkeln runt huvudet är inte samma rörelse som sträckning i armbågar eller bakåtföring i ryggläge. Ingen tydlig dublett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "russian-twist",
@@ -3931,11 +4310,22 @@
         "result": "ok",
         "commit": "b0c05f9",
         "notes": "E87: nio faser samt reduced-motion vänster/höger i erbjuden sned vy och kroppsvikt/hantel 2/4 kg/kettlebell 4/8 kg visar bröstkorgsvridning med hälar kvar. Vikt nära bålen och ramen räcker; inget sidoval behövs. Tips om liten bekväm vridning, stopp vid ryggsmärta och upprätt obelastad variant finns. Rotationens djup och handkontakt bakom överlappningar inte säkert bedömda; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "8368eb0",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio faser samt reduced-motion vänster/höger och erbjuden snedvy granskade med kroppsvikt, hantel 2/4 kg och kettlebell 4/8 kg. Axellinjen ändrar riktning medan hälarna ligger kvar; vikterna följer händerna nära bålen och ramen räcker. Ok avser dessa synliga lägen/varianter, inte rotationsdjup eller greppkontakt bakom överlappningar. Ingen sidväljare. Textens lilla bekväma vridning, stopp vid ryggsmärta och mer upprätt/obelastat alternativ lästa; återgång till mitten inte dynamiskt verifierad. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "ae670395cccc"
+    "fingerprint": "ae670395cccc",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM ROTATIONSVARIANT. Jämför: woodchop, side-plank. Sittande liten rotation med hälarna i golvet skiljer sig från stående diagonal och statisk sidoplanka. Inte direkt ersättning för woodchop trots gemensam fokusplats. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "woodchop",
@@ -3985,7 +4375,10 @@
     "openIssues": [
       "[strong] E88, profilrutorna 0–1 och reduced-motion Slut H/V: axlar/händer och startbenets knä/fot visar inte den beskrivna diagonalen till motsatt axel eller medvridningen i golvplanet. Hällyftet ensamt gör inte rotationen läsbar. Lägg till en front-/snedvy eller annan tydlig geometri där höft-till-motsatt-axel-banan och knäets/fotens gemensamma medvridning kan verifieras."
     ],
-    "fingerprint": "c6d9d996a7bb"
+    "fingerprint": "c6d9d996a7bb",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT, INTE DUBLETT. Jämför: russian-twist. Stående diagonal med fotmedvridning tillför ett eget mönster. Öppet vy-/rotationsfel motiverar rättning eller separat pausbeslut, inte påståendet att Russian twist är samma övning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "seated-tibial-rotation",
@@ -4005,7 +4398,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "07216ff4fcee"
+    "fingerprint": "07216ff4fcee",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: seated-knee-extension, seated-knee-flexion. Underbensrotation med stilla lår skiljer sig från knästräckning/-böjning. Inget bortval enbart på grund av stolpositionen. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "step-down",
@@ -4035,6 +4431,14 @@
         "result": "ok",
         "commit": "1f8ef01",
         "notes": "Omgranskning efter 4db6a48: reduced-motion Start/Slut från sidan och framifrån på H/V visar nu stödhanden mot räcket. I frontvyn håller motsatt hand från det blå stödbenet i det vertikala räcket; fri fot är ovan golv. Nio frysta sidofaser visar kontrollerad geometrisk sänkning och fast stödfot. Det tidigare fyndet om saknat frontstöd är åtgärdat i de sedda rutorna; mellanliggande frontfaser och loopsöm är inte visuellt slutbedömda. Avgränsad omgranskning av rapporterade fynd, inte full animationsacceptans. Kontaktblad genererade med shots:exercises; kompletterande fasblad från övningsvyn och isolerade SVG-förstoringar granskade. Endast stillbilder, ingen kontinuerlig animation: loopsöm, tempo och hålltider ej verifierade. Status kvar fixed-awaiting-review, inget godkännande. Lokala bilder: .impeccable/review/audit-2026-11-03-c (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Läst instruktion, sidocue och råd om steghöjd mot nio profilfaser samt reduced-motion H/V i profil/front. Vald blå fot står på steget och den fria hälen sänks under överkanten; frontens stödhand ligger vid räcket. Texten anger kontrollerad sänkning, knä i tåns riktning, mer handstöd och individuell steghöjd. Inga vikter. Exakt 5–8 cm, profilens stödhand och kontinuerlig kontakt kan inte säkert verifieras; textgranskning, inte full figuracceptans. Befintliga öppna punkter lämnas kvar. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4064,7 +4468,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "f881536bbd8d"
+    "fingerprint": "f881536bbd8d",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: step-up. Nedsänkning av fri häl under stödnivån och tillbaka har annan start, rörelsegräns och instruktion än uppsteg från golv. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "bosu-squat",
@@ -4084,7 +4491,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "6f4e44ecdc12"
+    "fingerprint": "6f4e44ecdc12",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: half-squat, goblet-squat. Själva knäböjen överlappar, men det instabila underlaget är hela variantens avsikt. Redan utanför allmänna program; inget automatiskt bortval eller byte av individuellt rehabval. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "copenhagen-hold",
@@ -4114,6 +4524,14 @@
         "result": "ok",
         "commit": "f16acb8",
         "notes": "Ny begränsad E91-granskning: nio frysta faser och reduced-motion Start/Håll på H/V visar bäckenlyft, övre blå benet vid bänken och undre benet fritt i hållet. Spegling och sidotext följer varandra; stödarm och bänk ryms. Tips om stadig vadderad bänk, stilla håll, stopp vid ljumske/insida-knä-smärta och avlastning med undre benet finns. Kroppsvikt/bänk, inga viktvarianter. Profilen visar inte övre knäets tredimensionella böjning eller bäckenrotation tillräckligt för säker bedömning. Inget säkert nytt textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; faktisk hållvisning, tid och övergångar ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Bilder: shots:exercises samt .impeccable/review/audit-sequential/copenhagen-hold-*.png (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "text",
+        "result": "ok",
+        "notes": "Nio profilrutor och reduced-motion Start/Håll H/V jämförda med text och sidocue. Vald övre sida har kontakt vid bänken; bäckenet höjs och undre benet blir fritt. Texten skiljer tydligt statiskt håll från upprepade benlyft, anger vadderat stöd, smärtavbrott och avlastning med nedre ben. Inga viktval; speglingen ryms. Exakt övre knävinkel/stödpunkt är svårläst i profilen och hålltiden inte verifierad. Ok gäller textens beskrivning, inte full animations- eller säkerhetsacceptans. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4125,7 +4543,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "fd4dea8a6555"
+    "fingerprint": "fd4dea8a6555",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BÄNKALTERNATIV. Jämför: bench-side-plank-leg-lift, side-lying-hip-adduction. Tydligt statiskt håll med böjt övre knä på bänken. Prioritera denna framför E42 om bara ett bänkkort ska finnas, men statiskt knästöd och dynamiskt nedre benlyft är inte samma dosering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "nordic-hamstring-curl",
@@ -4145,7 +4566,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "12b9e32b3a5a"
+    "fingerprint": "12b9e32b3a5a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: hamstring-curl. Fixerade anklar och kontrollerad kroppssänkning från knästående skiljer sig väsentligt från stående aktiv lårcurl. Inte dublett trots samma muskelgrupp. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "bent-knee-calf-hold",
@@ -4165,7 +4589,10 @@
     ],
     "fixes": [],
     "openIssues": [],
-    "fingerprint": "c5718798f44a"
+    "fingerprint": "c5718798f44a",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-calf-raise, calf-raise. Böjt knä och tidsstyrt hälhåll är en särskild position/dosering, inte samma som dynamiska tåhävningar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "wall-tibialis-raise",
@@ -4195,6 +4622,14 @@
         "result": "ok",
         "commit": "29bab7d",
         "notes": "E94: nio frysta faser och reduced-motion Start/Slut visar tår/framfötter som lyfts, med hälar kvar vid golvet och rygg vid väggen. Profilen visar fotleden och hela figuren ryms. Bilateral kroppsvikt utan sidoval eller utrustningsvariant. Tips om fasta hälar, bibehållen ryggkontakt och mindre lyft närmare väggen överensstämmer med stickproven. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-06",
+        "reviewer": "codex:gpt6astra",
+        "commit": "f74b433",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Avgränsad kontroll av nio profilrutor och reduced-motion Start/Slut: framfötterna höjs med hälarna kvar vid golvet, kroppens läge vid väggen bibehålls och händerna går inte igenom väggen. Figuren ryms. Bilateral kroppsvikt utan sid-/viktval. Läst text skiljer tålyft från hällyft och anger mindre rörelse/närmare fötter som förenkling. Ok avser synlig rörelseriktning och ändlägen; djupkontakt mellan rygg och vägg samt hela återgången inte slutbedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4206,7 +4641,10 @@
       }
     ],
     "openIssues": [],
-    "fingerprint": "c2bf5ef400ff"
+    "fingerprint": "c2bf5ef400ff",
+    "notes": [
+      "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: calf-raise, bent-knee-calf-hold. Framfoten lyfts medan hälen stannar; tåhävning gör motsatt fotrörelse. Ska inte gallras som likadan vadövning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
+    ]
   },
   {
     "id": "isometric-lunge-hold",
