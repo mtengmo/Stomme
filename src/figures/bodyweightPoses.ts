@@ -215,7 +215,8 @@ function pull(t: number, chin: boolean): Pose {
   // narrower chin-up grip starts lower than the wide pull-up grip.
   // The chin-up hang is exactly one arm length (2 x 30) from each hand, so the
   // shoulder-elbow-wrist lines are dead straight (no sagitta) at phase 0.
-  const hangNeck = chin ? 31 + Math.sqrt(60 * 60 - 20 * 20) : 80;
+  // The wide pull-up grip (hands 34 px either side of the neck) is straightened the same way.
+  const hangNeck = 31 + Math.sqrt(60 * 60 - (chin ? 20 * 20 : 34 * 34));
   const neck: Pt = [100, mix(hangNeck, 36, t)],
     hip: Pt = [100, neck[1] + 43];
   const hands: [Pt, Pt] = chin
@@ -227,8 +228,8 @@ function pull(t: number, chin: boolean): Pose {
         [66, 31],
         [134, 31],
       ];
-  // The chin-up hang starts lower, so the knees are bent and the feet stay clear of the floor.
-  const legDrop = chin ? 38 : 48;
+  // Both hangs bend the knees so the feet stay clear of the floor.
+  const legDrop = 38;
   const rightAnkle: Pt = [chin ? 78 : 90, hip[1] + legDrop],
     leftAnkle: Pt = [chin ? 100 : 112, hip[1] + legDrop];
   return pose(
@@ -242,10 +243,10 @@ function pull(t: number, chin: boolean): Pose {
       hands[1],
     ],
     [
-      chin ? joint(hip, rightAnkle, 36, 34, 1) : [82, hip[1] + 25],
+      joint(hip, rightAnkle, 36, 34, 1),
       rightAnkle,
       foot(rightAnkle),
-      chin ? joint(hip, leftAnkle, 36, 34, 1) : [118, hip[1] + 25],
+      joint(hip, leftAnkle, 36, 34, 1),
       leftAnkle,
       foot(leftAnkle),
     ],
