@@ -2643,7 +2643,7 @@
     "name": "Pull-up med överhandsgrepp",
     "group": "bodyweight",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -2662,11 +2662,17 @@
         "notes": "Nio frontrutor och reduced-motion Start/Slut granskade mot text. Händerna ligger kvar på stången och kroppen stiger inom ramen. Startarmarna är synligt vinklade vid armbågarna trots instruktionens utsträckta armar. Fötterna är mycket nära golvet men ett litet mellanrum syns. Överhandsgreppets handflatsriktning kan inte utläsas. Fast stång, kontrollerad sänkning och rodd som alternativ beskrivs; inga sid-/viktval. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-06",
+        "fixer": "claude-sonnet",
+        "notes": "E55: hang start pose now has dead-straight shoulder-elbow-wrist lines (neck placed exactly one arm length from each hand on the wide grip), hands stay on the bar, and the knees are bent like the chin-up so the feet are clear of the floor. Needs re-review by a cross-vendor reviewer (Astra) before openIssues is cleared."
+      }
+    ],
     "openIssues": [
       "[cheap] E55, fas 0 och reduced-motion Start: armbågarna har en synlig knäck i stället för ett tydligt utsträckt hängläge. Visa raka axel–armbåge–handled-linjer enligt texten, med händerna kvar på stången och tydligt fria fötter."
     ],
-    "fingerprint": "44c9d7c8e5b6",
+    "fingerprint": "61757213309c",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM MÖJLIG HUVUDPOST. Jämför: chin-up. Samma stång och vertikala dragfamilj. Om greppen samlas under en post, bevara underhandsgrepp som val; avsaknad av öppet fel här betyder inte att animationen är fullständigt godkänd. Kodkopplingar: allmänna kandidatplatser A/pull, B/pull; fokusplatser vertical-pull; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -4034,7 +4040,7 @@
     "name": "Hantel-pullover",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -4080,12 +4086,17 @@
         "fixer": "claude-sonnet",
         "commit": "bececf3",
         "notes": "W6: floor-press both arms on the pivot; shared floorBase far knee via IK (also affects pullover and kettlebell floor press)."
+      },
+      {
+        "date": "2026-11-06",
+        "fixer": "claude-sonnet",
+        "notes": "E79: framing widened leftwards (and symmetrically on the right for the mirrored side) to viewBox -18 20 236 168 so the dumbbell plate is no longer clipped at the frame edge at 1 and 2 kg. Needs re-review (Astra)."
       }
     ],
     "openIssues": [
       "[cheap] E79, fas 1 och reduced-motion Slut för 1 och 2 kg: hantelns vänstra viktskiva ligger mot/kapas av vänster bildkant. Vidga ramen åt vänster så att hela hanteln och handen syns med marginal även längst bakom huvudet."
     ],
-    "fingerprint": "9536e7ba1ca2",
+    "fingerprint": "789fb053376a",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: floor-press, overhead-triceps-extension. Armarna förs bakåt med lätt böjda armbågar; varken bröstpress eller armbågssträckning bakom huvudet är samma moment. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
