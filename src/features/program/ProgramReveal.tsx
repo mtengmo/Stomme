@@ -1,7 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, Redirect } from 'wouter';
 import { focusLabel } from '../../content/focusPresets';
-import { isTrainingPreferences } from '../../content/programmes';
+import {
+  experienceLabels,
+  isTrainingPreferences,
+} from '../../content/programmes';
 import { getDb } from '../../db/db';
 import { readTrainingProgram } from '../../db/program';
 import { getMeta, listSessions } from '../../db/repo';
@@ -19,6 +22,7 @@ import {
   passMinutes,
   passPlan,
   programDays,
+  programLevel,
   weekdayAbbr,
 } from './programView';
 
@@ -70,6 +74,15 @@ export function ProgramReveal() {
           {BLOCK_WEEKS} veckor · {program.daysPerWeek} pass i veckan ·{' '}
           {emphasisLabels[program.emphasis]}
         </p>
+        <p className="m-0 text-lg">
+          Nivå: {experienceLabels[programLevel(program, preferences)]}
+        </p>
+        {program.curated && programLevel(program, preferences) !== 'new' ? (
+          <p className="m-0 text-base text-ink-soft">
+            Första blocket bygger på grundövningar. Fler övningar när du gör om
+            programmet.
+          </p>
+        ) : null}
       </header>
       <p className="count m-0 text-3xl leading-none">
         Vecka 1 <span className="text-2xl">av {BLOCK_WEEKS}</span>

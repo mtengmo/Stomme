@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { exerciseList } from '../content/exercises';
 import { routineFocusIds } from '../content/focusPresets';
 import { programExcludedIds } from '../content/programExclusions';
+import { isRetiredExercise } from '../content/retiredExercises';
+import { plyometricIds } from '../content/runningProposals';
+import { ballisticIds } from '../content/widePool';
 import type { ExerciseId, TrainingProgram } from '../domain/types';
 import { isRealDate } from '../lib/dates';
 import type { StommeDB } from './db';
@@ -47,6 +50,8 @@ export const trainingProgramSchema = z
       .min(1)
       .max(5),
     curated: z.boolean(),
+    seed: z.number().int().min(0).max(4294967295).optional(),
+    level: z.enum(['new', 'some', 'regular']).optional(),
   })
   .superRefine((program, ctx) => {
     if (
@@ -59,13 +64,30 @@ export const trainingProgramSchema = z
       });
     if (new Set(program.weekdays).size !== program.weekdays.length)
       ctx.addIssue({ code: 'custom', message: 'Duplicate weekday' });
-    for (const pass of program.passes)
+    // The one jump exercise is allowed only in a template B lower pass of a wide
+    // running programme for a user who is not new (rules/programRosters.ts,
+    // running mode). Ballistic and retired exercises are never allowed.
+    const plyoProgramme =
+      !program.curated &&
+      program.emphasis === 'run' &&
+      (program.level === 'some' || program.level === 'regular');
+    for (const pass of program.passes) {
+      const plyoPass =
+        plyoProgramme &&
+        pass.template === 'B' &&
+        (pass.focus === 'lower' || pass.focus === 'legs');
       for (const id of pass.exerciseIds)
-        if (programExcludedIds.has(id))
+        if (
+          (programExcludedIds.has(id) ||
+            ballisticIds.has(id) ||
+            isRetiredExercise(id)) &&
+          !(plyoPass && plyometricIds.has(id))
+        )
           ctx.addIssue({
             code: 'custom',
             message: `Exercise ${id} is not allowed in a programme`,
           });
+    }
   });
 
 export function isTrainingProgram(value: unknown): value is TrainingProgram {

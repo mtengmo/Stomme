@@ -13,6 +13,7 @@ import {
   type RosterSlot,
   rehabAdditionIds,
 } from '../content/rosterSlots';
+import { type RunningSlot, runningSlots } from '../content/runningProposals';
 import type {
   BodyRegionId,
   ExerciseId,
@@ -37,6 +38,39 @@ export interface RosterContext {
    * used and the result is never annotated. Absent: today's behaviour.
    */
   pool?: ReadonlySet<ExerciseId>;
+  /**
+   * Variation seed. The same seed gives the same roster; another seed rotates
+   * among the equivalent candidates of each slot. Absent: the first/most
+   * demanding candidate, as before the seed existed.
+   */
+  seed?: number;
+  /** Programme mode: lower-body passes draw from the running slot model. */
+  running?: boolean;
+  /** Running mode: the jump exercise may enter template B passes. */
+  plyo?: boolean;
+}
+
+/** Deterministic 32-bit hash of the seed and a key. */
+export function mix(seed: number, key: string): number {
+  let h = (seed ^ 0x9e3779b9) >>> 0;
+  for (let i = 0; i < key.length; i += 1) {
+    h = Math.imul(h ^ key.charCodeAt(i), 0x85ebca6b);
+    h ^= h >>> 13;
+  }
+  h = Math.imul(h ^ (h >>> 16), 0xc2b2ae35);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+/** The list starting at a seed-chosen position; unchanged without a seed. */
+function rotated<T>(list: readonly T[], seed: number | undefined, key: string) {
+  if (seed === undefined || list.length < 2) return [...list];
+  const at = mix(seed, key) % list.length;
+  return [...list.slice(at), ...list.slice(0, at)];
+}
+
+interface Vary {
+  seed: number;
+  key: string;
 }
 
 /** Fewest exercises a programme pass may have. */
@@ -71,17 +105,27 @@ function poolSlot(slot: RosterSlot, pool: ReadonlySet<ExerciseId>): RosterSlot {
 }
 
 /** Core-only filler for a pass that came out short; valid without any note. */
+function coreOnlyCandidates(): ExerciseId[] {
+  return [
+    ...new Set(
+      [...generalSlots.A, ...generalSlots.B]
+        .flatMap((slot) => slot.candidates)
+        .filter((id) => exerciseMuscles[id].primary.every((m) => m === 'core')),
+    ),
+  ];
+}
+
 function coreFill(
   ids: ExerciseId[],
   preferences: TrainingPreferences,
   pool: ReadonlySet<ExerciseId>,
+  seed?: number,
 ): void {
-  const filler = [...generalSlots.A, ...generalSlots.B]
-    .flatMap((slot) => slot.candidates)
-    .filter(
-      (id) =>
-        pool.has(id) && exerciseMuscles[id].primary.every((m) => m === 'core'),
-    );
+  const filler = rotated(
+    coreOnlyCandidates().filter((id) => pool.has(id)),
+    seed,
+    `core-fill:${ids.join()}`,
+  );
   for (const id of filler) {
     if (ids.length >= MIN_PASS_EXERCISES) break;
     const pick = pickFromSlot(
@@ -130,7 +174,7 @@ function usable(id: ExerciseId, preferences: TrainingPreferences): boolean {
  * for the small-muscle arm and shoulder work. A slot whose only loaded variant
  * would start heavier moves on to its next candidate.
  */
-const programWeightCeilingKg: Partial<Record<ExerciseId, number>> = {
+export const programWeightCeilingKg: Partial<Record<ExerciseId, number>> = {
   'lateral-raise': 5,
   'triceps-kickback': 5,
   'biceps-curl': 10,
@@ -173,6 +217,8 @@ function pickFromSlot(
   allowFallback = true,
   /** Programme mode: skip loaded variants that would start above the beginner ceiling. */
   capWeights = false,
+  /** Programme mode with a seed: rotate among the equivalent in-level candidates. */
+  vary?: Vary,
 ): { id: ExerciseId; note?: string } | undefined {
   const levels = allowedLevels(preferences.experience);
   // A weighted exercise without a registered weight is never suggested; the slot moves on.
@@ -193,14 +239,23 @@ function pickFromSlot(
     )[0];
     return easiest ? { id: easiest, note: EASIEST_NOTE } : undefined;
   }
-  if (preferences.experience !== 'regular')
+  if (preferences.experience !== 'regular' && !vary)
     return { id: pool[0] as ExerciseId };
   const score = (id: ExerciseId) =>
     levelRankOf(levelOf(id, preferences)) +
     // A registered weighted variant keeps priority over unweighted difficulty.
     (isLoaded(id, preferences) ? 2.5 : 0);
+  const best = pool.reduce((top, id) => (score(id) > score(top) ? id : top));
+  if (!vary) return { id: best };
+  // Equivalent options: everything for new and some, the demanding tier for regular.
+  const tier =
+    preferences.experience === 'regular'
+      ? pool.filter((id) => score(id) >= score(best) - 1)
+      : pool;
   return {
-    id: pool.reduce((best, id) => (score(id) > score(best) ? id : best)),
+    id: tier[
+      mix(vary.seed, `${vary.key}:${slot.id}`) % tier.length
+    ] as ExerciseId,
   };
 }
 
@@ -208,6 +263,7 @@ function wholeBody(
   preferences: TrainingPreferences,
   template: TemplateId,
   pool?: ReadonlySet<ExerciseId>,
+  seed?: number,
 ): Roster {
   const ids: ExerciseId[] = [];
   const notes: Roster['notes'] = {};
@@ -218,12 +274,13 @@ function wholeBody(
       new Set(ids),
       !pool,
       !!pool,
+      pool && seed !== undefined ? { seed, key: `wb${template}` } : undefined,
     );
     if (!pick) continue;
     ids.push(pick.id);
     if (pick.note) notes[pick.id] = pick.note;
   }
-  if (pool) coreFill(ids, preferences, pool);
+  if (pool) coreFill(ids, preferences, pool, seed);
   return { ids, notes };
 }
 
@@ -250,32 +307,77 @@ export function focusAvailable(preferences: TrainingPreferences): {
   };
 }
 
+/**
+ * Lower-body passes for running strength: the running slot model (single-leg
+ * squat pattern, hinge, hip extension, calf, then hip stability, hold, the jump
+ * exercise when allowed, and core), easier first. The tail order rotates with
+ * the seed. Wall sit is an easy beginner-set hold before the lunge hold.
+ */
+function runningRosterSlots(seed: number | undefined, plyo: boolean) {
+  const options = (id: string) => {
+    const found = [
+      ...(runningSlots.find((s) => s.id === id) as RunningSlot).options,
+    ];
+    if (id === 'core')
+      // Core-only exercises as well, so A and B lower passes can differ when
+      // the back exercise (bird-dog) is not allowed next to an upper pass.
+      return [...new Set([...found, ...coreOnlyCandidates()])];
+    return id === 'hold' ? (['wall-sit', ...found] as ExerciseId[]) : found;
+  };
+  const tail = rotated(
+    ['hip-stability', 'hold', ...(plyo ? ['reactive'] : []), 'core'],
+    seed,
+    'run-tail',
+  );
+  return ['squat', 'hinge', 'hip-extension', 'calf', ...tail].map(
+    (id): RosterSlot => ({ id: `run-${id}`, candidates: options(id) }),
+  );
+}
+
 function focusRoster(
   preferences: TrainingPreferences,
   template: TemplateId,
   focus: WorkoutFocus,
-  pool?: ReadonlySet<ExerciseId>,
+  context: RosterContext,
 ): Roster {
+  const { pool, seed } = context;
+  const capWeights = !!pool;
   const targets = focusTargets(focus);
   const preset = focusPresets.find(
     (p) => p.id === focus.id,
   ) as (typeof focusPresets)[number];
-  const slots = (
-    preset.slots.length
-      ? preset.slots.map(
-          (id) =>
-            focusSlots.find((s) => s.id === id) as (typeof focusSlots)[number],
-        )
-      : focusSlots
-  )
-    .filter((slot) => slot.targets.some((m) => targets.includes(m)))
-    .map((slot) => (pool ? { ...slot, ...poolSlot(slot, pool) } : slot))
-    .map((slot) => ({
-      ...slot,
-      candidates: slot.candidates.filter((id) =>
-        exerciseMuscles[id].primary.some((m) => targets.includes(m)),
-      ),
-    }));
+  const runningLower =
+    !!pool &&
+    !!context.running &&
+    (focus.id === 'lower' || focus.id === 'legs');
+  const slots: RosterSlot[] = runningLower
+    ? runningRosterSlots(seed, !!context.plyo && template === 'B')
+        .map((slot) => poolSlot(slot, pool as ReadonlySet<ExerciseId>))
+        // Every primary muscle must belong to the focus, so a lower pass never
+        // trains the back (bird-dog) the day before an upper pass.
+        .map((slot) => ({
+          ...slot,
+          candidates: slot.candidates.filter((id) =>
+            exerciseMuscles[id].primary.every((m) => targets.includes(m)),
+          ),
+        }))
+    : (preset.slots.length
+        ? preset.slots.map(
+            (id) =>
+              focusSlots.find(
+                (s) => s.id === id,
+              ) as (typeof focusSlots)[number],
+          )
+        : focusSlots
+      )
+        .filter((slot) => slot.targets.some((m) => targets.includes(m)))
+        .map((slot) => (pool ? { ...slot, ...poolSlot(slot, pool) } : slot))
+        .map((slot) => ({
+          ...slot,
+          candidates: slot.candidates.filter((id) =>
+            exerciseMuscles[id].primary.some((m) => targets.includes(m)),
+          ),
+        }));
   const ids: ExerciseId[] = [];
   const notes: Roster['notes'] = {};
   const limit = preferences.experience === 'regular' ? 6 : 5;
@@ -291,7 +393,16 @@ function focusRoster(
     for (const slot of slots) {
       if (ids.length >= limit) break;
       const used = new Set(ids);
-      const first = pickFromSlot(slot, preferences, used, false, !!pool);
+      const vary: Vary | undefined =
+        pool && seed !== undefined ? { seed, key: `r${round}` } : undefined;
+      const first = pickFromSlot(
+        slot,
+        preferences,
+        used,
+        false,
+        capWeights,
+        vary,
+      );
       if (template === 'B' && round === 0 && first) {
         used.add(first.id);
         // The alternative is taken only when it is an in-level pick.
@@ -300,7 +411,8 @@ function focusRoster(
           preferences,
           used,
           false,
-          !!pool,
+          capWeights,
+          vary,
         );
         add(alternative ?? first);
       } else add(first);
@@ -308,7 +420,7 @@ function focusRoster(
     if (ids.length === before) break;
   }
   if (pool) {
-    coreFill(ids, preferences, pool);
+    coreFill(ids, preferences, pool, seed);
     return { ids, notes };
   }
   if (ids.length >= 3) return { ids, notes };
@@ -352,8 +464,8 @@ export function buildRoster(
       ? { id: 'custom' as const, regions: preferences.bodyParts }
       : { id: 'full' as const });
   return focus.id === 'full'
-    ? wholeBody(preferences, template, context.pool)
-    : focusRoster(preferences, template, focus, context.pool);
+    ? wholeBody(preferences, template, context.pool, context.seed)
+    : focusRoster(preferences, template, focus, context);
 }
 export function initialTrainingRoster(
   preferences: TrainingPreferences,

@@ -18,6 +18,7 @@ import type {
   TemplateId,
   TrainingCheckin,
   TrainingPreferences,
+  TrainingProgram,
   WorkoutEquipment,
 } from '../domain/types';
 
@@ -28,7 +29,7 @@ import { equipmentFits } from '../rules/equipment';
 import { trainingDayAfterDue, validateCheckin } from '../rules/training';
 
 import type { StommeDB } from './db';
-import { isTrainingProgram } from './program';
+import { isTrainingProgram, saveTrainingProgram } from './program';
 
 import { expireStaleSessions, getActiveSession } from './repo';
 
@@ -55,6 +56,8 @@ export async function saveTrainingPreferences(
   preferences: TrainingPreferences,
   /** Runs in the same transaction, so both writes happen or neither does. */
   alsoWrite?: () => Promise<void>,
+  /** Shown when a session with recorded work blocks the save. */
+  lockedMessage = 'Avsluta det pågående passet innan du byter träningsinriktning.',
 ) {
   if (
     !isTrainingPreferences(preferences) ||
@@ -69,15 +72,36 @@ export async function saveTrainingPreferences(
     const active = await getActiveSession(db);
     if (active) {
       if (!(await canReplaceTrainingPreparation(db, active)))
-        throw new Error(
-          'Avsluta det pågående passet innan du byter träningsinriktning.',
-        );
+        throw new Error(lockedMessage);
       await db.sessions.delete(active.id);
     }
 
     await db.meta.put({ key: 'training', value: preferences });
     await alsoWrite?.();
   });
+}
+
+export const REDO_LOCKED_MESSAGE =
+  'Avsluta det pågående passet innan du gör om programmet.';
+
+/**
+ * Replaces the programme (and sets the level as the general training level) in
+ * one transaction, for both a changed and an unchanged level. Refuses while a
+ * session with recorded work runs; an untouched prepared session is removed
+ * with the old programme. Any failure rolls everything back.
+ */
+export async function redoTrainingProgram(
+  db: StommeDB,
+  preferences: TrainingPreferences,
+  level: TrainingPreferences['experience'],
+  program: TrainingProgram,
+): Promise<void> {
+  await saveTrainingPreferences(
+    db,
+    { ...preferences, experience: level },
+    () => saveTrainingProgram(db, program),
+    REDO_LOCKED_MESSAGE,
+  );
 }
 
 export function validateTrainingPlan(plan: PlannedExercise[]): boolean {

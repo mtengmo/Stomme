@@ -1,17 +1,21 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { beginnerExerciseIds } from '../../content/beginnerSet';
 import { experienceLabels } from '../../content/programmes';
+import { isCuratedLevel, programPool } from '../../content/widePool';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
-import { saveTrainingPreferences } from '../../db/training';
+import {
+  redoTrainingProgram,
+  saveTrainingPreferences,
+} from '../../db/training';
 import type {
   ExerciseId,
   TrainingPreferences,
   TrainingProgram,
 } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
+import { randomSeed } from '../../lib/seed';
 import { buildProgram } from '../../rules/programPlan';
 import { Button } from '../../ui/Button';
 import { ChoiceCard } from '../../ui/ChoiceCard';
@@ -147,6 +151,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
           step: 'days',
           days: redo.program?.daysPerWeek ?? readDraft(null).days,
           emphasis: redo.program?.emphasis ?? 'full',
+          experience: redo.preferences.experience,
         }
       : loadDraft(),
   );
@@ -187,7 +192,9 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
     }
   }, [step]);
 
-  const steps: Step[] = redo ? ['days', 'emphasis'] : stepsFor(goal, draft);
+  const steps: Step[] = redo
+    ? ['days', 'emphasis', 'level']
+    : stepsFor(goal, draft);
   const position = Math.max(0, steps.indexOf(step));
   const last = position === steps.length - 1;
   const rehab = isRehabGoal(goal);
@@ -237,24 +244,26 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
     setError('');
     try {
       if (redo) {
+        // A new programme is a new variation: always a fresh seed.
+        const preferences = { ...redo.preferences, experience };
         const next = buildProgram({
-          preferences: redo.preferences,
+          preferences,
           daysPerWeek: days,
           emphasis,
           startDate: toLocalDate(new Date()),
           now: new Date().toISOString(),
           id: crypto.randomUUID(),
           block: redo.program?.block ?? 1,
-          ...(!redo.program || redo.program.curated
-            ? { pool: beginnerExerciseIds }
-            : {}),
+          pool: programPool(experience, emphasis),
+          curated: isCuratedLevel(experience),
+          seed: randomSeed(),
         });
         if (!next) {
           setError('Det gick inte att bygga ett program med din utrustning.');
           setBusy(false);
           return;
         }
-        await saveTrainingProgram(getDb(), next);
+        await redoTrainingProgram(getDb(), redo.preferences, experience, next);
         navigate('/program?ny=1');
         return;
       }
@@ -269,7 +278,9 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
               startDate: toLocalDate(new Date()),
               now: new Date().toISOString(),
               id: crypto.randomUUID(),
-              pool: beginnerExerciseIds,
+              pool: programPool('new', emphasis),
+              curated: true,
+              seed: randomSeed(),
             })
           : null;
       await saveTrainingPreferences(
@@ -562,6 +573,12 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
               {goal === 'build' ? (
                 <p className="m-0 text-base text-ink-soft">
                   Styr vilka övningar vi visar, antal set och startvikt.
+                </p>
+              ) : null}
+              {redo ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Nivån styr också din allmänna träningsvana: antal set och
+                  startvikter i hela appen.
                 </p>
               ) : null}
             </fieldset>
