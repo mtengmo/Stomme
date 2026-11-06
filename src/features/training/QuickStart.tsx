@@ -5,7 +5,10 @@ import { isCuratedLevel, programPool } from '../../content/widePool';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
-import { saveTrainingPreferences } from '../../db/training';
+import {
+  redoTrainingProgram,
+  saveTrainingPreferences,
+} from '../../db/training';
 import type {
   ExerciseId,
   TrainingPreferences,
@@ -260,12 +263,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
           setBusy(false);
           return;
         }
-        if (experience === redo.preferences.experience)
-          await saveTrainingProgram(getDb(), next);
-        else
-          await saveTrainingPreferences(getDb(), preferences, () =>
-            saveTrainingProgram(getDb(), next),
-          );
+        await redoTrainingProgram(getDb(), redo.preferences, experience, next);
         navigate('/program?ny=1');
         return;
       }
@@ -575,6 +573,12 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
               {goal === 'build' ? (
                 <p className="m-0 text-base text-ink-soft">
                   Styr vilka övningar vi visar, antal set och startvikt.
+                </p>
+              ) : null}
+              {redo ? (
+                <p className="m-0 text-base text-ink-soft">
+                  Nivån styr också din allmänna träningsvana: antal set och
+                  startvikter i hela appen.
                 </p>
               ) : null}
             </fieldset>

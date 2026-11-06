@@ -4,8 +4,7 @@ import { focusLabel } from '../../content/focusPresets';
 import { experienceLabels } from '../../content/programmes';
 import { isCuratedLevel, programPool } from '../../content/widePool';
 import { getDb } from '../../db/db';
-import { saveTrainingProgram } from '../../db/program';
-import { saveTrainingPreferences } from '../../db/training';
+import { redoTrainingProgram } from '../../db/training';
 import type { TrainingPreferences, TrainingProgram } from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
 import { randomSeed } from '../../lib/seed';
@@ -14,7 +13,6 @@ import { Button } from '../../ui/Button';
 import { ChoiceCard } from '../../ui/ChoiceCard';
 import { levelHints } from '../training/quickStartModel';
 import { ExerciseThumb } from './ExerciseThumb';
-import { programLevel } from './programView';
 
 /** A full-screen confirmation: the safe choice first, the action as the heavier button. */
 export function Confirm({
@@ -23,6 +21,7 @@ export function Confirm({
   keepLabel,
   confirmLabel,
   busy,
+  confirmDisabled = false,
   error,
   onKeep,
   onConfirm,
@@ -32,6 +31,8 @@ export function Confirm({
   keepLabel: string;
   confirmLabel: string;
   busy: boolean;
+  /** Only the action is disabled; keeping the programme always works. */
+  confirmDisabled?: boolean;
   error: string;
   onKeep(): void;
   onConfirm(): void;
@@ -66,7 +67,7 @@ export function Confirm({
             {error}
           </p>
         ) : null}
-        <Button disabled={busy} onClick={onConfirm}>
+        <Button disabled={busy || confirmDisabled} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>
@@ -100,6 +101,9 @@ export function rebuildProgram(
     ...(seed !== undefined ? { seed } : {}),
   });
 }
+
+const passSignature = (program: TrainingProgram | null) =>
+  JSON.stringify(program?.passes.map((pass) => pass.exerciseIds));
 
 /** The new passes with a still figure per exercise, so the choice is seen before it is saved. */
 function PassPreview({ program }: { program: TrainingProgram }) {
@@ -146,9 +150,16 @@ export function ProgramRedoEnd({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [level, setLevel] = useState<Level>(programLevel(program, preferences));
+  // The current general training level, the same default as "Gör om" in the
+  // quick start; saving writes the chosen level back as the training level.
+  const [level, setLevel] = useState<Level>(preferences.experience);
   const [shuffle, setShuffle] = useState(true);
   const [freshSeed, setFreshSeed] = useState(randomSeed);
+  // Polite status for a changed preview; 'same' is also shown as text.
+  const [announce, setAnnounce] = useState<{
+    kind: 'updated' | 'same';
+    n: number;
+  }>();
   const id = useRef(crypto.randomUUID());
   const keep = () => {
     setError('');
@@ -162,19 +173,27 @@ export function ProgramRedoEnd({
     [program, preferences, level, seed],
   );
 
+  const note = (kind: 'updated' | 'same') =>
+    setAnnounce((current) => ({ kind, n: (current?.n ?? 0) + 1 }));
+  const reshuffle = () => {
+    const nextSeed = randomSeed();
+    const candidate = rebuildProgram(
+      program,
+      preferences,
+      level,
+      nextSeed,
+      id.current,
+    );
+    setFreshSeed(nextSeed);
+    note(passSignature(candidate) === passSignature(next) ? 'same' : 'updated');
+  };
+
   const rebuild = async () => {
     if (!next) return;
     setBusy(true);
     setError('');
     try {
-      const db = getDb();
-      if (level === preferences.experience) await saveTrainingProgram(db, next);
-      else
-        await saveTrainingPreferences(
-          db,
-          { ...preferences, experience: level },
-          () => saveTrainingProgram(db, next),
-        );
+      await redoTrainingProgram(getDb(), preferences, level, next);
       onRebuilt();
     } catch (err) {
       setError(
@@ -204,14 +223,15 @@ export function ProgramRedoEnd({
         title="Göra om programmet?"
         keepLabel="Behåll programmet"
         confirmLabel="Gör om programmet nu"
-        busy={busy || !next}
+        busy={busy}
+        confirmDisabled={!next}
         error={error}
         onKeep={keep}
         onConfirm={() => void rebuild()}
       >
         <p className="m-0 text-xl">
-          Du får ett nytt block med samma antal pass och tyngdpunkt, byggt på
-          din utrustning nu. Blockets räknare börjar om. Sparade pass i
+          Du får nya pass med samma antal dagar och tyngdpunkt, byggda på din
+          utrustning nu. Blocket börjar om från vecka 1. Sparade pass i
           historiken finns kvar.
         </p>
         <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
@@ -225,26 +245,43 @@ export function ProgramRedoEnd({
               label={experienceLabels[value]}
               hint={levelHints[value]}
               checked={level === value}
-              onChange={() => setLevel(value)}
+              onChange={() => {
+                setLevel(value);
+                note('updated');
+              }}
             />
           ))}
+          <p className="m-0 text-base text-ink-soft">
+            Nivån styr också din allmänna träningsvana: antal set och
+            startvikter i hela appen.
+          </p>
         </fieldset>
         <ChoiceCard
           type="checkbox"
           label="Blanda om övningarna"
-          hint="Nya övningar för samma ändamål. Av: samma urval som nu."
+          hint="Nya övningar för samma ändamål. Av: inga slumpade byten. Passen anpassas till nivå och utrustning."
           checked={shuffle}
-          onChange={setShuffle}
+          onChange={(value) => {
+            setShuffle(value);
+            note('updated');
+          }}
         />
         {shuffle ? (
-          <Button
-            variant="secondary"
-            disabled={busy}
-            onClick={() => setFreshSeed(randomSeed())}
-          >
+          <Button variant="secondary" disabled={busy} onClick={reshuffle}>
             Blanda igen
           </Button>
         ) : null}
+        <div role="status" className="empty:hidden">
+          {announce?.kind === 'same' ? (
+            <p key={announce.n} className="m-0 text-base font-bold">
+              Inga fler likvärdiga övningar för din nivå och utrustning.
+            </p>
+          ) : announce ? (
+            <span key={announce.n} className="sr-only">
+              Passen är uppdaterade
+            </span>
+          ) : null}
+        </div>
         <section aria-labelledby="redo-preview" className="flex flex-col gap-3">
           <h2 id="redo-preview" className="m-0 text-3xl font-bold">
             Så här blir passen

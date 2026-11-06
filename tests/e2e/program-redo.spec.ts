@@ -26,7 +26,9 @@ const passNames = (page: Page) =>
     .locator('section[aria-labelledby^="redo-pass-"]')
     .evaluateAll((sections) =>
       sections.map((s) =>
-        [...s.querySelectorAll('li')].map((li) => li.textContent?.trim()),
+        [...s.querySelectorAll('li')].map((li) =>
+          li.querySelector('.break-words')?.textContent?.trim(),
+        ),
       ),
     );
 
@@ -60,10 +62,15 @@ test('redo: pick a level, preview the passes, keep or save', async ({
   // Redo at another level: the preview is what gets saved.
   await page.getByRole('button', { name: /^Gör om programmet/ }).click();
   await level.getByRole('radio', { name: 'Viss vana' }).check();
-  expect((await passNames(page)).length).toBe(3);
+  const previewed = await passNames(page);
+  expect(previewed.length).toBe(3);
   await page.getByRole('button', { name: 'Gör om programmet nu' }).click();
   await expect(page).toHaveURL(/#\/$/);
   await expect(page.getByRole('heading', { name: /^Vecka 1/ })).toBeVisible();
+  // The first pass on Idag is the one that was previewed.
+  const home = (await page.locator('main').innerText()).toLowerCase();
+  for (const name of previewed[0] ?? [])
+    expect(home, name).toContain((name ?? '').toLowerCase());
   await page.goto('/#/mitt-program');
   await expect(page.getByText('Nivå: Viss vana')).toBeVisible();
 });
@@ -79,6 +86,14 @@ for (const size of SIZES)
       test.setTimeout(90_000);
       await page.setViewportSize(size.viewport);
       await page.emulateMedia({ colorScheme });
+      // A constant seed: "Blanda igen" cannot change the preview, so the note shows.
+      await page.addInitScript(() => {
+        const real = crypto.getRandomValues.bind(crypto);
+        crypto.getRandomValues = ((array: Uint32Array) =>
+          array instanceof Uint32Array && array.length === 1
+            ? Object.assign(array, [7])
+            : real(array as never)) as typeof crypto.getRandomValues;
+      });
       await toProgramme(page);
       await page.goto('/#/mitt-program');
       if (size.scale !== 100)
@@ -86,6 +101,12 @@ for (const size of SIZES)
       await page.getByRole('button', { name: /^Gör om programmet/ }).click();
       await expect(
         page.getByRole('heading', { name: 'Så här blir passen' }),
+      ).toBeVisible();
+      await page.getByRole('button', { name: 'Blanda igen' }).click();
+      await expect(
+        page.getByText(
+          'Inga fler likvärdiga övningar för din nivå och utrustning.',
+        ),
       ).toBeVisible();
       const over = await page.evaluate(
         () => document.documentElement.scrollWidth - innerWidth,

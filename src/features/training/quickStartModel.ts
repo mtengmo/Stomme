@@ -37,7 +37,7 @@ export const DEFAULT_SUPPORT: EquipmentChoice[] = ['chair', 'support'];
 export const levelHints: Record<Experience, string> = {
   new: 'Grundövningar, 2 set, lättaste vikterna.',
   some: 'Även övningar med lite vana, 3 set, mellanvikter.',
-  regular: 'Alla övningar, 3–4 set, tyngre startvikter.',
+  regular: 'Även krävande övningar, 3–4 set, tyngre vikter.',
 };
 
 const goals: Goal[] = ['general', 'build', 'knee', 'physio', 'custom'];

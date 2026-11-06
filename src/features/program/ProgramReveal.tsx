@@ -77,6 +77,12 @@ export function ProgramReveal() {
         <p className="m-0 text-lg">
           Nivå: {experienceLabels[programLevel(program, preferences)]}
         </p>
+        {program.curated && programLevel(program, preferences) !== 'new' ? (
+          <p className="m-0 text-base text-ink-soft">
+            Första blocket bygger på grundövningar. Fler övningar när du gör om
+            programmet.
+          </p>
+        ) : null}
       </header>
       <p className="count m-0 text-3xl leading-none">
         Vecka 1 <span className="text-2xl">av {BLOCK_WEEKS}</span>
