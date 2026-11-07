@@ -61,6 +61,7 @@ describe('authored frontal demonstrations', () => {
       'side-lunge',
       'farmer-carry',
       'woodchop',
+      'kettlebell-goblet-squat',
     ]);
     expect(supportedObliqueViews).toEqual([
       'split-squat',
@@ -445,6 +446,39 @@ describe('front pilot support contacts', () => {
         );
         expect((markup.match(/stroke-width="4"/g) ?? []).length).toBe(1);
       }
+    },
+  );
+});
+
+describe('kettlebell goblet squat front view', () => {
+  it('opens in front view with both hands on the horns at chest height', () => {
+    expect(defaultViewFor('kettlebell-goblet-squat')).toBe('front');
+    for (let i = 0; i <= 20; i++) {
+      const p = frontMovementPose('kettlebell-goblet-squat', i / 20);
+      expect(p.hR[1]).toBeCloseTo(p.hL[1], 5);
+      expect(p.hL[0] - p.hR[0]).toBeCloseTo(12, 5);
+      expect(p.hR[1] - p.neck[1]).toBeCloseTo(13, 5);
+      // Elbows tucked: below the hands and inside the shoulder-wide frame.
+      expect(p.eR[1]).toBeGreaterThan(p.hR[1] - 1);
+      expect(p.eL[1]).toBeGreaterThan(p.hL[1] - 1);
+      expect(100 - p.eR[0]).toBeLessThan(14);
+    }
+  });
+  it.each([0, 0.5, 1])(
+    'draws the grip markers on the handle at phase %s',
+    (phase) => {
+      const markup = renderToStaticMarkup(
+        <FigureFrame
+          exerciseId="kettlebell-goblet-squat"
+          pose={movementPose('kettlebell-goblet-squat', phase)}
+          working={null}
+          equipment="kettlebell"
+          view="front"
+          phase={phase}
+        />,
+      );
+      expect(markup).toContain('data-grip="goblet-horns"');
+      expect(markup).toContain('data-equipment="kettlebell"');
     },
   );
 });

@@ -4182,7 +4182,7 @@
     "name": "Gobletknäböj med kettlebell",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -4221,12 +4221,17 @@
         "fixer": "claude-sonnet",
         "commit": "6f58404",
         "notes": "W9: squat family as one IK body with fixed ankles (SHIN 26.5)."
+      },
+      {
+        "date": "2026-11-07",
+        "fixer": "claude-sonnet",
+        "notes": "E82 grip: ny frontvy (standardvy) med båda händerna på kettlebellens horn i bröstställ, armbågarna nedtryckta och inåt, kulan nära bröstet genom hela knäböjen; synliga handmarkörer. Sidovyn finns kvar som alternativ. Behöver granskning av Astra/människa."
       }
     ],
     "openIssues": [
       "[strong] E82, profilfas 0–1 samt reduced-motion Start/Slut vid 4 och 8 kg: synlig hand/underarm ligger vid kulans nedre sida och inte vid handtagets horn. Visa tydlig kontakt mellan båda händerna och hornen enligt instruktionen, vid behov med sned-/frontvy; bevara kontakten genom knäböjen."
     ],
-    "fingerprint": "b3bc992ca8f5",
+    "fingerprint": "fa80ff89b601",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: goblet-squat. Samma fria gobletknäböj; huvudposten har redan kettlebell på 8 kg samt hantel/kroppsvikt. Svagare separat post. Bevara denna posts 4 kg-val och instruktion om grepp i hornen som kettlebellvariant innan inaktivering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]

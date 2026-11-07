@@ -26,6 +26,7 @@ export const supportedFrontViews = [
   'side-lunge',
   'farmer-carry',
   'woodchop',
+  'kettlebell-goblet-squat',
 ] as const satisfies readonly ExerciseId[];
 
 export const supportedObliqueViews = [
@@ -47,7 +48,12 @@ export type FigureAngle = 'side' | 'front' | 'oblique';
 /** Start with the angle that explains each movement most clearly. */
 export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
   if (FRONT_ONLY.includes(exerciseId)) return 'front';
-  if (exerciseId === 'side-lunge' || exerciseId === 'woodchop') return 'front';
+  if (
+    exerciseId === 'side-lunge' ||
+    exerciseId === 'woodchop' ||
+    exerciseId === 'kettlebell-goblet-squat'
+  )
+    return 'front';
   if (exerciseId === 'russian-twist') return 'oblique';
   return 'side';
 }
@@ -667,6 +673,36 @@ export function frontMovementPose(
       point(130, 177 - 9 * leftLift),
     );
   }
+  if (exerciseId === 'kettlebell-goblet-squat') {
+    // Same legs as the goblet squat; both hands sit on the bell's horns at
+    // chest height with the elbows tucked in (hands at 94/106 = the handle
+    // width of Held), so the grip survives the whole squat.
+    const hipY = mix(118, 136, t);
+    const neckY = hipY - 44;
+    // Feet stay planted; the knees travel out with the thigh/shin lengths kept.
+    const hip = point(100, hipY);
+    const aR = point(86, 174);
+    const aL = point(114, 174);
+    const neck = point(100, neckY);
+    const gripY = neckY + 13;
+    const armR = solveTwoBone(neck, [94, gripY], 27, 23, -1);
+    const armL = solveTwoBone(neck, [106, gripY], 27, 23, 1);
+    return skeleton(
+      point(100, neckY - 14),
+      neck,
+      hip,
+      armR.mid,
+      armR.end,
+      armL.mid,
+      armL.end,
+      joint(hip, aR, FRONT_THIGH, 34, 1),
+      aR,
+      point(72, 177),
+      joint(hip, aL, FRONT_THIGH, 34, -1),
+      aL,
+      point(128, 177),
+    );
+  }
   if (exerciseId === 'goblet-squat') {
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
@@ -981,7 +1017,8 @@ export function FrontFigureFrame({
   const heldAt: Pt[] =
     kind === null
       ? []
-      : exerciseId === 'goblet-squat'
+      : exerciseId === 'goblet-squat' ||
+          exerciseId === 'kettlebell-goblet-squat'
         ? [[100, pose.neck[1] + 11]]
         : exerciseId === 'farmer-carry'
           ? [pose.hR, pose.hL]
@@ -1263,6 +1300,17 @@ export function FrontFigureFrame({
           {heldAt.map((at) => (
             <Held key={at.join(',')} kind={kind} at={at} />
           ))}
+        </g>
+      ) : null}
+      {exerciseId === 'kettlebell-goblet-squat' && kind === 'kettlebell' ? (
+        <g
+          data-grip="goblet-horns"
+          stroke="var(--accent)"
+          strokeWidth="2"
+          fill="var(--paper)"
+        >
+          <circle cx={pose.hR[0]} cy={pose.hR[1]} r="3.5" />
+          <circle cx={pose.hL[0]} cy={pose.hL[1]} r="3.5" />
         </g>
       ) : null}
       {heldIsRack && kind === 'dumbbell' ? (
