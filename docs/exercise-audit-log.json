@@ -3672,6 +3672,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio frontrutor och reduced-motion Start/Slut granskade: fötterna börjar innanför de två orange markeringarna, lämnar golvet och slutar brett utanför dem med böjda knän. Hela figuren ryms; bilateral kroppsvikt utan sidval. Ok avser dessa poser. Markeringarna ritas som vertikala streck; deras perspektiv och framfotslandningens djup är inte verifierade. Läst text klargör golvtejp, inga föremål i landningen, halkfritt underlag och alternativ utan hopp. Återhopp och landningens mjukhet kan inte slutbedömas. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "d6ca2b3",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio frontrutor och reduced-motion: fötterna går från innanför till utanför markeringarna med luftfas och böjda knän i landningsläget. Bilateral kroppsvikt, inga val; figur och markeringar ryms. Framvyn visar bredd men inte framfotslandning i djupet. Textens halkfria yta, inga föremål i landningen, paus vid hårda landningar och stegvariant lästa. Inget säkert nytt fel i de visade poserna. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3730,6 +3738,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio frontrutor och reduced-motion Start/Slut: ledande foten kliver först, följande fot lyfts därefter, utan synlig korsning; båda fötterna hamnar på andra sidan markeringen. Ramen räcker och inget vikt-/sidval finns. Ok gäller synlig stegordning och ändlägen. Läst instruktion anger halkfritt utrymme, golvtejp utan hinder och långsammare steg med paus. Kontinuerlig stödfotslåsning, knäriktning i djup och återgångens riktningsbyte ej slutbedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "d6ca2b3",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio frontrutor och reduced-motion visar ledande fot följd av andra foten över markeringen, utan korsning i stickproven. Stödfot på golvet, böjda knän och ram tillräcklig. Bilateral utan utrustnings-/sidval. Returens riktningsbyte och framfotsbelastning kan inte bedömas från dessa rutor. Text om halkfri fri yta, inga föremål i landningen och långsammare steg läst; inget säkert nytt posefel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -3788,6 +3804,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio profilrutor och reduced-motion Start/Slut visar växlande knälyft nära höfthöjd med upprätt bål; stödfoten ligger vid golvet i de synliga poserna. Ramen räcker, inga sid-/utrustningsval. Ok avser knälyftens ändlägen och inramning. Ben och armar överlappar vid mitten, så motsatt armkoordination och framfotsisättning kan inte säkert bedömas. Läst text anger fri halkfri yta, sänkta knälyft vid tappad rytm samt gång utan studs. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "d6ca2b3",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilfaser och reduced-motion visar knälyft mot höfthöjd, växlande benposer, armarnas pendellägen och upprätt bål; stödfoten når golvet och ramen räcker. Bilateral kroppsvikt utan val. Likfärgade överlappande lemmar begränsar säker identifiering av motsatt arm/ben och höftbredd. Text om halkfri yta, lägre lyft vid bakåtlutning och gång utan studs läst. Ok avser synliga poser, inte löprytm eller landningskvalitet. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4298,6 +4322,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Riktad omgranskning E80 på f1d517b: nio frontfaser visar nu vald fot lyft under utsteget (0,125–0,375), följt av kontakt och fast läge under knäböjen från 0,5. Tidigare glidande utsteg är åtgärdat i sedda faser. Reduced-motion H/V och kroppsvikt/2/4 kg visar vald sida, grepp och full ram. Text om bromsat steg, knä över tå och grundare alternativ läst. Ok avser fotlyftsrättningen; viktvarianternas mellanlägen och återsteget är inte fullständigt visuellt verifierade. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "d6ca2b3",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio frontfaser samt reduced-motion H/V i front/profil och kroppsvikt/2/4 kg: vald fot lyfts ut före nedsättning, valt knä böjs och andra benet är rakare. Spegling, hand/viktkontakt och ram fungerar i stickproven. Fronten gör sidsteget läsbart; profilen ensam räcker inte. Text om hel fot, knä i tårnas riktning, kontrollerat steg och grundare obelastat alternativ läst. Inget säkert nytt fel i visade poser; återgångens fotkontakt ej verifierad. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4940,7 +4972,16 @@
     "group": "ballistic",
     "risk": "high",
     "status": "fixed-awaiting-review",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "d6ca2b3",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilfaser och reduced-motion Start/Slut: lågt hopp med fria fötter i mitten, framfotskontakt i ändlägen och upprätt bål. Skivan ligger som separat markering utanför landningsplatsen; ramen räcker. Bilateral kroppsvikt utan variantval. Profilen räcker inte för knä/tår i sidled. Text om halkfritt underlag, aldrig hoppa på/över skivan, paus vid tunga landningar och mindre hopp läst. Ok avser synliga poser; fjädring och faktisk landningskvalitet ej bedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-05",
