@@ -97,7 +97,10 @@ describe('isometric lunge hold and plate pogos', () => {
       expect(entry?.risk).toBe('high');
       expect(entry?.status).toBe('fixed-awaiting-review');
       expect(entry?.fixes.at(-1)?.fixer).toBe('claude-sonnet');
-      expect(entry?.reviews).toEqual([]);
+      // Astra may have reviewed it since; the fixer never reviews its own fix.
+      expect(entry?.reviews.map((r) => r.reviewer)).not.toContain(
+        'claude-sonnet',
+      );
       expect(JSON.stringify(entry?.notes)).toContain('codex:gpt6astra');
     }
   });
