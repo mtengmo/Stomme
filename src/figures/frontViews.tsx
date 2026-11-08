@@ -1016,6 +1016,29 @@ export function FrontFigureFrame({
         hL: armL.end,
       };
     }
+    if (kind === 'kettlebell' && exerciseId === 'dumbbell-rdl') {
+      // Both hands share the kettlebell handle (hands at 96/104 = the handle
+      // width of Held) through the whole hinge; the arm lengths stay those of
+      // the hanging dumbbell arms, the elbows bow outward.
+      const upper = Math.hypot(
+        basePose.eR[0] - basePose.neck[0],
+        basePose.eR[1] - basePose.neck[1],
+      );
+      const fore = Math.hypot(
+        basePose.hR[0] - basePose.eR[0],
+        basePose.hR[1] - basePose.eR[1],
+      );
+      const gripY = basePose.hR[1];
+      const armR = solveTwoBone(basePose.neck, [96, gripY], upper, fore, 1);
+      const armL = solveTwoBone(basePose.neck, [104, gripY], upper, fore, -1);
+      return {
+        ...basePose,
+        eR: armR.mid,
+        hR: armR.end,
+        eL: armL.mid,
+        hL: armL.end,
+      };
+    }
     if (!splitSupported) return basePose;
     const handAt = point(
       splitSupportX + (working === 'left' ? -4 : 4),
@@ -1334,6 +1357,17 @@ export function FrontFigureFrame({
         >
           <circle cx={pose.hR[0]} cy={pose.hR[1]} r="3.5" />
           <circle cx={pose.hL[0]} cy={pose.hL[1]} r="3.5" />
+        </g>
+      ) : null}
+      {exerciseId === 'dumbbell-rdl' && kind === 'kettlebell' ? (
+        <g
+          data-grip="rdl-handle"
+          stroke="var(--accent)"
+          strokeWidth="2"
+          fill="var(--paper)"
+        >
+          <circle cx={pose.hR[0]} cy={pose.hR[1]} r="3" />
+          <circle cx={pose.hL[0]} cy={pose.hL[1]} r="3" />
         </g>
       ) : null}
       {heldIsRack && kind === 'dumbbell' ? (

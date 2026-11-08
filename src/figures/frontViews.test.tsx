@@ -483,6 +483,40 @@ describe('kettlebell goblet squat front view', () => {
   );
 });
 
+describe('dumbbell-rdl front view, kettlebell variant', () => {
+  const frame = (equipment: 'kettlebell' | 'dumbbell', phase: number) =>
+    renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="dumbbell-rdl"
+        pose={movementPose('dumbbell-rdl', phase)}
+        working={null}
+        equipment={equipment}
+        view="front"
+        phase={phase}
+      />,
+    );
+  it.each([0, 0.5, 1])(
+    'puts both hands on the one handle at phase %s',
+    (phase) => {
+      const markup = frame('kettlebell', phase);
+      expect(markup).toContain('data-grip="rdl-handle"');
+      const circles = [
+        ...markup
+          .split('data-grip="rdl-handle"')[1]
+          .matchAll(/cx="([\d.]+)" cy="([\d.]+)"/g),
+      ].slice(0, 2);
+      expect(circles).toHaveLength(2);
+      const [r, l] = circles.map((m) => [Number(m[1]), Number(m[2])]);
+      expect(r[1]).toBeCloseTo(l[1], 5);
+      expect(l[0] - r[0]).toBeLessThanOrEqual(10);
+      expect(l[0] - r[0]).toBeGreaterThan(0);
+    },
+  );
+  it('leaves the dumbbell variant without a handle grip', () => {
+    expect(frame('dumbbell', 0.5)).not.toContain('rdl-handle');
+  });
+});
+
 describe('woodchop front view', () => {
   it('lets the pivot knee follow the foot, on both sides', () => {
     // Side of the hip-ankle line the knee bends to: positive = outward

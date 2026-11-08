@@ -812,7 +812,7 @@
     "name": "Rumänskt marklyft",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -865,6 +865,11 @@
         "fixer": "claude-sonnet",
         "commit": "a566efc",
         "notes": "W9 hip hinge family: fixed ankles, constant thigh/shin/torso/arm lengths for two dumbbells and for the kettlebell variant (shared grip copies the near arm instead of blending), same path on the way back; 14 baseline rows removed."
+      },
+      {
+        "date": "2026-11-08",
+        "fixer": "claude-sonnet",
+        "notes": "E14 (Astra [strong]): frontvyn, kettlebellvarianten: båda händerna ligger nu på samma handtag (händer vid x 96/104, handtagets bredd) och följer det genom hela höftfällningen, inklusive reduced-motion Start/Slut; armlängderna är de hängande armarnas och armbågarna bågar utåt (frontViews.tsx, kind kettlebell, data-grip=\"rdl-handle\"). Samma geometri för 8 och 16 kg (vikten ändrar inte figuren). Hantelvarianterna oförändrade. Sedd fas 0, 0.25, 0.5, 0.75, 1 för kettlebell och hantel. Ej omgranskad av annan: openIssues kvarstår tills korsleverantörsgranskning."
       }
     ],
     "openIssues": [
