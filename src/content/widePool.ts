@@ -35,7 +35,7 @@ export const ballisticIds: ReadonlySet<ExerciseId> = new Set<ExerciseId>([
  * id here only after the re-review (Astra) has cleared its openIssues.
  */
 export const unresolvedFigureIssueIds: ReadonlySet<ExerciseId> =
-  new Set<ExerciseId>(['woodchop', 'kettlebell-goblet-squat']);
+  new Set<ExerciseId>(['dumbbell-rdl']);
 
 /** The AAOS knee range E28-E38 (half-squat, seated knee extension, ...). */
 function isAaosKneeGroup(id: ExerciseId): boolean {
