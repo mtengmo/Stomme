@@ -4349,7 +4349,7 @@
     "name": "Gobletknäböj med kettlebell",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -4409,6 +4409,11 @@
         "date": "2026-11-07",
         "fixer": "claude-sonnet",
         "notes": "E82 grip: ny frontvy (standardvy) med båda händerna på kettlebellens horn i bröstställ, armbågarna nedtryckta och inåt, kulan nära bröstet genom hela knäböjen; synliga handmarkörer. Sidovyn finns kvar som alternativ. Behöver granskning av Astra/människa."
+      },
+      {
+        "date": "2026-11-08",
+        "fixer": "claude-sonnet",
+        "notes": "E82: sidovyn (Från sidan): händerna ritas nu som en tydlig handmarkering på kulans handtag (hornen) ovanför kulkroppen i alla faser och vid reducerad rörelse Start/Slut, för 4 och 8 kg (Figure.tsx). Underarmen kommer uppifrån mot hornen i stället för att läsas som kontakt vid kulans nedre sida. Frontvyn är oförändrad. Sedd H fas 0, 0.5, 0.75, 1 (zoomade bilder). Underarmen går fortfarande förbi kulans vänstra kant i profil; omgranskning behövs."
       }
     ],
     "openIssues": [
@@ -4532,7 +4537,7 @@
     "name": "Woodchop",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -4586,12 +4591,17 @@
         "fixer": "claude-sonnet",
         "commit": "ce92e90",
         "notes": "E88: ny frontvy (Framifrån, standardvy) i frontViews.tsx med spegling för V: den delade greppvikten går diagonalt från startsidans höft över bröstet till ovanför motsatt axel; höft och hals skiftar mot slutsidan och startsidans fot vrids i golvplanet (tån sveper från utåt till tvärs, hälen lyfts, konstant fotlängd) medan knät följer med; andra foten står kvar. Sidovyn oförändrad. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd H fas 0, 0.25, 0.5, 0.75, 1; V täcks av test (spegling)."
+      },
+      {
+        "date": "2026-11-08",
+        "fixer": "claude-sonnet",
+        "notes": "E88: frontvyn: pivotbenets knä följer nu fotvridningen. Tån pekar ut vid start och knät böjs utåt; i fas 0.75-1 och Slut pekar tån mot andra foten och knät ligger på insidan av höft-fotlinjen (turnedKnee i frontViews.tsx, båda sidor via spegling). Diagonalen höft till motsatt axel och ramen är oförändrade. Knät passerar linjen kring fas 0.5 (underbenet kortas då i frontprojektionen, ny baslinjerad drift woodchop|front|drift:kR-aR 9.2). Sedd H och V fas 0, 0.5, 0.75, 1."
       }
     ],
     "openIssues": [
       "[strong] E88, profilrutorna 0–1 och reduced-motion Slut H/V: axlar/händer och startbenets knä/fot visar inte den beskrivna diagonalen till motsatt axel eller medvridningen i golvplanet. Hällyftet ensamt gör inte rotationen läsbar. Lägg till en front-/snedvy eller annan tydlig geometri där höft-till-motsatt-axel-banan och knäets/fotens gemensamma medvridning kan verifieras."
     ],
-    "fingerprint": "c6d9d996a7bb",
+    "fingerprint": "a8fda1653962",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT, INTE DUBLETT. Jämför: russian-twist. Stående diagonal med fotmedvridning tillför ett eget mönster. Öppet vy-/rotationsfel motiverar rättning eller separat pausbeslut, inte påståendet att Russian twist är samma övning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
       "[Astra-granskning 2026-11-08 (0d3f962) föråldrad] Granskningen gjordes på en äldre gren och beskriver figuren före rättningen (ce92e90); figurens fingerprint på main skiljer sig från den som granskades. Posten behålls som fixed-awaiting-review och openIssues rörs inte. codex:gpt6astra (eller human) måste granska om aktuell main innan något kan godkännas."

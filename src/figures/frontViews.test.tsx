@@ -484,6 +484,32 @@ describe('kettlebell goblet squat front view', () => {
 });
 
 describe('woodchop front view', () => {
+  it('lets the pivot knee follow the foot, on both sides', () => {
+    // Side of the hip-ankle line the knee bends to: positive = outward
+    // (away from the planted foot), negative = inward (towards it).
+    const outward = (
+      p: ReturnType<typeof frontMovementPose>,
+      w: 'right' | 'left',
+    ) => {
+      const [hx, hy] = p.hip;
+      const [ax, ay] = w === 'right' ? p.aR : p.aL;
+      const [kx, ky] = w === 'right' ? p.kR : p.kL;
+      const cross = (ax - hx) * (ky - hy) - (ay - hy) * (kx - hx);
+      return (w === 'right' ? 1 : -1) * cross;
+    };
+    for (const w of ['right', 'left'] as const) {
+      const start = frontMovementPose('woodchop', 0, w);
+      const end = frontMovementPose('woodchop', 1, w);
+      const mid = frontMovementPose('woodchop', 0.75, w);
+      const pivotKnee = (p: typeof start) => (w === 'right' ? p.kR : p.kL);
+      expect(pivotKnee(start)).toBeDefined();
+      // Toe points out at the start: knee out. At 0.75 and the finish the toe
+      // points across to the other foot: knee on the inward side as well.
+      expect(Math.sign(outward(start, w))).not.toBe(Math.sign(outward(end, w)));
+      expect(Math.sign(outward(mid, w))).toBe(Math.sign(outward(end, w)));
+    }
+  });
+
   it('shows the diagonal from the start hip to above the opposite shoulder, mirrored per side', () => {
     expect(defaultViewFor('woodchop')).toBe('front');
     const dist = (a: readonly number[], b: readonly number[]) =>
@@ -509,8 +535,11 @@ describe('woodchop front view', () => {
       );
       expect(dist(p.neck, p.eR)).toBeCloseTo(24, 0);
       expect(dist(p.eR, p.hR)).toBeCloseTo(24, 0);
-      expect(dist(p.hip, p.kR)).toBeCloseTo(35.9, 0);
-      expect(dist(p.kR, p.aR)).toBeCloseTo(34, 0);
+      // The turning knee foreshortens in the frontal projection, never grows.
+      expect(dist(p.hip, p.kR)).toBeLessThanOrEqual(35.9 + 0.5);
+      expect(dist(p.kR, p.aR)).toBeLessThanOrEqual(34 + 0.5);
+      expect(dist(p.hip, p.kR)).toBeGreaterThan(24);
+      expect(dist(p.kR, p.aR)).toBeGreaterThan(24);
       expect(dist(p.aR, p.tR)).toBeCloseTo(Math.hypot(9, 3), 1);
       const mirrored = frontMovementPose('woodchop', i / 20, 'left');
       expect(mirrored.hR[0]).toBeCloseTo(200 - p.hL[0], 5);

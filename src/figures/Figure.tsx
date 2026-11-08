@@ -537,6 +537,20 @@ export function FigureFrame({
             ))}
           </g>
         ) : null}
+        {exerciseId === 'kettlebell-goblet-squat' &&
+        heldKind === 'kettlebell' ? (
+          // Both hands share the horns in profile: the hand sits on the handle
+          // above the bell body, so the contact reads at every squat depth.
+          <circle
+            data-grip="goblet-horns"
+            cx={p.hR[0]}
+            cy={p.hR[1]}
+            r="3.5"
+            stroke={accent}
+            strokeWidth="2"
+            fill="var(--paper)"
+          />
+        ) : null}
       </g>
       {working ? (
         <text

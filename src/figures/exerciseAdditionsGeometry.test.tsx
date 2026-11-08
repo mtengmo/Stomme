@@ -550,6 +550,11 @@ describe('kettlebell goblet squat figure geometry', () => {
     expect(markup.match(/data-equipment="kettlebell"/g)).toHaveLength(1);
     expect(markup.match(/<circle cx=/g)).toHaveLength(2);
     expect(markup).toContain(`cy="${bottom.hR[1] + 12}"`);
+    // Profile: the hand sits on the horns (the handle top), above the bell body.
+    expect(markup.match(/data-grip="goblet-horns"/g)).toHaveLength(1);
+    expect(markup).toContain(
+      `data-grip="goblet-horns" cx="${bottom.hR[0]}" cy="${bottom.hR[1]}"`,
+    );
   });
 });
 
