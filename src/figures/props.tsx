@@ -159,7 +159,13 @@ export function Held({
         {...PROP}
         stroke="var(--equipment)"
         strokeWidth={4}
-        transform={vertical ? `rotate(90 ${x} ${y})` : undefined}
+        transform={
+          angle !== undefined
+            ? `rotate(${angle} ${x} ${y})`
+            : vertical
+              ? `rotate(90 ${x} ${y})`
+              : undefined
+        }
       >
         <path
           d={`M${x - 8} ${y}H${x + 8}M${x - 8} ${y - 5}V${y + 5}M${x + 8} ${y - 5}V${y + 5}`}

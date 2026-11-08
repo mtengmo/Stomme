@@ -1093,7 +1093,7 @@
     "name": "Hammarcurl",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1134,7 +1134,13 @@
         "notes": "Ny bildinsamling: nio faser och reduced-motion för båda hantelvikterna bekräftar befintligt orienteringsproblem. Hantlarna står lodrätt även när underarmarna blir nästan vågräta (kring fas 0.5); neutralt handledsläge förmedlas inte. Samtidig böjning, stilla bål/fötter och ram syns; bilateral utan sidval. Text om handflator mot varandra, inga vikta handleder/höftfart och lättare vikt läst. Befintlig openIssue behålls utan dubblett. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-08",
+        "fixer": "claude-sonnet",
+        "notes": "E20: the dumbbell long axis now follows its forearm (elbow to hand) through the whole curl, both hands, so the wrist stays neutral and grip contact is kept; the old fixed vertical dumbbell is only right when the forearm is plumb (Figure.tsx forearmAxisAngle, test hammerCurlGrip.test.tsx). openIssues kept as text until a cross-vendor re-review (Astra/human); not approved. The exercise stays out of the beginner set until then."
+      }
+    ],
     "openIssues": [
       "[strong] E20 hammarcurl, fas 0.375–0.75 och reduced-motion Slut, båda händer/handleder: hantlarnas längdaxlar ligger kvar lodrätt medan underarmarna ändrar riktning. Vid ungefär vågrät underarm visar vikten därför inte ett neutralt hammargrepp i linje med underarmen, trots textens råd att inte vika handleden. Låt hantelns orientering följa hand/underarm genom curlen med bibehållen greppkontakt; kontrollera båda viktvarianterna och returfasen."
     ],
