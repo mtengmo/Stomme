@@ -22,9 +22,9 @@ describe('hammer curl dumbbell follows the forearm (E20)', () => {
         const angle = forearmAxisAngle(p, h);
         // The long axis (rotated from the horizontal bar) is parallel to e -> h.
         const rad = (angle * Math.PI) / 180;
-        const axis = [Math.cos(rad), Math.sin(rad)];
-        const fore = [h[0] - e[0], h[1] - e[1]];
-        const len = Math.hypot(fore[0], fore[1]);
+        const axis: readonly [number, number] = [Math.cos(rad), Math.sin(rad)];
+        const fore: readonly [number, number] = [h[0] - e[0], h[1] - e[1]];
+        const len = Math.hypot(...fore);
         expect(
           Math.abs(axis[0] * fore[1] - axis[1] * fore[0]) / len,
         ).toBeLessThan(1e-6);
