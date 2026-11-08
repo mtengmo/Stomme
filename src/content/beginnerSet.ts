@@ -58,8 +58,8 @@ export const beginnerExerciseIds: ReadonlySet<ExerciseId> = new Set<ExerciseId>(
     'bird-dog',
     // E15: one hand on a support, the loaded row for anyone with weights.
     'supported-row',
-    // E20: neutral grip, elbows still; the curl slot.
-    'hammer-curl',
+    // E20 hammer-curl is out while its audit status is needs-fix/open
+    // (dumbbell axis vs forearm); biceps-curl below covers the curl slot.
     // E19: second curl, so pull-focused B passes get a different arm exercise.
     'biceps-curl',
 
