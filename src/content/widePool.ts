@@ -36,6 +36,7 @@ export const ballisticIds: ReadonlySet<ExerciseId> = new Set<ExerciseId>([
  */
 export const unresolvedFigureIssueIds: ReadonlySet<ExerciseId> =
   new Set<ExerciseId>([
+    'hammer-curl',
     'chin-up',
     'diamond-push-up',
     'woodchop',
