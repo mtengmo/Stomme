@@ -2293,6 +2293,14 @@
         "scope": "text",
         "result": "ok",
         "notes": "Begränsad omgranskning E45: fasparametern ger inte frysta rörelsefaser för denna övning (displayedPose använder löpande t); kompletterat med nio tidsprov, cirka 0,8 s mellan bilder. Dessa visar hälglidning ut och tillbaka med stilla bål, samt ny utsträckning. Reduced-motion visar böjt och utsträckt ben. Foten ryms med liten högermarginal. Ingen sidoväljare/viktvariant; bilateral blå färg begränsar kontroll av benväxlingen. Text om hälkontakt, stilla bäcken och kortare sträcka är konsekvent; inget nytt säkert textfel. Stillbilderna är inte en kontinuerlig animationsbedömning. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "caa3aba",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Reduced-motion Start/Slut och nio tidsbaserade profilbilder visar häl ut och tillbaka med häl vid underlaget och stilla bål/bäcken i stickproven; ramen räcker med liten marginal vid utsträckt fot. Fasparametern gav enbart startposer, därför användes cirka 0,7 s mellan tidsbilderna (etiketterna är provindex, inte rörelsefas). Benbyte över flera cykler ej verifierat. Inga sido-/viktval. Text om bekvämt bäckenläge och kortare glidning läst. Ok avser sedda poser/kontakter. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -2899,6 +2907,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Riktad visuell kontroll av nio profilrutor och reduced-motion: raka stödarmar i Start, böjda armbågar vid sänkning och fötter fria även i botten syns. Händerna ligger kvar mot stängerna och hela ställningen/figuren ryms. Ok gäller dessa synliga kontakter och ändlägen. Bilateral kroppsvikt utan variantval. Läst text anger stabil kroppsviktsställning, bekvämt djup och ställningens steg vid avslut; avslutet illustreras inte. Axelsänkning i djup och återpress ej slutbedömda från profilbilderna. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "caa3aba",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilfaser och reduced-motion: raka armar i Start, böjning vid sänkning, händer vid stängerna och fria fötter i samtliga stickprov. Figur/ställning ryms. Bilateral kroppsvikt utan val. Profilen döljer axelkontroll och båda händernas inbördes placering; på-/avstigning visas inte. Text om avsedd stabil ställning, bekvämt djup, avslut via steg och armhävningar som förenkling läst. Inget säkert nytt posefel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4428,6 +4444,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio faser i nya standard-frontvyn samt reduced-motion front/profil och 4/8 kg granskade. Frontens handmarkörer ligger på hornen genom knäböjen och ramen räcker. Men valbara Från sidan Start/Slut behåller tidigare arm/hand vid kulans nedre del i stället för hornen. Befintlig E82-punkt kvarstår för sidovyn, som behöver samma greppkontakt som fronten; ingen dubblett tillagd. Status needs-fix. Bilateral; fötterna kvar vid golvet. Text om horn, knäriktning, kontrollerbart djup och lättare vikt läst. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "caa3aba",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Rättning 1ca3431 kontrollerad i nio sidofaser samt reduced-motion front/profil och 4/8 kg. Sidovyn har nu handmarkör på handtaget genom knäböjen; fronten visar båda hornkontakterna. Tidigare E82-greppunkt stängs. Fötter vid golvet, ram tillräcklig, bilateral utan sidval. Text om kontrollerbart djup, knä/tår och lättare variant läst. Ok avser synlig greppfix; djupkontakt och alla viktvariantmellanfaser ej slutbedömda. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4448,9 +4472,7 @@
         "notes": "E82: sidovyn (Från sidan): händerna ritas nu som en tydlig handmarkering på kulans handtag (hornen) ovanför kulkroppen i alla faser och vid reducerad rörelse Start/Slut, för 4 och 8 kg (Figure.tsx). Underarmen kommer uppifrån mot hornen i stället för att läsas som kontakt vid kulans nedre sida. Frontvyn är oförändrad. Sedd H fas 0, 0.5, 0.75, 1 (zoomade bilder). Underarmen går fortfarande förbi kulans vänstra kant i profil; omgranskning behövs."
       }
     ],
-    "openIssues": [
-      "[strong] E82, profilfas 0–1 samt reduced-motion Start/Slut vid 4 och 8 kg: synlig hand/underarm ligger vid kulans nedre sida och inte vid handtagets horn. Visa tydlig kontakt mellan båda händerna och hornen enligt instruktionen, vid behov med sned-/frontvy; bevara kontakten genom knäböjen."
-    ],
+    "openIssues": [],
     "fingerprint": "fa80ff89b601",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: goblet-squat. Samma fria gobletknäböj; huvudposten har redan kettlebell på 8 kg samt hantel/kroppsvikt. Svagare separat post. Bevara denna posts 4 kg-val och instruktion om grepp i hornen som kettlebellvariant innan inaktivering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
@@ -4518,6 +4540,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Riktad omgranskning E84 på f1d517b: kulan ritas nu ovanför handtaget/händerna i samtliga nio faser och reduced-motion 4/8 kg. Tidigare felvänd kettlebell är åtgärdad och motsvarar textens upp-och-ned-orientering. Figuren ryms, ingen sidoväljare. Text om lugn cirkel, riktningsbyte och stopp vid nack-/axelbesvär läst. Ok avser orienteringen; sidoprojektionens huvudöverlappning gör att frigång och exakt tvåhandsgrepp i hornen inte kan slutbedömas. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "caa3aba",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Nio profilfaser och reduced-motion 4/8 kg visar uppochnedvänd kettlebell, synlig hand vid handtaget, stilla bål/fötter och tillräcklig ram. Inga sidval. Ok avser orientering och poser; överlappningen med huvudet gör avstånd, tvåhandsgrepp och komplett cirkel i djupet omöjliga att slutbedöma. Text om lugn cirkel utan huvudkontakt, byte av håll, nack-/axelavbrott och lättare alternativ läst. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4610,6 +4640,14 @@
         "scope": "animation",
         "result": "issues",
         "notes": "Nio faser i nya frontvyn, reduced-motion H/V front/profil och fyra viktval granskade. Diagonalen från vald höft till motsatt axel är nu läsbar och vikten ryms. Startsidans fot vrids synligt, men i frontfas 0.75–1/Slut pekar tån in mot andra foten medan knäets böjpunkt fortfarande ligger utåt; textens knä-följer-fot framgår fortfarande inte. Befintlig E88-punkt behålls för denna del: samordna knäets synliga riktning med fotvridningen på båda sidor. Ingen dubblett. Profilen visar inte rotation i golvplanet. Textens ryggsmärtestopp, kontrollerad vridning och lättare/lägre alternativ lästa. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-08",
+        "reviewer": "codex:gpt6astra",
+        "commit": "caa3aba",
+        "scope": "animation",
+        "result": "ok",
+        "notes": "Rättning 1ca3431 verifierad i nio frontfaser och reduced-motion H/V, front/profil samt fyra vikter. Startsidans knä följer nu fotens vridning in mot rörelseriktningen i slutfaserna i stället för att ligga kvar utåt. Diagonalen till motsatt axel syns och ramen räcker. E88-punkten stängs för den synliga frontgeometrin. Profilen ensam visar inte rotationen; fysisk belastning och djuprotation ej slutbedömda. Text om ryggsmärtestopp, lugn vridning och lättare/lägre alternativ läst. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
       }
     ],
     "fixes": [
@@ -4630,9 +4668,7 @@
         "notes": "E88: frontvyn: pivotbenets knä följer nu fotvridningen. Tån pekar ut vid start och knät böjs utåt; i fas 0.75-1 och Slut pekar tån mot andra foten och knät ligger på insidan av höft-fotlinjen (turnedKnee i frontViews.tsx, båda sidor via spegling). Diagonalen höft till motsatt axel och ramen är oförändrade. Knät passerar linjen kring fas 0.5 (underbenet kortas då i frontprojektionen, ny baslinjerad drift woodchop|front|drift:kR-aR 9.2). Sedd H och V fas 0, 0.5, 0.75, 1."
       }
     ],
-    "openIssues": [
-      "[strong] E88, profilrutorna 0–1 och reduced-motion Slut H/V: axlar/händer och startbenets knä/fot visar inte den beskrivna diagonalen till motsatt axel eller medvridningen i golvplanet. Hällyftet ensamt gör inte rotationen läsbar. Lägg till en front-/snedvy eller annan tydlig geometri där höft-till-motsatt-axel-banan och knäets/fotens gemensamma medvridning kan verifieras."
-    ],
+    "openIssues": [],
     "fingerprint": "a8fda1653962",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT, INTE DUBLETT. Jämför: russian-twist. Stående diagonal med fotmedvridning tillför ett eget mönster. Öppet vy-/rotationsfel motiverar rättning eller separat pausbeslut, inte påståendet att Russian twist är samma övning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
