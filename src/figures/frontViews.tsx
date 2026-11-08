@@ -275,6 +275,27 @@ function mirrorPose(pose: Pose): Pose {
  * while the heel rises, with the knee following. The left foot stays planted. Thigh, shin and arm segments keep their lengths (IK).
  */
 export const WOODCHOP_FRONT_FIXED_FOOT_X = 118;
+
+/**
+ * Knee of a leg whose lower leg turns with the foot. `bend` is the sideways
+ * bend of the knee off the hip-ankle line: 1 = fully outward, -1 = fully
+ * inward, 0 = straight in line (the knee points at the viewer). In between the
+ * knee swings about the hip-ankle axis, so the segments shorten a little in
+ * this frontal projection, the way a turned knee foreshortens.
+ */
+function turnedKnee(hip: Pt, ankle: Pt, bend: number): Pt {
+  const dx = ankle[0] - hip[0];
+  const dy = ankle[1] - hip[1];
+  const d = Math.hypot(dx, dy);
+  const along = (FRONT_THIGH * FRONT_THIGH - 34 * 34 + d * d) / (2 * d);
+  const height = Math.sqrt(
+    Math.max(0, FRONT_THIGH * FRONT_THIGH - along * along),
+  );
+  return point(
+    hip[0] + (dx / d) * along - (dy / d) * height * bend,
+    hip[1] + (dy / d) * along + (dx / d) * height * bend,
+  );
+}
 function woodchopFrontPose(t: number): Pose {
   const s = smooth(t);
   const hip = point(mix(96, 104, s), mix(121, 117, s));
@@ -303,7 +324,9 @@ function woodchopFrontPose(t: number): Pose {
     arm.end,
     arm.mid,
     arm.end,
-    joint(hip, aR, FRONT_THIGH, 34, 1),
+    // The knee follows the foot: outward while the toe points out, over the
+    // inward-pointing toe at the finish (not outward of a toe that points in).
+    turnedKnee(hip, aR, mix(1, -0.8, s)),
     aR,
     tR,
     joint(hip, aL, FRONT_THIGH, 34, -1),
