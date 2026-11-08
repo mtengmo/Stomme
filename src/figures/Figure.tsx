@@ -298,6 +298,19 @@ const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;
  * DEV only review hook: `?phase=0..1` in the hash (for example
  * `#/ovning/quad-set?phase=0.5`) freezes the figure at that cycle phase.
  */
+/**
+ * Rotation (degrees) that lays a dumbbell's long axis along the forearm ending
+ * at the hand `at` (elbow -> hand), so the wrist stays neutral through a hammer
+ * curl. 90 is the plumb forearm (the old fixed vertical dumbbell).
+ */
+export function forearmAxisAngle(
+  p: { hR: Pt; eR: Pt; hL: Pt; eL: Pt },
+  at: Pt,
+): number {
+  const [e, h] = at === p.hL ? [p.eL, p.hL] : [p.eR, p.hR];
+  return 90 + (Math.atan2(-(h[0] - e[0]), h[1] - e[1]) * 180) / Math.PI;
+}
+
 function forcedPhase(): number | undefined {
   if (!import.meta.env.DEV || typeof window === 'undefined') return undefined;
   const raw = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get(
@@ -512,10 +525,13 @@ export function FigureFrame({
                 at={at}
                 vertical={exerciseId === 'hammer-curl'}
                 // Halo: held upside down, ball above the two-hand grip.
+                // Hammer curl: the dumbbell follows its forearm (neutral wrist).
                 angle={
                   exerciseId === 'kettlebell-halo' && heldKind === 'kettlebell'
                     ? 180
-                    : undefined
+                    : exerciseId === 'hammer-curl'
+                      ? forearmAxisAngle(p, at)
+                      : undefined
                 }
               />
             ))}
