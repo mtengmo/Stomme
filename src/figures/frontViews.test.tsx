@@ -500,16 +500,19 @@ describe('dumbbell-rdl front view, kettlebell variant', () => {
     (phase) => {
       const markup = frame('kettlebell', phase);
       expect(markup).toContain('data-grip="rdl-handle"');
-      const circles = [
-        ...markup
-          .split('data-grip="rdl-handle"')[1]
-          .matchAll(/cx="([\d.]+)" cy="([\d.]+)"/g),
-      ].slice(0, 2);
-      expect(circles).toHaveLength(2);
-      const [r, l] = circles.map((m) => [Number(m[1]), Number(m[2])]);
-      expect(r[1]).toBeCloseTo(l[1], 5);
-      expect(l[0] - r[0]).toBeLessThanOrEqual(10);
-      expect(l[0] - r[0]).toBeGreaterThan(0);
+      const xy = [
+        ...(markup.split('data-grip="rdl-handle"')[1] ?? '').matchAll(
+          /cx="([\d.]+)" cy="([\d.]+)"/g,
+        ),
+      ]
+        .slice(0, 2)
+        .map((m) => [Number(m[1]), Number(m[2])] as const);
+      expect(xy).toHaveLength(2);
+      const [rx, ry] = xy[0] ?? [0, 0];
+      const [lx, ly] = xy[1] ?? [0, 0];
+      expect(ry).toBeCloseTo(ly, 5);
+      expect(lx - rx).toBeGreaterThan(0);
+      expect(lx - rx).toBeLessThanOrEqual(10);
     },
   );
   it('leaves the dumbbell variant without a handle grip', () => {
