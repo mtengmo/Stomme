@@ -39,7 +39,7 @@ export const runningSlots: readonly RunningSlot[] = [
   },
   {
     id: 'hinge',
-    options: ['kettlebell-deadlift', 'dumbbell-rdl', 'single-leg-rdl'],
+    options: ['kettlebell-deadlift', 'single-leg-rdl'],
   },
   {
     id: 'hip-extension',
