@@ -36,7 +36,8 @@ it('offers three Löpstyrka proposals and a random draw, and adds the shown one'
   expect(
     (screen.getByRole('radio', { name: 'Stark' }) as HTMLInputElement).checked,
   ).toBe(true);
-  expect(screen.getByText(/Pogohopp är ett hopp/)).toBeTruthy();
+  // Löpstyrka and Löparens tio both carry the hop warning.
+  expect(screen.getAllByText(/Pogohopp är ett hopp/).length).toBeGreaterThan(0);
   await user.click(screen.getByRole('radio', { name: 'Grund' }));
   expect(screen.getByText(/Förslag: Grund/)).toBeTruthy();
   await user.click(screen.getByRole('button', { name: 'Slumpa nytt förslag' }));
