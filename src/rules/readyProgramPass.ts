@@ -9,8 +9,8 @@ import type {
 import { equipmentFits } from './equipment';
 
 /**
- * One programme pass from a ready-made workout, or null for an unknown id or
- * when nothing in it fits the equipment. `exerciseIds` is a copy.
+ * One programme pass from a ready-made workout, or null for an unknown id
+ * (bodyweight always fits, so a known workout is never empty). `exerciseIds` is a copy.
  *
  * Löpstyrka uses the fixed proposals: Grund for a beginner, Medel otherwise.
  * Fixed workouts are filtered by equipment and, for a beginner, lose the jump.
@@ -27,8 +27,9 @@ export function readyProgramPass(
   let ids: ExerciseId[];
   if (workout.id === 'running-strength') {
     const wanted = preferences.experience === 'new' ? 'grund' : 'medel';
-    ids =
-      proposals(preferences).find((p) => p.id === wanted)?.exerciseIds ?? [];
+    ids = proposals(preferences)
+      .filter((p) => p.id === wanted)
+      .flatMap((p) => p.exerciseIds);
   } else {
     ids = workout.exerciseIds.filter(
       (id) =>
@@ -37,7 +38,6 @@ export function readyProgramPass(
         ) && !(preferences.experience === 'new' && plyometricIds.has(id)),
     );
   }
-  if (ids.length === 0) return null;
   return {
     focus: 'lower',
     template: 'A',
