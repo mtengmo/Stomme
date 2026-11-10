@@ -228,7 +228,7 @@ test('running emphasis with one day can start from a ready workout', async ({
   const scaled = await page.addStyleTag({ content: 'html{font-size:130%}' });
   await expectNoSideScroll(page, 'plan step 130%');
   await expectNoClipping(page, 'plan step 130%');
-  await scaled.evaluate((el) => el.remove());
+  await scaled.evaluate((el) => (el as HTMLElement).remove());
   await page.getByRole('radio', { name: 'Löpstyrka' }).check();
   await next.click();
   await noNav();
