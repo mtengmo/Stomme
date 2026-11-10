@@ -2,9 +2,10 @@ import { z } from 'zod';
 import { exerciseList } from '../content/exercises';
 import { routineFocusIds } from '../content/focusPresets';
 import { programExcludedIds } from '../content/programExclusions';
+import { readyWorkouts } from '../content/readyWorkouts';
 import { isRetiredExercise } from '../content/retiredExercises';
-import { plyometricIds } from '../content/runningProposals';
-import { ballisticIds } from '../content/widePool';
+import { plyometricIds, runningSlots } from '../content/runningProposals';
+import { ballisticIds, unresolvedFigureIssueIds } from '../content/widePool';
 import type { ExerciseId, TrainingProgram } from '../domain/types';
 import { isRealDate } from '../lib/dates';
 import type { StommeDB } from './db';
@@ -13,6 +14,23 @@ const exerciseIds = exerciseList.map((e) => e.id) as [
   ExerciseId,
   ...ExerciseId[],
 ];
+
+/** A ready pass can hold a whole ready workout; a generated pass 4-6. */
+const MAX_READY_PASS_EXERCISES = 12;
+
+/** Every exercise a ready workout may hold; Löpstyrka: any option of any slot. */
+function readyAllowedIds(readyId: string): ReadonlySet<string> | null {
+  const workout = readyWorkouts.find((w) => w.id === readyId);
+  if (!workout) return null;
+  return new Set<string>(
+    workout.id === 'running-strength'
+      ? [
+          ...runningSlots.flatMap((slot) => slot.options),
+          ...workout.exerciseIds,
+        ]
+      : workout.exerciseIds,
+  );
+}
 
 /**
  * The stored programme: strict shape plus the relations between fields.
@@ -38,10 +56,17 @@ export const trainingProgramSchema = z
         z.strictObject({
           focus: z.enum(routineFocusIds as [string, ...string[]]),
           template: z.enum(['A', 'B']),
+          ready: z
+            .strictObject({
+              id: z.string().min(1).max(100),
+              name: z.string().min(1).max(100),
+            })
+            .optional(),
+          // 4-6 in a generated pass; a ready pass has its own bounds below.
           exerciseIds: z
             .array(z.enum(exerciseIds))
-            .min(4)
-            .max(6)
+            .min(1)
+            .max(MAX_READY_PASS_EXERCISES)
             .refine((ids) => new Set(ids).size === ids.length, {
               message: 'Duplicate exercise in a programme pass',
             }),
@@ -71,7 +96,40 @@ export const trainingProgramSchema = z
       !program.curated &&
       program.emphasis === 'run' &&
       (program.level === 'some' || program.level === 'regular');
-    for (const pass of program.passes) {
+    for (const [index, pass] of program.passes.entries()) {
+      if (pass.ready) {
+        // A ready pass is a copy of a ready workout. It sits outside the
+        // programme exclusions on purpose (copenhagen-hold, isometric-lunge-hold),
+        // but ballistic, retired and unresolved exercises stay out, and the
+        // jump is not for a beginner.
+        const allowed = readyAllowedIds(pass.ready.id);
+        if (!allowed)
+          ctx.addIssue({
+            code: 'custom',
+            path: ['passes', index, 'ready'],
+            message: `Unknown ready workout ${pass.ready.id}`,
+          });
+        for (const id of pass.exerciseIds)
+          if (
+            (allowed && !allowed.has(id)) ||
+            (ballisticIds.has(id) && !plyometricIds.has(id)) ||
+            unresolvedFigureIssueIds.has(id) ||
+            isRetiredExercise(id) ||
+            (plyometricIds.has(id) && program.level === 'new')
+          )
+            ctx.addIssue({
+              code: 'custom',
+              path: ['passes', index, 'exerciseIds'],
+              message: `Exercise ${id} is not allowed in ready workout ${pass.ready.id}`,
+            });
+        continue;
+      }
+      if (pass.exerciseIds.length < 4 || pass.exerciseIds.length > 6)
+        ctx.addIssue({
+          code: 'custom',
+          path: ['passes', index, 'exerciseIds'],
+          message: 'A programme pass holds 4-6 exercises',
+        });
       const plyoPass =
         plyoProgramme &&
         pass.template === 'B' &&

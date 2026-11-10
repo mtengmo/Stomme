@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { readyWorkouts } from '../content/readyWorkouts';
 import { rehabAdditionIds } from '../content/rosterSlots';
+import { readyProgramPass } from '../rules/readyProgramPass';
 import { programFixture } from '../test/programFixture';
 import { StommeDB } from './db';
 import {
@@ -265,5 +267,129 @@ describe('training programme storage', () => {
       value: { ...programFixture(), daysPerWeek: 9 },
     });
     expect(await readTrainingProgram(db)).toBeNull();
+  });
+});
+
+describe('ready passes', () => {
+  const eight = [
+    'step-down',
+    'rear-foot-split-squat',
+    'single-leg-rdl',
+    'single-leg-hip-thrust',
+    'single-leg-calf-raise',
+    'copenhagen-hold',
+    'isometric-lunge-hold',
+    'plate-pogos',
+  ];
+  const ready = (
+    exerciseIds: string[],
+    id = 'running-strength',
+    level: 'new' | 'some' | 'regular' = 'some',
+  ) =>
+    programFixture({
+      level,
+      passes: [
+        {
+          focus: 'lower',
+          template: 'A',
+          exerciseIds,
+          ready: { id, name: 'Ready' },
+        } as never,
+        programFixture().passes[1] as never,
+      ],
+    });
+  const normal = (ids: string[]) =>
+    programFixture({
+      passes: [passOf(ids), programFixture().passes[1] as never],
+    });
+
+  it('accepts a ready pass with eight exercises, including excluded holds', () => {
+    expect(isTrainingProgram(ready(eight))).toBe(true);
+  });
+  it('accepts a fixed ready workout with ten exercises', () => {
+    const ten = [
+      'rear-foot-split-squat',
+      'kettlebell-goblet-squat',
+      'plate-pogos',
+      'single-leg-rdl',
+      'single-leg-calf-raise',
+      'walking-lunge',
+      'single-leg-hip-thrust',
+      'wall-tibialis-raise',
+      'isometric-lunge-hold',
+      'copenhagen-hold',
+    ];
+    expect(isTrainingProgram(ready(ten, 'runner-ten'))).toBe(true);
+  });
+  it('rejects an unknown ready id', () => {
+    expect(isTrainingProgram(ready(eight, 'nope'))).toBe(false);
+  });
+  it('rejects ids outside the workout', () => {
+    expect(
+      isTrainingProgram(
+        ready(['glute-bridge', 'plank', 'dead-bug', 'wall-sit'], 'runner-home'),
+      ),
+    ).toBe(false);
+  });
+  it('rejects the jump at level new but accepts it otherwise', () => {
+    expect(isTrainingProgram(ready(eight, 'running-strength', 'new'))).toBe(
+      false,
+    );
+    expect(isTrainingProgram(ready(eight, 'running-strength', 'regular'))).toBe(
+      true,
+    );
+  });
+  it('rejects more than twelve exercises', () => {
+    const many = [
+      ...eight,
+      'step-up',
+      'split-squat',
+      'dead-bug',
+      'bird-dog',
+      'side-plank',
+    ];
+    expect(isTrainingProgram(ready(many))).toBe(false);
+  });
+  it('still caps a normal pass at six and keeps excluded exercises out', () => {
+    expect(
+      isTrainingProgram(
+        normal([
+          'plank',
+          'dead-bug',
+          'glute-bridge',
+          'wall-sit',
+          'bird-dog',
+          'side-plank',
+          'calf-raise',
+        ]),
+      ),
+    ).toBe(false);
+    expect(
+      isTrainingProgram(
+        normal(['copenhagen-hold', 'plank', 'dead-bug', 'glute-bridge']),
+      ),
+    ).toBe(false);
+  });
+  it('parses an old programme without the field', () => {
+    expect(isTrainingProgram(programFixture())).toBe(true);
+  });
+  it('accepts what readyProgramPass builds for every workout and level', () => {
+    for (const w of readyWorkouts)
+      for (const experience of ['new', 'some', 'regular'] as const) {
+        const pass = readyProgramPass(w.id, {
+          programId: 'general',
+          experience,
+          equipment: ['bodyweight', 'chair', 'support', 'step', 'bench'],
+        });
+        expect(pass).not.toBeNull();
+        expect(
+          isTrainingProgram(
+            programFixture({
+              level: experience,
+              passes: [pass as never, programFixture().passes[1] as never],
+            }),
+          ),
+        ).toBe(true);
+      }
   });
 });

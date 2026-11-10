@@ -13,6 +13,7 @@ import {
   programFocusPlan,
   weekdaysFor,
 } from './programPlan';
+import { readyProgramPass } from './readyProgramPass';
 import { adjacent, overlaps } from './weekSuggestion';
 
 const emphases: ProgramEmphasis[] = ['full', 'run', 'upper'];
@@ -221,5 +222,30 @@ describe('buildProgram', () => {
         make({ pool: pool(['dead-bug', 'push-up', 'supported-row']) }),
       ).toBeNull();
     });
+  });
+});
+
+describe('buildProgram with a ready pass', () => {
+  const readyPass = readyProgramPass('running-strength', home) as NonNullable<
+    ReturnType<typeof readyProgramPass>
+  >;
+  it('is only the ready pass for one day', () => {
+    const p = make({ daysPerWeek: 1, ready: readyPass });
+    expect(p?.passes).toEqual([readyPass]);
+    expect(p?.passes[0]?.exerciseIds).not.toContain('knee-push-up');
+  });
+  it('keeps the ready pass as pass 1 for 2-5 days', () => {
+    for (const d of [2, 3, 4, 5] as const) {
+      const p = make({ daysPerWeek: d, ready: readyPass });
+      expect(p?.passes).toHaveLength(d);
+      expect(p?.passes[0]).toEqual(readyPass);
+      expect(p?.passes[1]?.ready).toBeUndefined();
+    }
+  });
+  it('keeps it in the fallback rows', () => {
+    const p = pool(['back-extension', 'plank', 'side-plank', 'wall-push-up']);
+    const built = make({ pool: p, ready: readyPass });
+    expect(built?.passes[0]).toEqual(readyPass);
+    expect(shape(built)).toBe('lowerA fullB');
   });
 });
