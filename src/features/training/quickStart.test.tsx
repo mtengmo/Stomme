@@ -472,6 +472,9 @@ it('opens the days step for an existing user and remakes the programme, keeping 
   await next(user);
   await user.click(radio('Ben & bål för löpning'));
   await next(user);
+  await screen.findByRole('heading', { name: 'Hur vill du lägga upp passen?' });
+  expect(screen.getByText('Steg 3 av 4')).toBeTruthy();
+  await next(user);
   // The level step starts on the saved level.
   await screen.findByRole('heading', {
     name: 'Hur van är du vid styrketräning?',
@@ -531,4 +534,108 @@ it('does not open the programme change for rehab', async () => {
   render(<App />);
   await screen.findByRole('link', { name: 'Visa nästa pass' });
   expect(window.location.hash).toBe('#/');
+});
+
+/** Goal -> 1 day -> running emphasis, stopping on the plan step. */
+async function toPlan(user: User) {
+  await user.click(await screen.findByRole('button', { name: 'Bli starkare' }));
+  await user.click(radio('1 dag'));
+  await next(user);
+  await user.click(radio('Ben & bål för löpning'));
+  await next(user);
+  await screen.findByRole('heading', { name: 'Hur vill du lägga upp passen?' });
+}
+
+it('offers the plan step only for running emphasis, with automatic as default', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await toPlan(user);
+  expect(screen.getByText('Steg 4 av 6')).toBeTruthy();
+  expect(screen.queryByRole('navigation', { name: 'Huvudmeny' })).toBeNull();
+  expect(radio('Automatiskt program').checked).toBe(true);
+  expect(screen.getAllByRole('radio')).toHaveLength(4);
+  for (const name of ['Löpstyrka', 'Löparens tio', 'Hemmapass för löpare'])
+    expect(radio(name).checked).toBe(false);
+  // Back keeps the emphasis, forward keeps the plan.
+  await user.click(radio('Löpstyrka'));
+  await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
+  expect(radio('Ben & bål för löpning').checked).toBe(true);
+  await next(user);
+  expect(radio('Löpstyrka').checked).toBe(true);
+  // Another emphasis drops the step.
+  await user.click(screen.getByRole('button', { name: 'Tillbaka' }));
+  await user.click(radio('Hela kroppen'));
+  await next(user);
+  expect(
+    screen.getByRole('heading', { name: 'Vad tränar du med?' }),
+  ).toBeTruthy();
+  expect(screen.getByText('Steg 4 av 5')).toBeTruthy();
+});
+
+it('saves a ready workout as the only pass of a one day programme', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await toPlan(user);
+  await user.click(radio('Löpstyrka'));
+  await next(user);
+  await next(user);
+  await user.click(screen.getByRole('button', { name: 'Visa mitt program' }));
+  await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
+  expect(window.location.hash).toBe('#/program?ny=1');
+  const program = (await getDb().meta.get('trainingProgram'))?.value as {
+    emphasis: string;
+    passes: { ready?: { id: string; name: string } }[];
+  };
+  expect(program.emphasis).toBe('run');
+  expect(program.passes).toHaveLength(1);
+  expect(program.passes[0]?.ready).toEqual({
+    id: 'running-strength',
+    name: 'Löpstyrka',
+  });
+  expect(
+    screen.getByRole('region', { name: 'Nästa pass: Pass 1, Löpstyrka' }),
+  ).toBeTruthy();
+  expect(screen.queryByText('Armhävning på knä')).toBeNull();
+});
+
+it('keeps the generated programme with the automatic plan', async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await toPlan(user);
+  await next(user);
+  await next(user);
+  await user.click(screen.getByRole('button', { name: 'Visa mitt program' }));
+  await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
+  const program = (await getDb().meta.get('trainingProgram'))?.value as {
+    passes: { ready?: unknown }[];
+  };
+  expect(program.passes.every((pass) => pass.ready === undefined)).toBe(true);
+});
+
+it('offers the plan step when changing the planning and saves the ready pass', async () => {
+  const { seedProgram } = await import('../program/programFixtures');
+  await seedProgram(3);
+  window.location.hash = '#/kom-igang?steg=days';
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Hur många dagar i veckan?' });
+  expect(screen.getByText('Steg 1 av 3')).toBeTruthy();
+  await next(user);
+  await user.click(radio('Ben & bål för löpning'));
+  await next(user);
+  await screen.findByRole('heading', { name: 'Hur vill du lägga upp passen?' });
+  expect(screen.getByText('Steg 3 av 4')).toBeTruthy();
+  await user.click(radio('Löparens tio'));
+  await next(user);
+  await user.click(screen.getByRole('button', { name: 'Gör om programmet' }));
+  await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
+  expect(window.location.hash).toBe('#/program?ny=1');
+  const program = (await getDb().meta.get('trainingProgram'))?.value as {
+    daysPerWeek: number;
+    passes: { ready?: { id: string } }[];
+  };
+  expect(program.daysPerWeek).toBe(3);
+  expect(program.passes).toHaveLength(3);
+  expect(program.passes[0]?.ready?.id).toBe('runner-ten');
+  expect(program.passes[1]?.ready).toBeUndefined();
 });

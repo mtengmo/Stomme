@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { exercises } from '../../content/exercises';
-import { focusLabel } from '../../content/focusPresets';
 import { programExcludedIds } from '../../content/programExclusions';
 import { trainingName } from '../../content/programmes';
 import { getDb } from '../../db/db';
@@ -33,6 +32,7 @@ import { ProgramWeekStrip } from './ProgramWeekStrip';
 import {
   cardExercises,
   MIN_USABLE_EXERCISES,
+  passFocusLabel,
   passMinutes,
   passPlan,
   programDays,
@@ -326,7 +326,7 @@ export function ProgramHome({
           <PassCard
             variant="lead"
             passNumber={progress.nextPass}
-            focusLabel={focusLabel(nextPass.focus)}
+            focusLabel={passFocusLabel(nextPass)}
             minutes={passMinutes(plan)}
             exercises={cardExercises(plan)}
             dayLabel={dayLabel}
@@ -354,7 +354,7 @@ export function ProgramHome({
         <PassCard
           variant="receding"
           passNumber={afterIndex + 1}
-          focusLabel={focusLabel(afterPass.focus)}
+          focusLabel={passFocusLabel(afterPass)}
           minutes={passMinutes(afterPlan)}
           exercises={cardExercises(afterPlan)}
           dayLabel={weekdayAbbr(program.weekdays[afterIndex] ?? 1)}

@@ -5,7 +5,8 @@ import { afterEach, beforeEach, expect, it } from 'vitest';
 import { App } from '../../App';
 import { getDb } from '../../db/db';
 import { setMeta } from '../../db/repo';
-import { programSession, seedProgram } from './programFixtures';
+import { readyProgramPass } from '../../rules/readyProgramPass';
+import { programPrefs, programSession, seedProgram } from './programFixtures';
 
 beforeEach(async () => {
   window.localStorage.clear();
@@ -40,6 +41,20 @@ it('shows the new programme with pass 1 as lead and the rest receding', async ()
     screen.getByText('Samma pass varje vecka, så ser du att du blir starkare.'),
   ).toBeTruthy();
   expect(screen.getAllByTestId('exercise-thumb').length).toBeGreaterThan(3);
+});
+
+it('names the ready workout instead of the focus on its pass', async () => {
+  const ready = readyProgramPass('running-strength', programPrefs);
+  if (!ready) throw new Error('ready pass missing');
+  await seedProgram(3, programPrefs, ready);
+  render(<App />);
+  await screen.findByRole('heading', { level: 1, name: 'Ditt program' });
+  expect(
+    screen.getByRole('region', { name: 'Nästa pass: Pass 1, Löpstyrka' }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole('region', { name: /^Därefter: Pass 2, / }),
+  ).toBeTruthy();
 });
 
 it('has no warnings, no "Saknas" and no E-codes', async () => {

@@ -1,6 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { exercises } from '../../content/exercises';
-import { focusLabel } from '../../content/focusPresets';
 import { experienceLabels } from '../../content/programmes';
 import { isCuratedLevel, programPool } from '../../content/widePool';
 import { getDb } from '../../db/db';
@@ -13,6 +12,7 @@ import { Button } from '../../ui/Button';
 import { ChoiceCard } from '../../ui/ChoiceCard';
 import { levelHints } from '../training/quickStartModel';
 import { ExerciseThumb } from './ExerciseThumb';
+import { passFocusLabel } from './programView';
 
 /** A full-screen confirmation: the safe choice first, the action as the heavier button. */
 export function Confirm({
@@ -115,7 +115,7 @@ function PassPreview({ program }: { program: TrainingProgram }) {
         // biome-ignore lint/suspicious/noArrayIndexKey: passes are a fixed-order list; focus can repeat
         <section key={index} aria-labelledby={`redo-pass-${index}`}>
           <h3 id={`redo-pass-${index}`} className="m-0 mb-1 text-xl font-bold">
-            Pass {index + 1} · {focusLabel(pass.focus)}
+            Pass {index + 1} · {passFocusLabel(pass)}
           </h3>
           <ul className="m-0 list-none p-0">
             {pass.exerciseIds.map((id) => (

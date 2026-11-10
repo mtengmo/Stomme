@@ -23,6 +23,47 @@ describe('quick start model', () => {
       expect(stepsFor(goal)).toEqual(['goal', 'rehab', 'equipment']);
   });
 
+  it('adds the plan step after emphasis only for running emphasis', () => {
+    expect(stepsFor('general', { weightKinds: [], emphasis: 'run' })).toEqual([
+      'goal',
+      'days',
+      'emphasis',
+      'plan',
+      'equipment',
+      'level',
+    ]);
+    for (const emphasis of ['full', 'upper'] as const)
+      expect(stepsFor('general', { weightKinds: [], emphasis })).not.toContain(
+        'plan',
+      );
+    expect(
+      stepsFor('general', { weightKinds: ['dumbbell'], emphasis: 'run' }),
+    ).toEqual([
+      'goal',
+      'days',
+      'emphasis',
+      'plan',
+      'equipment',
+      'weights',
+      'level',
+    ]);
+    expect(
+      stepsFor('build', { weightKinds: [], emphasis: 'run' }),
+    ).not.toContain('plan');
+  });
+
+  it('reads the plan of a draft and falls back to automatic', () => {
+    const read = (value: Record<string, unknown>) =>
+      readDraft(JSON.stringify({ goal: 'general', emphasis: 'run', ...value }));
+    expect(read({}).plan).toBe('auto');
+    expect(read({ plan: 'runner-ten' }).plan).toBe('runner-ten');
+    expect(read({ plan: 'nope' }).plan).toBe('auto');
+    expect(read({ plan: 7 }).plan).toBe('auto');
+    expect(read({ step: 'plan' }).step).toBe('plan');
+    // Without running emphasis the plan step does not exist.
+    expect(read({ emphasis: 'full', step: 'plan' }).step).toBe('equipment');
+  });
+
   it('adds the weights step only when dumbbells or kettlebells are ticked', () => {
     expect(stepsFor('general', { weightKinds: ['dumbbell'] })).toEqual([
       'goal',

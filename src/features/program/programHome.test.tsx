@@ -17,6 +17,7 @@ import { readTrainingProgram, saveTrainingProgram } from '../../db/program';
 import { setMeta } from '../../db/repo';
 import { toLocalDate } from '../../lib/dates';
 import { buildProgram } from '../../rules/programPlan';
+import { readyProgramPass } from '../../rules/readyProgramPass';
 import { programPrefs, programSession, seedProgram } from './programFixtures';
 
 beforeEach(async () => {
@@ -67,6 +68,18 @@ it('shows week 1, pass 1 and the start button on a fresh programme', async () =>
   expect(screen.queryByText('Bläddra bland övningar')).toBeNull();
   // No exercise carries an E-code.
   expect(document.body.textContent).not.toMatch(/\bE\d{2}\b/);
+});
+
+it('shows the ready workout name on the next pass', async () => {
+  const ready = readyProgramPass('runner-ten', programPrefs);
+  if (!ready) throw new Error('ready pass missing');
+  await seedProgram(1, programPrefs, ready);
+  render(<App />);
+  expect(
+    await screen.findByRole('region', {
+      name: /^Nästa pass: Pass 1, Löparens tio/,
+    }),
+  ).toBeTruthy();
 });
 
 it('hides Mina pass while no workout is saved and shows it when there is one', async () => {

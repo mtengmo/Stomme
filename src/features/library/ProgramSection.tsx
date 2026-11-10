@@ -1,8 +1,8 @@
 import { Link } from 'wouter';
 import { exercises } from '../../content/exercises';
-import { type FocusId, focusLabel } from '../../content/focusPresets';
 import type { TrainingProgram } from '../../domain/types';
 import { ExerciseThumb } from '../program/ExerciseThumb';
+import { passFocusLabel } from '../program/programView';
 
 /** "Ditt program": the exercises of the active programme, grouped per pass. */
 export function ProgramSection({ program }: { program: TrainingProgram }) {
@@ -15,7 +15,7 @@ export function ProgramSection({ program }: { program: TrainingProgram }) {
         // biome-ignore lint/suspicious/noArrayIndexKey: passes are a fixed-order list; template and focus can repeat
         <div key={index}>
           <h3 className="m-0 mb-1 text-xl font-bold">
-            Pass {index + 1} · {focusLabel(pass.focus as FocusId)}
+            Pass {index + 1} · {passFocusLabel(pass)}
           </h3>
           <ul className="m-0 list-none p-0">
             {pass.exerciseIds.map((id) => (
