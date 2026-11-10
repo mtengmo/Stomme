@@ -144,6 +144,8 @@ export interface BuildProgramInput {
   curated?: boolean;
   /** Variation seed (uint32). Absent: the first candidate of every slot. */
   seed?: number;
+  /** A ready-made pass (rules/readyProgramPass.ts); it replaces pass 1 in every row. */
+  ready?: ProgramPass;
 }
 
 /**
@@ -173,7 +175,14 @@ export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
     wholeBodyRow(daysPerWeek),
   ];
   for (const row of rows) {
-    const passes = rosterRow(row, preferences, context);
+    // A ready pass is pass 1; only the rest of the row is generated.
+    const generated = rosterRow(
+      input.ready ? row.slice(1) : row,
+      preferences,
+      context,
+    );
+    const passes =
+      generated && input.ready ? [input.ready, ...generated] : generated;
     if (passes)
       return {
         id: input.id,

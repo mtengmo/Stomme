@@ -56,7 +56,7 @@ async function seeded() {
 
 describe('backup of the physiotherapist knee programme', () => {
   it('uses schema version 5', () => {
-    expect(BACKUP_SCHEMA_VERSION).toBe(6);
+    expect(BACKUP_SCHEMA_VERSION).toBe(7);
   });
 
   it('rejects an in-progress rehab session with sets but no check-in before', async () => {

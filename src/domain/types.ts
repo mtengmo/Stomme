@@ -344,8 +344,13 @@ export interface ProgramPass {
   focus: RoutineFocus;
   /** The A/B variant used when the pass was generated. */
   template: TemplateId;
-  /** 4-6 unique exercises, fixed during the block. */
+  /** 4-6 unique exercises, fixed during the block (up to 12 in a ready pass). */
   exerciseIds: ExerciseId[];
+  /**
+   * Set when the pass is a ready-made workout (content/readyWorkouts.ts).
+   * `exerciseIds` is then a copy of the workout's list, not a reference.
+   */
+  ready?: { id: string; name: string };
 }
 export interface TrainingProgram {
   /** uuid; sessions point here. */

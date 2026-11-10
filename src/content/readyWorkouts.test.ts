@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { maxWorkoutExercises } from '../db/customWorkouts';
+import { readAuditLog } from './exerciseAudit';
 import { exercises } from './exercises';
 import { readyWorkouts } from './readyWorkouts';
 import { isRetiredExercise } from './retiredExercises';
+import { plyometricIds, runningSlots } from './runningProposals';
+import { ballisticIds, unresolvedFigureIssueIds } from './widePool';
 
 describe('ready-made workouts', () => {
   it('have unique ids and names, and Löpstyrka stays first', () => {
@@ -60,5 +63,32 @@ describe('ready-made workouts', () => {
       'split-squat',
     ]);
     expect(workout?.caution).toContain('Närmaste övningar');
+  });
+});
+
+/**
+ * Ready workouts sit outside the beginner set and the wide pool on purpose
+ * (copenhagen-hold and isometric-lunge-hold are programme-excluded). They
+ * still need clean figures.
+ */
+describe('ready workouts as programme passes', () => {
+  const needsFix = new Set(
+    readAuditLog()
+      .filter((e) => e.status === 'needs-fix')
+      .map((e) => e.id),
+  );
+  const all = new Set([
+    ...readyWorkouts.flatMap((w) => w.exerciseIds),
+    ...runningSlots.flatMap((s) => s.options),
+  ]);
+
+  it('holds no needs-fix, unresolved, retired or ballistic exercise', () => {
+    for (const id of all) {
+      expect(needsFix.has(id), id).toBe(false);
+      expect(unresolvedFigureIssueIds.has(id), id).toBe(false);
+      expect(isRetiredExercise(id), id).toBe(false);
+      // plate-pogos is the one allowed jump; level new drops it elsewhere.
+      if (!plyometricIds.has(id)) expect(ballisticIds.has(id), id).toBe(false);
+    }
   });
 });

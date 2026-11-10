@@ -59,7 +59,7 @@ describe('backup schema v5: training programme', () => {
   it('writes version 5 and round trips the programme and programPass', async () => {
     const backup = await seeded();
     expect(backup.schemaVersion).toBe(BACKUP_SCHEMA_VERSION);
-    expect(BACKUP_SCHEMA_VERSION).toBe(6);
+    expect(BACKUP_SCHEMA_VERSION).toBe(7);
     const parsed = parseBackup(text(backup));
     expect(parsed.meta.find((m) => m.key === 'trainingProgram')?.value).toEqual(
       programFixture(),
@@ -199,5 +199,37 @@ describe('backup schema v5: training programme', () => {
     expect(await mutate((s) => (s.programPass.extra = 1))).toThrow();
     expect(await mutate((s) => (s.programId = 'rehab'))).toThrow();
     expect(await mutate((s) => (s.customWorkoutId = 'one'))).toThrow();
+  });
+});
+
+describe('backup schema v7: ready pass', () => {
+  it('round trips a ready pass and still imports version 6', async () => {
+    const program = programFixture({
+      level: 'some',
+      passes: [
+        {
+          focus: 'lower',
+          template: 'A',
+          exerciseIds: [
+            'step-down',
+            'single-leg-rdl',
+            'copenhagen-hold',
+            'plate-pogos',
+          ],
+          ready: { id: 'running-strength', name: 'Ready' },
+        },
+        programFixture().passes[1] as never,
+      ],
+    });
+    await db.meta.clear();
+    await saveTrainingProgram(db, program);
+    const backup = JSON.parse(serializeBackup(await exportAll(db)));
+    expect(backup.schemaVersion).toBe(7);
+    expect(
+      parseBackup(text(backup)).meta.find((m) => m.key === 'trainingProgram')
+        ?.value,
+    ).toEqual(program);
+    backup.schemaVersion = 6;
+    expect(parseBackup(text(backup)).schemaVersion).toBe(6);
   });
 });

@@ -96,6 +96,8 @@ export function rebuildProgram(
     now: new Date().toISOString(),
     id,
     block: program.block,
+    // A ready pass is kept as it is; only the generated passes are reshuffled.
+    ...(program.passes[0]?.ready ? { ready: program.passes[0] } : {}),
     pool: programPool(level, program.emphasis),
     curated: isCuratedLevel(level),
     ...(seed !== undefined ? { seed } : {}),
