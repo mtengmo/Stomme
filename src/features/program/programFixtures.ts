@@ -2,7 +2,11 @@ import { beginnerExerciseIds } from '../../content/beginnerSet';
 import { getDb } from '../../db/db';
 import { saveTrainingProgram } from '../../db/program';
 import { createSession, setMeta } from '../../db/repo';
-import type { TrainingPreferences, TrainingProgram } from '../../domain/types';
+import type {
+  ProgramPass,
+  TrainingPreferences,
+  TrainingProgram,
+} from '../../domain/types';
 import { toLocalDate } from '../../lib/dates';
 import { buildProgram } from '../../rules/programPlan';
 
@@ -16,6 +20,7 @@ export const programPrefs: TrainingPreferences = {
 export async function seedProgram(
   days: 1 | 2 | 3 | 4 | 5 = 3,
   prefs: TrainingPreferences = programPrefs,
+  ready?: ProgramPass,
 ): Promise<TrainingProgram> {
   const program = buildProgram({
     preferences: prefs,
@@ -25,6 +30,7 @@ export async function seedProgram(
     now: new Date().toISOString(),
     id: 'prog-1',
     pool: beginnerExerciseIds,
+    ...(ready ? { ready } : {}),
   });
   if (!program) throw new Error('fixture programme failed');
   await setMeta(getDb(), 'training', prefs);

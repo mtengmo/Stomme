@@ -196,3 +196,52 @@ test.describe('week tick', () => {
       );
     });
 });
+
+test('running emphasis with one day can start from a ready workout', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Jag förstår/ }).click();
+  const mainNav = page.getByRole('navigation', { name: 'Huvudmeny' });
+  const next = page.getByRole('button', { name: 'Nästa', exact: true });
+  let hidden = 0;
+  const noNav = async () => {
+    await expect(mainNav).toHaveCount(0);
+    hidden += 1;
+  };
+  await noNav();
+  await page.getByRole('button', { name: 'Bli starkare', exact: true }).click();
+  await noNav();
+  await page.getByRole('radio', { name: '1 dag' }).check();
+  await next.click();
+  await noNav();
+  await page.getByRole('radio', { name: 'Ben & bål för löpning' }).check();
+  await next.click();
+  await expect(
+    page.getByRole('heading', { name: 'Hur vill du lägga upp passen?' }),
+  ).toBeVisible();
+  await noNav();
+  await expectNoSideScroll(page, 'plan step');
+  await expectNoClipping(page, 'plan step');
+  const scaled = await page.addStyleTag({ content: 'html{font-size:130%}' });
+  await expectNoSideScroll(page, 'plan step 130%');
+  await expectNoClipping(page, 'plan step 130%');
+  await scaled.evaluate((el) => el.remove());
+  await page.getByRole('radio', { name: 'Löpstyrka' }).check();
+  await next.click();
+  await noNav();
+  await next.click();
+  await noNav();
+  await page.getByRole('radio', { name: /Ny eller på väg tillbaka/ }).check();
+  await page.getByRole('button', { name: 'Visa mitt program' }).click();
+  await expect(page).toHaveURL(/#\/program(?:\?|$)/);
+  // Goal, days, emphasis, plan, equipment and level.
+  expect(hidden).toBe(6);
+  await expect(
+    page.getByRole('region', { name: 'Nästa pass: Pass 1, Löpstyrka' }),
+  ).toBeVisible();
+  await expect(page.getByText('Armhävning på knä')).toHaveCount(0);
+  await expectNoSideScroll(page, 'reveal');
+});

@@ -146,6 +146,8 @@ function PreviewEditor({
     pass: number;
     week: number;
     exerciseIds: readonly ExerciseId[];
+    /** Name of the ready workout the pass came from, shown instead of the focus. */
+    readyName?: string;
   };
   preferences: TrainingPreferences;
   homePreferences?: TrainingPreferences;
@@ -548,7 +550,7 @@ function PreviewEditor({
         <h1 className="m-0 break-words text-5xl font-extrabold">
           {customWorkout?.name ??
             (programPass
-              ? `Pass ${programPass.pass} · ${focusLabel(focus.id)}`
+              ? `Pass ${programPass.pass} · ${programPass.readyName ?? focusLabel(focus.id)}`
               : preferences.programId === 'rehab'
                 ? 'Mitt rehabpass'
                 : focus.id === 'full'
@@ -1825,6 +1827,7 @@ export function TrainingPreview({ id }: { id: string }) {
           pass: request.pass,
           week: request.week,
           exerciseIds: passSpec.exerciseIds,
+          ...(passSpec.ready ? { readyName: passSpec.ready.name } : {}),
         }
       : undefined;
   const focus: WorkoutFocus = passSpec

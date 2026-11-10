@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { experienceLabels } from '../../content/programmes';
+import { readyWorkouts } from '../../content/readyWorkouts';
 import { isCuratedLevel, programPool } from '../../content/widePool';
 import { saveStartWithCustomWorkout } from '../../db/customWorkouts';
 import { getDb } from '../../db/db';
@@ -17,6 +18,7 @@ import type {
 import { toLocalDate } from '../../lib/dates';
 import { randomSeed } from '../../lib/seed';
 import { buildProgram } from '../../rules/programPlan';
+import { readyProgramPass } from '../../rules/readyProgramPass';
 import { Button } from '../../ui/Button';
 import { ChoiceCard } from '../../ui/ChoiceCard';
 import { linkClass } from '../../ui/link';
@@ -79,6 +81,7 @@ const headings: Record<Step, string> = {
   rehab: 'Vilket knäprogram följer du?',
   days: 'Hur många dagar i veckan?',
   emphasis: 'Vad vill du få ut mest av?',
+  plan: 'Hur vill du lägga upp passen?',
   equipment: 'Vad tränar du med?',
   weights: 'Vilka vikter har du?',
   level: 'Hur van är du vid styrketräning?',
@@ -135,6 +138,12 @@ function StepCard({
   );
 }
 
+/** The summaries of the ready workouts end with a how-to-use sentence that does not apply here. */
+function firstSentence(text: string): string {
+  const end = text.indexOf('. ');
+  return end === -1 ? text : text.slice(0, end + 1);
+}
+
 /** What "Gör om programmet" starts from: the saved preferences and programme. */
 export interface RedoStart {
   preferences: TrainingPreferences;
@@ -165,6 +174,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
     side,
     days,
     emphasis,
+    plan,
     weightKinds,
   } = draft;
   const update = (patch: Partial<Draft>) =>
@@ -193,7 +203,12 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
   }, [step]);
 
   const steps: Step[] = redo
-    ? ['days', 'emphasis', 'level']
+    ? [
+        'days',
+        'emphasis',
+        ...(emphasis === 'run' ? (['plan'] as const) : []),
+        'level',
+      ]
     : stepsFor(goal, draft);
   const position = Math.max(0, steps.indexOf(step));
   const last = position === steps.length - 1;
@@ -235,6 +250,13 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
     </label>
   );
 
+  /** The ready workout chosen on the plan step, only while the emphasis is running. */
+  function chosenReady(preferences: TrainingPreferences) {
+    return emphasis === 'run' && plan !== 'auto'
+      ? readyProgramPass(plan, preferences)
+      : null;
+  }
+
   async function save() {
     if (hasTools && !adjustableValid) {
       setError('Kontrollera de justerbara vikterna innan du fortsätter.');
@@ -246,6 +268,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
       if (redo) {
         // A new programme is a new variation: always a fresh seed.
         const preferences = { ...redo.preferences, experience };
+        const ready = chosenReady(preferences);
         const next = buildProgram({
           preferences,
           daysPerWeek: days,
@@ -254,6 +277,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
           now: new Date().toISOString(),
           id: crypto.randomUUID(),
           block: redo.program?.block ?? 1,
+          ...(ready ? { ready } : {}),
           pool: programPool(experience, emphasis),
           curated: isCuratedLevel(experience),
           seed: randomSeed(),
@@ -269,10 +293,12 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
       }
       const preferences = preferencesFromDraft(draft);
       // Strength users get a four-week programme saved with their answers, in one transaction.
+      const ready = chosenReady(preferences);
       const program =
         goal === 'general'
           ? buildProgram({
               preferences,
+              ...(ready ? { ready } : {}),
               daysPerWeek: days,
               emphasis,
               startDate: toLocalDate(new Date()),
@@ -299,6 +325,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
   }
 
   const draftPrefs = useMemo(() => preferencesFromDraft(draft), [draft]);
+  const planPrefs = redo ? { ...redo.preferences, experience } : draftPrefs;
   async function createPass(ids: ExerciseId[]) {
     const id = await saveStartWithCustomWorkout(
       draftPrefs,
@@ -487,6 +514,47 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
                   update({ emphasis: 'full' });
                 }}
               />
+            </fieldset>
+          ) : null}
+          {step === 'plan' ? (
+            <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
+              <legend className="sr-only">Upplägg</legend>
+              <ChoiceCard
+                type="radio"
+                name="plan"
+                value="auto"
+                label="Automatiskt program"
+                hint="Vi bygger alla pass åt dig."
+                checked={plan === 'auto'}
+                onChange={() => update({ plan: 'auto' })}
+              />
+              {readyWorkouts.map((workout) => {
+                const count =
+                  readyProgramPass(workout.id, planPrefs)?.exerciseIds.length ??
+                  workout.exerciseIds.length;
+                return (
+                  <ChoiceCard
+                    key={workout.id}
+                    type="radio"
+                    name="plan"
+                    value={workout.id}
+                    label={workout.name}
+                    hint={
+                      <>
+                        <span className="block">
+                          {firstSentence(workout.summary)}
+                        </span>
+                        <span className="block">
+                          {count} övningar. Blir ditt första pass.
+                        </span>
+                        <span className="block">{workout.caution}</span>
+                      </>
+                    }
+                    checked={plan === workout.id}
+                    onChange={() => update({ plan: workout.id })}
+                  />
+                );
+              })}
             </fieldset>
           ) : null}
           {step === 'equipment' ? (

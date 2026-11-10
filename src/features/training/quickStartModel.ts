@@ -3,6 +3,7 @@ import {
   equipmentChoices,
   isTrainingPreferences,
 } from '../../content/programmes';
+import { readyWorkouts } from '../../content/readyWorkouts';
 import type {
   AdjustableWeightItem,
   BodyRegionId,
@@ -19,6 +20,7 @@ export type Step =
   | 'rehab'
   | 'days'
   | 'emphasis'
+  | 'plan'
   | 'equipment'
   | 'weights'
   | 'level'
@@ -43,18 +45,19 @@ export const levelHints: Record<Experience, string> = {
 const goals: Goal[] = ['general', 'build', 'knee', 'physio', 'custom'];
 
 /**
- * Steps of a goal. Strength ends with days, emphasis, equipment, an optional
- * weights step (when dumbbells or kettlebells are ticked) and level.
+ * Steps of a goal. Strength ends with days, emphasis, a plan step (running
+ * emphasis only), equipment, an optional weights step (when dumbbells or kettlebells are ticked) and level.
  */
 export function stepsFor(
   goal: Goal | null,
-  draft?: Pick<Draft, 'weightKinds'>,
+  draft?: Pick<Draft, 'weightKinds'> & Partial<Pick<Draft, 'emphasis'>>,
 ): Step[] {
   if (goal === 'general')
     return [
       'goal',
       'days',
       'emphasis',
+      ...(draft?.emphasis === 'run' ? (['plan'] as const) : []),
       'equipment',
       ...(draft?.weightKinds.length ? (['weights'] as const) : []),
       'level',
@@ -93,6 +96,8 @@ export interface Draft {
   /** Training days per week (strength programme). */
   days: DaysPerWeek;
   emphasis: ProgramEmphasis;
+  /** 'auto' builds every pass; a ready-workout id makes it pass 1 (running emphasis only). */
+  plan: string;
   /** Ticked weight kinds; their weights are entered on the weights step. */
   weightKinds: WeightKind[];
   focus: Focus;
@@ -111,6 +116,7 @@ export const emptyDraft: Draft = {
   side: 'both',
   days: DEFAULT_DAYS,
   emphasis: 'full',
+  plan: 'auto',
   weightKinds: [],
   focus: 'all',
   bodyParts: [],
@@ -148,7 +154,13 @@ export function readDraft(raw: string | null): Draft {
       ? value.weightKinds.includes(kind)
       : weights.some((item) => item?.type === kind),
   );
-  const steps = stepsFor(goal, { weightKinds });
+  const emphasis = EMPHASES.find((item) => item === value.emphasis) ?? 'full';
+  const plan =
+    typeof value.plan === 'string' &&
+    readyWorkouts.some((w) => w.id === value.plan)
+      ? value.plan
+      : 'auto';
+  const steps = stepsFor(goal, { weightKinds, emphasis });
   // The rehab choice is also open before a goal is picked.
   const step =
     goal === null && value.step === 'rehab'
@@ -190,7 +202,8 @@ export function readDraft(raw: string | null): Draft {
       : [],
     side: value.side === 'right' || value.side === 'left' ? value.side : 'both',
     days: DAY_OPTIONS.find((item) => item === value.days) ?? DEFAULT_DAYS,
-    emphasis: EMPHASES.find((item) => item === value.emphasis) ?? 'full',
+    emphasis,
+    plan,
     weightKinds,
     focus: value.focus === 'select' ? 'select' : 'all',
     bodyParts,

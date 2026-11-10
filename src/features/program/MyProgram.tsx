@@ -13,6 +13,7 @@ import { canReplaceTrainingPreparation } from '../../db/training';
 import { nextTemplateId } from '../../rules/schedule';
 import { Icon } from '../../ui/Icon';
 import { ProgramRedoEnd } from './ProgramConfirm';
+import { CHANGE_PROGRAM_HREF } from './ProgramReveal';
 import { programLevel } from './programView';
 
 const rowClass =
@@ -144,6 +145,24 @@ export function MyProgram() {
         </li>
         {program ? (
           <>
+            <li>
+              {locked ? (
+                <button
+                  type="button"
+                  disabled
+                  className={`${rowClass} disabled:opacity-50`}
+                >
+                  <Row label="Ändra planeringen" />
+                </button>
+              ) : (
+                <Link href={CHANGE_PROGRAM_HREF} className={rowClass}>
+                  <Row
+                    label="Ändra planeringen"
+                    hint="Dagar, tyngdpunkt och färdigt pass"
+                  />
+                </Link>
+              )}
+            </li>
             <li>
               <button
                 type="button"

@@ -14,6 +14,8 @@ async function toProgramme(page: Page, emphasis = 'Ben & bål för löpning') {
   await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await page.getByRole('radio', { name: emphasis }).check();
   await page.getByRole('button', { name: 'Nästa', exact: true }).click();
+  if (emphasis === 'Ben & bål för löpning')
+    await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await page.getByRole('button', { name: 'Nästa', exact: true }).click();
   await page.getByRole('radio', { name: /Ny eller på väg tillbaka/ }).check();
   await page.getByRole('button', { name: 'Visa mitt program' }).click();
@@ -73,6 +75,36 @@ test('redo: pick a level, preview the passes, keep or save', async ({
     expect(home, name).toContain((name ?? '').toLowerCase());
   await page.goto('/#/mitt-program');
   await expect(page.getByText('Nivå: Viss vana')).toBeVisible();
+});
+
+test('the change flow offers the plan step and keeps the ready pass on redo', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await toProgramme(page, 'Hela kroppen');
+  await page.goto('/#/mitt-program');
+  await page.getByRole('link', { name: /^Ändra planeringen/ }).click();
+  await expect(page).toHaveURL(/kom-igang\?steg=days/);
+  const next = page.getByRole('button', { name: 'Nästa', exact: true });
+  await next.click();
+  await page.getByRole('radio', { name: 'Ben & bål för löpning' }).check();
+  await next.click();
+  await expect(
+    page.getByRole('heading', { name: 'Hur vill du lägga upp passen?' }),
+  ).toBeVisible();
+  await page.getByRole('radio', { name: 'Löparens tio' }).check();
+  await next.click();
+  await page.getByRole('button', { name: 'Gör om programmet' }).click();
+  await expect(page).toHaveURL(/#\/program\?ny=1/);
+  await expect(
+    page.getByRole('region', { name: /^Nästa pass: Pass 1, Löparens tio/ }),
+  ).toBeVisible();
+  // "Gör om programmet" later keeps the ready pass.
+  await page.goto('/#/mitt-program');
+  await page.getByRole('button', { name: /^Gör om programmet/ }).click();
+  await expect(
+    page.getByRole('heading', { name: /^Pass 1 · Löparens tio/ }),
+  ).toBeVisible();
 });
 
 const SIZES = [

@@ -337,7 +337,7 @@ const EMPHASIS_LABEL = {
 
 /**
  * Walks the one-question-per-screen first-use flow at /kom-igang.
- * General (strength): goal, days (default 2), emphasis (default whole body), equipment,
+ * General (strength): goal, days (default 2), emphasis (default whole body), plan (running only), equipment,
  * weights (only when dumbbells or kettlebells are ticked) and level. Chair and wall are
  * always included; `equipment` lists extra checkbox labels to tick, `without` labels to
  * untick (own and rehab programmes only), and `onEquipment` runs on that screen (weights).
@@ -357,6 +357,8 @@ export async function quickStart(
     level?: keyof typeof LEVEL_LABEL;
     days?: 1 | 2 | 3 | 4 | 5;
     emphasis?: keyof typeof EMPHASIS_LABEL;
+    /** Running emphasis only: the ready workout to start with (default: automatic). */
+    plan?: string;
     side?: 'both' | 'right' | 'left';
     /** 'equipment' stops after the equipment screen; false stops on the last screen. */
     finish?: boolean | 'equipment';
@@ -388,6 +390,13 @@ export async function quickStart(
         .getByRole('radio', { name: EMPHASIS_LABEL[options.emphasis] })
         .check();
     await next.click();
+    // Running emphasis adds the plan step.
+    if (options.emphasis === 'run') {
+      await page
+        .getByRole('radio', { name: options.plan ?? 'Automatiskt program' })
+        .check();
+      await next.click();
+    }
   }
   for (const label of equipment)
     await page.getByRole('checkbox', { name: label, exact: true }).check();

@@ -1,8 +1,10 @@
 import { exercises } from '../../content/exercises';
+import { focusLabel } from '../../content/focusPresets';
 import type {
   ExerciseId,
   PlannedExercise,
   ProgramEmphasis,
+  ProgramPass,
   Session,
   SetLog,
   TrainingPreferences,
@@ -21,6 +23,13 @@ export const emphasisLabels: Record<ProgramEmphasis, string> = {
   run: 'Ben & bål för löpning',
   upper: 'Mer överkropp',
 };
+
+/** What a pass is called: the ready workout's name when it is one, otherwise its focus. */
+export function passFocusLabel(
+  pass: Pick<ProgramPass, 'focus' | 'ready'>,
+): string {
+  return pass.ready?.name ?? focusLabel(pass.focus);
+}
 
 /** The level a programme was built for; older programmes follow the saved preferences. */
 export function programLevel(

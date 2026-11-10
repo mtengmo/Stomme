@@ -1,6 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Link, Redirect } from 'wouter';
-import { focusLabel } from '../../content/focusPresets';
 import {
   experienceLabels,
   isTrainingPreferences,
@@ -19,6 +18,7 @@ import { ProgramWeekStrip } from './ProgramWeekStrip';
 import {
   cardExercises,
   emphasisLabels,
+  passFocusLabel,
   passMinutes,
   passPlan,
   programDays,
@@ -107,7 +107,7 @@ export function ProgramReveal() {
         <PassCard
           variant="lead"
           passNumber={1}
-          focusLabel={focusLabel(first.pass.focus)}
+          focusLabel={passFocusLabel(first.pass)}
           minutes={passMinutes(first.plan)}
           exercises={cardExercises(first.plan)}
           dayLabel={
@@ -125,7 +125,7 @@ export function ProgramReveal() {
           key={`pass-${number}`}
           variant="receding"
           passNumber={number}
-          focusLabel={focusLabel(pass.focus)}
+          focusLabel={passFocusLabel(pass)}
           minutes={passMinutes(plan)}
           exercises={cardExercises(plan)}
           dayLabel={weekdayAbbr(program.weekdays[number - 1] ?? 1)}
