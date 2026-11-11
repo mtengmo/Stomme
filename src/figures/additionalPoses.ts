@@ -1,3 +1,4 @@
+import { pushUp } from './bodyweightPoses';
 import { farmerCarryPose, rackCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
 import type { Pt } from './lerp';
@@ -169,6 +170,38 @@ export function dumbbellPulloverPose(progress: number): Pose {
     hR: hand,
     eL: elbow,
     hL: hand,
+  };
+}
+
+/** Handle height of the dumbbells on the floor (resting hand centre). */
+const RENEGADE_HAND_Y = 172;
+const RENEGADE_ROW_TOP: P = [98, 147];
+
+/**
+ * Renegade row, side view: the straight-arm plank of pushUp(0) with both hands
+ * on dumbbell handles. The far arm (L) supports on its dumbbell; the near arm
+ * (R) rows the hand to hip height with the elbow above the back. Neck, hips and
+ * ankles are fixed; both arms keep constant limb lengths through joint().
+ */
+export function renegadeRowPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const base = pushUp(0);
+  const neck = base.neck;
+  const reach = RENEGADE_HAND_Y - neck[1];
+  // Long enough that the offset far arm is exactly straight on its handle.
+  const upper = Math.hypot(4, reach) / 2;
+  const rest: P = [neck[0], RENEGADE_HAND_Y];
+  const hand: P = [
+    rest[0] + (RENEGADE_ROW_TOP[0] - rest[0]) * t,
+    rest[1] + (RENEGADE_ROW_TOP[1] - rest[1]) * t,
+  ];
+  const farHand: P = [neck[0] + 4, RENEGADE_HAND_Y];
+  return {
+    ...base,
+    eR: joint(neck, hand, upper, upper, -1),
+    hR: hand,
+    eL: joint(neck, farHand, upper, upper, -1),
+    hL: farHand,
   };
 }
 
@@ -776,6 +809,12 @@ export const additionalFigures = {
     },
     props: [],
     held: oneBell,
+  },
+  'renegade-row': {
+    start: renegadeRowPose(0),
+    end: renegadeRowPose(1),
+    props: [],
+    held: twoDumbbells,
   },
   woodchop: {
     // Low-to-high diagonal: both hands share one grip on the single weight,

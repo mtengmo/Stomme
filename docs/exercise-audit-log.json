@@ -5117,5 +5117,25 @@
       "Ny övning från en löpstyrkevideo. Väntar på korsgranskning av Astra (codex:gpt6astra). Godkänns aldrig av byggaren. Dos 20-45 s, ej i någon roster."
     ],
     "fingerprint": "5ecba7c91027"
+  },
+  {
+    "id": "renegade-row",
+    "name": "Renegaderodd",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-11",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E107: rodd med hantlar från raka armar i plankläge, sidovy (pushUp-planka, stödarm på hantel i golvet, rodd-arm till höfthöjd med armbågen över ryggen, konstanta lemlängder, speglas för vänster). Sidovyn visar inte bäckenrotation; det sägs i texten. Utanför program via pendingReviewIds. Källa: ACE Renegade Row (öppnad och verifierad)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/human); sidovy visar inte bäckenrotation; utanför program tills godkänd"
+    ],
+    "fingerprint": "6ec36434d3dc"
   }
 ]

@@ -307,6 +307,11 @@ export const exerciseMuscles: Record<
     secondary: ['shoulders', 'glutes'],
     qualities: [],
   },
+  'renegade-row': {
+    primary: ['back', 'core'],
+    secondary: ['biceps', 'shoulders', 'triceps'],
+    qualities: [],
+  },
   'russian-twist': {
     primary: ['core'],
     secondary: ['hip-flexors'],

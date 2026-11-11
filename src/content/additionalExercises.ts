@@ -66,6 +66,7 @@ function entry(
                     'kettlebell-press',
                     'single-arm-thruster',
                     'woodchop',
+                    'renegade-row',
                     'one-arm-kettlebell-swing',
                     'kettlebell-floor-press',
                     'kettlebell-rack-carry',
@@ -294,6 +295,20 @@ export const lateAdditionalExercises: Exercise[] = [
     'Du svingar vikten med armarna eller vrider ryggen utan att vrida foten med.',
     'Gör rörelsen utan vikt eller med en lättare vikt och lägre lyft.',
     [single(2), single(4), single(4, 'kettlebell'), single(8, 'kettlebell')],
+    true,
+  ),
+  entry(
+    'renegade-row',
+    'Renegaderodd',
+    ['Rygg', 'Bål', 'Biceps'],
+    [
+      'Ställ två stabila hantlar, helst sexkantiga, axelbrett isär. Stöd dig på handtagen i plankläge med raka armar, handlederna raka över handtagen och fötterna brett isär.',
+      'Pressa stödhanden ned i golvet och dra den andra hanteln mot höften med armbågen nära kroppen. Håll höfter och axlar i nivå så att bäckenet inte roterar.',
+      'Sänk hanteln med kontroll. Gör alla repetitioner på en sida och byt sedan. Avbryt vid smärta i handled eller axel. Sidovyn kan inte visa bäckenrotation, så kontrollera den själv.',
+    ],
+    'Bäckenet roterar, höfterna sjunker eller handleden viker sig.',
+    'Gör rörelsen med knäna i golvet eller välj enarmsrodd med stöd.',
+    [pair(2), pair(4)],
     true,
   ),
 ];

@@ -388,6 +388,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Håll en lätt kettlebell i handtaget med båda händerna.',
     ],
   ],
+  'renegade-row': [
+    [
+      'dumbbell',
+      2,
+      [0, 1],
+      'Stöd dig på två stabila hantlar, helst sexkantiga, med raka handleder.',
+    ],
+  ],
   'russian-twist': [
     ['bodyweight', 1, [0], 'Håll händerna nära bröstet utan extra vikt.'],
     [
@@ -768,6 +776,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Diagonal rotation från höft till axel med vriden fot och kontrollerad bål.',
   ],
+  'renegade-row': [
+    'technical',
+    'Plankstöd på hantlar kräver att bäckenet och axlarna hålls stilla medan en arm rör sig.',
+  ],
   'russian-twist': [
     'practiced',
     'Sittande vridning kräver liten kontrollerad rörelse utan armarnas fart.',
@@ -879,6 +891,15 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
         publisher: 'American Council on Exercise',
         url: 'https://www.acefitness.org/resources/everyone/exercise-library/47/seated-medicine-ball-trunk-rotations/',
         note: 'Källan visar bålrotation med boll; woodchop med hantel eller kettlebell är en stående, diagonal variant. Appens rörelseomfång och dos är redaktionella förslag.',
+      },
+    ];
+  if (id === 'renegade-row')
+    return [
+      {
+        title: 'Renegade Row',
+        publisher: 'American Council on Exercise',
+        url: 'https://www.acefitness.org/resources/everyone/exercise-library/355/renegade-row/',
+        note: 'Källan beskriver rodd med hantlar från plankläge med armbågen nära kroppen. Appens dos och viktval är redaktionella förslag; sidovyn visar inte bäckenrotation.',
       },
     ];
   if (id === 'russian-twist')
@@ -1254,15 +1275,18 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'lateral-shuffle' ||
         id === 'knee-drive' ||
         id === 'isometric-lunge-hold' ||
-        id === 'plate-pogos'
-          ? id === 'isometric-lunge-hold' || id === 'plate-pogos'
-            ? '2026-11-05'
-            : id === 'fast-feet' ||
-                id === 'in-and-out-jump' ||
-                id === 'lateral-shuffle' ||
-                id === 'knee-drive'
-              ? '2026-11-03'
-              : '2026-11-01'
+        id === 'plate-pogos' ||
+        id === 'renegade-row'
+          ? id === 'renegade-row'
+            ? '2026-11-11'
+            : id === 'isometric-lunge-hold' || id === 'plate-pogos'
+              ? '2026-11-05'
+              : id === 'fast-feet' ||
+                  id === 'in-and-out-jump' ||
+                  id === 'lateral-shuffle' ||
+                  id === 'knee-drive'
+                ? '2026-11-03'
+                : '2026-11-01'
           : [
                 'bent-over-row',
                 'sumo-squat',
@@ -1339,6 +1363,7 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'single-arm-thruster') metadata.easierExerciseId = 'thruster';
     if (id === 'bent-over-row') metadata.easierExerciseId = 'supported-row';
     if (id === 'supported-row') metadata.harderExerciseId = 'bent-over-row';
+    if (id === 'renegade-row') metadata.easierExerciseId = 'supported-row';
     if (id === 'sumo-squat') metadata.easierExerciseId = 'goblet-squat';
     if (id === 'weighted-glute-bridge')
       metadata.easierExerciseId = 'glute-bridge';
