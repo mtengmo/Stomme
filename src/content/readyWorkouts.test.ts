@@ -53,6 +53,24 @@ describe('ready-made workouts', () => {
     expect(workout?.caution).toContain('Pogohopp');
   });
 
+  it('Snabbt helkroppspass is fixed, ordered and not a running start', () => {
+    const workout = readyWorkouts.find((w) => w.id === 'dumbbell-full-body');
+    expect(workout?.name).toBe('Snabbt helkroppspass med hantlar');
+    expect(workout?.fixed).toBe(true);
+    expect(workout?.group).toBe('full');
+    expect(workout?.runningStart).toBeUndefined();
+    expect(workout?.exerciseIds).toEqual([
+      'thruster',
+      'forward-lunge',
+      'renegade-row',
+      'push-up',
+      'weighted-sit-up',
+    ]);
+    expect(
+      readyWorkouts.filter((w) => w.runningStart).map((w) => w.id),
+    ).toEqual(['running-strength', 'runner-ten', 'runner-home']);
+  });
+
   it('Hemmapass för löpare is four bodyweight exercises and says what was substituted', () => {
     const workout = readyWorkouts.find((w) => w.id === 'runner-home');
     expect(workout?.fixed).toBe(true);

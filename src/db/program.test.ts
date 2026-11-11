@@ -324,6 +324,17 @@ describe('ready passes', () => {
   it('rejects an unknown ready id', () => {
     expect(isTrainingProgram(ready(eight, 'nope'))).toBe(false);
   });
+  it('rejects the full-body workout as a ready pass', () => {
+    expect(
+      isTrainingProgram(
+        ready(
+          ['thruster', 'forward-lunge', 'renegade-row', 'push-up'],
+          'dumbbell-full-body',
+          'regular',
+        ),
+      ),
+    ).toBe(false);
+  });
   it('rejects ids outside the workout', () => {
     expect(
       isTrainingProgram(
@@ -374,7 +385,7 @@ describe('ready passes', () => {
     expect(isTrainingProgram(programFixture())).toBe(true);
   });
   it('accepts what readyProgramPass builds for every workout and level', () => {
-    for (const w of readyWorkouts)
+    for (const w of readyWorkouts.filter((r) => r.runningStart))
       for (const experience of ['new', 'some', 'regular'] as const) {
         const pass = readyProgramPass(w.id, {
           programId: 'general',

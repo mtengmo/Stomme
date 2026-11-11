@@ -21,7 +21,7 @@ const MAX_READY_PASS_EXERCISES = 12;
 /** Every exercise a ready workout may hold; Löpstyrka: any option of any slot. */
 function readyAllowedIds(readyId: string): ReadonlySet<string> | null {
   const workout = readyWorkouts.find((w) => w.id === readyId);
-  if (!workout) return null;
+  if (!workout?.runningStart) return null;
   return new Set<string>(
     workout.id === 'running-strength'
       ? [

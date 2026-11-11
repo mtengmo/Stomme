@@ -51,6 +51,10 @@ describe('readyProgramPass', () => {
     expect(bare?.exerciseIds.length).toBeLessThan(10);
   });
 
+  it('returns null for a ready workout that is not a running start', () => {
+    expect(readyProgramPass('dumbbell-full-body', prefs('regular'))).toBeNull();
+  });
+
   it('returns a copy, not the workout list', () => {
     const pass = readyProgramPass('runner-home', prefs('regular'));
     const source = readyWorkouts.find((w) => w.id === 'runner-home');
