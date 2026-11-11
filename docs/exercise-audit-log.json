@@ -5215,5 +5215,25 @@
       "Väntar på korsgranskning (codex:gpt6astra/human); sidovy visar inte bäckenrotation; utanför program tills godkänd"
     ],
     "fingerprint": "6ec36434d3dc"
+  },
+  {
+    "id": "weighted-sit-up",
+    "name": "Situps med vikt",
+    "group": "dumbbell",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-11",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E108: situp med en hantel mot bröstet, sidovy. Bålen roterar stelt kring höften 0 till cirka 65 grader med konstant längd nacke-höft, båda händerna vid en bröstpunkt, fötter och knän fasta. Ryggvarning i texten: upprullning under belastning passar inte vid ryggproblem, benskörhet, graviditet eller efter bukkirurgi. Utanför program via pendingReviewIds. Redaktionell källa (Stomme); ingen extern källa verifierad."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/human); säkerhetsgranskning av ryggvarningen behövs; utanför program tills godkänd"
+    ],
+    "fingerprint": "5cf741aec490"
   }
 ]

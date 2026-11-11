@@ -6,6 +6,11 @@ import { pendingReviewIds, programExcludedIds } from './programExclusions';
 import { programPool, widePool } from './widePool';
 
 describe('exercises pending review', () => {
+  it('lists the exercises added for cross-review', () => {
+    expect(pendingReviewIds.has('renegade-row')).toBe(true);
+    expect(pendingReviewIds.has('weighted-sit-up')).toBe(true);
+  });
+
   it('are never approved in the audit log', () => {
     const log = readAuditLog();
     for (const id of pendingReviewIds) {

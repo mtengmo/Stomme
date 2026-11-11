@@ -3,9 +3,9 @@ import { exerciseList, exercises } from './exercises';
 import { templates } from './templates';
 
 describe('exercise seed', () => {
-  it('has 103 exercises with unique ids', () => {
-    expect(exerciseList).toHaveLength(103);
-    expect(new Set(exerciseList.map((e) => e.id)).size).toBe(103);
+  it('has 104 exercises with unique ids', () => {
+    expect(exerciseList).toHaveLength(104);
+    expect(new Set(exerciseList.map((e) => e.id)).size).toBe(104);
   });
 
   it.each(exerciseList)(

@@ -165,6 +165,7 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
   ],
   woodchop: ['Woodchop', 'Vedhuggning', 'Diagonal bålrotation'],
   'renegade-row': ['Plankrodd', 'Renegade row', 'Renegade rows'],
+  'weighted-sit-up': ['Situps med hantel', 'Weighted sit-up', 'Weighted situp'],
   'russian-twist': ['Russian twist', 'Sittande bålrotation', 'Rysk twist'],
   'biceps-curl': ['Bicepscurl', 'Bicepscurl med hantlar'],
   'hammer-curl': ['Hammercurl', 'Hammer curl'],

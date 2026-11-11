@@ -388,6 +388,14 @@ const variantSeeds: Partial<Record<ExerciseId, VariantSeed[]>> = {
       'Håll en lätt kettlebell i handtaget med båda händerna.',
     ],
   ],
+  'weighted-sit-up': [
+    [
+      'dumbbell',
+      1,
+      [0, 1],
+      'Håll en hantel mot bröstet med båda händerna, knäna böjda och fötterna i golvet.',
+    ],
+  ],
   'renegade-row': [
     [
       'dumbbell',
@@ -776,6 +784,10 @@ const technical: Partial<Record<ExerciseId, [TechnicalLevel, string]>> = {
     'practiced',
     'Diagonal rotation från höft till axel med vriden fot och kontrollerad bål.',
   ],
+  'weighted-sit-up': [
+    'practiced',
+    'Upprullning med vikt mot bröstet kräver kontroll av nacke och ländrygg.',
+  ],
   'renegade-row': [
     'technical',
     'Plankstöd på hantlar kräver att bäckenet och axlarna hålls stilla medan en arm rör sig.',
@@ -891,6 +903,14 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
         publisher: 'American Council on Exercise',
         url: 'https://www.acefitness.org/resources/everyone/exercise-library/47/seated-medicine-ball-trunk-rotations/',
         note: 'Källan visar bålrotation med boll; woodchop med hantel eller kettlebell är en stående, diagonal variant. Appens rörelseomfång och dos är redaktionella förslag.',
+      },
+    ];
+  if (id === 'weighted-sit-up')
+    return [
+      {
+        title: 'Situps med vikt (Stommes egen beskrivning)',
+        publisher: 'Stomme',
+        note: 'Egen svensk beskrivning utifrån allmänna rörelseprinciper. Ingen extern källa; dos och viktval är redaktionella förslag.',
       },
     ];
   if (id === 'renegade-row')
@@ -1276,8 +1296,9 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'knee-drive' ||
         id === 'isometric-lunge-hold' ||
         id === 'plate-pogos' ||
-        id === 'renegade-row'
-          ? id === 'renegade-row'
+        id === 'renegade-row' ||
+        id === 'weighted-sit-up'
+          ? id === 'renegade-row' || id === 'weighted-sit-up'
             ? '2026-11-11'
             : id === 'isometric-lunge-hold' || id === 'plate-pogos'
               ? '2026-11-05'
@@ -1364,6 +1385,7 @@ export const exerciseMetadata = Object.fromEntries(
     if (id === 'bent-over-row') metadata.easierExerciseId = 'supported-row';
     if (id === 'supported-row') metadata.harderExerciseId = 'bent-over-row';
     if (id === 'renegade-row') metadata.easierExerciseId = 'supported-row';
+    if (id === 'weighted-sit-up') metadata.easierExerciseId = 'crunch';
     if (id === 'sumo-squat') metadata.easierExerciseId = 'goblet-squat';
     if (id === 'weighted-glute-bridge')
       metadata.easierExerciseId = 'glute-bridge';

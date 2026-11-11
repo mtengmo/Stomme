@@ -15,6 +15,7 @@ function isKneeRange(id: ExerciseId): boolean {
  */
 export const pendingReviewIds: ReadonlySet<ExerciseId> = new Set([
   'renegade-row',
+  'weighted-sit-up',
 ]);
 
 /**
