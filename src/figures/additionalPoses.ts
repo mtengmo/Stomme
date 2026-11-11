@@ -205,6 +205,50 @@ export function renegadeRowPose(progress: number): Pose {
   };
 }
 
+/** Hip pivot, trunk length (hip to neck) and head length for the weighted sit-up. */
+const SITUP_HIP: P = [97, 169];
+const SITUP_TRUNK = 48;
+const SITUP_HEAD = 14;
+const SITUP_MAX_ANGLE = (65 * Math.PI) / 180;
+
+/**
+ * Weighted sit-up, side view: the whole trunk rotates rigidly about the hip
+ * (0 to 65 degrees) with constant neck-hip length. Both hands hold the
+ * dumbbell at one chest point; feet and knees stay fixed on the floor.
+ */
+export function weightedSitUpPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const phi = SITUP_MAX_ANGLE * t;
+  const ux = -Math.cos(phi),
+    uy = -Math.sin(phi);
+  const hip = SITUP_HIP;
+  const neck: P = [hip[0] + SITUP_TRUNK * ux, hip[1] + SITUP_TRUNK * uy];
+  const head: P = [neck[0] + SITUP_HEAD * ux, neck[1] + SITUP_HEAD * uy];
+  // Chest point: along the trunk, offset 7 towards the front (knee side).
+  const chest: P = [
+    hip[0] + 0.7 * SITUP_TRUNK * ux + 7 * Math.sin(phi),
+    hip[1] + 0.7 * SITUP_TRUNK * uy - 7 * Math.cos(phi),
+  ];
+  const elbow = joint(neck, chest, 17, 17, -1);
+  const ar: P = [140, 174],
+    al: P = [136, 174];
+  return {
+    head,
+    neck,
+    hip,
+    eR: elbow,
+    hR: chest,
+    eL: elbow,
+    hL: chest,
+    kR: joint(hip, ar, 36, 34, -1),
+    aR: ar,
+    tR: [ar[0] + 9, ar[1] + 3],
+    kL: joint(hip, al, 36, 34, -1),
+    aL: al,
+    tL: [al[0] + 9, al[1] + 3],
+  };
+}
+
 const shoulderStart = p(
   [99, 69],
   [98, 83],
@@ -815,6 +859,12 @@ export const additionalFigures = {
     end: renegadeRowPose(1),
     props: [],
     held: twoDumbbells,
+  },
+  'weighted-sit-up': {
+    start: weightedSitUpPose(0),
+    end: weightedSitUpPose(1),
+    props: mat,
+    held: oneDumbbell,
   },
   woodchop: {
     // Low-to-high diagonal: both hands share one grip on the single weight,
