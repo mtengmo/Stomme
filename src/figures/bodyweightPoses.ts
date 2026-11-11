@@ -44,7 +44,7 @@ const farFoot = (ankle: Pt, angle: number): Pt => [
   ankle[0] - 3 * Math.sin(angle),
   ankle[1] + 3 * Math.cos(angle),
 ];
-function pushUp(t: number): Pose {
+export function pushUp(t: number): Pose {
   const ankle: Pt = [165, 174];
   const angle = mix(-2.72, -3.02, t);
   const neck = polar(ankle, 110, angle),
