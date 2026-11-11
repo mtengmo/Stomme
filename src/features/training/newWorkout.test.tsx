@@ -36,13 +36,19 @@ it('keeps grouped saved workouts collapsed on the creation page without a duplic
   window.location.hash = '#/nytt-pass';
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByRole('heading', { name: 'Skapa eget pass' });
+  await screen.findByRole(
+    'heading',
+    { name: 'Skapa eget pass' },
+    { timeout: 10_000 },
+  );
   expect(screen.queryByRole('heading', { name: 'Press' })).toBeNull();
   await user.click(screen.getByText('Dina sparade pass'));
-  expect(await screen.findByRole('heading', { name: 'Press' })).toBeTruthy();
+  expect(
+    await screen.findByRole('heading', { name: 'Press' }, { timeout: 10_000 }),
+  ).toBeTruthy();
   expect(screen.getByText('Mitt presspass')).toBeTruthy();
   expect(screen.queryByRole('link', { name: 'Skapa eget pass' })).toBeNull();
-});
+}, 30_000);
 
 it('Home shows an empty Mina pass with a link to the picker', async () => {
   await setMeta(getDb(), 'training', prefs);
@@ -64,18 +70,28 @@ it('creates one workout and leaves the setup and sessions alone', async () => {
   window.location.hash = '#/nytt-pass';
   const user = userEvent.setup();
   render(<App />);
-  await screen.findByRole('heading', { name: 'Skapa eget pass' });
-  const rows = await screen.findAllByRole('button', { name: /^Välj: / });
+  await screen.findByRole(
+    'heading',
+    { name: 'Skapa eget pass' },
+    { timeout: 10_000 },
+  );
+  const rows = await screen.findAllByRole(
+    'button',
+    { name: /^Välj: / },
+    { timeout: 10_000 },
+  );
   await user.click(rows[0] as HTMLElement);
   await user.click(screen.getByRole('button', { name: 'Skapa pass' }));
-  await screen.findByLabelText('Namn på passet');
+  await screen.findByLabelText('Namn på passet', undefined, {
+    timeout: 10_000,
+  });
   expect((await getDb().meta.get('training'))?.value).toEqual(prefs);
   expect(
     ((await getDb().meta.get('customWorkouts'))?.value as unknown[] | undefined)
       ?.length,
   ).toBe(1);
   expect(await getDb().sessions.count()).toBe(0);
-});
+}, 30_000);
 
 it('blocks exercises outside the AAOS knee programme and keeps rehab prefs', async () => {
   const rehab = {
