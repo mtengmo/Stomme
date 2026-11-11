@@ -23,7 +23,7 @@ export function readyProgramPass(
   preferences: TrainingPreferences,
 ): ProgramPass | null {
   const workout = readyWorkouts.find((w) => w.id === readyId);
-  if (!workout) return null;
+  if (!workout?.runningStart) return null;
   let ids: ExerciseId[];
   if (workout.id === 'running-strength') {
     const wanted = preferences.experience === 'new' ? 'grund' : 'medel';
