@@ -38,6 +38,24 @@ function Harness({
 }
 const json = () => JSON.parse(screen.getByTestId('json').textContent ?? '{}');
 
+function PendingHost({
+  onPending,
+}: {
+  onPending: (pending: PendingWeight | null) => void;
+}) {
+  const [value, setValue] = useState<WorkoutEquipment>({ equipment: [] });
+  return (
+    <EquipmentInventory
+      idPrefix="h"
+      value={value}
+      onChange={setValue}
+      onPendingChange={onPending}
+      inlineAdd={false}
+      supportItems={[]}
+    />
+  );
+}
+
 describe('parseKg', () => {
   it('accepts comma and dot within 0,5 to 100', () => {
     expect(parseKg('7,5')).toBe(7.5);
@@ -194,20 +212,7 @@ describe('EquipmentInventory', () => {
   it('hands the add button to the host while the form is open', async () => {
     const user = userEvent.setup();
     const seen: (PendingWeight | null)[] = [];
-    function Host() {
-      const [value, setValue] = useState<WorkoutEquipment>({ equipment: [] });
-      return (
-        <EquipmentInventory
-          idPrefix="h"
-          value={value}
-          onChange={setValue}
-          onPendingChange={(p) => seen.push(p)}
-          inlineAdd={false}
-          supportItems={[]}
-        />
-      );
-    }
-    render(<Host />);
+    render(<PendingHost onPending={(p) => seen.push(p)} />);
     await user.click(screen.getByRole('checkbox', { name: 'Hantlar' }));
     await user.click(
       screen.getByRole('button', { name: 'Annan vikt, hantel' }),
