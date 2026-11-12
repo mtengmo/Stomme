@@ -86,3 +86,39 @@ describe('FRAMING keeps every joint in view on both working sides', () => {
     }
   });
 });
+
+/** Visible margin (viewBox units) kept around every joint: a rounded line end must not touch the frame edge. */
+const EDGE_MARGIN = 8;
+
+const insideWithMargin = (frames: Pose[], [x, y, w, h]: ViewBox) =>
+  frames.flatMap((pose, frame) =>
+    POSE_KEYS.filter(
+      (key) =>
+        pose[key][0] < x + EDGE_MARGIN ||
+        pose[key][0] > x + w - EDGE_MARGIN ||
+        pose[key][1] < y + EDGE_MARGIN ||
+        pose[key][1] > y + h - EDGE_MARGIN,
+    ).map((key) => `${frame}:${key}`),
+  );
+
+describe('FRAMING keeps a visible margin around the feet and hands', () => {
+  it('renegade-row, both working sides', () => {
+    const viewBox = viewBoxOf('renegade-row');
+    const right = sample((t) => movementPose('renegade-row', t));
+    expect(insideWithMargin(right, viewBox)).toEqual([]);
+    expect(insideWithMargin(right.map(mirror), viewBox)).toEqual([]);
+  });
+
+  it('mountain-climber, every phase', () => {
+    const frames = sample((t) => movementPose('mountain-climber', t));
+    expect(insideWithMargin(frames, viewBoxOf('mountain-climber'))).toEqual([]);
+    // Reduced-motion stills.
+    for (const pose of [
+      figures['mountain-climber'].start,
+      figures['mountain-climber'].end,
+    ])
+      expect(insideWithMargin([pose], viewBoxOf('mountain-climber'))).toEqual(
+        [],
+      );
+  });
+});

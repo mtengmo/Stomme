@@ -21,13 +21,16 @@ import type { Pose, Prop } from './poses';
  * Figure.tsx does it.
  */
 
-const RAIL_Y = 106;
+const RAIL_Y = 96;
+/** Rail length in x; the support hand grips it ahead of the body, within reach. */
+const RAIL_X2 = 140;
+const HAND_AHEAD = 27;
 
 export const STEP_DOWN_PILOT_PROPS: Prop[] = [
   // Stair height: 14 units, roughly 19 cm at this scale (the catalogue
   // figure uses a step of about 43 cm).
   { type: 'step', x: 84, y: 164, w: 34 },
-  { type: 'rail', x1: 70, x2: 132, y: RAIL_Y },
+  { type: 'rail', x1: 70, x2: RAIL_X2, y: RAIL_Y },
 ];
 
 export const STEP_DOWN_VIEWBOX = [14, 0, 164, 188] as const;
@@ -122,7 +125,7 @@ export function stepDownKeyframePose(t: number): Pose {
   // arm hangs relaxed, slightly forward. Elbows point backwards.
   const farArm = solveTwoBone(
     neck,
-    [v.hipX + 16, RAIL_Y],
+    [v.hipX + HAND_AHEAD, RAIL_Y],
     UPPER_ARM,
     FOREARM,
     1,

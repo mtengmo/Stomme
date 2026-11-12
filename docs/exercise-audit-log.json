@@ -3513,7 +3513,7 @@
     "name": "Mountain climber",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3573,12 +3573,17 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "E64: far support arm redrawn straight (shoulder-elbow-hand collinear, same arm length as the near arm) with the hand on the floor, in every phase; push-up and plank figures untouched. Test asserts both arms straight over 41 phases. Awaits review by codex or human."
+      },
+      {
+        "date": "2026-11-12",
+        "fixer": "claude-sonnet",
+        "notes": "E64: ramen flyttad till 22 20 164 168 (FRAMING) så att den bakre utsträckta fotens tå med rundad linje har minst 8 enheters marginal i alla faser och i reduced-motion Start/Rörelse; posen oförändrad. Test i framing.test.ts. Väntar på omgranskning."
       }
     ],
     "openIssues": [
       "[cheap] E64 mountain-climber, fas 0.625/0.75 och reduced-motion Start: bakre utsträckta fotens tåände ligger vid höger ramkant och klipps. Ge hela fotänden inklusive rundad linje marginal genom hela cykeln så att tå-/golvkontakt går att granska."
     ],
-    "fingerprint": "7b7891d4a8b4",
+    "fingerprint": "883dc0863090",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: knee-drive, plank, burpee. Växlande knäframföring i handstöd skiljer sig från upprätt löpsteg och statisk planka. Kodkopplingar: allmänna kandidatplatser A/core; fokusplatser core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5142,7 +5147,7 @@
     "name": "Nedsteg från steg",
     "group": "rehab/knee-strength",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -5207,12 +5212,17 @@
         "fixer": "claude-sonnet",
         "commit": "4db6a48",
         "notes": "Front view: the support hand (opposite the working leg) keeps hold of an upright railing through the lowering and return, constant arm lengths, both sides."
+      },
+      {
+        "date": "2026-11-12",
+        "fixer": "claude-sonnet",
+        "notes": "E96: stödhanden (grå, motsatt arm) låst till det horisontella räcket i hela sänkningen och återgången; räcket höjt till y=96 och förlängt (x 70-140) och handen sitter framför kroppen (hipX+27) så att armen når kontakten med konstanta segmentlängder, båda sidor H/V. Test i stepDownKeyframes.test.ts. Frontvyn orörd. Väntar på omgranskning."
       }
     ],
     "openIssues": [
       "[strong] E96 step-down, profil fas 0.875–1 och reduced-motion Slut H/V: ingen hand ligger kvar på det horisontella räcket; främre handen är nedanför linjen och bakre handen vid höften ovanför. Lås en stödhand till räcket genom sänkning/återgång, med armbågsgeometri som når kontakten, såsom texten kräver."
     ],
-    "fingerprint": "f881536bbd8d",
+    "fingerprint": "cd14d802e44b",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: step-up. Nedsänkning av fri häl under stödnivån och tillbaka har annan start, rörelsegräns och instruktion än uppsteg från golv. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5509,7 +5519,7 @@
     "name": "Renegaderodd",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-12",
@@ -5525,6 +5535,11 @@
         "date": "2026-11-11",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E107: rodd med hantlar från raka armar i plankläge, sidovy (pushUp-planka, stödarm på hantel i golvet, rodd-arm till höfthöjd med armbågen över ryggen, konstanta lemlängder, speglas för vänster). Sidovyn visar inte bäckenrotation; det sägs i texten. Utanför program via pendingReviewIds. Källa: ACE Renegade Row (öppnad och verifierad)."
+      },
+      {
+        "date": "2026-11-12",
+        "fixer": "claude-sonnet",
+        "notes": "E107: ramen ändrad från 14 20 182 168 till 8 20 176 168 (symmetrisk kring spegelaxeln) så att fotänden har minst 8 enheters marginal i höger och speglad vänster vy, även 2x2/2x4 kg; posen oförändrad. Test i framing.test.ts. Väntar på omgranskning."
       }
     ],
     "openIssues": [
@@ -5533,7 +5548,7 @@
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/human); sidovy visar inte bäckenrotation; utanför program tills godkänd"
     ],
-    "fingerprint": "6ec36434d3dc"
+    "fingerprint": "e52ae2397e9f"
   },
   {
     "id": "weighted-sit-up",
@@ -5562,6 +5577,6 @@
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/human); säkerhetsgranskning av ryggvarningen behövs; utanför program tills godkänd"
     ],
-    "fingerprint": "5cf741aec490"
+    "fingerprint": "fb1a30b91488"
   }
 ]
