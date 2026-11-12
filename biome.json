@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.7/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -16,11 +16,12 @@
       "!**/screenshots",
       "!**/.impeccable",
       "!**/.claude",
-      "!**/.worktrees"
+      "!**/.worktrees",
+      "!**/*.md"
     ]
   },
   "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
-  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "linter": { "enabled": true, "rules": { "preset": "recommended" } },
   "overrides": [
     {
       "includes": ["src/rules/**"],
