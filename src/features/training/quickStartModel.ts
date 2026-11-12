@@ -157,7 +157,7 @@ export function readDraft(raw: string | null): Draft {
   const emphasis = EMPHASES.find((item) => item === value.emphasis) ?? 'full';
   const plan =
     typeof value.plan === 'string' &&
-    readyWorkouts.some((w) => w.id === value.plan)
+    readyWorkouts.some((w) => w.runningStart && w.id === value.plan)
       ? value.plan
       : 'auto';
   const steps = stepsFor(goal, { weightKinds, emphasis });

@@ -114,6 +114,10 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     label: `Start vid ${sideWord(side)} höft`,
     explanation: `Börja med vikten vid ${sideWord(side)} höft, för den diagonalt upp över motsatt axel och tillbaka.`,
   }),
+  'renegade-row': (side) => ({
+    label: `Rodd med ${sideWord(side)} arm`,
+    explanation: `Rodda med ${sideWord(side)} arm; den andra armen stödjer i golvet.`,
+  }),
   'single-arm-thruster': (side) => ({
     label: `Vikt i ${sideWord(side)} hand`,
     explanation: `Pressa vikten med ${sideWord(side)} arm; den andra armen vilar.`,

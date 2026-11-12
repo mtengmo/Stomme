@@ -307,6 +307,16 @@ export const exerciseMuscles: Record<
     secondary: ['shoulders', 'glutes'],
     qualities: [],
   },
+  'weighted-sit-up': {
+    primary: ['core'],
+    secondary: ['hip-flexors'],
+    qualities: [],
+  },
+  'renegade-row': {
+    primary: ['back', 'core'],
+    secondary: ['biceps', 'shoulders', 'triceps'],
+    qualities: [],
+  },
   'russian-twist': {
     primary: ['core'],
     secondary: ['hip-flexors'],

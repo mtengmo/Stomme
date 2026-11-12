@@ -13,11 +13,14 @@ export interface ReadyWorkout {
   exerciseIds: readonly ExerciseId[];
   /** A fixed list shown as is, with no proposals to choose between. */
   fixed?: boolean;
+  /** Offered as the running plan in onboarding, planning and programmes. Opt-in. */
+  runningStart?: true;
 }
 
 export const readyWorkouts: readonly ReadyWorkout[] = [
   {
     id: 'running-strength',
+    runningStart: true,
     name: 'Löpstyrka',
     group: 'legs',
     summary:
@@ -37,6 +40,7 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
   },
   {
     id: 'runner-ten',
+    runningStart: true,
     name: 'Löparens tio',
     group: 'legs',
     fixed: true,
@@ -59,6 +63,7 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
   },
   {
     id: 'runner-home',
+    runningStart: true,
     name: 'Hemmapass för löpare',
     group: 'legs',
     fixed: true,
@@ -71,6 +76,23 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
       'glute-bridge',
       'single-leg-floor-bridge',
       'split-squat',
+    ],
+  },
+  {
+    id: 'dumbbell-full-body',
+    name: 'Snabbt helkroppspass med hantlar',
+    group: 'full',
+    fixed: true,
+    summary:
+      'Fem övningar som tar alla stora muskelgrupper: styrka, kondition och bål med bara två hantlar. Snabbt att göra. Kör 3 set med ca 60 s vila; appens vanliga progression sätter reps och vikt.',
+    caution:
+      'Du behöver två stadiga hantlar. Passet passar vana tränande på grund av thrusters och armhävningar. Håll handlederna raka i rodd med stödjande hand. Avbryt vid smärta i rygg, nacke, handled eller axel. Situps passar inte vid ryggproblem, benskörhet, graviditet eller efter bukoperation.',
+    exerciseIds: [
+      'thruster',
+      'forward-lunge',
+      'renegade-row',
+      'push-up',
+      'weighted-sit-up',
     ],
   },
 ];

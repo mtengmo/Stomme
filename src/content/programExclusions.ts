@@ -10,6 +10,15 @@ function isKneeRange(id: ExerciseId): boolean {
 }
 
 /**
+ * New exercises waiting for cross-review (see docs/exercise-audit-log.json).
+ * Kept out of generated programmes until approved; then remove the id here.
+ */
+export const pendingReviewIds: ReadonlySet<ExerciseId> = new Set([
+  'renegade-row',
+  'weighted-sit-up',
+]);
+
+/**
  * Exercises a stored programme must never contain: rehab additions, rehab
  * impact exercises and the knee exercises E90-E98. Enforced by the programme
  * schema (db/program.ts), by the next-level swap filter and by
@@ -22,6 +31,7 @@ export const programExcludedIds: ReadonlySet<ExerciseId> = new Set(
       (id) =>
         rehabAdditionIds.has(id) ||
         rehabImpactExercises.has(id) ||
-        isKneeRange(id),
+        isKneeRange(id) ||
+        pendingReviewIds.has(id),
     ),
 );

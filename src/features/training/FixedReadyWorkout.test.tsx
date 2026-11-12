@@ -25,6 +25,16 @@ it('lists the exercises and adds the whole fixed list under its name', async () 
   ]);
 });
 
+it('renders the dumbbell full-body workout with its count and caution', () => {
+  const full = readyWorkouts.find((w) => w.id === 'dumbbell-full-body');
+  if (!full) throw new Error('missing workout');
+  render(<FixedReadyWorkout workout={full} busy={false} onAdd={vi.fn()} />);
+  expect(screen.getByText('Snabbt helkroppspass med hantlar')).toBeTruthy();
+  expect(screen.getByText('5 övningar')).toBeTruthy();
+  expect(screen.getAllByRole('listitem')).toHaveLength(5);
+  expect(screen.getByText(/Du behöver två stadiga hantlar/)).toBeTruthy();
+});
+
 it('disables the button while busy', () => {
   if (!workout) throw new Error('missing workout');
   render(<FixedReadyWorkout workout={workout} busy onAdd={vi.fn()} />);

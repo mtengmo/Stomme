@@ -317,6 +317,6 @@ describe('review ordering', () => {
       .sort(compareReferences);
     expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
     expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
-    expect(sorted.at(-1)).toBe('E106');
+    expect(sorted.at(-1)).toBe('E108');
   });
 });

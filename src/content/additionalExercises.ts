@@ -66,6 +66,7 @@ function entry(
                     'kettlebell-press',
                     'single-arm-thruster',
                     'woodchop',
+                    'renegade-row',
                     'one-arm-kettlebell-swing',
                     'kettlebell-floor-press',
                     'kettlebell-rack-carry',
@@ -295,6 +296,33 @@ export const lateAdditionalExercises: Exercise[] = [
     'Gör rörelsen utan vikt eller med en lättare vikt och lägre lyft.',
     [single(2), single(4), single(4, 'kettlebell'), single(8, 'kettlebell')],
     true,
+  ),
+  entry(
+    'renegade-row',
+    'Renegaderodd',
+    ['Rygg', 'Bål', 'Biceps'],
+    [
+      'Ställ två stabila hantlar, helst sexkantiga, axelbrett isär. Stöd dig på handtagen i plankläge med raka armar, handlederna raka över handtagen och fötterna brett isär.',
+      'Pressa stödhanden ned i golvet och dra den andra hanteln mot höften med armbågen nära kroppen. Håll höfter och axlar i nivå så att bäckenet inte roterar.',
+      'Sänk hanteln med kontroll. Gör alla repetitioner på en sida och byt sedan. Avbryt vid smärta i handled eller axel. Sidovyn kan inte visa bäckenrotation, så kontrollera den själv.',
+    ],
+    'Bäckenet roterar, höfterna sjunker eller handleden viker sig.',
+    'Gör rörelsen med knäna i golvet eller välj enarmsrodd med stöd.',
+    [pair(2), pair(4)],
+    true,
+  ),
+  entry(
+    'weighted-sit-up',
+    'Situps med vikt',
+    ['Mage', 'Höftböjare'],
+    [
+      'Ligg på rygg med böjda knän och fötterna i golvet. Håll en hantel mot bröstet med båda händerna.',
+      'Andas ut och rulla upp med nacken i linje med ryggraden. Fötterna stannar kvar i golvet.',
+      'Rulla ned långsamt. Avbryt om det gör ont i rygg eller nacke. Upprullning under belastning passar inte vid ryggproblem, benskörhet, graviditet eller efter bukkirurgi.',
+    ],
+    'Du rycker upp dig, drar i nacken eller fötterna lyfter från golvet.',
+    'Gör magcrunch eller dead bug utan vikt.',
+    [single(2), single(4)],
   ),
 ];
 

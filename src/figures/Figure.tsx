@@ -7,8 +7,10 @@ import {
   floorPressPose,
   hamstringCurlPose,
   kettlebellFloorPressPose,
+  renegadeRowPose,
   seatedKneeExtensionPose,
   walkingLungePose,
+  weightedSitUpPose,
 } from './additionalPoses';
 import { bodyweightMovementPose } from './bodyweightPoses';
 import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
@@ -87,6 +89,8 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
     return kettlebellFloorPressPose(t);
   if (exerciseId === 'floor-press') return floorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
+  if (exerciseId === 'renegade-row') return renegadeRowPose(t);
+  if (exerciseId === 'weighted-sit-up') return weightedSitUpPose(t);
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   if (exerciseId === 'suitcase-carry') return suitcaseCarryPose(t);
   if (exerciseId === 'farmer-carry') return farmerCarryPose(t);
@@ -260,6 +264,8 @@ const HOLD_STILLS: ReadonlySet<ExerciseId> = new Set([
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
 export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'plank-arm-lift': '0 20 200 168',
+  'renegade-row': '14 20 182 168',
+  'weighted-sit-up': '14 20 182 168',
   'decline-push-up': '14 20 182 168',
   'knee-push-up': '14 20 182 168',
   'overhead-triceps-extension': '14 0 164 188',

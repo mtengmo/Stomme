@@ -528,33 +528,35 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
                 checked={plan === 'auto'}
                 onChange={() => update({ plan: 'auto' })}
               />
-              {readyWorkouts.map((workout) => {
-                const count =
-                  readyProgramPass(workout.id, planPrefs)?.exerciseIds.length ??
-                  workout.exerciseIds.length;
-                return (
-                  <ChoiceCard
-                    key={workout.id}
-                    type="radio"
-                    name="plan"
-                    value={workout.id}
-                    label={workout.name}
-                    hint={
-                      <>
-                        <span className="block">
-                          {firstSentence(workout.summary)}
-                        </span>
-                        <span className="block">
-                          {count} övningar. Blir ditt första pass.
-                        </span>
-                        <span className="block">{workout.caution}</span>
-                      </>
-                    }
-                    checked={plan === workout.id}
-                    onChange={() => update({ plan: workout.id })}
-                  />
-                );
-              })}
+              {readyWorkouts
+                .filter((w) => w.runningStart)
+                .map((workout) => {
+                  const count =
+                    readyProgramPass(workout.id, planPrefs)?.exerciseIds
+                      .length ?? workout.exerciseIds.length;
+                  return (
+                    <ChoiceCard
+                      key={workout.id}
+                      type="radio"
+                      name="plan"
+                      value={workout.id}
+                      label={workout.name}
+                      hint={
+                        <>
+                          <span className="block">
+                            {firstSentence(workout.summary)}
+                          </span>
+                          <span className="block">
+                            {count} övningar. Blir ditt första pass.
+                          </span>
+                          <span className="block">{workout.caution}</span>
+                        </>
+                      }
+                      checked={plan === workout.id}
+                      onChange={() => update({ plan: workout.id })}
+                    />
+                  );
+                })}
             </fieldset>
           ) : null}
           {step === 'equipment' ? (

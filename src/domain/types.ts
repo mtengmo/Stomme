@@ -102,7 +102,9 @@ export type ExerciseId =
   | 'lateral-shuffle'
   | 'knee-drive'
   | 'isometric-lunge-hold'
-  | 'plate-pogos';
+  | 'plate-pogos'
+  | 'renegade-row'
+  | 'weighted-sit-up';
 
 export type Unit = 'reps' | 'seconds' | 'meters' | 'laps';
 export type SideKind = 'ben' | 'sida' | 'hand';
