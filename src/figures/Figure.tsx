@@ -264,7 +264,8 @@ const HOLD_STILLS: ReadonlySet<ExerciseId> = new Set([
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
 export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'plank-arm-lift': '0 20 200 168',
-  'renegade-row': '14 20 182 168',
+  'renegade-row': '8 20 176 168',
+  'mountain-climber': '22 20 164 168',
   'weighted-sit-up': '14 20 182 168',
   'decline-push-up': '14 20 182 168',
   'knee-push-up': '14 20 182 168',

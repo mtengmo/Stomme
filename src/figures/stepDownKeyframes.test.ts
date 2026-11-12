@@ -49,10 +49,35 @@ describe('E96 step-down keyframes', () => {
     expect(low.aR).toEqual(top.aR);
     expect(low.tR[1]).toBeCloseTo(164, 0);
   });
-  it('keeps the far hand on the rail at the lowest point', () => {
-    for (const t of [0.5, 0.54, 0.58])
-      expect(Math.abs(stepDownKeyframePose(t).hL[1] - 106)).toBeLessThan(0.5);
-  });
+  it.each(['right', 'left'] as const)(
+    'keeps the far hand locked to the rail in every phase, both sides (%s)',
+    (side) => {
+      const rail = STEP_DOWN_PILOT_PROPS.find((p) => p.type === 'rail');
+      if (rail?.type !== 'rail') throw new Error('no rail');
+      const [x1, x2] =
+        side === 'right' ? [rail.x1, rail.x2] : [192 - rail.x2, 192 - rail.x1];
+      for (let i = 0; i <= 200; i++) {
+        const p = stepDownWorldPose(i / 200, side);
+        expect(Math.abs(p.hL[1] - rail.y)).toBeLessThan(0.5);
+        expect(p.hL[0]).toBeGreaterThanOrEqual(x1);
+        expect(p.hL[0]).toBeLessThanOrEqual(x2);
+        // The elbow reaches the contact: the arm is within its full length
+        // and keeps both segments at constant length.
+        expect(
+          Math.hypot(p.hL[0] - p.neck[0], p.hL[1] - p.neck[1]),
+        ).toBeLessThanOrEqual(50.0001);
+        expect(
+          Math.hypot(p.eL[0] - p.neck[0], p.eL[1] - p.neck[1]),
+        ).toBeCloseTo(25, 4);
+        expect(Math.hypot(p.hL[0] - p.eL[0], p.hL[1] - p.eL[1])).toBeCloseTo(
+          25,
+          4,
+        );
+        // Ahead of the thigh so the grip is visible, not hidden at the hip.
+        expect(Math.abs(p.hL[0] - p.hip[0])).toBeGreaterThanOrEqual(20);
+      }
+    },
+  );
   it.each(['right', 'left'] as const)(
     'bends both elbows backwards with a consistent sign (%s)',
     (side) => {
@@ -95,9 +120,9 @@ describe('E96 step-down keyframes', () => {
     });
     expect(rail && mirrorProp(rail)).toEqual({
       type: 'rail',
-      x1: 192 - 132,
+      x1: 192 - 140,
       x2: 192 - 70,
-      y: 106,
+      y: 96,
     });
     const mat = { type: 'mat', x1: 0, x2: 5 } as const;
     expect(mirrorProp(mat)).toBe(mat);
