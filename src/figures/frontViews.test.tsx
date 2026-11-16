@@ -8,14 +8,18 @@ import {
 } from './Figure';
 import {
   alternateView,
+  CHAIR_OBLIQUE_SEAT_Y,
   defaultViewFor,
+  FrontFigureFrame,
   frontMovementPose,
   obliqueMovementPose,
+  SPLIT_REAR_LINE_Y,
   STEP_DOWN_FRONT_GRIP_Y,
   STEP_DOWN_FRONT_RAIL_X,
   supportedObliqueViews,
+  supportedViewsFor,
 } from './frontViews';
-import { figures } from './poses';
+import { figures, type Pose } from './poses';
 
 describe('authored frontal demonstrations', () => {
   it('rotates seated feet with still knees and ankles, a cushion and foot band', () => {
@@ -64,6 +68,7 @@ describe('authored frontal demonstrations', () => {
       'kettlebell-goblet-squat',
     ]);
     expect(supportedObliqueViews).toEqual([
+      'goblet-chair-squat',
       'split-squat',
       'bench-side-plank-leg-lift',
       'russian-twist',
@@ -234,6 +239,40 @@ describe('authored frontal demonstrations', () => {
       expect(pose.hR).toEqual([72, 92]);
       expect(pose.hL).toEqual([128, 92]);
     }
+  });
+
+  it.each(['right', 'left'] as const)(
+    'keeps the %s-front split squat rear toe on the contact line and the front shin length steady',
+    (working) => {
+      const lengths: number[] = [];
+      for (let i = 0; i <= 20; i++) {
+        const pose = obliqueMovementPose('split-squat', i / 20, working);
+        const [front, rear] =
+          working === 'right'
+            ? [{ k: pose.kR, a: pose.aR }, { t: pose.tL }]
+            : [{ k: pose.kL, a: pose.aL }, { t: pose.tR }];
+        expect(rear.t[1]).toBe(SPLIT_REAR_LINE_Y);
+        lengths.push(
+          Math.hypot(front.k[0] - front.a[0], front.k[1] - front.a[1]),
+        );
+      }
+      const mean = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+      for (const length of lengths)
+        expect(Math.abs(length - mean) / mean).toBeLessThanOrEqual(0.1);
+    },
+  );
+
+  it('draws the rear contact line at the rear toe height', () => {
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId="split-squat"
+        pose={movementPose('split-squat', 0.5)}
+        working="right"
+        view="oblique"
+        phase={0.5}
+      />,
+    );
+    expect(markup).toContain(`d="M54 ${SPLIT_REAR_LINE_Y}h96"`);
   });
 
   it('keeps split-squat depth distinct and E42 support contacts explicit in oblique views', () => {
@@ -581,6 +620,86 @@ describe('woodchop front view', () => {
       const mirrored = frontMovementPose('woodchop', i / 20, 'left');
       expect(mirrored.hR[0]).toBeCloseTo(200 - p.hL[0], 5);
       expect(mirrored.aL[0]).toBeCloseTo(200 - p.aR[0], 5);
+    }
+  });
+});
+
+describe('goblet chair squat oblique view', () => {
+  const samples = Array.from({ length: 21 }, (_, i) => i / 20);
+  const dist = (a: readonly number[], b: readonly number[]) =>
+    Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
+
+  it('is offered next to the side view', () => {
+    expect(alternateView('goblet-chair-squat')).toBe('oblique');
+    expect(supportedViewsFor('goblet-chair-squat')).toEqual([
+      'side',
+      'oblique',
+    ]);
+  });
+
+  it('keeps every limb length constant through the loop', () => {
+    const poses = samples.map((t) =>
+      obliqueMovementPose('goblet-chair-squat', t, null),
+    );
+    const segs: [keyof Pose, keyof Pose][] = [
+      ['neck', 'eR'],
+      ['eR', 'hR'],
+      ['neck', 'eL'],
+      ['eL', 'hL'],
+      ['hip', 'kR'],
+      ['kR', 'aR'],
+      ['hip', 'kL'],
+      ['kL', 'aL'],
+      ['neck', 'hip'],
+    ];
+    for (const [a, b] of segs) {
+      const lengths = poses.map((p) => dist(p[a], p[b]));
+      expect(Math.max(...lengths) - Math.min(...lengths)).toBeLessThan(0.5);
+    }
+  });
+
+  it('plants both feet, stands at the start and reaches the seat at the end', () => {
+    const start = obliqueMovementPose('goblet-chair-squat', 0, null);
+    const end = obliqueMovementPose('goblet-chair-squat', 1, null);
+    for (const t of samples) {
+      const p = obliqueMovementPose('goblet-chair-squat', t, null);
+      expect(p.aR).toEqual(start.aR);
+      expect(p.aL).toEqual(start.aL);
+      expect(p.aR[1]).toBe(174);
+    }
+    expect(start.hip[1]).toBeLessThan(end.hip[1] - 20);
+    expect(Math.abs(end.hip[1] - CHAIR_OBLIQUE_SEAT_Y)).toBeLessThan(4);
+    expect(end.hip[0]).toBeLessThan(start.hip[0]);
+  });
+
+  it('keeps the knees forward over the feet and apart as deep as the feet', () => {
+    for (const t of samples) {
+      const p = obliqueMovementPose('goblet-chair-squat', t, null);
+      for (const [knee, toe] of [
+        [p.kR, p.tR],
+        [p.kL, p.tL],
+      ] as const)
+        expect(knee[0]).toBeLessThanOrEqual(toe[0] + 10);
+      expect(p.kR[0]).toBeGreaterThan(p.hip[0] - 2);
+      expect(p.kL[0]).toBeGreaterThan(p.hip[0] - 2);
+    }
+  });
+
+  it('shows the chair and the held weight in every equipment variant', () => {
+    for (const equipment of [null, 'dumbbell', 'kettlebell'] as const) {
+      const html = renderToStaticMarkup(
+        <FrontFigureFrame
+          exerciseId="goblet-chair-squat"
+          working={null}
+          equipment={equipment}
+          phase={1}
+          angle="oblique"
+        />,
+      );
+      expect(html).toContain('data-support="chair"');
+      expect(html).toContain('data-view="oblique"');
+      if (equipment) expect(html).toContain(`data-equipment="${equipment}"`);
+      else expect(html).not.toContain('data-equipment');
     }
   });
 });

@@ -14,6 +14,8 @@ const HINT =
   'Starta och gör dig redo under 5 sekunder. Rör dig i jämn takt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.';
 const LEG_SWAP_HINT =
   'Starta och gör dig redo under 5 sekunder. Växla ben lugnt under hela tiden och vila vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.';
+const WALK_HINT =
+  'Ställ vikten nära foten och starta. Du får 5 sekunder att ta upp den och komma upprätt. Gå lugnt under hela tiden, sätt ned vikten vid signalen. Appen sparar automatiskt. Timern pausas om du lämnar appen.';
 const SAVED = 'Setet sparas automatiskt.';
 
 /**
@@ -60,5 +62,20 @@ export const timedMovementCue: Partial<Record<ExerciseId, TimedMovementCue>> = {
     status: `Lyft knäna växelvis i jämn takt tills signalen. Tiden gäller båda benen tillsammans. ${SAVED}`,
     startVoice: 'Börja rörelsen.',
     hint: HINT,
+  },
+  'suitcase-carry': {
+    status: `Gå lugnt med vikten tills signalen. Tiden gäller per hand. ${SAVED}`,
+    startVoice: 'Börja gå.',
+    hint: WALK_HINT,
+  },
+  'farmer-carry': {
+    status: `Gå lugnt med vikterna tills signalen. Tiden gäller båda händerna tillsammans. ${SAVED}`,
+    startVoice: 'Börja gå.',
+    hint: WALK_HINT,
+  },
+  'kettlebell-rack-carry': {
+    status: `Gå lugnt med vikten vid axeln tills signalen. Tiden gäller per hand. ${SAVED}`,
+    startVoice: 'Börja gå.',
+    hint: WALK_HINT,
   },
 };

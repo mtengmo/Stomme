@@ -26,6 +26,7 @@ import {
 } from '../../rules/levelPolicy';
 
 import { buildRoster } from '../../rules/programRosters';
+import { restSecFor } from '../../rules/restPolicy';
 import { trainingPlanSuggestion } from '../../rules/training';
 import { startingWeight } from '../../rules/weightInventory';
 
@@ -78,7 +79,7 @@ export function basePlan(
         : exercise.range.start,
     loadIndex: variant?.defaultLoadIndex ?? 0,
     weightKg: start.totalKg,
-    restSec: 60,
+    restSec: restSecFor(id, preferences),
     reason: 'first_time',
     variantId: variant?.id,
     sides: exercise.perSide

@@ -73,6 +73,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio profilfaser och reduced-motion kroppsvikt/10 kg hantel/16 kg kettlebell: sittkontakt mot stolen i nederläget, fötter kvar och uppresning till stående. Vikt nära bröstet, figur/stol ryms. Bilateral utan sidval. Profilen döljer knäriktning och bortre hand. Text om stadig stol, tre sekunders sänkning och kudde/armstöd läst; stödvarianterna visas inte och sänkningstiden ej verifierad. Ok avser synliga poser/kontakter. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E01: score 9/15 (T2 R1 AS1 AF n/a U2 S3). Befintlig vy: sida; kontrollerad: sida för kroppsvikt, 10 kg hantel och 16 kg kettlebell. Nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 390 px mörkt och 1280 px ljust; reduced-motion Start/Slut i båda. Live-loop utan phase samplad i 24 tidsordnade bilder per variant över cirka 6,6 s vid 1280 px (hela ut-/återgången och loopsöm); ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Bilateral övning utan H/V-val. Fötter kvar i golvet, höften når stolens sits, vikter följer händerna och allt ryms. Röst kontrollerad: i källa, ej uppspelad; Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart., återstart Fortsätt om tre. Två. Ett.; automatisk vila Vila. N sekunder. repTempo och demonstrationTiming ger 2 s per rörelseriktning, tips 2 kräver 3 s sänkning: konsistens mismatch. AS1: båda underarmarna krymper synligt från sittande till stående, cirka 17,1 till 10,8 enheter; baseline drift:eR-hR och drift:eL-hL 6,3, överarmsdrift 2,6/2,7 och asym 0,9. Baseline accepterar befintliga fel och är inget godkännande. Saknad front-/snedvy gör textens knäriktning och vanliga fel (knän inåt) osynliga. Mindre avvikelser: T2 Start-stillbilden sitter medan instruktionen börjar stående; U2 hanteln ligger horisontellt vid handen och visar inte tydligt lastetikettens tvåhandsgobletgrepp. Stabil stol, lätt sitskontakt, kontrollerad sänkning, knän följer tårna samt kroppsvikt/kudde/armstöd som förenkling finns; global avbryttext och smärtrapportering finns i onboarding/pass. Profil visar ingen tydlig osäker ryggform; knäriktning framifrån går inte att verifiera, stöd-/kuddalternativen visas inte. Säkerhetsprincipen stadig stol och lugn rörelse jämförd med https://www.nhs.uk/live-well/exercise/strength-exercises/ (ingen separat medicinsk bedömning av viktstegen). Tester för figurer och röst: 29 filer, 622 tester godkända. Arbetskopian har oincheckade figur-/textändringar för andra övningar och gemensam rendering; E01s egna tips/poser är oförändrade mot HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Senaste rättare claude-sonnet: cross-vendor. Ej godkänd."
       }
     ],
     "fixes": [
@@ -85,10 +93,19 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E01: fötter och tår låsta (ankel 104/101,174 i start och slut), konstanta benlängder, höften lämnar sätets framkant uppåt och framåt; tillagt i constrainLegInterpolation (plantedFeet). Sedda faser 0-1 för kroppsvikt (och en viktad variant); hantel/kettlebell ändrar bara armarna. Obs: min tidigare claude-opus-animationsgranskning 2026-11-04 (ok) missade fotglidningen som Astra hittade; den bör inte tas som stöd. Behöver ny granskning av Codex-modell eller human."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E01 efter codex:gpt61sol-granskning 2026-11-16. (1) Ordning/tempo: start och slut i poses.ts bytta så att fas 0 är stående och fas 1 sittande på stolen; en repetition = stå, sänk på 3 s mot stolen, res dig på 2 s, räknas när man står igen (stämmer med tips 1-3, reduced-motion Start = stående, Slut = sittande). repTempo har nu upMs 3000 / downMs 2000 för goblet-chair-squat (MOVEMENT_MS), demonstrationTiming/cycleProgress får separat returtid (returnMs, andra övningar oförändrade eftersom downMs = upMs). (2) Armar: båda armarna har konstanta segment (18 + 17) i alla faser och varianter; händerna ligger vid bröstet och armbågarna löses med solveTwoBone (constrainedLegs.ts keepArmLengths); baseline-raderna drift/asym för armarna borttagna. Hanteln ritas stående under händerna och kettlebellen hänger mellan händerna mot bröstet (equipmentPose, Held vertical). 16 kg-etiketten: 'mot bröstet'. (3) Ny vy 'Sned vinkel' (obliqueMovementPose, FrontFigureFrame): fötterna planterade och isär, knän lösta ur höft och egen fotled med konstanta längder (31/29), stol med sits, hantel/kettlebell/kroppsvikt, tester i frontViews.test.tsx. Begränsning: med konstanta längder överlappar knäna delvis i djupaste läget och främre knät ligger upp till cirka 8 px framför tån; knä-inåt kan ses som att knäna inte närmar sig varandra men är ingen fullständig frontvy. Ingen granskningspost tillagd, inget godkännande. Behöver ny granskning av Codex-modell eller human: titta på alla tre varianter i båda vyer över hela loopen, live-loopens 3 s/2 s, reduced-motion samt om snedvyn räcker för knäriktning."
       }
     ],
-    "openIssues": [],
-    "fingerprint": "6c68ea04b029",
+    "openIssues": [
+      "[cheap] E01 goblet-chair-squat, alla varianter, automatisk räkning och sidoloop: tips 2 föreskriver sänkning på 3 sekunder men repTempo/demonstrationTiming använder 2 sekunder. Samordna instruktion, räknartempo och animationens sänkningstid.",
+      "[strong] E01 goblet-chair-squat, profil fas 0–1 och återgång, kroppsvikt/10 kg hantel/16 kg kettlebell: båda underarmarna krymper synligt vid uppresningen (cirka 17,1 till 10,8 enheter; baseline drift 6,3). Behåll konstanta armsegment genom hela loopen och reduced-motion Start/Slut.",
+      "[strong] E01 goblet-chair-squat, samtliga faser och varianter: endast sidovy finns, så knänas sidledsriktning och det angivna vanliga felet knän inåt kan inte avläsas. Komplettera med front- eller snedvy som visar knän över fötterna."
+    ],
+    "fingerprint": "89f368d6c90e",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: goblet-squat, half-squat. Stolkontakten och möjligheten till högre sits/armstöd ger en egen ingång. Behåll även den fria knäböjen som nästa steg; samma muskler gör dem inte till dubletter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/squat; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -144,6 +161,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Begränsad omgranskning: fasrutorna visar uppsteg med vald fot kvar på steget och fri fot som lyfts. Profil/front, H/V och reduced-motion Start/Slut stämmer med sidangivelsen och ryms. Kroppsvikt samt två hantlar 5/10 kg har synlig kontakt i granskade stillbilder. Textens råd om stadigt/lägre steg, hel fot och lugn nedsänkning lästa; ingen ny konkret avvikelse i bildproven. Befintlig punkt om full loop och nybörjarförståelse kvarstår. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E02: score 18/18 (T3 R3 AS3 AF3 U3 S3). Vyer finns/kontrollerade: sida och fram. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt, 2×5 kg och 2×10 kg. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. Ingen ny konkret avvikelse: hel stödfot på steget, fria benet följer med utan synlig frånskjutsstuds, blått ben/sidocue och anatomiskt H/V i front stämmer; båda hantlarna följer händerna och ryms. Frontens kortare lår i start är projektion mot betraktaren; ingen baseline-rad finns. Stadigt steg, lugn sänkning, lägre steg/väggstöd och råd att fråga fysioterapeuten om steghöjd finns. Befintlig processpunkt om nybörjarförståelse kvarstår: ingen nybörjardeltagare har provat guiden. Den gamla openIssues-raden behålls; issues avser återstående processkontroll, inte ett nytt text-/figurfel. Ingen godkännandestatus. Senaste rättare claude-sonnet: cross-vendor. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [
@@ -174,7 +199,7 @@
     "name": "Enbens rumänskt marklyft",
     "group": "dumbbell",
     "risk": "high",
-    "status": "unreviewed",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -205,10 +230,20 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio profilrutor samt reduced-motion Start/Slut, H/V och kroppsvikt/hantel/kettlebell granskade mot texten. Synlig höftfällning och bakåtfört fritt ben, stödets framfot ligger kvar och vikterna följer handen utan synlig beskärning. Speglingen byter stödbenets markering. Profilen räcker för höftfällningen men inte för att säkert bedöma höftrotation eller vilken hand som håller vikten i djupet. Rådet om handstöd/bakre tå läst, dessa lättare varianter visas inte separat. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E03: score 13/15 (T3 R3 AS1 AF n/a U3 S3). Vy finns/kontrollerad: sida. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt, 10 kg hantel och 16 kg kettlebell. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. AS1: bålen krymper tydligt i mittfaserna; hals–höft är cirka 38,0 i Start, 29,1 vid .5 och 38,5 i Slut. Baseline drift:neck-hip 9,4 bekräftas visuellt. Bålen ska rotera som ett segment, inte förkortas. Stödfot kvar i golvet, fritt ben bakåt och last i rätt hand; vikter följer händerna och ryms. Mindre: huvud–hals-drift 3,6, fri fot 3,5 och lårasymmetri 3,2; profil döljer bäckenrotation. Lång rygg och stolstöd/tåstöd som regression finns. Ingen ny tydlig osäker ryggform eller markkontakt i granskad profil. Ingen tidigare fixer. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E03 single-leg-rdl, profil fas .25–.75 och återgång, H/V, kroppsvikt/10 kg hantel/16 kg kettlebell: bålen krymper från cirka 38 till 29 enheter i höftfällningen och växer igen (baseline drift 9,4). Rotera en bål med konstant längd genom hela loopen."
+    ],
     "fingerprint": "61f149c0459a",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: balance-pendulum, dumbbell-rdl. Enbens höftfällning med kroppsvikt eller last ger en egen progression. Balanspendelns knäframföring är ett annat moment och behöver inte ersätta denna. Kodkopplingar: allmänna kandidatplatser A/hinge; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -219,7 +254,7 @@
     "name": "Dead bug",
     "group": "strength",
     "risk": "normal",
-    "status": "unreviewed",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -242,11 +277,20 @@
         "scope": "text",
         "result": "ok",
         "notes": "E04: nio profilfaser och reduced-motion H/V visar blå arm bakåt och blå ben framåt, andra arm upp och andra knä böjt. Sidocue anger motsatt arm/ben och speglingen byter paret; anatomisk höger/vänster-djupordning går inte säkert att läsa ur profilen. Huvud/bål kvar och ram räcker. Kroppsvikt. Text om utandning, ländrygg kvar och bara ben med böjt knä som förenkling finns. Armbågssträckning/ryggkontakt är schematisk; inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E04: score 13/15 (T3 R3 AS1 AF n/a U3 S3). Vy finns/kontrollerad: sida. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. AS1: den rörliga överarmen växer från 20,0 till 33,2 enheter; motsatta låret krymper från 30,1 till 21,6 i mitten. Underarmen går 20,0→14,2→18,1. Baseline överarmsdrift 13,2, lårdrift 8,6 och underarmsdrift 5,9 syns i fas-/livebilderna. Vald arm och motsatt ben är blå och följer rätt sidocue; stilla arm/ben ligger kvar, bålen ligger kvar mot mattan och hela figuren ryms. Andas ut/ländrygg mot golv och regression med bara böjda ben finns. Befintlig processpunkt om nybörjarförståelse kvarstår; ingen nybörjardeltagare eller uppspelad röst. Ingen tidigare fixer. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [],
     "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
+      "[strong] E04 dead-bug, profil fas 0–1 och återgång, H/V, kroppsvikt: rörliga överarmen växer cirka 20→33,2 medan motsatta låret krymper cirka 30,1→21,6 i mitten; även underarmen krymper. Behåll konstanta arm- och bensegment när lederna roteras (baseline drift 13,2/8,6/5,9)."
     ],
     "fingerprint": "911193812d0d",
     "notes": [
@@ -259,7 +303,7 @@
     "name": "Sidoplanka",
     "group": "strength",
     "risk": "normal",
-    "status": "unreviewed",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -282,11 +326,27 @@
         "scope": "text",
         "result": "ok",
         "notes": "E05: nio faser och reduced-motion H/V visar vald underarm som stöd och raka ben/fötter vid mattan, höften något högre i Slut och fri arm upp. Spegling/sidocue och ram stämmer. Kroppsvikt. Text om armbåge under axel, kroppslinje, lugn sänkning och knävariant finns. Start är redan uppstött; full uppgång från/sänkning till golvet och hålltid visas inte i underlaget. Djupordning och bäckenrotation osäkra. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E05: score 13/15 (T3 R3 AS1 AF n/a U3 S3). Vy finns/kontrollerad: sida. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja hålla. / Klart. Släpp positionen.; Fortsätt hålla.; Hålltid. Trevägskonsistens: consistent. Hållrättningen fungerar: live utan phase är oförändrad, motion hold, timer Hålltid och reduced-motion Start/Håll. DEV-fasbilderna visar avsiktligt setup→håll och är inte bevis på rörelse under hålltiden. Kroppslinjen i Håll är rak, armbågen under axeln, underarm/fötter på mattan, fri arm upp, H/V speglas och allt ryms. AS1: i själva Håll-posen är stödarmens överarm 36 enheter men den fria överarmen 18 (baseline asym:neck-eR 18); den stora längdskillnaden syns även statiskt. Anpassa armproportionerna. Mindre asymmetri i underarm 3,9 och lår 1,9. Regression från knäna finns; uppgång/avslut till golvet och knävarianten visas inte i livehållningen. Senaste rättare claude-sonnet: cross-vendor. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
-    "fixes": [],
-    "openIssues": [],
-    "fingerprint": "dfa0558cd828",
+    "fixes": [
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E05: Sidoplanka som statisk hållning (motion hold, stillbild Start/Håll). Slutposen rätad: höften på linjen hals-fotled (höft y 153, knän y 162), fria armen lodrät mot taket; tips 2 kompletterad med Sträck den fria armen mot taket. Sedda poser i sidovy via geometrimått; ej hela loopen i webbläsare."
+      }
+    ],
+    "openIssues": [
+      "[strong] E05 side-plank, profil Håll/live och reduced-motion Håll, H/V, kroppsvikt: stödarmens överarm ritas dubbelt så lång som den fria överarmen (36 mot 18 enheter; baseline asym 18). Ge armarna förenliga segmentlängder med bibehållen underarmskontakt och fri arm mot taket."
+    ],
+    "fingerprint": "ccb6c83898f7",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: plank, copenhagen-hold, bench-side-plank-leg-lift. Vanlig sidoplanka kräver ingen bänk och har en egen roll jämfört med framsidesplanka och adduktorvarianter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/core, B/side-core; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -296,7 +356,7 @@
     "name": "Stationärt utfall (split squat)",
     "group": "rehab/knee",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -351,6 +411,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio profilfaser samt reduced-motion H/V i profil/sned vy och kroppsvikt/2×5/2×10 kg granskade. Profilen visar knäböjning, främre fot och bakre tå kvar, händer mot vägg. Vald sida speglas och hantlar följer händerna i snedvyn; ramen räcker. Snedvyns förskjutna bakre golvplan gör exakt bakkontakt osäker. Text om upprätt bål, fasta fötter, kortare rörelse/stöd och fysioterapeutens djupval läst. Ok avser de synliga poserna, inte full kontaktkontinuitet. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E06: score 15/18 (T3 R3 AS2 AF1 U3 S3). Vyer finns/kontrollerade: sida och sned. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt, 2×5 kg och 2×10 kg. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. Rättningarna av bakre tåns kontaktlinje, väggstöd i kroppsvikt och två närliggande hantlar i profil fungerar. Båda händerna delar samma stödpunktsgeometri i sned vy, så en arm täcker den andra. Främre fot/bakre tå kvar och ingen klippning. AF1: låren kortas tydligt under sänkningen i sned vy, jämfört med profilens konstanta lår; baseline drift 9,5/8,2 i lår och stor underbensasymmetri 18,2. Ge snedvyn en anatomiskt sammanhängande projektion och bibehåll kontaktplanen. AS2 mindre överarmsdrift 3,4/2,8 i kroppsvikt; belastade profilarmar är stabila. Texten beskriver styrbart djup, handstöd utan vikter och att vikthänderna inte kan stödja; fysioterapeutråd om djup finns. Första livefångsten avbröts av utvecklingssidans omladdning; sida och sned fångades om med kontroll av H/V och last. Senaste rättare claude-sonnet: cross-vendor. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [
@@ -358,10 +426,17 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E06: sned vinkel, kroppsvikt: båda händerna når nu en väggstödlinje (data-support=wall) som i profilvarianten; viktvarianter oförändrade. Sedda faser 0, 0.5 och 1 i sned vy; båda händerna delar en punkt så bara en arm syns."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E06: Sned vinkel: bakre tån ligger nu på den streckade bakre kontaktlinjen i alla faser (linje y 146, tå y 146), främre underbenets ritade längd håller sig inom ±10 % genom loopen (knät glider framåt när det sänks). Profilvyn med hantlar: båda hantlarna hänger bredvid varandra vid höften i stället för att ritas som en bred stång (såg ut som frontvy). Sedda faser 0, 0.5 och 1 i profil och sned vy, kroppsvikt och hantel, via renderade bilder."
       }
     ],
-    "openIssues": [],
-    "fingerprint": "c5c2eebcc088",
+    "openIssues": [
+      "[strong] E06 split-squat, sned vy fas 0–1 och återgång, H/V, kroppsvikt/2×5 kg/2×10 kg: låren kortas tydligt under sänkningen (baseline drift 9,5/8,2), medan profilen håller konstanta lår. Korrigera projektion/segment så att kroppen förblir proportionerlig och främre fot/bakre tå behåller sina kontaktplan."
+    ],
+    "fingerprint": "3c38416714a8",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, rear-foot-split-squat. Fötterna står kvar och handstöd kan användas. Behåll detta enklare stationsbundna steg även om någon dynamisk utfallsvariant tas bort. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -371,7 +446,7 @@
     "name": "Enbens bäckenlyft med ryggstöd",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -418,6 +493,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Begränsad omgranskning: nio fasrutor visar bäckenlyft med vald fot i golvet, fri fot lyft och övre rygg vid lågt stöd. Slutposen visar höft/bål i linje. H/V-spegling, reduced-motion samt kroppsvikt, hantel och kettlebell på höften ryms; vikten följer höften och handen i granskade ändlägen. Textens stadiga stöd, jämnt bäcken och varning för svank lästa. Profilen kan inte visa bäckenets sidotippning. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E07: score 11/15 (T3 R3 AS1 AF n/a U1 S3). Vy finns/kontrollerad: sida. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt, 10 kg hantel och 16 kg kettlebell på höften. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. U1: viktvarianterna flyttar händerna till höften men lämnar armbågarna kvar; den främre underarmen blir cirka 45,1–52,5 enheter mot kroppsviktens 18,9. Bakre underarmen blir cirka 33,1–42,6. Den orimliga armförlängningen syns genom loopen och i stillbilderna; default-baseline omfattar inte dessa viktvarianter. Lasten följer höften och händerna, stödfoten är kvar och den fria foten är tydligt lyft redan i Start; ryggstödet och figuren ryms. AS1: endast profil finns, så instruktionens jämna bäcken kan inte demonstreras i sidled. Mindre geometri i kroppsvikt: båldrift 5,0, stödlår 3,2 och underben upp till 2,8. Stadigt lågt stöd, kontrollerad sänkning, undvik ökad svank och tvåbensregression finns. Inget tydligt belastat ryggfel i profilen. Senaste rättare claude-sonnet: cross-vendor. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [
@@ -427,7 +510,10 @@
         "notes": "E07: den fria foten (kL/aL/tL) hålls nu lyft från golvet i start och efter återgång (~23 enheter), skild från tvåbensvarianten. Sedd sida H fas 0 och 0.5."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E07 single-leg-hip-thrust, profil fas 0–1/återgång och reduced-motion, H/V, 10 kg hantel/16 kg kettlebell: händerna flyttas till höften utan motsvarande armbågsgeometri; främre underarmen är cirka 45,1–52,5 enheter mot 18,9 utan vikt. Lös armarna med konstanta segment så att händerna håller vikten på höften.",
+      "[strong] E07 single-leg-hip-thrust, alla faser och varianter: endast profil finns och döljer instruktionens jämna bäcken. Komplettera med front-/snedvy där bäckenets sidledsläge och stödfoten kan avläsas."
+    ],
     "fingerprint": "ece043c9ef91",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: single-leg-floor-bridge, glute-bridge. Ryggstöd och last på höften skiljer denna från golvvarianterna. Inte direkt utbytbar mot rehabens enbenslyft på golv. Kodkopplingar: allmänna kandidatplatser B/bridge; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -438,7 +524,7 @@
     "name": "Enbens tåhävning",
     "group": "rehab/knee-aaos",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -485,6 +571,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Begränsad omgranskning: fasrutorna visar lyft av stödbenets häl med tåkontakt kvar och fri fot ovan golvet. Handen når väggen i granskade rutor. H/V-spegling och reduced-motion visar samma rörelse; kroppsvikt och hantelvariant ryms med hanteln vid handen. Textens stabila stöd, långsamma sänkning och varning för studsar lästa. Fotens sidostabilitet kan inte avgöras i profil. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "538d6f8",
+        "notes": "E08: score 13/15 (T3 R3 AS2 AF n/a U2 S3). Vy finns/kontrollerad: sida. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: kroppsvikt och 10 kg hantel. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja. / repetitionsnummer / Klart.; återstart Fortsätt om tre. Två. Ett.; vila vid automatisk fortsättning Vila. N sekunder. Tempo 2 s ut/upp och 2 s tillbaka/ned utan föreskrivet håll. Trevägskonsistens: consistent. Valt blått ben är stödbenet och dess häl lyfter; sidocuen är rättad och stämmer med både röst och figur. Fria foten hålls lyft, tåänden behåller golvkontakt, en stödhand finns kvar även med hantel och vikten följer andra handen. Lugn cirka 4 s rep, spegling, ram och reduced-motion Start/Slut stämmer. AS2: stödfotens ritade längd ändras cirka 3,2 och tåkontakten glider cirka 2 enheter; U2: viktarmen har kortare överarm än motsatta stödarmen (cirka 20,9 mot 29,5–30,5) men grip-/väggkontakt och rörelsen förblir tydliga. Dessa mindre stiliseringar noteras utan openIssues. Baseline övrigt: fotasymmetri 6,4, underbensasymmetri 6,2; ingen motsvarande stor drift över loopen eller synligt kontaktfel. Stadigt stöd, långsam sänkning, varning för snabba studsar och tvåbensregression finns. Principerna stöd och långsam tåhävning jämförda med NHS strength exercises, https://www.nhs.uk/live-well/exercise/strength-exercises/ . Senaste rättare claude-sonnet: cross-vendor. Samtliga scopes ok och inga öppna punkter: godkänd. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [
@@ -505,7 +599,7 @@
     "name": "Väskbärning (suitcase carry)",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -560,6 +654,14 @@
         "scope": "animation",
         "result": "ok",
         "notes": "Nio profilfaser och reduced-motion H/V i profil/front med hantel/kettlebell: vikt i markerad hand, växlande fotlyft, upprätt bål och hela figuren inom ram. Frontens grepp och spegling tydliga; kontinuerlig fotisättning och sidolutning under gången ej verifierade. Text om lugna steg, upptag/nedsättning med höft/knäböjning och lättare/kortare alternativ läst. Upptag, vändning och nedläggning illustreras inte. Ok avser visade gångposer. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E09: score 15/18 (T3 R3 AS2 AF1 U3 S3). Vyer finns/kontrollerade: sida och fram. Granskat H/V i alla befintliga vyer och angivna laststeg: nio faser 0/.25/.5/.75/1/.75/.5/.25/0 vid 1280 px ljust, 0/.5/1 vid 390 px mörkt, reduced-motion i båda storlekarna. Live utan phase samplad i tidsordnade bilder över minst en loop per sida/vy/distinkt utrustningsvariant; för 2×10 kg används samma geometri som 2×5 kg och separata fasbilder/stillbilder. Ingen kontinuerlig videouppspelning eller live-loop vid 390 px. Laststeg: 10 kg hantel och 16 kg kettlebell. Röst kontrollerad: i källa, ej uppspelad; sidocue + Gör dig redo. Fem sekunder. / Börja gå. / Klart. Vila.; Fortsätt rörelsen.; Övningstid och status per hand. Trevägskonsistens: consistent. Tidsrättningen fungerar: seconds 20–40, Övningstid, Börja gå., per hand samt kortare tid stämmer med gångsekvensen. Live fångad på nytt i 28 tidsordnade bilder över cirka 14 s per vy/sida/variant, så hela 12 s-loopen och sömmen ingår. Profilen lyfter svängfoten och håller bålen upprätt; AS2 fri underarm är något kortare (baseline asym 3,9). Lasten sitter i vald hand och ryms i båda vyerna. AF1: frontens lår är oproportionerligt långa/ojämna; baseline 4,7/10,2 för hip-kR/L är överskott över max 36, alltså upp till cirka 46,2 enheter, inte driftens amplitud. Dessutom är gångfasen omvänd mellan vyerna: i .25 lyfts vänster fot i profil men höger i front (H), omvänt i .75. Reduced-motion front visar identiska Start/Slut eftersom fronten får fas 0/1 i en sluten cykel; profilen visar två olika steg. Befintlig processpunkt om nybörjarförståelse kvarstår, ingen deltagare. Neutral bål, böjda höfter/knän vid upptag/nedsättning och lättare vikt/kortare tid som regression finns. Senaste rättare claude-sonnet: cross-vendor. Global avbryttext i onboarding och smärtrapportering i passet finns. Arbetskopian har oincheckade figur-/textändringar; granskningen avser aktuell rendering, inte en ren HEAD. Reviewer-id codex:gpt61sol angivet av användaren. Bilder under .impeccable/review/e02-e10/ är inte incheckade; inget evidence-fält. "
       }
     ],
     "fixes": [
@@ -567,10 +669,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E09: ny gångcykel (carryPoses.ts) med stödfas och svängfot som lyfts ~10 enheter, upprätt bål, vikten i vald hand, exakt loopsöm; motion sequence (envägsloop). Sedda faser 0-1 i profil med hantel; vänster hand och kettlebell ej separat sedda. Stillbilderna är de två dubbelstödslägena."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E09: Enhet ändrad från meter till sekunder (20-40 s per hand, steg 5); tips och enklare variant omskrivna till tidsformulering; tidskue Börja gå tillagd (timedMovement.ts). Figur oförändrad. Gamla loggar migreras inte."
       }
     ],
     "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
+      "[strong] E09 suitcase-carry, front alla faser och reduced-motion, H/V, 10 kg hantel/16 kg kettlebell: låren är oproportionerligt långa och olika; baseline överskott över max 36 är 4,7/10,2, motsvarande upp till cirka 46,2 enheter. Korrigera frontens benproportioner med bibehållen gång och fotkontakt.",
+      "[cheap] E09 suitcase-carry, profil/front fas .25 och .75, H/V, båda vikter: vyerna lyfter motsatt fot vid samma fas (.25 H: vänster i profil, höger i front). Samordna frontens sväng-/stödfas med profilen så att vybyte behåller steget.",
+      "[cheap] E09 suitcase-carry, reduced-motion front Start/Slut, H/V, båda vikter: båda stillbilderna visar samma steg eftersom fas 0 och 1 är samma punkt i den slutna cykeln. Välj två skilda gångfaser så att alterneringen framgår."
     ],
     "fingerprint": "5fa166eaf280",
     "notes": [
@@ -583,7 +693,7 @@
     "name": "Bird dog",
     "group": "strength",
     "risk": "normal",
-    "status": "unreviewed",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -606,11 +716,22 @@
         "scope": "text",
         "result": "ok",
         "notes": "E10: nio profilfaser och reduced-motion H/V visar arm framåt och ben bakåt till bålhöjd, med andra handen/knäet som stöd. Sidocue anger motsatt arm/ben och speglingen byter paret. Ram räcker; kroppsvikt utan varianter. Text om händer under axlar/knän under höfter, stilla höft och bara arm/ben som förenkling finns. Profilen döljer anatomisk djupordning och bäckenrotation; återgång ej verifierad. Inget säkert textfel. Endast kontaktblad/stillbilder, ingen kontinuerlig animation; tempo, återgång och loopsöm ej visuellt verifierade. Ingen full säkerhetsacceptans eller godkännande. Kontaktblad från shots:exercises samt kompletterande bilder under .impeccable/review/audit-next/ (ej incheckade)."
+      },
+      {
+        "date": "2026-11-16",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "538d6f8",
+        "notes": "E10: score 14/18 (T3 R3 AS1 AF1 saknas U3 S3). Vy: sida (enda befintliga), H/V kroppsvikt; nio faser ut/åter, live över hel 4 s-loop, reduced-motion Start/Slut; 1280 px ljust och 390 px mörkt. Röst kontrollerad: i källa, ej uppspelad; ljud ej verifierat. Sidocue, Börja., repnummer och Klart. samt 2+2 s stämmer med ut/åter och rep vid fas 0. Trevägskonsistens: mismatch för knäkontakt; rörelse/sida/repordning stämmer. AS1: rörliga armsegment krymper 18→13,5 och växer till 20; rörligt lår 32,1→21,6→26. Baseline drift 6,6/6,6/10,9. Stödknät ligger vid y170 ovan mattans överkant y176 även i Start/Slut. AF1: front-/snedvy saknas för textens höftrotation. Bål och stödhand är stabila, figuren ryms. Endast arm/ben som förenkling och globalt smärtstopp finns. Visuell loopkontroll av befintlig vy/variant gjord; nybörjarförståelse ej prövad, befintlig processrad behålls exakt. Ingen fixer registrerad. Dirty arbetskopia: figur-, text- och tempofiler ändrade; commit är referens. Ej sett: front/sned, förenklad variant, live 390 px."
       }
     ],
     "fixes": [],
     "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
+      "[strong] E10 bird-dog, profil fas .25–.75 och återgång, H/V, kroppsvikt: rörliga över-/underarmen krymper 18→cirka 13,5 och växer till 20 enheter; motsatta låret krymper 32,1→21,6 (baseline drift 6,6/6,6/10,9). Rotera leder med konstanta segmentlängder genom hela loopen.",
+      "[strong] E10 bird-dog, profil hela loopen och reduced-motion Start/Slut, H/V, kroppsvikt: stödknät saknar mattkontakt; knäcentrum y170 och 6 enheters linjebredd lämnar en lucka till mattans överkant y176. Lägg stödknät på mattan och behåll kontakten när motsatt arm och ben lyfts, som instruktionen kräver.",
+      "[strong] E10 bird-dog, alla faser och reduced-motion, H/V, kroppsvikt: endast sidovy finns och döljer höftrotationen som anges i vanligt fel. Lägg till front-/snedvy som visar att höften hålls stilla utan rotation."
     ],
     "fingerprint": "e73c0b0ca7a6",
     "notes": [
@@ -685,10 +806,15 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E11: fötterna ett steg framför kroppen från start och fasta (ankel 96/94,174), ryggen mot väggen under hela rörelsen, benlängder 32/30 konstanta; tillagt i constrainLegInterpolation. Sedda faser 0-1 för kroppsvikt."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E11: Väggsittning som statisk hållning (motion hold, tillagd i HOLD_STILLS; ingen animerad sänkning/resning mer). Ingen geometriändring i posen. Vaktprov (timedHolds.test.ts) kräver motion hold för alla tidsövningar som inte rör sig."
       }
     ],
     "openIssues": [],
-    "fingerprint": "da2c4362bdcc",
+    "fingerprint": "2792b0774a17",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: half-squat, goblet-chair-squat. Statiskt vägghåll med självvalt djup är inte samma uppgift som dynamisk knäböj eller kort paus i halv knäböj. Kodkopplingar: nybörjarurval; allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -1152,6 +1278,11 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E18: ny gångcykel (farmerCarryPose, återanvänder suitcaseCarryPose för benen): fast stödfot, svängfot lyfts ~10 enheter, konstanta benlängder, upprätt bål, armarna hänger med svag motsving, exakt loopsöm; motion sequence. Frontvyns lyfta fot följer profilens gång (vänster t<0.5, höger t>0.5). Sedd profil och front fas 0-0.75 med hantel; andra viktvarianten ej separat sedd."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E18: Enhet ändrad från meter till sekunder (20-40 s, steg 5); tips och enklare variant omskrivna till tidsformulering; tidskue Börja gå tillagd. Figur oförändrad. Gamla loggar migreras inte."
       }
     ],
     "openIssues": [],
@@ -2265,6 +2396,11 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E40: profil: ny gångcykel (rackCarryPose, benen från suitcaseCarryPose) med fast stödfot och lyft svängfot, rackgreppet vid axeln med armbåge nedåt, fria armen hänger och svänger; motion sequence, exakt loopsöm. Frontvy: med V valt ligger kettlebellen nu vid vänster axel/övre bröst med armbåge nedåt (armvalet var bytt). Sedd profil och front fas 0-1; vikterna 4/8/16 kg ej separat sedda; frontvyn har ingen gångcykel (bara höger ben lyfts som förut)."
+      },
+      {
+        "date": "2026-11-16",
+        "fixer": "claude-sonnet",
+        "notes": "E40: Enhet ändrad från meter till sekunder (20-40 s per hand, steg 5); tips och enklare variant omskrivna till tidsformulering; tidskue Börja gå tillagd. Figur oförändrad. Gamla loggar migreras inte."
       }
     ],
     "openIssues": [],

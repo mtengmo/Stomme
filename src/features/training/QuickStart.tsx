@@ -524,7 +524,7 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
                 name="plan"
                 value="auto"
                 label="Automatiskt program"
-                hint="Vi bygger alla pass åt dig."
+                hint="Vi bygger alla pass åt dig, så många dagar du valt."
                 checked={plan === 'auto'}
                 onChange={() => update({ plan: 'auto' })}
               />
@@ -547,7 +547,8 @@ export function QuickStart({ redo }: { redo?: RedoStart }) {
                             {firstSentence(workout.summary)}
                           </span>
                           <span className="block">
-                            {count} övningar. Blir ditt första pass.
+                            {count} övningar. Blir hela programmet: ett pass, en
+                            dag i veckan.
                           </span>
                           <span className="block">{workout.caution}</span>
                         </>

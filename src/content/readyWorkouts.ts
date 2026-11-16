@@ -84,7 +84,7 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
     group: 'full',
     fixed: true,
     summary:
-      'Fem övningar som tar alla stora muskelgrupper: styrka, kondition och bål med bara två hantlar. Snabbt att göra. Kör 3 set med ca 60 s vila; appens vanliga progression sätter reps och vikt.',
+      'Fem övningar som tar alla stora muskelgrupper: styrka, kondition och bål med bara två hantlar. Snabbt att göra. Kör 3 set med ca 20–30 s vila; appens vanliga progression sätter reps och vikt.',
     caution:
       'Du behöver två stadiga hantlar. Passet passar vana tränande på grund av thrusters och armhävningar. Håll handlederna raka i rodd med stödjande hand. Avbryt vid smärta i rygg, nacke, handled eller axel. Situps passar inte vid ryggproblem, benskörhet, graviditet eller efter bukoperation.',
     exerciseIds: [

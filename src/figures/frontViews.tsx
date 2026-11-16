@@ -30,6 +30,7 @@ export const supportedFrontViews = [
 ] as const satisfies readonly ExerciseId[];
 
 export const supportedObliqueViews = [
+  'goblet-chair-squat',
   'split-squat',
   'bench-side-plank-leg-lift',
   'russian-twist',
@@ -846,6 +847,97 @@ function russianTwistProjection(progress: number): {
   };
 }
 
+/** Height of the dashed rear contact line in the oblique split squat. */
+export const SPLIT_REAR_LINE_Y = 146;
+/** Forward glide of the front knee at full depth (keeps the shin length). */
+const SPLIT_KNEE_GLIDE = 6.5;
+
+/** Thigh and shin of the oblique chair squat: those of the profile figure. */
+const CHAIR_THIGH = 31;
+const CHAIR_SHIN = 29;
+/** Upper arm and forearm of the profile figure (see its authored poses). */
+const CHAIR_UPPER_ARM = 18;
+const CHAIR_FOREARM = 17;
+const CHAIR_TRUNK = 39.1;
+/**
+ * The person faces forward-right, turned this far from the profile towards
+ * the viewer: forward distances shrink by cos, sideways ones show by sin.
+ */
+const CHAIR_YAW = (35 * Math.PI) / 180;
+/** Half the distance between the feet, and between the hands on the weight. */
+const CHAIR_FOOT_HALF = 12;
+const CHAIR_HAND_HALF = 3;
+const CHAIR_FOOT_FORWARD = 6;
+/** Seat of the chair in the oblique view; the hips reach it at t = 1. */
+export const CHAIR_OBLIQUE_SEAT_Y = 146;
+
+/**
+ * Oblique chair squat. The hips, trunk and planted feet come from the profile
+ * poses, projected with a forward-right turn. The two legs stand shoulder
+ * width apart and each knee is solved from the hip and its own ankle with the
+ * profile segment lengths, bending forward over the toes (never towards the
+ * other leg). Both hands rest on the weight at the chest; the arms keep their
+ * lengths through the whole movement.
+ */
+function chairSquatObliquePose(t: number): Pose {
+  const { start, end } = figures['goblet-chair-squat'];
+  const cos = Math.cos(CHAIR_YAW);
+  const sin = Math.sin(CHAIR_YAW);
+  const proj = (x: number, y: number, lateral = 0): Pt =>
+    point(100 + (x - 100) * cos + lateral * sin, y);
+  const at = (a: Pt, b: Pt): Pt =>
+    point(mix(a[0], b[0], t), mix(a[1], b[1], t));
+  const hipSide = at(start.hip, end.hip);
+  const neckSide = at(start.neck, end.neck);
+  const hip = proj(hipSide[0], hipSide[1]);
+  const lean = proj(neckSide[0], neckSide[1]);
+  const run = Math.hypot(lean[0] - hip[0], lean[1] - hip[1]);
+  const neck = point(
+    hip[0] + ((lean[0] - hip[0]) / run) * CHAIR_TRUNK,
+    hip[1] + ((lean[1] - hip[1]) / run) * CHAIR_TRUNK,
+  );
+  const head = point(neck[0] + 4, neck[1] - 14.3);
+  const leg = (side: 1 | -1) => {
+    // Right foot towards the viewer's left; both feet point straight ahead.
+    const ankle = proj(
+      start.aR[0] + CHAIR_FOOT_FORWARD,
+      174,
+      side * CHAIR_FOOT_HALF,
+    );
+    const toe = proj(
+      start.tR[0] + CHAIR_FOOT_FORWARD,
+      177,
+      side * CHAIR_FOOT_HALF,
+    );
+    return {
+      knee: joint(hip, ankle, CHAIR_THIGH, CHAIR_SHIN, -1),
+      ankle,
+      toe,
+    };
+  };
+  const right = leg(-1);
+  const left = leg(1);
+  const grip = (side: 1 | -1): Pt =>
+    point(neck[0] + 16 + side * CHAIR_HAND_HALF * sin, neck[1] + 12);
+  const armR = solveTwoBone(neck, grip(-1), CHAIR_UPPER_ARM, CHAIR_FOREARM, 1);
+  const armL = solveTwoBone(neck, grip(1), CHAIR_UPPER_ARM, CHAIR_FOREARM, 1);
+  return skeleton(
+    head,
+    neck,
+    hip,
+    armR.mid,
+    armR.end,
+    armL.mid,
+    armL.end,
+    right.knee,
+    right.ankle,
+    right.toe,
+    left.knee,
+    left.ankle,
+    left.toe,
+  );
+}
+
 /** Three-quarter projections expose front/back support relationships. */
 export function obliqueMovementPose(
   exerciseId: ObliqueViewExercise,
@@ -854,32 +946,37 @@ export function obliqueMovementPose(
 ): Pose {
   const t = clamp(progress);
   if (exerciseId === 'russian-twist') return russianTwistProjection(t).pose;
+  if (exerciseId === 'goblet-chair-squat') return chairSquatObliquePose(t);
   if (exerciseId === 'split-squat') {
     const depth = t;
     const rightFront = working !== 'left';
     const hip = point(100, mix(111, 133, depth));
     const neck = point(104, hip[1] - 44);
+    // The front shin keeps its drawn length within 10 %: as the knee drops it
+    // also glides forward over the toes, so the projection does not squash it.
+    const kneeShift = mix(0, SPLIT_KNEE_GLIDE, depth);
     const front = rightFront
       ? {
-          knee: point(82, mix(145, 153, depth)),
+          knee: point(83 - kneeShift, mix(145.5, 150, depth)),
           ankle: point(81, 174),
           toe: point(71, 177),
         }
       : {
-          knee: point(118, mix(145, 153, depth)),
+          knee: point(117 + kneeShift, mix(145.5, 150, depth)),
           ankle: point(119, 174),
           toe: point(129, 177),
         };
+    // The rear toe stays on the rear contact line (SPLIT_REAR_LINE_Y) in every phase.
     const rear = rightFront
       ? {
           knee: point(120, mix(136, 146, depth)),
-          ankle: point(128, 143),
-          toe: point(138, 146),
+          ankle: point(128, SPLIT_REAR_LINE_Y - 3),
+          toe: point(138, SPLIT_REAR_LINE_Y),
         }
       : {
           knee: point(80, mix(136, 146, depth)),
-          ankle: point(72, 143),
-          toe: point(62, 146),
+          ankle: point(72, SPLIT_REAR_LINE_Y - 3),
+          toe: point(62, SPLIT_REAR_LINE_Y),
         };
     const right = rightFront ? front : rear;
     const left = rightFront ? rear : front;
@@ -1066,18 +1163,25 @@ export function FrontFigureFrame({
       : exerciseId === 'goblet-squat' ||
           exerciseId === 'kettlebell-goblet-squat'
         ? [[100, pose.neck[1] + 11]]
-        : exerciseId === 'farmer-carry'
-          ? [pose.hR, pose.hL]
-          : exerciseId === 'side-lunge'
-            ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
-            : exerciseId === 'russian-twist' || exerciseId === 'woodchop'
+        : exerciseId === 'goblet-chair-squat'
+          ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2 + 6]]
+          : exerciseId === 'farmer-carry'
+            ? [pose.hR, pose.hL]
+            : exerciseId === 'side-lunge'
               ? [[(pose.hR[0] + pose.hL[0]) / 2, (pose.hR[1] + pose.hL[1]) / 2]]
-              : exerciseId === 'kettlebell-rack-carry' ||
-                  exerciseId === 'suitcase-carry'
-                ? [rackSide === 'R' ? pose.hR : pose.hL]
-                : kind === 'kettlebell' && exerciseId !== 'step-up'
-                  ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
-                  : [pose.hR, pose.hL];
+              : exerciseId === 'russian-twist' || exerciseId === 'woodchop'
+                ? [
+                    [
+                      (pose.hR[0] + pose.hL[0]) / 2,
+                      (pose.hR[1] + pose.hL[1]) / 2,
+                    ],
+                  ]
+                : exerciseId === 'kettlebell-rack-carry' ||
+                    exerciseId === 'suitcase-carry'
+                  ? [rackSide === 'R' ? pose.hR : pose.hL]
+                  : kind === 'kettlebell' && exerciseId !== 'step-up'
+                    ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
+                    : [pose.hR, pose.hL];
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
   const color = (side: 'R' | 'L') =>
     working === null || (working === 'right' ? side === 'R' : side === 'L')
@@ -1173,7 +1277,7 @@ export function FrontFigureFrame({
       {exerciseId === 'split-squat' ? (
         <path
           data-contact-plane="rear-foot"
-          d="M54 151h96"
+          d={`M54 ${SPLIT_REAR_LINE_Y}h96`}
           fill="none"
           stroke="var(--edge)"
           strokeWidth="2"
@@ -1261,6 +1365,23 @@ export function FrontFigureFrame({
           <path d="M79 137h42M83 139v34M117 139v34" />
         </g>
       ) : null}
+      {exerciseId === 'goblet-chair-squat' ? (
+        <g
+          data-support="chair"
+          fill="var(--surface)"
+          stroke="var(--equipment)"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path
+            d={`M52 ${CHAIR_OBLIQUE_SEAT_Y}H90L98 ${CHAIR_OBLIQUE_SEAT_Y - 6}H60Z`}
+          />
+          <path
+            d={`M55 ${CHAIR_OBLIQUE_SEAT_Y + 2}V175M87 ${CHAIR_OBLIQUE_SEAT_Y + 2}V175M96 ${CHAIR_OBLIQUE_SEAT_Y - 4}V170`}
+          />
+        </g>
+      ) : null}
       {exerciseId === 'bench-side-plank-leg-lift' ? (
         <g
           data-support="bench"
@@ -1344,7 +1465,12 @@ export function FrontFigureFrame({
       {!heldIsRack && kind ? (
         <g data-equipment={kind}>
           {heldAt.map((at) => (
-            <Held key={at.join(',')} kind={kind} at={at} />
+            <Held
+              key={at.join(',')}
+              kind={kind}
+              at={at}
+              vertical={exerciseId === 'goblet-chair-squat'}
+            />
           ))}
         </g>
       ) : null}

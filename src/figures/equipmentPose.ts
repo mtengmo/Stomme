@@ -30,10 +30,14 @@ export function applyEquipmentPose(
       hR: [pose.hip[0] + 10, pose.hip[1] + 8],
     };
     if (exerciseId === 'split-squat')
+      // In profile the two weights hang side by side: near and far hand sit
+      // almost on top of each other, so they do not read as one wide bar (a front view).
       p = {
         ...p,
-        eL: [pose.neck[0] - 8, pose.neck[1] + 20],
-        hL: [pose.hip[0] - 12, pose.hip[1] + 8],
+        eR: [pose.neck[0] + 3, pose.neck[1] + 20],
+        hR: [pose.hip[0] + 3, pose.hip[1] + 8],
+        eL: [pose.neck[0] - 3, pose.neck[1] + 20],
+        hL: [pose.hip[0] - 3, pose.hip[1] + 8],
       };
   }
   if (
@@ -68,16 +72,21 @@ export function applyEquipmentPose(
   }
   const anchors: Pt[] = twoHandedBell
     ? [p.hR]
-    : exerciseId === 'russian-twist'
-      ? [[(p.hR[0] + p.hL[0]) / 2, (p.hR[1] + p.hL[1]) / 2]]
-      : exerciseId === 'single-leg-hip-thrust' || exerciseId === 'glute-bridge'
-        ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
-        : (
-            spec.held?.hands ??
-            (exerciseId === 'split-squat'
-              ? (['hR', 'hL'] as const)
-              : (['hR'] as const))
-          ).map((hand) => p[hand]);
+    : exerciseId === 'goblet-chair-squat'
+      ? // Goblet hold: both hands (one point in profile) cup the top of the
+        // weight, which hangs below them against the chest.
+        [[p.hR[0], p.hR[1] + 6]]
+      : exerciseId === 'russian-twist'
+        ? [[(p.hR[0] + p.hL[0]) / 2, (p.hR[1] + p.hL[1]) / 2]]
+        : exerciseId === 'single-leg-hip-thrust' ||
+            exerciseId === 'glute-bridge'
+          ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
+          : (
+              spec.held?.hands ??
+              (exerciseId === 'split-squat'
+                ? (['hR', 'hL'] as const)
+                : (['hR'] as const))
+            ).map((hand) => p[hand]);
   if (equipment === null && exerciseId === 'goblet-squat')
     p = {
       ...p,

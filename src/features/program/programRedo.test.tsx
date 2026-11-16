@@ -42,15 +42,14 @@ const mount = (
 const names = () =>
   screen.getAllByRole('listitem').map((li) => li.textContent?.trim());
 
-it('keeps the ready pass as pass 1 and reshuffles only the rest', async () => {
+it('rebuilds a ready programme as the same single pass on one day', async () => {
   const ready = readyProgramPass('running-strength', programPrefs);
   if (!ready) throw new Error('ready pass missing');
   const program = await seedProgram(3, programPrefs, ready);
+  expect(program.daysPerWeek).toBe(1);
   const rebuilt = rebuildProgram(program, programPrefs, 'new', 7, 'x');
-  expect(rebuilt?.passes).toHaveLength(3);
-  expect(rebuilt?.passes[0]).toEqual(ready);
-  expect(rebuilt?.passes[1]?.ready).toBeUndefined();
-  expect(rebuilt?.passes[2]?.ready).toBeUndefined();
+  expect(rebuilt?.daysPerWeek).toBe(1);
+  expect(rebuilt?.passes).toEqual([ready]);
 });
 
 it('keeps "Behåll programmet" enabled when no programme can be built', async () => {

@@ -144,7 +144,10 @@ export interface BuildProgramInput {
   curated?: boolean;
   /** Variation seed (uint32). Absent: the first candidate of every slot. */
   seed?: number;
-  /** A ready-made pass (rules/readyProgramPass.ts); it replaces pass 1 in every row. */
+  /**
+   * A ready-made pass (rules/readyProgramPass.ts). A ready workout is the whole
+   * programme: one pass on one day, whatever `daysPerWeek` says.
+   */
   ready?: ProgramPass;
 }
 
@@ -154,8 +157,23 @@ export interface BuildProgramInput {
  * lower body in turn, then whole body A/B in turn.
  */
 export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
-  const { preferences, daysPerWeek, emphasis, pool, seed } = input;
+  const { preferences, emphasis, pool, seed } = input;
   if (preferences.programId === 'rehab') return null;
+  if (input.ready)
+    return {
+      id: input.id,
+      block: input.block ?? 1,
+      createdAt: input.now,
+      startDate: input.startDate,
+      daysPerWeek: 1,
+      emphasis,
+      weekdays: weekdaysFor(input.startDate, 1),
+      passes: [input.ready],
+      curated: pool !== undefined && input.curated !== false,
+      ...(seed !== undefined ? { seed } : {}),
+      level: preferences.experience,
+    };
+  const { daysPerWeek } = input;
   const curated = pool !== undefined && input.curated !== false;
   const context: Omit<RosterContext, 'focus'> = {
     ...(pool ? { pool } : {}),
@@ -175,14 +193,7 @@ export function buildProgram(input: BuildProgramInput): TrainingProgram | null {
     wholeBodyRow(daysPerWeek),
   ];
   for (const row of rows) {
-    // A ready pass is pass 1; only the rest of the row is generated.
-    const generated = rosterRow(
-      input.ready ? row.slice(1) : row,
-      preferences,
-      context,
-    );
-    const passes =
-      generated && input.ready ? [input.ready, ...generated] : generated;
+    const passes = rosterRow(row, preferences, context);
     if (passes)
       return {
         id: input.id,

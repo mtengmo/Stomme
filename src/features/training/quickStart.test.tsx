@@ -635,8 +635,7 @@ it('offers the plan step when changing the planning and saves the ready pass', a
     daysPerWeek: number;
     passes: { ready?: { id: string } }[];
   };
-  expect(program.daysPerWeek).toBe(3);
-  expect(program.passes).toHaveLength(3);
+  expect(program.daysPerWeek).toBe(1);
+  expect(program.passes).toHaveLength(1);
   expect(program.passes[0]?.ready?.id).toBe('runner-ten');
-  expect(program.passes[1]?.ready).toBeUndefined();
 });

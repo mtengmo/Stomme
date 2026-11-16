@@ -234,18 +234,23 @@ describe('buildProgram with a ready pass', () => {
     expect(p?.passes).toEqual([readyPass]);
     expect(p?.passes[0]?.exerciseIds).not.toContain('knee-push-up');
   });
-  it('keeps the ready pass as pass 1 for 2-5 days', () => {
+  it('stays one pass on one day whatever the days per week', () => {
     for (const d of [2, 3, 4, 5] as const) {
       const p = make({ daysPerWeek: d, ready: readyPass });
-      expect(p?.passes).toHaveLength(d);
-      expect(p?.passes[0]).toEqual(readyPass);
-      expect(p?.passes[1]?.ready).toBeUndefined();
+      expect(p?.daysPerWeek).toBe(1);
+      expect(p?.weekdays).toHaveLength(1);
+      expect(p?.passes).toEqual([readyPass]);
     }
   });
-  it('keeps it in the fallback rows', () => {
+  it('needs no pool or fallback row to build', () => {
     const p = pool(['back-extension', 'plank', 'side-plank', 'wall-push-up']);
     const built = make({ pool: p, ready: readyPass });
-    expect(built?.passes[0]).toEqual(readyPass);
-    expect(shape(built)).toBe('lowerA fullB');
+    expect(built?.passes).toEqual([readyPass]);
+    expect(built?.curated).toBe(true);
+  });
+  it('is still null for rehab', () => {
+    expect(
+      make({ ready: readyPass }, { ...home, programId: 'rehab' }),
+    ).toBeNull();
   });
 });

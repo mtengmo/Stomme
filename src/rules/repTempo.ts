@@ -29,6 +29,17 @@ const FIXED_REP_MS: Partial<Record<ExerciseId, number>> = {
   'one-arm-kettlebell-swing': 2_000,
   burpee: 6_000,
 };
+/**
+ * Rep exercises whose first movement (progress 0 to 1) is a slower, controlled
+ * lowering and whose return is quicker. Without a hold, one rep counts when
+ * the return ends.
+ */
+const MOVEMENT_MS: Partial<
+  Record<ExerciseId, { upMs: number; downMs: number }>
+> = {
+  // Stand, lower to the chair on 3 s (the written instruction), stand up on 2 s.
+  'goblet-chair-squat': { upMs: 3_000, downMs: 2_000 },
+};
 /** Figures whose animation is one whole repetition per cycle, not up and down. */
 const SEQUENCE_FIGURES: readonly ExerciseId[] = ['squat-jump', 'burpee'];
 
@@ -66,9 +77,10 @@ export function repTempo(id: ExerciseId): RepTempo | null {
   // The physio catalogue prescribes no hold; the beat still pauses 3 s at the top.
   const holdSeconds = id === 'quad-set' ? 3 : exerciseMetadata[id].holdSeconds;
   const hasHold = holdSeconds !== undefined;
-  const upMs = hasHold ? 1_500 : 2_000;
+  const movement = hasHold ? undefined : MOVEMENT_MS[id];
+  const upMs = movement?.upMs ?? (hasHold ? 1_500 : 2_000);
   const holdMs = (holdSeconds ?? 0) * 1_000;
-  const downMs = upMs;
+  const downMs = movement?.downMs ?? upMs;
   const relaxMs = hasHold ? (relaxSeconds ?? 1) * 1_000 : 0;
   return {
     upMs,

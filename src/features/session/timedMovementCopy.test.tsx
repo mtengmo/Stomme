@@ -57,6 +57,9 @@ const MOVING: ExerciseId[] = [
   'lateral-shuffle',
   'knee-drive',
   'plate-pogos',
+  'suitcase-carry',
+  'farmer-carry',
+  'kettlebell-rack-carry',
 ];
 
 describe('timer copy for timed exercises', () => {

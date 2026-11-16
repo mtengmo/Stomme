@@ -116,40 +116,43 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
   ...additionalFigures,
   ...rehabFigures,
   'goblet-chair-squat': {
+    // Start standing in front of the chair (the written sequence), lower to
+    // the seat at the end. Both arms keep the same two segments (18 + 17) in
+    // every phase: the hands stay on the chest and only the elbows move.
     start: pose(
-      [97, 92],
-      [92, 106],
-      [82, 144],
-      [
-        [102, 124],
-        [108, 108],
-        [100, 124],
-        [106, 108],
-      ],
-      [
-        [112.9, 146.4],
-        [104, 174],
-        [114, 177],
-        [112.8, 147.5],
-        [101, 174],
-        [111, 177],
-      ],
-    ),
-    end: pose(
       [111, 62],
       [106, 76],
       [104, 115],
       [
-        [114, 92],
-        [118, 82],
-        [112, 92],
-        [116, 82],
+        [106.1, 94],
+        [122, 88],
+        [106.1, 94],
+        [122, 88],
       ],
       [
         [109.5, 145.5],
         [104, 174],
         [114, 177],
         [107.7, 145.8],
+        [101, 174],
+        [111, 177],
+      ],
+    ),
+    end: pose(
+      [97, 92],
+      [92, 106],
+      [82, 144],
+      [
+        [92.1, 124],
+        [108, 118],
+        [92.1, 124],
+        [108, 118],
+      ],
+      [
+        [112.9, 146.4],
+        [104, 174],
+        [114, 177],
+        [112.8, 147.5],
         [101, 174],
         [111, 177],
       ],
@@ -269,7 +272,7 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
     end: pose(
       [47, 132],
       [60, 136],
-      [104, 150],
+      [104, 153],
       [
         [60, 172],
         [74, 174],
@@ -277,15 +280,16 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
         [60, 100],
       ],
       [
-        [128, 161],
+        [128, 162],
         [152, 172],
         [158, 176],
-        [130, 161],
+        [130, 162],
         [154, 172],
         [160, 176],
       ],
     ),
     props: [{ type: 'mat', x1: 14, x2: 186 }],
+    motion: 'hold',
   },
   'split-squat': {
     start: pose(
@@ -499,6 +503,7 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
       ],
     ),
     props: [{ type: 'wall', x: 64 }],
+    motion: 'hold',
   },
 };
 

@@ -157,7 +157,8 @@ describe('hands-free reps through the session runner', () => {
     await until(() => button('Starta – 5 s förberedelse') !== null);
     await press('Starta – 5 s förberedelse');
     await until(() => has(/^Pågår/));
-    await run(9_000);
+    // One chair-squat rep is 5 s (3 s lowering, 2 s standing): two reps by 11 s.
+    await run(11_000);
     await press('Avsluta setet');
     await until(() => has('Set 1 loggat'));
     const [log] = await getDb().setLogs.toArray();

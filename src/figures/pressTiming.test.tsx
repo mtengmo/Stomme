@@ -1,8 +1,10 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { exerciseMetadata } from '../content/exerciseMetadata';
+import { exercises } from '../content/exercises';
 import { demonstrationTiming, FigureFrame, movementPose } from './Figure';
 import { cycleProgress, TWEEN_MS } from './lerp';
+import { figures } from './poses';
 import { pressGripAngle } from './props';
 
 describe('supported press grip and demonstration timing', () => {
@@ -82,5 +84,22 @@ describe('supported press grip and demonstration timing', () => {
       ).toBe(0);
     }
     expect(demonstrationTiming('prone-leg-raise').startHoldMs).toBe(2000);
+  });
+});
+
+describe('goblet chair squat demonstration', () => {
+  it('lowers on 3 s and rises on 2 s like the rep counter and the written tip', () => {
+    expect(demonstrationTiming('goblet-chair-squat')).toMatchObject({
+      tweenMs: 3000,
+      returnMs: 2000,
+      startHoldMs: 0,
+      endHoldMs: 0,
+    });
+    expect(exercises['goblet-chair-squat'].tips[1]).toContain('3 sekunder');
+  });
+  it('starts standing and ends seated, also in the reduced-motion stills', () => {
+    const { start, end } = figures['goblet-chair-squat'];
+    expect(start.hip[1]).toBeLessThan(end.hip[1] - 20);
+    expect(Math.abs(end.hip[1] - 146)).toBeLessThan(4);
   });
 });

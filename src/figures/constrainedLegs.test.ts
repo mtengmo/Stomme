@@ -64,3 +64,34 @@ describe('constrained leg interpolation', () => {
     expect(movementPose('split-squat', 1).kL).not.toEqual(start.kL);
   });
 });
+
+describe('goblet chair squat arms', () => {
+  it('keeps both arm segments constant, with hands on the chest, in every phase', async () => {
+    const { movementPose } = await import('./Figure');
+    const { applyEquipmentPose } = await import('./equipmentPose');
+    for (const equipment of [null, 'dumbbell', 'kettlebell'] as const)
+      for (const side of [
+        ['eR', 'hR'],
+        ['eL', 'hL'],
+      ] as const) {
+        const upper: number[] = [];
+        const fore: number[] = [];
+        for (let i = 0; i <= 40; i++) {
+          const p = applyEquipmentPose(
+            'goblet-chair-squat',
+            movementPose('goblet-chair-squat', i / 40),
+            equipment,
+          ).p;
+          upper.push(Math.hypot(p.eR[0] - p.neck[0], p.eR[1] - p.neck[1]));
+          fore.push(
+            Math.hypot(
+              p[side[1]][0] - p[side[0]][0],
+              p[side[1]][1] - p[side[0]][1],
+            ),
+          );
+        }
+        expect(Math.max(...upper) - Math.min(...upper)).toBeLessThan(0.3);
+        expect(Math.max(...fore) - Math.min(...fore)).toBeLessThan(0.3);
+      }
+  });
+});

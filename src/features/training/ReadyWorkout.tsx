@@ -126,7 +126,7 @@ export function ReadyWorkout({
       ) : null}
       {!physio && !knee && !hasHistory ? (
         <p className="m-0 text-base text-ink-soft">
-          2 × 10 = 2 set med 10 repetitioner. 60 s vila mellan seten.
+          2 × 10 = 2 set med 10 repetitioner. 20–30 s vila mellan seten.
         </p>
       ) : null}
       {undoBanner}

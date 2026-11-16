@@ -15,6 +15,16 @@ describe('repTempo', () => {
     expect(t).toMatchObject({ upMs: 2000, downMs: 2000, repMs: 4000 });
     expect(t && repSeconds(t)).toBe(4);
   });
+  it('lowers to the chair on 3 s and stands on 2 s, a rep ending standing', () => {
+    const t = repTempo('goblet-chair-squat');
+    expect(t).toMatchObject({ upMs: 3000, downMs: 2000, repMs: 5000 });
+    if (!t) throw new Error('tempo');
+    // Progress 0 is standing, 1 is seated; the rep counts when standing again.
+    expect(repProgress(t, 0)).toBe(0);
+    expect(repProgress(t, 3000)).toBe(1);
+    expect(repPosition(t, 4999)).toEqual({ completed: 0, phase: 'down' });
+    expect(repPosition(t, 5000)).toEqual({ completed: 1, phase: 'up' });
+  });
   it('adds the hold and a default one second relax for hold exercises', () => {
     const t = repTempo('half-squat');
     expect(t).toMatchObject({ upMs: 1500, holdMs: 5000, relaxMs: 1000 });

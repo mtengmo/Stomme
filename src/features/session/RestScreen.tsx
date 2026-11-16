@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { EFFORT_LABEL, sideLabel } from '../../content/copy';
-import type { Effort, Exercise } from '../../domain/types';
+import { loadPresentation } from '../../content/loadPresentation';
+import type { Effort, Exercise, ExerciseId } from '../../domain/types';
 import { formatClock } from '../../lib/format';
 import { stopTimerVoice, timerVoice } from '../../lib/timerVoice';
 import { useCountdown } from '../../lib/useCountdown';
 import type { SetStep } from '../../rules/sessionPlan';
 import { Button } from '../../ui/Button';
 import { PencilTick } from '../../ui/PencilTick';
+import { FigureSlot } from './FigureSlot';
 import { SessionFrame, type SessionFrameProps } from './SessionFrame';
 
 const RADIUS = 124;
@@ -17,6 +19,10 @@ interface RestScreenProps {
   nextExercise: Exercise | undefined;
   nextStep: SetStep | undefined;
   nextTotalSets: number;
+  /** The exercise just done; the same id as the next set's makes the label "Nästa set". */
+  currentExerciseId?: ExerciseId;
+  /** Load and variant the next set starts with; drives the figure and the how-to. */
+  nextPreview?: { loadIndex: number; variantId?: string };
   onContinue(): void;
   /** True when the rest follows a set (not an effort answer): draws the tick. */
   afterSet: boolean;
@@ -32,6 +38,8 @@ export function RestScreen({
   nextExercise,
   nextStep,
   nextTotalSets,
+  currentExerciseId,
+  nextPreview,
   onContinue,
   afterSet,
   autoContinue = false,
@@ -71,6 +79,8 @@ export function RestScreen({
   const fraction = over ? 0 : Math.min(1, timer.seconds / total.current);
   const side =
     nextExercise && nextStep ? sideLabel(nextExercise, nextStep.side) : '';
+  const sameExercise =
+    nextExercise !== undefined && nextExercise.id === currentExerciseId;
   return (
     <SessionFrame
       {...frame}
@@ -196,6 +206,34 @@ export function RestScreen({
             {side ? ` · ${side}` : ''}
           </p>
         </div>
+      ) : null}
+      {nextExercise && nextStep && nextPreview ? (
+        <section
+          aria-label={sameExercise ? 'Nästa set' : 'Nästa övning'}
+          className="flex flex-col gap-2 border-t-2 border-edge pt-2"
+        >
+          <h2 className="m-0 text-lg font-bold">
+            {sameExercise ? 'Nästa set' : 'Nästa övning'}
+          </h2>
+          <div className="h-48 [&>.session-movement]:h-full">
+            <FigureSlot
+              exerciseId={nextExercise.id}
+              side={nextStep.side}
+              loadIndex={nextPreview.loadIndex}
+              variantId={nextPreview.variantId}
+            />
+          </div>
+          <h3 className="m-0 text-base font-bold">Så gör du</h3>
+          <ol className="m-0 list-decimal space-y-1 pl-6 text-base">
+            {loadPresentation(
+              nextExercise,
+              nextPreview.loadIndex,
+              nextPreview.variantId,
+            ).tips.map((tip) => (
+              <li key={tip}>{tip}</li>
+            ))}
+          </ol>
+        </section>
       ) : null}
     </SessionFrame>
   );

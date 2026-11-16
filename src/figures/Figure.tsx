@@ -183,11 +183,13 @@ export function demonstrationTiming(id: ExerciseId) {
       endHoldMs: tempo.holdMs,
       startHoldMs: tempo.relaxMs,
       tweenMs: tempo.upMs,
+      returnMs: tempo.downMs,
     };
   return {
     tweenMs: TWEEN_MS,
     endHoldMs: (metadata.holdSeconds ?? 0.8) * 1000,
     startHoldMs: (metadata.relaxSeconds ?? 0.8) * 1000,
+    returnMs: TWEEN_MS,
   };
 }
 
@@ -259,6 +261,8 @@ const HOLD_STILLS: ReadonlySet<ExerciseId> = new Set([
   'copenhagen-hold',
   'bent-knee-calf-hold',
   'isometric-lunge-hold',
+  'side-plank',
+  'wall-sit',
 ]);
 
 /** Per-exercise framing: a lying body would otherwise sit small in the card. */
@@ -530,7 +534,10 @@ export function FigureFrame({
                 key={at.join(',')}
                 kind={heldKind}
                 at={at}
-                vertical={exerciseId === 'hammer-curl'}
+                vertical={
+                  exerciseId === 'hammer-curl' ||
+                  exerciseId === 'goblet-chair-squat'
+                }
                 // Halo: held upside down, ball above the two-hand grip.
                 // Hammer curl: the dumbbell follows its forearm (neutral wrist).
                 angle={
@@ -632,6 +639,7 @@ export function Figure({
                   demonstrationTiming(exerciseId).endHoldMs,
                   demonstrationTiming(exerciseId).startHoldMs,
                   demonstrationTiming(exerciseId).tweenMs,
+                  demonstrationTiming(exerciseId).returnMs,
                 ),
       );
       raf = requestAnimationFrame(tick);

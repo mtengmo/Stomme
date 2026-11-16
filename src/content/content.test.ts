@@ -38,13 +38,13 @@ describe('templates', () => {
     }
   });
 
-  it('uses 3 sets for the carry and 60 s rest everywhere', () => {
+  it('uses 3 sets for the carry and 20 s rest everywhere', () => {
     const carry = templates.B.items.find(
       (i) => i.exerciseId === 'suitcase-carry',
     );
     expect(carry?.sets).toBe(3);
     for (const t of Object.values(templates)) {
-      for (const i of t.items) expect(i.restSec).toBe(60);
+      for (const i of t.items) expect(i.restSec).toBe(20);
     }
   });
 });

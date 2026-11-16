@@ -60,7 +60,7 @@ it('has no E-codes, shows the beginner note and the set legend without history',
   expect(screen.queryByText(/Antal bygger på/)).toBeNull();
   expect(
     screen.getByText(
-      '2 × 10 = 2 set med 10 repetitioner. 60 s vila mellan seten.',
+      '2 × 10 = 2 set med 10 repetitioner. 20–30 s vila mellan seten.',
     ),
   ).toBeTruthy();
 });

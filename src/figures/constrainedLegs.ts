@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
 import type { Pose } from './poses';
 
@@ -101,5 +102,30 @@ export function constrainLegInterpolation(
 
     out[knee] = solveKnee(out.hip, out[ankle], out[knee], upper, lower);
   }
+  if (exerciseId === 'goblet-chair-squat') keepArmLengths(out, referencePoses);
   return out;
+}
+
+/**
+ * Both arms keep the segment lengths of the authored start pose: the hands
+ * follow the interpolated chest position and each elbow is solved from the
+ * shoulder, so the forearms never shrink while the trunk leans.
+ */
+function keepArmLengths(out: Pose, referencePoses: readonly Pose[]) {
+  const ref = referencePoses[0];
+  if (!ref) return;
+  for (const [elbow, hand] of [
+    ['eR', 'hR'],
+    ['eL', 'hL'],
+  ] as const) {
+    const arm = solveTwoBone(
+      out.neck,
+      out[hand],
+      distance(ref.neck, ref[elbow]),
+      distance(ref[elbow], ref[hand]),
+      1,
+    );
+    out[elbow] = arm.mid;
+    out[hand] = arm.end;
+  }
 }

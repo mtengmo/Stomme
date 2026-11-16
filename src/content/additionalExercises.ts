@@ -34,6 +34,12 @@ const kneeLoadedAdditional = new Set<ExerciseId>([
   'one-arm-kettlebell-swing',
 ]);
 
+/** Carries are timed walks, so they get a longer ceiling than holds. */
+const timedCarries: ReadonlySet<ExerciseId> = new Set([
+  'farmer-carry',
+  'kettlebell-rack-carry',
+]);
+
 /** Library defaults are editable starting points, not an AAOS prescription. */
 function entry(
   id: ExerciseId,
@@ -77,7 +83,9 @@ function entry(
       : {}),
     range:
       unit === 'seconds'
-        ? { start: 20, max: 30, step: 5 }
+        ? timedCarries.has(id)
+          ? { start: 20, max: 40, step: 5 }
+          : { start: 20, max: 30, step: 5 }
         : unit === 'meters'
           ? { start: 10, max: 20, step: 5 }
           : unit === 'laps'
@@ -413,13 +421,13 @@ export const additionalExercises: Exercise[] = [
     [
       'Ställ vikterna nära fötterna. Böj höfter och knän, ta en i varje hand och res dig upprätt.',
       'Gå med lugna steg och armarna längs sidorna. Håll överkroppen upprätt.',
-      'Räkna hela sträckan, även efter en lugn vändning. Sätt ned vikterna med böjda höfter och knän.',
+      'Gå under hela tiden, gärna med en lugn vändning. Sätt ned vikterna med böjda höfter och knän.',
     ],
     'Du drar upp axlarna eller tappar hållningen när du går.',
-    'Välj lättare vikter eller kortare sträcka.',
+    'Lättare vikt eller kortare tid.',
     [pair(2), pair(4, 'kettlebells')],
     false,
-    'meters',
+    'seconds',
   ),
   entry(
     'biceps-curl',
@@ -734,17 +742,17 @@ export const additionalExercises: Exercise[] = [
     ['Bål', 'Axlar', 'Rygg'],
     [
       'Hjälp till med båda händerna när du tar upp vikten. Greppa handtaget med vald hand nära övre delen av bröstet. Låt kulan vila mot underarmens utsida, håll handleden i linje med underarmen och armbågen nedåt nära revbenen.',
-      'Gå med korta, lugna steg och upprätt överkropp. Håll vikten stilla vid axeln och andas under hela sträckan.',
-      'Räkna hela sträckan, även efter en lugn vändning. Stanna, ta hjälp av fria handen och sätt ned vikten kontrollerat. Gå angiven sträcka på varje vald sida.',
+      'Gå med korta, lugna steg och upprätt överkropp. Håll vikten stilla vid axeln och andas under hela tiden.',
+      'Gå under hela tiden, gärna med en lugn vändning. Stanna, ta hjälp av fria handen och sätt ned vikten kontrollerat. Gör lika lång tid på varje vald sida.',
     ],
     'Kulan hänger framför handen, handleden viks bakåt eller armbågen pekar ut åt sidan. Du lutar eller håller andan.',
-    'Välj en lättare kettlebell eller kortare sträcka. Öva först att hålla vikten stilla vid axeln.',
+    'Lättare vikt eller kortare tid. Öva först att hålla vikten stilla vid axeln.',
     [
       single(4, 'kettlebell'),
       single(8, 'kettlebell'),
       single(16, 'kettlebell'),
     ],
     true,
-    'meters',
+    'seconds',
   ),
 ];

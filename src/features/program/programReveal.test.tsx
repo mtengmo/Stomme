@@ -52,9 +52,7 @@ it('names the ready workout instead of the focus on its pass', async () => {
   expect(
     screen.getByRole('region', { name: 'Nästa pass: Pass 1, Löpstyrka' }),
   ).toBeTruthy();
-  expect(
-    screen.getByRole('region', { name: /^Därefter: Pass 2, / }),
-  ).toBeTruthy();
+  expect(screen.queryByRole('region', { name: /^Därefter: / })).toBeNull();
 });
 
 it('has no warnings, no "Saknas" and no E-codes', async () => {

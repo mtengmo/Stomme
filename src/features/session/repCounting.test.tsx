@@ -129,17 +129,14 @@ describe('rep counting on the set screen', () => {
     });
   });
 
-  it.each([
-    'pull-up',
-    'parallel-dip',
-    'box-jump',
-    'balance-clock',
-    'farmer-carry',
-  ] as const)('%s stays manual', (id) => {
-    show(id);
-    expect(screen.getByRole('button', { name: 'Klar set' })).toBeTruthy();
-    expect(screen.queryByText('Räkna själv: av')).toBeNull();
-  });
+  it.each(['pull-up', 'parallel-dip', 'box-jump', 'balance-clock'] as const)(
+    '%s stays manual',
+    (id) => {
+      show(id);
+      expect(screen.getByRole('button', { name: 'Klar set' })).toBeTruthy();
+      expect(screen.queryByText('Räkna själv: av')).toBeNull();
+    },
+  );
 
   it.each([
     'squat-jump',

@@ -1,6 +1,6 @@
 import type { TemplateId, WorkoutTemplate } from '../domain/types';
 
-const REST_SEC = 60;
+const REST_SEC = 20;
 
 export const templates: Record<TemplateId, WorkoutTemplate> = {
   A: {

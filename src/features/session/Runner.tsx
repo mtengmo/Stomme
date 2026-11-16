@@ -122,6 +122,21 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
 
   const step = steps[cursor];
   const total = (planIndex: number) => session.plan[planIndex]?.sets ?? 0;
+  /** Load and variant a coming set starts with: the last logged one, else the plan's. */
+  const previewOf = (
+    upcoming: { exerciseId: ExerciseId; planIndex: number } | undefined,
+  ) => {
+    if (!upcoming) return undefined;
+    const plan = session.plan[upcoming.planIndex];
+    const prior = logs
+      .filter((l) => l.exerciseId === upcoming.exerciseId)
+      .sort((a, b) => a.loggedAt.localeCompare(b.loggedAt))
+      .at(-1);
+    return {
+      loadIndex: prior?.loadIndex ?? plan?.loadIndex ?? 0,
+      variantId: prior?.variantId ?? plan?.variantId,
+    };
+  };
 
   const tally = useMemo(() => {
     const items: TallyItem[] = [];
@@ -436,6 +451,8 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         nextExercise={upcoming ? exercises[upcoming.exerciseId] : undefined}
         nextStep={upcoming}
         nextTotalSets={upcoming ? total(upcoming.planIndex) : 0}
+        currentExerciseId={step.exerciseId}
+        nextPreview={previewOf(upcoming)}
         onContinue={() => advance()}
         afterSet={steps[cursor - 1]?.kind === 'set'}
         autoContinue={
@@ -458,6 +475,8 @@ export function Runner({ session, logs, hasAfter }: RunnerProps) {
         nextExercise={upcoming ? exercises[upcoming.exerciseId] : undefined}
         nextStep={upcoming}
         nextTotalSets={upcoming ? total(upcoming.planIndex) : 0}
+        currentExerciseId={step.exerciseId}
+        nextPreview={previewOf(upcoming)}
         onContinue={() => {
           void run(async () => {
             if (!restEffort)
