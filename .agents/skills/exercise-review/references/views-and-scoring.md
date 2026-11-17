@@ -49,7 +49,8 @@ Read for `animation` and `all` reviews. The scoring rubric and result mapping ar
   oblique contacts, railings, H/V), `catalogue.test.tsx` (equipment and contacts for specific
   exercises), and each family's pose test (e.g. `squatFamilyKeyframes.test.ts`). Run
   `npx vitest run src/figures`.
-- Not measured: variants other than the default, and the left side. Check them by eye.
+- Not in the ratchet: other variants and the left side. `inspect.ts` (tables, stills) and
+  `inspect.ts --scan` measure them; still check them by eye.
 
 Rule of thumb (not a repo rule; say in `notes` what you saw):
 
@@ -57,8 +58,13 @@ Rule of thumb (not a repo rule; say in `notes` what you saw):
 |---|---|---|
 | drift or asym up to about 2 units | invisible | 3 |
 | 2 to 5 units | check closely in that view | 2 if visible |
-| more than about 5 units (about 15 % of a thigh) | visible | 2; 1 if a limb visibly grows or shrinks |
+| more than about 5 units (about 15 % of a thigh) | visible | 2; 1 if a limb visibly grows or shrinks, or a static mismatch (below) |
 | any `count:*` row | contact error | 1 |
+
+Static left/right mismatch (an `asym` where both sides keep their length in the `inspect.ts`
+table, not drift): more than about 5 units: AS at most 2; also more than about 20 % of the
+shorter segment (shin 29 -> 6) and visible at 390 px: AS 1. *Maintainer policy default; the user
+may change it.* A baseline `asym:*` row does not excuse it (accepted, not a pass).
 
 ## 3. Measuring contacts
 
@@ -70,19 +76,18 @@ a 1 or a 2 depends on whether it is visible at 390 px and 1280 px.
 
 ## 4. Viewing tools
 
-- **`npm run shots:exercises`**: `#/dev/figurer` with reduced motion; contact sheets of Start,
-  Mitt, Slut (H and V), default view only, in `.impeccable/review/exercises/E01-E09.png` etc. The
-  numbers are catalogue positions in batches of 9, not E-numbers (they differ from position 71):
-  find each exercise by its heading.
-- **`npx tsx scripts/animation-fix-shots.ts <id> ...`**: phases 0, .25, .5, .75, 1 and back to 0,
-  H and V, to `.impeccable/review/animation-fixes/390-<id>.png` (dark) and `1280-<id>.png`
-  (light). No ids = 8 defaults. It switches to Framifrån only for `step-up`,
-  `rear-foot-split-squat` and `suitcase-carry`; check other views by hand. Ignore `*-guide.png`.
-- **By hand** (needed for views and variants): `npm run dev`, open `http://localhost:5173`, click
-  "Jag förstår, fortsätt"; open `#/ovning/<id>?phase=0.5` (`?phase=0..1` works in DEV only); use
-  "Från sidan", "Framifrån", "Sned vinkel", "Byt sida" and the equipment controls; also watch the
-  live loop without `phase` and the reduced-motion stills (OS setting or browser emulation).
-  `#/granska?ovning=E01` is the read-only guide with previous/next; `#/dev/figurer` shows all
-  stills; `#/dev/figurer-jamforelse` is the comparison page.
+`inspect.ts` already compares every still with the live loop (numbers, not a look). Images:
+
+- **`npx tsx .agents/skills/exercise-review/scripts/capture.ts <id|E-ref> ...`** starts and stops
+  its own Vite (port 5304) and writes `.impeccable/review/<id>/<390-dark|1280-light>-<view>.png`:
+  per view x weight tool x H/V the `?phase=` sweep out and back (not for `hold`), the
+  reduced-motion stills and one live cycle (fake clock). About 25 s per exercise.
+- Catalogue overview: `npm run shots:exercises` (reduced-motion stills, default view only).
+
+- **By hand:** `npm run dev`, `http://localhost:5173`, "Jag förstår, fortsätt", then
+  `#/ovning/<id>` (live loop) or `?phase=0.5`; buttons "Från sidan", "Framifrån", "Sned vinkel",
+  "Byt sida", the "Vikt" select; reduced motion via the OS or browser emulation.
+  `#/granska?ovning=E01` (guide with previous/next), `#/dev/figurer` (all stills),
+  `#/dev/figurer-jamforelse` (comparison).
 - **Evidence:** `.impeccable/review/` is gitignored. Put a path in `evidence` only when the file is
   committed; otherwise describe in `notes` what you looked at.

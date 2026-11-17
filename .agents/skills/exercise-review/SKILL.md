@@ -1,6 +1,6 @@
 ---
 name: exercise-review
-description: Review, audit or approve a Stomme exercise - its stick-figure animation and views, Swedish instructions (tips, easier variant, units), spoken voice and timer cues, or safety - and record the result in docs/exercise-audit-log.json. Use when asked to review, re-review, approve, audit or check an exercise figure, animation, pose, instruction text or voice cue, or to work the exercise audit queue.
+description: Review, audit or approve a Stomme exercise - its stick-figure animation and views, Swedish instructions (tips, easier variant, units), spoken voice and timer cues, or safety - and record the result or a fix in docs/exercise-audit-log.json. Use when asked to review, re-review, approve, audit, check or fix an exercise figure, animation, pose, instruction text or voice cue, or to work the exercise audit queue.
 ---
 
 # Exercise review (text, voice, animation, safety)
@@ -12,7 +12,9 @@ not a fix: never change figures, poses, exercise text or other app code; leave f
 **Load** this file and `references/checklist.md` every review. Read on demand:
 `references/views-and-scoring.md` for `animation`/`all` (views, left/right, projection, baseline
 rows, contact measurement, screenshots, by-hand viewing); `references/voice-crosscheck.md` when a
-spoken string, timer label or status line is in doubt, or to test or play audio.
+spoken string, timer label or status line is in doubt, or to test or play audio;
+`references/sources.md` for safety scope, high risk, loading/progression or rehab claims;
+`references/fixing.md` instead of the review workflow when you fix (change a figure, view or text).
 
 ## Must-follow rules (T = a test enforces it)
 
@@ -34,7 +36,8 @@ spoken string, timer label or status line is in doubt, or to test or play audio.
 5. **`approved`** (T for most): one `scope: "all"` review or `text` + `animation` + `safety`, all
    `ok`, all dated on or after the last fix, none by the last fixer; the last review in `reviews`
    is `ok`; `openIssues` empty. Never set `approved` without such an entry; unreviewed stays
-   `unreviewed`.
+   `unreviewed`. The gates compare dates only (`>=`): do not rely on a same-day review that saw
+   the old figure (its `commit` predates the fix, or the fix notes name it); re-review that scope.
 6. **Whole loop in every existing view x side (H/V) x equipment variant**, several phases. Anything
    existing but unchecked = incomplete: no `ok` for `animation` or `all`.
 7. **No new JSON fields or scopes** (T, `SCOPES`: `text`, `animation`, `safety`, `all`). Voice goes
@@ -61,10 +64,13 @@ Screenshot scripts need `npx playwright install chromium` once.
    `unreviewed`; then fewest reviews. Take about 8-10 from the top unless the user named
    exercises; skip your own fixes.
 4. `npx tsx .agents/skills/exercise-review/scripts/inspect.ts <id|E-ref> ...` (read-only facts:
-   text, variants, views, voice, tempo, phase-0 pose, segment lengths, baseline rows, audit entry,
-   dirty files).
-5. Watch every view x side x variant: phases 0, .25, .5, .75, 1, the way back, the live loop, the
-   reduced-motion stills (`views-and-scoring.md` §4).
+   text, variants, sources, views, voice, tempo, segment lengths, stills vs live loop (FLAG = a
+   finding to confirm), baseline rows, fingerprint, HEAD figure identical, audit entry).
+   Siblings with the same defect, for the report: `inspect.ts --scan --metric asym:shin` (kinds
+   `drift`, `asym`, `front`, `oblique`, `stills`; top 15, `--top 0` all).
+5. `npx tsx .agents/skills/exercise-review/scripts/capture.ts <id>`; look at every sheet in
+   `.impeccable/review/<id>/`: each view x side x variant, phases out and back, reduced-motion
+   stills, live loop, 390 dark and 1280 light.
 6. Work `checklist.md` per scope; fill the voice | animation | how-to row; score (below). Note
    each finding with phase, view, side and variant.
 7. Record, run "After editing the log", report with the template.
@@ -73,7 +79,8 @@ Sources: text `src/content/exercises.ts` (spreads `bodyweightExercises.ts`,
 `kneeStrengthExercises.ts`, `additionalExercises.ts`, `rehabAdditions.ts`); variants
 `exerciseMetadata.ts`; side `exerciseSideCues.ts`; moving timed `timedMovement.ts`; tempo
 `src/rules/repTempo.ts`; figure `figures[id]` in `src/figures/poses.ts`, `*Poses.ts`,
-`*Keyframes.ts`, `frontViews.tsx`, `equipmentPose.ts`, `Figure.tsx` (`HOLD_STILLS`); E-number
+`*Keyframes.ts`, `frontViews.tsx`, `equipmentPose.ts`, `constrainedLegs.ts` (`SEGMENT_RULES`),
+`Figure.tsx` (`HOLD_STILLS`); E-number
 `src/content/exerciseReferences.ts`.
 
 ## Dirty workspace
@@ -82,9 +89,8 @@ Sources: text `src/content/exercises.ts` (spreads `bodyweightExercises.ts`,
 
 - Review a clean copy (`git worktree add ../stomme-review HEAD`; own `node_modules`; remove it
   after), or review the working tree and say so in `notes` (`commit` is then only a reference).
-- On a dirty tree, report whether the exercise's own lines are in the diff (`inspect.ts` lists
-  files whose diff names the id) and whether shared rendering (`Figure.tsx`, `lerp.ts`,
-  `frontViews.tsx`, `equipmentPose.ts`, `constrainedLegs.ts`, `repTempo.ts`) is dirty.
+- On a dirty tree, `inspect.ts` prints `HEAD figure identical: yes/no/unknown` (rendered from a
+  HEAD copy, shared code included) and the files whose diff names the id: report both.
 - Status before: from `git show HEAD:docs/exercise-audit-log.json` or the working tree; say which.
 - `npm run audit:fingerprints -- --write` only if no other uncommitted figure change would be
   hashed; otherwise skip and report which fingerprints it would change.
@@ -140,7 +146,10 @@ Append one object per scope to the end of `reviews`, 2-space formatting, exactly
 
 - `date`: today `YYYY-MM-DD` (`Get-Date -Format yyyy-MM-dd` / `date +%F`), on or after the last
   fix. `result`: `ok` or `issues` only ("needs fix" = `issues` + status `needs-fix`).
-- `commit` (optional): `git rev-parse --short HEAD`. `evidence` (optional): a committed path only
+- `commit`: always `git rev-parse --short HEAD` (optional in the schema, but it dates what you
+  saw); dirty tree: say so and add `fp <fingerprint now>` and "HEAD-figur identisk: ja/nej/okänd"
+  from `inspect.ts` to `notes`.
+  `evidence` (optional): a committed path only
   (`.impeccable/review/` is gitignored); suggest `docs/audit-evidence/<E-ref>-<date>.png` only if
   the user wants the image committed, otherwise describe what you saw in `notes`.
 - `notes`: Swedish, at most about 1200 characters, no trailing whitespace; details go in the
@@ -174,9 +183,10 @@ Beginner comprehension is a human judgement: only `human` or a maintainer decisi
 line, so agents alone cannot approve the exercise; say so, and remove the line only if the user
 says to.
 
-**Self-check:** notes length counted, no trailing space or newline; every view and variant named
-exists; status-before source known; denominator matches; `result`, status and tags follow the
-rules above.
+**Self-check:** `npx tsx .agents/skills/exercise-review/scripts/check-entry.ts --log <id>` passes
+(length, trailing space, a space before numbers: "fas 0", not "fas0", exactly `AF n/a`/`U n/a`,
+score sum and denominator); every view and variant named exists; status-before source known;
+`result`, status and tags follow the rules above; the report starts with the template header.
 
 ## After editing the log
 
@@ -212,6 +222,6 @@ Checklist per exercise: [ ] text [ ] voice [ ] every view x side x variant [ ] s
 Findings: <E-ref: phase, view, side, variant - problem (score, tag)>. Minor (2): <...>. Not viewed: <...>.
 Objective inputs: baseline rows <...>; `npx vitest run src/figures` <pass/fail>.
 Same-vendor: <list|none>. Gates failing because of this review: <list|none>; already failing: <list>.
-Workspace: HEAD <sha>, clean | dirty (<files>; own lines in diff yes/no; shared rendering dirty yes/no); worktree yes/no.
+Workspace: HEAD <sha>, clean | dirty (<files>; HEAD figure identical yes/no/unknown; own lines in diff yes/no); worktree yes/no.
 Commands: audit:fingerprints --write (<n> changed | skipped: ...), audit:summary, tests <result>. Log edited, not committed.
 ```

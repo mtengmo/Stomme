@@ -29,13 +29,14 @@ Read the Swedish as a beginner would.
 
 ## ANIMATION (AS, AF, U)
 
-Phases 0, .25, .5, .75, 1, the way back and the live loop; stills alone are not enough. Views,
-measurement and tools: `views-and-scoring.md`.
+The `capture.ts` sheets (phases out and back, live loop, stills); stills alone are not enough.
+Views, measurement and scoring: `views-and-scoring.md`.
 
 - [ ] Motion type: a static hold (`unit: "seconds"`, not in `timedMovementCue`) is `motion: 'hold'`, all frames identical, stills Start/Håll (`HOLD_STILLS`; `src/figures/timedHolds.test.ts`). A moving exercise is `controlled`, `ballistic` or `sequence` and visibly moves.
 - [ ] Thigh, shin, upper arm and forearm keep their length in every phase, view and variant (`inspect.ts` table; compare knee and elbow at Start and End).
 - [ ] Contacts: planted feet stay planted (no sliding); stepping or walking feet lift and swing; a lunge's rear foot touches the floor; nothing goes through the floor; back on the wall in a wall-sit; hips reach the seat; hands and knees are on the railing, bench, bar, floor, mat or thigh where the text says, through the lowering and the return.
 - [ ] Equipment: the weight is in the hand (no gap, no floating kettlebell); the dumbbell axis follows the grip (hammer curl: along the forearm, not locked upright); the grip matches the text (horns, goblet at the chest, rack at the shoulder); two weights in profile do not read as one wide bar; axis and grip agree across views and with the wording ("längs sidorna", "mot bröstet"); every variant, including front views.
+- [ ] Range: the drawn lift height, depth or angle fits the tip words ("en liten bit", "halv") and the cited source (`source:` in `inspect.ts`, from `exerciseMetadata` `sources`); a clear overshoot is a minor (2) point in `notes`.
 - [ ] Joints bend the right way within a plausible range; arms described as straight are straight (a pull-up starts from a straight hang); no elbow or knee flips direction.
 - [ ] Every view from `supportedViewsFor(id)` x side x variant, over several phases; all views show the same movement; the default view shows the defining part; every view the movement needs exists (`views-and-scoring.md` §1).
 - [ ] Baseline rows (`drift:*`, `asym:*`, `count:*`) confirmed by eye (`views-and-scoring.md` §2).
