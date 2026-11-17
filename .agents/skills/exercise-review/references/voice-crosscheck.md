@@ -18,7 +18,7 @@ The app speaks only through `timerVoice(message)` in `src/lib/timerVoice.ts` (se
 | Timed resume | `"Fortsätt hålla."` / `"Fortsätt rörelsen."` / `"Gör dig redo."` | `useTimedHold.ts` |
 | Rep set prepares | `"<Side>. Gör dig redo. Fem sekunder."` | `src/lib/useRepCounter.ts` |
 | Rep set starts | `"Börja."`, or `"Börja. Upp."` when `repTempo(id).hasHold` | `useRepCounter.ts` |
-| Each rep | the number (`"3"`); with a hold `"3. Håll"` and the phase words `Upp` / `Håll` / `Ner` (`CUE`) | `useRepCounter.ts` |
+| Each rep | the number (`"3"`); with a hold `"3. Håll"` and the phase words `Upp` / `Håll` / `Ner`, or the exercise's own `cues` | `useRepCounter.ts`, `repTempo.ts` |
 | Rep resume / end | `"Fortsätt om tre. Två. Ett."` / `"Klart."` | `useRepCounter.ts` |
 | Rest (auto-continue only) | `"Vila. N sekunder."` | `src/features/session/RestScreen.tsx` |
 
@@ -28,6 +28,9 @@ The app speaks only through `timerVoice(message)` in `src/lib/timerVoice.ts` (se
   exists (`movingTimed`). That also switches the timer label "Hålltid" / "Övningstid" and the
   status line: "Håll tills signalen. ..." for a hold, `timedMovementCue[id].status` for movement;
   at the end "Hålltiden är klar. Släpp positionen. ..." or "Övningstiden är klar. ...".
+- Rep cue words are per exercise: `CUE_WORDS` in `src/rules/repTempo.ts` (as `tempo.cues`, read by
+  `useRepCounter.ts`; e.g. quad-set says Spänn/Slappna av). `inspect.ts` prints the words an
+  exercise really speaks; never hard-code Upp/Håll/Ner in text, tests or a review.
 - `repTempo(id)` (`src/rules/repTempo.ts`) gives up, hold, down and relax in ms; it returns `null`
   for `MANUAL_REPS` and non-rep units, which have no spoken count.
 - `meters` and `laps` have no timer and no count voice; if such an exercise is really done for a

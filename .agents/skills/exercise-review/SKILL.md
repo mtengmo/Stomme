@@ -50,10 +50,11 @@ spoken string, timer label or status line is in doubt, or to test or play audio;
 
 ## Setup
 
-Node 24 (`engines.node >= 24`; on Node 22 vitest fails with "Cannot read properties of undefined
-(reading 'config')"). The default `node` (nvm4w) is 22: run npm and tests from **PowerShell** with
-this prefix in every call: `$env:Path = "C:\Program Files\nodejs;$env:Path"; node --version`.
-Screenshot scripts need `npx playwright install chromium` once.
+Node 24 (`engines.node >= 24`); the default `node` is 22. Tests (`vitest`, `npm run test`) only
+work from **PowerShell** with `$env:Path = "C:\Program Files\nodejs;$env:Path"`; from Bash they
+fail with "reading 'config'" even if `node --version` says 24. `tsx`, `inspect.ts` and `capture.ts`
+also work from Bash with that PATH prefix. Screenshot scripts need `npx playwright install
+chromium` once. Repo files are LF: edit with the Edit tool (more in `fixing.md`).
 
 ## Workflow
 

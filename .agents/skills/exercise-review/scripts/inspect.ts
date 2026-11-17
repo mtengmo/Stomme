@@ -725,7 +725,7 @@ for (const arg of args) {
     if (cue) console.log(`  hint: ${cue.hint}`);
   } else if (tempo) {
     console.log(
-      `  start: "${e.perSide ? '<side>. ' : ''}Gör dig redo. Fem sekunder." then "${tempo.hasHold ? 'Börja. Upp.' : 'Börja.'}"; count "1", "2", ...${tempo.hasHold ? ' with "Upp"/"Håll"/"Ner"' : ''}; end "Klart."`,
+      `  start: "${e.perSide ? '<side>. ' : ''}Gör dig redo. Fem sekunder." then "${tempo.hasHold ? `Börja. ${tempo.cues?.up ?? 'Upp'}.` : 'Börja.'}"; count "1", "2", ...${tempo.hasHold ? ` with "${tempo.cues?.up ?? 'Upp'}"/"${tempo.cues?.hold ?? 'Håll'}"/"${tempo.cues?.down ?? 'Ner'}"` : ''}; end "Klart."`,
     );
     console.log(
       `  repTempo up ${tempo.upMs} ms, hold ${tempo.holdMs}, down ${tempo.downMs}, relax ${tempo.relaxMs}, rep ${tempo.repMs}${tempo.sequence ? ', sequence' : ''}`,

@@ -7,6 +7,8 @@
  * 0 .25 .5 .75 1 .75 .5 .25 0 (skipped for motion 'hold', whose live loop is
  * one pose), a row of reduced-motion stills and a row of live-loop frames over
  * one cycle (fake clock, so the frames are exact).
+ * Options (defaults: all rows, all views): --rows phases,stills,live  --views side,front,oblique
+ * (small sheet: `capture.ts <id> --rows live --views side`).
  */
 import { type ChildProcess, spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -33,12 +35,18 @@ type Shot = { label: string; png: string };
 const byRef = new Map(
   Object.entries(exerciseReferences).map(([id, ref]) => [ref, id]),
 );
-const ids = process.argv
-  .slice(2)
-  .map((a) => (byRef.get(a.toUpperCase()) ?? a) as ExerciseId);
+const argv = process.argv.slice(2);
+const opt = (name: string) => {
+  const i = argv.indexOf(name);
+  return i < 0 ? undefined : (argv.splice(i, 2)[1] ?? '').split(',');
+};
+const ROWS = opt('--rows');
+const VIEWS = opt('--views');
+const wantRow = (r: 'phases' | 'stills' | 'live') => !ROWS || ROWS.includes(r);
+const ids = argv.map((a) => (byRef.get(a.toUpperCase()) ?? a) as ExerciseId);
 if (!ids.length || ids.some((id) => !exercises[id])) {
   console.log(
-    `Usage: npx tsx .agents/skills/exercise-review/scripts/capture.ts <id|E-ref> ...${ids.length ? `\nnot in the catalogue: ${ids.filter((id) => !exercises[id]).join(', ')}` : ''}`,
+    `Usage: npx tsx .agents/skills/exercise-review/scripts/capture.ts <id|E-ref> ... [--rows phases,stills,live] [--views side,front,oblique]${ids.length ? `\nnot in the catalogue: ${ids.filter((id) => !exercises[id]).join(', ')}` : ''}`,
   );
   process.exit(1);
 }
@@ -164,20 +172,26 @@ async function capture(
     .getByRole('group')
     .getByRole('button')
     .allTextContents();
-  const views = Object.entries(VIEW_BUTTON).filter(([, name]) =>
-    buttons.includes(name),
+  const views = Object.entries(VIEW_BUTTON).filter(
+    ([view, name]) =>
+      buttons.includes(name) && (!VIEWS || VIEWS.includes(view)),
   );
   const hold = figures[id].motion === 'hold';
   const ms = cycleMs(id);
   const out = `.impeccable/review/${id}`;
   mkdirSync(out, { recursive: true });
-  for (const [view, button] of views.length
+  const hasViewButtons = Object.values(VIEW_BUTTON).some((n) =>
+    buttons.includes(n),
+  );
+  for (const [view, button] of hasViewButtons
     ? views
-    : [['default', '-'] as const]) {
+    : !VIEWS || VIEWS.includes('side')
+      ? [['default', '-'] as const]
+      : []) {
     const rows: [string, Shot[]][] = [];
     for (const c of combos(id)) {
       const tag = `${c.variant}${c.side ? ` ${c.side}` : ''}`;
-      if (!hold) {
+      if (!hold && wantRow('phases')) {
         const shots: Shot[] = [];
         for (const phase of PHASES) {
           const stage = await open(live, id, button, c, phase);
@@ -188,16 +202,19 @@ async function capture(
         }
         rows.push([`${tag}: ?phase= ut och tillbaka`, shots]);
       }
-      const stage = await open(still, id, button, c);
-      rows.push([
-        `${tag}: reduced-motion`,
-        [
-          {
-            label: 'stills',
-            png: (await stage.screenshot()).toString('base64'),
-          },
-        ],
-      ]);
+      if (wantRow('stills')) {
+        const stage = await open(still, id, button, c);
+        rows.push([
+          `${tag}: reduced-motion`,
+          [
+            {
+              label: 'stills',
+              png: (await stage.screenshot()).toString('base64'),
+            },
+          ],
+        ]);
+      }
+      if (!wantRow('live')) continue;
       // Freeze the fake clock, then step it: the frames span one whole cycle
       // (seam included) from wherever the loop is. A hold needs only three.
       const loop = await open(live, id, button, c);
