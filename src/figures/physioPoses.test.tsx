@@ -143,7 +143,11 @@ describe('knee programme figures', () => {
     expect(BAND_KNEE_ANCHOR[1]).toBeGreaterThan(chair.y);
     for (const t of STEPS) {
       const p = at('band-knee-extension', t);
-      expect(p).toEqual(movementPose('seated-knee-extension', t));
+      // The moving (near) leg is E30's; only the far leg has its own, equal-length pose.
+      const seated = movementPose('seated-knee-extension', t);
+      expect({ ...p, kL: seated.kL, aL: seated.aL, tL: seated.tL }).toEqual(
+        seated,
+      );
       const [from, to] = bandEndpoints(band, p);
       expect(from).toEqual(BAND_KNEE_ANCHOR);
       expect(to).toEqual(p.aR);

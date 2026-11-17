@@ -73,6 +73,18 @@ export function pushUp(t: number): Pose {
     ],
   );
 }
+/**
+ * Push-up proper: both hands on the mat, the far hand 4 further out and level
+ * with the near one, so the far arm is as straight as the near one at the top
+ * (a hand 3 higher left a visible kink in the far elbow).
+ */
+function standardPushUp(t: number): Pose {
+  const p = pushUp(t);
+  const top = pushUp(0).neck;
+  const arm = (174 - top[1]) / 2;
+  const farHand: Pt = [top[0] + 4, 174];
+  return { ...p, hL: farHand, eL: joint(p.neck, farHand, arm, arm, -1) };
+}
 /** Forearm plank angle: shoulders over the elbows, trunk straight to the toes. */
 const PLANK_ANGLE = -2.912;
 /**
@@ -301,6 +313,13 @@ function back(t: number): Pose {
 function legRaise(t: number): Pose {
   const hip: Pt = [97, 169],
     angle = mix(0, -1.3, t);
+  // The far leg is the near leg moved 3 up, perpendicular to it, so both hang
+  // from the same hip with equal, constant thigh and shin lengths.
+  const away: Pt = [3 * Math.sin(angle), -3 * Math.cos(angle)];
+  const farLeg = (length: number): Pt => {
+    const along = polar(hip, length, angle);
+    return [along[0] + away[0], along[1] + away[1]];
+  };
   return pose(
     [32, 162],
     [46, 169],
@@ -315,9 +334,9 @@ function legRaise(t: number): Pose {
       polar(hip, 32, angle),
       polar(hip, 64, angle),
       polar(polar(hip, 64, angle), 9, angle - 0.8),
-      polar([94, 166], 32, angle),
-      polar([94, 166], 64, angle),
-      polar(polar([94, 166], 64, angle), 9, angle - 0.8),
+      farLeg(32),
+      farLeg(64),
+      polar(farLeg(64), 9, angle - 0.8),
     ],
   );
 }
@@ -842,7 +861,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'diamond-push-up': diamondPushUp,
   'blast-off-push-up': blastOffPushUp,
   'plank-arm-lift': plankArmLift,
-  'push-up': pushUp,
+  'push-up': standardPushUp,
   'pull-up': (t) => pull(t, false),
   'chin-up': (t) => pull(t, true),
   'back-extension': back,

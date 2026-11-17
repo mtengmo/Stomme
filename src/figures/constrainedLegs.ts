@@ -101,6 +101,11 @@ export const SEGMENT_RULES: Partial<
     foot('R'),
     foot('L'),
   ],
+  // Side-lying leg lifts: the lifted leg swings straight at constant length.
+  // The pressed leg keeps its length from the folded start to the push.
+  'band-leg-press': [leg('R'), foot('R')],
+  'side-lying-hip-abduction': [leg('R', { straight: true }), foot('R')],
+  'side-lying-hip-adduction': [leg('R', { straight: true }), foot('R')],
   'bird-dog': [
     arm('R', { straight: true }),
     arm('L', { straight: true }),

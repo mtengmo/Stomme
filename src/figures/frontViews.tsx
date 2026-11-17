@@ -298,6 +298,33 @@ function turnedKnee(hip: Pt, ankle: Pt, bend: number): Pt {
     hip[1] + (dy / d) * along + (dx / d) * height * bend,
   );
 }
+/**
+ * Front legs of the three carries: the profile gait's thigh and shin (30, 29),
+ * hip at the profile height, the left foot swinging first (t < 0.5) and the
+ * right second, as in `suitcaseCarryPose`.
+ */
+function carryFrontLegs(t: number): {
+  hip: Pt;
+  limbs: [Pt, Pt, Pt, Pt, Pt, Pt];
+} {
+  const stride = Math.sin(2 * Math.PI * t);
+  const liftL = Math.max(0, stride);
+  const liftR = Math.max(0, -stride);
+  const hip = point(100, 118);
+  const aR = point(82, 174 - 9 * liftR);
+  const aL = point(118, 174 - 9 * liftL);
+  return {
+    hip,
+    limbs: [
+      joint(hip, aR, CARRY_THIGH, CARRY_SHIN, 1),
+      aR,
+      point(72, 177 - 9 * liftR),
+      joint(hip, aL, CARRY_THIGH, CARRY_SHIN, -1),
+      aL,
+      point(128, 177 - 9 * liftL),
+    ],
+  };
+}
 function woodchopFrontPose(t: number): Pose {
   const s = smooth(t);
   const hip = point(mix(96, 104, s), mix(121, 117, s));
@@ -399,15 +426,19 @@ export function frontMovementPose(
   if (exerciseId === 'single-leg-chair-squat') {
     const depth = t;
     const side = working === 'left' ? 1 : -1;
-    const hip = point(100 + 6 * side * depth, mix(106, 133, depth));
+    // Start lower than before: the thighs only foreshorten from FRONT_THIGH
+    // (no longer than the profile) and the shins stay under the profile's 36.
+    const hip = point(100 + 6 * side * depth, mix(118, 133, depth));
     const neck = point(hip[0] + 3 * side * depth, hip[1] - 43);
     const supportX = 100 + 19 * side;
     const freeX = 100 - 21 * side;
+    const supportKneeX = mix(supportX, supportX + 5 * side, depth);
+    const supportKneeY = Math.min(
+      mix(148, 156, depth),
+      hip[1] + Math.sqrt(FRONT_THIGH ** 2 - (supportKneeX - hip[0]) ** 2),
+    );
     const support = {
-      knee: point(
-        mix(supportX, supportX + 5 * side, depth),
-        mix(148, 156, depth),
-      ),
+      knee: point(supportKneeX, supportKneeY),
       ankle: point(supportX, 174),
       toe: point(supportX + 10 * side, 177),
     };
@@ -435,24 +466,18 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'farmer-carry') {
-    const stride = Math.sin(2 * Math.PI * t);
-    // Same cycle as the profile gait: the left foot swings first (t<0.5).
-    const liftR = Math.max(0, -stride);
-    const liftL = Math.max(0, stride);
+    // The profile gait's legs (thigh 30, shin 29, left foot swings first) and
+    // both weights hanging at the sides.
+    const legs = carryFrontLegs(t);
     return skeleton(
-      point(100, 46),
       point(100, 60),
-      point(100, 104),
-      point(78, 83),
-      point(78, 111),
-      point(122, 83),
-      point(122, 111),
-      point(82, 141 - 5 * liftR),
-      point(80, 174 - 8 * liftR),
-      point(70, 177 - 8 * liftR),
-      point(118, 141 - 5 * liftL),
-      point(120, 174 - 8 * liftL),
-      point(130, 177 - 8 * liftL),
+      point(100, 74),
+      legs.hip,
+      point(78, 97),
+      point(78, 125),
+      point(122, 97),
+      point(122, 125),
+      ...legs.limbs,
     );
   }
   if (exerciseId === 'side-lunge') {
@@ -566,11 +591,52 @@ export function frontMovementPose(
       left.toe,
     );
   }
-  if (
-    exerciseId === 'step-up' ||
-    exerciseId === 'step-down' ||
-    exerciseId === 'rear-foot-split-squat'
-  ) {
+  if (exerciseId === 'rear-foot-split-squat') {
+    // Front leg: knee over the planted foot, thigh at most 35.9 (it only
+    // foreshortens). Rear leg: the foot rests on the bench behind; its thigh
+    // (30) and projected shin (18) keep their length instead of collapsing.
+    // Arms are folded at the chest with the profile's 25.5 / 12.8.
+    const hipY = mix(117, 140, t);
+    const neckY = hipY - 44;
+    const hip = point(100, hipY);
+    const rearAnkle = point(120, 139);
+    const [kneeA, kneeB] = [1, -1].map((bend) =>
+      joint(hip, rearAnkle, 30, 18, bend),
+    ) as [Pt, Pt];
+    const selected = {
+      knee: point(82, mix(148, 155, t)),
+      ankle: point(82, 174),
+      toe: point(72, 177),
+    };
+    const other = {
+      knee: kneeA[1] >= kneeB[1] ? kneeA : kneeB,
+      ankle: rearAnkle,
+      toe: point(130, 142),
+    };
+    const right = working === 'left' ? other : selected;
+    const left = working === 'left' ? selected : other;
+    const place = (p: Pt, side: 'R' | 'L'): Pt =>
+      point(
+        side === 'R' ? 100 - Math.abs(p[0] - 100) : 100 + Math.abs(p[0] - 100),
+        p[1],
+      );
+    return skeleton(
+      point(100, neckY - 14),
+      point(100, neckY),
+      hip,
+      point(83, neckY + 19),
+      point(91.5, neckY + 9.5),
+      point(117, neckY + 19),
+      point(108.5, neckY + 9.5),
+      place(right.knee, 'R'),
+      place(right.ankle, 'R'),
+      place(right.toe, 'R'),
+      place(left.knee, 'L'),
+      place(left.ankle, 'L'),
+      place(left.toe, 'L'),
+    );
+  }
+  if (exerciseId === 'step-up' || exerciseId === 'step-down') {
     const step = exerciseId === 'step-up' || exerciseId === 'step-down';
     const down = exerciseId === 'step-down';
     // Step-up keeps both shins vertical at a fixed 33 and only foreshortens
@@ -679,29 +745,16 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'suitcase-carry') {
-    const stride = Math.sin(2 * Math.PI * t);
-    // Same cycle as the profile gait: the left foot swings first (t<0.5).
-    const liftL = Math.max(0, stride);
-    const liftR = Math.max(0, -stride);
-    // Hip at the profile hip height and the profile thigh/shin lengths (30,
-    // 29), so no segment is longer than in the side view or changes length.
-    const hip = point(100, 118);
-    const aR = point(82, 174 - 9 * liftR);
-    const aL = point(118, 174 - 9 * liftL);
+    const legs = carryFrontLegs(t);
     return skeleton(
       point(100, 60),
       point(100, 74),
-      hip,
+      legs.hip,
       point(78, 98),
       point(72, 122),
       point(122, 98),
       point(128, 122),
-      joint(hip, aR, CARRY_THIGH, CARRY_SHIN, 1),
-      aR,
-      point(72, 177 - 9 * liftR),
-      joint(hip, aL, CARRY_THIGH, CARRY_SHIN, -1),
-      aL,
-      point(128, 177 - 9 * liftL),
+      ...legs.limbs,
     );
   }
   if (exerciseId === 'kettlebell-goblet-squat') {
@@ -779,30 +832,37 @@ export function frontMovementPose(
     );
   }
 
+  // Kettlebell rack carry: the profile gait's legs; the selected arm holds the
+  // bell at the shoulder (upper arm 29.8, forearm 25.2, as in profile), the
+  // other arm hangs with the same lengths.
   const movingRight = working !== 'left';
-  const rackX = movingRight ? 78 : 122;
-  const oppositeX = movingRight ? 122 : 78;
-  const lift = Math.sin(Math.PI * t);
-  const rackElbow = point(rackX + (movingRight ? 9 : -9), 88);
-  const rackHand = point(rackX, 65);
-  const hangElbow = point(oppositeX + (movingRight ? -4 : 4), 88);
-  const hangHand = point(oppositeX, 105);
+  const legs = carryFrontLegs(t);
+  const neck = point(100, 74);
+  const rackArm = solveTwoBone(
+    neck,
+    point(movingRight ? 78 : 122, 79),
+    29.8,
+    25.2,
+    movingRight ? 1 : -1,
+  );
+  const hangArm = solveTwoBone(
+    neck,
+    point(movingRight ? 120 : 80, 122),
+    29.8,
+    25.2,
+    movingRight ? 1 : -1,
+  );
   return skeleton(
-    point(100, 46),
     point(100, 60),
-    point(100, 104),
-    // The selected side holds the rack grip: the person's right arm is on the
-    // viewer's left, so a left selection puts the grip in the L slot.
-    movingRight ? rackElbow : hangElbow,
-    movingRight ? rackHand : hangHand,
-    movingRight ? hangElbow : rackElbow,
-    movingRight ? hangHand : rackHand,
-    point(82, 137 - 7 * lift),
-    point(80, 174 - 10 * lift),
-    point(70, 177 - 10 * lift),
-    point(118, 148),
-    point(120, 174),
-    point(130, 177),
+    neck,
+    legs.hip,
+    // The person's right arm is on the viewer's left, so a left selection
+    // puts the grip in the L slot.
+    movingRight ? rackArm.mid : hangArm.mid,
+    movingRight ? rackArm.end : hangArm.end,
+    movingRight ? hangArm.mid : rackArm.mid,
+    movingRight ? hangArm.end : rackArm.end,
+    ...legs.limbs,
   );
 }
 

@@ -56,6 +56,8 @@ export interface RepTempo {
   hasHold: boolean;
   /** The figure plays one whole rep per cycle, so progress is linear. */
   sequence: boolean;
+  /** Spoken words for isometric work where Upp/Ner would say lift/lower. */
+  cues?: Partial<Record<RepPhase, string>>;
 }
 
 /** Tempo for rep-based exercises that count automatically; null means count by hand. */
@@ -90,8 +92,21 @@ export function repTempo(id: ExerciseId): RepTempo | null {
     repMs: upMs + holdMs + downMs + relaxMs,
     hasHold,
     sequence: false,
+    ...(CUE_WORDS[id] ? { cues: CUE_WORDS[id] } : {}),
   };
 }
+
+/**
+ * Spoken words where the generic Upp/Ner would say the wrong thing: a quad set
+ * is a muscle contraction (tense, hold, release), the band leg press moves out
+ * and back as the written instruction says.
+ */
+const CUE_WORDS: Partial<
+  Record<ExerciseId, Partial<Record<RepPhase, string>>>
+> = {
+  'quad-set': { up: 'Spänn', hold: 'Håll', down: 'Slappna av' },
+  'band-leg-press': { up: 'Ut', hold: 'Håll', down: 'Tillbaka' },
+};
 
 /** Pace steps for the quicker/slower buttons; a bigger factor is a slower beat. */
 export const PACE_FACTORS = [0.7, 0.85, 1, 1.25, 1.5, 1.8] as const;

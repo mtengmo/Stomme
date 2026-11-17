@@ -157,6 +157,30 @@ describe('ballistic beats', () => {
   });
 });
 
+describe('spoken cue words', () => {
+  it('quad set tenses, holds and releases instead of up and down', () => {
+    expect(repTempo('quad-set')?.cues).toEqual({
+      up: 'Spänn',
+      hold: 'Håll',
+      down: 'Slappna av',
+    });
+  });
+  it('band leg press says out and back like its written steps', () => {
+    expect(repTempo('band-leg-press')?.cues).toMatchObject({
+      up: 'Ut',
+      down: 'Tillbaka',
+    });
+  });
+  it('other held exercises keep the generic words', () => {
+    expect(repTempo('prone-leg-raise')?.cues).toBeUndefined();
+  });
+  it('scaling keeps the cue words', () => {
+    const base = repTempo('quad-set');
+    if (!base) throw new Error('tempo');
+    expect(scaleTempo(base, 1.5).cues).toEqual(base.cues);
+  });
+});
+
 describe('scaleTempo', () => {
   it('scales movement and relax but keeps prescribed holds', () => {
     const base = repTempo('wall-sit') ?? repTempo('goblet-squat');

@@ -251,6 +251,20 @@ export function balanceClockPose(progress: number): Pose {
   );
 }
 
+/**
+ * Band knee extension: the seated extension with a far leg of the near leg's
+ * lengths (thigh 32.1, shin 39), so the two legs are not 8 units apart. The far
+ * foot stays on the floor a little behind the near one.
+ */
+export function bandKneeExtensionPose(progress: number): Pose {
+  return {
+    ...seatedKneeExtensionPose(progress),
+    kL: [115, 135.3],
+    aL: [110, 174],
+    tL: [121, 177],
+  };
+}
+
 const mat: FigureSpec['props'] = [{ type: 'mat', x1: 14, x2: 186 }];
 const wall: FigureSpec['props'] = [{ type: 'wall', x: 157 }];
 const kneeChair: FigureSpec['props'] = [
@@ -272,8 +286,8 @@ export const physioFigures: Record<PhysioFigureId, FigureSpec> = {
     props: [{ type: 'chair', x: 66, y: 144, w: 47 }],
   },
   'band-knee-extension': {
-    start: seatedKneeExtensionPose(0),
-    end: seatedKneeExtensionPose(1),
+    start: bandKneeExtensionPose(0),
+    end: bandKneeExtensionPose(1),
     props: kneeChair,
     band: { from: BAND_KNEE_ANCHOR, to: 'aR', rest: 50 },
   },
@@ -301,7 +315,7 @@ export function physioMovementPose(
     case 'seated-knee-flexion':
       return seatedKneeFlexionPose(t);
     case 'band-knee-extension':
-      return seatedKneeExtensionPose(t);
+      return bandKneeExtensionPose(t);
     case 'band-hip-extension':
       return bandHipExtensionPose(t);
     case 'balance-clock':

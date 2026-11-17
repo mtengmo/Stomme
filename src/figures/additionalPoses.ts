@@ -127,8 +127,9 @@ export function kettlebellFloorPressPose(progress: number): Pose {
     ...floorBase,
     eR: elbow,
     hR: [elbow[0], elbow[1] - 26],
-    eL: [78, 174],
-    hL: [98, 174],
+    // The resting arm has the pressing arm's lengths (26 + 26) and lies on the mat.
+    eL: [79.7, 174],
+    hL: [105.7, 174],
   };
 }
 
@@ -456,23 +457,29 @@ const prone = p(
     [165, 173],
   ],
 );
+/**
+ * Side-lying base (hip abduction / adduction). Both arms are 16.6 + 15, both
+ * legs 30 + 30 with 9.5 feet, so near and far limbs match and the lifted leg
+ * can keep its length (`SEGMENT_RULES`). The lower arm lies under the head,
+ * the upper hand rests on the mat in front of the chest and belly.
+ */
 const sideLying = p(
   [38, 157],
   [52, 165],
   [99, 168],
   [
-    [46, 173],
-    [31, 174],
-    [70, 173],
-    [79, 176],
+    [38, 174],
+    [23, 175.5],
+    [65, 175.3],
+    [80, 176],
   ],
   [
-    [130, 170],
-    [160, 173],
-    [168, 176],
-    [113, 151],
+    [128.9, 170.8],
+    [158.7, 173.6],
+    [167.7, 176.6],
+    [120.8, 147.4],
     [138, 172],
-    [148, 176],
+    [146.6, 176],
   ],
 );
 
@@ -1150,27 +1157,32 @@ export const additionalFigures = {
   },
   'side-lying-hip-abduction': {
     start: sideLying,
-    end: { ...sideLying, kR: [124, 146], aR: [148, 124], tR: [156, 126] },
+    end: {
+      ...sideLying,
+      kR: [121.3, 147.9],
+      aR: [143.6, 127.9],
+      tR: [153, 126.3],
+    },
     props: mat,
   },
   'side-lying-hip-adduction': {
     start: {
       ...sideLying,
-      kL: [120, 145],
+      kL: [119.3, 146],
       aL: [130, 174],
-      tL: [141, 177],
-      kR: [128, 173],
-      aR: [156, 174],
-      tR: [165, 177],
+      tL: [139, 177],
+      kR: [128.9, 170.8],
+      aR: [158.7, 173.6],
+      tR: [167.7, 176.6],
     },
     end: {
       ...sideLying,
-      kL: [120, 145],
+      kL: [119.3, 146],
       aL: [130, 174],
-      tL: [141, 177],
-      kR: [128, 161],
-      aR: [155, 155],
-      tR: [164, 158],
+      tL: [139, 177],
+      kR: [128.1, 160.7],
+      aR: [157.2, 153.5],
+      tR: [166.7, 154.3],
     },
     props: mat,
   },
@@ -1216,22 +1228,34 @@ export const additionalFigures = {
     props: wall,
     motion: 'hold',
   },
+  // Both arms 28.5 + 31.5, both legs 29.5 + 28.5, both feet 9.5: the wall hand
+  // and the hand on the ankle stay on their contacts.
   'quadriceps-stretch': {
     start: {
       ...supportedStand,
-      eR: [87, 97],
+      eR: [72.8, 87.3],
       hR: [80, 118],
-      kR: [100, 148],
-      aR: [75, 137],
-      tR: [70, 130],
+      eL: [124.3, 85],
+      hL: [155, 92],
+      kR: [100, 147.5],
+      aR: [73.7, 136.5],
+      tR: [68.3, 128.8],
+      kL: [98.5, 147.5],
+      aL: [88, 174],
+      tL: [97.1, 176.7],
     },
     end: {
       ...supportedStand,
-      eR: [83, 99],
-      hR: [80, 123],
-      kR: [100, 148],
-      aR: [80, 123],
-      tR: [73, 119],
+      eR: [77.9, 94.2],
+      hR: [82, 125.4],
+      eL: [124.3, 85],
+      hL: [155, 92],
+      kR: [100, 147.5],
+      aR: [82, 125.4],
+      tR: [73.8, 120.7],
+      kL: [98.5, 147.5],
+      aL: [88, 174],
+      tL: [97.1, 176.7],
     },
     props: wall,
     motion: 'hold',
@@ -1278,24 +1302,26 @@ export const additionalFigures = {
     props: mat,
     motion: 'hold',
   },
+  // Arms 16.8 + 26.7, legs 31 + 30, feet 9.4 (constant, `SEGMENT_RULES`); the
+  // band hands and the pressed ankle stay where they were.
   'band-leg-press': {
     start: p(
       [39, 164],
       [53, 170],
       [96, 171],
       [
-        [71, 172],
+        [69.8, 171.2],
         [86, 150],
-        [65, 170],
+        [69.7, 172],
         [79, 147],
       ],
       [
-        [102, 141],
+        [98.1, 140.1],
         [128, 143],
-        [134, 136],
-        [119, 145],
+        [134.1, 135.8],
+        [120.1, 151.5],
         [140, 174],
-        [151, 177],
+        [149.1, 176.5],
       ],
     ),
     end: p(
@@ -1303,18 +1329,18 @@ export const additionalFigures = {
       [53, 170],
       [96, 171],
       [
-        [71, 172],
+        [69.8, 171.2],
         [86, 150],
-        [65, 170],
+        [69.7, 172],
         [79, 147],
       ],
       [
-        [124, 159],
+        [123, 155.8],
         [152, 148],
         [157, 140],
-        [119, 145],
+        [120.1, 151.5],
         [140, 174],
-        [151, 177],
+        [149.1, 176.5],
       ],
     ),
     props: mat,

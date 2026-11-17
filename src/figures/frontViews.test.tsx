@@ -161,7 +161,8 @@ describe('authored frontal demonstrations', () => {
     expect(squatBottom.hip[1]).toBeGreaterThan(squatStart.hip[1]);
     expect(squatBottom.kR[0]).toBeLessThan(squatStart.kR[0]);
     const carryStart = frontMovementPose('kettlebell-rack-carry', 0);
-    const carryStep = frontMovementPose('kettlebell-rack-carry', 0.5);
+    // The left foot swings first (t < 0.5), the right one second, as in profile.
+    const carryStep = frontMovementPose('kettlebell-rack-carry', 0.75);
     expect(carryStep.aR[1]).toBeLessThan(carryStart.aR[1]);
   });
 

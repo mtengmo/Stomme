@@ -189,7 +189,12 @@ export function useRepCounter({
         }
         cue.go();
         if (state === 'prepare') {
-          timerVoice(tempoRef.current?.hasHold ? 'Börja. Upp.' : 'Börja.');
+          const startTempo = tempoRef.current;
+          timerVoice(
+            startTempo?.hasHold
+              ? `Börja. ${startTempo.cues?.up ?? CUE.up}.`
+              : 'Börja.',
+          );
           tapFeedback();
         }
         segmentStart.current = now;
@@ -218,7 +223,7 @@ export function useRepCounter({
         tapFeedback();
         // Spoken numbers need a Swedish voice; otherwise a tick marks each rep.
         if (canSpeakSwedish()) {
-          const next = CUE[position.phase];
+          const next = t.cues?.[position.phase] ?? CUE[position.phase];
           timerVoice(
             t.hasHold && position.phase === 'up' && next
               ? `${count}. ${next}`
@@ -227,7 +232,7 @@ export function useRepCounter({
         } else cue.rep();
       } else if (position.phase !== lastMovement.current) {
         lastMovement.current = position.phase;
-        const word = CUE[position.phase];
+        const word = t.cues?.[position.phase] ?? CUE[position.phase];
         if (t.hasHold && word) timerVoice(word);
       }
     };

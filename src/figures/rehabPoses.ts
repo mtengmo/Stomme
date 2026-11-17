@@ -95,8 +95,8 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
       [49, 147],
       hip,
       [
-        [52, 173],
-        [78, 173],
+        [52, 173.5],
+        [78, 173.5],
         [66, 127],
         [88.5, 140],
       ],
@@ -135,24 +135,26 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
       ],
     );
   },
+  // Pelvis on the mat (centre 172.5 + stroke 3 = mat top 175.5); the torso keeps
+  // its length (neck 2.7 further along), forearms stay flat on the mat.
   'prone-on-forearms': () =>
     skeleton(
-      [49, 124],
-      [62, 136],
-      [108, 169],
+      [51.7, 124],
+      [64.7, 136],
+      [108, 172.5],
       [
-        [62, 174],
-        [84, 174],
-        [66, 172],
-        [87, 172],
+        [64.7, 174],
+        [86.7, 174],
+        [68.7, 172],
+        [89.7, 172],
       ],
       [
-        [140, 171],
-        [172, 173],
-        [183, 175],
-        [138, 168],
-        [170, 170],
-        [181, 172],
+        [140, 173.5],
+        [172, 174.5],
+        [183, 176.5],
+        [138, 171.5],
+        [170, 173.5],
+        [181, 175.5],
       ],
     ),
   'heel-slide': (t) => heelSlidePose(t),
@@ -197,8 +199,10 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
     const hip: Pt = [mix(101, 80, t), mix(109, 140, t)],
       ankle: Pt = [116, 174];
     const neck: Pt = [hip[0] + 10 * t, hip[1] - 43];
-    const k: Pt = [hip[0] + 31, hip[1] + 9],
-      a: Pt = [k[0] + 28, k[1] + 10];
+    // The free leg has the stance leg's lengths (36 + 36), thigh forward and
+    // shin angled down, so both shins match.
+    const k: Pt = [hip[0] + 34.6, hip[1] + 10.1],
+      a: Pt = [k[0] + 33.9, k[1] + 12.1];
     return skeleton(
       [neck[0] + 3, neck[1] - 14],
       neck,
@@ -276,23 +280,23 @@ export function heelSlidePose(t: number, side: 'R' | 'L' = 'R'): Pose {
  * supported hold (torso, upper arm 38, forearm 22).
  */
 export function proneRelaxedPose(): Pose {
-  const hip: Pt = [108, 169];
-  const neck: Pt = [hip[0] - Math.hypot(46, 33), 169];
+  const hip: Pt = [108, 172.5];
+  const neck: Pt = [hip[0] - Math.hypot(46, 33), 171];
   // The arms rest on the mat one unit lower than the torso line.
-  const elbowR: Pt = [neck[0] + Math.sqrt(38 * 38 - 1), 170];
-  const elbowL: Pt = [neck[0] + Math.sqrt(36 * 36 + 16 - 1), 170];
+  const elbowR: Pt = [neck[0] + Math.sqrt(38 * 38 - 1), 172];
+  const elbowL: Pt = [neck[0] + Math.sqrt(36 * 36 + 16 - 1), 172];
   return skeleton(
     [neck[0] - Math.hypot(13, 12), 169],
     neck,
     hip,
-    [elbowR, [elbowR[0] + 22, 170], elbowL, [elbowL[0] + 22, 173]],
+    [elbowR, [elbowR[0] + 22, 172], elbowL, [elbowL[0] + 22, 175]],
     [
-      [140, 171],
-      [172, 173],
-      [183, 175],
-      [138, 168],
-      [170, 170],
-      [181, 172],
+      [140, 173.5],
+      [172, 174.5],
+      [183, 176.5],
+      [138, 171.5],
+      [170, 173.5],
+      [181, 175.5],
     ],
   );
 }

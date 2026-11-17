@@ -203,7 +203,9 @@ export function stillFramePhase(
   // The closed gait cycle makes phase 0 and 1 the same frame: the front stills
   // show the left and the right foot swinging instead.
   if (
-    (exerciseId === 'farmer-carry' || exerciseId === 'suitcase-carry') &&
+    (exerciseId === 'farmer-carry' ||
+      exerciseId === 'suitcase-carry' ||
+      exerciseId === 'kettlebell-rack-carry') &&
     view === 'front'
   )
     return label === 'Slut' ? 0.75 : 0.25;
