@@ -2,8 +2,10 @@ import type { Pt } from './lerp';
 import type { Pose } from './poses';
 
 /** Constant limb lengths for the profile gait; they never change. */
-const THIGH = 30;
-const SHIN = 29;
+export const CARRY_THIGH = 30;
+export const CARRY_SHIN = 29;
+const THIGH = CARRY_THIGH;
+const SHIN = CARRY_SHIN;
 const FLOOR_ANKLE_Y = 174;
 const STRIDE_HALF = 16;
 const FOOT_CLEARANCE = 10;

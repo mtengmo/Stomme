@@ -1,7 +1,16 @@
 import type { ExerciseId } from '../domain/types';
-import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
 import type { Pose } from './poses';
+import {
+  arm,
+  bone,
+  foot,
+  headNeck,
+  keepSegmentLengths,
+  leg,
+  type SegmentRule,
+  trunk,
+} from './segmentLengths';
 
 type LegSide = 'R' | 'L';
 type LegKeys = {
@@ -54,6 +63,59 @@ export function constrainLegInterpolation(
   pose: Pose,
   referencePoses: readonly Pose[],
 ): Pose {
+  const solved = solveLegKnees(exerciseId, pose, referencePoses);
+  const rules = SEGMENT_RULES[exerciseId];
+  return rules ? keepSegmentLengths(solved, referencePoses, rules) : solved;
+}
+
+/**
+ * Per-exercise segment-length rules (opt-in, see `segmentLengths.ts`): the
+ * listed segments keep the length of the authored start pose through the whole
+ * interpolation. The authored start, middle and end keyframes must agree on
+ * those lengths; `segmentLengths.test.ts` asserts it.
+ */
+export const SEGMENT_RULES: Partial<
+  Record<ExerciseId, readonly SegmentRule[]>
+> = {
+  // Hands stay on the chest, only the elbows move.
+  'goblet-chair-squat': [arm('R', { bend: 1 }), arm('L', { bend: 1 })],
+  // A hinging trunk of constant length; head and arms ride on it.
+  'single-leg-rdl': [trunk(), headNeck()],
+  // Opposite arm and leg reach out as straight, constant-length limbs.
+  'dead-bug': [
+    arm('R', { straight: true }),
+    arm('L', { straight: true }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+  // Hold figure: the loop between Start and Håll only moves the hip and the
+  // free arm, every segment keeps its length.
+  'side-plank': [
+    bone('neck', 'hip'),
+    arm('R'),
+    arm('L'),
+    leg('R', { straight: true }),
+    leg('L', { straight: true }),
+    foot('R'),
+    foot('L'),
+  ],
+  'bird-dog': [
+    arm('R', { straight: true }),
+    arm('L', { straight: true }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+};
+
+function solveLegKnees(
+  exerciseId: ExerciseId,
+  pose: Pose,
+  referencePoses: readonly Pose[],
+): Pose {
   if (
     ![
       'step-down',
@@ -102,30 +164,5 @@ export function constrainLegInterpolation(
 
     out[knee] = solveKnee(out.hip, out[ankle], out[knee], upper, lower);
   }
-  if (exerciseId === 'goblet-chair-squat') keepArmLengths(out, referencePoses);
   return out;
-}
-
-/**
- * Both arms keep the segment lengths of the authored start pose: the hands
- * follow the interpolated chest position and each elbow is solved from the
- * shoulder, so the forearms never shrink while the trunk leans.
- */
-function keepArmLengths(out: Pose, referencePoses: readonly Pose[]) {
-  const ref = referencePoses[0];
-  if (!ref) return;
-  for (const [elbow, hand] of [
-    ['eR', 'hR'],
-    ['eL', 'hL'],
-  ] as const) {
-    const arm = solveTwoBone(
-      out.neck,
-      out[hand],
-      distance(ref.neck, ref[elbow]),
-      distance(ref[elbow], ref[hand]),
-      1,
-    );
-    out[elbow] = arm.mid;
-    out[hand] = arm.end;
-  }
 }

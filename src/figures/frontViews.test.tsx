@@ -481,7 +481,7 @@ describe('front pilot support contacts', () => {
           />,
         );
         expect(markup).toContain(
-          side === 'right' ? 'cx="72" cy="120"' : 'cx="128" cy="120"',
+          side === 'right' ? 'cx="72" cy="134"' : 'cx="128" cy="134"',
         );
         expect((markup.match(/stroke-width="4"/g) ?? []).length).toBe(1);
       }

@@ -200,7 +200,12 @@ export function stillFramePhase(
 ): number {
   if (exerciseId === 'russian-twist' && view === 'oblique')
     return label === 'Vrid åt höger' ? 0.75 : 0.25;
-  if (exerciseId === 'farmer-carry' && view === 'front')
+  // The closed gait cycle makes phase 0 and 1 the same frame: the front stills
+  // show the left and the right foot swinging instead.
+  if (
+    (exerciseId === 'farmer-carry' || exerciseId === 'suitcase-carry') &&
+    view === 'front'
+  )
     return label === 'Slut' ? 0.75 : 0.25;
   return label === 'Slut' ? 1 : 0;
 }

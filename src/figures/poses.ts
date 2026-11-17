@@ -186,15 +186,17 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
         [94, 177],
       ],
     ),
+    // Trunk 38 and head offset 14.1 as in the start pose, so the hinge rotates
+    // constant-length segments (see SEGMENT_RULES).
     end: pose(
-      [146, 106],
-      [134, 108],
+      [147.4, 105.8],
+      [133.5, 108.1],
       [96, 114],
       [
-        [136, 126],
-        [136, 144],
-        [134, 126],
-        [134, 144],
+        [135.5, 126.1],
+        [135.5, 144.1],
+        [133.5, 126.1],
+        [133.5, 144.1],
       ],
       [
         [98, 146],
@@ -216,7 +218,7 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
       [
         [64, 151],
         [64, 131],
-        [66, 151],
+        [65, 151],
         [66, 131],
       ],
       [
@@ -228,64 +230,71 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
         [140, 137],
       ],
     ),
+    // Every segment keeps its start length (arm 20 + 20, thigh 30, shin 28,
+    // foot 7.2): the reaching arm and the extended leg are straight, constant
+    // length limbs (see SEGMENT_RULES).
     end: pose(
       [50, 168],
       [64, 171],
       [104, 171],
       [
-        [40, 148],
-        [22, 146],
-        [66, 151],
+        [52, 155],
+        [40, 139],
+        [65, 151],
         [66, 131],
       ],
       [
         [104, 141],
         [132, 141],
         [138, 137],
-        [130, 168],
-        [158, 170],
-        [164, 166],
+        [134.1, 170.4],
+        [162.1, 169.9],
+        [168.1, 165.9],
       ],
     ),
     props: [{ type: 'mat', x1: 14, x2: 186 }],
   },
   'side-plank': {
+    // Both arms are 18 + 18: the supporting forearm lies on the mat (elbow and
+    // hand y 172.5, stroke edge on the mat top y 175.5), so the shoulder sits
+    // one upper arm (18) above the elbow. Trunk 45 and legs 24.4 + 24.4 in both
+    // keyframes; the stacked feet hide the far leg behind the near one.
     start: pose(
-      [47, 144],
-      [60, 148],
-      [104, 164],
+      [47, 150.5],
+      [60, 154.5],
+      [103.6, 165.8],
       [
-        [60, 172],
-        [74, 174],
-        [76, 150],
-        [92, 160],
+        [60, 172.5],
+        [78, 172.5],
+        [77.8, 156.7],
+        [93, 166.2],
       ],
       [
-        [128, 168],
+        [127.8, 168.9],
         [152, 172],
         [158, 176],
-        [130, 168],
-        [154, 172],
-        [160, 176],
+        [127.8, 168.9],
+        [152, 172],
+        [158, 176],
       ],
     ),
     end: pose(
-      [47, 132],
-      [60, 136],
-      [104, 153],
+      [47, 150.5],
+      [60, 154.5],
+      [104.2, 162.9],
       [
-        [60, 172],
-        [74, 174],
-        [60, 118],
-        [60, 100],
+        [60, 172.5],
+        [78, 172.5],
+        [60, 136.5],
+        [60, 118.5],
       ],
       [
-        [128, 162],
+        [128.1, 167.5],
         [152, 172],
         [158, 176],
-        [130, 162],
-        [154, 172],
-        [160, 176],
+        [128.1, 167.5],
+        [152, 172],
+        [158, 176],
       ],
     ),
     props: [{ type: 'mat', x1: 14, x2: 186 }],
@@ -423,6 +432,10 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
     held: { kind: 'kettlebell', hands: ['hR'] },
   },
   'bird-dog': {
+    // Contact on the mat (top edge y 175.5): the supporting knee and both
+    // shins rest at y 172.5 (half the 6 unit stroke above the edge). Segment
+    // lengths are the same in both keyframes: arm 18 + 18, thigh 34.5, shin 26,
+    // foot 6.7, so the loop interpolates constant-length limbs (SEGMENT_RULES).
     start: pose(
       [54, 126],
       [62, 138],
@@ -430,16 +443,16 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
       [
         [62, 156],
         [62, 174],
-        [64, 156],
+        [63, 156],
         [64, 174],
       ],
       [
-        [108, 170],
-        [134, 172],
-        [140, 176],
-        [110, 170],
-        [136, 172],
-        [142, 176],
+        [108, 172.5],
+        [134, 172.5],
+        [140, 175.5],
+        [110, 172.5],
+        [136, 172.5],
+        [142, 175.5],
       ],
     ),
     end: pose(
@@ -447,18 +460,18 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
       [62, 138],
       [108, 138],
       [
-        [42, 138],
-        [22, 138],
-        [64, 156],
+        [44, 138],
+        [26, 138],
+        [63, 156],
         [64, 174],
       ],
       [
-        [108, 170],
-        [134, 172],
-        [140, 176],
-        [134, 139],
-        [160, 139],
-        [166, 142],
+        [108, 172.5],
+        [134, 172.5],
+        [140, 175.5],
+        [142.6, 138],
+        [168.6, 138],
+        [174.6, 141],
       ],
     ),
     props: [{ type: 'mat', x1: 10, x2: 190 }],

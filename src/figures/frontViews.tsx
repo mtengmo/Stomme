@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { CARRY_SHIN, CARRY_THIGH } from './carryPoses';
 import type { Equipment, Working } from './Figure';
 import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
@@ -679,22 +680,28 @@ export function frontMovementPose(
   }
   if (exerciseId === 'suitcase-carry') {
     const stride = Math.sin(2 * Math.PI * t);
-    const rightLift = Math.max(0, stride);
-    const leftLift = Math.max(0, -stride);
+    // Same cycle as the profile gait: the left foot swings first (t<0.5).
+    const liftL = Math.max(0, stride);
+    const liftR = Math.max(0, -stride);
+    // Hip at the profile hip height and the profile thigh/shin lengths (30,
+    // 29), so no segment is longer than in the side view or changes length.
+    const hip = point(100, 118);
+    const aR = point(82, 174 - 9 * liftR);
+    const aL = point(118, 174 - 9 * liftL);
     return skeleton(
-      point(100, 46),
       point(100, 60),
-      point(100, 104),
-      point(78, 84),
-      point(72, 108),
-      point(122, 84),
-      point(128, 108),
-      point(82, 140 - 6 * rightLift),
-      point(80, 174 - 9 * rightLift),
-      point(70, 177 - 9 * rightLift),
-      point(118, 146 - 6 * leftLift),
-      point(120, 174 - 9 * leftLift),
-      point(130, 177 - 9 * leftLift),
+      point(100, 74),
+      hip,
+      point(78, 98),
+      point(72, 122),
+      point(122, 98),
+      point(128, 122),
+      joint(hip, aR, CARRY_THIGH, CARRY_SHIN, 1),
+      aR,
+      point(72, 177 - 9 * liftR),
+      joint(hip, aL, CARRY_THIGH, CARRY_SHIN, -1),
+      aL,
+      point(128, 177 - 9 * liftL),
     );
   }
   if (exerciseId === 'kettlebell-goblet-squat') {
@@ -849,8 +856,16 @@ function russianTwistProjection(progress: number): {
 
 /** Height of the dashed rear contact line in the oblique split squat. */
 export const SPLIT_REAR_LINE_Y = 146;
-/** Forward glide of the front knee at full depth (keeps the shin length). */
-const SPLIT_KNEE_GLIDE = 6.5;
+/**
+ * Projected leg segments of the oblique split squat: the front leg keeps the
+ * profile thigh and shin (33.1, 28.1); the rear leg points away from the viewer
+ * and is foreshortened to about 80 % (27, 20). Both are constant, so the
+ * knees are solved from the hip and the planted ankles in every phase.
+ */
+const SPLIT_FRONT_THIGH = 33.1;
+const SPLIT_FRONT_SHIN = 28.1;
+const SPLIT_REAR_THIGH = 27;
+const SPLIT_REAR_SHIN = 20;
 
 /** Thigh and shin of the oblique chair squat: those of the profile figure. */
 const CHAIR_THIGH = 31;
@@ -950,34 +965,30 @@ export function obliqueMovementPose(
   if (exerciseId === 'split-squat') {
     const depth = t;
     const rightFront = working !== 'left';
-    const hip = point(100, mix(111, 133, depth));
-    const neck = point(104, hip[1] - 44);
-    // The front shin keeps its drawn length within 10 %: as the knee drops it
-    // also glides forward over the toes, so the projection does not squash it.
-    const kneeShift = mix(0, SPLIT_KNEE_GLIDE, depth);
-    const front = rightFront
-      ? {
-          knee: point(83 - kneeShift, mix(145.5, 150, depth)),
-          ankle: point(81, 174),
-          toe: point(71, 177),
-        }
-      : {
-          knee: point(117 + kneeShift, mix(145.5, 150, depth)),
-          ankle: point(119, 174),
-          toe: point(129, 177),
-        };
-    // The rear toe stays on the rear contact line (SPLIT_REAR_LINE_Y) in every phase.
-    const rear = rightFront
-      ? {
-          knee: point(120, mix(136, 146, depth)),
-          ankle: point(128, SPLIT_REAR_LINE_Y - 3),
-          toe: point(138, SPLIT_REAR_LINE_Y),
-        }
-      : {
-          knee: point(80, mix(136, 146, depth)),
-          ankle: point(72, SPLIT_REAR_LINE_Y - 3),
-          toe: point(62, SPLIT_REAR_LINE_Y),
-        };
+    // Standing the front leg is nearly straight (hip 60.6 above reach 61.2).
+    const hip = point(100, mix(116.5, 138.5, depth));
+    // Trunk 38, as in the profile figure.
+    const neck = point(104, hip[1] - 38);
+    // Feet stay planted; the knees are solved with constant segment lengths.
+    // The front knee glides forward over the toes as the hip drops. Rear
+    // toe stays on the rear contact line (SPLIT_REAR_LINE_Y) in every phase.
+    const frontAnkle = rightFront ? point(81, 174) : point(119, 174);
+    const rearAnkle = rightFront
+      ? point(128, SPLIT_REAR_LINE_Y - 3)
+      : point(72, SPLIT_REAR_LINE_Y - 3);
+    const bend = rightFront ? 1 : -1;
+    const front = {
+      knee: joint(hip, frontAnkle, SPLIT_FRONT_THIGH, SPLIT_FRONT_SHIN, bend),
+      ankle: frontAnkle,
+      toe: rightFront ? point(71, 177) : point(129, 177),
+    };
+    const rear = {
+      knee: joint(hip, rearAnkle, SPLIT_REAR_THIGH, SPLIT_REAR_SHIN, bend),
+      ankle: rearAnkle,
+      toe: rightFront
+        ? point(138, SPLIT_REAR_LINE_Y)
+        : point(62, SPLIT_REAR_LINE_Y),
+    };
     const right = rightFront ? front : rear;
     const left = rightFront ? rear : front;
     return skeleton(
