@@ -79,6 +79,7 @@ describe('authored frontal demonstrations', () => {
       'kettlebell-floor-press',
       'quadriceps-stretch',
       'balance-clock',
+      'balance-pendulum',
     ]);
     expect(alternateView('split-squat')).toBe('oblique');
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');

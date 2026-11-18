@@ -20,6 +20,7 @@ import {
   supportedViewsFor,
   usePrefersReducedMotion,
 } from '../../figures/Figure';
+import { PushUpHandDiagram } from '../../figures/PushUpHandDiagram';
 import { buttonClass } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { ExerciseDifficulty } from './ExerciseDifficulty';
@@ -236,6 +237,7 @@ export function ExerciseCardBody({
                 {pauseControl}
               </BalanceClockDiagram>
             ) : null}
+            {exercise.id === 'push-up' ? <PushUpHandDiagram /> : null}
             <div
               className={`exercise-stage rounded-md border-2 border-edge p-2 ${review ? 'review-stage' : ''}`}
             >

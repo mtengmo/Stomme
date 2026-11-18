@@ -17,6 +17,7 @@ const candidates = [
   ['kettlebell-floor-press', 'oblique'],
   ['quadriceps-stretch', 'oblique'],
   ['balance-clock', 'oblique'],
+  ['balance-pendulum', 'oblique'],
 ] as const;
 
 for (const width of [320, 360, 412]) {

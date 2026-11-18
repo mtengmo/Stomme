@@ -23,6 +23,7 @@ export const LYING_OBLIQUE_IDS = [
   'kettlebell-floor-press',
   'quadriceps-stretch',
   'balance-clock',
+  'balance-pendulum',
 ] as const satisfies readonly ExerciseId[];
 
 export type LyingObliqueId = (typeof LYING_OBLIQUE_IDS)[number];
@@ -228,6 +229,17 @@ export const LYING_OBLIQUE: Record<LyingObliqueId, ObliqueSpec> = {
       { wallX: 157 },
     ),
     lengthsFrom: { leg: 'L' },
+  },
+  // Stance foot pinned to the floor, swing leg straight; lengths come from the
+  // stance side (the profile swing leg has the same lengths).
+  'balance-pendulum': {
+    ...standingSpec('balance-pendulum', {
+      armR: 'free',
+      armL: 'free',
+      legR: 'pinned',
+      legL: 'straight',
+    }),
+    lengthsFrom: { leg: 'R' },
   },
   'kettlebell-floor-press': supineSpec(
     'kettlebell-floor-press',

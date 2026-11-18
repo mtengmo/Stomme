@@ -48,6 +48,7 @@ export const supportedObliqueViews = [
   'kettlebell-floor-press',
   'quadriceps-stretch',
   'balance-clock',
+  'balance-pendulum',
 ] as const satisfies readonly ExerciseId[];
 
 /** Front-only demonstrations: the movement cannot be read from the side. */

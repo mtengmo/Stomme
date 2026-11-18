@@ -4,8 +4,6 @@
   "back-extension|side|drift:neck-eL": 1.9,
   "back-extension|side|drift:neck-eR": 1.8,
   "balance-pendulum|side|asym:aR-tR": 1,
-  "balance-pendulum|side|asym:hip-kR": 0.7,
-  "balance-pendulum|side|asym:kR-aR": 2.1,
   "band-hip-extension|side|asym:aR-tR": 0.6,
   "band-hip-extension|side|asym:eR-hR": 3.7,
   "band-hip-extension|side|asym:hip-kR": 1,

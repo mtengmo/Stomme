@@ -396,3 +396,53 @@ describe('balance-clock (E53) oblique view', () => {
     });
   }
 });
+
+describe('balance-pendulum (E46) oblique view', () => {
+  const id = 'balance-pendulum';
+  // The trunk sweeps from vertical to nearly horizontal, so at one mid phase it
+  // is parallel to the (fixed-slope) bars; the bars must still read at both
+  // stills (checked below), so the every-phase bar-angle gate is switched off.
+  shared(id, false, 0);
+  for (const side of SIDES) {
+    it(`${side}: bars clear of the trunk at both stills`, () => {
+      for (const t of [0, 1]) {
+        const { pose, pelvis, shoulders } = obliqueFrame(
+          LYING_OBLIQUE[id],
+          t,
+          side,
+        );
+        const angle = (
+          a: readonly [number, number],
+          b: readonly [number, number],
+        ) => Math.atan2(b[1] - a[1], b[0] - a[0]);
+        for (const bar of [pelvis, shoulders]) {
+          let diff =
+            Math.abs(angle(bar[1], bar[0]) - angle(pose.hip, pose.neck)) %
+            Math.PI;
+          if (diff > Math.PI / 2) diff = Math.PI - diff;
+          expect((diff * 180) / Math.PI).toBeGreaterThanOrEqual(25);
+        }
+      }
+    });
+
+    it(`${side}: stance foot pinned, the trunk hinges forward, the swing foot never goes below the floor`, () => {
+      const stance = side === 'right' ? 'R' : 'L';
+      const swing = side === 'right' ? 'L' : 'R';
+      const frames = PHASES.map((t) =>
+        obliqueFrame(LYING_OBLIQUE[id], t, side),
+      );
+      const first = frames[0] as ReturnType<typeof obliqueFrame>;
+      const last = frames[frames.length - 1] as ReturnType<typeof obliqueFrame>;
+      for (const { pose } of frames) {
+        const a = pose[`a${stance}`];
+        const a0 = first.pose[`a${stance}`];
+        expect(Math.hypot(a[0] - a0[0], a[1] - a0[1])).toBeLessThan(1);
+        expect(pose[`a${swing}`][1]).toBeLessThan(a0[1] + 1);
+      }
+      expect(Math.abs(last.pose.neck[0] - last.pose.hip[0])).toBeGreaterThan(
+        30,
+      );
+      expect(Math.abs(first.pose.neck[0] - first.pose.hip[0])).toBeLessThan(5);
+    });
+  }
+});

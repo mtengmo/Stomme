@@ -3255,7 +3255,7 @@
     "name": "Balanspendel på ett ben",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3317,12 +3317,17 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E46: armarna är nu raka framåt (armbåge och hand kolinjära 18+21), sänks med lutningen (0-1.2 rad); händerna ryms i ramen vid full lutning. Pilen/riktningen är mitt val. Sedd H och V fas 0-1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E46: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, golvet som projicerad yta, egen ram. Stödfoten är fastlåst vid golvet (glidning under 1 enhet), svingbenet är rakt med konstant längd och går aldrig under golvet, bålen fäller framåt, armarna är fria; bäcken- och axelstreck ritas som överlägg. Längderna tas från det raka stödbenet (lengthsFrom). Profilen ändrad: det svingande benet hade 32 + 29 mot stödbenets 31,3 + 31,1 och gjordes lika långt (31,3 + 31,1), annars når inte det fastlåsta stödbenet golvet utan att snedvyn blir längre än profilen; det tar bort profilens asym-rader hip-kR (0,7) och kR-aR (2,1) i baslinjen (REMOVED, inga höjda eller nya) och ändrar sidovyns fri fot något (fri fotled når ungefär 2 enheter längre; fortfarande ovanför golvet). Segmentlängder i snedvyn konstanta (drift 0,0, höger = vänster). Begränsning: bäcken- och axelstrecken ligger parallellt med bålen i ett mellanläge under fällningen (strecken lutar fast cirka 36 grader) och syns bara tydligt i start- och slutläget. Sidovyn är därmed ändrad: granskaren bör titta på alla faser H/V i båda vyer, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [
       "[strong] E46 balance-pendulum, hela loopen/reduced-motion H/V, kroppsvikt: endast profil erbjuds och döljer angivet fel bäckenrotation. Lägg till front-/snedvy som visar bäckenets båda sidor under fällning och knäföring."
     ],
-    "fingerprint": "8e63bf398cec",
+    "fingerprint": "f4d0c4b116d8",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-rdl, balance-clock. Stor överlappning med obelastad enbens-RDL, men knäframföring och balanssekvens ger ett eget upplägg. Prioritera inte inaktivering utan att rehabens användning klarlagts. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -3765,7 +3770,7 @@
     "name": "Armhävning",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3810,6 +3815,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E54: ny standardPushUp (sidovy): bortre handen i nivå med den närmare och båda armarna raka överst (var knäck i bortre armbågen); renegade row, climber och diamond använder kvar gamla pushUp. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E54: ingen sned vinkel (kroppsmodellen med yaw och djupskjuv ger ingen tydlig bild av armhävningen). I stället en statisk handplaceringsbild sedd uppifrån (PushUpHandDiagram.tsx, visas i övningskortet och under Hur gör man? i passet, oberoende av vy): händerna något bredare än axlarna (axel +-20, hand +-27) och armbåge cirka 45 grader snett bakåt från bålen, konstanta armlängder 28 + 28; texten i tipsen är oförändrad och oberoende av vy. Ingen figur- eller sidovyändring (fingeravtryck oförändrat). Begränsning: en statisk bild, ingen animerad frontvy; bilden visar handbredd och armbågsriktning men inte armarnas rörelse genom loopen. Granskaren bör avgöra om bilden räcker för openIssues (befintlig punkt kvarstår tills dess). Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [

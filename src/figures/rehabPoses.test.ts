@@ -28,8 +28,14 @@ describe('rehabilitation movement geometry', () => {
       expect(current.kR).toEqual(start.kR);
       expect(current.aR).toEqual(start.aR);
       expect(current.tR).toEqual(start.tR);
-      expect(distance(current.hip, current.kL)).toBeCloseTo(32, 8);
-      expect(distance(current.kL, current.aL)).toBeCloseTo(29, 8);
+      expect(distance(current.hip, current.kL)).toBeCloseTo(
+        Math.hypot(4, 31),
+        8,
+      );
+      expect(distance(current.kL, current.aL)).toBeCloseTo(
+        Math.hypot(3, 31),
+        8,
+      );
       expect(distance(current.neck, current.head)).toBeCloseTo(14, 8);
       expect(distance(current.hip, current.neck)).toBeCloseTo(44, 8);
       expect(distance(current.neck, current.eR)).toBeCloseTo(18, 8);

@@ -171,13 +171,17 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
     ];
     const thighAngle = mix(-1.05, Math.PI - 0.14, t),
       shinAngle = mix(0.8, Math.PI + 0.04, t);
+    // The swinging leg has the stance leg's lengths (31.3 + 31.1), so both legs
+    // are equally long.
+    const thigh = Math.hypot(4, 31),
+      shin = Math.hypot(3, 31);
     const freeKnee: Pt = [
-      hip[0] + 32 * Math.cos(thighAngle),
-      hip[1] + 32 * Math.sin(thighAngle),
+      hip[0] + thigh * Math.cos(thighAngle),
+      hip[1] + thigh * Math.sin(thighAngle),
     ];
     const freeAnkle: Pt = [
-      freeKnee[0] + 29 * Math.cos(shinAngle),
-      freeKnee[1] + 29 * Math.sin(shinAngle),
+      freeKnee[0] + shin * Math.cos(shinAngle),
+      freeKnee[1] + shin * Math.sin(shinAngle),
     ];
     // Straight arms (upper arm 18, forearm 21, both constant) reach forward
     // and dip with the lean, so they stay clear of the head and in the frame.
