@@ -49,9 +49,9 @@ describe('isometric lunge hold figure', () => {
 
   it('is a side-view hold with its own framing', () => {
     expect(figures[id].motion).toBe('hold');
-    expect(supportedViewsFor(id)).toEqual(['side']);
+    expect(supportedViewsFor(id)).toEqual(['side', 'oblique']);
     expect(defaultViewFor(id)).toBe('side');
-    expect(alternateView(id)).toBeUndefined();
+    expect(alternateView(id)).toBe('oblique');
     expect(FRAMING[id]).toBeDefined();
   });
 
@@ -96,7 +96,7 @@ describe('plate pogos figure', () => {
 
   it('is a ballistic side-view figure with the plate as a floor prop', () => {
     expect(figures[id].motion).toBe('ballistic');
-    expect(supportedViewsFor(id)).toEqual(['side']);
+    expect(supportedViewsFor(id)).toEqual(['side', 'oblique']);
     expect(figures[id].props).toEqual([
       expect.objectContaining({ type: 'plate' }),
     ]);

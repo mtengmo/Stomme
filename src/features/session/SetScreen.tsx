@@ -8,7 +8,10 @@ import { loadPresentation } from '../../content/loadPresentation';
 import { timedMovementCue } from '../../content/timedMovement';
 import type { Exercise } from '../../domain/types';
 import { BalanceClockDiagram } from '../../figures/BalanceClockDiagram';
-import { PushUpHandDiagram } from '../../figures/PushUpHandDiagram';
+import {
+  hasPlacementDiagram,
+  PlacementDiagram,
+} from '../../figures/PlacementDiagrams';
 import { formatClock } from '../../lib/format';
 import { isManual, paceFor, saveManual, savePace } from '../../lib/repPrefs';
 import { useRepCounter } from '../../lib/useRepCounter';
@@ -563,7 +566,9 @@ export function SetScreen({
                 paused
               />
             ) : null}
-            {exercise.id === 'push-up' ? <PushUpHandDiagram /> : null}
+            {hasPlacementDiagram(exercise.id) ? (
+              <PlacementDiagram exerciseId={exercise.id} />
+            ) : null}
             <ExerciseMuscles exerciseId={exercise.id} />
             <h2 className="m-0 text-2xl font-bold">Så gör du</h2>
             <ExerciseDifficulty

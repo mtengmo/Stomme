@@ -61,9 +61,9 @@ describe.each([['fast-feet'], ['knee-drive']] as const)(
 
     it('is a side-view ballistic demonstration', () => {
       expect(figures[id].motion).toBe('ballistic');
-      expect(supportedViewsFor(id)).toEqual(['side']);
+      expect(supportedViewsFor(id)).toEqual(['side', 'oblique']);
       expect(defaultViewFor(id)).toBe('side');
-      expect(alternateView(id)).toBeUndefined();
+      expect(alternateView(id)).toBe('oblique');
       expect(FRONT_ONLY).not.toContain(id);
     });
 

@@ -53,6 +53,12 @@ export const supportedObliqueViews = [
   'quadriceps-stretch',
   'balance-clock',
   'balance-pendulum',
+  'side-plank',
+  'bird-dog',
+  'fast-feet',
+  'knee-drive',
+  'isometric-lunge-hold',
+  'plate-pogos',
 ] as const satisfies readonly ExerciseId[];
 
 /** Front-only demonstrations: the movement cannot be read from the side. */
@@ -116,8 +122,9 @@ const point = (x: number, y: number): Pt => [x, y];
 /** Step-down front view: the upright railing the support hand holds. */
 export const STEP_DOWN_FRONT_RAIL_X = 136;
 export const STEP_DOWN_FRONT_GRIP_Y = 90;
-const FRONT_UPPER_ARM = Math.hypot(22, 22);
-const FRONT_FOREARM = Math.hypot(6, 22);
+/** Step-down front: arms 25 + 25 and trunk 40, as in the profile figure. */
+const FRONT_UPPER_ARM = 25;
+const FRONT_FOREARM = 25;
 
 function skeleton(
   head: Pt,
@@ -163,8 +170,8 @@ function frontStance(hip: Pt, aR: Pt, aL: Pt, toeDx: number): Pose {
 }
 const smooth = (x: number) => x * x * (3 - 2 * x);
 /** Oblique bodyweight split squat: the wall in front of a right / left front leg. */
-const SPLIT_WALL_X_LEFT = 56;
-const SPLIT_WALL_X_RIGHT = 144;
+const SPLIT_WALL_X_LEFT = 64;
+const SPLIT_WALL_X_RIGHT = 136;
 
 /** Floor markers of the in-and-out jump sit this far from the body's centre line. */
 export const IN_OUT_MARKER_DX = 25;
@@ -674,7 +681,7 @@ export function frontMovementPose(
           ? mix(108, 84, t)
           : mix(112, 140, t);
     const otherAnkleY = mix(174, 150, t);
-    const neckY = hipY - 44;
+    const neckY = hipY - (down ? 40 : 44);
     // Feet occupy distinct depth planes: the support remains fixed while the
     // trailing foot rises (step-up) or rests on the rear bench (split squat).
     const selected = {
@@ -742,10 +749,19 @@ export function frontMovementPose(
     const gripHand = grip
       ? place(grip.end, working === 'left' ? 'R' : 'L')
       : [0, 0];
+    // Step-down arms hang 25 + 25 like the profile; step-up keeps its own.
     const freeElbow = (side: 'R' | 'L'): Pt =>
-      side === 'R' ? point(78, neckY + 22) : point(122, neckY + 22);
+      down
+        ? point(side === 'R' ? 86.5 : 113.5, neckY + 21)
+        : side === 'R'
+          ? point(78, neckY + 22)
+          : point(122, neckY + 22);
     const freeHand = (side: 'R' | 'L'): Pt =>
-      side === 'R' ? point(72, neckY + 44) : point(128, neckY + 44);
+      down
+        ? point(side === 'R' ? 78 : 122, neckY + 44.5)
+        : side === 'R'
+          ? point(72, neckY + 44)
+          : point(128, neckY + 44);
     const gripSide = working === 'left' ? 'R' : 'L';
     const armR = down && gripSide === 'R';
     const armL = down && gripSide === 'L';
@@ -767,14 +783,15 @@ export function frontMovementPose(
   }
   if (exerciseId === 'suitcase-carry') {
     const legs = carryFrontLegs(t);
+    // Trunk 40, upper arms 20 and forearms 16.2 (the free profile forearm) hanging at the sides, as in the profile gait.
     return skeleton(
-      point(100, 60),
-      point(100, 74),
+      point(100, 64),
+      point(100, 78),
       legs.hip,
-      point(78, 98),
-      point(72, 122),
-      point(122, 98),
-      point(128, 122),
+      point(88, 94),
+      point(83.1, 109.4),
+      point(112, 94),
+      point(116.9, 109.4),
       ...legs.limbs,
     );
   }
@@ -1079,8 +1096,9 @@ export function obliqueMovementPose(
       point(106, neck[1] - 14),
       neck,
       hip,
-      point(83, neck[1] + 21),
-      point(77, neck[1] + 44),
+      // Both arms keep the profile's 23.3 + 23.5 (never longer than the side view).
+      point(87.5, neck[1] + 16.5),
+      point(83, neck[1] + 39.6),
       point(120, neck[1] + 17),
       point(123, neck[1] + 40),
       right.knee,
@@ -1374,13 +1392,13 @@ export function FrontFigureFrame({
     if (!splitSupported) return basePose;
     const handAt = point(
       splitSupportX + (working === 'left' ? -4 : 4),
-      basePose.neck[1] + 30,
+      basePose.neck[1] + 27,
     );
     const arm = solveTwoBone(
       basePose.neck,
       handAt,
-      31,
-      27,
+      23.3,
+      23.5,
       working === 'left' ? 1 : -1,
     );
     return {

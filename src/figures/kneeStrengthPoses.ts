@@ -131,9 +131,10 @@ export function copenhagenHoldPose(t: number): Pose {
     hL: Pt = [84, 174];
   const neck = joint(hip, eL, 46, 25, 1),
     head = polar(neck, 16, -2.8);
-  // The knee rests on the bench; the foot hangs clear of the plate.
-  const aR: Pt = [kR[0] + 12, 127],
-    tR: Pt = [aR[0] + 8, 127];
+  // The knee rests on the bench and the upper shin lies along it at the full
+  // lower-leg length (28, as the free leg); the foot points up, clear of the plate.
+  const aR: Pt = [kR[0] + 28, 127],
+    tR = polar(aR, 12, -1.9);
   const kL = polar(hip, 38, 0.75),
     aL = polar(kL, 28, 3.2),
     tL = polar(aL, 12, 0.1);

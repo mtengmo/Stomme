@@ -358,12 +358,17 @@
         "date": "2026-11-17",
         "fixer": "claude-sonnet",
         "notes": "E05: armarna har nu förenliga segment (18+18) i hållet; underarmen ligger plant på mattan, fria armen pekar rakt upp. Överkroppen ritas cirka 18 enheter lägre än tidigare, höftsänkningen mellan Start och Håll är 2,8 (tidigare cirka 11). Via SEGMENT_RULES. Behöver ny granskning av Codex-modell eller human: Håll live, reduced-motion Håll, H/V, kontakt, att Start fortfarande läses som liggande."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E05: Start ligger nu på sidan med höft och ben i mattkontakt (höft och ben y 172,5, tidigare höft y 165,8 med cirka 6,7 gap); Håll oförändrat (höft y 162,9), segmentlängder konstanta (bål 45, ben 24,4+24,4, fot 7,2), fotled glider 2 enheter mellan Start och Håll. Ny vy \"Sned vinkel\" (obliqueSpecs, yaw 35, bäcken-/axelstreck tvärs bålen, benen staplade, stödunderarmen lagd framåt i djupled) som visar höftens läge i djupled; mattkontakt i Start och Håll. Granska: Start/Håll, H/V, snedvyns benstapling vid 390 mörkt/1280 ljust, att höft bakåt syns. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E05 side-plank, profil Håll/live och reduced-motion Håll, H/V, kroppsvikt: stödarmens överarm ritas dubbelt så lång som den fria överarmen (36 mot 18 enheter; baseline asym 18). Ge armarna förenliga segmentlängder med bibehållen underarmskontakt och fri arm mot taket."
     ],
-    "fingerprint": "e6a18689fd14",
+    "fingerprint": "a290fc1a806d",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: plank, copenhagen-hold, bench-side-plank-leg-lift. Vanlig sidoplanka kräver ingen bänk och har en egen roll jämfört med framsidesplanka och adduktorvarianter. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/core, B/side-core; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -453,12 +458,17 @@
         "date": "2026-11-17",
         "fixer": "claude-sonnet",
         "notes": "E06: snedvyn löser nu knän med konstanta längder från planterade fötter (främre lår/underben 33,1/28,1, bakre 27/20), bakre tån ligger på SPLIT_REAR_LINE_Y, bålen 38 som i profilen (var 44). Tidigare startlår 38,5 och bakre underben 8-10,6 är åtgärdade. Kvarstår: arm-asymmetri neck-eR 6,4. Behöver ny granskning av Codex-modell eller human: snedvy fas 0-1 och återgång, H/V, alla varianter, profilvyn med hantlar."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E06: snedvyn hade överarm 29,7 mot 23,3 på andra sidan; nu båda 23,3 och underarmar 23,5 (aldrig längre än profilens). Väggstödet flyttat till x 64/136 och stödarmen löst med 23,3+23,5 så handen når väggen (tidigare 31+27). Baseline-rader asym:neck-eR 6,4 och asym:eR-hR 0,6 borttagna. Kvarstår: övriga snedvyrader (hip-kR 6,1, kR-aR 8,1) och profilens minor-drift. Granska: snedvy H/V, kroppsvikt (vägg) och 2 hantlar, fas 0-1. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E06 split-squat, sned vy fas 0–1 och återgång, H/V, kroppsvikt/2×5 kg/2×10 kg: låren kortas tydligt under sänkningen (baseline drift 9,5/8,2), medan profilen håller konstanta lår. Korrigera projektion/segment så att kroppen förblir proportionerlig och främre fot/bakre tå behåller sina kontaktplan."
     ],
-    "fingerprint": "61a6d6a5f3e3",
+    "fingerprint": "5af9458f945f",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, rear-foot-split-squat. Fötterna står kvar och handstöd kan användas. Behåll detta enklare stationsbundna steg även om någon dynamisk utfallsvariant tas bort. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -706,6 +716,11 @@
         "date": "2026-11-17",
         "fixer": "claude-sonnet",
         "notes": "E09: frontvyns lår 30 och underben 29 är konstanta och lika profilen (tidigare lår upp till 45,7, över max 36); frontvyn lyfter samma fot som profilen vid fas .25/.75; reduced-motion Start/Slut i front visar nu faserna .25/.75 och skiljer sig åt. Enhet och text ändrades tidigare (sekunder). Behöver ny granskning av Codex-modell eller human: front och profil, båda vikter, H/V, reduced-motion."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E09: frontvyn har nu bål 40 (tidigare 44) och armar 20+16,2 (tidigare 32,6+24,7), hängande längs sidorna; vikten sitter i handen och fotväxlingen är oförändrad. Frontens underarm är satt till profilens fria underarm (16,2) så ingen segment är längre än profilen. Processraden (nybörjartest, full loopacceptans) kvarstår. Granska: front H/V, hantel och kettlebell, hela gången, att vikten inte skär benet. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
@@ -714,7 +729,7 @@
       "[cheap] E09 suitcase-carry, profil/front fas .25 och .75, H/V, båda vikter: vyerna lyfter motsatt fot vid samma fas (.25 H: vänster i profil, höger i front). Samordna frontens sväng-/stödfas med profilen så att vybyte behåller steget.",
       "[cheap] E09 suitcase-carry, reduced-motion front Start/Slut, H/V, båda vikter: båda stillbilderna visar samma steg eftersom fas 0 och 1 är samma punkt i den slutna cykeln. Välj två skilda gångfaser så att alterneringen framgår."
     ],
-    "fingerprint": "732d65de0ba0",
+    "fingerprint": "c1fd3981e664",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: farmer-carry, kettlebell-rack-carry. Ensidig bärning med armen längs sidan har annan lastfördelning än tvåhandsbärning och enklare greppbeskrivning än rackgång. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/carry; fokusplatser carry; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -763,6 +778,11 @@
         "date": "2026-11-17",
         "fixer": "claude-sonnet",
         "notes": "E10: rörlig arm och motsatt lår har konstanta längder (arm 18+18, lår 34,5 och underben 26, tidigare drift 6,6/10,9); utsträckt ben når lika långt som stödbenet; stödknä och båda underben ligger på y 172,5 så att linjekanten ligger på mattans överkant (175,5) i alla faser och i reduced-motion Start/Slut. Front-/snedvy saknas fortfarande (öppen punkt). Behöver ny granskning av Codex-modell eller human."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E10: ny vy \"Sned vinkel\" (yaw 35): händer/knän axel-/höftbreda i djupled, stödhand och stödknä på mattan, lyft arm och motsatt ben med konstanta längder (kvarvarande knä- och armböjning i startläget bevaras), bäcken-/axelstreck horisontella så höftrotation syns. Granska: snedvy H/V alla faser (lyft ben böjs under mellanfasen precis som i profilen), mattkontakt. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
@@ -771,7 +791,7 @@
       "[strong] E10 bird-dog, profil hela loopen och reduced-motion Start/Slut, H/V, kroppsvikt: stödknät saknar mattkontakt; knäcentrum y170 och 6 enheters linjebredd lämnar en lucka till mattans överkant y176. Lägg stödknät på mattan och behåll kontakten när motsatt arm och ben lyfts, som instruktionen kräver.",
       "[strong] E10 bird-dog, alla faser och reduced-motion, H/V, kroppsvikt: endast sidovy finns och döljer höftrotationen som anges i vanligt fel. Lägg till front-/snedvy som visar att höften hålls stilla utan rotation."
     ],
-    "fingerprint": "97a72f4c763f",
+    "fingerprint": "648859513a00",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dead-bug, plank-arm-lift, back-extension. Fyrfota motsatt arm/ben ger en egen stödposition. Liknande bålmål innebär inte att den kan ersättas med rygglyft eller planka. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/pull, B/pull; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -2342,13 +2362,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E33: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, mattan som projicerad yta, egen tät ram. Bäcken- och axelstreck ritas lodrätt (sidoliggande kropp, vänster-höger-axeln är vertikal) och visar att bäcken och axlar ligger staplade; arbetsbenet är rakt med konstant längd och lyfts utåt, stödfoten ligger fastlåst (glidning under 1 enhet) och armarna är fria. Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: sidovyn visar fortfarande bäckenet 4,5 enheter över mattan (befintlig punkt kvarstår, ej åtgärdad här); snedvyn är en ungefärlig snedbild, benen ligger staplade så djupet syns mest i stödbenets böjning. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E33: bäckenet ligger nu på mattan (höft y 172,5, tidigare 168; gap 4,5 borta) i profil och snedvy; bål 47,1 och armar 16,6+15 oförändrade, understödsbenet och arbetsbenet 30+30 (lyft 45 grader, tidigare cirka 47). Granska: profil och snedvy fas 0-1, reducerade rutor H/V, bäckenkontakt vid 390/1280. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E33 side-lying-hip-abduction, hela loopen H/V, kroppsvikt: endast profil erbjuds och bäckenrullning/tårotation som texten varnar för döljs. Lägg till front-/snedvy som visar dessa riktningar.",
       "[strong] E33 side-lying-hip-abduction, profil hela loopen och reduced-motion H/V, kroppsvikt: bäckenet svävar över mattan (centrum y 168, linjekant 171 mot mattans överkant 175,5; glipa 4,5), synligt vid 390/1280 px. Visa sidliggande bäckenstöd medan övre benet lyfts, med de korrigerade segmenten kvar."
     ],
-    "fingerprint": "1ea12f761ef1",
+    "fingerprint": "e6155d1e203c",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: side-lunge, balance-clock. Sidliggande isolerat benlyft med håll är inte utbytbart mot stående utfall eller balansnuddar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2409,13 +2434,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E34: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, mattan som projicerad yta, egen tät ram. Bäcken- och axelstreck ritas lodrätt (sidoliggande kropp) och visar staplade bäcken och axlar; det övre benets fot är böjd framför kroppen och fastlåst vid mattan (glidning under 1 enhet), det undre benet är rakt med konstant längd och lyfts; armarna är fria. Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: benen ligger staplade så djupet syns mest i stödbenets böjning; snedvyn är en ungefärlig snedbild. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E34: bäckenet ligger nu på mattan (höft y 172,5, tidigare 168; gap 4,5 borta) i profil och snedvy; stödbenets knä omräknat (30+30), lyftet av det undre benet cirka 19,5 grader från ett nu plant utgångsläge (tidigare från ett sluttande). Granska: profil och snedvy fas 0-1, stödfot framför, reducerade rutor, bäckenkontakt. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E34 side-lying-hip-adduction, hela loopen H/V, kroppsvikt: profil döljer kroppsrullning och fotens placering framför arbetsbenet. Lägg till front-/snedvy som visar stödposition och stilla bäcken.",
       "[strong] E34 side-lying-hip-adduction, profil hela loopen och reduced-motion H/V, kroppsvikt: bäckenets nedre linjekant y 171 ligger 4,5 enheter över mattans överkant 175,5 (centrum y 168), synligt vid 390/1280 px. Visa stöd för bäckenet i sidliggande medan det undre benet lyfts; behåll konstanta segment."
     ],
-    "fingerprint": "982df9650043",
+    "fingerprint": "bca95dd8b648",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: copenhagen-hold, bench-side-plank-leg-lift. Sidliggande lyft av undre benet utan bänk är ett eget enklare upplägg; behåll även om bänkvarianten gallras. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -3322,12 +3352,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E46: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, golvet som projicerad yta, egen ram. Stödfoten är fastlåst vid golvet (glidning under 1 enhet), svingbenet är rakt med konstant längd och går aldrig under golvet, bålen fäller framåt, armarna är fria; bäcken- och axelstreck ritas som överlägg. Längderna tas från det raka stödbenet (lengthsFrom). Profilen ändrad: det svingande benet hade 32 + 29 mot stödbenets 31,3 + 31,1 och gjordes lika långt (31,3 + 31,1), annars når inte det fastlåsta stödbenet golvet utan att snedvyn blir längre än profilen; det tar bort profilens asym-rader hip-kR (0,7) och kR-aR (2,1) i baslinjen (REMOVED, inga höjda eller nya) och ändrar sidovyns fri fot något (fri fotled når ungefär 2 enheter längre; fortfarande ovanför golvet). Segmentlängder i snedvyn konstanta (drift 0,0, höger = vänster). Begränsning: bäcken- och axelstrecken ligger parallellt med bålen i ett mellanläge under fällningen (strecken lutar fast cirka 36 grader) och syns bara tydligt i start- och slutläget. Sidovyn är därmed ändrad: granskaren bör titta på alla faser H/V i båda vyer, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E46: snedvyns fria ben är nu \"free\" i stället för \"straight\": knät är böjt framåt/uppåt i start och återgång som i profilen, konstanta längder, stödfoten kvar. Granska: snedvy fas 0, 0.25, återgång och reducerad Start H/V; stråken som överlappar bålen i mitten är oförändrade (minor). Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E46 balance-pendulum, hela loopen/reduced-motion H/V, kroppsvikt: endast profil erbjuds och döljer angivet fel bäckenrotation. Lägg till front-/snedvy som visar bäckenets båda sidor under fällning och knäföring."
     ],
-    "fingerprint": "f4d0c4b116d8",
+    "fingerprint": "036a5ec7e272",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-rdl, balance-clock. Stor överlappning med obelastad enbens-RDL, men knäframföring och balanssekvens ger ett eget upplägg. Prioritera inte inaktivering utan att rehabens användning klarlagts. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -4276,7 +4311,7 @@
     "name": "Knäböj med hopp",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -4340,6 +4375,11 @@
         "date": "2026-11-03",
         "fixer": "claude-sonnet",
         "notes": "E62: reduced-motion visar nu tre rutor: Start, Hopp och en ny Landning (fas 0.85, båda fötter i golvet, böjda höfter/knän)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E62: ingen sned vinkel (kroppsmodellen kan inte rita en parallell fotställning läsbart: alla ben utgår från en höftpunkt). I stället en statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna axelbrett (±20 mot axel ±20), tårna lätt utåt, ett knä rakt över varje fot med streckad linje genom tårna, symmetriskt. Gäller nedgång och landning. Begränsning: statisk bild, visar inte hoppets rörelse. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 squat-jump all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4416,6 +4456,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E63: räknaren och figuren samordnade. Figuren är nu en sekvens med cykel på två räknade repetitioner (cycleReps 2 i repTempo.ts): rep 1 spelar ett benbyte (fas 0 till 0,5), rep 2 byter tillbaka (0,5 till 1), så varje räknat hopp visar exakt ett benbyte i stället för två. Slut-stillbilden visar det motsatta utfallet. Demon går 6 s per tvåhoppscykel. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, reduced-motion Start/Slut, live-loop med räknare, cross-vendor (Codex eller human). Granskning 2026-11-18 jumping-lunge all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E63: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna på två parallella höftbreda linjer (±12), inte på en lina, och det främre knät rakt över foten (streckad linje genom tårna); pilar visar att benen byter plats i hoppet. Begränsning: statisk bild, visar landningen men inte hoppet. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 jumping-lunge all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4563,6 +4608,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E65: bortre handen ligger nu i golvnivå med den främre (y 174 i stället för 171), så båda stödarmarna är raka i toppläget (22+22 konstanta). Lårasymmetrin 3,6 kvarstår (delpunkt). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida fas 0 och Start, alla faser, cross-vendor. Granskning 2026-11-18 knee-push-up all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E65: ingen sned vinkel (som för E54 ger yaw- och djupskjuvmodellen ingen tydlig bild av en armhävning; vyn är inte provad för E65 separat). I stället en statisk handplaceringsbild sedd uppifrån (PronePlacementDiagrams.tsx, KneePushUpDiagram, byggd på E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): händerna något bredare än axlarna (axel ±20, hand ±27), armbågarna cirka 45 grader snett bakåt från bålen, konstanta armlängder 28 + 28, knäna höftbrett (±9) på handduken. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, baseline-diff 0/0/0/0). Tester: PronePlacementDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Begränsning: statisk bild, inte armarnas rörelse genom loopen; knäna ritas schematiskt. Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 knee-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4579,7 +4629,7 @@
     "name": "Armhävning mot vägg",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -4619,6 +4669,11 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E66: starten har nu helt raka armar i från-väggen-läget (startvinkel 1.241 i stället för 1.222), handen kvar på väggen och hälarna kvar; bortre vristen flyttad ett steg för att hålla ratchet. Sedd fas 0, 0.5, 0.875 och 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E66: ingen sned vinkel (se E62; den bortre handen når inte väggen i modellen). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): händerna på väggen något bredare än axlarna (hand ±27 mot axel ±20), fötterna höftbrett (±12). Begränsning: statisk bild, armarnas böjning syns inte. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 wall-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4634,7 +4689,7 @@
     "name": "Tåhävning på två ben",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -4653,7 +4708,13 @@
         "notes": "E67: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, Kroppsvikt (Kroppsvikt), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Båda hälar höjs kring kvarvarande tåstöd och sänks lugnt, ben 36+34 och fötter 20 konstanta. Armasymmetri 0,8 stör inte; röst/reps rätt. Stöd är valfritt i ordinarie text, så händer vid sidorna motsäger inte uppgiften. AF1 saknas för textens sidovickning. Stöd/mindre lyft är regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E67: ingen sned vinkel (en fot är ett enda segment och kan inte visa fotens riktning). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna parallella och rakt framåt, höftbrett (±12), en streckad axel genom varje fot och en punkt vid trampdynan; ingen fot är vriden, så vickning inåt eller utåt syns som avvikelse från axeln. Begränsning: statisk bild, hälens lyft syns inte; sidofall visas bara som jämn tyngd över båda fötterna. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 calf-raise all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E67 calf-raise, hela loopen och reduced-motion, bilateral kroppsvikt: endast profil finns och döljer textens vickning inåt/utåt och sidofall på fötterna. Lägg till front-/snedvy för fötternas riktning och balans under tåhävningen."
     ],
@@ -4744,6 +4805,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E69: bortre handen ligger nu i golvnivå med den främre (y 174 i stället för 171), så båda stödarmarna är raka i toppläget (27,8+27,8 konstanta). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida fas 0, Start och sänkning, cross-vendor. Granskning 2026-11-18 decline-push-up all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E69: ingen sned vinkel (se E65). Statisk handplaceringsbild sedd uppifrån (DeclinePushUpDiagram i PronePlacementDiagrams.tsx, byggd på E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): händerna i golvet något bredare än axlarna (axel ±20, hand ±27), armbågarna cirka 45 grader snett bakåt från bålen, konstanta armlängder 28 + 28, fötterna (±8) på stolens sits. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, baseline-diff 0/0/0/0). Tester: PronePlacementDiagrams.test.tsx och proneDiagram.test.tsx. Begränsning: statisk bild, stolens lutning och höjd syns inte uppifrån, bara att tårna vilar på sitsen. Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 decline-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4760,7 +4826,7 @@
     "name": "Smala armhävningar",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -4819,6 +4885,11 @@
         "fixer": "claude-sonnet",
         "commit": "ce92e90",
         "notes": "E70: bägge armarna får samma halva längd (hypot till den bortre handen, som nu står på samma golvhöjd 174), så båda axel-armbåge-handled-linjerna är raka i topplägret och den bortre armbågen sticker inte längre bakåt; handkontakt kvar och konstant armlängd under sänkningen. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.5 och 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E70: ingen sned vinkel (se E65). Statisk handplaceringsbild sedd uppifrån (DiamondPushUpDiagram i PronePlacementDiagrams.tsx, byggd på E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): händerna tätt under bröstet (hand ±14 mot axel ±20; E54:s hand ±27), tummar och pekfingrar bildar en diamant mellan händerna, armbågarna nära sidorna (cirka 25 grader från bålen mot 45 i vanlig armhävning), konstanta armlängder 28 + 28. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, baseline-diff 0/0/0/0). Tester: PronePlacementDiagrams.test.tsx och proneDiagram.test.tsx. Begränsning: statisk bild, diamanten är schematisk (en romb mellan händerna). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 diamond-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -4865,7 +4936,7 @@
     "name": "Planka med armlyft",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -4897,6 +4968,11 @@
         "fixer": "claude-sonnet",
         "commit": "05d9a4b",
         "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E71: ingen sned vinkel (se E65). Statisk bild sedd uppifrån (PlankArmLiftDiagram i PronePlacementDiagrams.tsx, byggd på E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): underarmarna parallella under axlarna, en arm sträckt framåt, bäckenet jämnt (bäckenlinjen vågrät och parallell med axlarna, halv bredd 12 mot axel 18), fötterna med lite avstånd (±10) och den streckade stödytan genom den kvarvarande underarmen och båda fötterna. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, baseline-diff 0/0/0/0). Tester: PronePlacementDiagrams.test.tsx och proneDiagram.test.tsx. Begränsning: statisk bild; bäckenrotationen visas som ett jämnt bäcken, inte som en animerad rörelse genom loopen. Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 plank-arm-lift all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5043,6 +5119,11 @@
         "fixer": "claude-sonnet",
         "commit": "5b85319",
         "notes": "Riktig sidofigur E101: fötterna lyfts växelvis 8 px, stödfot på golvet, armar pendlar motsatt, t=0 och t=1 speglade mellan benen, cykel 600 ms."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E101: ny vy \"Sned vinkel\" (yaw 35, golvplatta): höftbreda fötter i djupled (benen på +-16), båda vristerna fästa vid sin projicerade position, knän lösta med konstanta längder, växelvisa låga fotlyft och motsatt armpendel. Bredden syns främst som svagt isärstående ben och bäckenstreck; på 390 px är separationen liten. Granska: snedvy hela loopen, stillbilder, om fotbredden räcker som signal. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
@@ -5050,7 +5131,7 @@
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: knee-drive. Båda är tidsstyrda växelsteg på stället utan utrustning. Föreslå att behålla knee-drive om bara ett sådant konditionskort ska finnas: knälyftet ger tydligare skillnad från vanlig gång i instruktionen. Låga snabba steg är dock en egen variant; valet är redaktionellt, inte en effektivitetsrangordning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
-    "fingerprint": "eb9e2eb93c33"
+    "fingerprint": "0da2d9b5ac74"
   },
   {
     "id": "in-and-out-jump",
@@ -5265,6 +5346,11 @@
         "fixer": "claude-sonnet",
         "commit": "b458077",
         "notes": "Granskningsrättning: tips 1 kompletterat med fritt omkring dig."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E104: ny vy \"Sned vinkel\" som E101 (höftbreda fötter, båda vrister fästa, växelvisa höga knälyft och motsatt armpendel, kalibrerad med båda fötterna nere). Granska: snedvy hela loopen, stillbilder, läsbarheten av fotbredden på 390 px. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
@@ -5272,7 +5358,7 @@
       "Från docs/plan-quick-feet-drills.md. Godkänns helst av codex eller human, aldrig av byggaren.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM MÖJLIG HUVUDVARIANT. Jämför: fast-feet, mountain-climber. Prioritera om bara ett upprätt växelstegskort ska finnas. Mountain climber har annan stödposition och bör inte slås ihop med denna. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ],
-    "fingerprint": "a2a1b8b43b95"
+    "fingerprint": "3a73324207ae"
   },
   {
     "id": "squat-curl",
@@ -5345,6 +5431,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E72: räknaren spelar nu figuren som en framåtriktad sekvens, en hel följd per räknad repetition (squat-curl i SEQUENCE_FIGURES i repTempo.ts, linjär progress), i stället för 0 till 1 till 0 med följden baklänges. Figurens poser är oförändrade. Återstår: front-/snedvy saknas (fas 2). Omgranskning: live-loop med räknare och reduced-motion, cross-vendor. Granskning 2026-11-18 squat-curl all avser beteendet före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E72: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna axelbrett (±20), tårna lätt utåt, ett knä rakt över varje fot, en hantel i varje hand vid sidorna. Begränsning: statisk bild, armböjningen syns inte. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 squat-curl all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5441,6 +5532,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E73: figuren är nu en sekvens per repetition: stående med hantlarna vid axlarna (fas 0, tips, Start, live och räknare), ned i knäböj (fas 0,2), resning och press ovanför huvudet (0,7) och sänkning tillbaka till axlarna (1). Stillbilder Start/Botten/Slut följer detta; steg-geometrin ligger kvar i thrusterStagePose. repTempo: sequence. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, Start/Botten/Slut, live med räknare, cross-vendor. Granskning 2026-11-18 thruster all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E73: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna axelbrett (±20), ett knä rakt över varje fot, hantlarna vid axlarna. Rör inte profilfyndet om start i bottenknäböj (kvarstår, ej åtgärdat här). Begränsning: statisk bild. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 thruster all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5538,6 +5634,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E74: samma sekvensändring som E73 (gemensam squatFamilyKeyframes): start stående med hanteln vid axeln, första rörelsen är sänkningen, sedan press och sänkning till axeln, H/V oförändrat. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida H och V, alla faser, stillbilder, live med räknare, cross-vendor. Granskning 2026-11-18 single-arm-thruster all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E74: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna axelbrett (±20), ett knä rakt över varje fot, en hantel vid vald axel och en streckad mittlinje med axel- och bäckenlinje parallella. Sidolutning av bålen är ett sidoplan och syns i praktiken inte uppifrån: bilden visar bara att bålen inte vrids; den delen av fyndet kvarstår. Profilfyndet om start i bottenknäböj kvarstår. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 single-arm-thruster all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5587,6 +5688,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E75: båda armarna har konstanta längder 24,6+22,6 (regler i ADDITIONAL_SEGMENT_RULES, Start/Slut normaliserade); sänkt Start har nästan raka armar under axeln, raden för händerna mot höftlinjen; bålen oförändrad; asymmetri 9,7 och drift 5,6 borta. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida alla faser med två hantlar, Start/Slut, cross-vendor. Granskning 2026-11-18 bent-over-row all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E75: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna höftbrett (±12) med tårna framåt, axellinje och bäckenlinje parallella, en hantel under varje axel. Profilfynden om armlängd och sänkt läge kvarstår (ej åtgärdade här). Begränsning: statisk bild. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 bent-over-row all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5757,6 +5863,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E78: figuren startar nu med vikten rakt ovanför huvudet (fas 0, tips och Start) och första rörelsen är sänkningen bakom huvudet (fas 1, Slut); överarmen står still och underarmen har konstant längd 29,5 och vrids kring armbågen (drift 8,3 till 0). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, Start/Slut, cross-vendor. Granskning 2026-11-18 overhead-triceps-extension all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E78: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): huvud, axlar och armar i planvy; upparmarna nära huvudet (armbåge ±22, heldragen) mot utfallande armbågar (±46, streckad), vikten bakom huvudet. Planvyn är schematisk (armlängder ritas inte skalenligt). Profilfynden om underarmsdrift och start kvarstår. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 overhead-triceps-extension all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5941,7 +6052,7 @@
     "name": "Utfallsgång med hantlar",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -5968,7 +6079,13 @@
         "notes": "E81: score 15/18 (T3 R3 AS2 AF1 U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, 2 hantlar (2 × 2 kg hantlar · totalt 4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Två växelvisa framåtsteg med uppresning och lyft fri fot; armar 25,6+25,2 och ben 34+32 konstanta, hantlar kvar i händerna. Manuell räkning av varje steg stämmer. AS2: loopen/stillen Utfall börjar i pågående utfall; den stående uppställningen visas inte, men fortsatt gång är tydlig. AF1 saknas för knäriktning. Oviktat framåtutfall på plats är regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E81: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna på två parallella höftbreda linjer (±12), det främre knät rakt över foten, en hantel i varje hand, pil för att bakre foten kliver fram på sin linje. Begränsning: statisk bild, visar en landning, inte de växelvisa stegen. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 walking-lunge all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E81 walking-lunge, hela loopen/reduced-motion, 2 hantlar: endast profil finns och döljer textens främre knä som faller inåt/följer foten. Lägg till front-/snedvy som visar knäriktning i de växelvisa landningarna."
     ],
@@ -6117,6 +6234,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E83: konstanta segment: bål 44, båda armar 24,6+22,6 räta i svängen, ben och fötter från stående (överarm 30,8 till 17,4, underarm 29,7 till 16,1, bål 35,4 till 44 borta); ankrarna står kvar. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida H/V, alla faser, Start/Slut, kettlebell, att fötterna inte lyfter, cross-vendor. Granskning 2026-11-18 one-arm-kettlebell-swing all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E83: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): fötterna bredare än höftbrett (±17, tårna utåt), axellinje och bäckenlinje parallella (bålen vrids inte), kettlebellen mellan fötterna med pil rakt fram. Profilfynden om segmentdrift kvarstår. Begränsning: statisk bild, vridning mitt i svingen syns inte. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 one-arm-kettlebell-swing all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -6194,6 +6316,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E84: båda armar har konstanta längder 24,6+22,6 genom hela cirkeln (överarm 4,7 och underarm 5,6 drift borta); händerna följer samma tre positioner kring huvudet. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, kettlebell, hornkontakt, cross-vendor. Granskning 2026-11-18 kettlebell-halo all avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E84: ingen sned vinkel (se E62). Statisk bild sedd uppifrån (StanceDiagrams.tsx, byggd i samma stil som E54:s PushUpHandDiagram; visas i övningskortet och under Hur gör man? i passet, oberoende av vy): vikten på en cirkel med konstant avstånd runt huvudet (radie 30, fritt avstånd till huvudet minst 8), fyra lägen (fram, sidor, bak), fyra riktningspilar och texten om att byta håll efter halva antalet. Profilfyndet om segmentdrift kvarstår. Begränsning: statisk bild, ingen animerad rörelse. Tipstexten är oförändrad. Ingen figur- eller sidovyändring (fingeravtrycket oförändrat, diagrammet hashas inte). Tester: StanceDiagrams.test.tsx och proneDiagram.test.tsx (övningskort och passkärm). Omgranskning: bilden i kort och pass vid 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 kettlebell-halo all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -6455,12 +6582,17 @@
         "date": "2026-11-12",
         "fixer": "claude-sonnet",
         "notes": "E96: stödhanden (grå, motsatt arm) låst till det horisontella räcket i hela sänkningen och återgången; räcket höjt till y=96 och förlängt (x 70-140) och handen sitter framför kroppen (hipX+27) så att armen når kontakten med konstanta segmentlängder, båda sidor H/V. Test i stepDownKeyframes.test.ts. Frontvyn orörd. Väntar på omgranskning."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E96: frontvyn har nu bål 40 (tidigare 44) och armar 25+25 (tidigare 31,1+22,8), stödhanden når fortfarande räcket (konstanta längder), stegfot och knäriktning oförändrade; hängande arm 25+25. Step-up (E02) oförändrad. Granska: front H/V fas 0-1, räckeskontakt, Start/Slut. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [
       "[strong] E96 step-down, profil fas 0.875–1 och reduced-motion Slut H/V: ingen hand ligger kvar på det horisontella räcket; främre handen är nedanför linjen och bakre handen vid höften ovanför. Lås en stödhand till räcket genom sänkning/återgång, med armbågsgeometri som når kontakten, såsom texten kräver."
     ],
-    "fingerprint": "cd14d802e44b",
+    "fingerprint": "307d04526f4b",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: step-up. Nedsänkning av fri häl under stödnivån och tillbaka har annan start, rörelsegräns och instruktion än uppsteg från golv. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -6556,10 +6688,15 @@
         "fixer": "claude-sonnet",
         "commit": "cd411a0",
         "notes": "W2: straight body, knee on bench, foot clear of the plate."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E91: övre underbenet är nu fulla 28 (tidigare 12) och vilar längs bänken med knät på bänken, foten pekar upp (12); asym kR-aR 16 och aR-tR 4 borta, baseline-raderna borttagna; undre benet fritt. Granska: Start/Håll H/V, att underbenet inte läses som avhugget, bänkens kant vid 390. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
-    "fingerprint": "fd4dea8a6555",
+    "fingerprint": "309b15fc2287",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BÄNKALTERNATIV. Jämför: bench-side-plank-leg-lift, side-lying-hip-adduction. Tydligt statiskt håll med böjt övre knä på bänken. Prioritera denna framför E42 om bara ett bänkkort ska finnas, men statiskt knästöd och dynamiskt nedre benlyft är inte samma dosering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -6715,13 +6852,18 @@
         "date": "2026-11-05",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E105: statisk delad fotställning, främre lår parallellt, bakre knä strax ovanför golvet, händer på höfterna, upprätt bål. Sidovy (hold) med planterade fötter och konstanta lemlängder; Start är ett högre läge, Håll är bottenläget. Redaktionell, ingen extern källa. Risk high eftersom knät belastas (kneeLoaded)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E105: ny vy \"Sned vinkel\" (yaw 25, golvplatta): delad ställning med båda fötter planterade och höftbreda i djupled (+-12), främre låret horisontellt och knät över foten; stillbilden Håll visar nu fas 1 i snedvyn (tidigare samma bild som Start). Granska: snedvy Start/Håll H/V, knäspårning och delad ställning. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Ny övning från en löpstyrkevideo. Väntar på korsgranskning av Astra (codex:gpt6astra). Godkänns aldrig av byggaren. Dos 30 s per ben, ej i någon roster."
     ],
-    "fingerprint": "dbebee19ac5d"
+    "fingerprint": "62976b1df24d"
   },
   {
     "id": "plate-pogos",
@@ -6752,13 +6894,18 @@
         "date": "2026-11-05",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E106: låga, snabba tvåbenshopp med stela fotleder och landning på framfoten, viktskiva som golvmarkering (ny rekvisita 'plate', ej att hoppa på). Ballistisk: varning, smärtgräns, ej vid knäbesvär, ingår i rehabImpactExercises (utesluts ur rehab, nybörjarprogram och beginnerSet via programExclusions). Reducerad rörelse: Start och Slut. Redaktionell, ingen extern källa."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E106: ny vy \"Sned vinkel\" som E101 (höftbreda fötter, båda vrister fästa, nästan raka ben, hopp), ram höjd så huvudet inte klipps vid hoppets topp; viktskivan ritas inte i snedvyn. Fotbredd och knäriktning syns svagt vid 390 px. Granska: snedvy hela loopen och reducerade rutor, om bredden räcker. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Ny övning från en löpstyrkevideo. Väntar på korsgranskning av Astra (codex:gpt6astra). Godkänns aldrig av byggaren. Dos 20-45 s, ej i någon roster."
     ],
-    "fingerprint": "5ecba7c91027"
+    "fingerprint": "146886ee93e4"
   },
   {
     "id": "renegade-row",
@@ -6817,12 +6964,17 @@
         "date": "2026-11-11",
         "fixer": "claude-sonnet",
         "notes": "Ny övning E108: situp med en hantel mot bröstet, sidovy. Bålen roterar stelt kring höften 0 till cirka 65 grader med konstant längd nacke-höft, båda händerna vid en bröstpunkt, fötter och knän fasta. Ryggvarning i texten: upprullning under belastning passar inte vid ryggproblem, benskörhet, graviditet eller efter bukkirurgi. Utanför program via pendingReviewIds. Redaktionell källa (Stomme); ingen extern källa verifierad."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E108: ryggen/bäckenet ligger nu på mattan i Start (höft y 172,5, tidigare 169; gap 3,5 borta) och huvudet vilar på mattan med hakan indragen vid start och följer bålen upp; bål 48 och leden kring höften oförändrade. Text (enklare variant) förtydligad: crunch/dead bug häver inte varningen, vid benskörhet eller ryggproblem avgör vården. Granska: profil Start/Slut, hela loopen, att texten räcker som avgränsning. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/human); säkerhetsgranskning av ryggvarningen behövs; utanför program tills godkänd"
     ],
-    "fingerprint": "fb1a30b91488"
+    "fingerprint": "2b2454241d5c"
   }
 ]

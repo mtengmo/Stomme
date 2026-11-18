@@ -329,7 +329,7 @@ export const lateAdditionalExercises: Exercise[] = [
       'Rulla ned långsamt. Avbryt om det gör ont i rygg eller nacke. Upprullning under belastning passar inte vid ryggproblem, benskörhet, graviditet eller efter bukkirurgi.',
     ],
     'Du rycker upp dig, drar i nacken eller fötterna lyfter från golvet.',
-    'Gör magcrunch eller dead bug utan vikt.',
+    'Gör magcrunch eller dead bug utan vikt. Det häver inte varningen ovan: vid benskörhet eller ryggproblem avgör vården vilken rörelse som passar dig.',
     [single(2), single(4)],
   ),
 ];

@@ -259,10 +259,12 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
     // hand y 172.5, stroke edge on the mat top y 175.5), so the shoulder sits
     // one upper arm (18) above the elbow. Trunk 45 and legs 24.4 + 24.4 in both
     // keyframes; the stacked feet hide the far leg behind the near one.
+    // Start: lying on the side propped on the forearm, pelvis and legs on the
+    // mat (hip and legs y 172.5, stroke edge on the mat top y 175.5).
     start: pose(
       [47, 150.5],
       [60, 154.5],
-      [103.6, 165.8],
+      [101.2, 172.5],
       [
         [60, 172.5],
         [78, 172.5],
@@ -270,12 +272,12 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
         [93, 166.2],
       ],
       [
-        [127.8, 168.9],
-        [152, 172],
-        [158, 176],
-        [127.8, 168.9],
-        [152, 172],
-        [158, 176],
+        [125.6, 172.5],
+        [150, 172.5],
+        [156, 176.5],
+        [125.6, 172.5],
+        [150, 172.5],
+        [156, 176.5],
       ],
     ),
     end: pose(

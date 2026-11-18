@@ -24,6 +24,12 @@ export const LYING_OBLIQUE_IDS = [
   'quadriceps-stretch',
   'balance-clock',
   'balance-pendulum',
+  'side-plank',
+  'bird-dog',
+  'fast-feet',
+  'knee-drive',
+  'isometric-lunge-hold',
+  'plate-pogos',
 ] as const satisfies readonly ExerciseId[];
 
 export type LyingObliqueId = (typeof LYING_OBLIQUE_IDS)[number];
@@ -191,7 +197,141 @@ const standingSpec = (
     options.wallX === undefined ? floorSurface : wallSurface(options.wallX),
 });
 
+/**
+ * Side plank hold. The body lies on its side in the profile plane: the pelvis
+ * and shoulder bars run across the trunk (stacked above each other), the legs
+ * are stacked, and the supporting forearm lies across the mat in front of the
+ * body (depth), so a hip pushed back would leave the shoulder-hip-foot line.
+ */
+const SIDE_PLANK: ObliqueSpec = {
+  profile: 'side-plank',
+  yawDeg: 35,
+  elevDeg: 25,
+  viewBox: '20 96 152 98',
+  near: 'working',
+  calibrateAt: 1,
+  body: (t: number): Body3 => {
+    const profile = movementPose('side-plank', t);
+    const dx = profile.hip[0] - profile.neck[0];
+    const dy = profile.hip[1] - profile.neck[1];
+    const n = Math.hypot(dx, dy);
+    // Across the trunk in the profile plane, pointing down towards the mat.
+    const perp: P3 = [-dy / n, dx / n, 0];
+    const above = (k: PoseKey): P3 => [
+      profile[k][0] - perp[0] * 9,
+      profile[k][1] - perp[1] * 9,
+      0,
+    ];
+    const on = (k: PoseKey, z = 0): P3 => [profile[k][0], profile[k][1], z];
+    return {
+      ...fromProfile(
+        profile,
+        1,
+        {
+          head: on('head'),
+          neck: on('neck'),
+          hip: on('hip'),
+          eR: on('eR'),
+          hR: on('eR', 18),
+          eL: on('eL'),
+          hL: on('hL'),
+          kR: on('kR'),
+          aR: on('aR'),
+          tR: on('tR'),
+          kL: above('kL'),
+          aL: above('aL'),
+          tL: above('tL'),
+        },
+        10,
+        11,
+      ),
+      pelvisAxis: perp,
+      shoulderAxis: perp,
+    };
+  },
+  limbs: { armR: 'free', armL: 'free', legR: 'straight', legL: 'straight' },
+  props: () => [],
+  surfaces: matSurface,
+};
+
+/**
+ * Bird dog on all fours. Hands and knees are shoulder / hip wide (the arms and
+ * legs sit at +-12 and +-9 in depth), the supporting hand and knee rest on the
+ * mat, the lifted arm and leg reach straight; the pelvis and shoulder bars stay
+ * level so a rotating hip would show.
+ */
+const BIRD_DOG: ObliqueSpec = {
+  profile: 'bird-dog',
+  yawDeg: 35,
+  elevDeg: 25,
+  viewBox: '16 100 168 92',
+  near: 'working',
+  body: (t: number): Body3 => {
+    const profile = movementPose('bird-dog', t);
+    const at = (k: PoseKey, z: number): P3 => [profile[k][0], profile[k][1], z];
+    return fromProfile(
+      profile,
+      1,
+      {
+        eR: at('eR', 12),
+        hR: at('hR', 12),
+        eL: at('eL', -12),
+        hL: at('hL', -12),
+        kR: at('kR', 9),
+        aR: at('aR', 9),
+        tR: at('tR', 9),
+        kL: at('kL', -9),
+        aL: at('aL', -9),
+        tL: at('tL', -9),
+      },
+      19,
+      25,
+    );
+  },
+  // Lifted limbs are free (raw directions, constant lengths): the folded start stays folded.
+  limbs: { armR: 'free', armL: 'pinned', legR: 'pinned', legL: 'free' },
+  props: () => [],
+  surfaces: matSurface,
+};
+
+/**
+ * Standing drills: hip-wide feet in depth. Both ankles keep their raw projected
+ * position (pinned) so the width reads from the feet; the knees are solved with
+ * constant lengths.
+ */
+const drillSpec = (
+  profile: LyingObliqueId,
+  calibrateAt: number,
+  extra: Partial<ObliqueSpec> = {},
+): ObliqueSpec => ({
+  ...standingSpec(
+    profile,
+    { armR: 'free', armL: 'free', legR: 'pinned', legL: 'pinned' },
+    { legZ: 16, viewBox: '20 22 152 170' },
+  ),
+  calibrateAt,
+  ...extra,
+});
+
 export const LYING_OBLIQUE: Record<LyingObliqueId, ObliqueSpec> = {
+  'side-plank': SIDE_PLANK,
+  'bird-dog': BIRD_DOG,
+  // Both legs free, calibrated with both feet down (the middle of the loop).
+  'fast-feet': drillSpec('fast-feet', 0.5),
+  'knee-drive': drillSpec('knee-drive', 0.5),
+  // Calibrated on the ground phase (t = 0); the plate lies beside the hops.
+  'plate-pogos': drillSpec('plate-pogos', 0),
+  // Both feet stay planted in the split stance, hip wide in depth; a lower yaw
+  // keeps the sagittal thighs from shortening too much.
+  'isometric-lunge-hold': {
+    ...standingSpec(
+      'isometric-lunge-hold',
+      { armR: 'free', armL: 'free', legR: 'pinned', legL: 'pinned' },
+      { legZ: 12 },
+    ),
+    yawDeg: 25,
+    calibrateAt: 1,
+  },
   'prone-leg-raise': PRONE_LEG_RAISE,
   'side-lying-hip-abduction': sideLyingSpec('side-lying-hip-abduction'),
   'side-lying-hip-adduction': sideLyingSpec('side-lying-hip-adduction'),
@@ -230,14 +370,15 @@ export const LYING_OBLIQUE: Record<LyingObliqueId, ObliqueSpec> = {
     ),
     lengthsFrom: { leg: 'L' },
   },
-  // Stance foot pinned to the floor, swing leg straight; lengths come from the
-  // stance side (the profile swing leg has the same lengths).
+  // Stance foot pinned to the floor, swing leg free (the profile lifts the knee
+  // forward at the start and the return, so the knee keeps its projected bend);
+  // lengths come from the stance side (the profile swing leg has the same lengths).
   'balance-pendulum': {
     ...standingSpec('balance-pendulum', {
       armR: 'free',
       armL: 'free',
       legR: 'pinned',
-      legL: 'straight',
+      legL: 'free',
     }),
     lengthsFrom: { leg: 'R' },
   },

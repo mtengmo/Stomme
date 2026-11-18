@@ -135,7 +135,8 @@ export function stillFramePhase(
     view === 'front'
   )
     return label === 'Slut' ? 0.75 : 0.25;
-  return label === 'Slut' ? 1 : 0;
+  // Hold figures label their final still "Håll".
+  return label === 'Slut' || label === 'Håll' ? 1 : 0;
 }
 
 const nudge = (pt: Pt, by: Pt | undefined): Pt =>

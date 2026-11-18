@@ -276,7 +276,8 @@ export function renegadeRowPose(progress: number): Pose {
 }
 
 /** Hip pivot, trunk length (hip to neck) and head length for the weighted sit-up. */
-const SITUP_HIP: P = [97, 169];
+// y 172.5 + stroke 3 = mat top 175.5: back and pelvis lie on the mat at the start.
+const SITUP_HIP: P = [97, 172.5];
 const SITUP_TRUNK = 48;
 const SITUP_HEAD = 14;
 const SITUP_MAX_ANGLE = (65 * Math.PI) / 180;
@@ -293,7 +294,13 @@ export function weightedSitUpPose(progress: number): Pose {
     uy = -Math.sin(phi);
   const hip = SITUP_HIP;
   const neck: P = [hip[0] + SITUP_TRUNK * ux, hip[1] + SITUP_TRUNK * uy];
-  const head: P = [neck[0] + SITUP_HEAD * ux, neck[1] + SITUP_HEAD * uy];
+  // Lying, the head rests on the mat with the chin tucked up (0.55 rad over the
+  // trunk line at the start), then follows the trunk line as it rolls up.
+  const headAngle = phi + 0.55 * (1 - t);
+  const head: P = [
+    neck[0] - SITUP_HEAD * Math.cos(headAngle),
+    neck[1] - SITUP_HEAD * Math.sin(headAngle),
+  ];
   // Chest point: along the trunk, offset 7 towards the front (knee side).
   const chest: P = [
     hip[0] + 0.7 * SITUP_TRUNK * ux + 7 * Math.sin(phi),
@@ -530,23 +537,25 @@ const prone = p(
  * Side-lying base (hip abduction / adduction). Both arms are 16.6 + 15, both
  * legs 30 + 30 with 9.5 feet, so near and far limbs match and the lifted leg
  * can keep its length (`SEGMENT_RULES`). The lower arm lies under the head,
- * the upper hand rests on the mat in front of the chest and belly.
+ * the upper hand rests on the mat in front of the chest and belly. The
+ * pelvis lies on the mat (centre 172.5 + stroke 3 = mat top 175.5) and the
+ * trunk is 47.1 as before.
  */
 const sideLying = p(
-  [38, 157],
-  [52, 165],
-  [99, 168],
+  [38, 161.4],
+  [52, 169.4],
+  [99, 172.5],
   [
-    [38, 174],
-    [23, 175.5],
-    [65, 175.3],
-    [80, 176],
+    [36.05, 174],
+    [21, 175.5],
+    [67.52, 175.3],
+    [82.5, 176],
   ],
   [
-    [128.9, 170.8],
-    [158.7, 173.6],
-    [167.7, 176.6],
-    [120.8, 147.4],
+    [128.9, 172.5],
+    [158.7, 172.5],
+    [167.7, 175.5],
+    [118.2, 149.5],
     [138, 172],
     [146.6, 176],
   ],
@@ -1255,30 +1264,30 @@ export const additionalFigures = {
     start: sideLying,
     end: {
       ...sideLying,
-      kR: [121.3, 147.9],
-      aR: [143.6, 127.9],
-      tR: [153, 126.3],
+      kR: [120.2, 151.3],
+      aR: [141.4, 130.1],
+      tR: [150.8, 128.5],
     },
     props: mat,
   },
   'side-lying-hip-adduction': {
     start: {
       ...sideLying,
-      kL: [119.3, 146],
+      kL: [115.6, 147.7],
       aL: [130, 174],
       tL: [139, 177],
-      kR: [128.9, 170.8],
-      aR: [158.7, 173.6],
-      tR: [167.7, 176.6],
+      kR: [128.9, 172.5],
+      aR: [158.7, 172.5],
+      tR: [167.7, 175.5],
     },
     end: {
       ...sideLying,
-      kL: [119.3, 146],
+      kL: [115.6, 147.7],
       aL: [130, 174],
       tL: [139, 177],
-      kR: [128.1, 160.7],
-      aR: [157.2, 153.5],
-      tR: [166.7, 154.3],
+      kR: [127.3, 162.5],
+      aR: [155.5, 152],
+      tR: [165, 152.8],
     },
     props: mat,
   },

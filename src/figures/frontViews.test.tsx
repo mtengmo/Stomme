@@ -80,6 +80,12 @@ describe('authored frontal demonstrations', () => {
       'quadriceps-stretch',
       'balance-clock',
       'balance-pendulum',
+      'side-plank',
+      'bird-dog',
+      'fast-feet',
+      'knee-drive',
+      'isometric-lunge-hold',
+      'plate-pogos',
     ]);
     expect(alternateView('split-squat')).toBe('oblique');
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');
@@ -379,7 +385,7 @@ describe('step-down front view railing', () => {
             pose[`e${hand}`][0] - pose[`h${hand}`][0],
             pose[`e${hand}`][1] - pose[`h${hand}`][1],
           ),
-        ).toBeCloseTo(Math.hypot(6, 22), 6);
+        ).toBeCloseTo(25, 6);
       }
     },
   );
@@ -490,7 +496,7 @@ describe('front pilot support contacts', () => {
           />,
         );
         expect(markup).toContain(
-          side === 'right' ? 'cx="72" cy="134"' : 'cx="128" cy="134"',
+          side === 'right' ? 'cx="83.1" cy="121.4"' : 'cx="116.9" cy="121.4"',
         );
         expect((markup.match(/stroke-width="4"/g) ?? []).length).toBe(1);
       }
