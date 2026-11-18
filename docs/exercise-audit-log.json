@@ -7004,7 +7004,7 @@
     "name": "Copenhagen-håll med knästöd",
     "group": "rehab/knee-strength",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -7059,6 +7059,14 @@
         "result": "issues",
         "commit": "aae49e8",
         "notes": "E91: score 10/12 (T3 R3 AS1 AF n/a U n/a S3). Vyer finns/kontrollerade: side; statiskt livehåll, reduced-motion, H/V, Kroppsvikt med stödutrustning (Kroppsvikt), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: mismatch. Gamla avhuggna underbenet rättat: båda underben 28 och fötter 12; hela foten ryms vid 390. Nytt AS1: övre knät är cirka 166 grader i livehåll/Håll H/V, nästan rakt i stället för textens böjda knä. Källan anger uttryckligen böjt övre knä, inte denna nästan raka bild. Knät ligger fortfarande på bänken och kroppslinje/underarmsstöd/undre fria benet är stabila. Hålltid/röst korrekta; bild mot how-to mismatch. Dirty: endast logg; figurkällor rena, HEAD-figur identisk: ja; fp 309b15fc2287. Fysio Fitaal, short-copenhagen-isometric, kontrollerad 2026-11-18: övre böjt knä på bänk; ingen personlig dos verifierad."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "a1c0f70",
+        "notes": "E91: score 12/12 (T3 R3 AS3 AF n/a U n/a S3). Befintlig/kontrollerad vy: side, H/V, kroppsvikt med bänk; reduced-motion Start/Håll och hel statisk liveperiod 4800 ms, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Befintlig strong-punkt rättad: övre knät är tydligt böjt, cirka 114 grader i Håll (Start cirka 144), inte nästan rakt. Knät stöder mot bänken; hela underben 28 och fot 12 ryms fria, båda ben samma längd. Axel–knä-linje, underarmskontakt och undre fria benet är stabila; livebilder identiska. Hålltid, vald övre sida, smärtgräns och kortare/stött regression stämmer. Baseline inga rader; figurtesterna gröna. Källa Fysio Fitaal https://fysiofitaal.nl/en/exercise/short-copenhagen-isometric/ (läst 2026-11-18): böjt övre knä på bänk och statisk axel–knä-linje; appens 10–20 s är redaktionellt, inte individuell ordination. Rena figur-/textkällor på HEAD a1c0f70; cross-vendor efter claude-sonnet."
       }
     ],
     "fixes": [
@@ -7079,9 +7087,7 @@
         "notes": "E91: det övre (bänkstödda) knät var nästan rakt (cirka 166 grader, underbenet låg rakt längs bänken); nu är knäet tydligt böjt, cirka 114 grader: knät kvar på bänken, övre underbenet stiger från knät i vinkel -1,4 rad med full längd 28 (konstant, SEGMENT_RULES oförändrade), foten 12 pekar framåt och fri. Lår 38, axel–knä-linje, underarmsstöd, bäcken och det undre fria benet är oförändrade. Främsta ändring: kneeStrengthPoses.ts copenhagenHoldPose (aR/tR). Verifierat: profil H/V i 390 px mörkt och 1280 px ljust, reduced-motion Start/Håll och live-loop; underben och fot ryms i ramen, baseline-diff 0/0/0/0, inspect Håll = live 1 (0,0). Återstår för omgranskning (annan leverantör, t.ex. Codex eller human): avläs om det böjda övre knät nu stämmer med instruktionen i Håll och Start, H/V, kroppsvikt, reduced motion; i verkligheten ligger underbenet tvärs över bänken, så profilen visar det som uppåtstigande underben. Granskning 2026-11-18 E91 avser figuren före denna rättning."
       }
     ],
-    "openIssues": [
-      "[strong] E91 copenhagen-hold, profil statiskt Håll/reduced-motion H/V, kroppsvikt: det övre benet läses nästan rakt över bänken (knävinkel cirka 166 grader), trots instruktionen om ett böjt övre knä. Visa tydlig knäböjning med full underbenslängd, knästöd och fri fot; behåll axel–knä-linjen."
-    ],
+    "openIssues": [],
     "fingerprint": "be5e9fa18d47",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BÄNKALTERNATIV. Jämför: bench-side-plank-leg-lift, side-lying-hip-adduction. Tydligt statiskt håll med böjt övre knä på bänken. Prioritera denna framför E42 om bara ett bänkkort ska finnas, men statiskt knästöd och dynamiskt nedre benlyft är inte samma dosering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
