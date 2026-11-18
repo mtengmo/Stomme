@@ -1318,7 +1318,7 @@
     "name": "Farmergång",
     "group": "dumbbell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1381,6 +1381,14 @@
         "result": "issues",
         "commit": "b91840c",
         "notes": "E18: score 16/18 (T3 R3 AS3 AF1 U3 S3). Vyer side/front kontrollerade. Nio faser ut/tillbaka, båda tillsammans, dumbbell/kettlebell; live hel loop, reduced-motion, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Seconds20–40, Övningstid, gångstart och kortare tid stämmer med sekvensen. Profilens ben/armar är konstanta och svängfötter lyfter, front och profil lyfter samma fot vid samma fas. Reduced-motion visar skilda steg. AF1: front vid fas0 överarm31,8/underarm28/lår41,1 mot profil20/20/30; frontlår når maxcirka41,6 över gränsen36. Utrustningen är två separata vikter i front, grepp och ram korrekta. Arbetsträd; HEAD b91840c referens, batchens figurhash oförändrad trots andra delade ändringar."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E18: score 15/18 (T3 R3 AS2 AF1 U3 S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, bilateral, 2 hantlar, 2 kettlebells (2 × 2 kg hantlar, 2 × 4 kg kettlebells), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Frontbenen är nu konstanta 30+29 och fotväxlingen stämmer; två vikter med bibehållet grepp i båda verktygsvarianter. AF1 kvar: frontöverarm 31,8 och underarm 28 mot profil 20+20, bål 44 mot 40. Den befintliga punkten preciseras till kvarvarande arm-/bålprojektion. AS2: profilens båda blå ben gör Start/Slut visuellt nästan identiska, men live visar fotlyft. Börja gå/Övningstid för båda händerna stämmer. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -1401,7 +1409,7 @@
       }
     ],
     "openIssues": [
-      "[strong] E18 farmer-carry, front hela loopen och reduced-motion, hantlar2 kg/kettlebells4 kg per hand: överarm31,8, underarm28 och lår41,1 vid fas0 överstiger profilens20/20/30; frontlår når cirka41,6 (gräns36). Korrigera kroppens projektion utan att ändra den korrekta fotväxlingen eller viktkontakten."
+      "[strong] E18 farmer-carry, front hela loopen och reduced-motion, 2 × 2 kg hantlar/2 × 4 kg kettlebells: överarm 31,8 och underarm 28 överstiger profilens 20+20, bål 44 mot 40. Benproportionerna är rättade; korrigera kvarvarande arm-/bålprojektion med viktkontakt och fotväxling kvar."
     ],
     "fingerprint": "baaaadb67aae",
     "notes": [
@@ -2214,7 +2222,7 @@
     "name": "Rakt benlyft på mage",
     "group": "rehab/knee-aaos",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2255,11 +2263,17 @@
         "notes": "E32: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Lågt rakt benlyft, 5 s toppaus och 2 s vila stämmer. Panna/armar, bål och stödben ligger stilla; små lår-/underbensvariationer 1,2/0,7 syns inte som kollaps. AF saknas för det angivna felet bäckenrotation. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E32: ny vy 'Sned vinkel' (oblique) för prone-leg-raise från den nya gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts). Projektion: yaw 35 grader mot fotänden plus ett djupskjuv (y förskjuts z*sin 25 grader, ingen sann pitch). Valt ben närmast kameran och ritat sist, benen på djup +-15, ben och armar fria med konstanta längder (drift 0,0, höger = vänster). Mattan ritas som en projicerad yta (data-surface). Bäcken- och axelstreck ritas som överlägg (data-pelvis/data-shoulders, tjocklek 5, utrustningsfärg) och lutar cirka 36 grader mot bålen. Det andra benet ligger kvar nere (avskjuvat y inom 2,5 px från vilopositionen) och syns bredvid det lyfta; det lyfta benet höjer fotleden över 10 px. Egen tät ram (viewBox 24 108 144 86), sidovyns FRAMING och sidovyn oförändrade. Ingen baslinjerad ändrad eller ny. Begränsning: det valda benet ser lätt knäckt ut i viloläget (längderna är kortare än profilens och riktningarna kommer från skjuvningen); vyn är en ungefärlig snedbild, inte en sann 3D-vy. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust, och avgöra om snedvyn visar bäckenläget tillräckligt tydligt för att openIssues ska kunna tas bort. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      }
+    ],
     "openIssues": [
       "[strong] E32 prone-leg-raise, hela loopen och reduced-motion H/V, kroppsvikt: endast profil finns och döljer den bäckenrotation som anges som vanligt fel. Lägg till front-/snedvy som visar båda bäckenhalvornas läge."
     ],
-    "fingerprint": "fcdd48ef3a5a",
+    "fingerprint": "3b4a5927b259",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: band-hip-extension, back-extension. Benlyft på mage med bäckenet kvar skiljer sig från bröstlyft och stående bandmotstånd. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2308,6 +2322,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E33: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Valt övre ben lyfts och hålls 5 s med 2 s vila, H/V rätt. AS1: statisk överarm 10 mot 19,7 och underarm 15 mot 9,5 samt lår upp till 33,3 mot 22 ger synligt olika lemlängder även i mobil. AF saknas för bäckenrullning/tårotation. Små dynamiska benvariationer 3,7/4,1 finns också. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E33: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Längdfelet rättat: armar 16,6+15 och ben 30+30 hålls konstanta; valt övre rakt ben lyfts, 5 s håll/2 s vila och spegling stämmer. Den gamla proportionspunkten stängs. AS1: bäckenets centrum y 168 ger nedre linjekant 171 mot matta 175,5, synlig glipa 4,5 genom loopen. Befintlig [strong]-punkt om saknad rotationsvy kvarstår. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -2315,13 +2337,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E33: konstanta segment via SEGMENT_RULES och delad sideLying-bas: armar 16,6+15 på båda sidor (var överarm 10/19,7, underarm 15/9,5), ben 30+30, fot 9,5, ingen drift; undre armen under huvudet, övre handen på mattan. Front-/snedvy saknas fortfarande (öppen punkt). Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E33: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, mattan som projicerad yta, egen tät ram. Bäcken- och axelstreck ritas lodrätt (sidoliggande kropp, vänster-höger-axeln är vertikal) och visar att bäcken och axlar ligger staplade; arbetsbenet är rakt med konstant längd och lyfts utåt, stödfoten ligger fastlåst (glidning under 1 enhet) och armarna är fria. Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: sidovyn visar fortfarande bäckenet 4,5 enheter över mattan (befintlig punkt kvarstår, ej åtgärdad här); snedvyn är en ungefärlig snedbild, benen ligger staplade så djupet syns mest i stödbenets böjning. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [
-      "[strong] E33 side-lying-hip-abduction, profil hela loopen/reduced-motion H/V, kroppsvikt: överarm 10 mot 19,7, underarm 15 mot 9,5 och lår upp till 33,3 mot 22 är synligt olika även vid 390 px. Gör sidornas segment förenliga med bibehållet stöd.",
-      "[strong] E33 side-lying-hip-abduction, hela loopen H/V, kroppsvikt: endast profil erbjuds och bäckenrullning/tårotation som texten varnar för döljs. Lägg till front-/snedvy som visar dessa riktningar."
+      "[strong] E33 side-lying-hip-abduction, hela loopen H/V, kroppsvikt: endast profil erbjuds och bäckenrullning/tårotation som texten varnar för döljs. Lägg till front-/snedvy som visar dessa riktningar.",
+      "[strong] E33 side-lying-hip-abduction, profil hela loopen och reduced-motion H/V, kroppsvikt: bäckenet svävar över mattan (centrum y 168, linjekant 171 mot mattans överkant 175,5; glipa 4,5), synligt vid 390/1280 px. Visa sidliggande bäckenstöd medan övre benet lyfts, med de korrigerade segmenten kvar."
     ],
-    "fingerprint": "8a480e38fcfb",
+    "fingerprint": "1ea12f761ef1",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: side-lunge, balance-clock. Sidliggande isolerat benlyft med håll är inte utbytbart mot stående utfall eller balansnuddar. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2362,6 +2389,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E34: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Undre valda benet lyfts lågt och hålls 5 s; 2 s vila och H/V stämmer. AS1: överarm 10 mot 19,7 och underarm 15 mot 9,5 är statiskt mycket olika och syns i mobil; handstöd framför magen är otydligt. AF saknas för kroppsrullning och stödfot framför det andra benet. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E34: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Armar och ben har nu förenliga, konstanta längder; litet undre benlyft med 5 s håll/2 s vila, rätt H/V och stödhand mot matta. Gamla längdpunkten stängs; djupplaceringen hör till kvarvarande vypunkt. AS1: bäckenet y 168 ger synlig 4,5 enhets glipa mot mattan. Befintlig [strong]-punkt om kroppsrullning och fot framför arbetsbenet kvarstår. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -2369,13 +2404,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E34: samma åtgärd som E33 (arm 16,6+15, ben 30+30, ingen drift); stödhanden ligger på mattan vid magens x men 'framför magen' kan inte visas i ren profil. Front-/snedvy saknas fortfarande (öppen punkt). Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E34: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, mattan som projicerad yta, egen tät ram. Bäcken- och axelstreck ritas lodrätt (sidoliggande kropp) och visar staplade bäcken och axlar; det övre benets fot är böjd framför kroppen och fastlåst vid mattan (glidning under 1 enhet), det undre benet är rakt med konstant längd och lyfts; armarna är fria. Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: benen ligger staplade så djupet syns mest i stödbenets böjning; snedvyn är en ungefärlig snedbild. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [
-      "[strong] E34 side-lying-hip-adduction, profil hela loopen/reduced-motion H/V, kroppsvikt: överarm 10 mot 19,7 och underarm 15 mot 9,5 är synligt olika. Korrigera armlängder och gör stödhandens position framför magen tydlig.",
-      "[strong] E34 side-lying-hip-adduction, hela loopen H/V, kroppsvikt: profil döljer kroppsrullning och fotens placering framför arbetsbenet. Lägg till front-/snedvy som visar stödposition och stilla bäcken."
+      "[strong] E34 side-lying-hip-adduction, hela loopen H/V, kroppsvikt: profil döljer kroppsrullning och fotens placering framför arbetsbenet. Lägg till front-/snedvy som visar stödposition och stilla bäcken.",
+      "[strong] E34 side-lying-hip-adduction, profil hela loopen och reduced-motion H/V, kroppsvikt: bäckenets nedre linjekant y 171 ligger 4,5 enheter över mattans överkant 175,5 (centrum y 168), synligt vid 390/1280 px. Visa stöd för bäckenet i sidliggande medan det undre benet lyfts; behåll konstanta segment."
     ],
-    "fingerprint": "0f1f6e94f291",
+    "fingerprint": "982df9650043",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: copenhagen-hold, bench-side-plank-leg-lift. Sidliggande lyft av undre benet utan bänk är ett eget enklare upplägg; behåll även om bänkvarianten gallras. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2461,6 +2501,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E36: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. statisk live-hållning och reduced-motion Start/Håll, H/V, Kroppsvikt + stabilt stöd / vägg, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Statisk hållpose, stödhand mot vägg och andra handen exakt på fotleden; sidocue rätt. AS1: underarm 24,2 mot 35,5 och underben 32 mot 26,3 är synligt olika i mobil (11,3/5,7 enheter). AF saknas för knä utåt i vanligt fel. Mindre drag med stöd är regression. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E36: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. statisk live-hållning och reduced-motion Start/Håll, H/V, Kroppsvikt + stabilt stöd / vägg, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Proportionsfelet rättat: armar 28,5+31,5, ben cirka 29,5+28,5 på båda sidor. Statisk hållpose, väggkontakt och fotledsgrepp inom 0,5 enhet H/V. Start visar uppställning och Slut hållposen. Röst/Hålltid och mindre drag med stöd stämmer. Gamla längdpunkten stängs; befintlig [strong]-punkt om saknad vy för knä utåt kvarstår. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -2468,13 +2516,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E36: armar 28,5+31,5, ben 29,5+28,5, fot 9,5 (var underarm 24,2/35,5, underben 32/26,3); vägghanden flyttad upp till y 92 så att kontakten behålls, handen på fotleden inom 0,5. Front-/snedvy saknas fortfarande (öppen punkt). Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E36: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, golvet och väggen som projicerade ytor (data-surface), egen ram. Stödfoten och handen mot väggen är fastlåsta (glidning under 1 enhet), arbetshanden når fotleden i slutläget (avstånd under 1 enhet, båda fastlåsta vid samma projicerade punkt), bäcken- och axelstreck ritas som överlägg. Längderna tas från den raka stödsidan (lengthsFrom) så att det böjda arbetsbenet inte förkortar räckvidden; segmentlängder konstanta (drift 0,0, höger = vänster) och aldrig längre än profilen. Benen ligger nära varandra i djupled (3 enheter) eftersom stödbenet annars inte når golvet. Sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: snedvyn är en ungefärlig snedbild och figuren är liten i smala kort; E36 är en hållövning och ligger inte i HOLD_STILLS (oförändrat). Granskaren bör titta på Start/Slut H/V i sida och sned vinkel, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [
-      "[strong] E36 quadriceps-stretch, profil Håll/reduced-motion H/V, kroppsvikt: underarmarna 24,2/35,5 och underbenen 32/26,3 har synligt oförenliga proportioner. Korrigera segmenten med bibehållet vägg- och fotledsgrepp.",
       "[strong] E36 quadriceps-stretch, Håll/reduced-motion H/V, kroppsvikt: endast profil finns och döljer angivet fel att knäet förs utåt. Lägg till front-/snedvy som visar knäets sidriktning."
     ],
-    "fingerprint": "43f5c76a58c4",
+    "fingerprint": "f26156c90037",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: hamstring-curl, kneeling-hip-flexor-stretch. Grepp om fotleden och hållen lårstretch är inte samma moment som aktiv lårcurl eller höftböjarstretch. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2559,7 +2611,7 @@
     "name": "Benpress med gummiband",
     "group": "rehab/knee-aaos",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2590,6 +2642,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E38: score 12/15 (T3 R2 AS1 AF n/a U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Gummiband, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: minor mismatch. Utsträckning och 2 s håll stämmer; R2: generiska Upp/Ner är mindre tydliga än textens Ut/tillbaka men ändrar inte repetitionsmönstret. AS1: överarm 18,1 mot 12 och underben 26,1–30,1 mot 35,8 är synligt olika. Bandet når båda händerna och fotens undersida, hålls genom återgången. Lättare band/kortare rörelse finns. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "51d22ef",
+        "notes": "E38: score 14/15 (T3 R3 AS2 AF n/a U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Gummiband, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Längdfelet är rättat: armar 16,8+26,7 och ben 31+30 konstanta H/V, bandet följer båda händerna och hålfoten. Ut/Håll/Tillbaka och Börja. Ut stämmer nu, 2 s håll synligt. AS2: slutknät är ännu lätt böjt (cirka 166 grader), men tydlig utsträckning/återgång visas utan ändrad uppgift. Gamla längdpunkten stängs. Lättare band/kortare rörelse finns. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -2599,9 +2659,7 @@
         "notes": "E38: konstanta segment (armar 16,8+26,7, ben 31+30, fot 9,4, ingen drift; var överarm 18,1/12 och underben 26,1-30,1 mot 35,8); bandkontakt oförändrad. Röst: Ut/Håll/Tillbaka i stället för Upp/Håll/Ner (CUE_WORDS i repTempo.ts). Röst ej uppspelad. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
       }
     ],
-    "openIssues": [
-      "[strong] E38 band-leg-press, profil fas 0–1 och reduced-motion H/V, band: överarm 18,1 mot 12 och underben 26,1–30,1 mot 35,8 är synligt olika i mobil. Ge kroppen förenliga segmentlängder med bibehållen bandkontakt."
-    ],
+    "openIssues": [],
     "fingerprint": "b5a01256840a",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: band-knee-extension, kettlebell-deadlift. Liggande press mot band omfattar annan kroppsposition och rörelse än sittande knästräckning eller stående marklyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -2666,6 +2724,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E39: score 14/18 (T3 R3 AS1 AF1 U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, 1 kettlebell (4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Pressarm 26+26 är konstant, vikten följer greppet/underarmen, överarm når mattan och ben/rygg ligger stilla. AS1: fria underarmen är 20 mot pressarmens 26 (30 % skillnad), synligt även i mobil. AF saknas för angiven kroppsrotation. Uppställning/avslut är textens separata steg. Fullständig visuell loopkontroll gjord; processraden behålls. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord (alla vyer, H/V, varianter); nybörjarförståelse kräver human/maintainer."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E39: score 16/18 (T3 R3 AS3 AF1 U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, 1 kettlebell (4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Fria armen nu 26+26 som pressarmen; konstanta segment, mattkontakt och vikt mot underarm/hand genom hela pressen H/V. Gamla armlängdspunkten stängs. Befintlig [strong]-punkt om saknad vy för höft-/axelrotation kvarstår. Röst/reps och lugn sänkning stämmer; start-/avslutsrullning ligger utanför repetitionsloopen. Full visuell loopkontroll gjord, processraden om nybörjarförståelse behålls. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord; nybörjarförståelse kräver human/maintainer."
       }
     ],
     "fixes": [
@@ -2679,14 +2745,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E39: fria armen 26+26 som pressarmen (var underarm 20, överarm 24,3); handen slutar vid x 105,7. Front-/snedvy för kroppsrotation saknas fortfarande (öppen punkt); processraden om nybörjarförståelse kvarstår. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E39: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, mattan som projicerad yta, egen tät ram. Båda fötterna står fastlåsta vid mattan (glidning under 1 enhet), bäcken- och axelstreck ritas som överlägg, armarna är fria med konstanta längder och kettlebellen ritas i arbetshanden med presshandtag (pressGripAngle; spegelvänd för vänster sida). Handen stiger över 20 enheter mellan fas 0 och 1. Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: snedvyn är en ungefärlig snedbild; kettlebellens vinkel är räknad på den ospeglade handen. Granskaren bör titta på alla faser H/V i sida och sned vinkel, alla tre belastningsvarianter, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
       }
     ],
     "openIssues": [
       "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
-      "[strong] E39 kettlebell-floor-press, profil fas 0–1/reduced-motion H/V, kettlebell 4 kg: underarmarna 26/20 är statiskt olika med 6 enheter (30 %), synligt i mobil. Ge armarna förenliga proportioner med bibehållen matt- och viktkontakt.",
       "[strong] E39 kettlebell-floor-press, hela loopen H/V, kettlebell: endast profil finns och döljer rotation i höfter/axlar som texten kräver stilla. Lägg till front-/snedvy där bålens rotation kan bedömas."
     ],
-    "fingerprint": "6d93d16005eb",
+    "fingerprint": "808ccc96ed4f",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: floor-press. Enarm och en kettlebell kräver särskilt grepp och in-/ur-position. Behåll utrustningstäckningen; en sammanslagning kräver verkligt variantstöd, inte bara namnbyte. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -2697,7 +2767,7 @@
     "name": "Gång med kettlebell vid axeln",
     "group": "kettlebell",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2752,6 +2822,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E40: score 16/18 (T3 R3 AS3 AF1 U3 S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, 1 kettlebell (4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Börja gå/Övningstid, sekunder per hand och kortare tid stämmer. Profilens gång/grepp och fotlyft är riktiga med konstanta ben. AF1: frontlår 47,5/37,6 mot profil 30, underben 37,1 mot 29; proportioner och steg stämmer inte mellan vyerna. Frontens Start/Slut är identiska. Rackkontakt bibehållen H/V. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E40: score 16/18 (T3 R3 AS3 AF1 U3 S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, 1 kettlebell (4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Benprojektionen rättad: frontlår 30, underben 29, armar 29,8+25,2 konstanta som profil. Svängfot följer profilen; frontens Start/Slut visar olika faser, båda gamla punkterna stängs. AF1 nytt: frontens rackarm böjs uppåt så armbågen hamnar ovanför axeln, trots textens nedåt nära revbenen och korrekt profil. Bålen är också 44 mot profil 40. U3: handtag och kula har fortsatt kontakt med hand/underarm H/V; röst/Övningstid per hand rätt. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -2772,8 +2850,7 @@
       }
     ],
     "openIssues": [
-      "[strong] E40 kettlebell-rack-carry, front hela loopen H/V, kettlebell 4 kg: lår 47,5/37,6 mot profil 30 och underben 37,1 mot 29 är för långa; korrigera frontprojektionen och samordna svängfot med profilen.",
-      "[cheap] E40 kettlebell-rack-carry, reduced-motion front H/V, kettlebell: Start och Slut visar identisk gångfas. Välj två olika sväng-/stödfaser så fotväxlingen framgår."
+      "[strong] E40 kettlebell-rack-carry, front hela loopen/reduced-motion H/V, kettlebell 4 kg: rackarmens armbåge ligger ovanför axeln i stället för nedåt nära revbenen, till skillnad från text och profil. Välj armens nedåtgående böjlösning med konstanta segment och bibehållen rackkontakt; korrigera även bål 44 mot profil 40."
     ],
     "fingerprint": "4e8d0c3f974d",
     "notes": [
@@ -2816,6 +2893,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E41: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Profilen har konstanta ben, fast främre fot och bakre vrist på stödet genom hela loopen. AF1: bakre underben kollapsar till 2,4 vid fas .25 mot profil 37; frontöverarm 31,1 mot 25,5 och underarm 22,8 mot 12,8 är för långa. Fullständig visuell loopkontroll gjord; processraden om nybörjarförståelse behålls. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord (alla vyer, H/V, varianter); nybörjarförståelse kräver human/maintainer."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "51d22ef",
+        "notes": "E41: score 15/15 (T3 R3 AS3 AF3 U n/a S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Tidigare frontfel rättat: bakre lår 30 och underben 18 konstanta utan kollaps; armar 25,5+12,7 stämmer med profilen. Främre frontlår 35,8–23,4 och underben 26–19 är kortare än profil 37 och varken för långa eller nära noll: rimlig projektion. Fot-/vristkontakt, rätt främre blå ben och sänkning/återgång H/V i båda vyer. Den faktiska punkten stängs; full visuell loopkontroll gjord, mänsklig nybörjarförståelse återstår. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord; nybörjarförståelse kräver human/maintainer."
       }
     ],
     "fixes": [
@@ -2826,8 +2911,7 @@
       }
     ],
     "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)",
-      "[strong] E41 rear-foot-split-squat, front fas 0–1/återgång H/V, kroppsvikt: bakre underben kollapsar till 2,4 vid fas .25 mot profil 37; överarm 31,1 och underarm 22,8 överstiger profil 25,5/12,8. Korrigera projektionen med bibehållen fot-/bänkkontakt."
+      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
     ],
     "fingerprint": "4022a82acddb",
     "notes": [
@@ -2840,7 +2924,7 @@
     "name": "Sidoplanka på bänk med benlyft",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2902,6 +2986,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E42: score 13/15 (T3 R3 AS2 AF2 U n/a S3). Befintliga/kontrollerade vyer: side, oblique. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Undre benet lyfts med konstanta segment, höften hålls uppe, stödarm/övre fot är fasta och H/V stämmer i båda vyer. AS2: underarm y 173 ger liten 0,5 enhets glipa mot golvets överkant. AF2: sned underarm 30,4 mot profil 26 och bål 55,8 mot 53,2 är statiskt större. Full visuell loopkontroll gjord; båda befintliga käll-/processrader kvarstår. Exakt bildvariant är inte styrkt av den relaterade studien. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord (alla vyer, H/V, varianter); nybörjarförståelse kräver human/maintainer. Befintlig [strong]-punkt kvarstår: källan styrker inte exakt bildvariant. Källa 2026-11-17: https://pmc.ncbi.nlm.nih.gov/articles/PMC6797385/ (relaterad progression, ej exakt variant)."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E42: score 14/15 (T3 R3 AS3 AF2 U n/a S3). Befintliga/kontrollerade vyer: side, oblique. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Profilens underarm y 173,5 ger linjekant 176,5 mot golvets överkant: glipan rättad. H/V, fast övre fot/höft och kontrollerat undre benlyft i båda vyer, konstanta segment. AF2 kvar: sned underarm 30,4 mot profil 26 och bål 55,8 mot 53,2. Befintlig [strong]-källpunkt kvarstår; BMJ-studien beskriver relaterade progressioner, inte exakt repetitiv variant. Båda ursprungliga käll-/processrader behålls; full visuell loopkontroll gjord. HEAD-figur identisk: ja; rent granskat källträd. Fullständig visuell loopkontroll: gjord; nybörjarförståelse kräver human/maintainer. Källa https://pmc.ncbi.nlm.nih.gov/articles/PMC6797385/ (läst 2026-11-18): relaterad progression, ej exakt bildvariant; primärstudie för denna befintliga källpunkt."
       }
     ],
     "fixes": [
@@ -2994,7 +3086,7 @@
     "name": "Magliggande på underarmar",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3048,6 +3140,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E44: score 10/12 (T3 R3 AS1 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. statisk live-hållning och reduced-motion Start/Håll, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Live är statiskt underarmsstöd och Vila/Håll-stills stämmer med hållrösten. AS1: bäckenets linjecentrum y 169, kroppens nedre kant y 172, mattans överkant y 175,5 lämnar 3,5 enheter synlig glipa trots textens bäcken mot underlaget. Armbågar stödjer och segment är konstanta. Lägre viloposition finns. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "51d22ef",
+        "notes": "E44: score 12/12 (T3 R3 AS3 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. statisk live-hållning och reduced-motion Start/Håll, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Bäckenkontakten rättad: centrum y 172,5 ger linjekant 175,5 exakt mot mattans överkant. Vila-stillen, statisk Håll-pose/live och underarmsstöd stämmer; ingen press på raka armar. Segment konstanta och små asymmetrier högst 2 stör inte. Hållröst, bekväm position/andning och vilande magläge som enklare variant stämmer. Befintlig kontaktpunkt stängs. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3069,9 +3169,7 @@
         "notes": "E44: bäckenet vilar på mattan (centrum y 172,5, linjekanten vid mattans överkant 175,5; var y 169 med 3,5 glipa); bållängden bevarad, Vila-stillen sänkt på samma sätt, underarmsstödet oförändrat. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
       }
     ],
-    "openIssues": [
-      "[strong] E44 prone-on-forearms, profil Håll/live och reduced-motion Håll, kroppsvikt: bäckenet svävar över mattan (centrum y 169, nedre linjekant 172 mot mattans överkant 175,5; glipa 3,5). Ge bäckenet synlig kontakt med underlaget som texten föreskriver, med underarmsstödet kvar."
-    ],
+    "openIssues": [],
     "fingerprint": "ee24fbbb36ea",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: back-extension. Passivt understött hållet läge skiljer sig från aktivt upprepat bröstlyft. Slå inte ihop utifrån liknande silhuett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -3234,7 +3332,7 @@
     "name": "Enbensknäböj till stol",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3289,6 +3387,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E47: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Sidocue och fri fot utan frånskjut stämmer; höften når sitsen och stödbenet håller segmentlängd. AS1: statiska underben 36/29,7 (6,3; 21 %) synligt olika i mobil. AF1: frontlår 46,1/38,3 vid fas 0 överstiger profil 36/32,3 och max 36. Kontrollerad sänkning och högre stol/handstöd finns. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E47: score 12/15 (T3 R3 AS1 AF2 U n/a S3). Befintliga/kontrollerade vyer: side, front. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Båda gamla proportionspunkter rättade: profilben 36+36 och frontlår högst 35,5 mot profil 36. AF2: frontarmar cirka 2–3 enheter längre än profil, rörelsen ändå tydlig. AS1 nytt: reduced-motion Start klipper fria fotens tåände H/V; tå x 179,5 plus radie 3 går utanför viewBox max 178. Live-rutans bredare format döljer klippningen. Stolskontakt, lyft fritt ben, knäspårning och lugn återgång stämmer. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3304,8 +3410,7 @@
       }
     ],
     "openIssues": [
-      "[strong] E47 single-leg-chair-squat, profil hela loopen/reduced-motion H/V, kroppsvikt: underben 36 mot 29,7 skiljer 6,3 enheter/21 %, synligt vid 390 px. Ge benen förenliga proportioner med bibehållen sitskontakt och lyft fri fot.",
-      "[strong] E47 single-leg-chair-squat, front fas 0–1/reduced-motion H/V, kroppsvikt: lår 46,1/38,3 vid fas 0 är längre än profil 36/32,3 och gräns 36. Korrigera frontprojektionen utan att tappa stolskontakt eller vald stödside."
+      "[cheap] E47 single-leg-chair-squat, profil reduced-motion Start H/V, kroppsvikt + stol, 390/1280 px: fria tåänden klipps vid bildkanten (x 179,5 plus linjeradie 3 mot viewBox max 178). Ge hela foten marginal på båda sidor utan att ändra de korrigerade segmenten."
     ],
     "fingerprint": "b5cc8eb443e6",
     "notes": [
@@ -3317,7 +3422,7 @@
     "name": "Enbens bäckenlyft på golv",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3350,11 +3455,17 @@
         "notes": "E48: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Vald stödfot är kvar, fria benet tydligt lyft, övre rygg och huvud stöds. Kontrollerat lyft med 2 s topphåll och sänkning H/V; konstanta segment och tydliga stills. AF saknas för bäckenrotation i textens varning. Tvåbenslyft är regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E48: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 20 grader (lägre än de andra så att strecken inte hamnar parallellt med bålen) plus djupskjuv 25 grader, mattan som projicerad yta, egen högre ram (benet når högt). Bäcken- och axelstreck ritas som överlägg och visar att bäckenet hålls plant när höften lyfts; stödfoten är fastlåst vid mattan (glidning under 1 enhet), det fria benet är rakt med konstant längd, axlarna ligger kvar mot mattan (inom 1 enhet i höjd; stommen kalibrerad vid fas 0,75 eftersom den projicerade bållängden varierar med lutningen och längderna ska vara konstanta). Segmentlängder konstanta (drift 0,0, höger = vänster); sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: i toppläget lutar strecken bara cirka 18 grader mot bålen, så de syns mindre tydligt där; snedvyn är en ungefärlig snedbild. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      }
+    ],
     "openIssues": [
       "[strong] E48 single-leg-floor-bridge, hela loopen/reduced-motion H/V, kroppsvikt: endast profil finns och döljer den bäckenrotation som texten varnar för. Lägg till front-/snedvy som visar jämnt bäcken under lyft och sänkning."
     ],
-    "fingerprint": "73dcdbbbde68",
+    "fingerprint": "cd5f7d15a298",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: single-leg-hip-thrust, glute-bridge. Enbenslyft på golv med tvåsekundershåll kräver inget ryggstöd. Bevara separat från belastad hip-thrust och tvåbenslyft. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -3364,7 +3475,7 @@
     "name": "Lårmuskelspänning i ryggläge",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3418,6 +3529,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E49: score 9/12 (T3 R1 AS2 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: mismatch. Knät pressas lite nedåt med tådrag och lårmarkering, bäckenet stilla, H/V och 3 s håll/avslappning synliga. R1: Upp/Håll/Ner säger lyft/sänk i stället för spänn/håll/slappna av. AS2: statisk överarmsasymmetri 6,8, men de överlappande armarna framträder inte som tydligt olika lemmar i mobil. Framingfixen håller. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "51d22ef",
+        "notes": "E49: score 11/12 (T3 R3 AS2 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Röstfelet rättat: Börja. Spänn samt Spänn/Håll/Slappna av stämmer med liten knäpress, 3 s håll och 1 s vila H/V; ingen höftlyftning. Gamla röstpunkten stängs. Benlängder konstanta. AS2: statisk överarmsasymmetri 6,8 (16,3 mot 9,5) syns inte som separata olika armar i överlappningen vid 390 px. Kontakten och vald lårmarkering är tydliga. Mindre kraft är verklig regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3433,9 +3552,7 @@
         "notes": "E49: röstorden är nu Spänn/Håll/Slappna av, startfras 'Börja. Spänn.' (var Upp/Håll/Ner) via CUE_WORDS i repTempo.ts; ingen figurändring. Röst ej uppspelad. Kvarstår: AS2 neck-eR 6,8. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
       }
     ],
-    "openIssues": [
-      "[strong] E49 quad-set, repetitionsröst H/V, kroppsvikt: Börja. Upp och Upp/Håll/Ner anger lyft/sänk trots textens isometriska lårspänning utan benlyft. Använd Spänn/Håll/Slappna av och motsvarande startfras för denna övning."
-    ],
+    "openIssues": [],
     "fingerprint": "3401ee1f9cc2",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: seated-knee-extension, straight-leg-raise. Isometrisk lårspänning utan benlyft eller stor knärörelse är en egen uppgift. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -3491,7 +3608,7 @@
     "name": "Sittande knästräckning med gummiband",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3522,6 +3639,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E51: score 13/15 (T3 R3 AS1 AF n/a U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Gummiband + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Vald vrist för bandet framåt med knästräckning, upprätt bål och fast sits. U3: ankelfäste och lågt främre stolsben hålls ihop genom återgång. AS1: statiska lår 32,1/24 (8,1; 34 %) synligt olika vid 390 px. Lättare band/utan band är regression. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "51d22ef",
+        "notes": "E51: score 15/15 (T3 R3 AS3 AF n/a U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Gummiband + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Gamla lårasymmetrin rättad: båda lår 32,1, underben 39, konstanta genom H/V-loop och stillbilder. Bäcken på stol, upprätt bål och stödben kvar; valt underben sträcks och böjs kontrollerat. Band från stolens främre ben till vald vrist följer rörelsen utan lossnat fäste. Röst/reps och enklare band eller utan band stämmer. Armavvikelser högst 1,2 är inte störande. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3531,9 +3656,7 @@
         "notes": "E51: egen bandKneeExtensionPose: lår 32,1/32,1 och underben 39/39 (var lår 32,1/24, underben 39/41); delad pose för seated-knee-extension orörd. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
       }
     ],
-    "openIssues": [
-      "[strong] E51 band-knee-extension, profil hela loopen/reduced-motion H/V, band: lår 32,1 mot 24 skiljer 8,1 enheter/34 %, synligt i mobil. Ge låren förenliga proportioner med bibehållen sittkontakt och band runt vald vrist."
-    ],
+    "openIssues": [],
     "fingerprint": "609738e79d3d",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: seated-knee-extension. Samma grundrörelse men bandmotstånd, säkrat fäste och annan hållinstruktion. Eventuell framtida gemensam post måste bevara båda doseringarna; ingen inaktivering nu. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -3589,7 +3712,7 @@
     "name": "Balansklocka på ett ben",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3622,11 +3745,17 @@
         "notes": "E53: score 12/15 (T3 R3 AS2 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, H/V, Kroppsvikt + stabilt stöd / vägg, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Varv utan räknarröst är rätt; blå rörlig fot och fast stödhand H/V. Befintligt uppifrån-diagram visar fem rätt numrerade punkter på egen sida, 10 s varv och reduced-motion; kontrollerat separat i båda teman. AS2: profilens fram/bak-pendel är bara schematisk jämfört med diagrammets fem nuddar. AF saknas för stödknäets inåtfall/bäckenrotation, vilket fotdiagrammet inte visar. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E53: ny vy 'Sned vinkel' (oblique) från den gemensamma kroppsmodellen (obliqueBody.ts, obliqueSpecs.ts): yaw 35 grader plus djupskjuv 25 grader, golvet och väggen som projicerade ytor (data-surface), egen ram. Stödfoten och båda händerna mot väggen är fastlåsta (glidning under 1 enhet), den rörliga foten följer sin projicerade fotled och tårna når golvet vid tappen framåt och bakåt (avskjuvad golvhöjd inom 1,5 enheter från stödfotens), bäcken- och axelstreck ritas som överlägg. Längderna tas från det raka stödbenet (lengthsFrom), segmentlängder konstanta (drift 0,0, höger = vänster) och aldrig längre än profilen; benen ligger nära varandra i djupled (3 enheter) så att stödbenet når golvet. Klockdiagrammet (BalanceClockDiagram) visas nu oberoende av vald vy (isClock i ExerciseCard.tsx). Sidovyn är oförändrad. Ingen baslinjerad ändrad eller ny. Begränsning: snedvyn är en ungefärlig snedbild; benen är nära varandra så djupet syns mest i strecken och väggen. Granskaren bör titta på alla faser H/V i sida och sned vinkel, reduced-motion Start/Slut, klockdiagrammet i båda vyerna, 390 mörkt och 1280 ljust. Granskas av Codex-modell eller human (inte claude-sonnet)."
+      }
+    ],
     "openIssues": [
       "[strong] E53 balance-clock, hela loopen H/V, kroppsvikt: profil och fotdiagram uppifrån visar inte stödknäets inåtfall eller bäckenets läge enligt textens varning. Lägg till front-/sned kroppsvy som visar knä över fot och stilla bäcken under nuddarna."
     ],
-    "fingerprint": "5b81d6ef8fe3",
+    "fingerprint": "fa17f1332add",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: balance-pendulum, single-leg-rdl. Fem riktade tånuddspositioner med stöd och varvräkning ger en annan balansuppgift än framåtfällning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -3636,7 +3765,7 @@
     "name": "Armhävning",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -3660,6 +3789,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E54: score 11/15 (T3 R3 AS1 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Rak kroppslinje, hand-/tåkontakt och lugn sänkning/press stämmer, segment konstanta. AS1: bortre armbågen har tydlig knäck i fas 0/Start trots raka topparmar. AF saknas för händernas bredd och armbågarnas snett bakåtriktning. Vägg/knästöd är regression. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E54: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Bortre armen är nu rak i Start/återgång som den främre, med handkontakt och konstanta segment cirka 22,6+22,6. Gamla armpunkten stängs. Sammanhängande kroppslinje, tåstöd och kontrollerad sänkning/press i live och stills. Röst/reps stämmer. Befintlig [strong]-punkt om saknad front/sned vy för handbredd och armbågsriktning kvarstår. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3676,7 +3813,6 @@
       }
     ],
     "openIssues": [
-      "[strong] E54 push-up, profil fas 0 och reduced-motion Start, kroppsvikt: bortre armbågen är tydligt böjd medan instruktionen kräver raka armar i toppläget. Räta ut båda stödarmarna med bibehållen handkontakt och kroppslinje.",
       "[strong] E54 push-up, hela loopen, kroppsvikt: endast profil finns och döljer föreskriven handbredd och armbågarnas riktning snett bakåt. Lägg till front-/snedvy som visar båda armarna och händernas bredd."
     ],
     "fingerprint": "5e3409c1974b",
@@ -3951,7 +4087,7 @@
     "name": "Liggande benlyft med båda benen",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "fixed-awaiting-review",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -3968,6 +4104,14 @@
         "result": "issues",
         "commit": "34df8a4",
         "notes": "E59: score 10/12 (T3 R3 AS1 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Båda benen lyfts/sänks tillsammans, huvudet och bålen stilla, armar längs sidorna; röst och stills stämmer. AS1: vänster lår varierar 5,1 enheter och krymper synligt under lyftet trots fast bäcken. Böjda knän/mindre rörelse eller Dead bug finns som regression. HEAD-figur identisk: ja; rent granskat källträd."
+      },
+      {
+        "date": "2026-11-18",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "51d22ef",
+        "notes": "E59: score 10/12 (T3 R3 AS1 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion Start/Slut, bilateral, Kroppsvikt, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Lårdriften rättad: lår 32/32,1 och båda underben 32 konstanta; båda benen lyfts/sänks tillsammans med stilla bål. Gamla längdpunkten stängs. AS1 nytt: bäckencentrum y 169 ger nedre linjekant 172 mot mattans överkant 175,5, synlig glipa 3,5 genom loop/stills. Armarna når mattan men inte bäckenet. Röst/reps stämmer; böjda knän/mindre rörelse eller Dead bug är verklig regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
     "fixes": [
@@ -3978,7 +4122,7 @@
       }
     ],
     "openIssues": [
-      "[strong] E59 lying-leg-raise, profil fas 0–1/återgång och reduced-motion, kroppsvikt: vänster lår varierar 5,1 enheter och krymper synligt när benen lyfts. Håll lårets längd konstant genom hela rörelsen med bibehållen bål- och mattkontakt."
+      "[strong] E59 lying-leg-raise, profil hela loopen och reduced-motion, bilateral kroppsvikt, 390/1280 px: bäckenet svävar över mattan (centrum y 169, nedre linjekant 172 mot mattans överkant 175,5; glipa 3,5). Visa ryggliggande bäckenstöd med stilla bål och behåll de nu konstanta benen."
     ],
     "fingerprint": "de23cb092c92",
     "notes": [

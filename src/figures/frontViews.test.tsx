@@ -72,6 +72,13 @@ describe('authored frontal demonstrations', () => {
       'split-squat',
       'bench-side-plank-leg-lift',
       'russian-twist',
+      'prone-leg-raise',
+      'side-lying-hip-abduction',
+      'side-lying-hip-adduction',
+      'single-leg-floor-bridge',
+      'kettlebell-floor-press',
+      'quadriceps-stretch',
+      'balance-clock',
     ]);
     expect(alternateView('split-squat')).toBe('oblique');
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');

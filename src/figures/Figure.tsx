@@ -2,24 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { ExerciseId } from '../domain/types';
 import { repTempo } from '../rules/repTempo';
-import {
-  dumbbellPulloverPose,
-  floorPressPose,
-  hamstringCurlPose,
-  kettlebellFloorPressPose,
-  renegadeRowPose,
-  seatedKneeExtensionPose,
-  walkingLungePose,
-  weightedSitUpPose,
-} from './additionalPoses';
-import { bodyweightMovementPose } from './bodyweightPoses';
 import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
-import {
-  farmerCarryPose,
-  rackCarryPose,
-  suitcaseCarryPose,
-} from './carryPoses';
-import { constrainLegInterpolation } from './constrainedLegs';
 import { applyEquipmentPose } from './equipmentPose';
 import type { FigureAngle } from './frontViews';
 import {
@@ -28,32 +11,20 @@ import {
   supportsFrontView,
   supportsObliqueView,
 } from './frontViews';
-import { hingeFamilyPose, isHingeFamily } from './hingeFamilyKeyframes';
-import { kneeStrengthMovementPose } from './kneeStrengthPoses';
-import { CYCLE_MS, cycleProgress, lerpPt, type Pt, TWEEN_MS } from './lerp';
-import { withReverseLungeRearFoot } from './lungeFootPath';
+import { CYCLE_MS, cycleProgress, type Pt, TWEEN_MS } from './lerp';
 import { MuscleOverlay } from './MuscleOverlay';
-import { physioMovementPose } from './physioPoses';
+import { movementPose } from './movementPose';
+import { isLyingOblique, LYING_OBLIQUE } from './obliqueSpecs';
 import {
   type FigureSpec,
   figures,
-  POSE_KEYS,
   type Pose,
   type PoseKey,
   type Prop,
 } from './poses';
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
-import {
-  heelSlidePose,
-  proneRelaxedPose,
-  rehabMovementPose,
-} from './rehabPoses';
-import {
-  isSquatFamily,
-  squatFamilyPose,
-  squatFamilyStills,
-} from './squatFamilyKeyframes';
-import { stepUpPose } from './stepUpKeyframes';
+import { heelSlidePose, proneRelaxedPose } from './rehabPoses';
+import { isSquatFamily, squatFamilyStills } from './squatFamilyKeyframes';
 
 export type { FigureAngle } from './frontViews';
 export {
@@ -68,52 +39,7 @@ export type Equipment = 'dumbbell' | 'kettlebell' | 'band' | null;
 
 export type Working = 'right' | 'left';
 
-export function lerpPose(a: Pose, b: Pose, t: number): Pose {
-  const out = { ...a };
-  for (const k of POSE_KEYS) out[k] = lerpPt(a[k], b[k], t);
-  return out;
-}
-
-export function movementPose(exerciseId: ExerciseId, t: number): Pose {
-  const kneePose = kneeStrengthMovementPose(exerciseId, t);
-  if (kneePose) return kneePose;
-  const bodyweightPose = bodyweightMovementPose(exerciseId, t);
-  if (bodyweightPose) return bodyweightPose;
-  const rehabPose = rehabMovementPose(exerciseId, t);
-  if (rehabPose) return rehabPose;
-  const physioPose = physioMovementPose(exerciseId, t);
-  if (physioPose) return physioPose;
-  if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
-  if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
-  if (exerciseId === 'kettlebell-floor-press')
-    return kettlebellFloorPressPose(t);
-  if (exerciseId === 'floor-press') return floorPressPose(t);
-  if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
-  if (exerciseId === 'renegade-row') return renegadeRowPose(t);
-  if (exerciseId === 'weighted-sit-up') return weightedSitUpPose(t);
-  if (exerciseId === 'walking-lunge') return walkingLungePose(t);
-  if (exerciseId === 'suitcase-carry') return suitcaseCarryPose(t);
-  if (exerciseId === 'farmer-carry') return farmerCarryPose(t);
-  if (exerciseId === 'kettlebell-rack-carry') return rackCarryPose(t);
-  if (exerciseId === 'step-up') return stepUpPose(t);
-  if (isSquatFamily(exerciseId)) return squatFamilyPose(exerciseId, t);
-  if (isHingeFamily(exerciseId)) return hingeFamilyPose(exerciseId, t);
-  const spec = figures[exerciseId];
-  const lerped = !spec.middle
-    ? lerpPose(spec.start, spec.end, t)
-    : t < 0.5
-      ? lerpPose(spec.start, spec.middle, t * 2)
-      : lerpPose(spec.middle, spec.end, (t - 0.5) * 2);
-  const interpolated =
-    exerciseId === 'reverse-lunge' && spec.middle
-      ? withReverseLungeRearFoot(lerped, spec.start, spec.middle, t)
-      : lerped;
-  return constrainLegInterpolation(
-    exerciseId,
-    interpolated,
-    spec.middle ? [spec.start, spec.middle, spec.end] : [spec.start, spec.end],
-  );
-}
+export { lerpPose, movementPose } from './movementPose';
 
 /** A still view should show the lunge and a distinct forward step. */
 export function walkingLungeReducedFrames(): readonly [
@@ -372,7 +298,13 @@ export function FigureFrame({
   /** Current animation progress, used by the authored front geometry. */
   phase?: number;
 }) {
-  const viewBox = viewBoxProp ?? FRAMING[exerciseId] ?? '14 20 164 168';
+  const viewBox =
+    viewBoxProp ??
+    (view === 'oblique' && isLyingOblique(exerciseId)
+      ? LYING_OBLIQUE[exerciseId].viewBox
+      : undefined) ??
+    FRAMING[exerciseId] ??
+    '14 20 164 168';
   if (
     (view === 'front' && supportsFrontView(exerciseId)) ||
     (view === 'oblique' && supportsObliqueView(exerciseId))

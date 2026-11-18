@@ -3,9 +3,15 @@ import { CARRY_SHIN, CARRY_THIGH } from './carryPoses';
 import type { Equipment, Working } from './Figure';
 import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
+import { mirrorAbout, obliqueFrame } from './obliqueBody';
+import {
+  isLyingOblique,
+  LYING_OBLIQUE,
+  type LYING_OBLIQUE_IDS,
+} from './obliqueSpecs';
 import type { Pose } from './poses';
 import { figures } from './poses';
-import { FloorLine, Held } from './props';
+import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { joint } from './rehabPoses';
 
 export const supportedFrontViews = [
@@ -35,6 +41,13 @@ export const supportedObliqueViews = [
   'split-squat',
   'bench-side-plank-leg-lift',
   'russian-twist',
+  'prone-leg-raise',
+  'side-lying-hip-abduction',
+  'side-lying-hip-adduction',
+  'single-leg-floor-bridge',
+  'kettlebell-floor-press',
+  'quadriceps-stretch',
+  'balance-clock',
 ] as const satisfies readonly ExerciseId[];
 
 /** Front-only demonstrations: the movement cannot be read from the side. */
@@ -250,22 +263,7 @@ function lateralHopPose(t: number, working: Working | null): Pose {
 
 /** Mirrors a pose authored for the right side about the body's centre line (x = 100). */
 function mirrorPose(pose: Pose): Pose {
-  const flip = (pt: Pt): Pt => point(200 - pt[0], pt[1]);
-  return {
-    head: flip(pose.head),
-    neck: flip(pose.neck),
-    hip: flip(pose.hip),
-    eR: flip(pose.eL),
-    hR: flip(pose.hL),
-    eL: flip(pose.eR),
-    hL: flip(pose.hR),
-    kR: flip(pose.kL),
-    aR: flip(pose.aL),
-    tR: flip(pose.tL),
-    kL: flip(pose.kR),
-    aL: flip(pose.aR),
-    tL: flip(pose.tR),
-  };
+  return mirrorAbout(pose, 200);
 }
 
 /**
@@ -1020,6 +1018,8 @@ export function obliqueMovementPose(
   working: Working | null = 'right',
 ): Pose {
   const t = clamp(progress);
+  if (isLyingOblique(exerciseId))
+    return obliqueFrame(LYING_OBLIQUE[exerciseId], t, working).pose;
   if (exerciseId === 'russian-twist') return russianTwistProjection(t).pose;
   if (exerciseId === 'goblet-chair-squat') return chairSquatObliquePose(t);
   if (exerciseId === 'split-squat') {
@@ -1068,6 +1068,10 @@ export function obliqueMovementPose(
     );
   }
 
+  // Every other oblique id has its own branch above; fail loudly instead of
+  // drawing the bench side plank for an id that has no oblique pose yet.
+  if (exerciseId !== 'bench-side-plank-leg-lift')
+    throw new Error(`No oblique pose for ${exerciseId}`);
   const hip: Pt = [106, 136];
   const supportAnkle: Pt = [163, 122];
   // The lifting leg is one straight 58.7 long leg swinging from the hip, as in
@@ -1124,6 +1128,132 @@ const limb = {
 } as const;
 const line = (pts: Pt[]) => `M${pts.map((p) => p.join(' ')).join('L')}`;
 
+/**
+ * Lying/standing oblique view from the shared body model: props, pelvis and
+ * shoulder bars as overlay, the camera-near side drawn last.
+ */
+function LyingObliqueFigure({
+  exerciseId,
+  working,
+  phase,
+  viewBox,
+  equipment,
+}: {
+  exerciseId: (typeof LYING_OBLIQUE_IDS)[number];
+  working: Working | null;
+  phase: number;
+  viewBox: string;
+  equipment?: Equipment;
+}) {
+  const frame = obliqueFrame(LYING_OBLIQUE[exerciseId], clamp(phase), working);
+  const { pose } = frame;
+  const [vbX = 14, vbY = 20] = viewBox.split(' ').map(Number);
+  const color = (side: 'R' | 'L') =>
+    working === null || (working === 'right' ? side === 'R' : side === 'L')
+      ? 'var(--accent)'
+      : 'var(--edge)';
+  const group = (side: 'R' | 'L') => (
+    <g
+      data-body-side={side === 'R' ? 'right' : 'left'}
+      stroke={color(side)}
+      {...limb}
+    >
+      <path d={line([pose.neck, pose[`e${side}`], pose[`h${side}`]])} />
+      <path
+        d={line([
+          pose.hip,
+          pose[`k${side}`],
+          pose[`a${side}`],
+          pose[`t${side}`],
+        ])}
+      />
+    </g>
+  );
+  // A weight in the working hand. A left-working frame is a mirror image, so
+  // the press-grip angle is measured on the un-mirrored hand and negated.
+  const heldSpec = LYING_OBLIQUE[exerciseId].held;
+  const handKey = working === 'left' ? 'L' : 'R';
+  const heldBell =
+    heldSpec && equipment !== null ? (
+      <g data-equipment={heldSpec.kind}>
+        <Held
+          kind={heldSpec.kind}
+          at={pose[`h${handKey}`]}
+          angle={
+            heldSpec.pressGrip
+              ? (handKey === 'L' ? -1 : 1) *
+                pressGripAngle(
+                  handKey === 'L' ? [192 - pose.eL[0], pose.eL[1]] : pose.eR,
+                  handKey === 'L' ? [192 - pose.hL[0], pose.hL[1]] : pose.hR,
+                )
+              : undefined
+          }
+        />
+      </g>
+    ) : null;
+  const trunk = (
+    <g stroke="var(--ink)" {...limb}>
+      <path d={line([pose.neck, pose.hip])} />
+      <path
+        data-pelvis=""
+        d={line(frame.pelvis)}
+        stroke="var(--equipment)"
+        strokeWidth="5"
+      />
+      <path
+        data-shoulders=""
+        d={line(frame.shoulders)}
+        stroke="var(--equipment)"
+        strokeWidth="5"
+      />
+      <circle cx={pose.head[0]} cy={pose.head[1]} r="9" fill="var(--paper)" />
+    </g>
+  );
+  return (
+    <svg
+      viewBox={viewBox}
+      role="img"
+      aria-hidden="true"
+      className="block h-auto w-full"
+      data-view="oblique"
+    >
+      <title>{`${exerciseId} – oblique`}</title>
+      {frame.surfaces.length === 0 ? <FloorLine /> : null}
+      {frame.surfaces.map((surface) => (
+        <polygon
+          key={surface.kind + surface.pts.join(',')}
+          data-surface={surface.kind}
+          points={surface.pts.map((p) => p.join(' ')).join(' ')}
+          fill="var(--edge)"
+          fillOpacity="0.18"
+          stroke="var(--edge)"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+      ))}
+      {frame.props.map((prop) => (
+        <PropShape key={JSON.stringify(prop)} prop={prop} />
+      ))}
+      {frame.near === 'R' ? group('L') : group('R')}
+      {trunk}
+      {frame.near === 'R' ? group('R') : group('L')}
+      {heldBell}
+      {working ? (
+        <text
+          x={vbX + 6}
+          y={vbY + 22}
+          fontSize="22"
+          fontWeight="800"
+          fill="var(--accent)"
+          fontFamily="system-ui, sans-serif"
+        >
+          {working === 'right' ? 'H' : 'V'}
+        </text>
+      ) : null}
+    </svg>
+  );
+}
+
 /** A frontal skeleton: blue follows the person's H/V side, not the viewer. */
 export function FrontFigureFrame({
   exerciseId,
@@ -1140,6 +1270,16 @@ export function FrontFigureFrame({
   viewBox?: string;
   angle?: 'front' | 'oblique';
 }) {
+  if (angle === 'oblique' && isLyingOblique(exerciseId))
+    return (
+      <LyingObliqueFigure
+        exerciseId={exerciseId}
+        working={working}
+        phase={phase}
+        viewBox={viewBox}
+        equipment={equipment}
+      />
+    );
   const basePose =
     angle === 'oblique'
       ? obliqueMovementPose(exerciseId as ObliqueViewExercise, phase, working)

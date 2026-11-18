@@ -10,6 +10,8 @@ import {
   supportedFrontViews,
   supportedObliqueViews,
 } from './frontViews';
+import { obliqueFrame } from './obliqueBody';
+import { isLyingOblique, LYING_OBLIQUE } from './obliqueSpecs';
 import { figures, type Pose } from './poses';
 import { heelSlidePose } from './rehabPoses';
 
@@ -84,6 +86,26 @@ export function exerciseGeometry(id: ExerciseId): unknown {
       parts[`oblique-${side}`] = T_SAMPLES.map((t) =>
         roundPose(obliqueMovementPose(id as never, t, side)),
       );
+    if (isLyingOblique(id))
+      // Pelvis and shoulder bars and the props are drawn outside the pose.
+      parts[`oblique-overlay-${side}`] = T_SAMPLES.map((t) => {
+        const frame = obliqueFrame(LYING_OBLIQUE[id], t, side);
+        return {
+          pelvis: frame.pelvis.flatMap(([x, y]) => [round1(x), round1(y)]),
+          shoulders: frame.shoulders.flatMap(([x, y]) => [
+            round1(x),
+            round1(y),
+          ]),
+          near: frame.near,
+          surfaces: frame.surfaces.map((x) => ({
+            kind: x.kind,
+            pts: x.pts.flatMap(([px, py]) => [round1(px), round1(py)]),
+          })),
+          props: JSON.parse(JSON.stringify(frame.props), (_k, v) =>
+            typeof v === 'number' ? round1(v) : v,
+          ),
+        };
+      });
   }
   return parts;
 }

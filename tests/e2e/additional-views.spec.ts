@@ -10,6 +10,13 @@ const candidates = [
   ['single-leg-chair-squat', 'front'],
   ['farmer-carry', 'front'],
   ['bench-side-plank-leg-lift', 'oblique'],
+  ['prone-leg-raise', 'oblique'],
+  ['side-lying-hip-abduction', 'oblique'],
+  ['side-lying-hip-adduction', 'oblique'],
+  ['single-leg-floor-bridge', 'oblique'],
+  ['kettlebell-floor-press', 'oblique'],
+  ['quadriceps-stretch', 'oblique'],
+  ['balance-clock', 'oblique'],
 ] as const;
 
 for (const width of [320, 360, 412]) {

@@ -3,6 +3,7 @@ import type { ExerciseId } from '../domain/types';
 import { FRAMING, movementPose } from './Figure';
 import { obliqueMovementPose, supportedObliqueViews } from './frontViews';
 import { checkPoseGeometry, type ViewBox } from './keyframes';
+import { LYING_OBLIQUE, LYING_OBLIQUE_IDS } from './obliqueSpecs';
 import { figures, POSE_KEYS, type Pose } from './poses';
 import { heelSlidePose } from './rehabPoses';
 
@@ -76,15 +77,22 @@ describe('FRAMING keeps every joint in view on both working sides', () => {
     });
   }
 
-  it('bench-side-plank-leg-lift oblique view', () => {
-    const id = 'bench-side-plank-leg-lift';
-    if (!(supportedObliqueViews as readonly string[]).includes(id)) return;
-    const viewBox = viewBoxOf(id);
-    for (const side of ['right', 'left'] as const) {
-      const frames = sample((t) => obliqueMovementPose(id as never, t, side));
-      expect(outside(frames, viewBox)).toEqual([]);
-    }
-  });
+  it.each(['bench-side-plank-leg-lift', ...LYING_OBLIQUE_IDS] as const)(
+    '%s oblique view',
+    (id) => {
+      expect(supportedObliqueViews as readonly string[]).toContain(id);
+      // Lying oblique views have their own tight frame; the side FRAMING is for the side view.
+      const own = (LYING_OBLIQUE as Record<string, { viewBox?: string }>)[id]
+        ?.viewBox;
+      const viewBox = own
+        ? (own.split(' ').map(Number) as unknown as ViewBox)
+        : viewBoxOf(id);
+      for (const side of ['right', 'left'] as const) {
+        const frames = sample((t) => obliqueMovementPose(id, t, side));
+        expect(outside(frames, viewBox)).toEqual([]);
+      }
+    },
+  );
 });
 
 /** Visible margin (viewBox units) kept around every joint: a rounded line end must not touch the frame edge. */

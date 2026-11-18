@@ -162,7 +162,8 @@ export function ExerciseCardBody({
     </div>
   );
 
-  const isClock = exercise.id === 'balance-clock' && activeView === 'side';
+  // The clock diagram belongs to the exercise, not to one view.
+  const isClock = exercise.id === 'balance-clock';
   const pauseControl = !reducedMotion ? (
     <button
       type="button"
