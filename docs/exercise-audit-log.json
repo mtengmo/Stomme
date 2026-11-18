@@ -7004,7 +7004,7 @@
     "name": "Copenhagen-håll med knästöd",
     "group": "rehab/knee-strength",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -7072,12 +7072,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E91: övre underbenet är nu fulla 28 (tidigare 12) och vilar längs bänken med knät på bänken, foten pekar upp (12); asym kR-aR 16 och aR-tR 4 borta, baseline-raderna borttagna; undre benet fritt. Granska: Start/Håll H/V, att underbenet inte läses som avhugget, bänkens kant vid 390. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E91: det övre (bänkstödda) knät var nästan rakt (cirka 166 grader, underbenet låg rakt längs bänken); nu är knäet tydligt böjt, cirka 114 grader: knät kvar på bänken, övre underbenet stiger från knät i vinkel -1,4 rad med full längd 28 (konstant, SEGMENT_RULES oförändrade), foten 12 pekar framåt och fri. Lår 38, axel–knä-linje, underarmsstöd, bäcken och det undre fria benet är oförändrade. Främsta ändring: kneeStrengthPoses.ts copenhagenHoldPose (aR/tR). Verifierat: profil H/V i 390 px mörkt och 1280 px ljust, reduced-motion Start/Håll och live-loop; underben och fot ryms i ramen, baseline-diff 0/0/0/0, inspect Håll = live 1 (0,0). Återstår för omgranskning (annan leverantör, t.ex. Codex eller human): avläs om det böjda övre knät nu stämmer med instruktionen i Håll och Start, H/V, kroppsvikt, reduced motion; i verkligheten ligger underbenet tvärs över bänken, så profilen visar det som uppåtstigande underben. Granskning 2026-11-18 E91 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E91 copenhagen-hold, profil statiskt Håll/reduced-motion H/V, kroppsvikt: det övre benet läses nästan rakt över bänken (knävinkel cirka 166 grader), trots instruktionen om ett böjt övre knä. Visa tydlig knäböjning med full underbenslängd, knästöd och fri fot; behåll axel–knä-linjen."
     ],
-    "fingerprint": "309b15fc2287",
+    "fingerprint": "be5e9fa18d47",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BÄNKALTERNATIV. Jämför: bench-side-plank-leg-lift, side-lying-hip-adduction. Tydligt statiskt håll med böjt övre knä på bänken. Prioritera denna framför E42 om bara ett bänkkort ska finnas, men statiskt knästöd och dynamiskt nedre benlyft är inte samma dosering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
