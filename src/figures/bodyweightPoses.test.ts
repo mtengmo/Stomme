@@ -108,17 +108,23 @@ describe('bodyweight movement paths', () => {
     },
   );
   it('jumps through continuous, constant-length thighs and shins with alternating front legs', () => {
+    // The figure cycle is two counted reps: one switch each (0 -> 0.5 -> 1).
     const first = movementPose('jumping-lunge', 0),
+      opposite = movementPose('jumping-lunge', 0.5),
       last = movementPose('jumping-lunge', 1);
     expect(first.aR[0]).toBeGreaterThan(first.aL[0]);
-    expect(last.aR[0]).toBeLessThan(last.aL[0]);
-    for (let n = 0; n <= 80; n++) {
-      const p = movementPose('jumping-lunge', n / 80);
+    expect(opposite.aR[0]).toBeLessThan(opposite.aL[0]);
+    expect(last).toEqual(first);
+    expect(figures['jumping-lunge'].motion).toBe('sequence');
+    expect(figures['jumping-lunge'].start).toEqual(first);
+    expect(figures['jumping-lunge'].end).toEqual(opposite);
+    for (let n = 0; n <= 160; n++) {
+      const p = movementPose('jumping-lunge', n / 160);
       expect(distance(p.hip, p.kR)).toBeCloseTo(36, 8);
       expect(distance(p.kR, p.aR)).toBeCloseTo(34, 8);
       if (n > 0)
         expect(
-          distance(p.kR, movementPose('jumping-lunge', (n - 1) / 80).kR),
+          distance(p.kR, movementPose('jumping-lunge', (n - 1) / 160).kR),
         ).toBeLessThan(5);
     }
   });
@@ -190,18 +196,37 @@ describe('bodyweight movement paths', () => {
     expect(start.aR[1] - top.aR[1]).toBeCloseTo(16, 8);
     expect(start.hip[1] - top.hip[1]).toBeCloseTo(16, 8);
   });
-  it('crunch curls head and shoulders about 40 degrees while hips and feet stay put', () => {
+  it('crunch lifts head and shoulders about 40 degrees while hips and feet stay put', () => {
     const start = movementPose('crunch', 0),
       top = movementPose('crunch', 1);
     expect(top.hip).toEqual(start.hip);
     expect(top.aR).toEqual(start.aR);
     expect(top.neck[1]).toBeLessThan(start.neck[1] - 5);
     expect(top.head[1]).toBeLessThan(start.head[1] - 5);
-    const pivot: Pt = [72, 169];
-    expect(distance(top.neck, pivot)).toBeCloseTo(26, 8);
+    // The trunk tilts about the resting pelvis at constant length; the head
+    // turns about 0.64 rad further than the trunk (0.7 rad in all).
+    expect(distance(top.neck, top.hip)).toBeCloseTo(51, 8);
     expect(
-      Math.atan2(pivot[1] - top.neck[1], pivot[0] - top.neck[0]),
-    ).toBeCloseTo(0.7, 8);
+      Math.atan2(top.hip[1] - top.neck[1], top.hip[0] - top.neck[0]),
+    ).toBeCloseTo(0.34, 8);
+    expect(
+      Math.atan2(top.neck[1] - top.head[1], top.neck[0] - top.head[0]),
+    ).toBeCloseTo(0.76, 8);
+  });
+  it('crunch rests the pelvis on the mat and keeps both arms 22 + 22 with the hands at the temples', () => {
+    for (let frame = 0; frame <= 20; frame++) {
+      const pose = movementPose('crunch', frame / 20);
+      // Mat top edge y 175.5, body stroke 6 wide.
+      expect(pose.hip[1] + 3).toBeCloseTo(175.5, 8);
+      for (const [elbow, hand] of [
+        [pose.eR, pose.hR],
+        [pose.eL, pose.hL],
+      ] as const) {
+        expect(distance(pose.neck, elbow)).toBeCloseTo(22, 6);
+        expect(distance(elbow, hand)).toBeCloseTo(22, 6);
+        expect(distance(hand, pose.head)).toBeLessThan(10);
+      }
+    }
   });
   it.each(['plank', 'plank-arm-lift', 'push-up'] as const)(
     '%s passes the geometry gate mid-rep',

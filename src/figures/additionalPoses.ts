@@ -1,10 +1,26 @@
+import type { ExerciseId } from '../domain/types';
 import { pushUp } from './bodyweightPoses';
 import { farmerCarryPose, rackCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
+import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
-import { SQUAT_CURL_TOP, squatFamilyPose } from './squatFamilyKeyframes';
+import {
+  arm,
+  bone,
+  foot,
+  headNeck,
+  keepSegmentLengths,
+  leg,
+  type SegmentRule,
+  trunk,
+} from './segmentLengths';
+import {
+  SQUAT_CURL_TOP,
+  squatFamilyPose,
+  THRUSTER_TOP,
+} from './squatFamilyKeyframes';
 
 type P = Pt;
 function p(
@@ -37,6 +53,59 @@ const stand = p(
     [97, 177],
   ],
 );
+
+/**
+ * Segment-length rules for the figures below that are authored as raw joint
+ * positions (see `segmentLengths.ts`). `constrainedLegs.ts` applies them to the
+ * interpolation; `withLengths` applies the same rules to an authored keyframe so the
+ * keyframes already have the constant lengths (those of `stand` unless a
+ * reference is given).
+ */
+const BOTH_ARMS = [arm('R', { bend: 1 }), arm('L', { bend: 1 })] as const;
+export const ADDITIONAL_SEGMENT_RULES: Partial<
+  Record<ExerciseId, readonly SegmentRule[]>
+> = {
+  'bent-over-row': BOTH_ARMS,
+  'kettlebell-halo': BOTH_ARMS,
+  woodchop: [trunk(), ...BOTH_ARMS],
+  'side-lunge': [
+    trunk(),
+    headNeck(),
+    ...BOTH_ARMS,
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+  // The swung arm and the free arm hang at full reach, the trunk keeps its length.
+  'one-arm-kettlebell-swing': [
+    trunk(),
+    headNeck(),
+    arm('R', { straight: true }),
+    arm('L', { straight: true }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+  // Shoulders stay on the mat: the hip follows the trunk arc, hands ride on the
+  // hip with the dumbbell, arms and legs keep their lengths.
+  'weighted-glute-bridge': [
+    bone('neck', 'hip', ['hR', 'hL']),
+    arm('R', { bend: -1 }),
+    arm('L', { bend: -1 }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+};
+const withLengths = (
+  pose: Pose,
+  id: keyof typeof ADDITIONAL_SEGMENT_RULES,
+  reference: Pose = stand,
+): Pose =>
+  keepSegmentLengths(pose, [reference], ADDITIONAL_SEGMENT_RULES[id] ?? []);
 const mat: FigureSpec['props'] = [{ type: 'mat', x1: 16, x2: 184 }];
 const wall: FigureSpec['props'] = [{ type: 'wall', x: 157 }];
 const twoDumbbells: FigureSpec['held'] = {
@@ -483,6 +552,105 @@ const sideLying = p(
   ],
 );
 
+/**
+ * Weighted glute bridge, side view. Shoulders stay on the mat, the pelvis rests
+ * on it at the start (centre 172.5 + stroke 3 = mat top 175.5) and rises along
+ * the trunk's arc; trunk 44, arms 23 + 23 (hands and dumbbell ride on the
+ * hips), legs 36 + 39.5 and the planted feet keep their lengths all the way
+ * (`ADDITIONAL_SEGMENT_RULES`).
+ */
+const wgbHip: Pt = [99, 172.5];
+const wgbArm = (hand: Pt) => solveTwoBone(bridgeStart.neck, hand, 23, 23, -1);
+const wgbLeg = (hip: Pt, ankle: Pt) => solveTwoBone(hip, ankle, 36, 39.5, -1);
+const wgbStart: Pose = (() => {
+  // One dumbbell on the pelvis: both hands at the same point, 4 above the hip.
+  const hand = wgbArm([wgbHip[0], wgbHip[1] - 4]);
+  return {
+    ...bridgeStart,
+    hip: wgbHip,
+    eR: hand.mid,
+    hR: hand.end,
+    eL: hand.mid,
+    hL: hand.end,
+    kR: wgbLeg(wgbHip, bridgeStart.aR).mid,
+    kL: wgbLeg(wgbHip, bridgeStart.aL).mid,
+  };
+})();
+const wgbEnd: Pose = withLengths(
+  {
+    ...wgbStart,
+    hip: [95.2, 153],
+    hR: [95.2, 149],
+    hL: [95.2, 149],
+  },
+  'weighted-glute-bridge',
+  wgbStart,
+);
+
+/**
+ * Overhead triceps extension, side view. The upper arms stay beside the head
+ * (elbows above the shoulders); the forearm (29.5) turns about the elbow from
+ * the straight overhead start (phase 0), behind the head, to the lowered
+ * position (phase 1) and back. Both hands share the one dumbbell.
+ */
+const TRICEPS_ELBOW: Pt = [104, 44];
+const TRICEPS_FOREARM = 29.5;
+const TRICEPS_UP = Math.atan2(
+  TRICEPS_ELBOW[1] - stand.neck[1],
+  TRICEPS_ELBOW[0] - stand.neck[0],
+);
+const TRICEPS_TURN = 2.46;
+export function overheadTricepsPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const angle = TRICEPS_UP - TRICEPS_TURN * t;
+  const hand: Pt = [
+    TRICEPS_ELBOW[0] + TRICEPS_FOREARM * Math.cos(angle),
+    TRICEPS_ELBOW[1] + TRICEPS_FOREARM * Math.sin(angle),
+  ];
+  return { ...stand, eR: TRICEPS_ELBOW, hR: hand, eL: TRICEPS_ELBOW, hL: hand };
+}
+
+/**
+ * Russian twist, profile. Seated and leaning back with both heels down (trunk,
+ * head and legs as before); only the weight and the arms follow the turn. The
+ * turn is the oblique view's `yaw = -sin(2 pi t)` (0 and 0.5 centre, 0.25 left,
+ * 0.75 right); the arms keep their lengths (22 + 18) and the two hands share
+ * one point.
+ */
+const TWIST_BASE = p(
+  [80, 113],
+  [84, 127],
+  [100, 171],
+  [
+    [97, 141],
+    [100, 152],
+    [97, 141],
+    [100, 152],
+  ],
+  [
+    [80, 146],
+    [79, 173],
+    [68, 176],
+    [120, 146],
+    [121, 173],
+    [132, 176],
+  ],
+);
+export function russianTwistSidePose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const yaw = -Math.sin(2 * Math.PI * t);
+  // Right (yaw > 0) is the near side: the weight passes in front of the near hip.
+  const weight: Pt = [100 + 4 * yaw, 152 + 6 * yaw];
+  const grip = solveTwoBone(TWIST_BASE.neck, weight, 22, 18, -1);
+  return {
+    ...TWIST_BASE,
+    eR: grip.mid,
+    hR: grip.end,
+    eL: grip.mid,
+    hL: grip.end,
+  };
+}
+
 /** Individually authored start/mid/end geometry; no fallback motion for new IDs. */
 export const additionalFigures = {
   'kettlebell-floor-press': {
@@ -535,20 +703,17 @@ export const additionalFigures = {
   'bent-over-row': {
     // Keep the hinge and stance fixed; row both dumbbells from a dead hang
     // toward the hip line without changing the back angle.
-    start: {
-      ...hinge,
-      eR: [126, 134],
-      hR: [122, 155],
-      eL: [112, 136],
-      hL: [98, 155],
-    },
-    end: {
-      ...hinge,
-      eR: [114, 117],
-      hR: [105, 137],
-      eL: [105, 118],
-      hL: [85, 137],
-    },
+    // Both arms keep the standing arm lengths (24.6 + 22.6). They hang almost
+    // straight under the shoulder at the start; the far arm sits just behind the
+    // near one, so the two read as a pair in profile.
+    start: withLengths(
+      { ...hinge, hR: [129, 157], hL: [124, 158] },
+      'bent-over-row',
+    ),
+    end: withLengths(
+      { ...hinge, hR: [105, 137], hL: [100, 138] },
+      'bent-over-row',
+    ),
     props: [],
     held: twoDumbbells,
   },
@@ -632,18 +797,18 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   thruster: {
+    // One pass per rep (a sequence): standing with the weights at the shoulders,
+    // down into the squat, drive and press overhead, lower back to the shoulders.
     start: squatFamilyPose('thruster', 0),
-    // A thruster finishes the squat and returns to the shoulder rack before
-    // the overhead press starts; the lowering path returns overhead -> rack -> squat.
-    middle: squatFamilyPose('thruster', 0.5),
-    end: squatFamilyPose('thruster', 1),
+    end: squatFamilyPose('thruster', THRUSTER_TOP),
+    motion: 'sequence',
     props: [],
     held: twoDumbbells,
   },
   'single-arm-thruster': {
     start: squatFamilyPose('single-arm-thruster', 0),
-    middle: squatFamilyPose('single-arm-thruster', 0.5),
-    end: squatFamilyPose('single-arm-thruster', 1),
+    end: squatFamilyPose('single-arm-thruster', THRUSTER_TOP),
+    motion: 'sequence',
     props: [],
     held: oneDumbbell,
   },
@@ -695,54 +860,18 @@ export const additionalFigures = {
     props: mat,
   },
   'weighted-glute-bridge': {
-    start: {
-      ...bridgeStart,
-      hR: [99, 167],
-      hL: [99, 167],
-      eR: [77, 169],
-      eL: [78, 173],
-    },
+    start: wgbStart,
     // The pelvis, hands, and single dumbbell rise as one unit. The top is
     // aligned from shoulders through hips toward knees rather than arched.
-    end: {
-      ...bridgeStart,
-      hip: [99, 153],
-      kR: [124, 144],
-      kL: [116, 142],
-      hR: [99, 149],
-      hL: [99, 149],
-      eR: [77, 155],
-      eL: [78, 161],
-    },
+    end: wgbEnd,
     props: mat,
     // Both hands meet at the same center; render one dumbbell there.
     held: oneDumbbell,
   },
   'overhead-triceps-extension': {
-    // Upper arms stay fixed next to the head (elbows above the shoulders). The
-    // forearm swings from lowered behind the head (start) up to a straight arm
-    // with the weight overhead (end), so each rep shows the elbow bend.
-    start: {
-      ...stand,
-      eR: [104, 44],
-      hR: [81, 63],
-      eL: [104, 44],
-      hL: [81, 63],
-    },
-    middle: {
-      ...stand,
-      eR: [104, 44],
-      hR: [84, 23],
-      eL: [104, 44],
-      hL: [84, 23],
-    },
-    end: {
-      ...stand,
-      eR: [104, 44],
-      hR: [109.7, 15.5],
-      eL: [104, 44],
-      hL: [109.7, 15.5],
-    },
+    // Phase 0: the weight straight overhead; the first movement is the lowering.
+    start: overheadTricepsPose(0),
+    end: overheadTricepsPose(1),
     props: [],
     // Hands meet at one logical point so the shared dumbbell renders once.
     held: oneDumbbell,
@@ -755,31 +884,25 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'side-lunge': {
-    start: {
-      ...stand,
-      eR: [116, 96],
-      hR: [98, 117],
-      eL: [80, 96],
-      hL: [98, 117],
-    },
+    // The weight is held near the chest (hands 14 in front of and 16 below the
+    // neck) in the whole movement; arms, legs and trunk keep the standing lengths.
+    start: withLengths(
+      { ...stand, hR: [112, 90], hL: [110, 92] },
+      'side-lunge',
+    ),
     // Side angle shows the controlled lowering and upright braced trunk;
     // the front angle carries the lateral weight shift and wide stance.
-    end: {
-      ...stand,
-      head: [91, 79],
-      neck: [92, 93],
-      hip: [88, 136],
-      eR: [109, 111],
-      hR: [91, 120],
-      eL: [74, 111],
-      hL: [91, 120],
-      kR: [117, 151],
-      aR: [108, 174],
-      tR: [119, 177],
-      kL: [79, 147],
-      aL: [86, 174],
-      tL: [97, 177],
-    },
+    end: withLengths(
+      {
+        ...stand,
+        head: [93, 78.2],
+        neck: [92, 92.2],
+        hip: [88, 136],
+        hR: [106, 108],
+        hL: [104, 110],
+      },
+      'side-lunge',
+    ),
     props: [],
     held: oneDumbbell,
   },
@@ -792,44 +915,11 @@ export const additionalFigures = {
     motion: 'sequence',
   },
   'russian-twist': {
-    start: p(
-      [80, 113],
-      [84, 127],
-      [100, 171],
-      [
-        [97, 141],
-        [100, 152],
-        [97, 141],
-        [100, 152],
-      ],
-      [
-        [80, 146],
-        [79, 173],
-        [68, 176],
-        [120, 146],
-        [121, 173],
-        [132, 176],
-      ],
-    ),
-    end: p(
-      [80, 113],
-      [84, 127],
-      [100, 171],
-      [
-        [97, 141],
-        [100, 152],
-        [97, 141],
-        [100, 152],
-      ],
-      [
-        [80, 146],
-        [79, 173],
-        [68, 176],
-        [120, 146],
-        [121, 173],
-        [132, 176],
-      ],
-    ),
+    // The same left - right - centre turn as the oblique view (`yaw`), in
+    // profile: turning toward the near side brings the weight down and forward
+    // over the near hip, turning away takes it up and back, out of sight.
+    start: russianTwistSidePose(0),
+    end: russianTwistSidePose(0.75),
     props: [],
     held: { kind: 'dumbbell', hands: ['hR', 'hL'] },
     motion: 'sequence',
@@ -837,27 +927,19 @@ export const additionalFigures = {
   'kettlebell-halo': {
     // Side projection of a circle round the head: front of the face, beside
     // the ear, then behind the head. Both hands share one grip on the horns.
-    start: {
-      ...stand,
-      eR: [112, 88],
-      hR: [116, 70],
-      eL: [112, 88],
-      hL: [116, 70],
-    },
-    middle: {
-      ...stand,
-      eR: [102, 90],
-      hR: [100, 66],
-      eL: [102, 90],
-      hL: [100, 66],
-    },
-    end: {
-      ...stand,
-      eR: [90, 88],
-      hR: [84, 68],
-      eL: [90, 88],
-      hL: [84, 68],
-    },
+    // Both arms keep the standing arm lengths; only the hands circle the head.
+    start: withLengths(
+      { ...stand, hR: [116, 70], hL: [116, 70] },
+      'kettlebell-halo',
+    ),
+    middle: withLengths(
+      { ...stand, hR: [100, 66], hL: [100, 66] },
+      'kettlebell-halo',
+    ),
+    end: withLengths(
+      { ...stand, hR: [84, 68], hL: [84, 68] },
+      'kettlebell-halo',
+    ),
     props: [],
     held: oneBell,
   },
@@ -876,40 +958,45 @@ export const additionalFigures = {
   woodchop: {
     // Low-to-high diagonal: both hands share one grip on the single weight,
     // starting beside the working hip and finishing high over the far shoulder.
-    start: {
-      ...stand,
-      head: [101, 62],
-      neck: [99, 76],
-      kR: [105, 148],
-      // Start-side foot flat; it then pivots on the ball of the foot (heel
-      // turns up, segment lengths kept) and the knee follows the chop.
-      kL: [91, 148],
-      eR: [100, 100],
-      hR: [104, 124],
-      eL: [100, 100],
-      hL: [104, 124],
-    },
-    middle: {
-      ...stand,
-      kR: [110.1, 146.1],
-      aR: [108.6, 172.4],
-      tR: [119, 177],
-      eR: [120, 76],
-      hR: [142, 76],
-      eL: [120, 76],
-      hL: [142, 76],
-    },
-    end: {
-      ...stand,
-      head: [97, 60],
-      kR: [113.2, 144.6],
-      aR: [109.5, 170.6],
-      tR: [119, 177],
-      eR: [106, 50],
-      hR: [112, 28],
-      eL: [106, 50],
-      hL: [112, 28],
-    },
+    // Trunk and both arms keep the standing lengths (44, 24.6 + 22.6): the
+    // hands go where the weight goes, the arms are solved from the shoulder.
+    start: withLengths(
+      {
+        ...stand,
+        head: [101, 62],
+        neck: [99, 76],
+        kR: [105, 148],
+        // Start-side foot flat; it then pivots on the ball of the foot (heel
+        // turns up, segment lengths kept) and the knee follows the chop.
+        kL: [91, 148],
+        hR: [104, 124],
+        hL: [104, 124],
+      },
+      'woodchop',
+    ),
+    middle: withLengths(
+      {
+        ...stand,
+        kR: [110.1, 146.1],
+        aR: [108.6, 172.4],
+        tR: [119, 177],
+        hR: [142, 76],
+        hL: [142, 76],
+      },
+      'woodchop',
+    ),
+    end: withLengths(
+      {
+        ...stand,
+        head: [97, 60],
+        kR: [113.2, 144.6],
+        aR: [109.5, 170.6],
+        tR: [119, 177],
+        hR: [112, 28],
+        hL: [112, 28],
+      },
+      'woodchop',
+    ),
     props: [],
     held: oneDumbbell,
   },
@@ -1021,51 +1108,60 @@ export const additionalFigures = {
     motion: 'ballistic',
   },
   'one-arm-kettlebell-swing': {
-    start: p(
-      [140, 99],
-      [127, 105],
-      [87, 121],
-      [
-        [109, 121],
-        [87, 141],
-        [124, 126],
-        [121, 146],
-      ],
-      [
-        [104, 147],
-        [108, 174],
-        [119, 177],
-        [88, 148],
-        [86, 174],
-        [97, 177],
-      ],
+    start: withLengths(
+      p(
+        [140, 99],
+        [127, 105],
+        [87, 121],
+        [
+          [109, 121],
+          [87, 141],
+          [124, 126],
+          [121, 146],
+        ],
+        [
+          [104, 147],
+          [108, 174],
+          [119, 177],
+          [88, 148],
+          [86, 174],
+          [97, 177],
+        ],
+      ),
+      'one-arm-kettlebell-swing',
     ),
-    middle: p(
-      [111, 70],
-      [107, 84],
-      [98, 119],
-      [
-        [132, 102],
-        [151, 114],
-        [110, 108],
-        [107, 130],
-      ],
-      [
-        [104, 148],
-        [108, 174],
-        [119, 177],
-        [90, 148],
-        [86, 174],
-        [97, 177],
-      ],
+    middle: withLengths(
+      p(
+        [111, 70],
+        [107, 84],
+        [98, 119],
+        [
+          [132, 102],
+          [151, 114],
+          [110, 108],
+          [107, 130],
+        ],
+        [
+          [104, 148],
+          [108, 174],
+          [119, 177],
+          [90, 148],
+          [86, 174],
+          [97, 177],
+        ],
+      ),
+      'one-arm-kettlebell-swing',
     ),
-    end: {
-      ...stand,
-      eR: [126, 79],
-      hR: [151, 82],
-      eL: [88, 98],
-      hL: [86, 120],
-    },
+    end: withLengths(
+      {
+        ...stand,
+        eR: [126, 79],
+        hR: [151, 82],
+        eL: [88, 98],
+        hL: [86, 120],
+      },
+      'one-arm-kettlebell-swing',
+    ),
     props: [],
     held: oneBell,
     motion: 'ballistic',

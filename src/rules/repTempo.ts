@@ -41,7 +41,19 @@ const MOVEMENT_MS: Partial<
   'goblet-chair-squat': { upMs: 3_000, downMs: 2_000 },
 };
 /** Figures whose animation is one whole repetition per cycle, not up and down. */
-const SEQUENCE_FIGURES: readonly ExerciseId[] = ['squat-jump', 'burpee'];
+const SEQUENCE_FIGURES: readonly ExerciseId[] = [
+  'squat-jump',
+  'burpee',
+  // Stand, squat, drive and press, lower to the shoulders: one pass per rep.
+  'squat-curl',
+  'thruster',
+  'single-arm-thruster',
+  // One hop with a leg switch per rep, so the figure's cycle is two reps
+  // (`cycleReps`): the switch alternates, never swaps twice inside one count.
+  'jumping-lunge',
+];
+/** Sequence figures whose cycle is more than one counted repetition long. */
+const CYCLE_REPS: Partial<Record<ExerciseId, number>> = { 'jumping-lunge': 2 };
 
 export type RepPhase = 'up' | 'hold' | 'down' | 'relax';
 
@@ -56,6 +68,8 @@ export interface RepTempo {
   hasHold: boolean;
   /** The figure plays one whole rep per cycle, so progress is linear. */
   sequence: boolean;
+  /** Counted reps in one figure cycle (alternating figures); 1 when left out. */
+  cycleReps?: number;
   /** Spoken words for isometric work where Upp/Ner would say lift/lower. */
   cues?: Partial<Record<RepPhase, string>>;
 }
@@ -74,6 +88,7 @@ export function repTempo(id: ExerciseId): RepTempo | null {
       repMs: fixed,
       hasHold: false,
       sequence: SEQUENCE_FIGURES.includes(id),
+      ...(CYCLE_REPS[id] ? { cycleReps: CYCLE_REPS[id] } : {}),
     };
   const { relaxSeconds } = exerciseMetadata[id];
   // The physio catalogue prescribes no hold; the beat still pauses 3 s at the top.
@@ -91,7 +106,8 @@ export function repTempo(id: ExerciseId): RepTempo | null {
     relaxMs,
     repMs: upMs + holdMs + downMs + relaxMs,
     hasHold,
-    sequence: false,
+    sequence: SEQUENCE_FIGURES.includes(id),
+    ...(CYCLE_REPS[id] ? { cycleReps: CYCLE_REPS[id] } : {}),
     ...(CUE_WORDS[id] ? { cues: CUE_WORDS[id] } : {}),
   };
 }
@@ -153,7 +169,12 @@ export function repPosition(tempo: RepTempo, elapsedMs: number): RepPosition {
 /** Movement 0 (start) to 1 (top of the rep) at `elapsedMs`; matches repPosition. */
 export function repProgress(tempo: RepTempo, elapsedMs: number): number {
   const within = Math.max(0, elapsedMs) % tempo.repMs;
-  if (tempo.sequence) return within / tempo.repMs;
+  if (tempo.sequence) {
+    // An alternating figure plays its cycle over `cycleReps` counted reps.
+    const cycle = tempo.cycleReps ?? 1;
+    const rep = Math.floor(Math.max(0, elapsedMs) / tempo.repMs) % cycle;
+    return (rep + within / tempo.repMs) / cycle;
+  }
   if (within < tempo.upMs) return easeInOut(within / tempo.upMs);
   if (within < tempo.upMs + tempo.holdMs) return 1;
   const down = within - tempo.upMs - tempo.holdMs;

@@ -134,13 +134,11 @@ describe('weighted glute bridge figure geometry', () => {
       const pose = movementPose('weighted-glute-bridge', frame / 20);
       expect(pose.head).toEqual(start.head);
       expect(pose.neck).toEqual(start.neck);
-      expect(pose.aR).toEqual(start.aR);
-      expect(pose.tR).toEqual(start.tR);
-      expect(pose.aL).toEqual(start.aL);
-      expect(pose.tL).toEqual(start.tL);
+      for (const key of ['aR', 'tR', 'aL', 'tL'] as const)
+        expect(distance(pose[key], start[key])).toBeLessThan(1e-9);
       expect(pose.hR).toEqual(pose.hL);
-      expect(pose.hR[0]).toBe(pose.hip[0]);
-      expect(pose.hip[1] - pose.hR[1]).toBe(4);
+      expect(pose.hR[0]).toBeCloseTo(pose.hip[0], 8);
+      expect(pose.hip[1] - pose.hR[1]).toBeCloseTo(4, 8);
 
       // The one load stays reachable from the shoulder line as its anchor
       // follows the pelvis through the raise.
@@ -176,7 +174,7 @@ describe('weighted glute bridge figure geometry', () => {
 });
 
 describe('overhead triceps extension figure geometry', () => {
-  it('keeps upper arms still and arcs one shared dumbbell behind and over the head', () => {
+  it('keeps upper arms still and lowers one shared dumbbell from overhead to behind the head', () => {
     const start = movementPose('overhead-triceps-extension', 0);
     const middle = movementPose('overhead-triceps-extension', 0.5);
     const end = movementPose('overhead-triceps-extension', 1);
@@ -192,9 +190,10 @@ describe('overhead triceps extension figure geometry', () => {
     expect(start.hR).toEqual(start.hL);
     expect(middle.hR).toEqual(middle.hL);
     expect(end.hR).toEqual(end.hL);
-    expect(start.hR[1]).toBeGreaterThan(start.head[1]);
-    expect(middle.hR[0]).toBeGreaterThan(start.hR[0]);
-    expect(end.hR[1]).toBeLessThan(end.head[1]);
+    // Phase 0 is the weight straight overhead (text: start overhead, lower first).
+    expect(start.hR[1]).toBeLessThan(start.head[1] - 40);
+    expect(middle.hR[0]).toBeLessThan(start.hR[0]);
+    expect(end.hR[1]).toBeGreaterThan(end.head[1]);
 
     for (let frame = 0; frame <= 20; frame++) {
       const pose = movementPose('overhead-triceps-extension', frame / 20);
@@ -213,11 +212,12 @@ describe('overhead triceps extension figure geometry', () => {
       for (const elbow of [pose.eR, pose.eL]) {
         const upperLength = distance(pose.neck, elbow);
         const forearmLength = distance(elbow, pose.hR);
-        expect(forearmLength).toBeGreaterThan(18);
-        expect(forearmLength).toBeLessThan(36);
+        // The forearm keeps one length through the whole arc.
+        expect(forearmLength).toBeCloseTo(29.5, 6);
+        expect(upperLength).toBeCloseTo(distance(start.neck, start.eR), 6);
         // The forearm folds backwards, behind the head, never forwards.
         expect(cross(pose.neck, elbow, pose.hR)).toBeLessThanOrEqual(1);
-        if (frame === 20)
+        if (frame === 0)
           expect(
             Math.abs(cross(pose.neck, elbow, pose.hR)) /
               (upperLength * forearmLength),
@@ -338,17 +338,27 @@ describe('side lunge front geometry', () => {
         expect(bottom[toeKey][0]).toBeLessThan(bottom[ankleKey][0]);
       else expect(bottom[toeKey][0]).toBeGreaterThan(bottom[ankleKey][0]);
 
-      const otherLegLengthViaKnee =
-        distance(bottom.hip, bottom[otherKneeKey]) +
-        distance(bottom[otherKneeKey], bottom[otherAnkleKey]);
-      expect(otherLegLengthViaKnee).toBeCloseTo(
-        distance(bottom.hip, bottom[otherAnkleKey]),
-        4,
-      );
-      expect(
-        distance(bottom.hip, bottom[kneeKey]) +
-          distance(bottom[kneeKey], bottom[ankleKey]),
-      ).toBeGreaterThan(distance(bottom.hip, bottom[ankleKey]) + 2);
+      // The legs keep the profile's standing lengths (30.6 + 26.3 = 56.9): the
+      // opposite leg stays planted and long (at least 80 % of full reach) and is
+      // straighter than the bent selected leg.
+      const bend = (
+        knee: 'kR' | 'kL',
+        ankle: 'aR' | 'aL',
+      ): { chord: number; excess: number } => {
+        const chord = distance(bottom.hip, bottom[ankle]);
+        return {
+          chord,
+          excess:
+            distance(bottom.hip, bottom[knee]) +
+            distance(bottom[knee], bottom[ankle]) -
+            chord,
+        };
+      };
+      const otherBend = bend(otherKneeKey, otherAnkleKey);
+      const selectedBend = bend(kneeKey, ankleKey);
+      expect(otherBend.chord).toBeGreaterThan(0.8 * (30.6 + 26.3));
+      expect(otherBend.excess).toBeLessThan(selectedBend.excess);
+      expect(selectedBend.excess).toBeGreaterThan(2);
 
       expect(start.hR).toEqual(start.hL);
       expect(bottom.hR).toEqual(bottom.hL);

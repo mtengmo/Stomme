@@ -4,7 +4,9 @@ import {
   floorPressPose,
   hamstringCurlPose,
   kettlebellFloorPressPose,
+  overheadTricepsPose,
   renegadeRowPose,
+  russianTwistSidePose,
   seatedKneeExtensionPose,
   walkingLungePose,
   weightedSitUpPose,
@@ -47,7 +49,10 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
     return kettlebellFloorPressPose(t);
   if (exerciseId === 'floor-press') return floorPressPose(t);
   if (exerciseId === 'dumbbell-pullover') return dumbbellPulloverPose(t);
+  if (exerciseId === 'overhead-triceps-extension')
+    return overheadTricepsPose(t);
   if (exerciseId === 'renegade-row') return renegadeRowPose(t);
+  if (exerciseId === 'russian-twist') return russianTwistSidePose(t);
   if (exerciseId === 'weighted-sit-up') return weightedSitUpPose(t);
   if (exerciseId === 'walking-lunge') return walkingLungePose(t);
   if (exerciseId === 'suitcase-carry') return suitcaseCarryPose(t);

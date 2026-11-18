@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { ADDITIONAL_SEGMENT_RULES } from './additionalPoses';
 import type { Pt } from './lerp';
 import type { Pose } from './poses';
 import {
@@ -114,6 +115,8 @@ export const SEGMENT_RULES: Partial<
     foot('R'),
     foot('L'),
   ],
+  // Raw-keyframe figures in additionalPoses.ts (the keyframes use the same rules).
+  ...ADDITIONAL_SEGMENT_RULES,
 };
 
 function solveLegKnees(

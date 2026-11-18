@@ -4355,7 +4355,7 @@
     "name": "Utfall med hopp och benbyte",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -4411,13 +4411,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E63: bakre foten har nu tårna i golvet (hälen lyft) i utfallsändlägena: grundare bakre underben (vinkel 2.967) och brantare fotvinkel för bakre foten, fasta benlängder 36/34. Faserna nära hoppet ej separat granskade visuellt."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E63: räknaren och figuren samordnade. Figuren är nu en sekvens med cykel på två räknade repetitioner (cycleReps 2 i repTempo.ts): rep 1 spelar ett benbyte (fas 0 till 0,5), rep 2 byter tillbaka (0,5 till 1), så varje räknat hopp visar exakt ett benbyte i stället för två. Slut-stillbilden visar det motsatta utfallet. Demon går 6 s per tvåhoppscykel. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, reduced-motion Start/Slut, live-loop med räknare, cross-vendor (Codex eller human). Granskning 2026-11-18 jumping-lunge all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[cheap] E63 jumping-lunge, automatisk repetitionsräkning och profil live, bilateral kroppsvikt: en 3 s räknarrepetition driver fas 0→1→0 och visar två hopp/benbyten, medan texten räknar varje hopp som en repetition. Samordna räknarprogressionen med ett benbyte per tal.",
       "[strong] E63 jumping-lunge, hela loopen och reduced-motion, bilateral kroppsvikt: endast profil finns och döljer textens fotbredd och knäets inåtfall vid landning. Lägg till front-/snedvy där båda signalerna syns."
     ],
-    "fingerprint": "12c047bd38af",
+    "fingerprint": "9a86de2dbf1f",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: squat-jump, reverse-lunge. Benbyte i luften och utfallslandning tillför annat än tvåbens knäböjshopp. Redan utesluten från allmänna program; inte dublett på grund av samma benmuskler. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -4513,7 +4518,7 @@
     "name": "Armhävning på knä",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -4553,13 +4558,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E65: egen ram (FRAMING 14 20 182 168) så att de upplyfta fötterna syns helt med marginal i alla faser. Sedd fas 0, 0.5, 0.875 och 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E65: bortre handen ligger nu i golvnivå med den främre (y 174 i stället för 171), så båda stödarmarna är raka i toppläget (22+22 konstanta). Lårasymmetrin 3,6 kvarstår (delpunkt). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida fas 0 och Start, alla faser, cross-vendor. Granskning 2026-11-18 knee-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E65 knee-push-up, profil fas 0/återgång och reduced-motion Start, bilateral kroppsvikt: bortre armbågen förblir tydligt böjd när främre armen är rak. Visa båda stödarmarna raka i toppläget, med hand-/knäkontakt kvar.",
       "[strong] E65 knee-push-up, hela loopen och reduced-motion, bilateral kroppsvikt: endast profil finns och döljer angiven handbredd samt armbågar snett bakåt. Lägg till front-/snedvy som visar båda händer och armbågsriktning."
     ],
-    "fingerprint": "8958294d8f02",
+    "fingerprint": "27640de494c7",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: wall-push-up, push-up. Mellansteget med knästöd behövs i progressionen. Gallra inte detta som en sämre normal armhävning. Kodkopplingar: nybörjarurval; allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -4657,7 +4667,7 @@
     "name": "Magcrunch",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -4676,12 +4686,18 @@
         "notes": "E68: score 9/12 (T2 R3 AS1 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, Kroppsvikt (Kroppsvikt), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Litet kontrollerat huvud-/axellyft med fötter kvar och rep-röst rätt. AS1: synlig underarmskrympning 9,3/9,1 och bäckengap 3,5; båldrift 3,1 mindre delpunkt. T2: lättare text upprepar litet lyft men korsade armar/mindre rörelse ger ett användbart enklare val. Ingen rotations-/sidledssignal kräver extra vy. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E68: underarmarna har konstant längd 22+22 med händerna vid tinningarna (de följer huvudet, armbågarna löses från axeln); bålen lutar nu kring bäckenet med konstant längd 51 (drift 3,1 till 0); bäckenet vilar på mattan (centrum y 172,5, linjekant mot mattans överkant 175,5) i alla faser, huvudet startar 9 över golvet. Omgranskning: sida alla faser, Start/Slut, 390 mörkt och 1280 ljust, cross-vendor. Granskning 2026-11-18 crunch all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E68 crunch, profil hela loopen och reduced-motion, bilateral kroppsvikt: underarmarna krymper 21,1→11,8 respektive 23→13,9 när axlarna lyfts (drift 9,3/9,1). Lös armarna med konstanta segment och händer lätt vid tinningar/bröst.",
       "[strong] E68 crunch, profil hela loopen och reduced-motion, bilateral kroppsvikt: bäckenets centrum y 169 ger linjekant 172 mot mattans överkant 175,5, synlig glipa 3,5. Visa stabilt bäckenstöd medan endast huvud/axlar lyfts."
     ],
-    "fingerprint": "786e32936d59",
+    "fingerprint": "be41cc3c21e7",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: dead-bug, lying-leg-raise. Kort aktiv bålflexion är ett annat moment än benrörelse med stilla bål. Ingen direkt dublett i katalogen. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -4691,7 +4707,7 @@
     "name": "Armhävning med fötterna upphöjda",
     "group": "bodyweight",
     "risk": "normal",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -4723,13 +4739,18 @@
         "fixer": "claude-sonnet",
         "commit": "05d9a4b",
         "notes": "W5: plank family with forearm plank and equal leg lengths (deviation: far knee IK-bends towards -1)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E69: bortre handen ligger nu i golvnivå med den främre (y 174 i stället för 171), så båda stödarmarna är raka i toppläget (27,8+27,8 konstanta). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida fas 0, Start och sänkning, cross-vendor. Granskning 2026-11-18 decline-push-up all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E69 decline-push-up, profil fas 0/återgång och reduced-motion Start, bilateral kroppsvikt + stol: bortre armen är tydligt böjd när främre armen når rakt toppläge. Räta båda stödarmarna med kvarvarande hand-/tåkontakt.",
       "[strong] E69 decline-push-up, hela loopen och reduced-motion, bilateral kroppsvikt + stol: endast profil finns och döljer armbågarnas angivna riktning snett bakåt. Lägg till front-/snedvy för båda armarnas riktning."
     ],
-    "fingerprint": "aafc0ac6f4a8",
+    "fingerprint": "bda4f083a3a2",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM PROGRESSION. Jämför: push-up, diamond-push-up, blast-off-push-up. Upphöjda fötter ger en tydligt beskriven ändring av stödpositionen. Behåll framför mer sammansatt blast-off om en avancerad armhävning ska finnas. Kodkopplingar: allmänna kandidatplatser A/horizontal-press; fokusplatser horizontal-press; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5258,7 +5279,7 @@
     "name": "Knäböj med bicepscurl",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -5319,6 +5340,11 @@
         "fixer": "claude-sonnet",
         "commit": "56d07e3",
         "notes": "One-way sequence (8 s): squat with hanging arms, rise while curling, lower the dumbbells standing, loop without a seam; reduced-motion stills Start (standing, hanging arms), Botten, Upp med curl."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E72: räknaren spelar nu figuren som en framåtriktad sekvens, en hel följd per räknad repetition (squat-curl i SEQUENCE_FIGURES i repTempo.ts, linjär progress), i stället för 0 till 1 till 0 med följden baklänges. Figurens poser är oförändrade. Återstår: front-/snedvy saknas (fas 2). Omgranskning: live-loop med räknare och reduced-motion, cross-vendor. Granskning 2026-11-18 squat-curl all avser beteendet före denna rättning."
       }
     ],
     "openIssues": [
@@ -5335,7 +5361,7 @@
     "name": "Knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -5410,13 +5436,18 @@
         "fixer": "claude-sonnet",
         "commit": "ce92e90",
         "notes": "E73: benen blir raka vid fas 0.46 (mjuk avslutning) och pressen börjar redan vid 0.40 och pågår över hela resten av loopen, så armarna börjar pressa under slutet av bensträckningen; reduced-motion Start är fas 0.40 (stående rack, knappt synlig höftskillnad). Test i thrusterGeometry.test.ts uppdaterat. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.2, 0.4, 0.43, 0.46, 0.55, 0.7, 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E73: figuren är nu en sekvens per repetition: stående med hantlarna vid axlarna (fas 0, tips, Start, live och räknare), ned i knäböj (fas 0,2), resning och press ovanför huvudet (0,7) och sänkning tillbaka till axlarna (1). Stillbilder Start/Botten/Slut följer detta; steg-geometrin ligger kvar i thrusterStagePose. repTempo: sequence. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, Start/Botten/Slut, live med räknare, cross-vendor. Granskning 2026-11-18 thruster all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E73 thruster, profil fas 0 och början av live/räknarloop, två hantlar: live börjar i bottenknäböj medan tips och reduced-motion Start börjar stående med vikt vid axeln. Samordna start och första sänkning så alla kanaler visar stå→knäböj→resning/press→axel.",
       "[strong] E73 thruster, hela loopen och reduced-motion, två hantlar: endast profil finns och döljer axelbred fotställning. Lägg till front-/snedvy med båda fötter."
     ],
-    "fingerprint": "488bebd66757",
+    "fingerprint": "a7bb77cd3432",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT SOM KOMBINATIONSBAS. Jämför: single-arm-thruster, goblet-squat, shoulder-press. Om knäböj–press-kombinationen ska finnas, prioritera tvåarmsvarianten framför enarms. Behåll inte på bekostnad av grundmomenten. Det öppna samordningsfelet måste fortfarande rättas; detta är inget animationsgodkännande. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
       "[Astra-granskning 2026-11-08 (0d3f962) föråldrad] Granskningen gjordes på en äldre gren och beskriver figuren före rättningen (ce92e90); figurens fingerprint på main skiljer sig från den som granskades. Posten behålls som fixed-awaiting-review och openIssues rörs inte. codex:gpt6astra (eller human) måste granska om aktuell main innan något kan godkännas."
@@ -5427,7 +5458,7 @@
     "name": "Enarms knäböj med axelpress",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -5502,13 +5533,18 @@
         "fixer": "claude-sonnet",
         "commit": "ce92e90",
         "notes": "E74: samma tidsändring som E73 (gemensam squatFamilyPose): pressen med vald arm börjar vid 0.40 när benen avslutar sträckningen (klara 0.46); spegling och handkontakt med hantel oförändrade. Åtgärdar openIssues-punkten (kvar som text tills omgranskad). Sedd fas 0, 0.4, 0.43, 0.46, 0.55, 1 (H)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E74: samma sekvensändring som E73 (gemensam squatFamilyKeyframes): start stående med hanteln vid axeln, första rörelsen är sänkningen, sedan press och sänkning till axeln, H/V oförändrat. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida H och V, alla faser, stillbilder, live med räknare, cross-vendor. Granskning 2026-11-18 single-arm-thruster all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E74 single-arm-thruster, profil fas 0 och början av live/räknarloop, en hantel H/V: live börjar i bottenknäböj medan tips och reduced-motion Start börjar stående med vikt vid axeln. Samordna start och första sänkning så alla kanaler visar stå→knäböj→resning/press→axel.",
       "[strong] E74 single-arm-thruster, hela loopen och reduced-motion, en hantel H/V: endast profil finns och döljer axelbred fotställning och textens sidolutning av bålen. Lägg till front-/snedvy med båda fötter och synlig sidobalans."
     ],
-    "fingerprint": "9795b24e3575",
+    "fingerprint": "1e1f05875176",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: thruster, kettlebell-press. Ytterligare ensidig variant av samma kombinationssekvens, med öppet samordningsfel och egen sidhantering. Svagare separat post än tvåarms-thruster i ett kompakt utbud. Beakta att endast en hantel krävs; användare med en vikt kan inte automatiskt bytas till tvåarmsvarianten. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
       "[Astra-granskning 2026-11-08 (0d3f962) föråldrad] Granskningen gjordes på en äldre gren och beskriver figuren före rättningen (ce92e90); figurens fingerprint på main skiljer sig från den som granskades. Posten behålls som fixed-awaiting-review och openIssues rörs inte. codex:gpt6astra (eller human) måste granska om aktuell main innan något kan godkännas."
@@ -5519,7 +5555,7 @@
     "name": "Hantelrodd, böjd framåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -5546,13 +5582,19 @@
         "notes": "E75: score 14/18 (T3 R3 AS1 AF1 U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, 2 hantlar (2 × 2 kg hantlar · totalt 4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Stilla höftfälld bål, fötter kvar och båda hantlar i händerna. AS1: överarmsdrift 5,6 och olikhet upp till 9,7 syns; sänkt Start har tydligt böjda armar i stället för nästan raka. AF1 saknas för fotbredd. Röst/reps rätt; stödd enarmsrodd/lättare vikter är regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E75: båda armarna har konstanta längder 24,6+22,6 (regler i ADDITIONAL_SEGMENT_RULES, Start/Slut normaliserade); sänkt Start har nästan raka armar under axeln, raden för händerna mot höftlinjen; bålen oförändrad; asymmetri 9,7 och drift 5,6 borta. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida alla faser med två hantlar, Start/Slut, cross-vendor. Granskning 2026-11-18 bent-over-row all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E75 bent-over-row, profil hela loopen och reduced-motion, 2 hantlar: främre överarmen krymper 23,8→18,2 och växer igen, bortre är upp till 9,7 enheter längre. Lös båda armar med konstanta förenliga segment och kvarvarande hantelkontakt.",
       "[strong] E75 bent-over-row, profil fas 0/återgång och reduced-motion Start, 2 hantlar: armbågarna är tydligt böjda redan i sänkt läge, trots textens nästan raka armar. Visa en tydlig sänkning till nästan raka armar utan att ändra bålställningen.",
       "[strong] E75 bent-over-row, hela loopen och reduced-motion, 2 hantlar: endast profil finns och döljer textens höftbreda fotställning. Lägg till front-/snedvy som visar båda fötterna."
     ],
-    "fingerprint": "8cba90aa4789",
+    "fingerprint": "a926a9e8569a",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: supported-row. Samma dragfamilj men två hantlar och ostödd framåtfällning. Prioritera supported-row i ett basutbud tack vare handstöd och val mellan hantel/kettlebell. Bilateralt ostött arbete är ett eget skäl att behålla denna. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser row; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5601,7 +5643,7 @@
     "name": "Bäckenlyft med hantel",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -5628,12 +5670,18 @@
         "notes": "E77: score 13/15 (T3 R3 AS1 AF n/a U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, 1 hantel (1 × 2 kg hantel · totalt 2 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Hanteln hålls med båda händerna vid höften och följer lyftet; fötterna kvar. AS1: tydlig lårkrympning 10,3/13,8, växande överarm 5,1 och bål 3,5; bäckengap 3,5 vid Start/återgång. Röst/reps stämmer, mindre lyft utan vikt är regression. Profilen visar angiven lyftlinje; inget extra rotationskrav i texten. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E77: konstanta segment: bål 44, armar 23+23, lår 36 och underben 39,5 (förut lår 36,9 till 26,6 och 34 till 20,2, bål 44 till 47,5, överarm 22,1 till 27,2); axlar och fötter står kvar, bäckenet startar på mattan (centrum y 172,5, linjekant 175,5) och följer bålens båge upp till linjen axlar, höft och knän; hanteln vilar 4 över höften. Omgranskning: sida alla faser, Start/Slut, cross-vendor. Granskning 2026-11-18 weighted-glute-bridge all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E77 weighted-glute-bridge, profil hela loopen och reduced-motion, en hantel: låren krymper 36,9→26,6 respektive 34→20,2 under lyftet; bål växer 44→47,5 och främre överarm 22,1→27,2. Behåll konstanta kroppssegment med händer/vikt vid höften och fötter kvar.",
       "[strong] E77 weighted-glute-bridge, profil fas 0/återgång och reduced-motion Start, en hantel: bäckenets nedre linjekant y 172 ligger 3,5 över mattans överkant 175,5. Låt bäckenet nå mattan i återgången enligt texten."
     ],
-    "fingerprint": "48e8cd129c8d",
+    "fingerprint": "4f81c1584378",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: glute-bridge. Samma tvåbens golvlyft och redan överlappande 2 kg-hantelval. Svagare separat post eftersom glute-bridge även täcker kroppsvikt. Flytta över 4 kg-val och vikt-/handinstruktion innan denna post inaktiveras. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5643,7 +5691,7 @@
     "name": "Triceps över huvudet",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -5704,6 +5752,11 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E78: egen ram (FRAMING 14 0 164 188, extra utrymme upptill) så att hela hanteln och händerna syns i toppläget; armgeometrin oförändrad. Sedd fas 0, 0.5, 0.875 och 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E78: figuren startar nu med vikten rakt ovanför huvudet (fas 0, tips och Start) och första rörelsen är sänkningen bakom huvudet (fas 1, Slut); överarmen står still och underarmen har konstant längd 29,5 och vrids kring armbågen (drift 8,3 till 0). Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, Start/Slut, cross-vendor. Granskning 2026-11-18 overhead-triceps-extension all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5711,7 +5764,7 @@
       "[strong] E78 overhead-triceps-extension, profil fas 0/reduced-motion Start, en hantel: starten är med böjda armbågar och vikt bakom huvudet medan texten börjar med vikten ovanför huvudet och först sänker. Samordna start och rörelseriktning.",
       "[strong] E78 overhead-triceps-extension, hela loopen och reduced-motion, en hantel: endast profil finns och döljer textens överarmar som faller ut åt sidorna. Lägg till front-/snedvy för överarmarnas sidriktning."
     ],
-    "fingerprint": "40ca41d267dd",
+    "fingerprint": "c5a2053f5048",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM VARIANT. Jämför: triceps-kickback. Samma armbågssträckning men två händer över huvudet i stället för enarm med stöd. Annan position/utrustningshantering motiverar att inte kalla den dublett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser arm-extension; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5810,7 +5863,7 @@
     "name": "Sidoutfall",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -5866,6 +5919,11 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E80: frontvy: vald fotled och tår lyfts under utsteget (stepLift 9*sin(pi*steg)) och står sedan fast under knäböjen; återsteget är samma rörelse baklänges. Sedd front H fas 0.25 och 0.75; viktvarianter ej separat sedda."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E80: profil: konstanta ben, armar och bål (lår 30,6, underben 26,3, armar 24,6+22,6; bortre lårdrift 16,8 till 0), vikten hålls nära bröstet (händer 14 framför och 16 under halsen) i start och slut. Front: ritad om med profilens längder som tak (underben 37,1 till 26,3, lår 36 till 30,6, inga drifter), vikten vid bröstet (hals plus 18) och bortre benet rakare än det valda. Jämfört med förut är sidosteget kortare och stegbredden mindre eftersom benen nu är profilens korta. Omgranskning: sida och front, H/V, kroppsvikt och hantel, cross-vendor. Granskning 2026-11-18 side-lunge all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
@@ -5873,7 +5931,7 @@
       "[strong] E80 side-lunge, front hela loopen/reduced-motion H/V, kroppsvikt/en hantel: underben når 37,1 mot profil 26,3 och lår 36 mot profil omkring 31; projektionen är för lång. Korrigera mot förenliga profilsegment utan att tappa sidosteget.",
       "[strong] E80 side-lunge, profil/front hela loopen/reduced-motion H/V, en hantel: vikten hålls vid midja/höft i stället för nära bröstet enligt texten. Höj och samordna tvåhandsgreppet i båda vyerna med konstanta armar."
     ],
-    "fingerprint": "d0cdb57ead1c",
+    "fingerprint": "334ec3d6bbd1",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, sumo-squat. Steg och återgång i sidled är ett eget rörelsemönster som framåt-/bakåtutfall och stationär bred knäböj inte täcker. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -5924,7 +5982,7 @@
     "name": "Gobletknäböj med kettlebell",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-01",
@@ -6005,13 +6063,18 @@
         "date": "2026-11-08",
         "fixer": "claude-sonnet",
         "notes": "E82: sidovyn (Från sidan): händerna ritas nu som en tydlig handmarkering på kulans handtag (hornen) ovanför kulkroppen i alla faser och vid reducerad rörelse Start/Slut, för 4 och 8 kg (Figure.tsx). Underarmen kommer uppifrån mot hornen i stället för att läsas som kontakt vid kulans nedre sida. Frontvyn är oförändrad. Sedd H fas 0, 0.5, 0.75, 1 (zoomade bilder). Underarmen går fortfarande förbi kulans vänstra kant i profil; omgranskning behövs."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E82: frontvyn ritad om med profilens längder (lår 30,8, underben 26,5, armar 24+20, fot 11,4; förut 35,9, 34, 27+23): start stående upprätt (fötter 12 från mitten), knäna går ut över tårna vid sänkning, hornkontakten kvar. Profilen är oförändrad. Omgranskning: front alla faser och Start, kettlebell, cross-vendor. Granskning 2026-11-18 kettlebell-goblet-squat all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E82 kettlebell-goblet-squat, front hela loopen/reduced-motion, kettlebell: lår 35,9 och underben 34 överstiger profilens 30,8/26,5; armar 27+23 mot 24+20. Korrigera frontprojektionen till förenliga segment.",
       "[strong] E82 kettlebell-goblet-squat, front fas 0/återgång och reduced-motion Start, kettlebell: knäna är tydligt böjda redan i Start, medan profil/text börjar upprätt. Samordna ett stående startläge mellan vyerna med bibehållen hornkontakt."
     ],
-    "fingerprint": "fa80ff89b601",
+    "fingerprint": "995df0af0344",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] SLÅ IHOP, P1. Jämför: goblet-squat. Samma fria gobletknäböj; huvudposten har redan kettlebell på 8 kg samt hantel/kroppsvikt. Svagare separat post. Bevara denna posts 4 kg-val och instruktion om grepp i hornen som kettlebellvariant innan inaktivering. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
       "[Astra-granskning 2026-11-08 (0d3f962) föråldrad] Granskningen gjordes på en äldre gren och beskriver figuren före rättningen (E82 front-view grip fix (PR #30)); figurens fingerprint på main skiljer sig från den som granskades. Posten behålls som fixed-awaiting-review och openIssues rörs inte. codex:gpt6astra (eller human) måste granska om aktuell main innan något kan godkännas."
@@ -6022,7 +6085,7 @@
     "name": "Enarms kettlebellsving",
     "group": "ballistic",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -6049,12 +6112,18 @@
         "notes": "E83: score 14/18 (T3 R3 AS1 AF1 U3 S3). Befintliga/kontrollerade vyer: side. nio faser ut/tillbaka, hel live-loop och reduced-motion, H/V, 1 kettlebell (1 × 4 kg kettlebell · totalt 4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. En vikt i vald hand H/V med bibehållen handtagskontakt, fri arm hänger, höftdriven fram-/återgång högst brösthöjd. AS1: tydlig arm-/bålkrympning, baseline drift 14/14,3/9,5; ben mindre avvikelser. AF1 saknas för bålrotation/fotbredd. Röst 2 s per rep stämmer i räknarläge; fristående demo snabbare. Tvåhandssving med lätt vikt är enklare. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E83: konstanta segment: bål 44, båda armar 24,6+22,6 räta i svängen, ben och fötter från stående (överarm 30,8 till 17,4, underarm 29,7 till 16,1, bål 35,4 till 44 borta); ankrarna står kvar. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida H/V, alla faser, Start/Slut, kettlebell, att fötterna inte lyfter, cross-vendor. Granskning 2026-11-18 one-arm-kettlebell-swing all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E83 one-arm-kettlebell-swing, profil hela loopen/reduced-motion H/V, kettlebell: överarm varierar cirka 17,4–30,8, underarm 16,1–29,7 och bål 35,4–44 (baseline drift 14/14,3/9,5). Lös höftfällning/sving med konstanta segment och kvarvarande handtagskontakt.",
       "[strong] E83 one-arm-kettlebell-swing, hela loopen/reduced-motion H/V, kettlebell: endast profil finns och döljer textens bålrotation och bredare fotställning. Lägg till front-/snedvy som visar båda fötterna och att bålen inte vrids."
     ],
-    "fingerprint": "8e5d3ed55958",
+    "fingerprint": "edfce0181675",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: kettlebell-swing. Samma höftdrivna sving och samma kettlebellvikter, men ensidigt grepp och extra sidhantering. Prioritera tvåhandsvarianten i ett smalare utbud; den ensidiga utmaningen är ett medvetet bortval, inte en identisk ersättning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser hinge; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -6064,7 +6133,7 @@
     "name": "Kettlebell halo",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -6120,13 +6189,18 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E84: kulan ritas nu ovanför greppet (Held angle 180) och handtaget sitter vid händerna. Sedd sida fas 0, 0.5 och 1 med 4 kg; 8 kg ej sedd. I mittfasen överlappar kulan huvudet i sidoprojektionen."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E84: båda armar har konstanta längder 24,6+22,6 genom hela cirkeln (överarm 4,7 och underarm 5,6 drift borta); händerna följer samma tre positioner kring huvudet. Återstår: front-/snedvy saknas (fas 2). Omgranskning: sida, alla faser, kettlebell, hornkontakt, cross-vendor. Granskning 2026-11-18 kettlebell-halo all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E84 kettlebell-halo, profil hela loopen/reduced-motion, kettlebell: överarmarna varierar cirka 15,1–19,8 och underarmarna 18,4–24,1 (drift 4,7/5,6), synligt under passagen vid huvudet. Bevara förenliga segment genom cirkelrörelsen med hornkontakten kvar.",
       "[strong] E84 kettlebell-halo, hela loopen/reduced-motion, kettlebell: endast profil finns och döljer hur vikten passerar runt huvudets sidor, cirkelriktningen och avståndet till huvudet. Lägg till front-/snedvy som tydliggör ett helt varv."
     ],
-    "fingerprint": "731821d79e48",
+    "fingerprint": "9c3ad029c481",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: overhead-triceps-extension, dumbbell-pullover. Cirkeln runt huvudet är inte samma rörelse som sträckning i armbågar eller bakåtföring i ryggläge. Ingen tydlig dublett. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -6136,7 +6210,7 @@
     "name": "Russian twist",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -6163,11 +6237,17 @@
         "notes": "E87: score 15/18 (T3 R3 AS1 AF3 U2 S3). Befintliga/kontrollerade vyer: side, oblique. nio faser ut/tillbaka, hel live-loop och reduced-motion, bilateral, Kroppsvikt (Kroppsvikt), 1 hantel (1 × 2 kg hantel · totalt 2 kg), 1 kettlebell (1 × 4 kg kettlebell · totalt 4 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: mismatch. Snedvyn visar liten vänster–höger–mitten-rotation med hälar kvar och vikter i händerna; kortare armprojektioner än profil är förväntade, inte längdfel. AS1 mismatch: hela profilen är statisk, även de två rotationsmärkta stillbilderna. U2: profilen håller vikten lägre vid bålen än snedvyn, men handkontakt finns. Litet sittgap cirka 2,5 är AS2 delpunkt. Manuell helcykelräkning rätt; mer upprätt/utan vikt är regression. HEAD-figur identisk: ja; rent granskat källträd."
       }
     ],
-    "fixes": [],
+    "fixes": [
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E87: profilen visar nu samma vänster-höger-mitten-vridning som snedvyn (yaw = -sin(2 pi t), russianTwistSidePose): vikten och armarna (22+18 konstanta) går ned och fram över närmaste höft vid vridning åt höger och upp och bak vid vridning åt vänster; stillbilderna Vrid åt vänster/höger skiljer sig nu, liksom start och slut. Skillnaden i ren profil är liten (djup syns inte) och bålen är oförändrad. Omgranskning: sida och sned, stillbilder, tre varianter, cross-vendor. Granskning 2026-11-18 russian-twist all avser figuren före denna rättning."
+      }
+    ],
     "openIssues": [
       "[strong] E87 russian-twist, profil hela loopen och reduced-motion Vrid åt vänster/Vrid åt höger, kroppsvikt/hantel/kettlebell: profilen är helt stilla med identiska start-/slutposer och visar ingen bålrotation. Visa samma vänster–höger–mitten-rörelse som i snedvyn, även i stillbilderna."
     ],
-    "fingerprint": "ae670395cccc",
+    "fingerprint": "3ef24de398a7",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM ROTATIONSVARIANT. Jämför: woodchop, side-plank. Sittande liten rotation med hälarna i golvet skiljer sig från stående diagonal och statisk sidoplanka. Inte direkt ersättning för woodchop trots gemensam fokusplats. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -6177,7 +6257,7 @@
     "name": "Woodchop",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-04",
@@ -6252,13 +6332,18 @@
         "date": "2026-11-08",
         "fixer": "claude-sonnet",
         "notes": "E88: frontvyn: pivotbenets knä följer nu fotvridningen. Tån pekar ut vid start och knät böjs utåt; i fas 0.75-1 och Slut pekar tån mot andra foten och knät ligger på insidan av höft-fotlinjen (turnedKnee i frontViews.tsx, båda sidor via spegling). Diagonalen höft till motsatt axel och ramen är oförändrade. Knät passerar linjen kring fas 0.5 (underbenet kortas då i frontprojektionen, ny baslinjerad drift woodchop|front|drift:kR-aR 9.2). Sedd H och V fas 0, 0.5, 0.75, 1."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E88: profil: bål och båda armar har konstanta längder (44, 24,6+22,6; armdrift 8 och 6,7 samt bål 2 borta). Front: ben begränsade till profilens 30,6 och 26,3 (förut 35,9 och 34; drift 9,2 till 3,5), armar 24,6+22,6, höften justerad så att det fasta benet når. Omgranskning: sida och front, H/V, hantel och kettlebell, cross-vendor. Granskning 2026-11-18 woodchop all avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E88 woodchop, profil fas 0–1 och tillbaka H/V, hantel/kettlebell: överarmarna ändrar längd cirka 8 och underarmarna 6,7 enheter; armarna krymper tydligt på vägen upp. Behåll segmentlängderna genom den diagonala rörelsen.",
       "[strong] E88 woodchop, front fas 0–1 H/V, hantel/kettlebell: det fasta benets lår 35,9 och underben 34 är längre än profilens cirka 30,8 respektive 26,3. Frontprojektionen får förkorta, inte förlänga ben; använd profilens längder som tak."
     ],
-    "fingerprint": "a8fda1653962",
+    "fingerprint": "0aea1192ba39",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL VILLKORLIGT, INTE DUBLETT. Jämför: russian-twist. Stående diagonal med fotmedvridning tillför ett eget mönster. Öppet vy-/rotationsfel motiverar rättning eller separat pausbeslut, inte påståendet att Russian twist är samma övning. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser side-core; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet.",
       "[Astra-granskning 2026-11-08 (0d3f962) föråldrad] Granskningen gjordes på en äldre gren och beskriver figuren före rättningen (ce92e90); figurens fingerprint på main skiljer sig från den som granskades. Posten behålls som fixed-awaiting-review och openIssues rörs inte. codex:gpt6astra (eller human) måste granska om aktuell main innan något kan godkännas."

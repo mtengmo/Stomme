@@ -618,13 +618,17 @@ describe('woodchop front view', () => {
       expect(dist(p.neck, p.eR) + dist(p.eR, p.hR)).toBeGreaterThan(
         dist(p.neck, p.hR) - 0.01,
       );
-      expect(dist(p.neck, p.eR)).toBeCloseTo(24, 0);
-      expect(dist(p.eR, p.hR)).toBeCloseTo(24, 0);
+      // Arms and legs never exceed the profile's standing lengths (24.6 + 22.6,
+      // thigh 30.6, shin 26.3).
+      expect(dist(p.neck, p.eR)).toBeCloseTo(24.6, 4);
+      expect(dist(p.eR, p.hR)).toBeCloseTo(22.6, 4);
       // The turning knee foreshortens in the frontal projection, never grows.
-      expect(dist(p.hip, p.kR)).toBeLessThanOrEqual(35.9 + 0.5);
-      expect(dist(p.kR, p.aR)).toBeLessThanOrEqual(34 + 0.5);
-      expect(dist(p.hip, p.kR)).toBeGreaterThan(24);
-      expect(dist(p.kR, p.aR)).toBeGreaterThan(24);
+      expect(dist(p.hip, p.kR)).toBeLessThanOrEqual(30.6 + 0.01);
+      expect(dist(p.kR, p.aR)).toBeLessThanOrEqual(26.3 + 0.01);
+      expect(dist(p.hip, p.kL)).toBeLessThanOrEqual(30.6 + 0.01);
+      expect(dist(p.kL, p.aL)).toBeLessThanOrEqual(26.3 + 0.01);
+      expect(dist(p.hip, p.kR)).toBeGreaterThan(20);
+      expect(dist(p.kR, p.aR)).toBeGreaterThan(20);
       expect(dist(p.aR, p.tR)).toBeCloseTo(Math.hypot(9, 3), 1);
       const mirrored = frontMovementPose('woodchop', i / 20, 'left');
       expect(mirrored.hR[0]).toBeCloseTo(200 - p.hL[0], 5);

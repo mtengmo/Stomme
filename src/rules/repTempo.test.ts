@@ -142,6 +142,35 @@ describe('ballistic beats', () => {
     expect(repProgress(t, 6000)).toBe(0);
     expect(repProgress(t, 4500)).toBeCloseTo(0.75, 5);
   });
+  it('jumping lunge plays one leg switch per counted rep (a two-rep figure cycle)', () => {
+    const t = repTempo('jumping-lunge');
+    if (!t) throw new Error('tempo');
+    expect(t.sequence).toBe(true);
+    expect(t.cycleReps).toBe(2);
+    // Rep 1 (0-3 s) goes from the first lunge to the opposite one (0 -> 0.5),
+    // rep 2 (3-6 s) switches back (0.5 -> 1); never two switches in one count.
+    expect(repProgress(t, 0)).toBe(0);
+    expect(repProgress(t, 1500)).toBeCloseTo(0.25, 5);
+    expect(repProgress(t, 2999)).toBeCloseTo(0.5, 2);
+    expect(repProgress(t, 3000)).toBeCloseTo(0.5, 5);
+    expect(repProgress(t, 4500)).toBeCloseTo(0.75, 5);
+    expect(repProgress(t, 6000)).toBe(0);
+    // The scaled (slower) beat keeps the two-rep cycle.
+    expect(scaleTempo(t, 1.25).cycleReps).toBe(2);
+  });
+  it.each(['squat-curl', 'thruster', 'single-arm-thruster'] as const)(
+    '%s plays one forward pass per counted rep (no up-and-back)',
+    (id) => {
+      const t = repTempo(id);
+      if (!t) throw new Error('tempo');
+      expect(t.sequence).toBe(true);
+      expect(t.cycleReps).toBeUndefined();
+      expect(repProgress(t, 0)).toBe(0);
+      expect(repProgress(t, t.repMs / 2)).toBeCloseTo(0.5, 5);
+      expect(repProgress(t, t.repMs * 0.99)).toBeGreaterThan(0.98);
+      expect(repProgress(t, t.repMs)).toBe(0);
+    },
+  );
   it('blast off push-up uses the default controlled tempo, not a fixed beat', () => {
     expect(repTempo('blast-off-push-up')).toMatchObject({
       upMs: 2000,

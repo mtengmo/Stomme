@@ -1,20 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { movementPose } from './Figure';
 import {
   THRUSTER_LEGS_DONE,
   THRUSTER_PRESS_START,
+  thrusterStagePose,
 } from './squatFamilyKeyframes';
+
+// The timeline of the figure is a sequence (see squatFamilyKeyframes.test.ts);
+// these checks pin the stage geometry: 0 bottom .. 1 overhead.
+const stagePose = thrusterStagePose;
 
 describe('thruster figure timing', () => {
   it.each(['thruster', 'single-arm-thruster'] as const)(
     '%s starts the press as the legs finish extending',
     (id) => {
-      const bottom = movementPose(id, 0);
-      const halfSquat = movementPose(id, 0.25);
-      const rack = movementPose(id, THRUSTER_PRESS_START);
-      const legsDone = movementPose(id, THRUSTER_LEGS_DONE);
-      const press = movementPose(id, 0.75);
-      const overhead = movementPose(id, 1);
+      const bottom = stagePose(id, 0);
+      const halfSquat = stagePose(id, 0.25);
+      const rack = stagePose(id, THRUSTER_PRESS_START);
+      const legsDone = stagePose(id, THRUSTER_LEGS_DONE);
+      const press = stagePose(id, 0.75);
+      const overhead = stagePose(id, 1);
       const near = (a: readonly number[], b: readonly number[]) =>
         Math.hypot((a[0] ?? 0) - (b[0] ?? 0), (a[1] ?? 0) - (b[1] ?? 0));
 
@@ -34,7 +38,7 @@ describe('thruster figure timing', () => {
       // The press starts while the legs are still finishing their extension
       // ('När höfter och knän sträcks, pressa'), not after they are straight.
       expect(THRUSTER_PRESS_START).toBeLessThan(THRUSTER_LEGS_DONE);
-      const mid = movementPose(
+      const mid = stagePose(
         id,
         (THRUSTER_PRESS_START + THRUSTER_LEGS_DONE) / 2,
       );
@@ -52,7 +56,7 @@ describe('thruster figure timing', () => {
 
       // The cycle's return traverses the same two safe stages in reverse:
       // overhead -> rack -> squat.
-      expect(movementPose(id, 0)).toEqual(bottom);
+      expect(stagePose(id, 0)).toEqual(bottom);
     },
   );
 });

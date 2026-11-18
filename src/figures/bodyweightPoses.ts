@@ -134,7 +134,8 @@ function declinePushUp(t: number): Pose {
   const hip = polar(ankle, 64, angle);
   const startNeck = polar(ankle, 110, -3.0);
   const hand: Pt = [startNeck[0], 174];
-  const farHand: Pt = [startNeck[0] + 4, 171];
+  // Level with the near hand so the far arm is as straight as the near one.
+  const farHand: Pt = [startNeck[0] + 4, 174];
   const length = (174 - startNeck[1]) / 2;
   return pose(
     polar(neck, 14, angle),
@@ -393,6 +394,16 @@ function lunge(t: number): Pose {
     [kr, ar, toe(ar, mix(flat, ball, t)), kl, al, toe(al, mix(ball, flat, t))],
   );
 }
+/**
+ * One counted jumping lunge is one hop with a leg switch (`lunge` goes from one
+ * lunge to the opposite one). The figure cycle is two reps: the first switch,
+ * then the switch back, so each counted rep plays exactly one switch
+ * (`cycleReps` in repTempo.ts). Phase 0 and 1 are the same lunge, 0.5 the
+ * opposite one; Slut shows that opposite lunge.
+ */
+function jumpingLunge(t: number): Pose {
+  return lunge(t < 0.5 ? 2 * t : 2 - 2 * t);
+}
 function climber(t: number): Pose {
   const p = pushUp(0);
   p.hip = [p.hip[0], p.hip[1] - 7];
@@ -570,7 +581,8 @@ function kneePushUp(t: number): Pose {
   const startNeck = polar(knee, 82, -2.59);
   const armLength = (174 - startNeck[1]) / 2;
   const hand: Pt = [startNeck[0], 174],
-    farHand: Pt = [startNeck[0] + 4, 171];
+    // Level with the near hand so the far arm is as straight as the near one.
+    farHand: Pt = [startNeck[0] + 4, 174];
   const farKnee: Pt = [knee[0] - 3, knee[1] - 2];
   const ankle = polar(knee, 34, -0.45),
     farAnkle = polar(farKnee, 34, -0.55);
@@ -650,28 +662,38 @@ function calfRaise(t: number): Pose {
     ],
   );
 }
-/** Lying on the back, knees bent: head and shoulders turn about 40 degrees around the mid-back. */
+/**
+ * Lying on the back, knees bent: head and shoulders lift about 40 degrees
+ * (the trunk tilts about the pelvis). The pelvis rests on the mat (centre 172.5 + stroke 3 = mat top
+ * 175.5). Both hands stay lightly at the temples (riding on the head), so each
+ * arm keeps its length (22 + 22) and only the elbows follow the lift.
+ */
 function crunch(t: number): Pose {
-  const hip: Pt = [97, 169],
-    pivot: Pt = [72, 169],
-    phi = 0.7 * t;
+  const hip: Pt = [97, 172.5],
+    phi = 0.12 + 0.64 * t;
+  const along: Pt = [Math.cos(phi), Math.sin(phi)];
+  const up: Pt = [Math.sin(phi), -Math.cos(phi)];
+  // The trunk (51 long) tilts about the resting pelvis; the head turns further.
+  // Resting: the head centre is 9 above the floor (y 169), the neck at y 170.5.
+  const trunk = 0.04 + 0.3 * t;
   const neck: Pt = [
-    pivot[0] - 26 * Math.cos(phi),
-    pivot[1] - 26 * Math.sin(phi),
+    hip[0] - 51 * Math.cos(trunk),
+    hip[1] - 51 * Math.sin(trunk),
   ];
-  const head: Pt = [neck[0] - 14 * Math.cos(phi), neck[1] - 14 * Math.sin(phi)];
+  const head: Pt = [neck[0] - 14 * along[0], neck[1] - 14 * along[1]];
+  const temple = (back: number, lift: number): Pt => [
+    head[0] + back * along[0] + lift * up[0],
+    head[1] + back * along[1] + lift * up[1],
+  ];
+  const hR = temple(6, 1),
+    hL = temple(8, 3);
   const ar: Pt = [140, 174],
     al: Pt = [136, 174];
   return pose(
     head,
     neck,
     hip,
-    [
-      [neck[0] + 4, neck[1] - 14],
-      [head[0] + 7, head[1] + 4],
-      [neck[0] + 8, neck[1] - 12],
-      [head[0] + 9, head[1] + 7],
-    ],
+    [joint(neck, hR, 22, 22, 1), hR, joint(neck, hL, 22, 22, 1), hL],
     [
       joint(hip, ar, 36, 34, -1),
       ar,
@@ -878,7 +900,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'knee-drive': kneeDrive,
   'isometric-lunge-hold': lungeHold,
   'plate-pogos': plateHop,
-  'jumping-lunge': lunge,
+  'jumping-lunge': jumpingLunge,
   'mountain-climber': climber,
   'knee-push-up': kneePushUp,
   'wall-push-up': wallPushUp,
@@ -898,11 +920,16 @@ export const bodyweightFigures = Object.fromEntries(
     id,
     {
       start: handler(0),
-      end: handler(id === 'plank-arm-lift' ? 0.25 : 1),
+      end: handler(
+        id === 'plank-arm-lift' ? 0.25 : id === 'jumping-lunge' ? 0.5 : 1,
+      ),
       motion:
         id === 'plank' || id === 'isometric-lunge-hold'
           ? 'hold'
-          : id === 'burpee' || id === 'squat-jump' || id === 'box-jump'
+          : id === 'burpee' ||
+              id === 'squat-jump' ||
+              id === 'box-jump' ||
+              id === 'jumping-lunge'
             ? 'sequence'
             : id === 'single-leg-lateral-hop' ||
                 id === 'fast-feet' ||

@@ -228,6 +228,10 @@ const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
   'squat-jump': 4500,
   'box-jump': 5000,
   'squat-curl': 8000,
+  // Two hops with a leg switch each (the figure cycle is two counted reps).
+  'jumping-lunge': 6000,
+  thruster: 5000,
+  'single-arm-thruster': 5000,
 };
 /** One ballistic cycle in milliseconds; running drills are quicker than hops. */
 const BALLISTIC_MS: Partial<Record<ExerciseId, number>> = {

@@ -9,7 +9,10 @@ import {
   SQUAT_FAMILY_IDS,
   squatFamilyPose,
   squatFamilyStills,
+  THRUSTER_BOTTOM,
   THRUSTER_PRESS_START,
+  THRUSTER_TOP,
+  thrusterStagePose,
 } from './squatFamilyKeyframes';
 
 const dist = (a: readonly number[], b: readonly number[]) =>
@@ -41,7 +44,9 @@ describe('squat family keyframes', () => {
           ? squatFamilyPose(id, 1)
           : id === 'squat-curl'
             ? squatFamilyPose(id, SQUAT_CURL_BOTTOM)
-            : squatFamilyPose(id, 0);
+            : id === 'thruster' || id === 'single-arm-thruster'
+              ? squatFamilyPose(id, THRUSTER_BOTTOM)
+              : squatFamilyPose(id, 0);
       expect(bottom.hip[1]).toBeGreaterThanOrEqual(bottom.kR[1] - 10);
     },
   );
@@ -60,13 +65,43 @@ describe('squat family keyframes', () => {
     }
   });
   it('thruster: rack hand sits 13 right of and 2 above the neck, and overhead is above the head', () => {
-    const rack = squatFamilyPose('thruster', THRUSTER_PRESS_START);
+    const rack = thrusterStagePose('thruster', THRUSTER_PRESS_START);
     expect(dist(rack.hR, [rack.neck[0] + 13, rack.neck[1] - 2])).toBeLessThan(
       0.5,
     );
-    const top = squatFamilyPose('thruster', 1);
+    const top = squatFamilyPose('thruster', THRUSTER_TOP);
     expect(top.hR[1]).toBeLessThanOrEqual(top.head[1] - 15);
   });
+  it.each(['thruster', 'single-arm-thruster'] as const)(
+    '%s is one pass per rep: rack, squat, press, back in the rack',
+    (id) => {
+      const rack = squatFamilyPose(id, 0);
+      // Standing with the weight at the shoulder (the Start, tips and live phase 0).
+      expect(dist(rack.hip, [98, 118])).toBeLessThan(2);
+      expect(dist(rack.hR, [rack.neck[0] + 13, rack.neck[1] - 2])).toBeLessThan(
+        0.5,
+      );
+      expect(figures[id].motion).toBe('sequence');
+      expect(figures[id].start).toEqual(rack);
+      // The loop closes: the lowered weight ends where it began.
+      expect(dist(squatFamilyPose(id, 1).hR, rack.hR)).toBeLessThan(0.01);
+      expect(dist(squatFamilyPose(id, 1).hip, rack.hip)).toBeLessThan(0.01);
+      // First movement is the descent: the hip sinks while the weight stays on the shoulder.
+      const down = squatFamilyPose(id, THRUSTER_BOTTOM / 2);
+      expect(down.hip[1]).toBeGreaterThan(rack.hip[1] + 5);
+      expect(dist(down.hR, [down.neck[0] + 13, down.neck[1] - 2])).toBeLessThan(
+        0.5,
+      );
+      const bottom = squatFamilyPose(id, THRUSTER_BOTTOM);
+      expect(bottom.hip[1]).toBeGreaterThan(rack.hip[1] + 15);
+      // Then drive and press, ending overhead; the return lowers to the shoulder.
+      const top = squatFamilyPose(id, THRUSTER_TOP);
+      expect(top.hR[1]).toBeLessThan(top.head[1] - 15);
+      const lowering = squatFamilyPose(id, 0.85);
+      expect(lowering.hR[1]).toBeGreaterThan(top.hR[1]);
+      expect(lowering.hR[1]).toBeLessThan(bottom.hR[1]);
+    },
+  );
   it('kettlebell goblet squat shares one grip point', () => {
     const p = squatFamilyPose('kettlebell-goblet-squat', 0.7);
     expect(p.hR).toEqual(p.hL);

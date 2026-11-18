@@ -28,6 +28,8 @@ const TORSO = 44;
 const NECK_TO_HEAD = 14;
 const THIGH = 30.8;
 const SHIN = 26.5;
+export const SQUAT_FAMILY_THIGH = THIGH;
+export const SQUAT_FAMILY_SHIN = SHIN;
 const ANKLE_R: Pt = [108, 174];
 const ANKLE_L: Pt = [86, 174];
 const TOE = (a: Pt): Pt => [a[0] + 11, a[1] + 3];
@@ -64,13 +66,35 @@ export function squatCurlPhase(t: number): { depth: number; curl: number } {
 }
 
 /**
- * Thrusters: the legs drive up over t = 0..THRUSTER_LEGS_DONE and the press
- * starts at THRUSTER_PRESS_START, while the last part of the leg extension is
- * still under way ('När höfter och knän sträcks, pressa'). The standing rack
- * (hands at the shoulders, legs straight) is the Start still.
+ * Thrusters, in "stages" (0 = bottom of the squat, 1 = overhead): the legs
+ * drive up over stage 0..THRUSTER_LEGS_DONE and the press starts at
+ * THRUSTER_PRESS_START, while the last part of the leg extension is still under
+ * way ('När höfter och knän sträcks, pressa'). The standing rack (hands at the
+ * shoulders, legs nearly straight) is stage THRUSTER_PRESS_START.
+ *
+ * The figure itself is one pass per repetition (a sequence, like the
+ * squat-curl): standing in the rack (0), down to the bottom (THRUSTER_BOTTOM),
+ * drive and press to overhead (THRUSTER_TOP), then lower to the shoulders back
+ * in the rack (1 = 0). Start, tips, reduced-motion stills, the live loop and
+ * the counter all begin standing with the weights at the shoulders.
  */
 export const THRUSTER_LEGS_DONE = 0.46;
 export const THRUSTER_PRESS_START = 0.4;
+export const THRUSTER_BOTTOM = 0.2;
+export const THRUSTER_TOP = 0.7;
+
+/** Stage (0 bottom .. 1 overhead) at sequence progress `u` (0 rack .. 1 rack). */
+export function thrusterStage(u: number): number {
+  const p = clamp(u);
+  if (p <= THRUSTER_BOTTOM)
+    return THRUSTER_PRESS_START * (1 - smooth(p / THRUSTER_BOTTOM));
+  if (p <= THRUSTER_TOP) {
+    const s = (p - THRUSTER_BOTTOM) / (THRUSTER_TOP - THRUSTER_BOTTOM);
+    return 1 - (1 - s) * (1 - s);
+  }
+  const w = (p - THRUSTER_TOP) / (1 - THRUSTER_TOP);
+  return 1 - (1 - THRUSTER_PRESS_START) * smooth(w);
+}
 
 /** Labelled stills for reduced motion; the loop itself starts standing. */
 export function squatFamilyStills(
@@ -84,9 +108,9 @@ export function squatFamilyStills(
     ];
   if (id === 'thruster' || id === 'single-arm-thruster')
     return [
-      ['Start', THRUSTER_PRESS_START],
-      ['Botten', 0],
-      ['Slut', 1],
+      ['Start', 0],
+      ['Botten', THRUSTER_BOTTOM],
+      ['Slut', THRUSTER_TOP],
     ];
   return undefined;
 }
@@ -146,20 +170,8 @@ export function squatFamilyPose(id: SquatFamilyId, progress: number): Pose {
       hL: polar(eL, 23, angle),
     });
   }
-  if (id === 'thruster' || id === 'single-arm-thruster') {
-    const depth = 1 - smooth(clamp(t / THRUSTER_LEGS_DONE));
-    const press = clamp(
-      (t - THRUSTER_PRESS_START) / (1 - THRUSTER_PRESS_START),
-    );
-    const { neck } = body(depth);
-    const reach = lerpPt([13, -2], [8, -43], press);
-    const near = arm(neck, add(neck, reach), 23, 22);
-    const far =
-      id === 'thruster'
-        ? arm(neck, add(neck, [reach[0] - 2, reach[1] + 1]), 23, 22)
-        : arm(neck, add(neck, [-3, 44]), 23, 22);
-    return assemble(depth, { eR: near.e, hR: near.h, eL: far.e, hL: far.h });
-  }
+  if (id === 'thruster' || id === 'single-arm-thruster')
+    return thrusterStagePose(id, thrusterStage(t));
   // Goblet squats: t = 0 standing, t = 1 bottom.
   const { neck } = body(t);
   const a = arm(neck, add(neck, [13, 6]), 24, 20);
@@ -167,6 +179,24 @@ export function squatFamilyPose(id: SquatFamilyId, progress: number): Pose {
     return assemble(t, { eR: a.e, hR: a.h, eL: a.e, hL: a.h });
   const b = arm(neck, add(neck, [11, 9]), 24, 20);
   return assemble(t, { eR: a.e, hR: a.h, eL: b.e, hL: b.h });
+}
+
+/** Thruster pose at a stage (see THRUSTER_PRESS_START), independent of the timeline. */
+export function thrusterStagePose(
+  id: 'thruster' | 'single-arm-thruster',
+  stage: number,
+): Pose {
+  const t = clamp(stage);
+  const depth = 1 - smooth(clamp(t / THRUSTER_LEGS_DONE));
+  const press = clamp((t - THRUSTER_PRESS_START) / (1 - THRUSTER_PRESS_START));
+  const { neck } = body(depth);
+  const reach = lerpPt([13, -2], [8, -43], press);
+  const near = arm(neck, add(neck, reach), 23, 22);
+  const far =
+    id === 'thruster'
+      ? arm(neck, add(neck, [reach[0] - 2, reach[1] + 1]), 23, 22)
+      : arm(neck, add(neck, [-3, 44]), 23, 22);
+  return assemble(depth, { eR: near.e, hR: near.h, eL: far.e, hL: far.h });
 }
 
 export const isSquatFamily = (id: string): id is SquatFamilyId =>

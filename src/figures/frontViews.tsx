@@ -13,6 +13,10 @@ import type { Pose } from './poses';
 import { figures } from './poses';
 import { FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { joint } from './rehabPoses';
+import {
+  SQUAT_FAMILY_SHIN as SQUAT_SHIN,
+  SQUAT_FAMILY_THIGH as SQUAT_THIGH,
+} from './squatFamilyKeyframes';
 
 export const supportedFrontViews = [
   'seated-tibial-rotation',
@@ -135,6 +139,9 @@ function skeleton(
 
 /** A hair under the 36 px side-view thigh so rounding never exceeds the front-view limit. */
 const FRONT_THIGH = 35.9;
+/** Thigh and shin of the standing profile figure (`stand` in additionalPoses.ts): the front caps. */
+const FRONT_STAND_THIGH = 30.6;
+const FRONT_STAND_SHIN = 26.3;
 /** Front stance from the hip and both ankles; the legs are solved so thigh and shin keep their length. */
 function frontStance(hip: Pt, aR: Pt, aL: Pt, toeDx: number): Pose {
   const neck = point(hip[0], hip[1] - 43);
@@ -284,14 +291,18 @@ export const WOODCHOP_FRONT_FIXED_FOOT_X = 118;
  * knee swings about the hip-ankle axis, so the segments shorten a little in
  * this frontal projection, the way a turned knee foreshortens.
  */
-function turnedKnee(hip: Pt, ankle: Pt, bend: number): Pt {
+function turnedKnee(
+  hip: Pt,
+  ankle: Pt,
+  bend: number,
+  thigh: number,
+  shin: number,
+): Pt {
   const dx = ankle[0] - hip[0];
   const dy = ankle[1] - hip[1];
   const d = Math.hypot(dx, dy);
-  const along = (FRONT_THIGH * FRONT_THIGH - 34 * 34 + d * d) / (2 * d);
-  const height = Math.sqrt(
-    Math.max(0, FRONT_THIGH * FRONT_THIGH - along * along),
-  );
+  const along = (thigh * thigh - shin * shin + d * d) / (2 * d);
+  const height = Math.sqrt(Math.max(0, thigh * thigh - along * along));
   return point(
     hip[0] + (dx / d) * along - (dy / d) * height * bend,
     hip[1] + (dy / d) * along + (dx / d) * height * bend,
@@ -326,7 +337,9 @@ function carryFrontLegs(t: number): {
 }
 function woodchopFrontPose(t: number): Pose {
   const s = smooth(t);
-  const hip = point(mix(96, 104, s), mix(121, 117, s));
+  // The hip stays within reach of the planted foot (thigh 30.6 + shin 26.3 as in
+  // the profile).
+  const hip = point(mix(96, 104, s), mix(122, 119.5, s));
   const neck = point(mix(93, 107, s), hip[1] - 43);
   const head = point(neck[0] + mix(-1, 2, s), neck[1] - 14);
   // The shared grip: right hip, up across the chest, over the left shoulder.
@@ -334,7 +347,7 @@ function woodchopFrontPose(t: number): Pose {
   const bow = Math.sin(Math.PI * s);
   const grip = point(mix(86, 122, s) + 10 * bow, mix(120, 36, s) + 20 * bow);
   // Both hands hold one weight, so both arms follow the same chain.
-  const arm = solveTwoBone(neck, grip, 24, 24, -1);
+  const arm = solveTwoBone(neck, grip, 24.6, 22.6, -1);
   // Right (pivot) foot: the toe stays on the floor and the foot turns about
   // it, from pointing outwards to pointing across; as it turns the heel rises
   // (ankle y = 177 - foot length * sin) with the foot length constant.
@@ -354,10 +367,10 @@ function woodchopFrontPose(t: number): Pose {
     arm.end,
     // The knee follows the foot: outward while the toe points out, over the
     // inward-pointing toe at the finish (not outward of a toe that points in).
-    turnedKnee(hip, aR, mix(1, -0.8, s)),
+    turnedKnee(hip, aR, mix(1, -0.8, s), FRONT_STAND_THIGH, FRONT_STAND_SHIN),
     aR,
     tR,
-    joint(hip, aL, FRONT_THIGH, 34, -1),
+    joint(hip, aL, FRONT_STAND_THIGH, FRONT_STAND_SHIN, -1),
     aL,
     tL,
   );
@@ -481,54 +494,63 @@ export function frontMovementPose(
   }
   if (exerciseId === 'side-lunge') {
     const side = working === 'left' ? 1 : -1;
-    // First step the selected foot out; then sit the hips toward that side
-    // while the selected knee bends and the opposite leg stays long.
+    // Legs and arms keep the profile's standing lengths (thigh 30.6, shin 26.3;
+    // arm 24.6 + 22.6), so the stance is narrower than a long-legged figure
+    // would take: first the selected foot steps out (the hips settle a little to
+    // stay in reach), then the hips sit toward that side over the bent knee
+    // while the opposite leg stays planted and nearly straight.
     const step = clamp(t * 2);
     const depth = clamp((t - 0.5) * 2);
-    const selectedAnkleStartX = 100 + side * 10;
-    const selectedAnkleEndX = 100 + side * 30;
-    const selectedAnkleX = mix(selectedAnkleStartX, selectedAnkleEndX, step);
     // The stepping foot leaves the floor on its way out (and in on the return)
     // and is planted again before the knee bends.
     const stepLift = 9 * Math.sin(Math.PI * step);
-    const otherAnkleX = 100 - side * 30;
-    const hipX = mix(100, 100 + side * 18, depth);
-    const hipY = mix(116, 136, depth);
-    const neckX = mix(100, 100 + side * 10, depth);
-    const neckY = hipY - 44;
-    const selectedStraightRatio = (148 - hipY) / (174 - hipY);
+    const selectedAnkleX = 100 + side * mix(9, 24, step);
+    const otherAnkleX = 100 - side * 9;
+    const hipX = 100 + side * 20 * depth;
+    const hipY = mix(mix(118, 123, step), 136, depth);
+    const hip = point(hipX, hipY);
+    // The trunk (43) leans a little back toward the middle as the hips shift.
+    const lean = -side * 10 * depth;
+    const neckX = hipX + lean;
+    const neckY = hipY - Math.sqrt(43 * 43 - lean * lean);
+    const neck = point(neckX, neckY);
+    // Knees travel outward over the toes (away from the middle line).
     const selected = {
-      knee: point(
-        mix(
-          hipX + (selectedAnkleX - hipX) * selectedStraightRatio,
-          selectedAnkleX + side * 2,
-          depth,
-        ),
-        mix(148, 153, depth) - stepLift * 0.5,
-      ),
       ankle: point(selectedAnkleX, 174 - stepLift),
       toe: point(selectedAnkleX + side * 10, 177 - stepLift),
     };
-    const otherKneeY = mix(148, 151, depth);
     const other = {
-      knee: point(
-        hipX + (otherAnkleX - hipX) * ((otherKneeY - hipY) / (174 - hipY)),
-        otherKneeY,
-      ),
       ankle: point(otherAnkleX, 174),
       toe: point(otherAnkleX - side * 10, 177),
     };
-    const right = working === 'left' ? other : selected;
-    const left = working === 'left' ? selected : other;
-    const hands = point(neckX, neckY + 27);
+    const sel = {
+      ...selected,
+      knee: joint(
+        hip,
+        selected.ankle,
+        FRONT_STAND_THIGH,
+        FRONT_STAND_SHIN,
+        -side,
+      ),
+    };
+    const oth = {
+      ...other,
+      knee: joint(hip, other.ankle, FRONT_STAND_THIGH, FRONT_STAND_SHIN, side),
+    };
+    const right = working === 'left' ? oth : sel;
+    const left = working === 'left' ? sel : oth;
+    // Hands hold the weight near the chest, as the profile does.
+    const hands = point(neckX, neckY + 18);
+    const armR = solveTwoBone(neck, hands, 24.6, 22.6, 1);
+    const armL = solveTwoBone(neck, hands, 24.6, 22.6, -1);
     return skeleton(
       point(neckX, neckY - 14),
-      point(neckX, neckY),
-      point(hipX, hipY),
-      point(neckX - 18, neckY + 19),
-      hands,
-      point(neckX + 18, neckY + 19),
-      hands,
+      neck,
+      hip,
+      armR.mid,
+      armR.end,
+      armL.mid,
+      armL.end,
       right.knee,
       right.ankle,
       right.toe,
@@ -757,19 +779,20 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'kettlebell-goblet-squat') {
-    // Same legs as the goblet squat; both hands sit on the bell's horns at
-    // chest height with the elbows tucked in (hands at 94/106 = the handle
-    // width of Held), so the grip survives the whole squat.
+    // Same legs and arms as the profile (thigh 30.8, shin 26.5, arm 24 + 20, the
+    // squat family constants): upright standing at the start, the knees travel
+    // out over the toes while the feet stay planted. Both hands sit on the
+    // bell's horns at chest height (hands at 94/106 = the handle width of Held),
+    // so the grip survives the whole squat.
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
-    // Feet stay planted; the knees travel out with the thigh/shin lengths kept.
     const hip = point(100, hipY);
-    const aR = point(86, 174);
-    const aL = point(114, 174);
+    const aR = point(88, 174);
+    const aL = point(112, 174);
     const neck = point(100, neckY);
     const gripY = neckY + 13;
-    const armR = solveTwoBone(neck, [94, gripY], 27, 23, -1);
-    const armL = solveTwoBone(neck, [106, gripY], 27, 23, 1);
+    const armR = solveTwoBone(neck, [94, gripY], 24, 20, -1);
+    const armL = solveTwoBone(neck, [106, gripY], 24, 20, 1);
     return skeleton(
       point(100, neckY - 14),
       neck,
@@ -778,12 +801,12 @@ export function frontMovementPose(
       armR.end,
       armL.mid,
       armL.end,
-      joint(hip, aR, FRONT_THIGH, 34, 1),
+      joint(hip, aR, SQUAT_THIGH, SQUAT_SHIN, 1),
       aR,
-      point(72, 177),
-      joint(hip, aL, FRONT_THIGH, 34, -1),
+      point(77, 177),
+      joint(hip, aL, SQUAT_THIGH, SQUAT_SHIN, -1),
       aL,
-      point(128, 177),
+      point(123, 177),
     );
   }
   if (exerciseId === 'goblet-squat') {
