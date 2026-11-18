@@ -8,6 +8,11 @@ import {
   type Pt,
   path,
 } from './PronePlacementDiagrams';
+import {
+  KettlebellDeadliftDiagram,
+  SupportedRowDiagram,
+  TwoHandKettlebellSwingDiagram,
+} from './StanceDiagramsHinge';
 
 /**
  * Static top-down (plan view) diagrams for standing exercises whose profile
@@ -30,6 +35,11 @@ export const STANCE_DIAGRAM_IDS = [
   'walking-lunge',
   'one-arm-kettlebell-swing',
   'kettlebell-halo',
+  'single-leg-hip-thrust',
+  'renegade-row',
+  'kettlebell-deadlift',
+  'kettlebell-swing',
+  'supported-row',
 ] as const satisfies readonly ExerciseId[];
 
 export type StanceDiagramId = (typeof STANCE_DIAGRAM_IDS)[number];
@@ -104,6 +114,36 @@ export const HALO = {
   pathR: 30,
   weightR: 6,
   shoulderY: 114,
+} as const;
+
+/**
+ * Single-leg hip thrust plan (lying on the back, head up): upper back on the
+ * bench, pelvis lifted and level, one foot on the floor, the other leg lifted.
+ */
+export const HIP_THRUST = {
+  head: [MID, 20] as Pt,
+  benchY: 30,
+  benchH: 24,
+  benchHalf: 32,
+  shoulderY: 42,
+  pelvisY: 92,
+  pelvisHalf: PELVIS_HALF,
+  kneeY: 112,
+  footY: 134,
+  freeKneeY: 108,
+  freeFootY: 124,
+} as const;
+
+/** Renegade row plan (plank, head up): two handles under the shoulders, wide feet. */
+export const RENEGADE = {
+  head: [MID, 20] as Pt,
+  shoulderY: 54,
+  shoulderHalf: SHOULDER_HALF,
+  handY: 46,
+  pelvisY: 100,
+  pelvisHalf: PELVIS_HALF,
+  footY: 140,
+  footHalf: 26,
 } as const;
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
@@ -662,6 +702,172 @@ export function KettlebellHaloDiagram() {
   );
 }
 
+const levelLine = (y: number) => (
+  <path
+    key={y}
+    data-level=""
+    d={path([
+      [26, y],
+      [134, y],
+    ])}
+    fill="none"
+    stroke="var(--accent)"
+    strokeWidth="2"
+    strokeDasharray="3 4"
+  />
+);
+
+const supportBase = (pts: Pt[]) => (
+  <path
+    data-support-base=""
+    d={`${path(pts)}Z`}
+    fill="var(--edge)"
+    fillOpacity="0.18"
+    stroke="var(--edge)"
+    strokeWidth="2.5"
+    strokeDasharray="4 4"
+    strokeLinejoin="round"
+  />
+);
+
+export function SingleLegHipThrustDiagram() {
+  const h = HIP_THRUST;
+  const supportHip: Pt = [MID - h.pelvisHalf, h.pelvisY];
+  const freeHip: Pt = [MID + h.pelvisHalf, h.pelvisY];
+  const supportKnee: Pt = [supportHip[0], h.kneeY];
+  const supportFoot: Pt = [supportHip[0], h.footY];
+  const freeKnee: Pt = [freeHip[0], h.freeKneeY];
+  const freeFoot: Pt = [freeHip[0], h.freeFootY];
+  const benchEdge = h.benchY + h.benchH;
+  return (
+    <Frame
+      testId="placement-diagram-single-leg-hip-thrust"
+      label="Enbens bäckenlyft, bäcken och stödfot sedda uppifrån"
+      caption="Sedd uppifrån: axlarna vilar på stödet, bäckenlinjen är jämn och mitt under bålen, inte tippad åt den lyfta sidan. Den valda foten står i golvet rakt under höften; det andra benet är lyft och bär ingen vikt."
+    >
+      {supportBase([
+        [MID - h.benchHalf, benchEdge],
+        [MID + h.benchHalf, benchEdge],
+        supportFoot,
+      ])}
+      <rect
+        data-support=""
+        x={MID - h.benchHalf}
+        y={h.benchY}
+        width={2 * h.benchHalf}
+        height={h.benchH}
+        rx="4"
+        fill="var(--edge)"
+        fillOpacity="0.18"
+        stroke="var(--edge)"
+        strokeWidth="2.5"
+      />
+      {levelLine(h.pelvisY)}
+      <Head at={h.head} />
+      <Bars
+        shoulderY={h.shoulderY}
+        pelvisY={h.pelvisY}
+        pelvisHalf={h.pelvisHalf}
+      />
+      <Body>
+        <path
+          data-leg="support"
+          d={path([supportHip, supportKnee, supportFoot])}
+        />
+        <path
+          data-leg="free"
+          d={path([freeHip, freeKnee, freeFoot])}
+          strokeDasharray="4 4"
+        />
+      </Body>
+      <Foot at={supportFoot} />
+      <Foot at={freeFoot} ghost />
+    </Frame>
+  );
+}
+
+export function RenegadeRowDiagram() {
+  const r = RENEGADE;
+  const handles = [-1, 1].map((s) => ({
+    shoulder: [MID + s * r.shoulderHalf, r.shoulderY] as Pt,
+    hand: [MID + s * r.shoulderHalf, r.handY] as Pt,
+  }));
+  const [left, right] = feetAt(r.footHalf, r.footY);
+  const row = handles[1]?.hand ?? [MID, r.handY];
+  return (
+    <Frame
+      testId="placement-diagram-renegade-row"
+      label="Renegaderodd, handtag, fötter och bäcken sedda uppifrån"
+      caption="Sedd uppifrån: handtagen axelbrett isär med händerna rakt under axlarna, fötterna brett isär. Axel- och bäckenlinjen ligger jämnt och parallella hela rodden, utan rotation. Den ena hanteln dras mot höften, den andra stödjer."
+    >
+      {supportBase([
+        [MID - r.shoulderHalf, r.handY],
+        [MID + r.shoulderHalf, r.handY],
+        right,
+        left,
+      ])}
+      {levelLine(r.shoulderY)}
+      {levelLine(r.pelvisY)}
+      <Head at={r.head} />
+      <Bars
+        shoulderY={r.shoulderY}
+        pelvisY={r.pelvisY}
+        shoulderHalf={r.shoulderHalf}
+        pelvisHalf={r.pelvisHalf}
+      />
+      <Body>
+        <path
+          data-leg=""
+          d={path([
+            [MID - r.pelvisHalf, r.pelvisY],
+            [left[0], r.footY - 8],
+          ])}
+        />
+        <path
+          data-leg=""
+          d={path([
+            [MID + r.pelvisHalf, r.pelvisY],
+            [right[0], r.footY - 8],
+          ])}
+        />
+      </Body>
+      <g
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="5"
+        strokeLinecap="round"
+      >
+        {handles.map((a) => (
+          <path key={a.hand[0]} data-arm="" d={path([a.shoulder, a.hand])} />
+        ))}
+      </g>
+      {handles.map((a) => (
+        <rect
+          key={a.hand[0]}
+          data-weight=""
+          x={a.hand[0] - 4}
+          y={a.hand[1] - 10}
+          width="8"
+          height="20"
+          rx="2"
+          fill="var(--paper)"
+          stroke="var(--equipment)"
+          strokeWidth="3"
+        />
+      ))}
+      {handles.map((a) => (
+        <HandRect key={a.hand[0]} at={[a.hand[0], a.hand[1] + 2]} />
+      ))}
+      <Arrow
+        from={[row[0] + 14, row[1] + 4]}
+        to={[row[0] + 14, r.pelvisY - 6]}
+      />
+      <Foot at={left} />
+      <Foot at={right} />
+    </Frame>
+  );
+}
+
 export function StanceDiagram({ exerciseId }: { exerciseId: ExerciseId }) {
   switch (exerciseId) {
     case 'squat-jump':
@@ -688,6 +894,16 @@ export function StanceDiagram({ exerciseId }: { exerciseId: ExerciseId }) {
       return <KettlebellSwingDiagram />;
     case 'kettlebell-halo':
       return <KettlebellHaloDiagram />;
+    case 'single-leg-hip-thrust':
+      return <SingleLegHipThrustDiagram />;
+    case 'renegade-row':
+      return <RenegadeRowDiagram />;
+    case 'kettlebell-deadlift':
+      return <KettlebellDeadliftDiagram />;
+    case 'kettlebell-swing':
+      return <TwoHandKettlebellSwingDiagram />;
+    case 'supported-row':
+      return <SupportedRowDiagram />;
     default:
       return null;
   }

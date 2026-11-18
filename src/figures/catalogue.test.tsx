@@ -5,7 +5,7 @@ import { exerciseList } from '../content/exercises';
 import { loadPresentation } from '../content/loadPresentation';
 import { FigureFrame, movementPose } from './Figure';
 import { checkPoseGeometry } from './keyframes';
-import { figures } from './poses';
+import { figures, type Pose } from './poses';
 
 describe('catalogue equipment and contacts', () => {
   it('extends the seated knee without shortening the shin, bending the foot or moving the chair-supported body', () => {
@@ -279,9 +279,19 @@ describe('catalogue equipment and contacts', () => {
     expect(figures['reverse-lunge'].middle?.aR).toEqual(
       figures['reverse-lunge'].end.aR,
     );
-    expect(movementPose('kettlebell-swing', 0.5)).toEqual(
-      figures['kettlebell-swing'].middle,
-    );
+    // The segment-length rules re-solve the authored middle: equal to rounding.
+    const swingMiddle = figures['kettlebell-swing'].middle;
+    const drawnSwingMiddle = movementPose('kettlebell-swing', 0.5);
+    for (const key of Object.keys(drawnSwingMiddle) as (keyof Pose)[]) {
+      expect(drawnSwingMiddle[key][0]).toBeCloseTo(
+        swingMiddle?.[key][0] ?? 0,
+        6,
+      );
+      expect(drawnSwingMiddle[key][1]).toBeCloseTo(
+        swingMiddle?.[key][1] ?? 0,
+        6,
+      );
+    }
     expect(figures['kettlebell-swing'].motion).toBe('ballistic');
   });
 });

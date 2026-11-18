@@ -200,6 +200,13 @@ describe('spoken cue words', () => {
       down: 'Tillbaka',
     });
   });
+  it('half squat says down, hold, up in the order the figure moves', () => {
+    expect(repTempo('half-squat')?.cues).toEqual({
+      up: 'Ner',
+      hold: 'Håll',
+      down: 'Upp',
+    });
+  });
   it('other held exercises keep the generic words', () => {
     expect(repTempo('prone-leg-raise')?.cues).toBeUndefined();
   });

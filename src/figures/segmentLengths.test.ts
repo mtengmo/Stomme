@@ -111,6 +111,13 @@ describe('keepSegmentLengths', () => {
   });
 });
 
+const ARMS: readonly (readonly [PoseKey, PoseKey])[] = [
+  ['neck', 'eR'],
+  ['eR', 'hR'],
+  ['neck', 'eL'],
+  ['eL', 'hL'],
+];
+
 /** Segments that must keep one length through the whole loop, per exercise. */
 const CONSTANT: Partial<
   Record<ExerciseId, readonly (readonly [PoseKey, PoseKey])[]>
@@ -124,6 +131,33 @@ const CONSTANT: Partial<
     ['neck', 'eL'],
     ['eL', 'hL'],
   ],
+  // Arms that turn about fixed joints (armSweep.ts).
+  'shoulder-press': ARMS,
+  'biceps-curl': ARMS,
+  'hammer-curl': ARMS,
+  'lateral-raise': ARMS,
+  'kettlebell-press': ARMS,
+  'supported-row': [
+    ['neck', 'eR'],
+    ['eR', 'hR'],
+  ],
+  'triceps-kickback': [
+    ['neck', 'eR'],
+    ['eR', 'hR'],
+  ],
+  'kettlebell-swing': SEGMENTS,
+  'glute-bridge': [
+    ['neck', 'hip'],
+    ['hip', 'kR'],
+    ['kR', 'aR'],
+    ['hip', 'kL'],
+    ['kL', 'aL'],
+    ['aR', 'tR'],
+    ['aL', 'tL'],
+  ],
+  // Standing leg lengths in every frame (the start is upright, no bent knees).
+  'reverse-lunge': SEGMENTS,
+  'forward-lunge': SEGMENTS,
   'dead-bug': SEGMENTS,
   'bird-dog': SEGMENTS,
   'side-plank': SEGMENTS,

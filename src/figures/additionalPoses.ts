@@ -1,4 +1,11 @@
 import type { ExerciseId } from '../domain/types';
+import {
+  ARM_FORE,
+  ARM_UPPER,
+  type ArmAngles,
+  mixAngle,
+  sweepArm,
+} from './armSweep';
 import { pushUp } from './bodyweightPoses';
 import { farmerCarryPose, rackCarryPose } from './carryPoses';
 import { hingeFamilyPose } from './hingeFamilyKeyframes';
@@ -83,6 +90,27 @@ export const ADDITIONAL_SEGMENT_RULES: Partial<
     headNeck(),
     arm('R', { straight: true }),
     arm('L', { straight: true }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+  // Both hands share the bell: both arms hang or swing straight at full reach,
+  // the trunk and legs keep their standing lengths through the hinge and drive.
+  'kettlebell-swing': [
+    trunk(),
+    headNeck(),
+    arm('R', { straight: true }),
+    arm('L', { straight: true }),
+    leg('R'),
+    leg('L'),
+    foot('R'),
+    foot('L'),
+  ],
+  // Bodyweight bridge: the shoulders stay on the mat, the hip follows the arc of
+  // a constant trunk, both legs keep their length and the feet stay planted.
+  'glute-bridge': [
+    bone('neck', 'hip'),
     leg('R'),
     leg('L'),
     foot('R'),
@@ -364,26 +392,6 @@ const bridgeStart = p(
     [147, 177],
   ],
 );
-const lungeEnd = p(
-  [104, 85],
-  [102, 99],
-  [100, 138],
-  [
-    [105, 121],
-    [108, 141],
-    [91, 121],
-    [88, 141],
-  ],
-  [
-    [131, 141],
-    [133, 174],
-    [145, 177],
-    [77, 164],
-    [55, 167],
-    [62, 177],
-  ],
-);
-
 function forwardBendingKnee(hip: P, ankle: P): P {
   const upper = 34;
   const lower = 32;
@@ -472,10 +480,30 @@ export function hamstringCurlPose(progress: number): Pose {
       knee[1] + dx * Math.sin(angle) + dy * Math.cos(angle),
     ];
   };
+  const ankle = rotate(supportedStand.aR);
+  // The foot keeps its length but is not rotated rigidly with the shin: a rigid
+  // foot swings the toe into the floor at the start of the lift. The toe stays
+  // on the floor at phase 0 and clears it by 4 units after the first 10 degrees
+  // of knee flexion; later the toe points down (plantar flexion) as it would.
+  const footLength = Math.hypot(
+    supportedStand.tR[0] - supportedStand.aR[0],
+    supportedStand.tR[1] - supportedStand.aR[1],
+  );
+  const rigid =
+    Math.atan2(
+      supportedStand.tR[1] - supportedStand.aR[1],
+      supportedStand.tR[0] - supportedStand.aR[0],
+    ) + angle;
+  const ceiling = 177 - 4 * Math.min(1, angle / ((10 * Math.PI) / 180));
+  const ratio = Math.max(-1, Math.min(1, (ceiling - ankle[1]) / footLength));
+  const footAngle = Math.min(rigid, Math.asin(ratio));
   return {
     ...supportedStand,
-    aR: rotate(supportedStand.aR),
-    tR: rotate(supportedStand.tR),
+    aR: ankle,
+    tR: [
+      ankle[0] + footLength * Math.cos(footAngle),
+      ankle[1] + footLength * Math.sin(footAngle),
+    ],
   };
 }
 const seatedKneeExtensionStart = p(
@@ -597,6 +625,117 @@ const wgbEnd: Pose = withLengths(
 );
 
 /**
+ * Bodyweight glute bridge, side view. Same body as the weighted bridge: pelvis
+ * resting on the mat at the start, trunk 44, legs 36 + 39.5, planted feet. The
+ * arms lie straight along the mat beside the body (23.1 + 23.1, hands on the mat).
+ */
+const gbArm = (hand: Pt) =>
+  solveTwoBone(bridgeStart.neck, hand, 23.1, 23.1, -1);
+const gbStart: Pose = (() => {
+  const r = gbArm([100.5, 172.5]);
+  const l = gbArm([99, 172.5]);
+  return {
+    ...bridgeStart,
+    hip: wgbHip,
+    eR: r.mid,
+    hR: r.end,
+    eL: l.mid,
+    hL: l.end,
+    kR: wgbLeg(wgbHip, bridgeStart.aR).mid,
+    kL: wgbLeg(wgbHip, bridgeStart.aL).mid,
+  };
+})();
+const gbEnd: Pose = withLengths(
+  { ...gbStart, hip: [93.7, 150] },
+  'glute-bridge',
+  gbStart,
+);
+
+/**
+ * Lunges, side view: standing legs (thigh 30.6, shin 26.3, foot 11.4) at every
+ * frame, so the start is upright and no leg is ever longer than a standing one.
+ * Body and arms are the standing upper body moved with the hip; the knees are
+ * solved by two-bone IK and always bend forward (+x).
+ */
+const LUNGE_THIGH = 30.6;
+const LUNGE_SHIN = 26.3;
+const lungeKnee = (hip: Pt, ankle: Pt): Pt =>
+  solveTwoBone(hip, ankle, LUNGE_THIGH, LUNGE_SHIN, -1).mid;
+function lungePose(
+  hip: Pt,
+  lean: number,
+  front: readonly [Pt, Pt],
+  rear: readonly [Pt, Pt],
+): Pose {
+  const neck: Pt = [hip[0] + lean, hip[1] - Math.sqrt(44 * 44 - lean * lean)];
+  const at = (key: 'head' | 'eR' | 'hR' | 'eL' | 'hL'): Pt => [
+    neck[0] + stand[key][0] - stand.neck[0],
+    neck[1] + stand[key][1] - stand.neck[1],
+  ];
+  return {
+    head: at('head'),
+    neck,
+    hip,
+    eR: at('eR'),
+    hR: at('hR'),
+    eL: at('eL'),
+    hL: at('hL'),
+    kR: lungeKnee(hip, front[0]),
+    aR: front[0],
+    tR: front[1],
+    kL: lungeKnee(hip, rear[0]),
+    aL: rear[0],
+    tL: rear[1],
+  };
+}
+// Reverse lunge: the right foot stays planted in front, the left foot steps
+// back, lands on its toe (heel up) and stays there while the body lowers.
+const reverseFront: readonly [Pt, Pt] = [
+  [133, 174],
+  [144, 177],
+];
+const reverseRear: readonly [Pt, Pt] = [
+  [72, 168],
+  [79, 177],
+];
+const reverseLungeStart = lungePose([129, 118], 0, reverseFront, [
+  [123, 174],
+  [134, 177],
+]);
+const reverseLungeMiddle = lungePose([110, 128], 0, reverseFront, reverseRear);
+const reverseLungeEnd = lungePose([104, 140], 3, reverseFront, reverseRear);
+// Forward lunge: the left foot stays behind (heel rising at the bottom), the
+// right foot steps forward and the body lowers over the two feet.
+const forwardRear = (ankle: Pt): readonly [Pt, Pt] => [ankle, [98, 177]];
+const forwardLungeStart = lungePose(
+  [93, 118],
+  0,
+  [
+    [99, 174],
+    [110, 177],
+  ],
+  forwardRear([87, 174]),
+);
+const forwardLungeMiddle = lungePose(
+  [102, 131],
+  0,
+  [
+    [140, 172.5],
+    [150.5, 177],
+  ],
+  forwardRear([87, 174]),
+);
+const forwardLungeEnd = lungePose(
+  [106, 140],
+  3,
+  [
+    [141, 174],
+    [152, 177],
+  ],
+  forwardRear([88.1, 171.3]),
+);
+
+/**
  * Overhead triceps extension, side view. The upper arms stay beside the head
  * (elbows above the shoulders); the forearm (29.5) turns about the elbow from
  * the straight overhead start (phase 0), behind the head, to the lowered
@@ -660,6 +799,160 @@ export function russianTwistSidePose(progress: number): Pose {
   };
 }
 
+/**
+ * Arm exercises whose arms turn about fixed shoulders and elbows (see
+ * `armSweep.ts`): the upper arm and forearm keep one length through the whole
+ * loop, only their angles change. The far (left) arm is drawn beside the near
+ * one, as in the earlier keyframes.
+ */
+type ArmPath = readonly [ArmAngles, ArmAngles];
+const armAt = (path: ArmPath, t: number): ArmAngles => ({
+  upper: mixAngle(path[0].upper, path[1].upper, t),
+  fore: mixAngle(path[0].fore, path[1].fore, t),
+});
+const armPath = (
+  upper: readonly [number, number],
+  fore: readonly [number, number],
+): ArmPath => [
+  { upper: upper[0], fore: fore[0] },
+  { upper: upper[1], fore: fore[1] },
+];
+function armSweepPose(
+  base: Pose,
+  right: ArmPath,
+  left: ArmPath,
+  progress: number,
+  lengths: readonly [number, number] = [ARM_UPPER, ARM_FORE],
+): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const r = sweepArm(base.neck, armAt(right, t), ...lengths);
+  const l = sweepArm(base.neck, armAt(left, t), ...lengths);
+  return { ...base, eR: r.mid, hR: r.end, eL: l.mid, hL: l.end };
+}
+export const shoulderPressPose = (t: number) =>
+  armSweepPose(
+    shoulderStart,
+    armPath([64, 155], [178, 185]),
+    armPath([-64, -155], [-178, -185]),
+    t,
+  );
+export const bicepsCurlPose = (t: number) =>
+  armSweepPose(
+    stand,
+    armPath([26, 26], [8, 140]),
+    armPath([-26, -26], [-8, 140]),
+    t,
+  );
+export const hammerCurlPose = (t: number) =>
+  armSweepPose(
+    stand,
+    armPath([24, 24], [6, 138]),
+    armPath([-24, -24], [-6, 138]),
+    t,
+  );
+/** Both arms rise towards shoulder height, a little forward of the body. */
+export const lateralRaisePose = (t: number) =>
+  armSweepPose(
+    stand,
+    armPath([24, 82], [8, 76]),
+    armPath([14, 68], [0, 64]),
+    t,
+  );
+/** One arm presses overhead; the other hangs. */
+export const kettlebellPressPose = (t: number) =>
+  armSweepPose(
+    stand,
+    armPath([38, 158], [185, 190]),
+    armPath([-26, -26], [-8, -8]),
+    t,
+  );
+/**
+ * Bent-over stance of the supported row and the kickback: the support arm
+ * (24.2 + 24.2, hand on the step) and both legs (34 + 28.3) have equal, constant
+ * lengths, solved to the authored hand and ankles.
+ */
+const ROW_ARM: readonly [number, number] = [24.2, 24.2];
+const rowBase: Pose = (() => {
+  const support = solveTwoBone(rowStart.neck, rowStart.hL, 24.2, 24.2, -1);
+  return {
+    ...rowStart,
+    eL: support.mid,
+    hL: support.end,
+    kR: solveTwoBone(rowStart.hip, rowStart.aR, 34, 28.3, -1).mid,
+    kL: solveTwoBone(rowStart.hip, rowStart.aL, 34, 28.3, -1).mid,
+  };
+})();
+/** Rowing arm: the elbow pulls back, the forearm hangs down from it. */
+export const supportedRowPose = (t: number) => {
+  const pose = armSweepPose(
+    rowBase,
+    armPath([-7, -86], [-7, 3]),
+    armPath([0, 0], [0, 0]),
+    t,
+    ROW_ARM,
+  );
+  return { ...pose, eL: rowBase.eL, hL: rowBase.hL };
+};
+/** Kickback: the upper arm is held along the trunk, the forearm swings back. */
+export const tricepsKickbackPose = (t: number) => {
+  const pose = armSweepPose(
+    rowBase,
+    armPath([-68, -68], [-7, -66]),
+    armPath([0, 0], [0, 0]),
+    t,
+    ROW_ARM,
+  );
+  return { ...pose, eL: rowBase.eL, hL: rowBase.hL };
+};
+/** Profile poses of the exercises above, used by `movementPose`. */
+export const ARM_SWEEP_POSES: Partial<
+  Record<ExerciseId, (progress: number) => Pose>
+> = {
+  'shoulder-press': shoulderPressPose,
+  'biceps-curl': bicepsCurlPose,
+  'hammer-curl': hammerCurlPose,
+  'lateral-raise': lateralRaisePose,
+  'kettlebell-press': kettlebellPressPose,
+  'supported-row': supportedRowPose,
+  'triceps-kickback': tricepsKickbackPose,
+};
+
+/**
+ * Half squat, side view: both feet planted, hands on a support ahead (the wall
+ * line at x 157). The hip sinks and moves back, the trunk leans forward 18
+ * degrees; thigh 30.6, shin 26.3, trunk 44 and the arms (24.6 + 22.6, solved to
+ * the fixed hand holds) keep their length through the whole movement.
+ */
+const HALF_SQUAT_ANKLES = { R: [118, 174], L: [105, 174] } as const;
+const HALF_SQUAT_HANDS = { R: [154, 96.5], L: [154, 97.5] } as const;
+export function halfSquatPose(progress: number): Pose {
+  const t = Math.min(1, Math.max(0, progress));
+  const mixN = (a: number, b: number) => a + (b - a) * t;
+  const hip: Pt = [mixN(113, 110), mixN(118, 131)];
+  const lean = (18 * Math.PI * t) / 180;
+  const neck: Pt = [hip[0] + 44 * Math.sin(lean), hip[1] - 44 * Math.cos(lean)];
+  const head: Pt = [neck[0] + mixN(1, 3), neck[1] - mixN(13.96, 13.68)];
+  const armR = solveTwoBone(neck, HALF_SQUAT_HANDS.R, ARM_UPPER, ARM_FORE, 1);
+  const armL = solveTwoBone(neck, HALF_SQUAT_HANDS.L, ARM_UPPER, ARM_FORE, 1);
+  const aR: Pt = [...HALF_SQUAT_ANKLES.R];
+  const aL: Pt = [...HALF_SQUAT_ANKLES.L];
+  return {
+    head,
+    neck,
+    hip,
+    eR: armR.mid,
+    hR: armR.end,
+    eL: armL.mid,
+    hL: armL.end,
+    kR: solveTwoBone(hip, aR, LUNGE_THIGH, LUNGE_SHIN, -1).mid,
+    aR,
+    tR: [aR[0] + 11, 177],
+    kL: solveTwoBone(hip, aL, LUNGE_THIGH, LUNGE_SHIN, -1).mid,
+    aL,
+    tL: [aL[0] + 11, 177],
+  };
+}
+
 /** Individually authored start/mid/end geometry; no fallback motion for new IDs. */
 export const additionalFigures = {
   'kettlebell-floor-press': {
@@ -704,8 +997,8 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   'supported-row': {
-    start: rowStart,
-    end: { ...rowStart, eR: [101, 101], hR: [102, 124] },
+    start: supportedRowPose(0),
+    end: supportedRowPose(1),
     props: [{ type: 'step', x: 140, y: 125, w: 31 }],
     held: oneDumbbell,
   },
@@ -777,14 +1070,8 @@ export const additionalFigures = {
     held: twoDumbbells,
   },
   'shoulder-press': {
-    start: shoulderStart,
-    end: {
-      ...shoulderStart,
-      eR: [112, 59],
-      hR: [108, 34],
-      eL: [84, 59],
-      hL: [88, 34],
-    },
+    start: shoulderPressPose(0),
+    end: shoulderPressPose(1),
     props: [],
     held: twoDumbbells,
   },
@@ -822,50 +1109,32 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'biceps-curl': {
-    start: {
-      ...stand,
-      eR: [111, 97],
-      hR: [113, 121],
-      eL: [85, 97],
-      hL: [83, 121],
-    },
-    end: { ...stand, eR: [111, 97], hR: [125, 79], eL: [85, 97], hL: [99, 79] },
+    start: bicepsCurlPose(0),
+    end: bicepsCurlPose(1),
     props: [],
     held: twoDumbbells,
   },
   'hammer-curl': {
-    start: {
-      ...stand,
-      eR: [109, 98],
-      hR: [111, 122],
-      eL: [84, 98],
-      hL: [82, 122],
-    },
-    end: { ...stand, eR: [109, 98], hR: [123, 80], eL: [84, 98], hL: [98, 80] },
+    start: hammerCurlPose(0),
+    end: hammerCurlPose(1),
     props: [],
     held: twoDumbbells,
   },
   'lateral-raise': {
-    start: {
-      ...stand,
-      eR: [109, 96],
-      hR: [115, 118],
-      eL: [86, 96],
-      hL: [80, 118],
-    },
-    end: { ...stand, eR: [126, 78], hR: [151, 81], eL: [70, 78], hL: [45, 81] },
+    start: lateralRaisePose(0),
+    end: lateralRaisePose(1),
     props: [],
     held: twoDumbbells,
   },
   'triceps-kickback': {
-    start: { ...rowStart, eR: [100, 110], hR: [103, 136] },
-    end: { ...rowStart, eR: [100, 110], hR: [76, 120] },
+    start: tricepsKickbackPose(0),
+    end: tricepsKickbackPose(1),
     props: [{ type: 'step', x: 140, y: 125, w: 31 }],
     held: oneDumbbell,
   },
   'glute-bridge': {
-    start: bridgeStart,
-    end: { ...bridgeStart, hip: [99, 146], kR: [124, 144], kL: [116, 142] },
+    start: gbStart,
+    end: gbEnd,
     props: mat,
   },
   'weighted-glute-bridge': {
@@ -1010,108 +1279,74 @@ export const additionalFigures = {
     held: oneDumbbell,
   },
   'reverse-lunge': {
-    start: p(
-      [130, 60],
-      [129, 74],
-      [129, 118],
-      [
-        [140, 96],
-        [145, 118],
-        [118, 96],
-        [113, 118],
-      ],
-      [
-        [133, 148],
-        [133, 174],
-        [145, 177],
-        [125, 148],
-        [123, 174],
-        [135, 177],
-      ],
-    ),
-    middle: {
-      ...stand,
-      kR: [123, 148],
-      aR: [133, 174],
-      tR: [145, 177],
-      kL: [77, 146],
-      aL: [55, 168],
-      tL: [62, 177],
-    },
-    end: lungeEnd,
+    start: reverseLungeStart,
+    middle: reverseLungeMiddle,
+    end: reverseLungeEnd,
     props: [],
     held: twoDumbbells,
   },
   'forward-lunge': {
-    start: { ...stand, kR: [93, 148], aR: [89, 174], tR: [101, 177] },
-    middle: {
-      ...stand,
-      hip: [101, 118],
-      kR: [127, 145],
-      aR: [141, 170],
-      tR: [153, 173],
-      kL: [88, 148],
-      aL: [78, 174],
-      tL: [90, 177],
-    },
-    end: {
-      ...lungeEnd,
-      kR: [135, 142],
-      aR: [141, 174],
-      tR: [153, 177],
-      kL: [84, 165],
-      aL: [78, 167],
-      tL: [85, 177],
-    },
+    start: forwardLungeStart,
+    middle: forwardLungeMiddle,
+    end: forwardLungeEnd,
     props: [],
     held: twoDumbbells,
   },
   'kettlebell-swing': {
-    start: p(
-      [140, 99],
-      [127, 105],
-      [87, 121],
-      [
-        [109, 121],
-        [87, 141],
-        [107, 123],
-        [87, 141],
-      ],
-      [
-        [104, 147],
-        [108, 174],
-        [119, 177],
-        [88, 148],
-        [86, 174],
-        [97, 177],
-      ],
+    start: withLengths(
+      p(
+        [140, 99],
+        [127, 105],
+        [87, 121],
+        [
+          [109, 121],
+          [87, 141],
+          [107, 123],
+          [87, 141],
+        ],
+        [
+          [104, 147],
+          [108, 174],
+          [119, 177],
+          [88, 148],
+          [86, 174],
+          [97, 177],
+        ],
+      ),
+      'kettlebell-swing',
     ),
-    middle: p(
-      [111, 70],
-      [107, 84],
-      [98, 119],
-      [
-        [132, 102],
-        [151, 114],
-        [130, 102],
-        [151, 114],
-      ],
-      [
-        [104, 148],
-        [108, 174],
-        [119, 177],
-        [90, 148],
-        [86, 174],
-        [97, 177],
-      ],
+    middle: withLengths(
+      p(
+        [111, 70],
+        [107, 84],
+        [98, 119],
+        [
+          [132, 102],
+          [151, 114],
+          [130, 102],
+          [151, 114],
+        ],
+        [
+          [104, 148],
+          [108, 174],
+          [119, 177],
+          [90, 148],
+          [86, 174],
+          [97, 177],
+        ],
+      ),
+      'kettlebell-swing',
     ),
-    end: {
-      ...stand,
-      eR: [126, 79],
-      hR: [151, 82],
-      eL: [124, 80],
-      hL: [151, 82],
-    },
+    end: withLengths(
+      {
+        ...stand,
+        eR: [126, 79],
+        hR: [151, 82],
+        eL: [124, 80],
+        hL: [151, 82],
+      },
+      'kettlebell-swing',
+    ),
     props: [],
     held: oneBell,
     motion: 'ballistic',
@@ -1176,32 +1411,14 @@ export const additionalFigures = {
     motion: 'ballistic',
   },
   'kettlebell-press': {
-    start: { ...stand, eR: [113, 93], hR: [111, 72] },
-    end: { ...stand, eR: [108, 49], hR: [104, 27] },
+    start: kettlebellPressPose(0),
+    end: kettlebellPressPose(1),
     props: [],
     held: oneBell,
   },
   'half-squat': {
-    start: supportedStand,
-    end: p(
-      [106, 78],
-      [103, 92],
-      [86, 128],
-      [
-        [131, 94],
-        [155, 99],
-        [130, 98],
-        [155, 103],
-      ],
-      [
-        [111, 150],
-        [101, 174],
-        [112, 177],
-        [94, 150],
-        [88, 174],
-        [99, 177],
-      ],
-    ),
+    start: halfSquatPose(0),
+    end: halfSquatPose(1),
     props: wall,
   },
   'hamstring-curl': {

@@ -5,10 +5,12 @@ import {
   CALF,
   FOOT_HALF,
   HALO,
+  HIP_THRUST,
   haloPoint,
   hasStanceDiagram,
   LUNGE,
   PELVIS_HALF,
+  RENEGADE,
   SHOULDER_HALF,
   STANCE_DIAGRAM_IDS,
   StanceDiagram,
@@ -48,8 +50,8 @@ const bar = (markup: string, attr: string) => {
 };
 
 describe('standing placement diagrams', () => {
-  it('cover the twelve exercises, all in the catalogue', () => {
-    expect(STANCE_DIAGRAM_IDS).toHaveLength(12);
+  it('cover the seventeen exercises, all in the catalogue', () => {
+    expect(STANCE_DIAGRAM_IDS).toHaveLength(17);
     for (const id of STANCE_DIAGRAM_IDS) {
       expect(exercises[id]).toBeDefined();
       expect(hasStanceDiagram(id)).toBe(true);
@@ -206,6 +208,79 @@ describe('standing placement diagrams', () => {
       expect(count(markup, 'data-arm')).toBe(4);
       expect(markup).toContain('data-arm="flared"');
       expect(count(markup, 'data-weight')).toBe(1);
+    });
+  });
+
+  describe('single-leg hip thrust (E07)', () => {
+    const h = HIP_THRUST;
+    it('keeps the pelvis level and centred, with the shoulders on the bench', () => {
+      const markup = html('single-leg-hip-thrust');
+      const [x1, y1, x2, y2] = bar(markup, 'data-pelvis');
+      expect(y1).toBe(y2);
+      expect(y1).toBe(h.pelvisY);
+      expect(x1 + x2).toBe(2 * MID);
+      expect((x2 - x1) / 2).toBe(h.pelvisHalf);
+      const [s1, sy1, s2, sy2] = bar(markup, 'data-shoulders');
+      expect(sy1).toBe(sy2);
+      expect(s1 + s2).toBe(2 * MID);
+      // The shoulder line lies on the bench rectangle.
+      const m = markup.match(
+        /data-support="" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/,
+      );
+      const [bx = 0, by = 0, bw = 0, bh = 0] = (m ?? []).slice(1).map(Number);
+      expect(s1).toBeGreaterThan(bx);
+      expect(s2).toBeLessThan(bx + bw);
+      expect(sy1).toBeGreaterThan(by);
+      expect(sy1).toBeLessThan(by + bh);
+      expect(count(markup, 'data-level')).toBe(1);
+      expect(markup).toContain('bäckenlinjen är jämn');
+    });
+
+    it('stands on one foot under the hip and lifts the other leg, mirrored about the midline', () => {
+      const markup = html('single-leg-hip-thrust');
+      expect(count(markup, 'data-foot')).toBe(2);
+      expect(markup).toContain('data-foot="next"');
+      expect(markup).toContain('data-leg="support"');
+      expect(markup).toContain('data-leg="free"');
+      expect(markup).toContain('stroke-dasharray="4 4"');
+      const feet = centres(markup, 'data-foot');
+      expect(feet).toContain(MID - h.pelvisHalf);
+      expect(feet).toContain(MID + h.pelvisHalf);
+      expect(h.freeFootY).toBeLessThan(h.footY);
+      expect(count(markup, 'data-support-base')).toBe(1);
+      expect(markup).toContain('bär ingen vikt');
+    });
+  });
+
+  describe('renegade row (E107)', () => {
+    const r = RENEGADE;
+    it('puts two handles shoulder-wide apart with the hands straight under the shoulders', () => {
+      const markup = html('renegade-row');
+      expect(count(markup, 'data-weight')).toBe(2);
+      expect(count(markup, 'data-hand')).toBe(2);
+      expect(count(markup, 'data-arm')).toBe(2);
+      const handles = centres(markup, 'data-weight');
+      expect(handles).toEqual([MID - r.shoulderHalf, MID + r.shoulderHalf]);
+      expect(r.shoulderHalf).toBe(SHOULDER_HALF);
+      const [s1, , s2] = bar(markup, 'data-shoulders');
+      expect(s1).toBe(handles[0]);
+      expect(s2).toBe(handles[1]);
+      expect(markup).toContain('axelbrett');
+    });
+
+    it('has wide feet, and level, parallel, centred shoulder and pelvis lines', () => {
+      const markup = html('renegade-row');
+      expect(r.footHalf).toBeGreaterThan(SHOULDER_HALF);
+      expect(count(markup, 'data-foot')).toBe(2);
+      for (const attr of ['data-shoulders', 'data-pelvis']) {
+        const [x1, y1, x2, y2] = bar(markup, attr);
+        expect(y1).toBe(y2);
+        expect(x1 + x2).toBe(2 * MID);
+      }
+      expect(count(markup, 'data-level')).toBe(2);
+      expect(count(markup, 'data-support-base')).toBe(1);
+      expect(count(markup, 'data-arrow')).toBe(1);
+      expect(markup).toContain('utan rotation');
     });
   });
 

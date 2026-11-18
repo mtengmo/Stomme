@@ -200,7 +200,9 @@ const handlers: Record<RehabExerciseId, (t: number) => Pose> = {
     );
   },
   'single-leg-chair-squat': (t) => {
-    const hip: Pt = [mix(101, 80, t), mix(109, 140, t)],
+    // The start hip is 9 left of the earlier 101, so the held-out free foot (reach
+    // 68.5 ahead of the hip) and its toe stay inside the frame at Start.
+    const hip: Pt = [mix(92, 80, t), mix(109, 140, t)],
       ankle: Pt = [116, 174];
     const neck: Pt = [hip[0] + 10 * t, hip[1] - 43];
     // The free leg has the stance leg's lengths (36 + 36), thigh forward and

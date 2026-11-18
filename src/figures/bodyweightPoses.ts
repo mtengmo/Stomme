@@ -311,8 +311,12 @@ function back(t: number): Pose {
     ],
   );
 }
+/**
+ * Lying leg raise: the pelvis rests on the mat (centre 172.5 + stroke 3 = mat
+ * top 175.5) and the whole upper body lies still; only the legs move.
+ */
 function legRaise(t: number): Pose {
-  const hip: Pt = [97, 169],
+  const hip: Pt = [97, 172.5],
     angle = mix(0, -1.3, t);
   // The far leg is the near leg moved 3 up, perpendicular to it, so both hang
   // from the same hip with equal, constant thigh and shin lengths.
@@ -322,14 +326,14 @@ function legRaise(t: number): Pose {
     return [along[0] + away[0], along[1] + away[1]];
   };
   return pose(
-    [32, 162],
-    [46, 169],
+    [32, 165.5],
+    [46, 172.5],
     hip,
     [
-      [66, 173],
-      [89, 173],
-      [66, 165],
-      [89, 165],
+      [66, 172.5],
+      [89, 172.5],
+      [65.6, 168.5],
+      [88.6, 168.5],
     ],
     [
       polar(hip, 32, angle),

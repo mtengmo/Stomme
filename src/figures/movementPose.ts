@@ -1,7 +1,9 @@
 import type { ExerciseId } from '../domain/types';
 import {
+  ARM_SWEEP_POSES,
   dumbbellPulloverPose,
   floorPressPose,
+  halfSquatPose,
   hamstringCurlPose,
   kettlebellFloorPressPose,
   overheadTricepsPose,
@@ -43,6 +45,9 @@ export function movementPose(exerciseId: ExerciseId, t: number): Pose {
   if (rehabPose) return rehabPose;
   const physioPose = physioMovementPose(exerciseId, t);
   if (physioPose) return physioPose;
+  const armSweep = ARM_SWEEP_POSES[exerciseId];
+  if (armSweep) return armSweep(t);
+  if (exerciseId === 'half-squat') return halfSquatPose(t);
   if (exerciseId === 'hamstring-curl') return hamstringCurlPose(t);
   if (exerciseId === 'seated-knee-extension') return seatedKneeExtensionPose(t);
   if (exerciseId === 'kettlebell-floor-press')

@@ -115,13 +115,16 @@ export function repTempo(id: ExerciseId): RepTempo | null {
 /**
  * Spoken words where the generic Upp/Ner would say the wrong thing: a quad set
  * is a muscle contraction (tense, hold, release), the band leg press moves out
- * and back as the written instruction says.
+ * and back as the written instruction says, the half squat sinks first and
+ * then rises.
  */
 const CUE_WORDS: Partial<
   Record<ExerciseId, Partial<Record<RepPhase, string>>>
 > = {
   'quad-set': { up: 'Spänn', hold: 'Håll', down: 'Slappna av' },
   'band-leg-press': { up: 'Ut', hold: 'Håll', down: 'Tillbaka' },
+  // The figure sinks first (progress 0 to 1), holds, then rises: Ner, håll, upp.
+  'half-squat': { up: 'Ner', hold: 'Håll', down: 'Upp' },
 };
 
 /** Pace steps for the quicker/slower buttons; a bigger factor is a slower beat. */

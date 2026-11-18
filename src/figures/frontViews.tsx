@@ -1,4 +1,5 @@
 import type { ExerciseId } from '../domain/types';
+import { sweepArm } from './armSweep';
 import { CARRY_SHIN, CARRY_THIGH } from './carryPoses';
 import type { Equipment, Working } from './Figure';
 import { solveTwoBone } from './keyframes';
@@ -38,6 +39,7 @@ export const supportedFrontViews = [
   'farmer-carry',
   'woodchop',
   'kettlebell-goblet-squat',
+  'lateral-raise',
 ] as const satisfies readonly ExerciseId[];
 
 export const supportedObliqueViews = [
@@ -383,6 +385,40 @@ function woodchopFrontPose(t: number): Pose {
   );
 }
 
+/**
+ * Lateral raise from the front: standing legs and trunk as in the profile; the
+ * arms (24.6 + 22.6, the profile lengths) swing out to both sides from hanging
+ * to shoulder height with a slight elbow bend, both at the same height.
+ */
+function lateralRaiseFrontPose(t: number): Pose {
+  const hip = point(100, 118);
+  const neck = point(100, 74);
+  const arm = (side: 1 | -1) =>
+    sweepArm(neck, {
+      upper: side * mix(24, 84, t),
+      fore: side * mix(8, 80, t),
+    });
+  const armR = arm(-1);
+  const armL = arm(1);
+  const aR = point(91, 174);
+  const aL = point(109, 174);
+  return skeleton(
+    point(100, 60),
+    neck,
+    hip,
+    armR.mid,
+    armR.end,
+    armL.mid,
+    armL.end,
+    joint(hip, aR, FRONT_STAND_THIGH, FRONT_STAND_SHIN, 1),
+    aR,
+    point(81, 177),
+    joint(hip, aL, FRONT_STAND_THIGH, FRONT_STAND_SHIN, -1),
+    aL,
+    point(119, 177),
+  );
+}
+
 /** Purpose-drawn frontal geometry for the small set of readable front views. */
 export function frontMovementPose(
   exerciseId: FrontViewExercise,
@@ -394,6 +430,7 @@ export function frontMovementPose(
     return working === 'left'
       ? mirrorPose(woodchopFrontPose(t))
       : woodchopFrontPose(t);
+  if (exerciseId === 'lateral-raise') return lateralRaiseFrontPose(t);
   if (exerciseId === 'in-and-out-jump') return inAndOutPose(t);
   if (exerciseId === 'lateral-shuffle') return lateralShufflePose(t);
   if (exerciseId === 'single-leg-lateral-hop')
@@ -420,26 +457,29 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'half-squat') {
-    const depth = t;
-    const hipY = mix(112, 131, depth);
-    const kneeY = mix(148, 151, depth);
-    const kneeDX = mix(19, 27, depth);
-    const ankleDX = 18;
-    const neckY = hipY - 44;
+    // Standing legs (thigh 30.6, shin 26.3) and trunk 44 as in the profile; the
+    // knees travel outward over the planted feet, the hands stay on the rail.
+    const hipY = mix(120, 131, t);
+    const hip = point(100, hipY);
+    const neck = point(100, hipY - 44);
+    const aR = point(82, 174);
+    const aL = point(118, 174);
+    const armR = solveTwoBone(neck, point(72, 92), 24.6, 22.6, -1);
+    const armL = solveTwoBone(neck, point(128, 92), 24.6, 22.6, 1);
     return skeleton(
-      point(100, neckY - 14),
-      point(100, neckY),
-      point(100, hipY),
-      point(82, mix(neckY + 20, neckY + 26, depth)),
+      point(100, neck[1] - 14),
+      neck,
+      hip,
+      armR.mid,
       point(72, 92),
-      point(118, mix(neckY + 20, neckY + 26, depth)),
+      armL.mid,
       point(128, 92),
-      point(100 - kneeDX, kneeY),
-      point(100 - ankleDX, 174),
-      point(90 - ankleDX, 177),
-      point(100 + kneeDX, kneeY),
-      point(100 + ankleDX, 174),
-      point(110 + ankleDX, 177),
+      joint(hip, aR, FRONT_STAND_THIGH, FRONT_STAND_SHIN, 1),
+      aR,
+      point(72, 177),
+      joint(hip, aL, FRONT_STAND_THIGH, FRONT_STAND_SHIN, -1),
+      aL,
+      point(128, 177),
     );
   }
   if (exerciseId === 'single-leg-chair-squat') {
@@ -472,10 +512,11 @@ export function frontMovementPose(
       point(neck[0], neck[1] - 14),
       neck,
       hip,
-      point(neck[0] - 18, neck[1] + 18),
-      point(neck[0] - 23, neck[1] + 41),
-      point(neck[0] + 18, neck[1] + 18),
-      point(neck[0] + 23, neck[1] + 41),
+      // Arms hang at the profile lengths (22.8 + 21.1), never longer.
+      point(neck[0] - 10, neck[1] + 20.4),
+      point(neck[0] - 12.5, neck[1] + 41.4),
+      point(neck[0] + 10, neck[1] + 20.4),
+      point(neck[0] + 12.5, neck[1] + 41.4),
       right.knee,
       right.ankle,
       right.toe,
@@ -488,14 +529,15 @@ export function frontMovementPose(
     // The profile gait's legs (thigh 30, shin 29, left foot swings first) and
     // both weights hanging at the sides.
     const legs = carryFrontLegs(t);
+    // Trunk 40 and arms 20 + 20, as in the profile gait (never longer).
     return skeleton(
-      point(100, 60),
-      point(100, 74),
+      point(100, 64),
+      point(100, 78),
       legs.hip,
-      point(78, 97),
-      point(78, 125),
-      point(122, 97),
-      point(122, 125),
+      point(88, 94),
+      point(84.4, 113.7),
+      point(112, 94),
+      point(115.6, 113.7),
       ...legs.limbs,
     );
   }
@@ -571,46 +613,51 @@ export function frontMovementPose(
     const rightIsFront = working !== 'left';
     const frontX = rightIsFront ? 82 : 118;
     const backX = rightIsFront ? 118 : 82;
-    const hipY = mix(111, 127, depth);
-    const neckY = hipY - 44;
-    const frontKneeY = mix(143, 151, depth);
-    const backKneeY = mix(143, 149, depth);
     const forward = exerciseId === 'forward-lunge';
+    // Standing legs as in the profile (thigh 30.6, shin 26.3): the hip stays
+    // within their reach of the planted ankle and sinks as the lunge deepens.
+    const hipY = forward ? mix(113, 130, depth) : mix(121, 133, depth);
+    const hip = point(100, hipY);
+    const neckY = hipY - 44;
     const frontFootY = forward ? mix(161, 174, depth) : 174;
     const backFootY = forward ? 161 : mix(174, 161, depth);
-    const frontAnkleX = frontX;
     const backDelta = forward ? 2 : mix(2, 11, depth);
     const backAnkleX = backX + (rightIsFront ? 1 : -1) * backDelta;
+    const leg = (ankle: Pt, bend: 1 | -1) =>
+      joint(hip, ankle, FRONT_STAND_THIGH, FRONT_STAND_SHIN, bend);
+    const frontAnkle = point(frontX, frontFootY);
+    const backAnkle = point(backAnkleX, backFootY);
     const right = rightIsFront
       ? {
-          knee: point(frontX, frontKneeY),
-          ankle: point(frontAnkleX, frontFootY),
-          toe: point(frontAnkleX - 9, frontFootY + 3),
+          knee: leg(frontAnkle, 1),
+          ankle: frontAnkle,
+          toe: point(frontX - 9, frontFootY + 3),
         }
       : {
-          knee: point(backX, backKneeY),
-          ankle: point(backAnkleX, backFootY),
+          knee: leg(backAnkle, 1),
+          ankle: backAnkle,
           toe: point(backAnkleX - 9, backFootY + 3),
         };
     const left = rightIsFront
       ? {
-          knee: point(backX, backKneeY),
-          ankle: point(backAnkleX, backFootY),
+          knee: leg(backAnkle, -1),
+          ankle: backAnkle,
           toe: point(backAnkleX + 9, backFootY + 3),
         }
       : {
-          knee: point(frontX, frontKneeY),
-          ankle: point(frontAnkleX, frontFootY),
-          toe: point(frontAnkleX + 9, frontFootY + 3),
+          knee: leg(frontAnkle, -1),
+          ankle: frontAnkle,
+          toe: point(frontX + 9, frontFootY + 3),
         };
+    // Arms 24.6 + 22.6 hang at the sides, as in the profile.
     return skeleton(
       point(100, neckY - 14),
       point(100, neckY),
-      point(100, hipY),
-      point(78, neckY + 20),
-      point(78, neckY + 43),
-      point(122, neckY + 20),
-      point(122, neckY + 43),
+      hip,
+      point(88.5, neckY + 21.7),
+      point(85.5, neckY + 44.1),
+      point(111.5, neckY + 21.7),
+      point(114.5, neckY + 44.1),
       right.knee,
       right.ankle,
       right.toe,
@@ -850,39 +897,46 @@ export function frontMovementPose(
   }
 
   if (exerciseId === 'dumbbell-rdl') {
-    const neckY = mix(74, 84, t);
-    const hipY = mix(118, 126, t);
-    const handY = mix(121, 158, t);
-    const kneeY = mix(149, 151, t);
+    // From the front the hinge shows as a hip that settles a little, a trunk
+    // that shortens slightly (44 to 42, never longer than the profile) and a
+    // head that follows it down; the arms hang plumb below the shoulders at the
+    // profile lengths (24.5 + 22.5). Legs: thigh 30.8 and shin 26.5 as in the
+    // profile, knees out.
+    const hipY = mix(120, 124, t);
+    const neckY = hipY - mix(44, 42, t);
+    const hip = point(100, hipY);
+    const aR = point(84, 174);
+    const aL = point(116, 174);
     return skeleton(
       point(100, neckY - 14),
       point(100, neckY),
-      point(100, hipY),
-      point(78, mix(99, 117, t)),
-      point(70, handY),
-      point(122, mix(99, 117, t)),
-      point(130, handY),
-      point(82, kneeY),
-      point(80, 174),
-      point(70, 177),
-      point(118, kneeY),
-      point(120, 174),
-      point(130, 177),
+      hip,
+      point(89, neckY + 21.9),
+      point(86, neckY + 44.2),
+      point(111, neckY + 21.9),
+      point(114, neckY + 44.2),
+      joint(hip, aR, 30.8, 26.5, 1),
+      aR,
+      point(74, 177),
+      joint(hip, aL, 30.8, 26.5, -1),
+      aL,
+      point(126, 177),
     );
   }
 
-  // Kettlebell rack carry: the profile gait's legs; the selected arm holds the
-  // bell at the shoulder (upper arm 29.8, forearm 25.2, as in profile), the
-  // other arm hangs with the same lengths.
+  // Kettlebell rack carry: the profile gait's legs and trunk (40); the selected
+  // arm holds the bell at the shoulder (upper arm 29.8, forearm 25.2, as in
+  // profile) with the elbow down by the ribs, the other arm hangs with the same
+  // lengths.
   const movingRight = working !== 'left';
   const legs = carryFrontLegs(t);
-  const neck = point(100, 74);
+  const neck = point(100, 78);
   const rackArm = solveTwoBone(
     neck,
-    point(movingRight ? 78 : 122, 79),
+    point(movingRight ? 78 : 122, 83),
     29.8,
     25.2,
-    movingRight ? 1 : -1,
+    movingRight ? -1 : 1,
   );
   const hangArm = solveTwoBone(
     neck,
@@ -892,7 +946,7 @@ export function frontMovementPose(
     movingRight ? 1 : -1,
   );
   return skeleton(
-    point(100, 60),
+    point(100, 64),
     neck,
     legs.hip,
     // The person's right arm is on the viewer's left, so a left selection
@@ -1136,19 +1190,21 @@ export function obliqueMovementPose(
   };
   const right = working === 'left' ? supported : moving;
   const left = working === 'left' ? moving : supported;
+  // Arms and trunk are never longer than the profile (upper arm 26.7, forearm
+  // 26, trunk 53.2); the oblique view only foreshortens.
   const lowerArm: [Pt, Pt] = [
     [56, 176],
-    [86.4, 176],
+    [82, 176],
   ];
   const upperArm: [Pt, Pt] = [
-    [70, 131],
-    [97, 145],
+    [71.1, 129.6],
+    [94.2, 141.6],
   ];
   const rightArm = working === 'left' ? upperArm : lowerArm;
   const leftArm = working === 'left' ? lowerArm : upperArm;
   return skeleton(
-    [34, 142],
-    [52, 150],
+    [41, 143.5],
+    [55, 150],
     hip,
     ...rightArm,
     ...leftArm,
@@ -1715,7 +1771,22 @@ export function FrontFigureFrame({
           />
         </g>
       ) : null}
-      {!heldIsRack && kind ? (
+      {exerciseId === 'lateral-raise' && kind === 'dumbbell' ? (
+        // The bar points front to back, so it is seen end-on: a disc in each hand.
+        <g data-equipment="dumbbell" data-grip="end-on">
+          {heldAt.map((at) => (
+            <circle
+              key={at.join(',')}
+              cx={at[0]}
+              cy={at[1]}
+              r="6"
+              fill="var(--paper)"
+              stroke="var(--equipment)"
+              strokeWidth="4"
+            />
+          ))}
+        </g>
+      ) : !heldIsRack && kind ? (
         <g data-equipment={kind}>
           {heldAt.map((at) => (
             <Held

@@ -65,11 +65,13 @@ export function applyEquipmentPose(
     p = { ...pose, ...reach('hR', 'eR', 5), ...reach('hL', 'eL', -5) };
   }
   if (equipment && exerciseId === 'glute-bridge') {
-    p = {
-      ...p,
-      hR: [p.hip[0] + 5, p.hip[1] - 5],
-      hL: [p.hip[0] - 5, p.hip[1] - 5],
-    };
+    // Both hands hold the weight on the pelvis (one shared point in profile);
+    // the arms keep their lying lengths, only the elbows bend to get there.
+    const grip: Pt = [p.hip[0], p.hip[1] - 4];
+    const upper = Math.hypot(p.eR[0] - p.neck[0], p.eR[1] - p.neck[1]);
+    const fore = Math.hypot(p.hR[0] - p.eR[0], p.hR[1] - p.eR[1]);
+    const held = solveTwoBone(p.neck, grip, upper, fore, -1);
+    p = { ...p, eR: held.mid, hR: held.end, eL: held.mid, hL: held.end };
   }
   const heldKind = equipment === undefined ? spec.held?.kind : equipment;
   const twoHandedBell =
@@ -107,7 +109,7 @@ export function applyEquipmentPose(
               ],
             ]
           : exerciseId === 'glute-bridge'
-            ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 5)]]
+            ? [[p.hip[0], p.hip[1] - (heldKind === 'kettlebell' ? 16 : 4)]]
             : (
                 spec.held?.hands ??
                 (exerciseId === 'split-squat'

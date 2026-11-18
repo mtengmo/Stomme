@@ -66,6 +66,7 @@ describe('authored frontal demonstrations', () => {
       'farmer-carry',
       'woodchop',
       'kettlebell-goblet-squat',
+      'lateral-raise',
     ]);
     expect(supportedObliqueViews).toEqual([
       'goblet-chair-squat',
