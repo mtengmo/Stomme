@@ -832,8 +832,8 @@ function armSweepPose(
 export const shoulderPressPose = (t: number) =>
   armSweepPose(
     shoulderStart,
-    armPath([64, 155], [178, 185]),
-    armPath([-64, -155], [-178, -185]),
+    armPath([64, 148], [178, 170]),
+    armPath([-64, -148], [-178, -170]),
     t,
   );
 export const bicepsCurlPose = (t: number) =>

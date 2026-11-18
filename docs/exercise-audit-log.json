@@ -1430,7 +1430,7 @@
     "name": "Axelpress med hantlar",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1484,12 +1484,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E17: Armens överarm och underarm roterar nu kring fasta leder (armSweep.ts) i stället för att leden interpoleras, så båda segmenten har konstant längd (24,6 + 22,6) i alla faser. Före: överarm 19,1→27,8 (baseline-drift 8,8/8,2); efter: drift 0,0 båda armar, hantelkontakt i händerna i alla faser. Kvarstår: inget känt. Omgranskningen ska läsa alla faser, H/V, varianter och reduced-motion Start/Slut (390 mörkt, 1280 ljust) av Codex-modell eller human (korsgranskning)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E17: Granskning 2026-11-18 (Codex re-review 5c47245) fann att hantlarna i toppläget (fas ~0,95-1 och Slut) läses som en stång med mittskiva. Rättat: armvinklarna i toppen ändrade från överarm 155/underarm 185 till 148/170 (båda armar, spegelvänt), så handcentrumen ligger cirka 33,8 enheter isär i stället för 16,9 och hantlarnas inre ändskivor är tydligt åtskilda. Armsegmenten är oförändrat konstanta 24,6+22,6, handkontakt kvar, start oförändrad. Hela loopen (fas 0-1 och tillbaka) och reduced-motion Slut påverkas; baseline-diff 0 raised/new. Återgranskning bör kontrollera profil fas 0,75-1 och Slut vid 390 mörkt och 1280 ljust, tvåhantelvarianten, av annan leverantör än claude-sonnet. Granskning 2026-11-18 E17 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[cheap] E17 shoulder-press, profil fas cirka 0,95–1 och reduced-motion Slut, två hantlar: händernas centrum är cirka 16,9 enheter isär i toppen, så hantlarnas inre ändskivor överlappar och de läses som en sammanhängande stång med mittskiva vid 390 och 1280 px. Separera hantlarna visuellt med bevarad handkontakt och konstanta armsegment."
     ],
-    "fingerprint": "60788a5584ec",
+    "fingerprint": "5bb32dd59cb6",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: kettlebell-press, thruster, single-arm-thruster. Ren bilateral hantelpress är ett tydligt basmoment; kombinationsövningarna bör inte ersätta den. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/overhead; fokusplatser overhead; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2073,7 +2078,7 @@
     "name": "Utfall framåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2148,12 +2153,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E25: som E24 för framåtutfall: stående benlängder (30,6 / 26,3), upprätt start (reduced-motion Start = live 0, skillnad 0,0), knät böjs alltid framåt och byter aldrig riktning, bakre hälen lyfts vid botten med tån fast. Före: knä x76,1 bakåt vid start och sedan x117; efter: inget knäknäck. Frontvyn har samma längder. Hela rörelsen omskriven, se E24-noten. Omgranskningen ska läsa alla faser, H/V, varianter och reduced-motion Start/Slut (390 mörkt, 1280 ljust) av Codex-modell eller human (korsgranskning)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E25: Granskning 2026-11-18 (Codex re-review 5c47245) fann att stegfoten gled längs golvet (tå x 110->150,5, y 177) utan fritt steg. Rättat i profil (H/V, alla varianter): ny lungeFootPath.withForwardLungeStep lyfter hela högerfoten (14 enheter, tån något nedåt i luften), för den fram och landar den platt vid steglängden (middle-ramen) vid fas 0,3, innan huvudsänkningen; från fas 0,3 står foten kvar medan kroppen sänks till Slut (forwardLungeBodyProgress). Tillbakavägen är samma bana baklänges, så foten lyfts och kliver tillbaka före loopsömmen (Start = stilla). Knät böjs hela tiden framåt, ben 30,6+26,3 och bål 44 konstanta, bakre benet står kvar som stöd. Höften sjunker ändå cirka 13 enheter under steget (benlängden tillåter inte ett rakt steg med upprätt höft), resten sänks efter landning. Räkning/röst/repTempo (2+2 s) oförändrade. Frontvyn är oförändrad. Återgranskning bör kontrollera profil H/V, kroppsvikt/hantlar/kettlebell, fas 0-0,5 och tillbaka, reduced-motion, av annan leverantör än claude-sonnet. Granskning 2026-11-18 E25 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E25 forward-lunge, profil fas 0–0,5 och återgång 0,5–0, H/V, kroppsvikt/hantlar/kettlebell: den valda foten glider fram och tillbaka utan fritt steg; tån flyttas x 110→150,5 medan y är 177 genom hela sträckan. Lyft hela stegfoten fri från golvet, låt den landa före sänkningen och lyft tillbaka med bibehållna segment och bakre stöd."
     ],
-    "fingerprint": "4952cf435a2f",
+    "fingerprint": "77bf9bd2b293",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: reverse-lunge, walking-lunge. Framåtstegets inbromsning tillför något eget; inte en ren dublett. Om endast ett dynamiskt utfall ska finnas, behåll reverse-lunge som redan ligger i nybörjarurvalet. Ta först bort walking-lunge före denna. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -3157,7 +3167,7 @@
     "name": "Gång med kettlebell vid axeln",
     "group": "kettlebell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3250,6 +3260,11 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E40: frontvyn: rackarmens armbåge ligger nu nedåt nära revbenen (böjriktningen vänd), bål 40 (före 44), armlängderna 29,8 + 25,2 oförändrade och lika som profilen; bellen följer handen vid axeln. Omgranskningen ska läsa alla faser, H/V, varianter och reduced-motion Start/Slut (390 mörkt, 1280 ljust) av Codex-modell eller human (korsgranskning)."
+      },
+      {
+        "date": "2026-11-18",
+        "fixer": "claude-sonnet",
+        "notes": "E40: Granskning 2026-11-18 (Codex re-review 5c47245) fann att racksvikten i frontvyn lutade åt bildhöger även för H (in mot kroppen, bakom underarmen). Rättat i frontViews.tsx: kulans lutning och handgreppet (tumlinjen) speglas efter vald sida, så för H (höger hand, bildvänster) ligger kulan åt bildvänster mot underarmens utsida och för V åt bildhöger, båda med samma grepp. Armsegment 29,8+25,2, bål 40 och gång oförändrade; profilvyn oförändrad. Återgranskning bör kontrollera front H och V, hela gångloopen och reduced-motion Start/Slut vid 390 mörkt och 1280 ljust, av annan leverantör än claude-sonnet. Granskning 2026-11-18 E40 avser figuren före denna rättning."
       }
     ],
     "openIssues": [

@@ -1492,6 +1492,9 @@ export function FrontFigureFrame({
                     ? [[100, (pose.hR[1] + pose.hL[1]) / 2]]
                     : [pose.hR, pose.hL];
   const heldIsRack = exerciseId === 'kettlebell-rack-carry' && kind !== null;
+  // The bell leans outward from the forearm: image-left for the right hand
+  // (on the viewer's left), image-right for the left hand.
+  const rackTilt = rackSide === 'R' ? 55 : -55;
   const color = (side: 'R' | 'L') =>
     working === null || (working === 'right' ? side === 'R' : side === 'L')
       ? 'var(--accent)'
@@ -1714,7 +1717,12 @@ export function FrontFigureFrame({
       ) : null}
       {heldIsRack && kind === 'kettlebell' ? (
         <g data-equipment="kettlebell" data-grip="rack">
-          <Held kind="kettlebell" at={heldAt[0] ?? pose.hR} rack />
+          <Held
+            kind="kettlebell"
+            at={heldAt[0] ?? pose.hR}
+            rack
+            angle={rackTilt}
+          />
         </g>
       ) : null}
       <g data-body-side="left" stroke={color('L')} {...limb}>
@@ -1757,7 +1765,7 @@ export function FrontFigureFrame({
           stroke={color(rackSide)}
           strokeWidth="2"
           fill="var(--paper)"
-          transform={`rotate(-55 ${heldAt[0]?.[0] ?? 100} ${heldAt[0]?.[1] ?? 65})`}
+          transform={`rotate(${rackTilt} ${heldAt[0]?.[0] ?? 100} ${heldAt[0]?.[1] ?? 65})`}
         >
           <rect
             x={(heldAt[0]?.[0] ?? 100) - 3}
@@ -1767,7 +1775,7 @@ export function FrontFigureFrame({
             rx="2"
           />
           <path
-            d={`M${(heldAt[0]?.[0] ?? 100) - 3} ${heldAt[0]?.[1] ?? 65}h4`}
+            d={`M${(heldAt[0]?.[0] ?? 100) + (rackSide === 'R' ? 3 : -3)} ${heldAt[0]?.[1] ?? 65}h${rackSide === 'R' ? -4 : 4}`}
           />
         </g>
       ) : null}
