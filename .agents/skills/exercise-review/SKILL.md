@@ -72,8 +72,11 @@ chromium` once. Repo files are LF: edit with the Edit tool (more in `fixing.md`)
 5. `npx tsx .agents/skills/exercise-review/scripts/capture.ts <id>`; look at every sheet in
    `.impeccable/review/<id>/`: each view x side x variant, phases out and back, reduced-motion
    stills, live loop, 390 dark and 1280 light.
-6. Work `checklist.md` per scope; fill the voice | animation | how-to row; score (below). Note
-   each finding with phase, view, side and variant.
+6. Compare the defining setup and movement with the cited source before accepting geometry:
+   support in front/behind/beside the body, working limb, movement plane and return. Check each
+   view communicates that same exercise; see `references/views-and-scoring.md` §1. Then work
+   `checklist.md`, fill the voice | animation | how-to row and score. Note each finding with
+   phase, view, side and variant.
 7. Record, run "After editing the log", report with the template.
 
 Sources: text `src/content/exercises.ts` (spreads `bodyweightExercises.ts`,

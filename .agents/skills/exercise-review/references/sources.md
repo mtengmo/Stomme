@@ -14,6 +14,12 @@ easier variant and stop guidance agree with each other and with the figure.
    trainer site, a single study) needs a one-line reason in `notes` ("ingen bättre källa för
    kettlebellgrepp").
 
+When verifying an exercise against its cited source, open the source and distinguish what its
+instructions establish from your interpretation of the drawing. Compare any relevant source
+illustration/video you can actually view; a title, link or transcript is not visual verification.
+Record access or viewing limits. Keep source-supported setup/movement facts separate from
+editorial changes to equipment, range, tempo or dose.
+
 ## When a source is required
 
 - A safety finding that changes S, or a claim about risk, pain limits, contraindications, load

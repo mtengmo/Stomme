@@ -32,6 +32,7 @@ Read the Swedish as a beginner would.
 The `capture.ts` sheets (phases out and back, live loop, stills); stills alone are not enough.
 Views, measurement and scoring: `views-and-scoring.md`.
 
+- [ ] Source comparison: the defining setup, support location (behind/in front/beside), working limb and movement plane remain recognisable in each view at start, middle and end. A correct profile or plausible segment lengths do not excuse a misleading front/oblique setup; explain accepted depth simplifications.
 - [ ] Motion type: a static hold (`unit: "seconds"`, not in `timedMovementCue`) is `motion: 'hold'`, all frames identical, stills Start/Håll (`HOLD_STILLS`; `src/figures/timedHolds.test.ts`). A moving exercise is `controlled`, `ballistic` or `sequence` and visibly moves.
 - [ ] Thigh, shin, upper arm and forearm keep their length in every phase, view and variant (`inspect.ts` table; compare knee and elbow at Start and End).
 - [ ] Contacts: planted feet stay planted (no sliding); stepping or walking feet lift and swing; a lunge's rear foot touches the floor; nothing goes through the floor; back on the wall in a wall-sit; hips reach the seat; hands and knees are on the railing, bench, bar, floor, mat or thigh where the text says, through the lowering and the return.

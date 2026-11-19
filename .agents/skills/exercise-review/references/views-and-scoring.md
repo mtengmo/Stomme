@@ -14,8 +14,12 @@ Read for `animation` and `all` reviews. The scoring rubric and result mapping ar
   `exerciseMetadata[id].variants`: phases 0, .25, .5, .75, 1 and back, the live loop and the
   reduced-motion stills (`?phase=` works in every view); contacts; limb lengths; left/right;
   equipment in the hand with the right grip and axis.
-- **Projection.** In front and oblique views a segment is a projection: shorter than its profile
-  length is expected, longer is a defect. Thigh limit 36 units (`FRONT_THIGH_MAX` in
+- **Projection.** In front and oblique views a segment can legitimately be shorter than its
+  profile length; this alone does not establish a correct projection. The joint path, limb
+  orientation and support placement must also describe the source's movement in that view.
+  Unexplained sideways joint travel or a rear support reading as a side support is not excused
+  by shorter segments or passing geometry tests. Longer than the profile is a defect. Thigh
+  limit 36 units (`FRONT_THIGH_MAX` in
   `figureGeometry.test.ts`; `frontViews.test.tsx` also asserts `toBeLessThanOrEqual(36)` for some
   thighs). Report numbers against the profile length `inspect.ts` prints ("lår 38.2 vs profil 30.0
   vid fas 0"), not "thighs shorten". A segment collapsing toward zero is also a defect.
@@ -28,6 +32,12 @@ Read for `animation` and `all` reviews. The scoring rubric and result mapping ar
   lunge depth or row reads best from the side. A view that shows a *different* movement from the
   profile is an animation error. A needed view that is missing is a finding (AF 1 "saknas");
   adding a view is a fix, not part of the review.
+- **Recognisable setup before measurements.** Compare source and app at start, middle and end:
+  which foot/hand supports the body, whether a prop is behind, in front or beside it, and where
+  the joints move. Judge what each view actually teaches without relying on its label or a
+  correct companion view. If depth/occlusion is ambiguous enough to suggest a different setup,
+  record the observable ambiguity and score its instructional effect; do not invent a medical
+  hazard or a precise 3D pose from 2D coordinates. Explain any accepted simplification in notes.
 
 ## 2. Objective inputs (read before you look; cite them)
 

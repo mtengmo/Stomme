@@ -3333,7 +3333,7 @@
     "name": "Bulgariskt utfall på bänk",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "approved",
+    "status": "needs-fix",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3403,6 +3403,14 @@
         "scope": "all",
         "result": "ok",
         "notes": "Magnus Tengmo godkände nybörjarförståelsen (comprehension-raden) 2026-11-19 efter Codex-granskningen codex:gpt61sol (scope all, ok) som kom efter senaste rättningen. Godkänner övningen som helhet på den grunden; ingen ny figurgranskning gjord av människan."
+      },
+      {
+        "date": "2026-11-19",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "4e1561f",
+        "notes": "E41: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Vyer finns/kontrollerade: side, front; nio faser ut/tillbaka, hel liveperiod 4 s, reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: mismatch i frontens uppställning; röst/profil/text stämmer sinsemellan. AF1: fronten läses som ett sidoböjt bakre ben mot en låda bredvid kroppen; bakre knät flyttas 21,5 i sidled (H x 103,8→125,2) med foten fast, utan tydliga djupsignaler för stöd bakom kroppen. Synligt H/V hela loopen/stills. Profilen visar rätt fram/bak-uppställning, fasta kontakter och segment. Tidigare AF2 accepterade förkortning som projektion men missade denna läsbarhet. Källa NASM https://www.nasm.org/resource-center/exercise-library/bulgarian-split-squat (läst 2026-11-19): bänk bakom, bakre fot på stödet, böj främre knä/höft och pressa upp genom främre benet. Källtext verifierad; källvideo ej sedd. Ingen ny medicinsk riskutsaga. Rena källor, HEAD 4e1561f identisk; senaste rättare claude-sonnet."
       }
     ],
     "fixes": [
@@ -3412,7 +3420,9 @@
         "notes": "E41: egen frontgren (delas inte längre med step-up/step-down): bakre lår 30 och underben 18 konstanta (var underben 2,4 vid fas .25), armar 25,5+12,7, lår högst 35,5; drift kR-aR 9 till 7. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E41 rear-foot-split-squat, front fas 0–1 och återgång samt reduced-motion Start/Slut, H/V, Kroppsvikt + stol: bakre benet och stödet läses som placerade åt sidan i stället för tydligt bakom kroppen. Bakre knät sveper cirka 21,5 enheter i sidled med foten fast på stödet; längdgränserna bevisar inte korrekt djup/projektion. Gör bakre stödets djup och benets rörelseplan tydliga, förenliga med profil och NASM:s uppställning, utan att dölja främre knäriktningen."
+    ],
     "fingerprint": "4022a82acddb",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
