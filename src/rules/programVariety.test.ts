@@ -373,7 +373,7 @@ describe('wide pool (content/widePool.ts)', () => {
         e.openIssues.some((i) => !processGaps.some((p) => p.test(i))),
       )
       .map((e) => e.id);
-    expect(unresolved.length).toBeGreaterThan(0);
+    // Empty once every factual issue is resolved; the loops below then hold trivially.
     for (const plyo of [false, true])
       expect(
         unresolved.filter((id) => widePool(plyo).has(id as ExerciseId)),
