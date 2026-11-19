@@ -54,6 +54,8 @@ const SEQUENCE_FIGURES: readonly ExerciseId[] = [
 ];
 /** Sequence figures whose cycle is more than one counted repetition long. */
 const CYCLE_REPS: Partial<Record<ExerciseId, number>> = { 'jumping-lunge': 2 };
+const cycleExtra = (id: ExerciseId): { cycleReps?: number } =>
+  CYCLE_REPS[id] ? { cycleReps: CYCLE_REPS[id] } : {};
 
 export type RepPhase = 'up' | 'hold' | 'down' | 'relax';
 
@@ -88,7 +90,7 @@ export function repTempo(id: ExerciseId): RepTempo | null {
       repMs: fixed,
       hasHold: false,
       sequence: SEQUENCE_FIGURES.includes(id),
-      ...(CYCLE_REPS[id] ? { cycleReps: CYCLE_REPS[id] } : {}),
+      ...cycleExtra(id),
     };
   const { relaxSeconds } = exerciseMetadata[id];
   // The physio catalogue prescribes no hold; the beat still pauses 3 s at the top.
@@ -107,7 +109,7 @@ export function repTempo(id: ExerciseId): RepTempo | null {
     repMs: upMs + holdMs + downMs + relaxMs,
     hasHold,
     sequence: SEQUENCE_FIGURES.includes(id),
-    ...(CYCLE_REPS[id] ? { cycleReps: CYCLE_REPS[id] } : {}),
+    ...cycleExtra(id),
     ...(CUE_WORDS[id] ? { cues: CUE_WORDS[id] } : {}),
   };
 }

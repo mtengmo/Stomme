@@ -3510,6 +3510,13 @@
         "result": "ok",
         "commit": "a915ee4",
         "notes": "E42: score 14/15 (T3 R3 AS3 AF2 U n/a S3). Vyer finns/kontrollerade: side, oblique; nio faser ut/tillbaka, hel liveperiod 4 s, reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Fast höft, övre fot på bänk och underarm i golv medan nedre benet lyfts/sänks; konstanta segment och 2+2 s/räkning stämmer. Snedvy underarmar 26 och bål 52,9 högst profilens 26/53,2. AF2: begränsad djupinformation. Källnoten skiljer nu uttryckligen relaterad forskning från appens exakta variant. PMC6797385 https://pmc.ncbi.nlm.nih.gov/articles/PMC6797385/ (läst 2026-11-19): nivå 1–5 isometriska, nivå 6 full CA; inget belägg för exakt repetitionsvariant påstås. Enligt användarens uttryckliga beslut stängs källraden som dokumenterad begränsning, inte som ny forskningsverifiering. Fullständig visuell loopkontroll gjord; mänsklig nybörjarbedömning kvar, processrad/status bevaras. Rena källor, HEAD a915ee4 identisk; senaste rättare claude-sonnet."
+      },
+      {
+        "date": "2026-11-19",
+        "reviewer": "human",
+        "scope": "all",
+        "result": "ok",
+        "notes": "Magnus Tengmo godkände E42 2026-11-19: källnotens nya formulering (närliggande Copenhagen-övningar har stöd i forskning; exakt repetitivt nedre benlyft visas inte av källan) accepteras som lösning på källraden, och nybörjarförståelsen godkänns. Codex granskade figuren som ok (14/15) 2026-11-18, efter senaste figurrättningen."
       }
     ],
     "fixes": [
