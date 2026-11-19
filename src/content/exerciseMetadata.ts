@@ -1040,7 +1040,7 @@ function sourceFor(id: ExerciseId): ExerciseSource[] {
       title: 'Modified progressive Copenhagen adduction exercise programme',
       publisher: 'BMJ Open Sport & Exercise Medicine',
       url: 'https://bmjopensem.bmj.com/content/5/1/e000570',
-      note: 'Beskriver relaterade Copenhagen-varianter. Källan fastställer inte exakt utförande för bildförlagans repetitiva nedre benlyft; kontrollera mot den tillhörande bilden.',
+      note: 'Närliggande Copenhagen-övningar har stöd i forskning. Källan visar inte exakt det här repetitiva lyftet med det nedre benet; utförandet följer bilden och instruktionen i appen.',
     },
     'kneeling-hip-flexor-stretch': {
       title: 'Four Hip Flexor Stretches to Relieve Tightness',
