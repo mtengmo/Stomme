@@ -119,7 +119,7 @@
     "name": "Uppsteg på låda (step-up)",
     "group": "rehab/knee",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -210,13 +210,18 @@
         "fixer": "claude-sonnet",
         "commit": "a971f09",
         "notes": "W3b: front view with fixed shins, foreshortened thighs, 18 unit step."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E02: fronten har nu ett tydligt fram/bak-djupplan: steget står FRAMFÖR kroppen (låda med lutande ovansida, stödfoten på ovansidan) och den fria foten står bakom på ett avlägset golvplan (högre upp i bilden, nära mittlinjen, streckad golvmarkering data-contact-plane=far-floor) och följer upp. Frontsegment lika långa som profilen: överarm 31,1 -> 25, bål 44 -> 40, startlår 35,8 -> 22-34 (aldrig över profilens 34); underben 33 lodräta, hantelgrepp och fotkontakter oförändrade. Start/Slut = live fas 0/1. Granska: fram H/V, kroppsvikt och två hantlar, fas 0-1 och tillbaka, stillbilder, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E02 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E02 step-up, fram fas 0–1 samt Start/Slut H/V, kroppsvikt/två hantlar: plattan bredvid stödfoten och fri fot utan tydligt bakre djupplan läses som sidouppsteg. Visa samma framåtriktade uppställning och följande fria fot som profil/text, med begripligt stegdjup och bibehållen knäspårning.",
       "[cheap] E02 step-up, fram fas 0–1 H/V och båda varianter: överarm 31,1 mot profil 25, bål 44 mot 40 och startlår 35,8 mot 34 ger synligt större kroppsproportioner. Anpassa frontsegmenten till profilen utan att tappa hantelgrepp eller fotkontakter."
     ],
-    "fingerprint": "ff388d06dc8b",
+    "fingerprint": "d319ba76b758",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: step-down, split-squat, box-jump. Uppsteg med hela foten på stödet skiljer sig från nedsteg, stationärt utfall och hopp. Behåll som eget rörelsemönster. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
@@ -438,7 +443,7 @@
     "name": "Stationärt utfall (split squat)",
     "group": "rehab/knee",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -547,13 +552,18 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E06: snedvyn hade överarm 29,7 mot 23,3 på andra sidan; nu båda 23,3 och underarmar 23,5 (aldrig längre än profilens). Väggstödet flyttat till x 64/136 och stödarmen löst med 23,3+23,5 så handen når väggen (tidigare 31+27). Baseline-rader asym:neck-eR 6,4 och asym:eR-hR 0,6 borttagna. Kvarstår: övriga snedvyrader (hip-kR 6,1, kR-aR 8,1) och profilens minor-drift. Granska: snedvy H/V, kroppsvikt (vägg) och 2 hantlar, fas 0-1. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E06: snedvyn har nu bakfoten planterad på golvet i stället för en lyft fri fot: bakre tån står på ett avlägset golvplan (y 172, 6 enheter över främre golvet) med hälen uppe, benet löper ner till golvet som i profilen (bakre lår/underben 30+25, tidigare 27+20, aldrig längre än profilen); den streckade linjen ligger nu vid golvet och ensam bär den inte läsningen. Baseline-raderna oblique asym:hip-kR 6,1 -> 3,1 och kR-aR 8,1 -> 3,1 sänkta. Reduced-motion Slut (profil) använder nu live fas 1 (knän upp till 10,7 och fötter 6 enheter var fel; nu 0,0). Granska: sned vinkel H/V, kroppsvikt (vägg) och två hantlar, fas 0-1, Start/Slut, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E06 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E06 split-squat, sned vinkel fas 0–1 och Start/Slut H/V, kroppsvikt/två hantlar: bakbenet läses som ett lyft fritt ben i stället för planterad fot i delad stans. Samordna golvets djupplan, fotkontakt och benriktning så samma fram/bak-stans som profil/text blir begriplig; en streckad linje ensam räcker inte.",
       "[cheap] E06 split-squat, reduced-motion Slut H/V, kroppsvikt/två hantlar: stillbildens knän skiljer upp till 10,7 och fötterna 6 enheter från live fas 1; profilens främre lår visas i annan vinkel. Generera Slut med samma rörelseväg och kontakter som live-loopen."
     ],
-    "fingerprint": "5af9458f945f",
+    "fingerprint": "763122ffc36f",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL. Jämför: reverse-lunge, forward-lunge, rear-foot-split-squat. Fötterna står kvar och handstöd kan användas. Behåll detta enklare stationsbundna steg även om någon dynamisk utfallsvariant tas bort. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -1045,7 +1055,7 @@
     "name": "Gobletknäböj utan stol",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -1128,12 +1138,17 @@
         "date": "2026-11-04",
         "fixer": "claude-sonnet",
         "notes": "E12: frontvyn låser fotleder och tår (ankleDX konstant 18) hela knäböjen; endast knäna rör sig utåt. Ingen sidoglidning vid nedgång eller återgång. Frontvyn ej visuellt granskad i kontaktblad, endast geometri/test."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E12: frontsegmenten följer nu profilens längder: överarm 30,5 -> 24 och underarm 19,7 -> 20 (lösta med solveTwoBone mot händerna vid bröstet), lår 35 -> 30,8 och underben 26 -> 26,5 (konstanta, knäna lösta över fasta fötter x 82/118). Tvåhandsgrepp, knäriktning utåt över tårna och fotkontakter bevarade; alla lastvarianter (kroppsvikt, hantel, kettlebell). Baseline-raderna front drift kR-aR/kL-aL 1,6 -> 0,8 sänkta. Start/Slut = live fas 0/1. Granska: fram fas 0-1 och tillbaka, alla varianter, stillbilder, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E12 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[cheap] E12 goblet-squat, fram fas 0–1 och Start/Slut, kroppsvikt/hantel/kettlebell: överarm 30,5 mot profil 24 och lår 35 mot 30,8 ger synligt förstorade kroppsproportioner. Anpassa segmenten till profilens längder och bevara tvåhandsgrepp, knäriktning och fotkontakter."
     ],
-    "fingerprint": "2a48327d74d5",
+    "fingerprint": "333f4a078014",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM HUVUDPOST. Jämför: kettlebell-goblet-squat, sumo-squat, goblet-chair-squat. Samlar redan kroppsvikt, hantel och kettlebell utan stol. Låt kettlebell-goblet-squat bli variant här, med dess 4 kg-val och greppinstruktion bevarade. Kodkopplingar: allmänna kandidatplatser A/squat; fokusplatser squat; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2045,7 +2060,7 @@
     "name": "Utfall bakåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2136,12 +2151,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E24: benen har nu stående längder (lår 30,6, underben 26,3, fot 11,4) i alla bildrutor, så starten är upprätt med nästan raka knän, och loopsömmen är lika med reduced-motion Start (skillnad 0,0, före 17,9). Knät böjs alltid framåt, bakre foten landar på tån och ligger kvar medan kroppen sänks. Före: bål 44→39,1, lår 39,1 och 35,0, arm 24,6→22,2; efter: drift 0,0. Frontvyn: samma ben- och armlängder (före lår 36,7→28,4, underben 31→16,3), nedre fotled/golvlinje oförändrad (front-baselinerader lägre/borta). Notera: hela rörelsen är omskriven (nya keyframes), så alla faser H/V, kroppsvikt/hantel/kettlebell och båda vyer behöver ses. Omgranskningen ska läsa alla faser, H/V, varianter och reduced-motion Start/Slut (390 mörkt, 1280 ljust) av Codex-modell eller human (korsgranskning)."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E24: frontens bakfot följer nu profilens tidpunkt: lyft, bakåtgående bana och landning vid fas 0,5 (uppåt i bilden = bakåt, 10 enheters lyft), därefter fast fot medan höften sänks (tidigare flyttades tån (133,5;170,5) -> (138;164) efter landningen). Läses som steg bakåt följt av sänkning i stället för diagonalt sidosteg. Främre foten, ben 30,6+26,3, armar och kettlebellgrepp oförändrade. Start/Slut = live fas 0/1. Granska: fram H/V, alla tre varianter, fas 0-1 och tillbaka, stillbilder, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E24 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E24 reverse-lunge, fram fas 0–1 ut/tillbaka och Start/Slut H/V, alla tre varianter: bakfoten saknar tydlig lyft-/landningssekvens och flyttar vidare från fas 0,5 till 1 trots att profilens fot redan landat. Samordna djupplan, fotbana och kontakttid med profilens baksteg så vyn inte läses som diagonalt sidosteg."
     ],
-    "fingerprint": "0d93c47fc3ff",
+    "fingerprint": "0149be7e2623",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM BAS. Jämför: forward-lunge, walking-lunge, split-squat. Bakåtsteg med främre foten kvar ger ett tydligt dynamiskt komplement till split-squat och ingår i nybörjarurvalet. Prioritera framför utfallsgång vid förenkling. Kodkopplingar: nybörjarurval; allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -2151,7 +2171,7 @@
     "name": "Utfall framåt",
     "group": "dumbbell",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -2247,12 +2267,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E25: Granskning 2026-11-18 (Codex re-review 5c47245) fann att stegfoten gled längs golvet (tå x 110->150,5, y 177) utan fritt steg. Rättat i profil (H/V, alla varianter): ny lungeFootPath.withForwardLungeStep lyfter hela högerfoten (14 enheter, tån något nedåt i luften), för den fram och landar den platt vid steglängden (middle-ramen) vid fas 0,3, innan huvudsänkningen; från fas 0,3 står foten kvar medan kroppen sänks till Slut (forwardLungeBodyProgress). Tillbakavägen är samma bana baklänges, så foten lyfts och kliver tillbaka före loopsömmen (Start = stilla). Knät böjs hela tiden framåt, ben 30,6+26,3 och bål 44 konstanta, bakre benet står kvar som stöd. Höften sjunker ändå cirka 13 enheter under steget (benlängden tillåter inte ett rakt steg med upprätt höft), resten sänks efter landning. Räkning/röst/repTempo (2+2 s) oförändrade. Frontvyn är oförändrad. Återgranskning bör kontrollera profil H/V, kroppsvikt/hantlar/kettlebell, fas 0-0,5 och tillbaka, reduced-motion, av annan leverantör än claude-sonnet. Granskning 2026-11-18 E25 avser figuren före denna rättning."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E25: frontens steg följer nu profilens: stegfoten lyfts (10 enheter), förs fram mot betraktaren och landar vid fas 0,3 (FORWARD_LUNGE_LAND), därefter fast fot medan kroppen sänks (höften följer forwardLungeBodyProgress). Tidigare gled tån y 164 -> 177 genom hela rörelsen. Bakre foten, ben 30,6+26,3, armar och kettlebellgrepp oförändrade. Start/Slut = live fas 0/1. Granska: fram H/V, alla tre varianter, fas 0-0,5 och tillbaka, stillbilder, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E25 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E25 forward-lunge, fram fas 0–1 ut/tillbaka och Start/Slut H/V, alla tre varianter: profilens fotlyft/landning vid fas 0,3 saknas; frontens tå flyttar genom hela sänkningen (y 164→177). Samordna frontens start, flygfas, landning och därefter fast fot med profilen så ett steg fram följt av sänkning blir begripligt."
     ],
-    "fingerprint": "77bf9bd2b293",
+    "fingerprint": "7a27b71b75bc",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] ÖVERVÄG FÄRRE VAL, P3. Jämför: reverse-lunge, walking-lunge. Framåtstegets inbromsning tillför något eget; inte en ren dublett. Om endast ett dynamiskt utfall ska finnas, behåll reverse-lunge som redan ligger i nybörjarurvalet. Ta först bort walking-lunge före denna. Kodkopplingar: allmänna kandidatplatser B/split-leg; fokusplatser split-leg; inte utesluten av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
@@ -7304,7 +7329,7 @@
     "name": "Nedsteg från steg",
     "group": "rehab/knee-strength",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-03",
@@ -7403,12 +7428,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E96: frontvyn har nu bål 40 (tidigare 44) och armar 25+25 (tidigare 31,1+22,8), stödhanden når fortfarande räcket (konstanta längder), stegfot och knäriktning oförändrade; hängande arm 25+25. Step-up (E02) oförändrad. Granska: front H/V fas 0-1, räckeskontakt, Start/Slut. Granskning 2026-11-18 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E96: fronten har nu ett tydligt fram/bak-djupplan: steget står framför kroppen med lutande ovansida (stödfoten uppe på steget) och den fria foten hänger FRAMFÖR steget, ritad över stegets framsida, ovanför en nära golvmarkering (data-contact-plane=near-floor) som den sänks mot. Räcke och stödhand (25+25), lodräta underben 33 och fast stödfot oförändrade; stegbredd 34 -> 46 så att fria foten når framför. Start/Slut = live fas 0/1. Granska: fram H/V fas 0-1 och tillbaka, stillbilder, av annan leverantör än claude-sonnet (cross-vendor). Granskning 2026-11-19 E96 avser figuren före denna rättning."
       }
     ],
     "openIssues": [
       "[strong] E96 step-down, fram fas 0–1 och Start/Slut H/V: plattan och fria foten läses bredvid kroppen som sidonedsteg, medan text/profil placerar fria foten framför steget. Visa begripligt fram/bak-djup, stegyta och fri fot framför utan att förlora räckeskontakt eller knäspårning."
     ],
-    "fingerprint": "307d04526f4b",
+    "fingerprint": "a9daa8c1d20a",
     "notes": [
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL FÖR REHAB. Jämför: step-up. Nedsänkning av fri häl under stödnivån och tillbaka har annan start, rörelsegräns och instruktion än uppsteg från golv. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]

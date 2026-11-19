@@ -4,6 +4,7 @@ import { CARRY_SHIN, CARRY_THIGH } from './carryPoses';
 import type { Equipment, Working } from './Figure';
 import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
+import { FORWARD_LUNGE_LAND, forwardLungeBodyProgress } from './lungeFootPath';
 import { mirrorAbout, obliqueFrame } from './obliqueBody';
 import {
   isLyingOblique,
@@ -127,6 +128,8 @@ export const STEP_DOWN_FRONT_GRIP_Y = 90;
 /** Step-down front: arms 25 + 25 and trunk 40, as in the profile figure. */
 const FRONT_UPPER_ARM = 25;
 const FRONT_FOREARM = 25;
+/** Step-up / step-down front shin: the profile shin (the thighs only foreshorten). */
+const STEP_SHIN = 33;
 
 function skeleton(
   head: Pt,
@@ -609,19 +612,26 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'reverse-lunge' || exerciseId === 'forward-lunge') {
-    const depth = t;
     const rightIsFront = working !== 'left';
     const frontX = rightIsFront ? 82 : 118;
     const backX = rightIsFront ? 118 : 82;
     const forward = exerciseId === 'forward-lunge';
+    // Same timing as the profile: the stepping foot lifts, travels and lands
+    // (reverse: phase 0.5, forward: FORWARD_LUNGE_LAND), then stays planted
+    // while the hips lower. Toward the viewer is forward, up the picture is back.
+    const landed = forward ? FORWARD_LUNGE_LAND : 0.5;
+    const stepU = clamp(t / landed);
+    const stepS = smooth(stepU);
+    const lift = 10 * Math.sin(Math.PI * stepU);
+    const depth = forward ? forwardLungeBodyProgress(t) : t;
     // Standing legs as in the profile (thigh 30.6, shin 26.3): the hip stays
     // within their reach of the planted ankle and sinks as the lunge deepens.
     const hipY = forward ? mix(113, 130, depth) : mix(121, 133, depth);
     const hip = point(100, hipY);
     const neckY = hipY - 44;
-    const frontFootY = forward ? mix(161, 174, depth) : 174;
-    const backFootY = forward ? 161 : mix(174, 161, depth);
-    const backDelta = forward ? 2 : mix(2, 11, depth);
+    const frontFootY = forward ? mix(161, 174, stepS) - lift : 174;
+    const backFootY = forward ? 161 : mix(174, 161, stepS) - lift;
+    const backDelta = forward ? 2 : mix(2, 11, stepS);
     const backAnkleX = backX + (rightIsFront ? 1 : -1) * backDelta;
     const leg = (ankle: Pt, bend: 1 | -1) =>
       joint(hip, ankle, FRONT_STAND_THIGH, FRONT_STAND_SHIN, bend);
@@ -717,63 +727,33 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'step-up' || exerciseId === 'step-down') {
-    const step = exerciseId === 'step-up' || exerciseId === 'step-down';
     const down = exerciseId === 'step-down';
-    // Step-up keeps both shins vertical at a fixed 33 and only foreshortens
-    // the thighs (a front view cannot show a longer thigh).
-    const up = exerciseId === 'step-up';
-    // Step-down: 14 unit stair step, vertical 33 shins, the free ankle only
-    // 0-3 units below the step top (the heel stops 5-8 cm under the step).
-    const freeAnkleY = mix(161, 168.5, t);
-    const hipY = down
-      ? mix(100, 108, t)
-      : up
-        ? mix(110, 92, t)
-        : step
-          ? mix(108, 84, t)
-          : mix(112, 140, t);
-    const otherAnkleY = mix(174, 150, t);
-    const neckY = hipY - (down ? 40 : 44);
-    // Feet occupy distinct depth planes: the support remains fixed while the
-    // trailing foot rises (step-up) or rests on the rear bench (split squat).
+    // Depth plane: the step stands in front of the body (towards the viewer)
+    // in both exercises. Step-up: the support foot is on the near step, the
+    // free foot starts on the far floor behind the body (higher on screen,
+    // nearer the middle line) and follows up. Step-down: the support foot is
+    // on the step and the free foot hangs in front of it (drawn over the step
+    // face) and lowers to the near floor. Legs are solved with the profile
+    // lengths (thigh 34, shin 33) so nothing is longer than the profile.
+    const hipY = down ? mix(100, 108, t) : mix(110, 95, t);
+    const neckY = hipY - 40;
+    const selAnkle = point(down ? 84 : 82, down ? 161 : 156);
+    const othAnkle = down
+      ? point(103, mix(161, 168.5, t))
+      : point(112, mix(171, 150, t));
+    const hipPt = point(100, hipY);
+    // Both shins stay vertical at a fixed 33 (the knee tracks straight over
+    // the foot); only the thighs foreshorten (at most 34, the profile thigh).
     const selected = {
-      knee: point(
-        82,
-        up ? 123 : down ? 128 : step ? mix(117, 113, t) : mix(146, 155, t),
-      ),
-      ankle: point(82, up ? 156 : down ? 161 : step ? 143 : 174),
-      toe: point(72, up ? 159 : down ? 164 : step ? 146 : 177),
+      knee: point(selAnkle[0], selAnkle[1] - STEP_SHIN),
+      ankle: selAnkle,
+      toe: point(selAnkle[0] - 10, selAnkle[1] + 3),
     };
-    const other = down
-      ? {
-          knee: point(118, freeAnkleY - 33),
-          ankle: point(118, freeAnkleY),
-          toe: point(128, freeAnkleY + 3),
-        }
-      : up
-        ? {
-            knee: point(118, otherAnkleY - 33),
-            ankle: point(118, otherAnkleY),
-            toe: point(128, otherAnkleY + 3),
-          }
-        : {
-            knee: point(
-              118,
-              down
-                ? mix(113, 132, t)
-                : step
-                  ? mix(140, 113, t)
-                  : mix(132, 155, t),
-            ),
-            ankle: point(
-              120,
-              down ? mix(143, 156, t) : step ? mix(174, 138, t) : 139,
-            ),
-            toe: point(
-              130,
-              down ? mix(146, 159, t) : step ? mix(177, 141, t) : 142,
-            ),
-          };
+    const other = {
+      knee: point(othAnkle[0], othAnkle[1] - STEP_SHIN),
+      ankle: othAnkle,
+      toe: point(othAnkle[0] + 10, othAnkle[1] + 3),
+    };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
     // Anatomical right is always viewer-left; select geometry before placing it.
@@ -801,26 +781,18 @@ export function frontMovementPose(
     const gripHand = grip
       ? place(grip.end, working === 'left' ? 'R' : 'L')
       : [0, 0];
-    // Step-down arms hang 25 + 25 like the profile; step-up keeps its own.
+    // Both arms hang 25 + 25 like the profile.
     const freeElbow = (side: 'R' | 'L'): Pt =>
-      down
-        ? point(side === 'R' ? 86.5 : 113.5, neckY + 21)
-        : side === 'R'
-          ? point(78, neckY + 22)
-          : point(122, neckY + 22);
+      point(side === 'R' ? 86.5 : 113.5, neckY + 21);
     const freeHand = (side: 'R' | 'L'): Pt =>
-      down
-        ? point(side === 'R' ? 78 : 122, neckY + 44.5)
-        : side === 'R'
-          ? point(72, neckY + 44)
-          : point(128, neckY + 44);
+      point(side === 'R' ? 78 : 122, neckY + 44.5);
     const gripSide = working === 'left' ? 'R' : 'L';
     const armR = down && gripSide === 'R';
     const armL = down && gripSide === 'L';
     return skeleton(
       point(100, neckY - 14),
       neckPt,
-      point(100, hipY),
+      hipPt,
       armR ? (gripElbow as Pt) : freeElbow('R'),
       armR ? (gripHand as Pt) : freeHand('R'),
       armL ? (gripElbow as Pt) : freeElbow('L'),
@@ -879,25 +851,31 @@ export function frontMovementPose(
     );
   }
   if (exerciseId === 'goblet-squat') {
+    // Profile lengths (arm 24 + 20, thigh 30.8, shin 26.5, trunk 44): the feet
+    // stay planted and the knees are solved, so they travel out over the toes
+    // as the hips drop. Both hands hold the weight at the chest.
     const hipY = mix(118, 136, t);
     const neckY = hipY - 44;
-    const kneeDX = mix(18, 31, t);
-    const ankleDX = 18; // feet stay planted; only the knees travel outward
-    const kneeY = mix(148, 150, t);
+    const hip = point(100, hipY);
+    const neck = point(100, neckY);
+    const aR = point(82, 174);
+    const aL = point(118, 174);
+    const armR = solveTwoBone(neck, [94, neckY + 10], 24, 20, -1);
+    const armL = solveTwoBone(neck, [106, neckY + 10], 24, 20, 1);
     return skeleton(
       point(100, neckY - 14),
-      point(100, neckY),
-      point(100, hipY),
-      point(77, neckY + 20),
-      point(94, neckY + 10),
-      point(123, neckY + 20),
-      point(106, neckY + 10),
-      point(100 - kneeDX, kneeY),
-      point(100 - ankleDX, 174),
-      point(90 - ankleDX, 177),
-      point(100 + kneeDX, kneeY),
-      point(100 + ankleDX, 174),
-      point(110 + ankleDX, 177),
+      neck,
+      hip,
+      armR.mid,
+      armR.end,
+      armL.mid,
+      armL.end,
+      joint(hip, aR, SQUAT_THIGH, SQUAT_SHIN, 1),
+      aR,
+      point(72, 177),
+      joint(hip, aL, SQUAT_THIGH, SQUAT_SHIN, -1),
+      aL,
+      point(128, 177),
     );
   }
 
@@ -1012,18 +990,18 @@ function russianTwistProjection(progress: number): {
   };
 }
 
-/** Height of the dashed rear contact line in the oblique split squat. */
-export const SPLIT_REAR_LINE_Y = 146;
+/** Floor height of the rear toe in the oblique split squat: the far floor plane, a little above the near floor (178). */
+export const SPLIT_REAR_LINE_Y = 172;
 /**
  * Projected leg segments of the oblique split squat: the front leg keeps the
  * profile thigh and shin (33.1, 28.1); the rear leg points away from the viewer
- * and is foreshortened to about 80 % (27, 20). Both are constant, so the
+ * and is foreshortened (30, 25), its toe planted on the far floor. Both are constant, so the
  * knees are solved from the hip and the planted ankles in every phase.
  */
 const SPLIT_FRONT_THIGH = 33.1;
 const SPLIT_FRONT_SHIN = 28.1;
-const SPLIT_REAR_THIGH = 27;
-const SPLIT_REAR_SHIN = 20;
+const SPLIT_REAR_THIGH = 30;
+const SPLIT_REAR_SHIN = 25;
 
 /** Thigh and shin of the oblique chair squat: those of the profile figure. */
 const CHAIR_THIGH = 31;
@@ -1133,9 +1111,11 @@ export function obliqueMovementPose(
     // The front knee glides forward over the toes as the hip drops. Rear
     // toe stays on the rear contact line (SPLIT_REAR_LINE_Y) in every phase.
     const frontAnkle = rightFront ? point(81, 174) : point(119, 174);
+    // The rear foot is planted on the far floor: the toe on the floor, the
+    // heel up, so the leg runs down to the floor like the profile's rear leg.
     const rearAnkle = rightFront
-      ? point(128, SPLIT_REAR_LINE_Y - 3)
-      : point(72, SPLIT_REAR_LINE_Y - 3);
+      ? point(122, SPLIT_REAR_LINE_Y - 6)
+      : point(78, SPLIT_REAR_LINE_Y - 6);
     const bend = rightFront ? 1 : -1;
     const front = {
       knee: joint(hip, frontAnkle, SPLIT_FRONT_THIGH, SPLIT_FRONT_SHIN, bend),
@@ -1146,8 +1126,8 @@ export function obliqueMovementPose(
       knee: joint(hip, rearAnkle, SPLIT_REAR_THIGH, SPLIT_REAR_SHIN, bend),
       ankle: rearAnkle,
       toe: rightFront
-        ? point(138, SPLIT_REAR_LINE_Y)
-        : point(62, SPLIT_REAR_LINE_Y),
+        ? point(131, SPLIT_REAR_LINE_Y)
+        : point(69, SPLIT_REAR_LINE_Y),
     };
     const right = rightFront ? front : rear;
     const left = rightFront ? rear : front;
@@ -1641,35 +1621,55 @@ export function FrontFigureFrame({
         </g>
       ) : null}
       {exerciseId === 'step-up' || exerciseId === 'step-down' ? (
-        <g
-          data-support="step"
-          fill="var(--surface)"
-          stroke="var(--equipment)"
-          strokeWidth="2"
-        >
-          <rect
-            x={
-              (exerciseId === 'step-up' || exerciseId === 'step-down') ===
-              (working !== 'left')
-                ? 61
-                : 107
+        // The step stands in front of the body (towards the viewer): a box with
+        // a receding top face. Step-up: the free foot waits on a far floor mark
+        // behind the body. Step-down: the free foot hangs over the step face,
+        // in front of it, above a near floor mark.
+        <g data-contact-plane="receding-step">
+          {(() => {
+            const left = working === 'left';
+            const up = exerciseId === 'step-up';
+            const [x0, x1, top, back] = up
+              ? [63, 101, 159, 151]
+              : [68, 114, 164, 157];
+            const m = (x: number) => (left ? 200 - x : x);
+            const fx0 = Math.min(m(x0), m(x1));
+            const fx1 = Math.max(m(x0), m(x1));
+            const inset = left ? -4 : 4;
+            return (
+              <g
+                data-support="step"
+                fill="var(--surface)"
+                stroke="var(--equipment)"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              >
+                <rect
+                  x={fx0}
+                  y={top}
+                  width={fx1 - fx0}
+                  height={up ? 18 : 14}
+                  rx="2"
+                />
+                <path
+                  d={`M${m(x0)} ${top}L${m(x0) + inset} ${back}H${m(x1) - inset}L${m(x1)} ${top}Z`}
+                />
+              </g>
+            );
+          })()}
+          <path
+            data-contact-plane={
+              exerciseId === 'step-up' ? 'far-floor' : 'near-floor'
             }
-            y={
+            d={
               exerciseId === 'step-up'
-                ? 159
-                : exerciseId === 'step-down'
-                  ? 164
-                  : 142
+                ? `M${working === 'left' ? 70 : 100} 175h30`
+                : `M${working === 'left' ? 84 : 94} 177h22`
             }
-            width="34"
-            height={
-              exerciseId === 'step-up'
-                ? 18
-                : exerciseId === 'step-down'
-                  ? 14
-                  : 35
-            }
-            rx="2"
+            fill="none"
+            stroke="var(--edge)"
+            strokeWidth="2"
+            strokeDasharray="4 3"
           />
         </g>
       ) : null}

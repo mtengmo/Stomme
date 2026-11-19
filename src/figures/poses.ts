@@ -332,13 +332,15 @@ const baseFigures: Record<Exclude<ExerciseId, PhysioFigureId>, FigureSpec> = {
         [132, 108],
         [156, 120],
       ],
+      // The legs are the live phase-1 pose (the constrained-leg solver's
+      // result), so the reduced-motion Slut equals the loop's last frame.
       [
-        [134, 142],
-        [126, 174],
-        [136, 177],
-        [92, 168],
-        [72, 166],
-        [78, 176],
+        [136.4, 151.2],
+        [120, 174],
+        [130, 177],
+        [102.7, 172],
+        [78, 166],
+        [84, 176],
       ],
     ),
     props: [{ type: 'wall', x: 160 }],
