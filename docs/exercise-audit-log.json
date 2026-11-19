@@ -3516,6 +3516,14 @@
         "result": "issues",
         "commit": "4e1561f",
         "notes": "E41: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Vyer finns/kontrollerade: side, front; nio faser ut/tillbaka, hel liveperiod 4 s, reduced-motion Start/Slut, H/V, Kroppsvikt + stol, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: mismatch i frontens uppställning; röst/profil/text stämmer sinsemellan. AF1: fronten läses som ett sidoböjt bakre ben mot en låda bredvid kroppen; bakre knät flyttas 21,5 i sidled (H x 103,8→125,2) med foten fast, utan tydliga djupsignaler för stöd bakom kroppen. Synligt H/V hela loopen/stills. Profilen visar rätt fram/bak-uppställning, fasta kontakter och segment. Tidigare AF2 accepterade förkortning som projektion men missade denna läsbarhet. Källa NASM https://www.nasm.org/resource-center/exercise-library/bulgarian-split-squat (läst 2026-11-19): bänk bakom, bakre fot på stödet, böj främre knä/höft och pressa upp genom främre benet. Källtext verifierad; källvideo ej sedd. Ingen ny medicinsk riskutsaga. Rena källor, HEAD 4e1561f identisk; senaste rättare claude-sonnet."
+      },
+      {
+        "date": "2026-11-19",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "bb89dfb",
+        "notes": "E41: score 13/15 (T3 R3 AS3 AF1 U n/a S3). Sida/fram H/V, Kroppsvikt + stol, nio faser ut/tillbaka, samplad hel live-loop, reduced-motion Start/Slut, 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad: främre ben/reps/2+2 s stämmer. Konsistens consistent; nytt fel gäller figurgeometri. Gamla bänk-/sidosveppunkten stängs: avtagande bakre bänk och fot nära höftens sida gör uppställningen bakom begriplig; knäets x-svep nu 4. AF1 kvar som nytt bottenlägesfel: bakre lår 34,3→15,5 mot profil 37, knä y 150,6→151,0 medan höften 117→140. I fas 0,75–1 och Slut H/V dras benet synligt ihop till en kort krok kring bänkkanten; profilen sänker bakknät y 147,3→168,1. Kortare segment ensamt är inte felet, utan den nästan stillastående knäbanan och hopdragna benformen. Främre fot fast, knäriktning synlig, stills = live 0/1. NASM https://www.nasm.org/resource-center/exercise-library/bulgarian-split-squat läst 2026-11-19: bänk bakom, främre ben driver. Källvideo/illustration ej verifierad. Ingen ny medicinsk risk sluts. HEAD-figur identisk: ja."
       }
     ],
     "fixes": [
@@ -3528,12 +3536,17 @@
         "date": "2026-11-19",
         "fixer": "claude-sonnet",
         "notes": "E41 AF1 (frontvyn): bakre benet och b�nken l�ses nu som bakom kroppen. Bakre vrist x 120 till 110 (n�ra samma sidas h�ft), bakre underben konstant 12 (var 18) och kn�t r�r sig mest lodr�tt (x-drift 4, var 21,5 i sidled); bakre l�r 34,3 till 15,5 (f�rkortas, aldrig �ver profilens 37), t� x 130 till 114. B�nken �r ritad f�re kroppen med l�gre kontrast och en avsmalnande, h�gre bortre kant (data-contact-plane receding-bench), placerad bakom b�da h�fterna i st�llet f�r en plan ruta bredvid kroppen. Fr�mre ben och armar of�r�ndrade. Profil or�rd. Testerna reviewFixesE32E59 och frontViews uppdaterade till nya geometrin; baseline-raderna ej h�jda. Granskning 2026-11-19 codex:gpt61sol all avser figuren f�re denna r�ttning. Ny granskning av Codex-modell eller human: front fas 0-1 ut/tillbaka H/V, reduced-motion Start/Slut, fr�mre kn�riktning, 390 m�rkt och 1280 ljust."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E41: frontvyns bakre knä sjunker nu med höften (y 148→155) på ett konstant underben 16 runt bänkvristen (x 118, tå 122), från innanför bänken till rakt under vristen, i stället för att stå still vid bänkkanten (bakre låret 34→15,5 tidigare). Bakre lår högst 36, bänk, främre ben och Start/Slut (= live 0/1) oförändrade, inga nya baslinjerader. Osäkert: bakre benet kan läsas som ett veckat ben på bänken; omgranskningen ska bedöma om det läses som sänkning bakom kroppen."
       }
     ],
     "openIssues": [
-      "[strong] E41 rear-foot-split-squat, front fas 0–1 och återgång samt reduced-motion Start/Slut, H/V, Kroppsvikt + stol: bakre benet och stödet läses som placerade åt sidan i stället för tydligt bakom kroppen. Bakre knät sveper cirka 21,5 enheter i sidled med foten fast på stödet; längdgränserna bevisar inte korrekt djup/projektion. Gör bakre stödets djup och benets rörelseplan tydliga, förenliga med profil och NASM:s uppställning, utan att dölja främre knäriktningen."
+      "[strong] E41 rear-foot-split-squat, fram fas 0,75–1 och reduced-motion Slut H/V, Kroppsvikt + stol: bakre knät står nästan still i höjd (y 150,6→151,0 över hela sänkningen) medan höften går 117→140. Låret dras synligt ihop 34,3→15,5 till en kort krok kring bänkkanten; profilens bakknä sänks y 147,3→168,1. Bänken bakom är nu begriplig, men bakbenets knäbana och orientering behöver en sammanhängande djupprojektion av sänkningen, med kvarvarande fotkontakt och synlig främre knäriktning."
     ],
-    "fingerprint": "63745249a0f5",
+    "fingerprint": "3365880b316f",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: split-squat, single-leg-chair-squat. Upphöjd bakfot ger ett eget upplägg. Redan utanför allmänna program; inte automatisk ersättning för stationärt utfall eller enbens stolknäböj. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."

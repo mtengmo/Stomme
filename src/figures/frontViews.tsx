@@ -680,18 +680,20 @@ export function frontMovementPose(
     // Front leg: knee over the planted foot, thigh at most 35.9 (it only
     // foreshortens). Rear leg: the foot rests on the bench BEHIND the body, so
     // the ankle sits just outside the same-side hip and the leg runs away from
-    // the viewer: the shin is strongly foreshortened (constant 12) and the knee
-    // moves mostly vertically (x drifts 4) instead of sweeping sideways. The
-    // thigh only foreshortens (at most 35.9, never longer than the profile 37).
+    // the viewer: the shin is a constant 16 (foreshortened) and the
+    // thigh stays under the profile 37.
     // Arms are folded at the chest with the profile's 25.5 / 12.8.
     const hipY = mix(117, 140, t);
     const neckY = hipY - 44;
     const hip = point(100, hipY);
-    const rearAnkle = point(110, 139);
-    const rearKneeDx = mix(-3, 1, t);
+    const rearAnkle = point(118, 139);
+    // The rear knee sinks with the hip (y 148 -> 155) on a constant 16 shin
+    // around the bench ankle, moving from inboard of the bench to straight under
+    // the ankle, so the leg reads as lowering towards the floor behind the body.
+    const rearKneeY = mix(148, 155, t);
     const rearKnee = point(
-      rearAnkle[0] + rearKneeDx,
-      rearAnkle[1] + Math.sqrt(12 * 12 - rearKneeDx * rearKneeDx),
+      rearAnkle[0] - Math.sqrt(16 * 16 - (rearKneeY - rearAnkle[1]) ** 2),
+      rearKneeY,
     );
     const selected = {
       knee: point(82, mix(148, 155, t)),
@@ -701,7 +703,7 @@ export function frontMovementPose(
     const other = {
       knee: rearKnee,
       ankle: rearAnkle,
-      toe: point(114, 142),
+      toe: point(122, 142),
     };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;

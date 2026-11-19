@@ -153,12 +153,8 @@ describe('E40/E41/E47 front projections', () => {
       for (const t of PHASES) {
         const p = frontMovementPose('rear-foot-split-squat', t, working);
         // The rear foot rests on the bench behind the body: the shin is a
-        // constant foreshortened 12 and the knee moves mostly vertically.
-        expect(length(p, rear[0], rear[1])).toBeCloseTo(12, 1);
-        const rearSide = working === 'right' ? 'L' : 'R';
-        expect(
-          Math.abs(p[`k${rearSide}`][0] - p[`a${rearSide}`][0]),
-        ).toBeLessThan(4);
+        // constant foreshortened 16 while the knee sinks with the hip.
+        expect(length(p, rear[0], rear[1])).toBeCloseTo(16, 1);
         expect(length(p, 'neck', 'eR')).toBeLessThanOrEqual(25.6);
         expect(length(p, 'eR', 'hR')).toBeLessThanOrEqual(12.8);
         expect(length(p, 'hip', 'kR')).toBeLessThanOrEqual(36);
