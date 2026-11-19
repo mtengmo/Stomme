@@ -668,25 +668,30 @@ export function frontMovementPose(
   }
   if (exerciseId === 'rear-foot-split-squat') {
     // Front leg: knee over the planted foot, thigh at most 35.9 (it only
-    // foreshortens). Rear leg: the foot rests on the bench behind; its thigh
-    // (30) and projected shin (18) keep their length instead of collapsing.
+    // foreshortens). Rear leg: the foot rests on the bench BEHIND the body, so
+    // the ankle sits just outside the same-side hip and the leg runs away from
+    // the viewer: the shin is strongly foreshortened (constant 12) and the knee
+    // moves mostly vertically (x drifts 4) instead of sweeping sideways. The
+    // thigh only foreshortens (at most 35.9, never longer than the profile 37).
     // Arms are folded at the chest with the profile's 25.5 / 12.8.
     const hipY = mix(117, 140, t);
     const neckY = hipY - 44;
     const hip = point(100, hipY);
-    const rearAnkle = point(120, 139);
-    const [kneeA, kneeB] = [1, -1].map((bend) =>
-      joint(hip, rearAnkle, 30, 18, bend),
-    ) as [Pt, Pt];
+    const rearAnkle = point(110, 139);
+    const rearKneeDx = mix(-3, 1, t);
+    const rearKnee = point(
+      rearAnkle[0] + rearKneeDx,
+      rearAnkle[1] + Math.sqrt(12 * 12 - rearKneeDx * rearKneeDx),
+    );
     const selected = {
       knee: point(82, mix(148, 155, t)),
       ankle: point(82, 174),
       toe: point(72, 177),
     };
     const other = {
-      knee: kneeA[1] >= kneeB[1] ? kneeA : kneeB,
+      knee: rearKnee,
       ankle: rearAnkle,
-      toe: point(130, 142),
+      toe: point(114, 142),
     };
     const right = working === 'left' ? other : selected;
     const left = working === 'left' ? selected : other;
@@ -1606,15 +1611,38 @@ export function FrontFigureFrame({
           strokeDasharray="4 3"
         />
       ) : null}
-      {exerciseId === 'step-up' ||
-      exerciseId === 'step-down' ||
-      exerciseId === 'rear-foot-split-squat' ? (
+      {exerciseId === 'rear-foot-split-squat' ? (
+        // The bench stands BEHIND the body: drawn before the figure so the
+        // body occludes it, lower contrast, and a receding top plane (the far
+        // edge is higher and narrower) as the depth cue.
         <g
-          data-support={
-            exerciseId === 'step-up' || exerciseId === 'step-down'
-              ? 'step'
-              : 'rear-bench'
-          }
+          data-support="rear-bench"
+          data-contact-plane="receding-bench"
+          fill="var(--surface)"
+          stroke="var(--equipment)"
+          strokeWidth="2"
+          strokeOpacity="0.55"
+          strokeLinejoin="round"
+        >
+          <rect
+            x={working === 'left' ? 72 : 88}
+            y="142"
+            width="40"
+            height="35"
+            rx="2"
+          />
+          <path
+            d={
+              working === 'left'
+                ? 'M72 142L76 137H108L112 142Z'
+                : 'M88 142L92 137H124L128 142Z'
+            }
+          />
+        </g>
+      ) : null}
+      {exerciseId === 'step-up' || exerciseId === 'step-down' ? (
+        <g
+          data-support="step"
           fill="var(--surface)"
           stroke="var(--equipment)"
           strokeWidth="2"

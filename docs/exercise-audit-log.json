@@ -3333,7 +3333,7 @@
     "name": "Bulgariskt utfall på bänk",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "needs-fix",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3418,12 +3418,17 @@
         "date": "2026-11-18",
         "fixer": "claude-sonnet",
         "notes": "E41: egen frontgren (delas inte längre med step-up/step-down): bakre lår 30 och underben 18 konstanta (var underben 2,4 vid fas .25), armar 25,5+12,7, lår högst 35,5; drift kR-aR 9 till 7. Behöver ny granskning av Codex-modell eller human (alla faser, varianter, H/V, reduced-motion)."
+      },
+      {
+        "date": "2026-11-19",
+        "fixer": "claude-sonnet",
+        "notes": "E41 AF1 (frontvyn): bakre benet och b�nken l�ses nu som bakom kroppen. Bakre vrist x 120 till 110 (n�ra samma sidas h�ft), bakre underben konstant 12 (var 18) och kn�t r�r sig mest lodr�tt (x-drift 4, var 21,5 i sidled); bakre l�r 34,3 till 15,5 (f�rkortas, aldrig �ver profilens 37), t� x 130 till 114. B�nken �r ritad f�re kroppen med l�gre kontrast och en avsmalnande, h�gre bortre kant (data-contact-plane receding-bench), placerad bakom b�da h�fterna i st�llet f�r en plan ruta bredvid kroppen. Fr�mre ben och armar of�r�ndrade. Profil or�rd. Testerna reviewFixesE32E59 och frontViews uppdaterade till nya geometrin; baseline-raderna ej h�jda. Granskning 2026-11-19 codex:gpt61sol all avser figuren f�re denna r�ttning. Ny granskning av Codex-modell eller human: front fas 0-1 ut/tillbaka H/V, reduced-motion Start/Slut, fr�mre kn�riktning, 390 m�rkt och 1280 ljust."
       }
     ],
     "openIssues": [
       "[strong] E41 rear-foot-split-squat, front fas 0–1 och återgång samt reduced-motion Start/Slut, H/V, Kroppsvikt + stol: bakre benet och stödet läses som placerade åt sidan i stället för tydligt bakom kroppen. Bakre knät sveper cirka 21,5 enheter i sidled med foten fast på stödet; längdgränserna bevisar inte korrekt djup/projektion. Gör bakre stödets djup och benets rörelseplan tydliga, förenliga med profil och NASM:s uppställning, utan att dölja främre knäriktningen."
     ],
-    "fingerprint": "4022a82acddb",
+    "fingerprint": "63745249a0f5",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] BEHÅLL SOM SPECIALVARIANT. Jämför: split-squat, single-leg-chair-squat. Upphöjd bakfot ger ett eget upplägg. Redan utanför allmänna program; inte automatisk ersättning för stationärt utfall eller enbens stolknäböj. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
