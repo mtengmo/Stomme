@@ -3424,7 +3424,7 @@
     "name": "Sidoplanka på bänk med benlyft",
     "group": "rehab/physio",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -3552,11 +3552,10 @@
         "notes": "E42: källnoten i exerciseMetadata.ts påstår nu bara det studien visar (närliggande Copenhagen-övningar har stöd i forskning; exakt repetitivt nedre benlyft visas inte). Figuren oförändrad. Källraden \"Exact lower-leg-lift variant has related research only\" är oförändrad och ska stängas av granskaren, inte av rättaren."
       }
     ],
-    "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
-    ],
+    "openIssues": [],
     "fingerprint": "d4883ac0c4c9",
     "notes": [
+      "[maintainerbeslut 2026-11-19, registrerat av codex:gpt61sol] Användaren godkände E42:s nybörjarförståelse med meddelandet \"nybörqr delen ok\" efter omgranskningen i e867d71. Processraden stängs på detta uttryckliga beslut. Fullständig visuell loopkontroll och scope all/ok finns i Codex-granskningen 2026-11-19 vid a915ee4, efter senaste Claude-rättningen. Inga öppna frågor återstår; status approved. Ingen ny human-granskningspost eller ny figurgranskning påstås. Äldre gransknings- och kataloganteckningar bevaras som historik.",
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
       "[katalogöverlapp 2026-11-05 codex:gpt6astra, ae176f5] INAKTIVERINGSKANDIDAT, P2. Jämför: copenhagen-hold, side-lying-hip-adduction. Svagast dokumenterad i bänk-/adduktorfamiljen: loggen har kvar lucka för källa till exakt benlyftsvariant och nybörjarförståelse. Överväg att dölja denna före alternativen. Dynamiskt långt ben och statiskt knästöd är olika doseringar; byt inte automatiskt i ett rehabpass. Kodkopplingar: allmänna kandidatplatser inga; fokusplatser inga; utesluten från allmänna program av programExcludedIds. Kandidatplats är inte belägg för faktisk användning eller frekvens. Redaktionellt förslag utifrån katalogens instruktioner, utrustningsval, kodkopplingar och befintlig auditlogg; inte ny animations-/säkerhetsgranskning eller medicinsk rangordning. Ingen inaktivering utförd. Vid senare bortval: kontrollera sparade program, favoriter, historik, alias, varianter och dosering innan id tas ur urvalet."
     ]
