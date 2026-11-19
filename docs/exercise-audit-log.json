@@ -119,7 +119,7 @@
     "name": "Uppsteg på låda (step-up)",
     "group": "rehab/knee",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -181,6 +181,13 @@
         "result": "ok",
         "commit": "f3bfc76",
         "notes": "E02: score 18/18 (T3 R3 AS3 AF3 U3 S3). Befintliga/kontrollerade vyer: side, front; nio faser ut/tillbaka, hel liveperiod, reduced-motion, H/V, Kroppsvikt + steg (Kroppsvikt), 2 hantlar + steg (2×5 kg), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Vald helfot ligger kvar på steget; det fria benet lyfter och återvänder till golvet i båda vyer. Profilsegment konstanta; frontlår förkortas 22,2–35,8 inom profilens längd, inte längdväxt. Front visar knä över fot, H/V anatomiskt rätt, båda hantlar i händerna. Stillbilder motsvarar ändlägen, rep 2+2 s och sidröst stämmer. Fullständig visuell loopkontroll: gjord; processraden kvarstår för mänsklig nybörjarbedömning. Granskat HEAD f3bfc76, figur identisk; isolerat worktree vid parallella källändringar."
+      },
+      {
+        "date": "2026-11-19",
+        "reviewer": "human",
+        "scope": "all",
+        "result": "ok",
+        "notes": "Magnus Tengmo godkände nybörjarförståelsen (comprehension-raden) 2026-11-19 efter Codex-granskningen codex:gpt61sol (scope all, ok) som kom efter senaste rättningen. Godkänner övningen som helhet på den grunden; ingen ny figurgranskning gjord av människan."
       }
     ],
     "fixes": [
@@ -197,9 +204,7 @@
         "notes": "W3b: front view with fixed shins, foreshortened thighs, 18 unit step."
       }
     ],
-    "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
-    ],
+    "openIssues": [],
     "fingerprint": "ff388d06dc8b",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
@@ -278,7 +283,7 @@
     "name": "Dead bug",
     "group": "strength",
     "risk": "normal",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-10-23",
@@ -317,6 +322,13 @@
         "result": "ok",
         "commit": "f3bfc76",
         "notes": "E04: score 11/12 (T3 R3 AS2 AF n/a U n/a S3). Befintliga/kontrollerade vyer: side; nio faser ut/tillbaka, hel liveperiod, reduced-motion, H/V, Kroppsvikt (Kroppsvikt), 390 mörkt/1280 ljust. Röst kontrollerad i källa, ej uppspelad; ljud ej verifierat. Konsistens: consistent. Tidigare segmentfel rättat: armar 20+20, lår cirka 30 och underben 28 konstanta. Vald arm och motsatt ben markeras/förs ut, den andra armen och det andra knät stannar; H/V speglar rätt. Ryggen kvar vid mattan, mindre stroke-gap cirka 1,5 (AS2); armen har begränsad men tydligt bakåtriktad räckning. Start/Slut matchar live och 2+2 s stämmer. Fullständig visuell loopkontroll gjord; processraden för mänsklig nybörjarbedömning kvar. Granskat HEAD f3bfc76, figur identisk; isolerat worktree vid parallella källändringar."
+      },
+      {
+        "date": "2026-11-19",
+        "reviewer": "human",
+        "scope": "all",
+        "result": "ok",
+        "notes": "Magnus Tengmo godkände nybörjarförståelsen (comprehension-raden) 2026-11-19 efter Codex-granskningen codex:gpt61sol (scope all, ok) som kom efter senaste rättningen. Godkänner övningen som helhet på den grunden; ingen ny figurgranskning gjord av människan."
       }
     ],
     "fixes": [
@@ -326,9 +338,7 @@
         "notes": "E04: överarm, underarm och lår har konstanta längder i hela loopen (tidigare överarm 20 till 33,2, lår 30,1 till 21,6); slutposens arm och ben är raka (20+20, 30+28). Via SEGMENT_RULES/segmentLengths.ts. Behöver ny granskning av Codex-modell eller human: alla faser, H/V, reduced-motion."
       }
     ],
-    "openIssues": [
-      "Beginner comprehension check and full-loop visual acceptance outstanding (animation-fix-handoff.md)"
-    ],
+    "openIssues": [],
     "fingerprint": "0a0ca764634e",
     "notes": [
       "docs/animation-fix-handoff.md (implemented 2026-10-24): side cues, press grip, E42 wording or front view changed; implementer not named in the doc.",
