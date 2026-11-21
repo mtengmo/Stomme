@@ -16,6 +16,7 @@ import { focusPresets } from './focusPresets';
 import { kneeConditioningPlan, kneeRehabExercises } from './kneeRehab';
 import { exerciseMuscles } from './muscles';
 import { physioKneeItems } from './physioKneeProgramme';
+import { pendingReviewIds, programExcludedIds } from './programExclusions';
 import {
   focusSlots,
   generalSlots,
@@ -317,7 +318,7 @@ describe('review ordering', () => {
       .sort(compareReferences);
     expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
     expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
-    expect(sorted.at(-1)).toBe('E109');
+    expect(sorted.at(-1)).toBe('E110');
   });
 });
 
@@ -372,5 +373,46 @@ describe('skater bound (E109)', () => {
     expect(exerciseList.filter((e) => e.id === id && !e.optional)).toHaveLength(
       0,
     );
+  });
+});
+
+describe('lunge with rotation (E110)', () => {
+  const id = 'lunge-with-rotation' as const;
+
+  it('takes the next permanent reference and is knee-loaded but not an impact exercise', () => {
+    expect(exerciseReferences[id]).toBe('E110');
+    expect(exercises[id].kneeLoaded).toBe(true);
+    expect(rehabImpactExercises.has(id)).toBe(false);
+  });
+
+  it('counts reps per front leg automatically with a bodyweight default', () => {
+    expect(exercises[id]).toMatchObject({
+      unit: 'reps',
+      perSide: true,
+      sideKind: 'ben',
+      range: { start: 6, max: 12, step: 1 },
+    });
+    expect(exerciseMetadata[id].variants[0]?.equipment).toEqual([
+      { type: 'bodyweight', count: 1 },
+    ]);
+    expect(exercises[id].loadLadder).toEqual([{ kg: 0, label: 'Kroppsvikt' }]);
+    expect(repTempo(id)).not.toBeNull();
+  });
+
+  it('is editorial, warns about pain and is pending cross-review', () => {
+    const [source] = exerciseMetadata[id].sources;
+    expect(source?.publisher).toBe('Stomme');
+    expect(source?.url).toBeUndefined();
+    expect(source?.note).toContain('Redaktionell övning');
+    expect(source?.note).toContain('Avbryt vid smärta');
+    expect(pendingReviewIds.has(id)).toBe(true);
+    expect(programExcludedIds.has(id)).toBe(true);
+    expect(exerciseMetadata[id].purposes.running).toBeDefined();
+    expect(exerciseAliases[id]).toContain('Lunge with rotation');
+  });
+
+  it('names the front leg in the side cue', () => {
+    expect(exerciseSideCue(id, 'right')?.label).toBe('höger ben fram');
+    expect(exerciseSideCue(id, 'left')?.label).toBe('vänster ben fram');
   });
 });

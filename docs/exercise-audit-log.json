@@ -5794,6 +5794,31 @@
     "fingerprint": "dd5ad5bee0d6"
   },
   {
+    "id": "lunge-with-rotation",
+    "name": "Utfall med rotation",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E110 (text, metadata, sidovy och sned vinkel). Utfall bakåt med kroppsvikt: främre (valda) benet står stilla, bakre foten kliver bakåt och tillbaka, händerna hålls ihop framför bröstet och bröstkorgen vrids över främre benet i botten (vridning 0 till cirka 80 grader mellan fas 0,55 och 0,95) medan höfterna står kvar. Risk high enligt loggens regel (knäbelastad övning, som övriga utfall). Sidovy (hand-författad, src/figures/lungeRotation.ts): benlängder 36/34, armar 25/25 och bål 43 konstanta, främre foten fast på y 174, bakre foten rullar upp på tå (tå på y 177). Sned vinkel (standard, LYING_OBLIQUE i obliqueSpecs.ts, yaw 35): axelbandet vrids mot kameran medan bäckenbandet ligger kvar, händerna på en båge med konstant avstånd från halsen; detta är vyn som visar rotationen. I sidovyn syns vridningen bara som att händerna dras mot halsen (djupet försvinner), armarna viker ihop sig vid hakan i botten. Reps per främre ben, räknas automatiskt (2 s ned, 2 s upp). Ingen belastningsvariant (bara kroppsvikt). Utanför program tills godkänd (pendingReviewIds); ingår i färdiga passet Löparens fem. Granska: sned vinkel fas 0, 0,25, 0,5, 0,75, 1 och tillbaka, H/V, om axelbandets vridning och händernas båge läses som bröstrotation och inte som armsving, sidovyns hopvikta armar, Start/Slut i reducerad rörelse, främre knäets riktning (ej synlig i dessa vyer), text och säkerhet. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E110 efter granskning: (1) Sned vinkel (standardvyn): främre foten lyftes cirka 3 enheter från golvet i början eftersom ståbenet var nästan rakt (68,5 av 70) och djupskjuvningen gjorde projicerat avstånd längre än benet; nu startar höften lägre (y 112 i stället för 106, benavstånd 62,5) och specen tar benlängderna från främre benet (lengthsFrom leg R). Testat: främre ankeln ligger kvar på projicerad kontaktpunkt för alla t, höger och vänster. (2) Bröstvridningen var 1,4 rad (cirka 80 grader), mer än övre ryggen klarar och just det fel texten varnar för; nu högst 0,8 rad (cirka 45 grader), fas 0,55 till 0,95. (3) Sned vinkel: armen konstruerad i 3D med lika långa segment (25 + 25) från hals till hand; de ritade segmenten är foreshortenade men konstanta genom loopen (inom 4 enheter från varandra). (4) Sidovyn: bakre foten tar nu steget längre bak (x 50, tå på golvet) så att bakre låret hänger nästan lodrätt (knät under höften, högst 8 enheter framför); före: knät cirka 10 enheter framför höften. (5) Text: enklare variant säger Bakåtutfall (inte Framåtutfall); tips 1 nämner valt ben framför och andra benet bakom. (6) Färdiga passet Löparens fem lämnar övningen ur veckoprogram tills den granskats (pendingReviewIds). Granska: sned vinkel fas 0 till 1 (främre foten stilla, axelbandets vridning 45 grader läses som bröstvridning), sidovyn bakre benet, H/V, Start/Slut. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag."
+    ],
+    "fingerprint": "2c8dbc60d63f"
+  },
+  {
     "id": "box-jump",
     "name": "Boxhopp",
     "group": "ballistic",

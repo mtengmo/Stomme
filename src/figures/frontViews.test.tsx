@@ -88,6 +88,7 @@ describe('authored frontal demonstrations', () => {
       'knee-drive',
       'isometric-lunge-hold',
       'plate-pogos',
+      'lunge-with-rotation',
     ]);
     expect(alternateView('split-squat')).toBe('oblique');
     expect(alternateView('bench-side-plank-leg-lift')).toBe('oblique');

@@ -1,4 +1,9 @@
 import type { ExerciseId } from '../domain/types';
+import {
+  LUNGE_ARM,
+  LUNGE_HAND_REACH,
+  lungeRotationAngle,
+} from './lungeRotation';
 import { movementPose } from './movementPose';
 import {
   type Body3,
@@ -30,6 +35,7 @@ export const LYING_OBLIQUE_IDS = [
   'knee-drive',
   'isometric-lunge-hold',
   'plate-pogos',
+  'lunge-with-rotation',
 ] as const satisfies readonly ExerciseId[];
 
 export type LyingObliqueId = (typeof LYING_OBLIQUE_IDS)[number];
@@ -313,6 +319,83 @@ const drillSpec = (
   ...extra,
 });
 
+/**
+ * Lunge with rotation. The right (working) leg is the front leg, nearest the
+ * camera; both feet stay planted, hip wide in depth, and the pelvis bar stays
+ * square. The hands are held together in front of the chest; the chest rotates
+ * towards the front leg (towards the camera), so the shoulder bar turns while
+ * the pelvis bar does not. The hands keep their reach from the neck and swing
+ * on an arc about the vertical axis through the neck.
+ */
+const LUNGE_WITH_ROTATION: ObliqueSpec = {
+  profile: 'lunge-with-rotation',
+  yawDeg: 35,
+  elevDeg: 25,
+  viewBox: '20 22 152 170',
+  near: 'working',
+  calibrateAt: 0,
+  body: (t: number): Body3 => {
+    const profile = movementPose('lunge-with-rotation', t);
+    const theta = lungeRotationAngle(t);
+    const { neck } = profile;
+    // Hands: a constant reach from the neck, turned by theta about the vertical
+    // axis through the neck (forward is +x, the working side is +z).
+    const hand: P3 = [
+      neck[0] + LUNGE_HAND_REACH * Math.cos(theta),
+      profile.hR[1],
+      LUNGE_HAND_REACH * Math.sin(theta),
+    ];
+    // The elbow hangs below the neck-hand line with equal segments (25 + 25,
+    // as in the side view): on the perpendicular bisector, towards down.
+    const n3: P3 = [neck[0], neck[1], 0];
+    const v: P3 = [hand[0] - n3[0], hand[1] - n3[1], hand[2] - n3[2]];
+    const len = Math.hypot(v[0], v[1], v[2]);
+    const dot = v[1] / len;
+    const down: P3 = [
+      -dot * (v[0] / len),
+      1 - dot * (v[1] / len),
+      -dot * (v[2] / len),
+    ];
+    const dn = Math.hypot(down[0], down[1], down[2]);
+    const drop = Math.sqrt(LUNGE_ARM * LUNGE_ARM - (len / 2) ** 2);
+    const elbow: P3 = [
+      (n3[0] + hand[0]) / 2 + (down[0] / dn) * drop,
+      (n3[1] + hand[1]) / 2 + (down[1] / dn) * drop,
+      (n3[2] + hand[2]) / 2 + (down[2] / dn) * drop,
+    ];
+    const at = (k: PoseKey, z: number): P3 => [profile[k][0], profile[k][1], z];
+    const legZ = 12;
+    return {
+      ...fromProfile(
+        profile,
+        1,
+        {
+          eR: elbow,
+          hR: hand,
+          eL: elbow,
+          hL: hand,
+          kR: at('kR', legZ),
+          aR: at('aR', legZ),
+          tR: at('tR', legZ),
+          kL: at('kL', -legZ),
+          aL: at('aL', -legZ),
+          tL: at('tL', -legZ),
+        },
+        19,
+        25,
+      ),
+      // The shoulder bar turns with the chest, the pelvis bar stays across.
+      shoulderAxis: [-Math.sin(theta), 0, Math.cos(theta)],
+    };
+  },
+  limbs: { armR: 'free', armL: 'free', legR: 'pinned', legL: 'pinned' },
+  // The near (front) leg is the straight-ish stance leg at the top; take the
+  // projected lengths from it so the planted front foot never lifts.
+  lengthsFrom: { leg: 'R' },
+  props: () => [],
+  surfaces: floorSurface,
+};
+
 export const LYING_OBLIQUE: Record<LyingObliqueId, ObliqueSpec> = {
   'side-plank': SIDE_PLANK,
   'bird-dog': BIRD_DOG,
@@ -321,6 +404,7 @@ export const LYING_OBLIQUE: Record<LyingObliqueId, ObliqueSpec> = {
   'knee-drive': drillSpec('knee-drive', 0.5),
   // Calibrated on the ground phase (t = 0); the plate lies beside the hops.
   'plate-pogos': drillSpec('plate-pogos', 0),
+  'lunge-with-rotation': LUNGE_WITH_ROTATION,
   // Both feet stay planted in the split stance, hip wide in depth; a lower yaw
   // keeps the sagittal thighs from shortening too much.
   'isometric-lunge-hold': {

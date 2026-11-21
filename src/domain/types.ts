@@ -97,6 +97,7 @@ export type ExerciseId =
   | 'seated-tibial-rotation'
   | 'single-leg-lateral-hop'
   | 'skater-bound'
+  | 'lunge-with-rotation'
   | 'box-jump'
   | 'fast-feet'
   | 'in-and-out-jump'

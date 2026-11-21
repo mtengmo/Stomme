@@ -553,12 +553,13 @@ it('offers the plan step only for running emphasis, with automatic as default', 
   expect(screen.getByText('Steg 4 av 6')).toBeTruthy();
   expect(screen.queryByRole('navigation', { name: 'Huvudmeny' })).toBeNull();
   expect(radio('Automatiskt program').checked).toBe(true);
-  expect(screen.getAllByRole('radio')).toHaveLength(5);
+  expect(screen.getAllByRole('radio')).toHaveLength(6);
   for (const name of [
     'Löpstyrka',
     'Löparens tio',
     'Hemmapass för löpare',
     'Löparens kraftpass',
+    'Löparens fem',
   ])
     expect(radio(name).checked).toBe(false);
   expect(screen.queryByRole('radio', { name: /helkroppspass/ })).toBeNull();

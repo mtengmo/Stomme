@@ -341,6 +341,31 @@ describe('ready passes', () => {
       ),
     ).toBe(true);
   });
+  it('rejects an exercise that is pending review in a ready pass', () => {
+    expect(
+      isTrainingProgram(
+        ready(
+          [
+            'lunge-with-rotation',
+            'single-leg-rdl',
+            'plate-pogos',
+            'forward-lunge',
+          ],
+          'runner-five-london',
+          'regular',
+        ),
+      ),
+    ).toBe(false);
+    expect(
+      isTrainingProgram(
+        ready(
+          ['single-leg-rdl', 'plate-pogos', 'forward-lunge'],
+          'runner-five-london',
+          'regular',
+        ),
+      ),
+    ).toBe(true);
+  });
   it('rejects the kettlebell swing in a ready workout that does not hold it', () => {
     expect(
       isTrainingProgram(

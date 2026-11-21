@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { pendingReviewIds } from '../content/programExclusions';
 import { readyWorkouts } from '../content/readyWorkouts';
 import { proposals } from '../content/runningProposals';
 import type { TrainingPreferences } from '../domain/types';
@@ -71,6 +72,24 @@ describe('readyProgramPass', () => {
     expect(beginner?.exerciseIds).not.toContain('skater-bound');
     expect(beginner?.exerciseIds).not.toContain('kettlebell-swing');
     expect(beginner?.exerciseIds).toContain('single-leg-rdl');
+  });
+
+  it('leaves exercises pending review out of every running-start pass', () => {
+    for (const w of readyWorkouts.filter((r) => r.runningStart))
+      for (const experience of ['new', 'some', 'regular'] as const) {
+        const pass = readyProgramPass(w.id, prefs(experience));
+        for (const id of pass?.exerciseIds ?? [])
+          expect(pendingReviewIds.has(id), `${w.id} ${experience} ${id}`).toBe(
+            false,
+          );
+      }
+    const five = readyProgramPass('runner-five-london', prefs('regular'));
+    expect(five?.exerciseIds).not.toContain('lunge-with-rotation');
+    expect(five?.exerciseIds).toContain('forward-lunge');
+    // The workout itself still lists it, for adding as a saved workout.
+    expect(
+      readyWorkouts.find((w) => w.id === 'runner-five-london')?.exerciseIds,
+    ).toContain('lunge-with-rotation');
   });
 
   it('returns null for a ready workout that is not a running start', () => {

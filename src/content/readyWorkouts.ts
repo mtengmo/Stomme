@@ -99,6 +99,24 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
     ],
   },
   {
+    id: 'runner-five-london',
+    runningStart: true,
+    name: 'Löparens fem',
+    group: 'legs',
+    fixed: true,
+    summary:
+      'Löparövningar med appens närmaste övningar: utfall med rotation, enbens raka lyft, sidolyft med hantlar, pogohopp och framåtutfall. Sidolyft är en svag ersättare för ett armlyft på ett ben, som inte finns i appen. Appens vanliga progression sätter antal och vikt.',
+    caution:
+      'Pogohopp är ett hopp (om det ingår i ditt pass) och hoppövningar passar inte vid knä-, fot- eller vadbesvär. Hoppa över dem och avbryt vid smärta. Utfall med rotation görs långsamt, passar inte vid knä- eller ryggbesvär och lämnas ur veckoprogrammen tills övningen har granskats; den ingår när du lägger till passet själv från Färdiga pass. Sidolyft kräver hantlar och är en svag ersättare för ett armlyft på ett ben. Ändra utrustning, antal och vikt i passet före start.',
+    exerciseIds: [
+      'lunge-with-rotation',
+      'single-leg-rdl',
+      'lateral-raise',
+      'plate-pogos',
+      'forward-lunge',
+    ],
+  },
+  {
     id: 'dumbbell-full-body',
     name: 'Snabbt helkroppspass med hantlar',
     group: 'full',

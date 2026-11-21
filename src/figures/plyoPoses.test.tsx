@@ -8,6 +8,9 @@ import {
   supportedViewsFor,
 } from './frontViews';
 import type { Pt } from './lerp';
+import { lungeRotationAngle } from './lungeRotation';
+import { obliqueFrame, project } from './obliqueBody';
+import { LYING_OBLIQUE } from './obliqueSpecs';
 import { figures } from './poses';
 
 const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -336,5 +339,106 @@ describe('skater bound figure', () => {
       expect(p.aR[1]).toBeLessThanOrEqual(174);
       expect(p.aL[1]).toBeLessThanOrEqual(174);
     }
+  });
+});
+
+describe('lunge with rotation figure', () => {
+  const id = 'lunge-with-rotation' as const;
+  const ts = Array.from({ length: 81 }, (_, n) => n / 80);
+  const lengths = (p: ReturnType<typeof movementPose>) => [
+    distance(p.hip, p.kR),
+    distance(p.kR, p.aR),
+    distance(p.hip, p.kL),
+    distance(p.kL, p.aL),
+    distance(p.neck, p.hip),
+    distance(p.neck, p.eR),
+    distance(p.eR, p.hR),
+  ];
+
+  it('opens in the oblique view, the one that shows the rotation', () => {
+    expect(defaultViewFor(id)).toBe('oblique');
+    expect(supportedViewsFor(id)).toEqual(['side', 'oblique']);
+    expect(figures[id].motion).toBe('controlled');
+  });
+
+  it('keeps segment lengths constant, the front foot planted and nothing below the floor', () => {
+    const first = lengths(movementPose(id, 0));
+    for (const t of ts) {
+      const p = movementPose(id, t);
+      for (const [i, len] of lengths(p).entries())
+        expect(len, `#${i} ${t}`).toBeCloseTo(first[i] ?? 0, 6);
+      expect(p.aR).toEqual([108, 174]);
+      for (const k of ['aR', 'aL', 'tR', 'tL', 'kR', 'kL'] as const)
+        expect(p[k][1], `${k} ${t}`).toBeLessThanOrEqual(177);
+      expect(distance(p.aR, p.tR)).toBeCloseTo(distance(p.aL, p.tL), 6);
+    }
+  });
+
+  it('starts and ends the loop standing, and sinks with the rear thigh hanging close to vertical', () => {
+    const top = movementPose(id, 0);
+    const bottom = movementPose(id, 1);
+    expect(bottom.hip[1] - top.hip[1]).toBeGreaterThan(18);
+    expect(bottom.aL[0]).toBeLessThan(bottom.aR[0] - 30);
+    expect(bottom.tL[1]).toBeCloseTo(177, 1);
+    expect(top.aL[1]).toBe(174);
+    // The rear knee hangs below the hip, no more than 8 units in front of it.
+    expect(bottom.kL[1] - bottom.hip[1]).toBeGreaterThan(25);
+    expect(Math.abs(bottom.kL[0] - bottom.hip[0])).toBeLessThan(8);
+  });
+
+  it('keeps the front foot planted at its projected contact in the oblique view, both sides', () => {
+    const spec = LYING_OBLIQUE[id];
+    const [cx, cy] = project([108, 174, 12], 35, 25);
+    for (const t of ts) {
+      const r = obliqueFrame(spec, t, 'right').pose.aR;
+      expect(r[0], `x ${t}`).toBeCloseTo(cx, 1);
+      expect(r[1], `y ${t}`).toBeCloseTo(cy, 1);
+      const l = obliqueFrame(spec, t, 'left').pose.aL;
+      expect(l[0], `lx ${t}`).toBeCloseTo(192 - cx, 1);
+      expect(l[1], `ly ${t}`).toBeCloseTo(cy, 1);
+    }
+  });
+
+  it('rotates about 45 degrees at most and keeps the oblique arm segments equal', () => {
+    expect(lungeRotationAngle(1)).toBeCloseTo(0.8, 6);
+    // The drawn segments keep their (foreshortened, calibrated) lengths through
+    // the loop and stay within 4 units of each other.
+    const first = obliqueFrame(LYING_OBLIQUE[id], 0, 'right').pose;
+    for (const t of ts) {
+      const p = obliqueFrame(LYING_OBLIQUE[id], t, 'right').pose;
+      expect(distance(p.neck, p.eR)).toBeCloseTo(
+        distance(first.neck, first.eR),
+        6,
+      );
+      expect(distance(p.eR, p.hR)).toBeCloseTo(distance(first.eR, first.hR), 6);
+      expect(
+        Math.abs(distance(p.neck, p.eR) - distance(p.eR, p.hR)),
+      ).toBeLessThan(4);
+    }
+  });
+
+  it('rotates the shoulder bar in the oblique view while the pelvis bar stays', () => {
+    const spec = LYING_OBLIQUE[id];
+    const start = obliqueFrame(spec, 0, 'right');
+    const end = obliqueFrame(spec, 1, 'right');
+    const width = (bar: [Pt, Pt]) => Math.abs(bar[0][0] - bar[1][0]);
+    expect(width(end.shoulders)).toBeGreaterThan(width(start.shoulders) + 4);
+    expect(end.pelvis[0][0] - end.pelvis[1][0]).toBeCloseTo(
+      start.pelvis[0][0] - start.pelvis[1][0],
+      6,
+    );
+    for (const t of ts) {
+      const p = obliqueFrame(spec, t, 'right').pose;
+      const f = obliqueFrame(spec, 0, 'right').pose;
+      expect(distance(p.neck, p.eR)).toBeCloseTo(distance(f.neck, f.eR), 6);
+      expect(distance(p.hip, p.kR)).toBeCloseTo(distance(f.hip, f.kR), 6);
+    }
+  });
+
+  it('mirrors for the left leg', () => {
+    const r = obliqueFrame(LYING_OBLIQUE[id], 1, 'right').pose;
+    const l = obliqueFrame(LYING_OBLIQUE[id], 1, 'left').pose;
+    expect(l.aL[0]).toBeCloseTo(192 - r.aR[0], 6);
+    expect(l.hip[0]).toBeCloseTo(192 - r.hip[0], 6);
   });
 });

@@ -1,7 +1,10 @@
 import { z } from 'zod';
 import { exerciseList } from '../content/exercises';
 import { routineFocusIds } from '../content/focusPresets';
-import { programExcludedIds } from '../content/programExclusions';
+import {
+  pendingReviewIds,
+  programExcludedIds,
+} from '../content/programExclusions';
 import { readyWorkouts } from '../content/readyWorkouts';
 import { isRetiredExercise } from '../content/retiredExercises';
 import {
@@ -106,8 +109,8 @@ export const trainingProgramSchema = z
         // programme exclusions on purpose (copenhagen-hold, isometric-lunge-hold),
         // but ballistic exercises stay out except the few a fixed running
         // workout holds (readyBallisticIds: pogo jumps, skater bound, kettlebell
-        // swing), and those are not for a beginner. Retired and unresolved
-        // exercises stay out too.
+        // swing), and those are not for a beginner. Retired, unresolved and
+        // pending-review exercises stay out too.
         const allowed = readyAllowedIds(pass.ready.id);
         if (!allowed)
           ctx.addIssue({
@@ -120,6 +123,7 @@ export const trainingProgramSchema = z
             (allowed && !allowed.has(id)) ||
             (ballisticIds.has(id) && !readyBallisticIds.has(id)) ||
             unresolvedFigureIssueIds.has(id) ||
+            pendingReviewIds.has(id) ||
             isRetiredExercise(id) ||
             (readyBallisticIds.has(id) && program.level === 'new')
           )

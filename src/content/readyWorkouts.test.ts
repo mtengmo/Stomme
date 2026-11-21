@@ -79,6 +79,28 @@ describe('ready-made workouts', () => {
     expect(workout?.caution).toContain('neutral rygg');
   });
 
+  it('Löparens fem has the five closest exercises in order and is honest about substitutions', () => {
+    const workout = readyWorkouts.find((w) => w.id === 'runner-five-london');
+    expect(workout).toMatchObject({
+      name: 'Löparens fem',
+      group: 'legs',
+      fixed: true,
+      runningStart: true,
+    });
+    expect(workout?.exerciseIds).toEqual([
+      'lunge-with-rotation',
+      'single-leg-rdl',
+      'lateral-raise',
+      'plate-pogos',
+      'forward-lunge',
+    ]);
+    expect(workout?.exerciseIds).not.toContain('knee-drive');
+    expect(workout?.summary).toContain('närmaste');
+    expect(workout?.summary).toContain('progression');
+    expect(workout?.caution).toContain('Pogohopp');
+    expect(workout?.caution).toContain('armlyft');
+  });
+
   it('Snabbt helkroppspass is fixed, ordered and not a running start', () => {
     const workout = readyWorkouts.find((w) => w.id === 'dumbbell-full-body');
     expect(workout?.name).toBe('Snabbt helkroppspass med hantlar');
@@ -99,6 +121,7 @@ describe('ready-made workouts', () => {
       'runner-ten',
       'runner-home',
       'runner-power-seven',
+      'runner-five-london',
     ]);
   });
 

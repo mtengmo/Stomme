@@ -21,6 +21,12 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Enbens sidohopp',
     'Sidohopp',
   ],
+  'lunge-with-rotation': [
+    'Lunge with rotation',
+    'Rotating lunge',
+    'Utfall med vridning',
+    'Utfall med bålrotation',
+  ],
   'skater-bound': [
     'Skater bound',
     'Skater bounds',

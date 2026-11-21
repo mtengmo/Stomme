@@ -139,6 +139,7 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'forward-lunge': 'Benstyrka och inbromsning av ett steg framåt.',
   'single-leg-lateral-hop': 'Landning och sidokontroll på ett ben.',
   'skater-bound': 'Kraft i sidled och stabil landning på ett ben.',
+  'lunge-with-rotation': 'Benstyrka och bålvridning i löpsteget.',
   'box-jump': 'Explosiv benstyrka med kontrollerad landning.',
   'fast-feet': 'Snabba fotisättningar och rytm.',
   'in-and-out-jump': 'Mjuka landningar och fotarbete i sidled.',
@@ -1291,6 +1292,7 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'blast-off-push-up' ||
         id === 'single-leg-lateral-hop' ||
         id === 'skater-bound' ||
+        id === 'lunge-with-rotation' ||
         id === 'box-jump' ||
         id === 'fast-feet' ||
         id === 'in-and-out-jump' ||
@@ -1300,7 +1302,7 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'plate-pogos' ||
         id === 'renegade-row' ||
         id === 'weighted-sit-up'
-          ? id === 'skater-bound'
+          ? id === 'skater-bound' || id === 'lunge-with-rotation'
             ? '2026-11-21'
             : id === 'renegade-row' || id === 'weighted-sit-up'
               ? '2026-11-11'

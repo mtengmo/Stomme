@@ -3,6 +3,7 @@ import { isBodyweightAddition } from '../content/bodyweightExercises';
 import type { ExerciseId } from '../domain/types';
 import { burpeePose } from './burpeeKeyframes';
 import type { Pt } from './lerp';
+import { lungeRotationSidePose } from './lungeRotation';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
 
@@ -506,6 +507,9 @@ function skaterBound(t: number): Pose {
   );
 }
 
+/** Side view of the lunge with rotation (see lungeRotation.ts). */
+const lungeWithRotation = lungeRotationSidePose;
+
 /** The step is about 30 cm high (44 px wide); ankles rest 3 px above its top so the toes touch it. */
 export const BOX_PROP = { x: 125, y: 156, w: 44 } as const;
 const BOX_ANKLE_Y = BOX_PROP.y - 3;
@@ -926,6 +930,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'squat-jump': squatJump,
   'single-leg-lateral-hop': lateralHop,
   'skater-bound': skaterBound,
+  'lunge-with-rotation': lungeWithRotation,
   'box-jump': boxJump,
   'fast-feet': fastFeet,
   'in-and-out-jump': inAndOutJump,

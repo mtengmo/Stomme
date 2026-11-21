@@ -80,6 +80,17 @@ it('drops ballistic exercises from a kept ready pass when redone for level new',
   ]);
 });
 
+it('redoes a Löparens fem pass for level new into a valid programme', async () => {
+  const regular = { ...programPrefs, experience: 'regular' as const };
+  const pass = readyProgramPass('runner-five-london', regular);
+  if (!pass) throw new Error('ready pass missing');
+  const program = await seedProgram(3, regular, pass);
+  const rebuilt = rebuildProgram(program, regular, 'new', 7, 'x');
+  expect(isTrainingProgram(rebuilt)).toBe(true);
+  expect(rebuilt?.passes[0]?.exerciseIds).not.toContain('lunge-with-rotation');
+  expect(rebuilt?.passes[0]?.exerciseIds).not.toContain('plate-pogos');
+});
+
 it('keeps "Behåll programmet" enabled when no programme can be built', async () => {
   const program = await seedProgram(3);
   mount(program, { ...programPrefs, programId: 'rehab' });

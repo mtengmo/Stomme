@@ -63,6 +63,7 @@ export const supportedObliqueViews = [
   'knee-drive',
   'isometric-lunge-hold',
   'plate-pogos',
+  'lunge-with-rotation',
 ] as const satisfies readonly ExerciseId[];
 
 /** Front-only demonstrations: the movement cannot be read from the side. */
@@ -85,7 +86,8 @@ export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
     exerciseId === 'kettlebell-goblet-squat'
   )
     return 'front';
-  if (exerciseId === 'russian-twist') return 'oblique';
+  if (exerciseId === 'russian-twist' || exerciseId === 'lunge-with-rotation')
+    return 'oblique';
   return 'side';
 }
 
