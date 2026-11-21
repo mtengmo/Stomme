@@ -479,10 +479,10 @@ describe('cossack squat (E111) and squat walk (E112)', () => {
 describe('kneeling ab wheel rollout (E113)', () => {
   const id = 'kneeling-ab-wheel-rollout';
 
-  it('takes the next permanent reference and stays out of programmes until reviewed', () => {
+  it('takes the next permanent reference and is no longer pending review once approved', () => {
     expect(exerciseReferences[id]).toBe('E113');
-    expect(pendingReviewIds.has(id)).toBe(true);
-    expect(programExcludedIds.has(id)).toBe(true);
+    expect(pendingReviewIds.has(id)).toBe(false);
+    expect(programExcludedIds.has(id)).toBe(false);
     expect(rehabImpactExercises.has(id)).toBe(false);
   });
 
