@@ -19,6 +19,7 @@ import {
   SQUAT_FAMILY_SHIN as SQUAT_SHIN,
   SQUAT_FAMILY_THIGH as SQUAT_THIGH,
 } from './squatFamilyKeyframes';
+import { squatWalkFeet } from './squatWalk';
 
 export const supportedFrontViews = [
   'seated-tibial-rotation',
@@ -27,6 +28,7 @@ export const supportedFrontViews = [
   'cossack-squat',
   'in-and-out-jump',
   'lateral-shuffle',
+  'squat-walk',
   'goblet-squat',
   'dumbbell-rdl',
   'kettlebell-rack-carry',
@@ -297,7 +299,7 @@ const BOUND_SHIN = 34;
 /**
  * Skater bound authored for the right start leg (the viewer's left): push off
  * the right foot, a short flight with both feet off the floor, soft landing on
- * the left foot at the far mark. The free foot trails behind the stance leg and
+ * the left foot at the far mark. The free foot trails outside the stance leg and
  * the arms counter-swing against the hip's travel. At t=1 the figure is the
  * mirror image of t=0, so the demonstration (out and back) loops seamlessly.
  * Every segment keeps its length and the stance foot stays at y=174.
@@ -310,10 +312,12 @@ function skaterBoundPose(t: number, working: Working | null): Pose {
   const hip = point(hx, 174 - 60 - 9 * air);
   const neck = point(hx, hip[1] - 43);
   // Right (push-off) foot: planted until 0.12, then it trails on the take-off
-  // side of the hip (8 px behind it) while it rises, and only near touchdown
-  // swings behind the left stance leg, ending 9 px past it. The left foot is
-  // its time-reversed mirror image, so it leads the hip (lands first) from
-  // about 0.3 on and is planted at the far mark from 0.88.
+  // side of the hip (8 px behind it) while it rises and stays there, ending
+  // 14 px outside the left stance leg (the knee bends away from it), so the
+  // free lower leg never closes against the stance calf; the figure draws it
+  // behind the stance leg (`skater-bound` draw order in FrontFigureFrame). The
+  // left foot is its time-reversed mirror image, so it leads the hip (lands
+  // first) from about 0.3 on and is planted at the far mark from 0.88.
   const hipX = (u: number) => mix(BOUND_X0, BOUND_X1, smooth(u));
   const offStart = BOUND_X0 - hipX(0.12);
   const rightFoot = (u: number): Pt => {
@@ -321,7 +325,7 @@ function skaterBoundPose(t: number, working: Working | null): Pose {
     const off =
       u < 0.5
         ? mix(offStart, -8, smooth((u - 0.12) / 0.38))
-        : mix(-8, 9, smooth((u - 0.5) / 0.5));
+        : mix(-8, -14, smooth((u - 0.5) / 0.5));
     return point(hipX(u) + off, 174 - 22 * smooth(clamp((u - 0.12) / 0.45)));
   };
   const aR = rightFoot(t);
@@ -409,6 +413,43 @@ function cossackPose(t: number, working: Working | null): Pose {
     tL,
   );
   return working === 'left' ? mirrorPose(pose) : pose;
+}
+
+/**
+ * Squat walk from the front: feet hip-wide (x 88 and 112) with the toes turned
+ * slightly out, a half squat (hip 50 above the floor) and the knees tracking
+ * outwards over the toes. The steps go towards and away from the viewer, so
+ * only a foot lifting off the floor and the weight shifting towards the other
+ * foot (the hip moves 3 units over the stance foot) can be shown; the side
+ * view shows the step length. Thigh 35.9, shin 34, trunk 43, arms 25 + 25.
+ */
+function squatWalkFrontPose(t: number): Pose {
+  const { right, left } = squatWalkFeet(t);
+  const liftR = 174 - right[1];
+  const liftL = 174 - left[1];
+  const shift = (3 * (liftR - liftL)) / 7;
+  const hip = point(100 + shift, 124);
+  const neck = point(hip[0], hip[1] - 43);
+  const aR = point(88, right[1]);
+  const aL = point(112, left[1]);
+  const hands = point(hip[0], neck[1] + 18);
+  const armR = solveTwoBone(neck, hands, FRONT_UPPER_ARM, FRONT_FOREARM, 1);
+  const armL = solveTwoBone(neck, hands, FRONT_UPPER_ARM, FRONT_FOREARM, -1);
+  return skeleton(
+    point(neck[0], neck[1] - 14),
+    neck,
+    hip,
+    armR.mid,
+    armR.end,
+    armL.mid,
+    armL.end,
+    joint(hip, aR, FRONT_THIGH, 34, 1),
+    aR,
+    point(aR[0] - 10, Math.min(177, aR[1] + 3)),
+    joint(hip, aL, FRONT_THIGH, 34, -1),
+    aL,
+    point(aL[0] + 10, Math.min(177, aL[1] + 3)),
+  );
 }
 
 /** Mirrors a pose authored for the right side about the body's centre line (x = 100). */
@@ -570,6 +611,7 @@ export function frontMovementPose(
     return lateralHopPose(t, working);
   if (exerciseId === 'skater-bound') return skaterBoundPose(t, working);
   if (exerciseId === 'cossack-squat') return cossackPose(t, working);
+  if (exerciseId === 'squat-walk') return squatWalkFrontPose(t);
   if (exerciseId === 'seated-tibial-rotation') {
     // Feet rotate in the horizontal plane; the shins and knees stay still.
     const angle = mix(0.65, -0.65, t);
@@ -1623,6 +1665,16 @@ export function FrontFigureFrame({
   const leg = (knee: Pt, ankle: Pt, toe: Pt) =>
     line([pose.hip, knee, ankle, toe]);
 
+  // Skater bound: the leg that is off the floor is drawn first, so it reads as
+  // swinging behind the stance leg on both landings (the stance leg swaps).
+  const freeLegFirst: 'R' | null =
+    exerciseId === 'skater-bound' && pose.aR[1] < pose.aL[1] ? 'R' : null;
+  const rightLimbs = (
+    <g data-body-side="right" stroke={color('R')} {...limb}>
+      <path d={arm(pose.eR, pose.hR, twist?.shoulderR)} />
+      <path d={leg(pose.kR, pose.aR, pose.tR)} />
+    </g>
+  );
   return (
     <svg
       viewBox={
@@ -1897,6 +1949,7 @@ export function FrontFigureFrame({
           />
         </g>
       ) : null}
+      {freeLegFirst === 'R' ? rightLimbs : null}
       <g data-body-side="left" stroke={color('L')} {...limb}>
         <path d={arm(pose.eL, pose.hL, twist?.shoulderL)} />
         <path d={leg(pose.kL, pose.aL, pose.tL)} />
@@ -1927,10 +1980,7 @@ export function FrontFigureFrame({
           <path d={line([pose.head, twist.noseDirection])} strokeWidth="3" />
         </g>
       ) : null}
-      <g data-body-side="right" stroke={color('R')} {...limb}>
-        <path d={arm(pose.eR, pose.hR, twist?.shoulderR)} />
-        <path d={leg(pose.kR, pose.aR, pose.tR)} />
-      </g>
+      {freeLegFirst === 'R' ? null : rightLimbs}
       {heldIsRack && kind === 'kettlebell' ? (
         <g
           data-rack-hand="true"

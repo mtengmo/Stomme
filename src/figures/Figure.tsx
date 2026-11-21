@@ -135,6 +135,9 @@ export function stillFramePhase(
     view === 'front'
   )
     return label === 'Slut' ? 0.75 : 0.25;
+  // The squat walk's closed cycle makes phase 1 the same frame as phase 0: its
+  // final still shows both feet forward (phase 0.5), as in the side view.
+  if (exerciseId === 'squat-walk' && label === 'Slut') return 0.5;
   // Hold figures label their final still "Håll".
   return label === 'Slut' || label === 'Håll' ? 1 : 0;
 }

@@ -53,6 +53,7 @@ describe('authored frontal demonstrations', () => {
       'cossack-squat',
       'in-and-out-jump',
       'lateral-shuffle',
+      'squat-walk',
       'goblet-squat',
       'dumbbell-rdl',
       'kettlebell-rack-carry',

@@ -46,7 +46,7 @@ export function lungeRotationSidePose(rawT: number): Pose {
   const t = clamp(rawT);
   const depth = lungeDepth(t);
   const theta = lungeRotationAngle(t);
-  const hip: Pt = [mix(100, 84, depth), mix(112, 134, depth)];
+  const hip: Pt = [mix(100, 84, depth), mix(105, 134, depth)];
   // The rear foot steps back with a small arc and lands on its toes.
   const stride = smooth(clamp(depth / 0.8));
   const rear: Pt = [

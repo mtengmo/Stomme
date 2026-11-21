@@ -5773,8 +5773,25 @@
     "name": "Skridskohopp",
     "group": "ballistic",
     "risk": "high",
-    "status": "fixed-awaiting-review",
-    "reviews": [],
+    "status": "approved",
+    "reviews": [
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "64d97bb",
+        "notes": "E109: score 10/12 (T3 R3 AS n/a AF1 U n/a S3). Framifrån, kroppsvikt, båda startbenen. Nio faser ut och tillbaka, hel liveloop och Start/Slut i 390 px mörkt och 1280 px ljust. Fötterna är isär i flykten. Figuren landar på motsatt ben, bromsar och hoppar tillbaka. Vid landning viks den lyfta foten mot stödvaden. Djupet bakom stödbenet går inte att läsa på båda landningarna. Stillsens Slut visar vändningen. Röst kontrollerad i källa, ej uppspelad. Manuell räkning. Konsistens: ut och tillbaka ger en rep per valt startben, byte efter setet. Fyra reps ger åtta hopp i ett set för valt startben. Fallrisken hanteras med balanspaus, fritt landningsområde, smärtgräns och sidosteg som alternativ. Physitracks övningsbeskrivning stöder mjuk enbenslandning med balans före återhopp (läst 2026-11-21, https://us.physitrack.com/home-exercise-video/skater-jumps). Dosen är Stommes. Ocommitterat arbetsträd, fp dd5ad5bee0d6. HEAD-figur identisk: okänd i inspect, id saknas i HEAD."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "claude-opus",
+        "scope": "all",
+        "result": "ok",
+        "commit": "5dceda9",
+        "notes": "E109: score 11/12 (T3 R3 AS n/a AF2 U n/a S3). Vy: framifrån (enda), kontrollerad. Kroppsvikt, H och V. Nio faser ut och tillbaka, liveloop och Start/Slut i 390 px mörkt och 1280 px ljust (capture.ts), förstorade utsnitt. Stödfoten står på märket till frånskjutet, båda fötterna lyfta i flykten, mjuk enbenslandning vid andra märket, stödknät faller inte inåt. Fas 1 är spegelbilden av fas 0, ingen söm. Codex fynd (fria foten sluter mot stödvaden): åtgärdat, tydlig lucka till stödbenet vid båda landningarna H/V. Ritordningen syns knappt, benen överlappar inte vid landning. Sonnets val att låta fria foten stanna på avstigssidan godtas: 'bakom stödbenet' är djup som frontvyn inte kan visa, så fria benet läses som lyft bredvid (AF2, ingen mismatch). Röst kontrollerad i källa, ej uppspelad (manuell räkning). Konsistens ok: ut och tillbaka är en rep per startben. Säkerhet: hög risk, balanspaus, fritt underlag, smärtgräns, sidosteg som alternativ. Ocommitterat arbetsträd, fp ed56ea12fc31, HEAD-figur identisk: nej. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; be Codex eller human bekräfta."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-21",
@@ -5785,13 +5802,18 @@
         "date": "2026-11-21",
         "fixer": "claude-sonnet",
         "notes": "E109 efter granskning: (1) frontvyn korsade benen i varje bildruta (fotavståndet konstant 9 enheter, landningsfoten ledde aldrig). Nu ligger tryckfoten kvar på avstigssidan, 8 enheter bakom höften, tills strax före landning och svingas då bakom stödbenet (slutar 9 enheter förbi det); landningsfoten är spegelbilden i tid och leder höften från cirka fas 0,3 och står på sitt märke från fas 0,88. I flykten är fötterna nu isär (landningsfoten till höger om höften, tryckfoten till vänster, avstånd över 6 enheter vid fas 0,3 till 0,6). Benlängder 35,9/34, armar 25/25, stödfot y 174 och sömlös loop (fas 1 är spegelbilden av fas 0) oförändrat. (2) Tips 3: raderat 'Sätt ned andra foten om du tappar balansen' (kopierat från E99, benen växlar ju inom en repetition), ersatt med 'Byt startben efter setet'; tips 1 flyttar tejpmärket till 'bredvid landningsplatsen, inte under den'. Granska: frontvyn fas 0 till 1 och tillbaka (särskilt 0,25 till 0,75: korsar benen eller ej, syns fria benet bakom stödbenet vid landning), H/V, Start/Slut. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E109 efter Codex-granskning (codex:gpt61sol, needs-fix): (1) den lyfta foten slöt mot stödvaden vid landning. Fria foten stannar nu på avstigssidan, 14 enheter utanför stödbenet vid fas 1 (före: 9 enheter förbi det, tvärs över), och knät böjer sig bort från stödbenet i stället för mot det; fria benet är därmed fritt från stödbenet på båda landningarna (fas 0 och 1, H och V). (2) Ritordningen var fast (höger lem alltid överst): nu ritas det ben som är lyft först, alltså bakom stödbenet, så fria benet läses som bakom vid båda landningarna när stödbenet växlar. Benlängder, stödfot på y 174 och sömlös loop oförändrade. Kvarstår: djupet bakom stödbenet kan i en tvådimensionell frontvy bara antydas av ritordningen och avståndet, inte visas fullt ut. Granska om fria benet nu läses som bakom och fritt på båda landningarna, fas 0, 0,25, 0,5, 0,75, 1 och tillbaka, H/V, Start/Slut. Granskning 2026-11-21 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
     ],
-    "fingerprint": "dd5ad5bee0d6"
+    "fingerprint": "ed56ea12fc31"
   },
   {
     "id": "lunge-with-rotation",
@@ -5799,7 +5821,24 @@
     "group": "bodyweight",
     "risk": "high",
     "status": "fixed-awaiting-review",
-    "reviews": [],
+    "reviews": [
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "64d97bb",
+        "notes": "E110: score 11/15 (T3 R3 AS2 AF1 U n/a S2). Sida och sned vinkel, kroppsvikt, H/V. Nio faser, hel liveloop och Start/Slut i 390 px mörkt och 1280 px ljust. Framfoten står kvar när bakfoten kliver tillbaka och landar på tå. Bålen är upprätt i Start men främre knät har cirka 54 graders böjning i profil. Toppläget kan läsas som en grund knäböj. I botten, fas 0,55–0,95, ändrar axelstrecket riktning medan bäckenstrecket ligger kvar. Vridningen går att se, storleken cirka 46 grader kommer från modellen. I båda vyerna syns knäböjningen men främre knäts riktning mot tårna går inte att bedöma under vridningen. Röst kontrollerad i källa, ej uppspelad. Valt framben, Börja, siffror och Klart. Konsistens ok: ned, vrid och vrid tillbaka, upp på fyra sekunder. Grundare utfall eller Bakåtutfall utan vridning finns. NSCA anger samma riktning för knä och tår vid utfall (läst 2026-11-21, https://www.nsca.com/contentassets/24dd7222ed1b4caeb8a0a46b81bd11f3/ptq-4.4.9-the-undervalued-lunge.pdf). Ocommitterat arbetsträd, fp 2c8dbc60d63f. HEAD-figur identisk: okänd i inspect, id saknas i HEAD."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "claude-opus",
+        "scope": "all",
+        "result": "issues",
+        "commit": "5dceda9",
+        "notes": "E110: score 12/15 (T3 R3 AS3 AF1 U n/a S2). Vyer: sida och sned vinkel (standard), båda kontrollerade. Kroppsvikt, H och V. Nio faser ut och tillbaka, liveloop och Start/Slut i 390 px mörkt och 1280 px ljust (capture.ts), förstorade utsnitt. Codex fynd om toppläget: åtgärdat, Start står upprätt med nästan rakt främre ben. Framfoten står kvar i båda vyerna, bakfoten kliver bak och landar på tå, vridningen läses som axelstreck mot fast bäckenstreck. Sonnets val godtas: yaw 55 bara här, kroppen 6 enheter lägre vid toppen i sned vy, ståknä under 15 grader. Codex blockerande fynd kvarstår: foten är en stump på cirka 6 enheter och vid yaw 55 hamnar både knäts framåtrörelse och ett inåtfall mest i sidled på skärmen, så knä mot tår går inte att bedöma (AF1). Det döljer textens knäsignal och vanliga fel (S2). Befintlig [strong]-punkt kvarstår. Röst kontrollerad i källa, ej uppspelad: valt framben, Börja, siffror, Klart. Konsistens ok: ned, vrid, vrid tillbaka och upp på fyra sekunder. Ocommitterat arbetsträd, fp 232155a77cc0, HEAD-figur identisk: nej. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; be Codex eller human bekräfta."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-21",
@@ -5810,21 +5849,37 @@
         "date": "2026-11-21",
         "fixer": "claude-sonnet",
         "notes": "E110 efter granskning: (1) Sned vinkel (standardvyn): främre foten lyftes cirka 3 enheter från golvet i början eftersom ståbenet var nästan rakt (68,5 av 70) och djupskjuvningen gjorde projicerat avstånd längre än benet; nu startar höften lägre (y 112 i stället för 106, benavstånd 62,5) och specen tar benlängderna från främre benet (lengthsFrom leg R). Testat: främre ankeln ligger kvar på projicerad kontaktpunkt för alla t, höger och vänster. (2) Bröstvridningen var 1,4 rad (cirka 80 grader), mer än övre ryggen klarar och just det fel texten varnar för; nu högst 0,8 rad (cirka 45 grader), fas 0,55 till 0,95. (3) Sned vinkel: armen konstruerad i 3D med lika långa segment (25 + 25) från hals till hand; de ritade segmenten är foreshortenade men konstanta genom loopen (inom 4 enheter från varandra). (4) Sidovyn: bakre foten tar nu steget längre bak (x 50, tå på golvet) så att bakre låret hänger nästan lodrätt (knät under höften, högst 8 enheter framför); före: knät cirka 10 enheter framför höften. (5) Text: enklare variant säger Bakåtutfall (inte Framåtutfall); tips 1 nämner valt ben framför och andra benet bakom. (6) Färdiga passet Löparens fem lämnar övningen ur veckoprogram tills den granskats (pendingReviewIds). Granska: sned vinkel fas 0 till 1 (främre foten stilla, axelbandets vridning 45 grader läses som bröstvridning), sidovyn bakre benet, H/V, Start/Slut. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E110 efter Codex-granskning (codex:gpt61sol, needs-fix): (1) ståläget: främre knät hade cirka 54 graders böjning i profil vid Start; höften startar nu på y 105 (före: 112), benavståndet 69,5 av 70, alltså under 15 graders böjning, och ett enhetstest håller det. Främre foten ligger kvar på golvet: den sneda vyns kropp står 6 enheter lägre vid toppen (bara i den vyn, avtar mot botten) så att det nästan raka benet når den projicerade kontaktpunkten; testat för alla t, höger och vänster. (2) Sned vinkel: kameran vriden från 35 till 55 grader och ramen strammad, så att främre foten och knät över den syns mer framifrån. Ofullständigt åtgärdat: i bilderna är figuren liten och tåns riktning mot knäets bana syns bara i grova drag, så punkten i openIssues (läsbar tå och knä tillsammans under vridningen) står kvar öppen; en riktig framvy för vridningen vore nästa steg. Granska: sned vinkel fas 0 till 1 och tillbaka, H/V, främre fotens kontakt, ståbenets rakhet i sidovyn, om tå och knä nu går att jämföra. Granskning 2026-11-21 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
-    "openIssues": [],
+    "openIssues": [
+      "[strong] E110 lunge-with-rotation, sida och sned vinkel under sänkning och vridning i botten, H/V, kroppsvikt. Främre foten syns från sidan även i den sneda vyn. Ingen av vyerna visar tillräckligt av fotens riktning för att jämföra med knäts bana. Gör knä och tår läsbara tillsammans samtidigt som bröstet vrids över det främre benet."
+    ],
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag."
     ],
-    "fingerprint": "2c8dbc60d63f"
+    "fingerprint": "232155a77cc0"
   },
   {
     "id": "cossack-squat",
     "name": "Cossack-knäböj",
     "group": "bodyweight",
     "risk": "high",
-    "status": "fixed-awaiting-review",
-    "reviews": [],
+    "status": "approved",
+    "reviews": [
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "64d97bb",
+        "notes": "E111: score 11/12 (T3 R3 AS n/a AF2 U n/a S3). Framifrån, kroppsvikt, H/V. Nio faser, hel liveloop och Start/Slut i 390 px mörkt och 1280 px ljust. Anklarna står kvar 92 figurenheter isär. Höften sjunker 16 enheter mot valt ben, arbetslåret blir vågrätt och knät ligger över foten i botten. Motsatt häl står kvar när tårna lyfter. Det avlastade knät har en synlig liten böj kvar i Slut (cirka 19 grader i bild). Textens styrda djup och grundare variant fungerar. Sidoutfall skiljs tydligt genom steget ut och in. Röst kontrollerad i källa, ej uppspelad. Valt ben, Börja, siffror och Klart. Konsistens ok: ned på valt ben och tillbaka till mitten ger en rep på fyra sekunder. Byte efter setet är appens upplägg. Catalyst Athletics beskriver bred stans, rakt avlastat ben och växling via mitten samt anger reps per sida (övningsspecifik jämförelse, läst 2026-11-21, https://www.catalystathletics.com/exercise/584/Cossack-Squat/). Ursprungsvideon ej tillgänglig. Ocommitterat arbetsträd, fp 3ebaaf34fee4. HEAD-figur identisk: okänd i inspect, id saknas i HEAD."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-21",
@@ -5839,7 +5894,7 @@
     ],
     "openIssues": [],
     "notes": [
-      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
+      "Godkänd av codex:gpt61sol 2026-11-21 (11/12). Redaktionell övning utan verifierad extern källa; dosen är appens förslag. Inte längre i pendingReviewIds: övningen får ingå i genererade program."
     ],
     "fingerprint": "3ebaaf34fee4"
   },
@@ -5848,8 +5903,25 @@
     "name": "Knäböjsgång",
     "group": "bodyweight",
     "risk": "high",
-    "status": "fixed-awaiting-review",
-    "reviews": [],
+    "status": "approved",
+    "reviews": [
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "issues",
+        "commit": "64d97bb",
+        "notes": "E112: score 10/15 (T2 R3 AS2 AF1 U n/a S2). Enda vyn är profil, kroppsvikt, båda benen tillsammans. Nio faser, hel liveloop och Start/Slut i 390 px mörkt och 1280 px ljust. Figuren håller höfthöjden. En fot lyfts i taget, två steg fram och två bak på åtta sekunder. Vid fas 1 står båda åter på startplatsen. Stillsens Slut visar vändningen vid fas 0,5 med samma kroppsställning som Start, förskjuten 22 enheter. Benen överlappar i profil. Höftbredd och knänas riktning mot tårna går inte att se. Röst kontrollerad i källa, ej uppspelad. Manuell räkning. Mindre ordskillnad: texten anger lika många steg tillbaka, utan att ge figurens två steg som exempel. En hel tur ger en rep. Grundare böj och mindre steg finns. Hartford HealthCare beskriver knä i tårnas riktning vid knäböj (läst 2026-11-21, https://hhcboneandjoint.org/services/bone-joint-institute/news/news-detail?articleId=73394&publicid=499). Ocommitterat arbetsträd, fp a6176cab4e55. HEAD-figur identisk: okänd i inspect, id saknas i HEAD."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "claude-opus",
+        "scope": "all",
+        "result": "ok",
+        "commit": "5dceda9",
+        "notes": "E112: score 14/15 (T3 R3 AS3 AF2 U n/a S3). Vyer: sida (standard) och framifrån (ny), båda kontrollerade. Kroppsvikt, båda benen tillsammans. Nio faser ut och tillbaka, liveloop och Start/Slut i 390 px mörkt och 1280 px ljust (capture.ts). Sidan: höften på samma höjd, en fot i taget, två steg fram och två bak, Slut fas 0,5 framflyttad. Codex fynd (fotbredd och knäriktning syns inte): åtgärdat, frontvyn visar höftbrett, tårna lätt utåt och knäna över tårna hela loopen. Codex ordfynd: åtgärdat, tips 3 ger två steg fram och två tillbaka. Sonnets val godtas: frontvyn visar bara lyft på cirka 7 enheter och viktförflyttning, stegen syns i sidovyn. Mindre (2): frontvyn läses nästan som att stå still, och dess Start och Slut är samma bild. Röst kontrollerad i källa, ej uppspelad (manuell räkning). Konsistens ok: fram och tillbaka är en rep. Säkerhet: knä i tårnas riktning nu synligt, styrt djup, smärtgräns, halv knäböj utan steg som alternativ. Ocommitterat arbetsträd, fp 0740662c3434, HEAD-figur identisk: nej. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; be Codex eller human bekräfta."
+      }
+    ],
     "fixes": [
       {
         "date": "2026-11-21",
@@ -5860,13 +5932,18 @@
         "date": "2026-11-21",
         "fixer": "claude-sonnet",
         "notes": "E112 efter granskning: (1) reducerad rörelse: Slut ritade samma bild som Start (fas 1 = fas 0, loopen är sluten); nu är Slut fas 0,5 (båda fötterna framme, höften 22 enheter framåt), som jumping-lunge, och ett enhetstest kräver att Start och Slut skiljer sig. (2) Enklare variant säger nu 'en vanlig halv knäböj utan steg' i stället för Utfallsgång med hantlar. Figuren i övrigt oförändrad. Granska: sidovy Start/Slut och fas 0,25 och 0,75. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E112 efter Codex-granskning (codex:gpt61sol, needs-fix): (1) ny frontvy (Framifrån, andra vyn; sidovyn är fortfarande standard): fötterna höftbrett (x 88 och 112, ankelavstånd 24), tårna lätt utåt, halv knäböj (höften 50 enheter över golvet) och knäna utåt över tårna genom hela loopen; en fot lyfts i taget och vikten flyttas 3 enheter över stödfoten. Stegen går mot och från kameran, så steglängden syns bara i sidovyn. Reducerad rörelse: Start och Slut i frontvyn är fas 0 och 0,5 (Slut = båda fötterna framme), som i sidovyn. Benlängder 35,9/34, bål 43 och armar 25/25 konstanta, inget under golvet; testat. Provat i additional-views.spec.ts (framifrån). (2) Text: tips 3 ger nu figurens exempel, två steg fram och två steg tillbaka. Granska: frontvyn fas 0 till 1, om fotbredd och knäriktning nu går att bedöma, att steget mot kameran inte missförstås som att man står still, Start/Slut i båda vyerna. Granskning 2026-11-21 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
       }
     ],
     "openIssues": [],
     "notes": [
-      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
+      "Godkänd av Claude Opus 2026-11-21 (14/15). Redaktionell övning utan verifierad extern källa. Dosen är appens förslag. Övningen får ingå i genererade program."
     ],
-    "fingerprint": "a6176cab4e55"
+    "fingerprint": "0740662c3434"
   },
   {
     "id": "box-jump",

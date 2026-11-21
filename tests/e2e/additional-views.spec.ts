@@ -7,6 +7,7 @@ const candidates = [
   ['reverse-lunge', 'front'],
   ['forward-lunge', 'front'],
   ['half-squat', 'front'],
+  ['squat-walk', 'front'],
   ['single-leg-chair-squat', 'front'],
   ['farmer-carry', 'front'],
   ['bench-side-plank-leg-lift', 'oblique'],
@@ -38,7 +39,11 @@ for (const width of [320, 360, 412]) {
           `.exercise-stage svg[data-view="${view}"]`,
         );
         await expect(figures).toHaveCount(2);
-        if (id !== 'farmer-carry' && id !== 'half-squat') {
+        if (
+          id !== 'farmer-carry' &&
+          id !== 'half-squat' &&
+          id !== 'squat-walk'
+        ) {
           const marker = figures
             .first()
             .locator('text')

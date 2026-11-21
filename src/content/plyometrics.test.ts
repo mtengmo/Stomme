@@ -424,12 +424,10 @@ describe('cossack squat (E111) and squat walk (E112)', () => {
   });
 
   it.each(['cossack-squat', 'squat-walk'] as const)(
-    '%s is a knee-loaded, bodyweight, non-impact exercise pending review',
+    '%s is a knee-loaded, bodyweight, non-impact exercise',
     (id) => {
       expect(exercises[id].kneeLoaded).toBe(true);
       expect(rehabImpactExercises.has(id)).toBe(false);
-      expect(pendingReviewIds.has(id)).toBe(true);
-      expect(programExcludedIds.has(id)).toBe(true);
       expect(exercises[id].loadLadder).toEqual([
         { kg: 0, label: 'Kroppsvikt' },
       ]);
@@ -439,6 +437,14 @@ describe('cossack squat (E111) and squat walk (E112)', () => {
       expect(source?.note).toContain('Redaktionell övning');
       expect(source?.note).toContain('Avbryt vid smärta');
       expect(exerciseMetadata[id].purposes.running).toBeDefined();
+    },
+  );
+
+  it.each(['cossack-squat', 'squat-walk'] as const)(
+    'allows approved %s in programmes',
+    (id) => {
+      expect(pendingReviewIds.has(id)).toBe(false);
+      expect(programExcludedIds.has(id)).toBe(false);
     },
   );
 

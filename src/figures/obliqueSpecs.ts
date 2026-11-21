@@ -1,7 +1,9 @@
 import type { ExerciseId } from '../domain/types';
+import type { Pt } from './lerp';
 import {
   LUNGE_ARM,
   LUNGE_HAND_REACH,
+  lungeDepth,
   lungeRotationAngle,
 } from './lungeRotation';
 import { movementPose } from './movementPose';
@@ -319,6 +321,9 @@ const drillSpec = (
   ...extra,
 });
 
+export const LUNGE_OBLIQUE_YAW = 55;
+export const LUNGE_OBLIQUE_TOP_DROP = 6;
+
 /**
  * Lunge with rotation. The right (working) leg is the front leg, nearest the
  * camera; both feet stay planted, hip wide in depth, and the pelvis bar stays
@@ -329,14 +334,30 @@ const drillSpec = (
  */
 const LUNGE_WITH_ROTATION: ObliqueSpec = {
   profile: 'lunge-with-rotation',
-  yawDeg: 35,
+  // A steeper camera than the other oblique views (35): the front foot and the
+  // knee over it are seen more from the front, so the toe direction and the
+  // knee path can be compared while the chest rotates.
+  yawDeg: LUNGE_OBLIQUE_YAW,
   elevDeg: 25,
-  viewBox: '20 22 152 170',
+  viewBox: '36 30 120 156',
   near: 'working',
   calibrateAt: 0,
   body: (t: number): Body3 => {
-    const profile = movementPose('lunge-with-rotation', t);
+    const base = movementPose('lunge-with-rotation', t);
     const theta = lungeRotationAngle(t);
+    // The depth shear puts the near (front) foot about 5 units lower on screen
+    // than in the side view, which the almost straight standing leg cannot
+    // reach: the body of this view stands a little lower at the top (the side
+    // view keeps the straight leg), so the planted front foot never lifts.
+    const dy = LUNGE_OBLIQUE_TOP_DROP * (1 - lungeDepth(t));
+    const lower = (pt: Pt): Pt => [pt[0], pt[1] + dy];
+    const profile = {
+      ...base,
+      head: lower(base.head),
+      neck: lower(base.neck),
+      hip: lower(base.hip),
+      hR: lower(base.hR),
+    };
     const { neck } = profile;
     // Hands: a constant reach from the neck, turned by theta about the vertical
     // axis through the neck (forward is +x, the working side is +z).

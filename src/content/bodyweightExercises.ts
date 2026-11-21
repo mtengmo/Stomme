@@ -378,7 +378,7 @@ export const bodyweightExercises: Exercise[] = [
     [
       'Stå med fötterna höftbrett och sjunk till en halv knäböj som du kan hålla. Håll händerna ihop framför bröstet, bröstet uppe och ha fritt framför och bakom dig.',
       'Stanna lågt och ta små steg framåt, ett ben i taget, utan att resa dig. Knäna följer tårnas riktning.',
-      'Ta lika många små steg bakåt tillbaka till startplatsen. Framåt och bakåt är en repetition. Res dig när setet är klart.',
+      'Ta lika många små steg bakåt tillbaka till startplatsen, till exempel två steg fram och två steg tillbaka. Framåt och bakåt är en repetition. Res dig när setet är klart.',
     ],
     'Du reser dig mellan stegen, tar för långa steg eller låter knäna falla inåt.',
     'Ta färre och mindre steg eller sjunk mindre, eller gör en vanlig halv knäböj utan steg.',

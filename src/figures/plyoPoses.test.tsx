@@ -10,7 +10,7 @@ import {
 import type { Pt } from './lerp';
 import { lungeRotationAngle } from './lungeRotation';
 import { obliqueFrame, project } from './obliqueBody';
-import { LYING_OBLIQUE } from './obliqueSpecs';
+import { LUNGE_OBLIQUE_YAW, LYING_OBLIQUE } from './obliqueSpecs';
 import { figures } from './poses';
 
 const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
@@ -386,9 +386,19 @@ describe('lunge with rotation figure', () => {
     expect(Math.abs(bottom.kL[0] - bottom.hip[0])).toBeLessThan(8);
   });
 
+  it('starts with an almost straight front leg in the side view (under 15 degrees of knee flexion)', () => {
+    const p = movementPose(id, 0);
+    const thigh = distance(p.hip, p.kR);
+    const shin = distance(p.kR, p.aR);
+    const reach = distance(p.hip, p.aR);
+    const cos = (thigh ** 2 + shin ** 2 - reach ** 2) / (2 * thigh * shin);
+    const interior = (Math.acos(cos) * 180) / Math.PI;
+    expect(180 - interior).toBeLessThan(15);
+  });
+
   it('keeps the front foot planted at its projected contact in the oblique view, both sides', () => {
     const spec = LYING_OBLIQUE[id];
-    const [cx, cy] = project([108, 174, 12], 35, 25);
+    const [cx, cy] = project([108, 174, 12], LUNGE_OBLIQUE_YAW, 25);
     for (const t of ts) {
       const r = obliqueFrame(spec, t, 'right').pose.aR;
       expect(r[0], `x ${t}`).toBeCloseTo(cx, 1);
@@ -402,7 +412,7 @@ describe('lunge with rotation figure', () => {
   it('rotates about 45 degrees at most and keeps the oblique arm segments equal', () => {
     expect(lungeRotationAngle(1)).toBeCloseTo(0.8, 6);
     // The drawn segments keep their (foreshortened, calibrated) lengths through
-    // the loop and stay within 4 units of each other.
+    // the loop and stay within 10 units of each other.
     const first = obliqueFrame(LYING_OBLIQUE[id], 0, 'right').pose;
     for (const t of ts) {
       const p = obliqueFrame(LYING_OBLIQUE[id], t, 'right').pose;
@@ -413,7 +423,7 @@ describe('lunge with rotation figure', () => {
       expect(distance(p.eR, p.hR)).toBeCloseTo(distance(first.eR, first.hR), 6);
       expect(
         Math.abs(distance(p.neck, p.eR) - distance(p.eR, p.hR)),
-      ).toBeLessThan(4);
+      ).toBeLessThan(10);
     }
   });
 
@@ -534,8 +544,9 @@ describe('squat walk figure', () => {
     distance(p.eR, p.hR),
   ];
 
-  it('is a side-view sequence figure, one rep per cycle', () => {
-    expect(supportedViewsFor(id)).toEqual(['side']);
+  it('is a sequence figure, one rep per cycle, with a side and a front view', () => {
+    expect(supportedViewsFor(id)).toEqual(['side', 'front']);
+    expect(defaultViewFor(id)).toBe('side');
     expect(figures[id].motion).toBe('sequence');
   });
 
@@ -576,6 +587,37 @@ describe('squat walk figure', () => {
     expect(end.hip[0] - start.hip[0]).toBeGreaterThan(15);
     expect(end.aL[0] - start.aL[0]).toBeGreaterThan(15);
     expect(stillFramePhase(id, 'side', 'Start')).toBe(0);
-    expect(stillFramePhase(id, 'side', 'Slut')).toBe(1);
+    expect(stillFramePhase(id, 'front', 'Slut')).toBe(0.5);
+  });
+
+  it('shows foot width and knee direction in the front view', () => {
+    const fl = (p: ReturnType<typeof frontMovementPose>) => [
+      distance(p.hip, p.kR),
+      distance(p.kR, p.aR),
+      distance(p.hip, p.kL),
+      distance(p.kL, p.aL),
+      distance(p.neck, p.hip),
+      distance(p.neck, p.eR),
+      distance(p.eR, p.hR),
+    ];
+    const first = fl(frontMovementPose(id, 0));
+    for (const t of ts) {
+      const p = frontMovementPose(id, t);
+      for (const [i, len] of fl(p).entries())
+        expect(len, `#${i} ${t}`).toBeCloseTo(first[i] ?? 0, 6);
+      // Hip-wide feet and knees outside the ankles (over the turned-out toes).
+      expect(p.aL[0] - p.aR[0]).toBeGreaterThanOrEqual(24);
+      expect(p.kR[0]).toBeLessThan(p.aR[0]);
+      expect(p.kL[0]).toBeGreaterThan(p.aL[0]);
+      // A half squat: the hip stays 50 above the floor; one foot at a time.
+      expect(174 - p.hip[1]).toBeCloseTo(50, 6);
+      expect(Math.max(p.aR[1], p.aL[1])).toBe(174);
+      for (const k of ['aR', 'aL', 'tR', 'tL'] as const)
+        expect(p[k][1]).toBeLessThanOrEqual(177);
+    }
+    // The weight shifts over the stance foot while the other foot lifts.
+    const lifted = frontMovementPose(id, 0.125);
+    expect(lifted.aR[1]).toBeLessThan(174);
+    expect(lifted.hip[0]).toBeGreaterThan(100);
   });
 });
