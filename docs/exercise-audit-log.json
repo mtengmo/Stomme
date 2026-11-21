@@ -5971,7 +5971,7 @@
     "name": "Utrullning på knä",
     "group": "bodyweight",
     "risk": "high",
-    "status": "fixed-awaiting-review",
+    "status": "approved",
     "reviews": [
       {
         "date": "2026-11-21",
@@ -5980,6 +5980,14 @@
         "result": "issues",
         "commit": "2d88214",
         "notes": "E113: score 9/12 (T1 R3 AS2 AF n/a U n/a S3). Enda vyn är sida, båda sidor arbetar samtidigt, en variant med magrulle. Hel liveloop genom flera faser och Start/Slut vid 390 px mörkt och 1280 px ljust. Knäna ligger kvar, armarna är raka och händerna följer navet. I vändläget ligger höften strax ovanför linjen knä–axel. Rullen är cirka 13 enheter framför axeln i Start. Under utrullningen går höften cirka 23 enheter framåt. Textens kvar ovanför knälinjen kan få användaren att hålla höften still. Mattkanten korsar rullbanan i bilden (AS2). Röst kontrollerad i källa, ej uppspelad: Börja, siffror, Klart. Fyra sekunder ut och tillbaka ger en rep. Konsistensbrist gäller höftbanan. Texten har begränsat rörelseutslag, enklare variant och smärtgräns i metadata. Prozis manual stöder kontrollerad utrullning på jämnt, halkfritt underlag (läst 2026-11-21, https://www.prozis.com/eu/it/userManuals/getManualFile?id=ht2m-830-5fe1b7a7). Manualens illustration gick inte att visa."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "f9fe351",
+        "notes": "E113: score 11/12 (T3 R3 AS2 AF n/a U n/a S3). Sida, enda vyn. En variant med magrulle, båda sidor arbetar samtidigt. Fas 0–1 och tillbaka, hel liveloop och Start/Slut vid 390 px mörkt och 1280 px ljust. Knäna ligger kvar, höften följer med cirka 23 enheter framåt och stannar ovanför linjen knä–axel. Raka armar och händer vid navet hela vägen. Tips 2 beskriver nu samma höftbana som figuren. Tidigare [cheap]-punkt åtgärdad. AS2: rullen börjar cirka 13 enheter framför axeln och mattkanten korsar rullbanan. Röst kontrollerad i källa, ej uppspelad: Börja, siffror, Klart. Konsistens ok: två sekunder ut och två tillbaka ger en repetition. Begränsat rörelseutslag, enklare alternativ och smärtgräns finns. Samma figur som i granskningen med Prozis manual som jämförelsekälla. Fp 664aa195e75a."
       }
     ],
     "fixes": [
@@ -5995,9 +6003,7 @@
       }
 
     ],
-    "openIssues": [
-      "[cheap] E113 kneeling-ab-wheel-rollout, tips 2 jämfört med sidovyn fas 0–1, magrulle. Formuleringen om att hålla höfterna kvar ovanför knälinjen kan läsas som att höften ska vara stilla. Visa i texten att knäna ligger kvar och att höften följer med framåt medan bålen hålls stabil."
-    ],
+    "openIssues": [],
     "notes": [
       "Väntar på korsgranskning (codex:gpt61sol/human); högrisk (ländrygg och axlar); utanför program tills godkänd. Redaktionell övning utan verifierad extern källa; dosen är appens förslag."
     ],
