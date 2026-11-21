@@ -5916,7 +5916,7 @@
     "name": "Knäböjsgång",
     "group": "bodyweight",
     "risk": "high",
-    "status": "approved",
+    "status": "fixed-awaiting-review",
     "reviews": [
       {
         "date": "2026-11-21",
@@ -5958,13 +5958,18 @@
         "date": "2026-11-21",
         "fixer": "claude-sonnet",
         "notes": "E112 efter Codex-granskning (codex:gpt61sol, needs-fix): (1) ny frontvy (Framifrån, andra vyn; sidovyn är fortfarande standard): fötterna höftbrett (x 88 och 112, ankelavstånd 24), tårna lätt utåt, halv knäböj (höften 50 enheter över golvet) och knäna utåt över tårna genom hela loopen; en fot lyfts i taget och vikten flyttas 3 enheter över stödfoten. Stegen går mot och från kameran, så steglängden syns bara i sidovyn. Reducerad rörelse: Start och Slut i frontvyn är fas 0 och 0,5 (Slut = båda fötterna framme), som i sidovyn. Benlängder 35,9/34, bål 43 och armar 25/25 konstanta, inget under golvet; testat. Provat i additional-views.spec.ts (framifrån). (2) Text: tips 3 ger nu figurens exempel, två steg fram och två steg tillbaka. Granska: frontvyn fas 0 till 1, om fotbredd och knäriktning nu går att bedöma, att steget mot kameran inte missförstås som att man står still, Start/Slut i båda vyerna. Granskning 2026-11-21 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-22",
+        "fixer": "claude-sonnet",
+        "notes": "E112 sidovy: underarmarna såg konstiga ut. Armböjen var vänd så att armbågen låg över axeln (cirka 11 enheter upp) med underarmen nedåt mot händerna. Nu är böjen vänd (solveTwoBone bend 1): överarmen hänger nedåt och underarmen går framåt och uppåt till händerna vid bröstet. Lemlängder oförändrade (25 + 25). Frontvyn ändrades inte. Behöver ny granskning av Codex eller human."
       }
     ],
     "openIssues": [],
     "notes": [
       "Godkänd av Claude Opus 2026-11-21 (14/15). Redaktionell övning utan verifierad extern källa. Dosen är appens förslag. Övningen får ingå i genererade program."
     ],
-    "fingerprint": "0740662c3434"
+    "fingerprint": "a4f35524e857"
   },
   {
     "id": "kneeling-ab-wheel-rollout",
@@ -6001,7 +6006,6 @@
         "fixer": "claude-sonnet",
         "notes": "Rättade Codex textfynd (tips 2): knäna ligger kvar och höften följer med framåt, aldrig under linjen mellan knä och axel. Ingen ändring av figuren. Mattkanten som korsar rullbanan (AS2) är inte åtgärdad. Behöver ny granskning av Codex eller human."
       }
-
     ],
     "openIssues": [],
     "notes": [

@@ -61,7 +61,7 @@ export function squatWalkSidePose(rawT: number): Pose {
   ];
   const head: Pt = [neck[0] + 2, neck[1] - 14];
   const hand: Pt = [neck[0] + 24, neck[1] + 14];
-  const arm = solveTwoBone(neck, hand, ARM, ARM, -1);
+  const arm = solveTwoBone(neck, hand, ARM, ARM, 1);
   const toe = (a: Pt): Pt => [a[0] + 9, a[1] + 3];
   return {
     head,
