@@ -392,7 +392,7 @@ export const bodyweightExercises: Exercise[] = [
     ['Bål', 'Skuldror', 'Rygg'],
     [
       'Knäa på en mjuk matta med magrullen på golvet under axlarna och håll i handtagen med raka armar. Luta bäckenet bakåt så att ryggen blir rund och buken spänd. Ha fritt framför dig och halkfritt underlag.',
-      'Rulla rullen långsamt framåt med raka armar och kroppen i en lång linje, med höfterna kvar ovanför knälinjen. Rulla bara så långt att ryggen förblir rak och bäckenet lutat bakåt.',
+      'Rulla rullen långsamt framåt med raka armar och kroppen i en lång linje, medan knäna ligger kvar och höften följer med framåt, aldrig under linjen mellan knä och axel. Rulla bara så långt att ryggen förblir rak och bäckenet lutat bakåt.',
       'Dra dig tillbaka med magmusklerna och inte med armarna, så att rullen går tillbaka till under axlarna. Ut och tillbaka är en repetition. Andas jämnt hela vägen.',
     ],
     'Du släpper ned höfterna så att ryggen svankar, eller rullar längre än du kan hålla bäckenet lutat.',
