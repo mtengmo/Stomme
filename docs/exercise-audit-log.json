@@ -5790,6 +5790,14 @@
         "result": "ok",
         "commit": "5dceda9",
         "notes": "E109: score 11/12 (T3 R3 AS n/a AF2 U n/a S3). Vy: framifrån (enda), kontrollerad. Kroppsvikt, H och V. Nio faser ut och tillbaka, liveloop och Start/Slut i 390 px mörkt och 1280 px ljust (capture.ts), förstorade utsnitt. Stödfoten står på märket till frånskjutet, båda fötterna lyfta i flykten, mjuk enbenslandning vid andra märket, stödknät faller inte inåt. Fas 1 är spegelbilden av fas 0, ingen söm. Codex fynd (fria foten sluter mot stödvaden): åtgärdat, tydlig lucka till stödbenet vid båda landningarna H/V. Ritordningen syns knappt, benen överlappar inte vid landning. Sonnets val att låta fria foten stanna på avstigssidan godtas: 'bakom stödbenet' är djup som frontvyn inte kan visa, så fria benet läses som lyft bredvid (AF2, ingen mismatch). Röst kontrollerad i källa, ej uppspelad (manuell räkning). Konsistens ok: ut och tillbaka är en rep per startben. Säkerhet: hög risk, balanspaus, fritt underlag, smärtgräns, sidosteg som alternativ. Ocommitterat arbetsträd, fp ed56ea12fc31, HEAD-figur identisk: nej. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; be Codex eller human bekräfta."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "1773d54",
+        "notes": "E109: score 11/12 (T3 R3 AS n/a AF2 U n/a S3). Framifrån, kroppsvikt, båda startbenen. Faser ut och tillbaka, hel liveloop och Start/Slut vid 390 px mörkt och 1280 px ljust. Fas 0 och 1 visar fri fot med tydlig lucka till stödvaden, H/V. Båda fötterna lyfter i flykten, stödbenet växlar, och figuren bromsar på ett ben före återhoppet. Den lyfta foten läses snett intill stödbenet. Djupet bakom benet är svårt att läsa framifrån (AF2). Röst kontrollerad i källa, ej uppspelad. Manuell räkning. Konsistens ok: två hopp, ut och tillbaka, ger en rep per valt startben. Hög risk, med balanspaus, fritt halkfritt underlag, smärtgräns och sidosteg som alternativ. Physitracks text stöder mjuk enbenslandning med balanspaus (läst 2026-11-21, https://us.physitrack.com/home-exercise-video/skater-jumps). Oberoende bekräftelse av Opus granskning efter senaste rättningen. Fp ed56ea12fc31."
       }
     ],
     "fixes": [
@@ -5925,6 +5933,14 @@
         "result": "ok",
         "commit": "5dceda9",
         "notes": "E112: score 14/15 (T3 R3 AS3 AF2 U n/a S3). Vyer: sida (standard) och framifrån (ny), båda kontrollerade. Kroppsvikt, båda benen tillsammans. Nio faser ut och tillbaka, liveloop och Start/Slut i 390 px mörkt och 1280 px ljust (capture.ts). Sidan: höften på samma höjd, en fot i taget, två steg fram och två bak, Slut fas 0,5 framflyttad. Codex fynd (fotbredd och knäriktning syns inte): åtgärdat, frontvyn visar höftbrett, tårna lätt utåt och knäna över tårna hela loopen. Codex ordfynd: åtgärdat, tips 3 ger två steg fram och två tillbaka. Sonnets val godtas: frontvyn visar bara lyft på cirka 7 enheter och viktförflyttning, stegen syns i sidovyn. Mindre (2): frontvyn läses nästan som att stå still, och dess Start och Slut är samma bild. Röst kontrollerad i källa, ej uppspelad (manuell räkning). Konsistens ok: fram och tillbaka är en rep. Säkerhet: knä i tårnas riktning nu synligt, styrt djup, smärtgräns, halv knäböj utan steg som alternativ. Ocommitterat arbetsträd, fp 0740662c3434, HEAD-figur identisk: nej. Samma leverantör som rättaren (claude-sonnet): svagare än cross-vendor; be Codex eller human bekräfta."
+      },
+      {
+        "date": "2026-11-21",
+        "reviewer": "codex:gpt61sol",
+        "scope": "all",
+        "result": "ok",
+        "commit": "1773d54",
+        "notes": "E112: score 14/15 (T3 R3 AS3 AF2 U n/a S3). Sida och framifrån, kroppsvikt, båda benen. Faser genom hel liveloop samt Start/Slut vid 390 px mörkt och 1280 px ljust. I profil går två steg fram och två tillbaka på åtta sekunder, med jämn höfthöjd och en fot i golvet. Framifrån är den höftbreda stansen läsbar. Knäna pekar utåt i tårnas riktning, med något överdriven bredd i teckningen. Frontvyn visar fotlyften men föga djup. Dess Start och Slut ser likadana ut, medan profilens Slut visar vändningen vid fas 0,5 (AF2). Röst kontrollerad i källa, ej uppspelad. Manuell räkning. Konsistens ok: två steg fram och två tillbaka är textens exempel på en rep. Grundare böj eller halv knäböj utan steg och smärtgräns finns. Hartford HealthCare anger knän i tårnas riktning vid knäböj (läst 2026-11-21, https://hhcboneandjoint.org/services/bone-joint-institute/news/news-detail?articleId=73394&publicid=499). Oberoende bekräftelse av Opus granskning efter senaste rättningen. Fp 0740662c3434."
       }
     ],
     "fixes": [
