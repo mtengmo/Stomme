@@ -242,6 +242,7 @@ describe('exercise library', () => {
   });
   it.each([
     ['sidohopp', 'single-leg-lateral-hop'],
+    ['skridskohopp', 'skater-bound'],
     ['boxhopp', 'box-jump'],
     ['höga knän', 'knee-drive'],
     ['knee drives', 'knee-drive'],

@@ -23,6 +23,7 @@ import {
 export const supportedFrontViews = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
+  'skater-bound',
   'in-and-out-jump',
   'lateral-shuffle',
   'goblet-squat',
@@ -68,6 +69,7 @@ export const supportedObliqueViews = [
 export const FRONT_ONLY: readonly ExerciseId[] = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
+  'skater-bound',
   'in-and-out-jump',
   'lateral-shuffle',
 ];
@@ -281,6 +283,81 @@ function lateralHopPose(t: number, working: Working | null): Pose {
   };
 }
 
+/** Ground contact points of the skater bound (the landing marks on the floor). */
+const BOUND_X0 = 72;
+const BOUND_X1 = 128;
+/** Thigh and shin of the front hop figures; a stance leg never reaches past their sum. */
+const BOUND_THIGH = FRONT_THIGH;
+const BOUND_SHIN = 34;
+
+/**
+ * Skater bound authored for the right start leg (the viewer's left): push off
+ * the right foot, a short flight with both feet off the floor, soft landing on
+ * the left foot at the far mark. The free foot trails behind the stance leg and
+ * the arms counter-swing against the hip's travel. At t=1 the figure is the
+ * mirror image of t=0, so the demonstration (out and back) loops seamlessly.
+ * Every segment keeps its length and the stance foot stays at y=174.
+ */
+function skaterBoundPose(t: number, working: Working | null): Pose {
+  const s = smooth(t);
+  const air = Math.sin(Math.PI * t);
+  const hx = mix(BOUND_X0, BOUND_X1, s);
+  // The knee is bent on both landings and extends in the flight.
+  const hip = point(hx, 174 - 60 - 9 * air);
+  const neck = point(hx, hip[1] - 43);
+  // Right (push-off) foot: planted until 0.12, then it trails on the take-off
+  // side of the hip (8 px behind it) while it rises, and only near touchdown
+  // swings behind the left stance leg, ending 9 px past it. The left foot is
+  // its time-reversed mirror image, so it leads the hip (lands first) from
+  // about 0.3 on and is planted at the far mark from 0.88.
+  const hipX = (u: number) => mix(BOUND_X0, BOUND_X1, smooth(u));
+  const offStart = BOUND_X0 - hipX(0.12);
+  const rightFoot = (u: number): Pt => {
+    if (u <= 0.12) return point(BOUND_X0, 174);
+    const off =
+      u < 0.5
+        ? mix(offStart, -8, smooth((u - 0.12) / 0.38))
+        : mix(-8, 9, smooth((u - 0.5) / 0.5));
+    return point(hipX(u) + off, 174 - 22 * smooth(clamp((u - 0.12) / 0.45)));
+  };
+  const aR = rightFoot(t);
+  const mirrored = rightFoot(1 - t);
+  const aL = point(200 - mirrored[0], mirrored[1]);
+  const toeY = (ankle: Pt) => Math.min(177, ankle[1] + 3);
+  const swing = mix(10, -10, s);
+  const handY = neck[1] + 34 - 5 * air;
+  const armR = solveTwoBone(
+    neck,
+    point(hx - 18 + swing, handY),
+    FRONT_UPPER_ARM,
+    FRONT_FOREARM,
+    1,
+  );
+  const armL = solveTwoBone(
+    neck,
+    point(hx + 18 + swing, handY),
+    FRONT_UPPER_ARM,
+    FRONT_FOREARM,
+    -1,
+  );
+  const pose = skeleton(
+    point(hx, neck[1] - 14),
+    neck,
+    hip,
+    armR.mid,
+    armR.end,
+    armL.mid,
+    armL.end,
+    joint(hip, aR, BOUND_THIGH, BOUND_SHIN, 1),
+    aR,
+    point(aR[0] - 10, toeY(aR)),
+    joint(hip, aL, BOUND_THIGH, BOUND_SHIN, -1),
+    aL,
+    point(aL[0] + 10, toeY(aL)),
+  );
+  return working === 'left' ? mirrorPose(pose) : pose;
+}
+
 /** Mirrors a pose authored for the right side about the body's centre line (x = 100). */
 function mirrorPose(pose: Pose): Pose {
   return mirrorAbout(pose, 200);
@@ -438,6 +515,7 @@ export function frontMovementPose(
   if (exerciseId === 'lateral-shuffle') return lateralShufflePose(t);
   if (exerciseId === 'single-leg-lateral-hop')
     return lateralHopPose(t, working);
+  if (exerciseId === 'skater-bound') return skaterBoundPose(t, working);
   if (exerciseId === 'seated-tibial-rotation') {
     // Feet rotate in the horizontal plane; the shins and knees stay still.
     const angle = mix(0.65, -0.65, t);
@@ -1530,6 +1608,16 @@ export function FrontFigureFrame({
         <path
           data-contact-plane="hop-line"
           d="M97 171v8M103 171v8"
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      ) : null}
+      {exerciseId === 'skater-bound' ? (
+        <path
+          data-contact-plane="bound-marks"
+          d={`M${BOUND_X0} 171v8M${BOUND_X1} 171v8`}
           fill="none"
           stroke="var(--edge)"
           strokeWidth="2"

@@ -206,3 +206,135 @@ describe('single-leg lateral hop figure', () => {
     }
   });
 });
+
+describe('skater bound figure', () => {
+  const ts = Array.from({ length: 81 }, (_, n) => n / 80);
+  const id = 'skater-bound' as const;
+  const segments = (p: ReturnType<typeof frontMovementPose>) => [
+    distance(p.hip, p.kR),
+    distance(p.kR, p.aR),
+    distance(p.hip, p.kL),
+    distance(p.kL, p.aL),
+    distance(p.neck, p.hip),
+    distance(p.neck, p.eR),
+    distance(p.eR, p.hR),
+    distance(p.neck, p.eL),
+    distance(p.eL, p.hL),
+  ];
+
+  it('is a front-only ballistic demonstration', () => {
+    expect(defaultViewFor(id)).toBe('front');
+    expect(supportedViewsFor(id)).toEqual(['front']);
+    expect(alternateView(id)).toBeUndefined();
+    expect(figures[id].motion).toBe('ballistic');
+  });
+
+  it('keeps every segment length constant and stays in the frame, above the floor', () => {
+    for (const working of ['right', 'left'] as const) {
+      const first = segments(frontMovementPose(id, 0, working));
+      for (const t of ts) {
+        const p = frontMovementPose(id, t, working);
+        for (const [i, len] of segments(p).entries())
+          expect(len, `${working} ${t} #${i}`).toBeCloseTo(first[i] ?? 0, 6);
+        for (const pt of Object.values(p)) {
+          expect(pt[0]).toBeGreaterThan(14);
+          expect(pt[0]).toBeLessThan(186);
+          expect(pt[1]).toBeGreaterThan(20);
+          expect(pt[1]).toBeLessThanOrEqual(177);
+        }
+      }
+    }
+  });
+
+  it('pushes off one foot, flies with both feet up and lands on the other', () => {
+    const start = frontMovementPose(id, 0, 'right');
+    const end = frontMovementPose(id, 1, 'right');
+    expect(start.aR[1]).toBe(174);
+    expect(start.aL[1]).toBeLessThan(174 - 10);
+    expect(end.aL[1]).toBe(174);
+    expect(end.aR[1]).toBeLessThan(174 - 10);
+    expect(end.hip[0] - start.hip[0]).toBeGreaterThan(40);
+    const mid = frontMovementPose(id, 0.5, 'right');
+    expect(mid.aR[1]).toBeLessThan(174 - 10);
+    expect(mid.aL[1]).toBeLessThan(174 - 10);
+    // A longer bound than the lateral hop (85 to 115).
+    expect(end.hip[0] - start.hip[0]).toBeGreaterThan(115 - 85);
+  });
+
+  it('lets the landing foot lead the hip in the second half of the flight and never crosses the legs mid-flight', () => {
+    for (const t of [0.4, 0.5, 0.6, 0.7, 0.8]) {
+      const p = frontMovementPose(id, t, 'right');
+      expect(p.aL[0], `aL ${t}`).toBeGreaterThan(p.hip[0]);
+    }
+    for (const t of [0.3, 0.4, 0.5, 0.6]) {
+      const p = frontMovementPose(id, t, 'right');
+      expect(p.aR[0], `aR ${t}`).toBeLessThan(p.hip[0]);
+      expect(p.aL[0] - p.aR[0], `gap ${t}`).toBeGreaterThan(6);
+    }
+  });
+
+  it('never has a foot below the floor and only the stance foot touches it', () => {
+    for (const t of ts) {
+      const p = frontMovementPose(id, t, 'right');
+      expect(p.aR[1]).toBeLessThanOrEqual(174);
+      expect(p.aL[1]).toBeLessThanOrEqual(174);
+      expect(p.tR[1]).toBeLessThanOrEqual(177);
+      expect(p.tL[1]).toBeLessThanOrEqual(177);
+    }
+  });
+
+  it('is a seamless loop: the end pose is the mirror image of the start', () => {
+    const a = frontMovementPose(id, 0, 'right');
+    const b = frontMovementPose(id, 1, 'right');
+    expect(b.hip[0]).toBeCloseTo(200 - a.hip[0], 6);
+    expect(b.aL[0]).toBeCloseTo(200 - a.aR[0], 6);
+    expect(b.aR[0]).toBeCloseTo(200 - a.aL[0], 6);
+    expect(b.hR[0]).toBeCloseTo(200 - a.hL[0], 6);
+    expect(b.kL[1]).toBeCloseTo(a.kR[1], 6);
+  });
+
+  it('swings the arms against the hip travel', () => {
+    const a = frontMovementPose(id, 0, 'right');
+    const b = frontMovementPose(id, 1, 'right');
+    expect(a.hR[0] - a.hip[0]).toBeGreaterThan(b.hR[0] - b.hip[0]);
+  });
+
+  it('mirrors left and right and swaps the leg roles', () => {
+    for (const t of ts) {
+      const r = frontMovementPose(id, t, 'right');
+      const l = frontMovementPose(id, t, 'left');
+      expect(l.aL[0]).toBeCloseTo(200 - r.aR[0], 6);
+      expect(l.aL[1]).toBeCloseTo(r.aR[1], 6);
+      expect(l.aR[0]).toBeCloseTo(200 - r.aL[0], 6);
+      expect(l.hip[0]).toBeCloseTo(200 - r.hip[0], 6);
+    }
+  });
+
+  it('uses Start and Slut for reduced motion and draws the landing marks', () => {
+    expect(stillFramePhase(id, 'front', 'Start')).toBe(0);
+    expect(stillFramePhase(id, 'front', 'Slut')).toBe(1);
+    const markup = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId={id}
+        pose={movementPose(id, 0.5)}
+        view="front"
+        phase={0.5}
+      />,
+    );
+    expect(markup).toContain('data-contact-plane="bound-marks"');
+  });
+
+  it('keeps the side-view fallback pose constant in length and above the floor', () => {
+    const first = movementPose(id, 0);
+    for (const t of ts) {
+      const p = movementPose(id, t);
+      expect(distance(p.hip, p.kR)).toBeCloseTo(
+        distance(first.hip, first.kR),
+        6,
+      );
+      expect(distance(p.kL, p.aL)).toBeCloseTo(distance(first.kL, first.aL), 6);
+      expect(p.aR[1]).toBeLessThanOrEqual(174);
+      expect(p.aL[1]).toBeLessThanOrEqual(174);
+    }
+  });
+});

@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { exercises } from '../../content/exercises';
 import { experienceLabels } from '../../content/programmes';
+import { readyBallisticIds } from '../../content/runningProposals';
 import { isCuratedLevel, programPool } from '../../content/widePool';
 import { getDb } from '../../db/db';
 import { redoTrainingProgram } from '../../db/training';
@@ -88,6 +89,18 @@ export function rebuildProgram(
   seed: number | undefined,
   id: string,
 ): TrainingProgram | null {
+  const keptReady = program.passes[0]?.ready ? program.passes[0] : undefined;
+  // A beginner gets no ballistic work in a ready pass (the programme schema
+  // rejects it), so a pass kept for level 'new' loses those exercises.
+  const ready =
+    keptReady && level === 'new'
+      ? {
+          ...keptReady,
+          exerciseIds: keptReady.exerciseIds.filter(
+            (id) => !readyBallisticIds.has(id),
+          ),
+        }
+      : keptReady;
   return buildProgram({
     preferences: { ...preferences, experience: level },
     daysPerWeek: program.daysPerWeek,
@@ -97,7 +110,7 @@ export function rebuildProgram(
     id,
     block: program.block,
     // A ready pass is kept as it is; only the generated passes are reshuffled.
-    ...(program.passes[0]?.ready ? { ready: program.passes[0] } : {}),
+    ...(ready ? { ready } : {}),
     pool: programPool(level, program.emphasis),
     curated: isCuratedLevel(level),
     ...(seed !== undefined ? { seed } : {}),

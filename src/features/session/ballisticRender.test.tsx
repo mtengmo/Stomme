@@ -22,6 +22,7 @@ describe('ballistic exercises render without crashing', () => {
     'kettlebell-swing',
     'box-jump',
     'single-leg-lateral-hop',
+    'skater-bound',
     'fast-feet',
     'in-and-out-jump',
     'lateral-shuffle',

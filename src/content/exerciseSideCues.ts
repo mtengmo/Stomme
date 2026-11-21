@@ -44,6 +44,11 @@ const lateralHopLeg: CueFactory = (side) => ({
   explanation: `Hoppa från sida till sida på det ${sideAdjective(side)} benet; den andra foten är lyft hela tiden.`,
 });
 
+const skaterBoundLeg: CueFactory = (side) => ({
+  label: `Börja på ${sideWord(side)} ben`,
+  explanation: `Skjut ifrån med det ${sideAdjective(side)} benet och landa på det andra; hoppa sedan tillbaka. Det fria benet svingar bakom stödbenet.`,
+});
+
 const cues: Partial<Record<ExerciseId, CueFactory>> = {
   'copenhagen-hold': (side) => ({
     label: `${sideWord(side)} knä överst på bänken`,
@@ -54,6 +59,7 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
     explanation: `Håll det ${sideAdjective(side)} knät böjt och hälen uppe. Den andra foten är fri.`,
   }),
   'single-leg-lateral-hop': lateralHopLeg,
+  'skater-bound': skaterBoundLeg,
   'isometric-lunge-hold': (side) => ({
     label: `${sideWord(side)} ben fram`,
     explanation: `Det ${sideAdjective(side)} benet står fram med låret parallellt med golvet; håll positionen under tiden som visas och byt sedan ben.`,

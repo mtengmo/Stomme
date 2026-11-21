@@ -5769,6 +5769,31 @@
     ]
   },
   {
+    "id": "skater-bound",
+    "name": "Skridskohopp",
+    "group": "ballistic",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E109 (text, metadata, frontfigur, sidovy). Skridskohopp: hopp i sidled från ben till ben med mjuk enbenslandning och kort paus; skiljer sig från E99 (kort hopp, landar på samma ben) genom att benen alternerar och sträckan är längre (höften x 72 till 128 i frontvyn, E99 85 till 115). Bara frontvy (FRONT_ONLY, som E99); sidovyn är en enkel enbensstående med studs som reservpose. Framfigur skriven för höger startben, vänster är spegelbilden; fas 0 och fas 1 är varandras spegelbilder så att ut-och-tillbaka-loopen (ballistic, 1,8 s) går ihop sömlöst. Stödfoten ligger på y 174 tills frånskjutet, båda fötterna lyfta i flykten (cirka 22 enheter), fria benet svingas bakom stödbenet, armarna motsvingar höftens riktning, benlängder 35,9/34 och armar 25/25 konstanta. Reps per startben, räknas för hand (MANUAL_REPS), start 4 max 8. Inte i program, bara bibliotek (rehabImpactExercises/ballistic). Granska: frontvyn faser 0, 0,25, 0,5, 0,75, 1 och tillbaka, H/V, Start/Slut i reducerad rörelse, om benen läses som korsande i flykten, om fria benet bakom stödbenet syns tydligt nog, texten och säkerheten (ballistisk, ej vid knä-, fot- eller vadbesvär). Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E109 efter granskning: (1) frontvyn korsade benen i varje bildruta (fotavståndet konstant 9 enheter, landningsfoten ledde aldrig). Nu ligger tryckfoten kvar på avstigssidan, 8 enheter bakom höften, tills strax före landning och svingas då bakom stödbenet (slutar 9 enheter förbi det); landningsfoten är spegelbilden i tid och leder höften från cirka fas 0,3 och står på sitt märke från fas 0,88. I flykten är fötterna nu isär (landningsfoten till höger om höften, tryckfoten till vänster, avstånd över 6 enheter vid fas 0,3 till 0,6). Benlängder 35,9/34, armar 25/25, stödfot y 174 och sömlös loop (fas 1 är spegelbilden av fas 0) oförändrat. (2) Tips 3: raderat 'Sätt ned andra foten om du tappar balansen' (kopierat från E99, benen växlar ju inom en repetition), ersatt med 'Byt startben efter setet'; tips 1 flyttar tejpmärket till 'bredvid landningsplatsen, inte under den'. Granska: frontvyn fas 0 till 1 och tillbaka (särskilt 0,25 till 0,75: korsar benen eller ej, syns fria benet bakom stödbenet vid landning), H/V, Start/Slut. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
+    ],
+    "fingerprint": "dd5ad5bee0d6"
+  },
+  {
     "id": "box-jump",
     "name": "Boxhopp",
     "group": "ballistic",

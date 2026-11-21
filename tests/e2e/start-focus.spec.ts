@@ -17,6 +17,7 @@ const IMPACT_IDS = [
   'jumping-lunge',
   'burpee',
   'single-leg-lateral-hop',
+  'skater-bound',
   'box-jump',
   'fast-feet',
   'in-and-out-jump',

@@ -239,6 +239,8 @@ const BALLISTIC_MS: Partial<Record<ExerciseId, number>> = {
   'fast-feet': 600,
   'knee-drive': 900,
   'plate-pogos': 800,
+  // Out and back with a short stick on each landing.
+  'skater-bound': 1800,
 };
 const ballisticMs = (id: ExerciseId) => BALLISTIC_MS[id] ?? 1100;
 const sequenceMs = (id: ExerciseId) => SEQUENCE_MS[id] ?? 12000;

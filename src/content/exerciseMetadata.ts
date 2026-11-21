@@ -138,6 +138,7 @@ const runningReasons: Partial<Record<ExerciseId, string>> = {
   'reverse-lunge': 'Kontrollerad benstyrka med steg bakåt.',
   'forward-lunge': 'Benstyrka och inbromsning av ett steg framåt.',
   'single-leg-lateral-hop': 'Landning och sidokontroll på ett ben.',
+  'skater-bound': 'Kraft i sidled och stabil landning på ett ben.',
   'box-jump': 'Explosiv benstyrka med kontrollerad landning.',
   'fast-feet': 'Snabba fotisättningar och rytm.',
   'in-and-out-jump': 'Mjuka landningar och fotarbete i sidled.',
@@ -1289,6 +1290,7 @@ export const exerciseMetadata = Object.fromEntries(
       reviewedAt:
         id === 'blast-off-push-up' ||
         id === 'single-leg-lateral-hop' ||
+        id === 'skater-bound' ||
         id === 'box-jump' ||
         id === 'fast-feet' ||
         id === 'in-and-out-jump' ||
@@ -1298,16 +1300,18 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'plate-pogos' ||
         id === 'renegade-row' ||
         id === 'weighted-sit-up'
-          ? id === 'renegade-row' || id === 'weighted-sit-up'
-            ? '2026-11-11'
-            : id === 'isometric-lunge-hold' || id === 'plate-pogos'
-              ? '2026-11-05'
-              : id === 'fast-feet' ||
-                  id === 'in-and-out-jump' ||
-                  id === 'lateral-shuffle' ||
-                  id === 'knee-drive'
-                ? '2026-11-03'
-                : '2026-11-01'
+          ? id === 'skater-bound'
+            ? '2026-11-21'
+            : id === 'renegade-row' || id === 'weighted-sit-up'
+              ? '2026-11-11'
+              : id === 'isometric-lunge-hold' || id === 'plate-pogos'
+                ? '2026-11-05'
+                : id === 'fast-feet' ||
+                    id === 'in-and-out-jump' ||
+                    id === 'lateral-shuffle' ||
+                    id === 'knee-drive'
+                  ? '2026-11-03'
+                  : '2026-11-01'
           : [
                 'bent-over-row',
                 'sumo-squat',

@@ -4,7 +4,11 @@ import { readAuditLog } from './exerciseAudit';
 import { exercises } from './exercises';
 import { readyWorkouts } from './readyWorkouts';
 import { isRetiredExercise } from './retiredExercises';
-import { plyometricIds, runningSlots } from './runningProposals';
+import {
+  plyometricIds,
+  readyBallisticIds,
+  runningSlots,
+} from './runningProposals';
 import { ballisticIds, unresolvedFigureIssueIds } from './widePool';
 
 describe('ready-made workouts', () => {
@@ -53,6 +57,28 @@ describe('ready-made workouts', () => {
     expect(workout?.caution).toContain('Pogohopp');
   });
 
+  it('Löparens kraftpass has the seven exercises in order and warns about the ballistic work', () => {
+    const workout = readyWorkouts.find((w) => w.id === 'runner-power-seven');
+    expect(workout).toMatchObject({
+      name: 'Löparens kraftpass',
+      group: 'legs',
+      fixed: true,
+      runningStart: true,
+    });
+    expect(workout?.exerciseIds).toEqual([
+      'skater-bound',
+      'single-leg-calf-raise',
+      'kettlebell-swing',
+      'dumbbell-rdl',
+      'rear-foot-split-squat',
+      'single-leg-rdl',
+      'kettlebell-goblet-squat',
+    ]);
+    expect(workout?.caution).toContain('ballistiska');
+    expect(workout?.caution).toContain('knä-, fot- eller vadbesvär');
+    expect(workout?.caution).toContain('neutral rygg');
+  });
+
   it('Snabbt helkroppspass is fixed, ordered and not a running start', () => {
     const workout = readyWorkouts.find((w) => w.id === 'dumbbell-full-body');
     expect(workout?.name).toBe('Snabbt helkroppspass med hantlar');
@@ -68,7 +94,12 @@ describe('ready-made workouts', () => {
     ]);
     expect(
       readyWorkouts.filter((w) => w.runningStart).map((w) => w.id),
-    ).toEqual(['running-strength', 'runner-ten', 'runner-home']);
+    ).toEqual([
+      'running-strength',
+      'runner-ten',
+      'runner-home',
+      'runner-power-seven',
+    ]);
   });
 
   it('Hemmapass för löpare is four bodyweight exercises and says what was substituted', () => {
@@ -95,18 +126,30 @@ describe('ready workouts as programme passes', () => {
       .filter((e) => e.status === 'needs-fix')
       .map((e) => e.id),
   );
-  const all = new Set([
-    ...readyWorkouts.flatMap((w) => w.exerciseIds),
-    ...runningSlots.flatMap((s) => s.options),
-  ]);
+  const slotIds = new Set(runningSlots.flatMap((s) => s.options));
+  const workoutIds = new Set(readyWorkouts.flatMap((w) => w.exerciseIds));
+  const all = new Set([...workoutIds, ...slotIds]);
 
-  it('holds no needs-fix, unresolved, retired or ballistic exercise', () => {
+  it('holds no needs-fix, unresolved or retired exercise', () => {
     for (const id of all) {
       expect(needsFix.has(id), id).toBe(false);
       expect(unresolvedFigureIssueIds.has(id), id).toBe(false);
       expect(isRetiredExercise(id), id).toBe(false);
-      // plate-pogos is the one allowed jump; level new drops it elsewhere.
-      if (!plyometricIds.has(id)) expect(ballisticIds.has(id), id).toBe(false);
     }
+  });
+
+  it('keeps ballistic work out of the Löpstyrka slots except the one jump', () => {
+    for (const id of slotIds)
+      if (!plyometricIds.has(id)) expect(ballisticIds.has(id), id).toBe(false);
+  });
+
+  it('holds ballistic work in fixed workouts only (and Löpstyrka), and only readyBallisticIds', () => {
+    for (const workout of readyWorkouts)
+      for (const id of workout.exerciseIds) {
+        if (!ballisticIds.has(id)) continue;
+        expect(readyBallisticIds.has(id), `${workout.id}: ${id}`).toBe(true);
+        if (workout.id !== 'running-strength')
+          expect(workout.fixed, `${workout.id}: ${id}`).toBe(true);
+      }
   });
 });

@@ -4,7 +4,11 @@ import { routineFocusIds } from '../content/focusPresets';
 import { programExcludedIds } from '../content/programExclusions';
 import { readyWorkouts } from '../content/readyWorkouts';
 import { isRetiredExercise } from '../content/retiredExercises';
-import { plyometricIds, runningSlots } from '../content/runningProposals';
+import {
+  plyometricIds,
+  readyBallisticIds,
+  runningSlots,
+} from '../content/runningProposals';
 import { ballisticIds, unresolvedFigureIssueIds } from '../content/widePool';
 import type { ExerciseId, TrainingProgram } from '../domain/types';
 import { isRealDate } from '../lib/dates';
@@ -100,8 +104,10 @@ export const trainingProgramSchema = z
       if (pass.ready) {
         // A ready pass is a copy of a ready workout. It sits outside the
         // programme exclusions on purpose (copenhagen-hold, isometric-lunge-hold),
-        // but ballistic, retired and unresolved exercises stay out, and the
-        // jump is not for a beginner.
+        // but ballistic exercises stay out except the few a fixed running
+        // workout holds (readyBallisticIds: pogo jumps, skater bound, kettlebell
+        // swing), and those are not for a beginner. Retired and unresolved
+        // exercises stay out too.
         const allowed = readyAllowedIds(pass.ready.id);
         if (!allowed)
           ctx.addIssue({
@@ -112,10 +118,10 @@ export const trainingProgramSchema = z
         for (const id of pass.exerciseIds)
           if (
             (allowed && !allowed.has(id)) ||
-            (ballisticIds.has(id) && !plyometricIds.has(id)) ||
+            (ballisticIds.has(id) && !readyBallisticIds.has(id)) ||
             unresolvedFigureIssueIds.has(id) ||
             isRetiredExercise(id) ||
-            (plyometricIds.has(id) && program.level === 'new')
+            (readyBallisticIds.has(id) && program.level === 'new')
           )
             ctx.addIssue({
               code: 'custom',

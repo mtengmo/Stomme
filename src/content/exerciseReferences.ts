@@ -106,6 +106,7 @@ export const exerciseReferences: Record<ExerciseId, string> = {
   'plate-pogos': 'E106',
   'renegade-row': 'E107',
   'weighted-sit-up': 'E108',
+  'skater-bound': 'E109',
 };
 
 /** Orders references numerically, so E99 comes before E100 and E10 before E11. */

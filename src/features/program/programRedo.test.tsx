@@ -3,8 +3,9 @@ import 'fake-indexeddb/auto';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { readyWorkouts } from '../../content/readyWorkouts';
 import { getDb } from '../../db/db';
-import { readTrainingProgram } from '../../db/program';
+import { isTrainingProgram, readTrainingProgram } from '../../db/program';
 import { REDO_LOCKED_MESSAGE } from '../../db/training';
 import { readyProgramPass } from '../../rules/readyProgramPass';
 import { ProgramRedoEnd, rebuildProgram } from './ProgramConfirm';
@@ -50,6 +51,33 @@ it('rebuilds a ready programme as the same single pass on one day', async () => 
   const rebuilt = rebuildProgram(program, programPrefs, 'new', 7, 'x');
   expect(rebuilt?.daysPerWeek).toBe(1);
   expect(rebuilt?.passes).toEqual([ready]);
+});
+
+it('drops ballistic exercises from a kept ready pass when redone for level new', async () => {
+  const power = readyWorkouts.find((w) => w.id === 'runner-power-seven');
+  if (!power) throw new Error('ready workout missing');
+  const pass = {
+    focus: 'lower' as const,
+    template: 'A' as const,
+    exerciseIds: [...power.exerciseIds],
+    ready: { id: power.id, name: power.name },
+  };
+  const regular = { ...programPrefs, experience: 'regular' as const };
+  const program = await seedProgram(3, regular, pass);
+  const rebuilt = rebuildProgram(program, regular, 'new', 7, 'x');
+  expect(rebuilt?.level).toBe('new');
+  expect(rebuilt?.passes[0]?.exerciseIds).toEqual([
+    'single-leg-calf-raise',
+    'dumbbell-rdl',
+    'rear-foot-split-squat',
+    'single-leg-rdl',
+    'kettlebell-goblet-squat',
+  ]);
+  expect(isTrainingProgram(rebuilt)).toBe(true);
+  // Other levels keep the pass as it is.
+  expect(rebuildProgram(program, regular, 'regular', 7, 'x')?.passes).toEqual([
+    pass,
+  ]);
 });
 
 it('keeps "Behåll programmet" enabled when no programme can be built', async () => {

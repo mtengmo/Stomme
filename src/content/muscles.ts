@@ -127,6 +127,10 @@ export const exerciseMuscles: Record<
     ...bodyweightDetails['single-leg-lateral-hop'],
     qualities: ['power', 'balance'],
   },
+  'skater-bound': {
+    ...bodyweightDetails['skater-bound'],
+    qualities: ['power', 'balance'],
+  },
   'box-jump': { ...bodyweightDetails['box-jump'], qualities: ['power'] },
   'fast-feet': { ...bodyweightDetails['fast-feet'], qualities: [] },
   'in-and-out-jump': {

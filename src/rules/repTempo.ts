@@ -19,6 +19,8 @@ const MANUAL_REPS: readonly ExerciseId[] = [
   'parallel-dip',
   // Full reset and step down between jumps; no fixed pace.
   'box-jump',
+  // Bound out, stick the landing and bound back at the user's own pace.
+  'skater-bound',
 ];
 
 /** Ballistic and plyometric work gets one suggested beat per rep, no holds. */

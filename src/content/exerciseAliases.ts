@@ -21,6 +21,12 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Enbens sidohopp',
     'Sidohopp',
   ],
+  'skater-bound': [
+    'Skater bound',
+    'Skater bounds',
+    'Skater jumps',
+    'Skridskohopp i sidled',
+  ],
   'box-jump': ['Box jump', 'Box jumps', 'Lådhopp', 'Hopp upp på låda'],
   'fast-feet': ['Fast feet', 'Quick feet', 'Snabba fotsteg', 'Trippning'],
   'in-and-out-jump': [

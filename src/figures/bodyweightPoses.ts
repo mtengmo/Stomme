@@ -478,6 +478,34 @@ function lateralHop(t: number): Pose {
   );
 }
 
+/** Side view of the skater bound: one-legged stance with the free leg behind and a small bounce (the front view carries the lateral travel). */
+function skaterBound(t: number): Pose {
+  const lift = 8 * Math.sin(Math.PI * t);
+  const ar: Pt = [100, 174 - lift];
+  const hip: Pt = [100, ar[1] - 64 - 4 * Math.sin(Math.PI * t)],
+    neck: Pt = [100, hip[1] - 43];
+  const al: Pt = [82, ar[1] - 22];
+  return pose(
+    [102, neck[1] - 14],
+    neck,
+    hip,
+    [
+      [neck[0] + 10, neck[1] + 20],
+      [neck[0] + 22, neck[1] + 34],
+      [neck[0] - 8, neck[1] + 20],
+      [neck[0] - 18, neck[1] + 36],
+    ],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 34, 1),
+      al,
+      foot(al),
+    ],
+  );
+}
+
 /** The step is about 30 cm high (44 px wide); ankles rest 3 px above its top so the toes touch it. */
 export const BOX_PROP = { x: 125, y: 156, w: 44 } as const;
 const BOX_ANKLE_Y = BOX_PROP.y - 3;
@@ -897,6 +925,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   plank,
   'squat-jump': squatJump,
   'single-leg-lateral-hop': lateralHop,
+  'skater-bound': skaterBound,
   'box-jump': boxJump,
   'fast-feet': fastFeet,
   'in-and-out-jump': inAndOutJump,
@@ -936,6 +965,7 @@ export const bodyweightFigures = Object.fromEntries(
               id === 'jumping-lunge'
             ? 'sequence'
             : id === 'single-leg-lateral-hop' ||
+                id === 'skater-bound' ||
                 id === 'fast-feet' ||
                 id === 'in-and-out-jump' ||
                 id === 'lateral-shuffle' ||

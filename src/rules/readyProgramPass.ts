@@ -1,6 +1,6 @@
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import { readyWorkouts } from '../content/readyWorkouts';
-import { plyometricIds, proposals } from '../content/runningProposals';
+import { proposals, readyBallisticIds } from '../content/runningProposals';
 import type {
   ExerciseId,
   ProgramPass,
@@ -13,7 +13,8 @@ import { equipmentFits } from './equipment';
  * (bodyweight always fits, so a known workout is never empty). `exerciseIds` is a copy.
  *
  * Löpstyrka uses the fixed proposals: Grund for a beginner, Medel otherwise.
- * Fixed workouts are filtered by equipment and, for a beginner, lose the jump.
+ * Fixed workouts are filtered by equipment and, for a beginner, lose their
+ * ballistic exercises (`readyBallisticIds`: jumps, skater bound, kettlebell swing).
  * Focus 'lower' / template 'A' keeps the rest rules between muscles right for
  * these leg workouts. Ready passes sit outside the beginner set and the wide
  * pool on purpose (see db/program.ts).
@@ -35,7 +36,7 @@ export function readyProgramPass(
       (id) =>
         exerciseMetadata[id].variants.some((v) =>
           equipmentFits(v.equipment, preferences),
-        ) && !(preferences.experience === 'new' && plyometricIds.has(id)),
+        ) && !(preferences.experience === 'new' && readyBallisticIds.has(id)),
     );
   }
   return {

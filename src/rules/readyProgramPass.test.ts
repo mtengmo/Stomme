@@ -51,6 +51,28 @@ describe('readyProgramPass', () => {
     expect(bare?.exerciseIds.length).toBeLessThan(10);
   });
 
+  it('drops the ballistic exercises of Löparens kraftpass for new', () => {
+    const everything = prefs('regular', [
+      'bodyweight',
+      'chair',
+      'support',
+      'step',
+      'bench',
+    ]);
+    const some = readyProgramPass('runner-power-seven', everything);
+    const power = readyWorkouts.find((w) => w.id === 'runner-power-seven');
+    for (const id of ['skater-bound', 'kettlebell-swing'] as const)
+      expect(power?.exerciseIds).toContain(id);
+    expect(some?.exerciseIds).toContain('skater-bound');
+    const beginner = readyProgramPass('runner-power-seven', {
+      ...everything,
+      experience: 'new',
+    });
+    expect(beginner?.exerciseIds).not.toContain('skater-bound');
+    expect(beginner?.exerciseIds).not.toContain('kettlebell-swing');
+    expect(beginner?.exerciseIds).toContain('single-leg-rdl');
+  });
+
   it('returns null for a ready workout that is not a running start', () => {
     expect(readyProgramPass('dumbbell-full-body', prefs('regular'))).toBeNull();
   });

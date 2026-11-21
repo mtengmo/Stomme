@@ -317,6 +317,60 @@ describe('review ordering', () => {
       .sort(compareReferences);
     expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
     expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
-    expect(sorted.at(-1)).toBe('E108');
+    expect(sorted.at(-1)).toBe('E109');
+  });
+});
+
+describe('skater bound (E109)', () => {
+  const id = 'skater-bound' as const;
+
+  it('takes the next permanent reference and is a knee-loaded impact exercise', () => {
+    expect(exerciseReferences[id]).toBe('E109');
+    expect(exercises[id].kneeLoaded).toBe(true);
+    expect(rehabImpactExercises.has(id)).toBe(true);
+    expect(exerciseMetadata[id].variants[0]?.technicalLevel).toBe('technical');
+  });
+
+  it('counts reps by hand per start leg with a low rep range', () => {
+    expect(exercises[id]).toMatchObject({
+      unit: 'reps',
+      perSide: true,
+      sideKind: 'ben',
+      range: { start: 4, max: 8, step: 1 },
+    });
+    expect(exerciseMetadata[id].sidePolicy).toBe('choose-side');
+    expect(repTempo(id)).toBeNull();
+  });
+
+  it('is editorial, warns about pain and is not a lateral hop', () => {
+    const [source] = exerciseMetadata[id].sources;
+    expect(source?.publisher).toBe('Stomme');
+    expect(source?.url).toBeUndefined();
+    expect(source?.note).toContain('Redaktionell övning');
+    expect(source?.note).toContain('Avbryt vid smärta');
+    expect(exerciseMetadata[id].easierExerciseId).toBeUndefined();
+    expect(exercises[id].name).not.toBe(
+      exercises['single-leg-lateral-hop'].name,
+    );
+    expect(exercises[id].unit).not.toBe(
+      exercises['single-leg-lateral-hop'].unit,
+    );
+  });
+
+  it('says which leg to start on and finds it by its aliases', () => {
+    expect(exerciseSideCue(id, 'right')?.label).toBe('Börja på höger ben');
+    expect(exerciseSideCue(id, 'left')?.label).toBe('Börja på vänster ben');
+    expect(exerciseAliases[id]).toContain('Skater bound');
+    expect(exerciseMetadata[id].purposes.running).toBeDefined();
+  });
+
+  it('stays out of every programme roster and slot', () => {
+    expect(
+      JSON.stringify([generalSlots, focusSlots, movementSlots]),
+    ).not.toContain(`"${id}"`);
+    expect(rehabAdditionIds.has(id)).toBe(false);
+    expect(exerciseList.filter((e) => e.id === id && !e.optional)).toHaveLength(
+      0,
+    );
   });
 });

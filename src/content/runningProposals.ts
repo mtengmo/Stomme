@@ -55,6 +55,16 @@ export const runningSlots: readonly RunningSlot[] = [
 /** The one jumping exercise. Never in the easiest proposal, at most one per proposal. */
 export const plyometricIds: ReadonlySet<ExerciseId> = new Set(['plate-pogos']);
 
+/**
+ * Ballistic exercises a fixed running workout may hold besides the jump
+ * (`plyometricIds`): never in a generated programme, never for a beginner.
+ */
+export const readyBallisticIds: ReadonlySet<ExerciseId> = new Set([
+  ...plyometricIds,
+  'skater-bound',
+  'kettlebell-swing',
+]);
+
 export type ProposalId = 'grund' | 'medel' | 'stark' | 'slump';
 
 export interface RunningProposal {

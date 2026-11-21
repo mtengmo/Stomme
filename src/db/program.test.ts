@@ -2,6 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { readyWorkouts } from '../content/readyWorkouts';
 import { rehabAdditionIds } from '../content/rosterSlots';
+import { readyBallisticIds } from '../content/runningProposals';
 import { readyProgramPass } from '../rules/readyProgramPass';
 import { programFixture } from '../test/programFixture';
 import { StommeDB } from './db';
@@ -320,6 +321,41 @@ describe('ready passes', () => {
       'copenhagen-hold',
     ];
     expect(isTrainingProgram(ready(ten, 'runner-ten'))).toBe(true);
+  });
+  it('accepts the kettlebell swing and skater bound in Löparens kraftpass, not at level new', () => {
+    const power = readyWorkouts.find((w) => w.id === 'runner-power-seven');
+    const ids = [...(power?.exerciseIds ?? [])];
+    expect(isTrainingProgram(ready(ids, 'runner-power-seven', 'regular'))).toBe(
+      true,
+    );
+    expect(isTrainingProgram(ready(ids, 'runner-power-seven', 'new'))).toBe(
+      false,
+    );
+    expect(
+      isTrainingProgram(
+        ready(
+          ids.filter((id) => !readyBallisticIds.has(id as never)),
+          'runner-power-seven',
+          'new',
+        ),
+      ),
+    ).toBe(true);
+  });
+  it('rejects the kettlebell swing in a ready workout that does not hold it', () => {
+    expect(
+      isTrainingProgram(
+        ready(
+          [
+            'kettlebell-swing',
+            'goblet-chair-squat',
+            'glute-bridge',
+            'split-squat',
+          ],
+          'runner-home',
+          'regular',
+        ),
+      ),
+    ).toBe(false);
   });
   it('rejects an unknown ready id', () => {
     expect(isTrainingProgram(ready(eight, 'nope'))).toBe(false);

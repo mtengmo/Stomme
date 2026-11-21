@@ -45,9 +45,9 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
     group: 'legs',
     fixed: true,
     summary:
-      'Tio övningar för löpare, i den ordning de brukar visas: enbensstyrka, vader, hållning och reaktiv styrka.',
+      'Övningar för löpare, i den ordning de brukar visas: enbensstyrka, vader, hållning och reaktiv styrka.',
     caution:
-      'Pogohopp är ett hopp och hoppövningar passar inte vid knä-, fot- eller vadbesvär. Hoppa över dem och avbryt vid smärta. Ändra utrustning, antal och vikt i passet före start.',
+      'Pogohopp är ett hopp (om det ingår i ditt pass) och hoppövningar passar inte vid knä-, fot- eller vadbesvär. Hoppa över dem och avbryt vid smärta. Ändra utrustning, antal och vikt i passet före start.',
     exerciseIds: [
       'rear-foot-split-squat',
       'kettlebell-goblet-squat',
@@ -76,6 +76,26 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
       'glute-bridge',
       'single-leg-floor-bridge',
       'split-squat',
+    ],
+  },
+  {
+    id: 'runner-power-seven',
+    runningStart: true,
+    name: 'Löparens kraftpass',
+    group: 'legs',
+    fixed: true,
+    summary:
+      'Kraft i sidled, vader, höftstyrka och enbensstyrka för löpare. Appens vanliga progression sätter antal och vikt.',
+    caution:
+      'Skridskohopp och kettlebell swing, om de ingår i ditt pass, är ballistiska och passar inte vid knä-, fot- eller vadbesvär. Hoppa över dem och avbryt vid smärta. Kettlebell swing och rumänska marklyft kräver en neutral rygg: håll ryggen rak och avbryt vid ryggsmärta. Ändra utrustning, antal och vikt i passet före start.',
+    exerciseIds: [
+      'skater-bound',
+      'single-leg-calf-raise',
+      'kettlebell-swing',
+      'dumbbell-rdl',
+      'rear-foot-split-squat',
+      'single-leg-rdl',
+      'kettlebell-goblet-squat',
     ],
   },
   {

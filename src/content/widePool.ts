@@ -19,6 +19,7 @@ export const ballisticIds: ReadonlySet<ExerciseId> = new Set<ExerciseId>([
   'mountain-climber',
   'blast-off-push-up',
   'single-leg-lateral-hop',
+  'skater-bound',
   'box-jump',
   'fast-feet',
   'in-and-out-jump',

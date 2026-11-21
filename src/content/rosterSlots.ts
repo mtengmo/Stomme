@@ -106,6 +106,7 @@ export const rehabImpactExercises: ReadonlySet<ExerciseId> = new Set([
   'jumping-lunge',
   'burpee',
   'single-leg-lateral-hop',
+  'skater-bound',
   'box-jump',
   'fast-feet',
   'in-and-out-jump',

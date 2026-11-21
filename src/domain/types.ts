@@ -96,6 +96,7 @@ export type ExerciseId =
   | 'wall-tibialis-raise'
   | 'seated-tibial-rotation'
   | 'single-leg-lateral-hop'
+  | 'skater-bound'
   | 'box-jump'
   | 'fast-feet'
   | 'in-and-out-jump'
