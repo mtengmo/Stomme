@@ -46,6 +46,16 @@ it('renders the kettlebell circuit with its six exercises and honest text', () =
   expect(screen.getByText(/ballistisk/)).toBeTruthy();
 });
 
+it('renders the 30-minute full-body workout with its five exercises and caution', () => {
+  const full = readyWorkouts.find((w) => w.id === 'full-body-thirty');
+  if (!full) throw new Error('missing workout');
+  render(<FixedReadyWorkout workout={full} busy={false} onAdd={vi.fn()} />);
+  expect(screen.getByText('Helkroppspass på 30 minuter')).toBeTruthy();
+  expect(screen.getByText('5 övningar')).toBeTruthy();
+  expect(screen.getAllByRole('listitem')).toHaveLength(5);
+  expect(screen.getByText(/Du behöver hantlar/)).toBeTruthy();
+});
+
 it('disables the button while busy', () => {
   if (!workout) throw new Error('missing workout');
   render(<FixedReadyWorkout workout={workout} busy onAdd={vi.fn()} />);

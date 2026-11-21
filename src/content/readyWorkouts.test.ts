@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { maxWorkoutExercises } from '../db/customWorkouts';
 import { readAuditLog } from './exerciseAudit';
+import { exerciseMetadata } from './exerciseMetadata';
 import { exercises } from './exercises';
 import { readyWorkouts } from './readyWorkouts';
 import { isRetiredExercise } from './retiredExercises';
@@ -126,6 +127,40 @@ describe('ready-made workouts', () => {
     expect(workout?.caution).toContain('ballistisk');
     expect(workout?.caution).toContain('neutral');
     expect(workout?.caution).toContain('smärta');
+  });
+
+  it('Helkroppspass på 30 minuter is fixed, ordered, in group full and not a running start', () => {
+    const workout = readyWorkouts.find((w) => w.id === 'full-body-thirty');
+    expect(workout).toMatchObject({
+      name: 'Helkroppspass på 30 minuter',
+      group: 'full',
+      fixed: true,
+    });
+    expect(workout?.runningStart).toBeUndefined();
+    expect(workout?.exerciseIds).toEqual([
+      'goblet-squat',
+      'dumbbell-rdl',
+      'floor-press',
+      'bent-over-row',
+      'shoulder-press',
+    ]);
+    expect(workout?.summary).toContain('fyra gånger');
+    expect(workout?.summary).toContain('15–30 s');
+    expect(workout?.summary).toContain('45–60 s');
+    expect(workout?.summary).toContain('progression');
+    expect(workout?.caution).toContain('hantlar');
+    expect(workout?.caution).toContain('utan vikt');
+    expect(workout?.caution).toContain('bänkpress');
+    expect(workout?.caution).toContain('neutral');
+    expect(workout?.caution).toContain('smärta');
+    expect(`${workout?.summary}${workout?.caution}`).not.toMatch(
+      /video|instagram/i,
+    );
+    expect(
+      exerciseMetadata['goblet-squat'].variants.some((v) =>
+        v.equipment.every((e) => e.type === 'bodyweight'),
+      ),
+    ).toBe(true);
   });
 
   it('Snabbt helkroppspass is fixed, ordered and not a running start', () => {

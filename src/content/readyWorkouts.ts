@@ -151,4 +151,21 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
       'weighted-sit-up',
     ],
   },
+  {
+    id: 'full-body-thirty',
+    name: 'Helkroppspass på 30 minuter',
+    group: 'full',
+    fixed: true,
+    summary:
+      'Fem övningar för hela kroppen: gobletknäböj, rumänskt marklyft, hantelpress på golv, hantelrodd och axelpress. Ett vanligt upplägg är att göra de fem övningarna ungefär fyra gånger, med 15–30 s vila mellan övningarna och 45–60 s mellan varven, efter en kort uppvärmning och med lugn nedvarvning. Appens vanliga progression sätter antal och vikt men kan inte ställa in varv eller vila per pass.',
+    caution:
+      'Du behöver hantlar till alla övningar utom gobletknäböjen, som går bra utan vikt. Hantelpress på golv är ett enklare alternativ till bänkpress med kortare rörelseväg. Håll ryggen neutral i marklyftet och i rodden. Avbryt vid smärta i rygg, nacke, axel eller handled. Ändra utrustning, antal och vikt i passet före start.',
+    exerciseIds: [
+      'goblet-squat',
+      'dumbbell-rdl',
+      'floor-press',
+      'bent-over-row',
+      'shoulder-press',
+    ],
+  },
 ];
