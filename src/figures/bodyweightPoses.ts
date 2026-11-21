@@ -1,6 +1,7 @@
 import type { BodyweightId } from '../content/bodyweightExercises';
 import { isBodyweightAddition } from '../content/bodyweightExercises';
 import type { ExerciseId } from '../domain/types';
+import { abWheelSidePose } from './abWheel';
 import { burpeePose } from './burpeeKeyframes';
 import type { Pt } from './lerp';
 import { lungeRotationSidePose } from './lungeRotation';
@@ -958,6 +959,7 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'lunge-with-rotation': lungeWithRotation,
   'cossack-squat': cossackSide,
   'squat-walk': squatWalkSidePose,
+  'kneeling-ab-wheel-rollout': abWheelSidePose,
   'box-jump': boxJump,
   'fast-feet': fastFeet,
   'in-and-out-jump': inAndOutJump,

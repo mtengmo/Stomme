@@ -87,6 +87,7 @@ const SUPPORT_ITEMS: EquipmentChoice[] = [
   'bosu',
   'bench',
   'nordic-anchor',
+  'ab-wheel',
 ];
 
 /** Only known pages may be returned to after saving. */

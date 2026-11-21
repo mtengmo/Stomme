@@ -5967,6 +5967,26 @@
     "fingerprint": "0740662c3434"
   },
   {
+    "id": "kneeling-ab-wheel-rollout",
+    "name": "Utrullning på knä",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E113 (text, metadata, sidofigur, ny utrustning Magrulle). Utrullning på knä med magrulle: knäna fasta på golvet (y 174), vristerna nästan plant på golvet med tårna i golvet, båda händerna på rullens nav och rullen rullar längs golvlinjen (navet y 167, radie 11, nederkanten y 178). Armarna är raka och konstanta (2 x 32), så rullen ligger en armlängd från axeln. Start: höften nästan över knät (lår 80 grader över golvet), bålen lutad cirka 42 grader från lodrät, rullen strax framför axlarna. Slut: kroppen från knä till axel är nästan en rak linje (lår 36 grader, bål 33 grader över golvet), höften några grader ovanför linjen knä-axel och aldrig under den (ingen svank), rullen längst fram. Lår 36, bål 46 och underben 34 konstanta; fjärran lem sammanfaller med närmaste lem i profil. Bara sidovy (standard); ingen frontvy. Rullen ritas vid handen (AbWheel i props.tsx) och följer figuren. Reducerad rörelse: Start och Slut skiljer tydligt (rullen 50 enheter längre fram och axlarna 19 enheter lägre i Slut). Räknas automatiskt per repetition (2 s ut, 2 s tillbaka); ut och tillbaka är en repetition. Risk high: lång hävarm över ländrygg och axlar, text om bäckenet lutat bakåt, rulla bara så långt att ryggen är rak, dra tillbaka med magen, vanligt fel svank, enklare variant kortare sträcka eller rulla mot vägg (endast text, ingen figur), ryggbesvär, skuldersmärta och avbryt vid smärta. Ny utrustning: ab-wheel (Magrulle) i EquipmentChoice, inställningar, snabbstart och backup; övningen kräver magrulle och visas inte för den som saknar den. Utanför program tills godkänd (pendingReviewIds); ingen färdig träning. Granska: sidovy fas 0, 0,25, 0,5, 0,75, 1 och tillbaka, knäkontakt, rullen på golvet, om höften kommer över linjen så att den läses som rak kropp, reducerad rörelse Start/Slut, text mot rörelse och säkerhet. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt61sol/human); högrisk (ländrygg och axlar); utanför program tills godkänd. Redaktionell övning utan verifierad extern källa; dosen är appens förslag."
+    ],
+    "fingerprint": "664aa195e75a"
+  },
+  {
     "id": "box-jump",
     "name": "Boxhopp",
     "group": "ballistic",

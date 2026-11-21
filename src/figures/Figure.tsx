@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { exerciseMetadata } from '../content/exerciseMetadata';
 import type { ExerciseId } from '../domain/types';
 import { repTempo } from '../rules/repTempo';
+import { AB_WHEEL } from './abWheel';
 import { BURPEE_STILL_PHASES } from './burpeeKeyframes';
 import { applyEquipmentPose } from './equipmentPose';
 import type { FigureAngle } from './frontViews';
@@ -22,7 +23,7 @@ import {
   type PoseKey,
   type Prop,
 } from './poses';
-import { FloorLine, Held, PropShape, pressGripAngle } from './props';
+import { AbWheel, FloorLine, Held, PropShape, pressGripAngle } from './props';
 import { heelSlidePose, proneRelaxedPose } from './rehabPoses';
 import { isSquatFamily, squatFamilyStills } from './squatFamilyKeyframes';
 
@@ -225,6 +226,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
   'bench-side-plank-leg-lift': '4 20 184 168',
   'isometric-lunge-hold': '0 0 200 188',
   'plate-pogos': '0 0 200 188',
+  'kneeling-ab-wheel-rollout': '4 20 184 168',
 };
 
 /** One whole repetition per cycle for sequence figures, in milliseconds. */
@@ -379,6 +381,9 @@ export function FigureFrame({
           <PropShape key={pr.type + JSON.stringify(pr)} prop={pr} />
         ))}
         <FloorLine />
+        {exerciseId === 'kneeling-ab-wheel-rollout' ? (
+          <AbWheel at={p.hR} radius={AB_WHEEL.radius} />
+        ) : null}
         {exerciseId === 'quad-set' ? (
           // Floor-contact cue under the knee: fades in as the knee presses down.
           <g

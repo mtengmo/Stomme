@@ -246,6 +246,7 @@ describe('exercise library', () => {
     ['utfall med rotation', 'lunge-with-rotation'],
     ['cossack', 'cossack-squat'],
     ['knäböjsgång', 'squat-walk'],
+    ['magrulle', 'kneeling-ab-wheel-rollout'],
     ['boxhopp', 'box-jump'],
     ['höga knän', 'knee-drive'],
     ['knee drives', 'knee-drive'],

@@ -132,6 +132,10 @@ export const exerciseMuscles: Record<
     qualities: ['balance'],
   },
   'squat-walk': { ...bodyweightDetails['squat-walk'], qualities: [] },
+  'kneeling-ab-wheel-rollout': {
+    ...bodyweightDetails['kneeling-ab-wheel-rollout'],
+    qualities: [],
+  },
   'lunge-with-rotation': {
     ...bodyweightDetails['lunge-with-rotation'],
     qualities: ['balance'],

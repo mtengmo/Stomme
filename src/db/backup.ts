@@ -177,6 +177,7 @@ const equipmentChoicesSchema = z
       'bosu',
       'bench',
       'nordic-anchor',
+      'ab-wheel',
     ]),
   )
   .max(Object.keys(equipmentChoices).length);

@@ -28,6 +28,15 @@ export const exerciseAliases: Record<ExerciseId, string[]> = {
     'Sidoknäböj med rakt ben',
   ],
   'squat-walk': ['Squat walk', 'Squat walks', 'Gå i knäböj', 'Knäböjsgång'],
+  'kneeling-ab-wheel-rollout': [
+    'Ab wheel',
+    'Ab wheel rollout',
+    'Magrulle',
+    'Magrullning',
+    'Utrullning',
+    'Utrullning med magrulle',
+    'Kneeling ab wheel rollout',
+  ],
   'lunge-with-rotation': [
     'Lunge with rotation',
     'Rotating lunge',

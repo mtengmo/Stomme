@@ -18,6 +18,7 @@ const SUPPORT_ITEMS: EquipmentChoice[] = [
   'bosu',
   'bench',
   'nordic-anchor',
+  'ab-wheel',
 ];
 
 export function WorkoutEquipmentControls({

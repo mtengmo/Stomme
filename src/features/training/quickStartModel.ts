@@ -74,7 +74,7 @@ export function isRehabGoal(goal: Goal | null): boolean {
 export function allowedEquipment(goal: Goal | null): EquipmentChoice[] {
   const base: EquipmentChoice[] = ['chair', 'support'];
   if (goal === 'general' || goal === 'build' || goal === 'custom')
-    return [...base, 'step', 'band', 'pull-up-bar', 'dip-bars'];
+    return [...base, 'step', 'band', 'ab-wheel', 'pull-up-bar', 'dip-bars'];
   if (goal === 'physio') return [...base, 'band'];
   return base;
 }

@@ -103,7 +103,7 @@ describe('knee strength catalogue contracts', () => {
     } as const;
     expect(isTrainingPreferences(pref)).toBe(true);
     expect(isWorkoutEquipment({ equipment: all })).toBe(true);
-    expect(all).toHaveLength(10);
+    expect(all).toHaveLength(11);
     for (const e of kneeStrengthExercises) {
       const variant = exerciseMetadata[e.id].variants[0];
       if (!variant) throw new Error(e.id);

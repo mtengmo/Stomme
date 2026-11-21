@@ -387,6 +387,21 @@ export const bodyweightExercises: Exercise[] = [
     10,
   ),
   exercise(
+    'kneeling-ab-wheel-rollout',
+    'Utrullning på knä',
+    ['Bål', 'Skuldror', 'Rygg'],
+    [
+      'Knäa på en mjuk matta med magrullen på golvet under axlarna och håll i handtagen med raka armar. Luta bäckenet bakåt så att ryggen blir rund och buken spänd. Ha fritt framför dig och halkfritt underlag.',
+      'Rulla rullen långsamt framåt med raka armar och kroppen i en lång linje, med höfterna kvar ovanför knälinjen. Rulla bara så långt att ryggen förblir rak och bäckenet lutat bakåt.',
+      'Dra dig tillbaka med magmusklerna och inte med armarna, så att rullen går tillbaka till under axlarna. Ut och tillbaka är en repetition. Andas jämnt hela vägen.',
+    ],
+    'Du släpper ned höfterna så att ryggen svankar, eller rullar längre än du kan hålla bäckenet lutat.',
+    'Rulla en kortare sträcka, eller rulla mot en vägg så att väggen stoppar rullen. Gör annars Planka på underarmar eller Dead bug.',
+    4,
+    'reps',
+    10,
+  ),
+  exercise(
     'box-jump',
     'Boxhopp',
     ['Framsida lår', 'Säte', 'Vader', 'Baksida lår', 'Bål'],
@@ -515,6 +530,7 @@ export const bodyweightIds = [
   'lunge-with-rotation',
   'cossack-squat',
   'squat-walk',
+  'kneeling-ab-wheel-rollout',
   'box-jump',
   'fast-feet',
   'in-and-out-jump',
@@ -615,6 +631,17 @@ export const bodyweightDetails: Record<
     secondary: ['calves', 'core', 'hamstrings'],
     publisher: 'Stomme',
     note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Små steg framåt och bakåt i en halv knäböj utan att resa dig. Håll ett djup du kan styra. Kroppsvikt, ingen extra vikt. Avbryt vid smärta i knä eller höft. Har du ont eller en skada: välj Knärehab eller följ din vårdgivare.',
+  },
+  'kneeling-ab-wheel-rollout': {
+    equipment: 'ab-wheel',
+    level: 'technical',
+    reason:
+      'Lång hävarm över ländrygg och axlar kräver stark bål och kontroll av bäckenet.',
+    primary: ['core'],
+    secondary: ['shoulders', 'back'],
+    publisher: 'Stomme',
+    note: 'Redaktionell övning utan verifierad extern källa. Dos och upplägg är appens förslag. Magrulle krävs. Rulla ut på knä så långt att ryggen förblir rak och bäckenet lutat bakåt, och dra dig tillbaka med magmusklerna. Du behöver en mjuk matta under knäna. Avbryt vid smärta. Passar inte vid ryggbesvär eller skuldersmärta; vid besvär avgör vården.',
+    cue: 'En magrulle med stadiga handtag och en mjuk matta under knäna.',
   },
   'box-jump': {
     equipment: 'step',

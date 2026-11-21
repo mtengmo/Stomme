@@ -318,7 +318,7 @@ describe('review ordering', () => {
       .sort(compareReferences);
     expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
     expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
-    expect(sorted.at(-1)).toBe('E112');
+    expect(sorted.at(-1)).toBe('E113');
   });
 });
 
@@ -473,5 +473,68 @@ describe('cossack squat (E111) and squat walk (E112)', () => {
     expect(text).toContain('rakt');
     expect(exercises['cossack-squat'].easierVariant).toContain('Sidoutfall');
     expect(exerciseAliases['cossack-squat']).toContain('Cossack squat');
+  });
+});
+
+describe('kneeling ab wheel rollout (E113)', () => {
+  const id = 'kneeling-ab-wheel-rollout';
+
+  it('takes the next permanent reference and stays out of programmes until reviewed', () => {
+    expect(exerciseReferences[id]).toBe('E113');
+    expect(pendingReviewIds.has(id)).toBe(true);
+    expect(programExcludedIds.has(id)).toBe(true);
+    expect(rehabImpactExercises.has(id)).toBe(false);
+  });
+
+  it('is counted by the user, per repetition, in bodyweight with no side', () => {
+    expect(exercises[id]).toMatchObject({
+      unit: 'reps',
+      perSide: false,
+      range: { start: 4, max: 10, step: 1 },
+    });
+    expect(exercises[id].loadLadder).toEqual([{ kg: 0, label: 'Kroppsvikt' }]);
+  });
+
+  it('states the safe form, the easier choice and the cautions in Swedish', () => {
+    const text = exercises[id].tips.join(' ');
+    expect(text).toContain('bäckenet bakåt');
+    expect(text).toContain('ryggen förblir rak');
+    expect(text).toContain('magmusklerna');
+    expect(exercises[id].commonMistake).toContain('svankar');
+    expect(exercises[id].easierVariant).toContain('kortare sträcka');
+    expect(exercises[id].easierVariant).toContain('vägg');
+    const [source] = exerciseMetadata[id].sources;
+    expect(source?.publisher).toBe('Stomme');
+    expect(source?.url).toBeUndefined();
+    expect(source?.note).toContain('Avbryt vid smärta');
+    expect(source?.note).toContain('ryggbesvär');
+    expect(source?.note).toContain('skuldersmärta');
+  });
+
+  it('needs an ab wheel: users without one never get it', () => {
+    const variant = exerciseMetadata[id].variants[0];
+    expect(variant?.equipment).toEqual([
+      { type: 'bodyweight', count: 1 },
+      { type: 'ab-wheel', count: 1 },
+    ]);
+    expect(variant?.label).toBe('Kroppsvikt + magrulle');
+    expect(equipmentFits(variant?.equipment ?? [], inventory())).toBe(false);
+    expect(
+      equipmentFits(
+        variant?.equipment ?? [],
+        inventory({ support: ['step', 'band', 'pull-up-bar'] }),
+      ),
+    ).toBe(false);
+    expect(
+      equipmentFits(
+        variant?.equipment ?? [],
+        inventory({ support: ['ab-wheel'] }),
+      ),
+    ).toBe(true);
+  });
+
+  it('can be found as magrulle', () => {
+    expect(exerciseAliases[id]).toContain('Ab wheel');
+    expect(exerciseAliases[id]).toContain('Magrulle');
   });
 });

@@ -17,7 +17,8 @@ export type EquipmentType =
   | 'dip-bars'
   | 'bosu'
   | 'bench'
-  | 'nordic-anchor';
+  | 'nordic-anchor'
+  | 'ab-wheel';
 export const purposeLabels: Record<Purpose, string> = {
   general: 'Allmän styrka',
   knee: 'Knäfokus',
@@ -43,6 +44,7 @@ export const equipmentLabels: Record<EquipmentType, string> = {
   bosu: 'BOSU (kupolen uppåt)',
   bench: 'Stadig vadderad bänk',
   'nordic-anchor': 'Säker Nordic-fotledsfixering',
+  'ab-wheel': 'Magrulle',
 };
 export interface EquipmentRequirement {
   type: EquipmentType;
@@ -1297,6 +1299,7 @@ export const exerciseMetadata = Object.fromEntries(
         id === 'lunge-with-rotation' ||
         id === 'cossack-squat' ||
         id === 'squat-walk' ||
+        id === 'kneeling-ab-wheel-rollout' ||
         id === 'box-jump' ||
         id === 'fast-feet' ||
         id === 'in-and-out-jump' ||
@@ -1309,7 +1312,8 @@ export const exerciseMetadata = Object.fromEntries(
           ? id === 'skater-bound' ||
             id === 'lunge-with-rotation' ||
             id === 'cossack-squat' ||
-            id === 'squat-walk'
+            id === 'squat-walk' ||
+            id === 'kneeling-ab-wheel-rollout'
             ? '2026-11-21'
             : id === 'renegade-row' || id === 'weighted-sit-up'
               ? '2026-11-11'

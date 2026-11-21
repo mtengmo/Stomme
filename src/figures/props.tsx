@@ -139,6 +139,26 @@ export function PropShape({ prop }: { prop: Prop }) {
   }
 }
 
+/**
+ * A rolling ab wheel seen from the side: a wheel on the floor line with its
+ * axle (where both hands hold the handles) at the hub. Drawn at the hand, so
+ * the wheel follows the figure along the floor.
+ */
+export function AbWheel({
+  at,
+  radius,
+}: {
+  at: readonly [number, number];
+  radius: number;
+}) {
+  return (
+    <g data-equipment="ab-wheel" {...PROP} stroke="var(--equipment)">
+      <circle cx={at[0]} cy={at[1]} r={radius} fill="var(--paper)" />
+      <circle cx={at[0]} cy={at[1]} r="2.5" fill="var(--equipment)" />
+    </g>
+  );
+}
+
 export function Held({
   kind,
   at,

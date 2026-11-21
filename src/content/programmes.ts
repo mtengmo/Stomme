@@ -37,6 +37,7 @@ export const equipmentChoices: Record<EquipmentChoice, string> = {
   bosu: 'BOSU (kupolen uppåt)',
   bench: 'Stadig vadderad bänk',
   'nordic-anchor': 'Säker Nordic-fotledsfixering',
+  'ab-wheel': 'Magrulle',
 };
 
 export const defaultEquipment: EquipmentChoice[] = [

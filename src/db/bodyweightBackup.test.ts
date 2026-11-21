@@ -11,7 +11,7 @@ it('round-trips the new exercises and apparatus without changing older IDs', asy
     await setMeta(db, 'training', {
       programId: 'general',
       experience: 'regular',
-      equipment: ['bodyweight', 'pull-up-bar', 'dip-bars'],
+      equipment: ['bodyweight', 'pull-up-bar', 'dip-bars', 'ab-wheel'],
     });
     // A custom workout holds at most 12 exercises: three workouts cover every id.
     await setMeta(db, 'customWorkouts', [

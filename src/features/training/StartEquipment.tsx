@@ -68,7 +68,7 @@ export function StartEquipment({
         <SupportToggles
           equipment={value.equipment}
           onChange={setEquipment}
-          items={only(['band'])}
+          items={only(['band', 'ab-wheel'])}
         />
       </fieldset>
       {furniture.length ? (

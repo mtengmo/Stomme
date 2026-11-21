@@ -76,6 +76,7 @@ const supportLabels: Record<string, string> = {
   bosu: 'BOSU (kupolen uppåt)',
   bench: 'Stadig vadderad bänk',
   'nordic-anchor': 'Säker Nordic-fotledsfixering',
+  'ab-wheel': 'magrulle',
 };
 
 function kgText(kg: number): string {

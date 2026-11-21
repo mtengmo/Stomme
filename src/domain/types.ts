@@ -100,6 +100,7 @@ export type ExerciseId =
   | 'lunge-with-rotation'
   | 'cossack-squat'
   | 'squat-walk'
+  | 'kneeling-ab-wheel-rollout'
   | 'box-jump'
   | 'fast-feet'
   | 'in-and-out-jump'
@@ -156,7 +157,8 @@ export type EquipmentChoice =
   | 'dip-bars'
   | 'bosu'
   | 'bench'
-  | 'nordic-anchor';
+  | 'nordic-anchor'
+  | 'ab-wheel';
 export interface WeightInventoryItem {
   type: 'dumbbell' | 'kettlebell';
   /** Weight of one implement, in kg. */
