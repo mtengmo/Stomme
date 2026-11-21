@@ -5854,6 +5854,11 @@
         "date": "2026-11-21",
         "fixer": "claude-sonnet",
         "notes": "E110 efter Codex-granskning (codex:gpt61sol, needs-fix): (1) ståläget: främre knät hade cirka 54 graders böjning i profil vid Start; höften startar nu på y 105 (före: 112), benavståndet 69,5 av 70, alltså under 15 graders böjning, och ett enhetstest håller det. Främre foten ligger kvar på golvet: den sneda vyns kropp står 6 enheter lägre vid toppen (bara i den vyn, avtar mot botten) så att det nästan raka benet når den projicerade kontaktpunkten; testat för alla t, höger och vänster. (2) Sned vinkel: kameran vriden från 35 till 55 grader och ramen strammad, så att främre foten och knät över den syns mer framifrån. Ofullständigt åtgärdat: i bilderna är figuren liten och tåns riktning mot knäets bana syns bara i grova drag, så punkten i openIssues (läsbar tå och knä tillsammans under vridningen) står kvar öppen; en riktig framvy för vridningen vore nästa steg. Granska: sned vinkel fas 0 till 1 och tillbaka, H/V, främre fotens kontakt, ståbenets rakhet i sidovyn, om tå och knä nu går att jämföra. Granskning 2026-11-21 (codex:gpt61sol) avser figuren före denna rättning. Behöver ny granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E110 ny frontvy Framifrån (src/figures/lungeRotation.ts lungeRotationFrontFrame, ritning i frontViews.tsx) för punkten i openIssues: knä och tå läsbara tillsammans under vridningen. Främre foten står fast på x 88, y 174 med tårna utåt (stub 10 enheter) och en streckad lodlinje genom fotens mitt; knät glider från x 93,5 (stående) till x 84 i botten, alltså över foten och aldrig förbi tårna. Smalbenet konstant 34, låret kortas bara (högst 35,9), armar 25+25, bål 43 konstanta. Bakre foten kliver rakt bakåt (högre upp i bild, tå ner), bakbenet ritas först bakom främre benet; bakre knät hänger under höften och underbenet släpar bakåt (stiliserat, benlängderna är konstanta vilket gör att underbenet inte förkortas som i verkligheten). Vridningen syns som att axelbandet smalnar (cos) och lutar medan bäckenbandet är oförändrat, och att de ihopklämda händerna svänger över till främre benet (30 sin v, v högst 0,8 rad, fas 0,55 till 0,95, samma tidsstyrning som sidovyn via lungeDepth och lungeStride). Standardvy ändrad från sned vinkel till Framifrån: det är den enda vy där knäriktning mot tå kan läsas, och Opus mätte att sned vinkel (yaw 55) lägger både knä framåt och knä inåt i sidled. Appen tillåter bara en andra vy, så Sned vinkel nås inte längre i gränssnittet (koden och dess tester finns kvar). H/V speglar (vänster ben fram, bakre benet först), Start och Slut skiljer sig (Slut är fas 1 med sänkt höft och vriden överkropp). Sedda bilder: fas 0, 0,4, 0,55, 0,75, 1, båda sidor, 390 mörkt och 1280 ljust samt Start/Slut. Ej klar: bakre benets utseende är en kompromiss; punkten i openIssues står kvar tills en granskare bekräftat att knä och tå nu går att jämföra. Granska: Framifrån alla faser H/V, om lodlinjen och knäts bana mot tån läses rätt, bakbenet, axelbandets vridning, Start/Slut i reducerad rörelse, att sidovyn fortfarande räcker som andra vy. Behöver ny granskning av Codex-modell eller human (cross-vendor); jag har inte godkänt något."
       }
     ],
     "openIssues": [
@@ -5862,7 +5867,7 @@
     "notes": [
       "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag."
     ],
-    "fingerprint": "232155a77cc0"
+    "fingerprint": "ace3b7220e06"
   },
   {
     "id": "cossack-squat",

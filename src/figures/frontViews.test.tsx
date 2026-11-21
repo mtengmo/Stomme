@@ -70,6 +70,7 @@ describe('authored frontal demonstrations', () => {
       'woodchop',
       'kettlebell-goblet-squat',
       'lateral-raise',
+      'lunge-with-rotation',
     ]);
     expect(supportedObliqueViews).toEqual([
       'goblet-chair-squat',

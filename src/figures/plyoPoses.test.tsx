@@ -8,7 +8,7 @@ import {
   supportedViewsFor,
 } from './frontViews';
 import type { Pt } from './lerp';
-import { lungeRotationAngle } from './lungeRotation';
+import { lungeRotationAngle, lungeRotationFrontFrame } from './lungeRotation';
 import { obliqueFrame, project } from './obliqueBody';
 import { LUNGE_OBLIQUE_YAW, LYING_OBLIQUE } from './obliqueSpecs';
 import { figures } from './poses';
@@ -355,9 +355,10 @@ describe('lunge with rotation figure', () => {
     distance(p.eR, p.hR),
   ];
 
-  it('opens in the oblique view, the one that shows the rotation', () => {
-    expect(defaultViewFor(id)).toBe('oblique');
-    expect(supportedViewsFor(id)).toEqual(['side', 'oblique']);
+  it('opens in the front view, the one that shows knee and toe together', () => {
+    expect(defaultViewFor(id)).toBe('front');
+    expect(supportedViewsFor(id)).toEqual(['side', 'front']);
+    expect(alternateView(id)).toBe('front');
     expect(figures[id].motion).toBe('controlled');
   });
 
@@ -443,6 +444,124 @@ describe('lunge with rotation figure', () => {
       expect(distance(p.neck, p.eR)).toBeCloseTo(distance(f.neck, f.eR), 6);
       expect(distance(p.hip, p.kR)).toBeCloseTo(distance(f.hip, f.kR), 6);
     }
+  });
+
+  it('has a front view ("Framifrån") that shows knee and toe together', () => {
+    const front = (t: number, w: 'right' | 'left' = 'right') =>
+      frontMovementPose(id, t, w);
+    const fl = (p: ReturnType<typeof front>) => [
+      distance(p.kR, p.aR),
+      distance(p.kL, p.aL),
+      distance(p.neck, p.hip),
+      distance(p.neck, p.eR),
+      distance(p.eR, p.hR),
+      distance(p.neck, p.eL),
+      distance(p.eL, p.hL),
+      distance(p.aR, p.tR),
+      distance(p.aL, p.tL),
+    ];
+    const first = fl(front(0));
+    for (const t of ts) {
+      const p = front(t);
+      for (const [i, len] of fl(p).entries())
+        expect(len, `#${i} ${t}`).toBeCloseTo(first[i] ?? 0, 6);
+      // Thighs only foreshorten, never longer than 36.
+      expect(distance(p.hip, p.kR)).toBeLessThanOrEqual(36);
+      expect(distance(p.hip, p.kL)).toBeLessThanOrEqual(36);
+      // Front foot planted on its floor contact, toes turned a little out.
+      expect(p.aR).toEqual([88, 174]);
+      expect(p.tR[0]).toBeLessThan(p.aR[0] - 8);
+      expect(p.tR[1]).toBeLessThanOrEqual(177);
+      expect(p.tL[1]).toBeLessThanOrEqual(177);
+      // The knee stays over the foot: never past the toes, never inside the hip.
+      expect(p.kR[0]).toBeGreaterThanOrEqual(p.tR[0]);
+      expect(p.kR[0]).toBeLessThanOrEqual(p.hip[0]);
+      // The rear foot is behind (higher up the picture) once stepped back.
+      expect(p.aL[1]).toBeLessThanOrEqual(174);
+    }
+    // Over the foot (inside the foot's width) once the lunge is deep.
+    const deep = front(0.6);
+    expect(deep.kR[0]).toBeGreaterThanOrEqual(deep.tR[0]);
+    expect(deep.kR[0]).toBeLessThanOrEqual(deep.aR[0]);
+    expect(deep.aL[1]).toBeLessThan(front(0).aL[1] - 8);
+    expect(deep.hip[1]).toBeGreaterThan(front(0).hip[1] + 15);
+  });
+
+  it('shows the rotation in the front view as a narrowing shoulder bar and swinging hands', () => {
+    const bars = (t: number) => lungeRotationFrontFrame(t, 'right');
+    const width = (bar: [Pt, Pt]) => bar[1][0] - bar[0][0];
+    const start = bars(0);
+    const end = bars(1);
+    expect(width(end.shoulders)).toBeLessThan(width(start.shoulders) - 8);
+    expect(width(end.pelvis)).toBeCloseTo(width(start.pelvis), 6);
+    // The rotation waits for the low position, as in the side view.
+    expect(width(bars(0.5).shoulders)).toBeCloseTo(width(start.shoulders), 6);
+    // The hands swing over to the front (viewer's left) leg.
+    expect(end.pose.hR[0]).toBeLessThan(start.pose.hR[0] - 15);
+    expect(end.pose.hR).toEqual(end.pose.hL);
+    // The front knee stays on the foot while the chest turns.
+    expect(end.pose.kR[0]).toBeLessThanOrEqual(end.pose.aR[0]);
+    expect(end.pose.kR[0]).toBeGreaterThanOrEqual(end.pose.tR[0]);
+  });
+
+  it('mirrors the front view for the left leg and draws the rear leg first', () => {
+    for (const t of ts) {
+      const r = frontMovementPose(id, t, 'right');
+      const l = frontMovementPose(id, t, 'left');
+      expect(l.aL[0]).toBeCloseTo(200 - r.aR[0], 6);
+      expect(l.kL[0]).toBeCloseTo(200 - r.kR[0], 6);
+      expect(l.aR[0]).toBeCloseTo(200 - r.aL[0], 6);
+      expect(l.hip[0]).toBeCloseTo(200 - r.hip[0], 6);
+    }
+    const left = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId={id}
+        pose={movementPose(id, 1)}
+        working="left"
+        view="front"
+        phase={1}
+      />,
+    );
+    expect(left).toContain('data-view="front"');
+    expect(left).toContain('data-guide="knee-over-foot"');
+    expect(left).toContain('data-shoulders');
+    expect(left).toContain('>V</text>');
+    // Rear (right) limbs first, so the planted left front leg is on top.
+    expect(left.indexOf('data-body-side="right"')).toBeLessThan(
+      left.indexOf('data-body-side="left"'),
+    );
+    const right = renderToStaticMarkup(
+      <FigureFrame
+        exerciseId={id}
+        pose={movementPose(id, 1)}
+        working="right"
+        view="front"
+        phase={1}
+      />,
+    );
+    expect(right.indexOf('data-body-side="left"')).toBeLessThan(
+      right.indexOf('data-body-side="right"'),
+    );
+  });
+
+  it('shows distinct reduced-motion Start and Slut stills in the front view', () => {
+    expect(stillFramePhase(id, 'front', 'Start')).toBe(0);
+    expect(stillFramePhase(id, 'front', 'Slut')).toBe(1);
+    const draw = (phase: number) =>
+      renderToStaticMarkup(
+        <FigureFrame
+          exerciseId={id}
+          pose={movementPose(id, phase)}
+          working="right"
+          view="front"
+          phase={phase}
+        />,
+      );
+    expect(draw(0)).not.toBe(draw(1));
+    const a = frontMovementPose(id, 0);
+    const b = frontMovementPose(id, 1);
+    expect(b.hip[1]).toBeGreaterThan(a.hip[1] + 15);
+    expect(b.hR[0]).toBeLessThan(a.hR[0] - 15);
   });
 
   it('mirrors for the left leg', () => {

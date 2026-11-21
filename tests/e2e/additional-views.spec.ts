@@ -8,6 +8,7 @@ const candidates = [
   ['forward-lunge', 'front'],
   ['half-squat', 'front'],
   ['squat-walk', 'front'],
+  ['lunge-with-rotation', 'front'],
   ['single-leg-chair-squat', 'front'],
   ['farmer-carry', 'front'],
   ['bench-side-plank-leg-lift', 'oblique'],

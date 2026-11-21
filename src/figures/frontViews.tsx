@@ -5,6 +5,7 @@ import type { Equipment, Working } from './Figure';
 import { solveTwoBone } from './keyframes';
 import type { Pt } from './lerp';
 import { FORWARD_LUNGE_LAND, forwardLungeBodyProgress } from './lungeFootPath';
+import { lungeRotationFrontFrame } from './lungeRotation';
 import { mirrorAbout, obliqueFrame } from './obliqueBody';
 import {
   isLyingOblique,
@@ -45,6 +46,7 @@ export const supportedFrontViews = [
   'woodchop',
   'kettlebell-goblet-squat',
   'lateral-raise',
+  'lunge-with-rotation',
 ] as const satisfies readonly ExerciseId[];
 
 export const supportedObliqueViews = [
@@ -87,11 +89,12 @@ export function defaultViewFor(exerciseId: ExerciseId): FigureAngle {
   if (
     exerciseId === 'side-lunge' ||
     exerciseId === 'woodchop' ||
-    exerciseId === 'kettlebell-goblet-squat'
+    exerciseId === 'kettlebell-goblet-squat' ||
+    // Knee against toe direction, the key alignment point, reads from the front.
+    exerciseId === 'lunge-with-rotation'
   )
     return 'front';
-  if (exerciseId === 'russian-twist' || exerciseId === 'lunge-with-rotation')
-    return 'oblique';
+  if (exerciseId === 'russian-twist') return 'oblique';
   return 'side';
 }
 
@@ -612,6 +615,8 @@ export function frontMovementPose(
   if (exerciseId === 'skater-bound') return skaterBoundPose(t, working);
   if (exerciseId === 'cossack-squat') return cossackPose(t, working);
   if (exerciseId === 'squat-walk') return squatWalkFrontPose(t);
+  if (exerciseId === 'lunge-with-rotation')
+    return lungeRotationFrontFrame(t, working ?? 'right').pose;
   if (exerciseId === 'seated-tibial-rotation') {
     // Feet rotate in the horizontal plane; the shins and knees stay still.
     const angle = mix(0.65, -0.65, t);
@@ -1667,8 +1672,17 @@ export function FrontFigureFrame({
 
   // Skater bound: the leg that is off the floor is drawn first, so it reads as
   // swinging behind the stance leg on both landings (the stance leg swaps).
+  // Lunge with rotation: the rear leg is drawn first, so it reads as stepping
+  // back behind the planted front leg.
+  const lungeFrame =
+    angle === 'front' && exerciseId === 'lunge-with-rotation'
+      ? lungeRotationFrontFrame(phase, working ?? 'right')
+      : undefined;
   const freeLegFirst: 'R' | null =
-    exerciseId === 'skater-bound' && pose.aR[1] < pose.aL[1] ? 'R' : null;
+    (exerciseId === 'skater-bound' && pose.aR[1] < pose.aL[1]) ||
+    (lungeFrame !== undefined && working === 'left')
+      ? 'R'
+      : null;
   const rightLimbs = (
     <g data-body-side="right" stroke={color('R')} {...limb}>
       <path d={arm(pose.eR, pose.hR, twist?.shoulderR)} />
@@ -1781,6 +1795,18 @@ export function FrontFigureFrame({
         <path
           data-contact-plane="receding-foot"
           d="M48 164h104"
+          fill="none"
+          stroke="var(--edge)"
+          strokeWidth="2"
+          strokeDasharray="4 3"
+        />
+      ) : null}
+      {lungeFrame ? (
+        // Plumb line through the middle of the planted front foot: the knee
+        // stays on it (over the toes), never caving in towards the other leg.
+        <path
+          data-guide="knee-over-foot"
+          d={`M${lungeFrame.footLineX} 176V92`}
           fill="none"
           stroke="var(--edge)"
           strokeWidth="2"
@@ -1978,6 +2004,19 @@ export function FrontFigureFrame({
             strokeWidth="3"
           />
           <path d={line([pose.head, twist.noseDirection])} strokeWidth="3" />
+        </g>
+      ) : null}
+      {lungeFrame ? (
+        // The pelvis bar stays square while the shoulder bar narrows and tilts
+        // as the chest turns over the front leg.
+        <g
+          fill="none"
+          stroke="var(--equipment)"
+          strokeWidth="5"
+          strokeLinecap="round"
+        >
+          <path data-pelvis="" d={line(lungeFrame.pelvis)} />
+          <path data-shoulders="" d={line(lungeFrame.shoulders)} />
         </g>
       ) : null}
       {freeLegFirst === 'R' ? null : rightLimbs}
