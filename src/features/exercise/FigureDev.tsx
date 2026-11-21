@@ -21,6 +21,8 @@ const SEQUENCE_IDS: ReadonlySet<string> = new Set([
   'single-leg-lateral-hop',
   'skater-bound',
   'lunge-with-rotation',
+  'cossack-squat',
+  'squat-walk',
   'box-jump',
   'jumping-lunge',
   'mountain-climber',

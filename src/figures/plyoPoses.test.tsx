@@ -442,3 +442,140 @@ describe('lunge with rotation figure', () => {
     expect(l.hip[0]).toBeCloseTo(192 - r.hip[0], 6);
   });
 });
+
+describe('cossack squat figure', () => {
+  const id = 'cossack-squat' as const;
+  const ts = Array.from({ length: 81 }, (_, n) => n / 80);
+  const lengths = (p: ReturnType<typeof frontMovementPose>) => [
+    distance(p.hip, p.kR),
+    distance(p.kR, p.aR),
+    distance(p.hip, p.kL),
+    distance(p.kL, p.aL),
+    distance(p.neck, p.hip),
+    distance(p.neck, p.eR),
+    distance(p.eR, p.hR),
+  ];
+
+  it('is a front-first demonstration with a side fallback', () => {
+    expect(defaultViewFor(id)).toBe('front');
+    expect(figures[id].motion).toBe('controlled');
+  });
+
+  it('keeps lengths constant, both feet planted and nothing below the floor', () => {
+    for (const working of ['right', 'left'] as const) {
+      const first = lengths(frontMovementPose(id, 0, working));
+      for (const t of ts) {
+        const p = frontMovementPose(id, t, working);
+        for (const [i, len] of lengths(p).entries())
+          expect(len, `${working} #${i} ${t}`).toBeCloseTo(first[i] ?? 0, 6);
+        expect(p.aR[1]).toBe(174);
+        expect(p.aL[1]).toBe(174);
+        for (const k of ['tR', 'tL', 'kR', 'kL'] as const)
+          expect(p[k][1]).toBeLessThanOrEqual(177);
+        for (const pt of Object.values(p)) {
+          expect(pt[0]).toBeGreaterThan(14);
+          expect(pt[0]).toBeLessThan(186);
+        }
+      }
+    }
+  });
+
+  it('sits deep over the working leg, with the knee in line and the other leg straight', () => {
+    const start = frontMovementPose(id, 0, 'right');
+    const end = frontMovementPose(id, 1, 'right');
+    expect(end.hip[1] - start.hip[1]).toBeGreaterThanOrEqual(15);
+    expect(end.hip[0]).toBeLessThan(start.hip[0] - 10);
+    expect(Math.abs(end.kR[0] - end.aR[0])).toBeLessThan(12);
+    expect(distance(end.hip, end.aL)).toBeGreaterThan(
+      distance(end.hip, end.kL) + distance(end.kL, end.aL) - 2,
+    );
+    expect(end.tL[1]).toBeLessThan(end.aL[1]);
+    expect(start.tL[1]).toBeGreaterThan(start.aL[1]);
+    for (const t of ts) {
+      const p = frontMovementPose(id, t, 'right');
+      expect(p.aL[0] - p.aR[0]).toBeGreaterThan(85);
+    }
+  });
+
+  it('mirrors for the left leg and shows Start and Slut', () => {
+    for (const t of ts) {
+      const r = frontMovementPose(id, t, 'right');
+      const l = frontMovementPose(id, t, 'left');
+      expect(l.aL[0]).toBeCloseTo(200 - r.aR[0], 6);
+      expect(l.hip[0]).toBeCloseTo(200 - r.hip[0], 6);
+    }
+    expect(stillFramePhase(id, 'front', 'Start')).toBe(0);
+    expect(stillFramePhase(id, 'front', 'Slut')).toBe(1);
+  });
+
+  it('has a side fallback with constant lengths above the floor', () => {
+    const first = movementPose(id, 0);
+    for (const t of ts) {
+      const p = movementPose(id, t);
+      expect(distance(p.hip, p.kR)).toBeCloseTo(
+        distance(first.hip, first.kR),
+        6,
+      );
+      expect(p.aR[1]).toBeLessThanOrEqual(174);
+    }
+  });
+});
+
+describe('squat walk figure', () => {
+  const id = 'squat-walk' as const;
+  const ts = Array.from({ length: 161 }, (_, n) => n / 160);
+  const lengths = (p: ReturnType<typeof movementPose>) => [
+    distance(p.hip, p.kR),
+    distance(p.kR, p.aR),
+    distance(p.hip, p.kL),
+    distance(p.kL, p.aL),
+    distance(p.neck, p.hip),
+    distance(p.neck, p.eR),
+    distance(p.eR, p.hR),
+  ];
+
+  it('is a side-view sequence figure, one rep per cycle', () => {
+    expect(supportedViewsFor(id)).toEqual(['side']);
+    expect(figures[id].motion).toBe('sequence');
+  });
+
+  it('keeps lengths constant, feet on or above the floor and the hip low', () => {
+    const first = lengths(movementPose(id, 0));
+    for (const t of ts) {
+      const p = movementPose(id, t);
+      for (const [i, len] of lengths(p).entries())
+        expect(len, `#${i} ${t}`).toBeCloseTo(first[i] ?? 0, 6);
+      expect(p.aR[1]).toBeLessThanOrEqual(174);
+      expect(p.aL[1]).toBeLessThanOrEqual(174);
+      expect(p.tR[1]).toBeLessThanOrEqual(177);
+      expect(p.tL[1]).toBeLessThanOrEqual(177);
+      expect(174 - p.hip[1]).toBeGreaterThan(45);
+      expect(174 - p.hip[1]).toBeLessThan(55);
+    }
+  });
+
+  it('steps forward, then back, and ends where it started', () => {
+    const a = movementPose(id, 0);
+    const mid = movementPose(id, 0.5);
+    const b = movementPose(id, 1);
+    expect(mid.hip[0] - a.hip[0]).toBeGreaterThan(15);
+    expect(mid.aR[0] - a.aR[0]).toBeGreaterThan(15);
+    expect(mid.aL[0] - a.aL[0]).toBeGreaterThan(15);
+    expect(b.hip[0]).toBeCloseTo(a.hip[0], 6);
+    expect(b.aR[0]).toBeCloseTo(a.aR[0], 6);
+    expect(b.aL[0]).toBeCloseTo(a.aL[0], 6);
+    for (const t of ts) {
+      const p = movementPose(id, t);
+      expect(Math.max(p.aR[1], p.aL[1])).toBe(174);
+    }
+  });
+
+  it('shows two different stages for reduced motion', () => {
+    const { start, end } = figures[id];
+    expect(start.aR).not.toEqual(end.aR);
+    expect(end.hip[0] - start.hip[0]).toBeGreaterThan(15);
+    expect(end.aL[0] - start.aL[0]).toBeGreaterThan(15);
+    expect(stillFramePhase(id, 'side', 'Start')).toBe(0);
+    expect(stillFramePhase(id, 'side', 'Slut')).toBe(1);
+  });
+});

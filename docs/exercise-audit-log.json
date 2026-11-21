@@ -5819,6 +5819,56 @@
     "fingerprint": "2c8dbc60d63f"
   },
   {
+    "id": "cossack-squat",
+    "name": "Cossack-knäböj",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E111 (text, metadata, frontfigur, sidovy som reserv). Cossack-knäböj med kroppsvikt: mycket bred fotställning (fötterna x 54 och 146, ankelavstånd 92), höfterna flyttas från mitten mot det valda benet (x 100 till 86) och sänks (y 124 till 140) medan andra benet är nästan rakt med hälen kvar och tårna upp (tåvinkel från 17 grader nedåt till 40 grader uppåt); båda fötterna står kvar hela tiden. Skiljer sig från Sidoutfall (side-lunge): där kliver man ut och in med ett ben från en smal start; här börjar och slutar man brett och sjunker djupare över ett ben med det andra benet rakt. Texten säger det uttryckligen. Risk high (knäbelastad, djup höft- och knäböjning). Reps per ben, 6 till 12, automatiskt räknade (2 s ned, 2 s upp). Front är standardvy (FRONT_ONLY); sidovyn är en enkel låg knäböj som reserv. Benlängder 35,9/34, bål 43 och armar 25/25 konstanta, inget under golvet; höger/vänster speglas. Ingen kettlebell- eller hantelvariant (bara kroppsvikt). Utanför program tills godkänd (pendingReviewIds); ingår i Kettlebellcirkel. Granska: frontvy fas 0, 0,25, 0,5, 0,75, 1 och tillbaka, H/V, om djupet (höften 140, lårben nästan vågrätt) och det raka benets tå upp läses rätt, om det breda avståndet ryms i ramen, knät i linje med foten (knät högst 12 enheter från foten, mät i fas 1), Start/Slut i reducerad rörelse, textens avgränsning mot Sidoutfall och säkerhet (rörlighet, avbryt vid smärta). Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E111 efter granskning: tips 3 ändrat från 'byt sedan sida om du vill' till 'byt ben efter setet' (reps räknas per ben). Figuren oförändrad. Granska texten mot rörelsen; figurgranskningen i föregående rättning gäller fortfarande. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
+    ],
+    "fingerprint": "3ebaaf34fee4"
+  },
+  {
+    "id": "squat-walk",
+    "name": "Knäböjsgång",
+    "group": "bodyweight",
+    "risk": "high",
+    "status": "fixed-awaiting-review",
+    "reviews": [],
+    "fixes": [
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "Ny övning E112 (text, metadata, sidofigur). Knäböjsgång med kroppsvikt: kvar i halv knäböj (höften 50 enheter över golvet hela tiden, bål lutar 9 enheter framåt, händerna ihop framför bröstet) tar figuren två små steg framåt (höger fot, sedan vänster, 22 enheter vardera, fotbåge 7 enheter) och sedan samma steg bakåt (vänster, sedan höger); framåt och bakåt är en repetition och cykeln slutar där den börjar. Alltid en fot i golvet. Sidovy är den enda vyn: stegen går längs x-axeln och syns bara från sidan; knäriktning syns inte (ingen frontvy). Reps (inte per ben), 4 till 10, räknas för hand (MANUAL_REPS), motion sequence, 8 s per cykel. Risk high (knäbelastad). Benlängder 36/34, bål 43 och armar 25/25 konstanta, fötter aldrig under golvet. Utanför program tills godkänd (pendingReviewIds); ingår i Kettlebellcirkel. Granska: sidovy fas 0 till 1 (särskilt 0,25 och 0,75 där en fot är framme), om steglängden och halva knäböjen läses som gång i låg position, att höften inte hoppar, Start/Slut, text och säkerhet. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      },
+      {
+        "date": "2026-11-21",
+        "fixer": "claude-sonnet",
+        "notes": "E112 efter granskning: (1) reducerad rörelse: Slut ritade samma bild som Start (fas 1 = fas 0, loopen är sluten); nu är Slut fas 0,5 (båda fötterna framme, höften 22 enheter framåt), som jumping-lunge, och ett enhetstest kräver att Start och Slut skiljer sig. (2) Enklare variant säger nu 'en vanlig halv knäböj utan steg' i stället för Utfallsgång med hantlar. Figuren i övrigt oförändrad. Granska: sidovy Start/Slut och fas 0,25 och 0,75. Behöver granskning av Codex-modell eller human (cross-vendor)."
+      }
+    ],
+    "openIssues": [],
+    "notes": [
+      "Väntar på korsgranskning (codex:gpt6astra/codex:gpt61sol/human). Redaktionell övning utan verifierad extern källa; dosen är appens förslag, inte videons."
+    ],
+    "fingerprint": "a6176cab4e55"
+  },
+  {
     "id": "box-jump",
     "name": "Boxhopp",
     "group": "ballistic",

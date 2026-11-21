@@ -318,7 +318,7 @@ describe('review ordering', () => {
       .sort(compareReferences);
     expect(sorted.indexOf('E99')).toBeLessThan(sorted.indexOf('E100'));
     expect(sorted.indexOf('E100')).toBeLessThan(sorted.indexOf('E101'));
-    expect(sorted.at(-1)).toBe('E110');
+    expect(sorted.at(-1)).toBe('E112');
   });
 });
 
@@ -414,5 +414,58 @@ describe('lunge with rotation (E110)', () => {
   it('names the front leg in the side cue', () => {
     expect(exerciseSideCue(id, 'right')?.label).toBe('höger ben fram');
     expect(exerciseSideCue(id, 'left')?.label).toBe('vänster ben fram');
+  });
+});
+
+describe('cossack squat (E111) and squat walk (E112)', () => {
+  it('take the next permanent references', () => {
+    expect(exerciseReferences['cossack-squat']).toBe('E111');
+    expect(exerciseReferences['squat-walk']).toBe('E112');
+  });
+
+  it.each(['cossack-squat', 'squat-walk'] as const)(
+    '%s is a knee-loaded, bodyweight, non-impact exercise pending review',
+    (id) => {
+      expect(exercises[id].kneeLoaded).toBe(true);
+      expect(rehabImpactExercises.has(id)).toBe(false);
+      expect(pendingReviewIds.has(id)).toBe(true);
+      expect(programExcludedIds.has(id)).toBe(true);
+      expect(exercises[id].loadLadder).toEqual([
+        { kg: 0, label: 'Kroppsvikt' },
+      ]);
+      const [source] = exerciseMetadata[id].sources;
+      expect(source?.publisher).toBe('Stomme');
+      expect(source?.url).toBeUndefined();
+      expect(source?.note).toContain('Redaktionell övning');
+      expect(source?.note).toContain('Avbryt vid smärta');
+      expect(exerciseMetadata[id].purposes.running).toBeDefined();
+    },
+  );
+
+  it('counts cossack squats per leg and squat walks by hand', () => {
+    expect(exercises['cossack-squat']).toMatchObject({
+      unit: 'reps',
+      perSide: true,
+      sideKind: 'ben',
+      range: { start: 6, max: 12, step: 1 },
+    });
+    expect(exercises['squat-walk']).toMatchObject({
+      unit: 'reps',
+      perSide: false,
+      range: { start: 4, max: 10, step: 1 },
+    });
+    expect(repTempo('squat-walk')).toBeNull();
+    expect(repTempo('cossack-squat')).not.toBeNull();
+    expect(exerciseSideCue('cossack-squat', 'right')?.label).toBe(
+      'Sjunk över höger ben',
+    );
+  });
+
+  it('describes how the cossack squat differs from the side lunge', () => {
+    const text = exercises['cossack-squat'].tips.join(' ');
+    expect(text).toContain('Sidoutfall');
+    expect(text).toContain('rakt');
+    expect(exercises['cossack-squat'].easierVariant).toContain('Sidoutfall');
+    expect(exerciseAliases['cossack-squat']).toContain('Cossack squat');
   });
 });

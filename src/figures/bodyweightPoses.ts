@@ -6,6 +6,7 @@ import type { Pt } from './lerp';
 import { lungeRotationSidePose } from './lungeRotation';
 import type { FigureSpec, Pose } from './poses';
 import { joint } from './rehabPoses';
+import { squatWalkSidePose } from './squatWalk';
 
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 const polar = (origin: Pt, length: number, angle: number): Pt => [
@@ -510,6 +511,30 @@ function skaterBound(t: number): Pose {
 /** Side view of the lunge with rotation (see lungeRotation.ts). */
 const lungeWithRotation = lungeRotationSidePose;
 
+/** Side view of the cossack squat (the front view is the one that teaches it): a wide, low sit with both feet flat. */
+function cossackSide(t: number): Pose {
+  const s = smooth(t);
+  const hip: Pt = [100, mix(110, 136, s)];
+  const neck: Pt = [100 + 4 * s, hip[1] - Math.sqrt(43 * 43 - 16 * s * s)];
+  const ar: Pt = [104, 174];
+  const al: Pt = [96, 174];
+  const hands: Pt = [neck[0] + 20, neck[1] + 18];
+  return pose(
+    [neck[0] + 2, neck[1] - 14],
+    neck,
+    hip,
+    [[neck[0] + 8, neck[1] + 22], hands, [neck[0] + 8, neck[1] + 22], hands],
+    [
+      joint(hip, ar, 36, 34, -1),
+      ar,
+      foot(ar),
+      joint(hip, al, 36, 34, -1),
+      al,
+      foot(al),
+    ],
+  );
+}
+
 /** The step is about 30 cm high (44 px wide); ankles rest 3 px above its top so the toes touch it. */
 export const BOX_PROP = { x: 125, y: 156, w: 44 } as const;
 const BOX_ANKLE_Y = BOX_PROP.y - 3;
@@ -931,6 +956,8 @@ const handlers: Record<BodyweightId, (t: number) => Pose> = {
   'single-leg-lateral-hop': lateralHop,
   'skater-bound': skaterBound,
   'lunge-with-rotation': lungeWithRotation,
+  'cossack-squat': cossackSide,
+  'squat-walk': squatWalkSidePose,
   'box-jump': boxJump,
   'fast-feet': fastFeet,
   'in-and-out-jump': inAndOutJump,
@@ -959,7 +986,11 @@ export const bodyweightFigures = Object.fromEntries(
     {
       start: handler(0),
       end: handler(
-        id === 'plank-arm-lift' ? 0.25 : id === 'jumping-lunge' ? 0.5 : 1,
+        id === 'plank-arm-lift'
+          ? 0.25
+          : id === 'jumping-lunge' || id === 'squat-walk'
+            ? 0.5
+            : 1,
       ),
       motion:
         id === 'plank' || id === 'isometric-lunge-hold'
@@ -967,6 +998,7 @@ export const bodyweightFigures = Object.fromEntries(
           : id === 'burpee' ||
               id === 'squat-jump' ||
               id === 'box-jump' ||
+              id === 'squat-walk' ||
               id === 'jumping-lunge'
             ? 'sequence'
             : id === 'single-leg-lateral-hop' ||

@@ -17,6 +17,8 @@ export const pendingReviewIds: ReadonlySet<ExerciseId> = new Set([
   'renegade-row',
   'weighted-sit-up',
   'lunge-with-rotation',
+  'cossack-squat',
+  'squat-walk',
 ]);
 
 /**

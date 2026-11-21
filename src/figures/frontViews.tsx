@@ -24,6 +24,7 @@ export const supportedFrontViews = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
   'skater-bound',
+  'cossack-squat',
   'in-and-out-jump',
   'lateral-shuffle',
   'goblet-squat',
@@ -71,6 +72,7 @@ export const FRONT_ONLY: readonly ExerciseId[] = [
   'seated-tibial-rotation',
   'single-leg-lateral-hop',
   'skater-bound',
+  'cossack-squat',
   'in-and-out-jump',
   'lateral-shuffle',
 ];
@@ -360,6 +362,55 @@ function skaterBoundPose(t: number, working: Working | null): Pose {
   return working === 'left' ? mirrorPose(pose) : pose;
 }
 
+/**
+ * Cossack squat from the front, authored for the right working leg (the
+ * viewer's left). Both feet stay planted, far apart (x 54 and 146); the hips
+ * move from the middle towards the right foot (x 100 to 86) and sink from 124
+ * to 140, so the thigh is almost horizontal and the knee ends over the foot,
+ * while the left leg stays nearly straight, its toes rising as the heel
+ * stays on the floor. Thigh 35.9 and shin 34 throughout; the right knee
+ * follows the right toes (outward). t=0 is the wide stance, t=1 the deepest
+ * point.
+ */
+const COSSACK_RIGHT_ANKLE = 54;
+const COSSACK_LEFT_ANKLE = 146;
+function cossackPose(t: number, working: Working | null): Pose {
+  const s = smooth(t);
+  const hip = point(mix(100, 86, s), mix(124, 140, s));
+  // The trunk (43) leans a little towards the middle as the hips shift.
+  const lean = 8 * s;
+  const neck = point(hip[0] + lean, hip[1] - Math.sqrt(43 * 43 - lean * lean));
+  const aR = point(COSSACK_RIGHT_ANKLE, 174);
+  const aL = point(COSSACK_LEFT_ANKLE, 174);
+  const foot = Math.hypot(10, 3);
+  // The straight leg's toes come up around the planted heel.
+  const toeAngle = mix(Math.atan2(3, 10), -0.7, s);
+  const tR = point(aR[0] - 10, 177);
+  const tL = point(
+    aL[0] + foot * Math.cos(toeAngle),
+    aL[1] + foot * Math.sin(toeAngle),
+  );
+  const hands = point(neck[0], neck[1] + 18);
+  const armR = solveTwoBone(neck, hands, FRONT_UPPER_ARM, FRONT_FOREARM, 1);
+  const armL = solveTwoBone(neck, hands, FRONT_UPPER_ARM, FRONT_FOREARM, -1);
+  const pose = skeleton(
+    point(neck[0], neck[1] - 14),
+    neck,
+    hip,
+    armR.mid,
+    armR.end,
+    armL.mid,
+    armL.end,
+    joint(hip, aR, FRONT_THIGH, 34, 1),
+    aR,
+    tR,
+    joint(hip, aL, FRONT_THIGH, 34, -1),
+    aL,
+    tL,
+  );
+  return working === 'left' ? mirrorPose(pose) : pose;
+}
+
 /** Mirrors a pose authored for the right side about the body's centre line (x = 100). */
 function mirrorPose(pose: Pose): Pose {
   return mirrorAbout(pose, 200);
@@ -518,6 +569,7 @@ export function frontMovementPose(
   if (exerciseId === 'single-leg-lateral-hop')
     return lateralHopPose(t, working);
   if (exerciseId === 'skater-bound') return skaterBoundPose(t, working);
+  if (exerciseId === 'cossack-squat') return cossackPose(t, working);
   if (exerciseId === 'seated-tibial-rotation') {
     // Feet rotate in the horizontal plane; the shins and knees stay still.
     const angle = mix(0.65, -0.65, t);

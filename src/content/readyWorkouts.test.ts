@@ -101,6 +101,33 @@ describe('ready-made workouts', () => {
     expect(workout?.caution).toContain('armlyft');
   });
 
+  it('Kettlebellcirkel is a fixed, non-running workout with the six exercises in order and honest text', () => {
+    const workout = readyWorkouts.find((w) => w.id === 'kettlebell-circuit');
+    expect(workout).toMatchObject({
+      name: 'Kettlebellcirkel',
+      group: 'legs',
+      fixed: true,
+    });
+    expect(workout?.runningStart).toBeUndefined();
+    expect(workout?.exerciseIds).toEqual([
+      'kettlebell-swing',
+      'cossack-squat',
+      'kettlebell-goblet-squat',
+      'squat-walk',
+      'reverse-lunge',
+      'single-leg-rdl',
+    ]);
+    expect(workout?.summary).toContain('en kettlebell räcker');
+    expect(workout?.summary).toContain('3 varv');
+    expect(workout?.caution).toContain('Du behöver en kettlebell');
+    expect(workout?.summary).not.toContain('Videon');
+    expect(workout?.summary).toContain('progression');
+    expect(workout?.summary).toContain('varv');
+    expect(workout?.caution).toContain('ballistisk');
+    expect(workout?.caution).toContain('neutral');
+    expect(workout?.caution).toContain('smärta');
+  });
+
   it('Snabbt helkroppspass is fixed, ordered and not a running start', () => {
     const workout = readyWorkouts.find((w) => w.id === 'dumbbell-full-body');
     expect(workout?.name).toBe('Snabbt helkroppspass med hantlar');

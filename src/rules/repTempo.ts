@@ -21,6 +21,8 @@ const MANUAL_REPS: readonly ExerciseId[] = [
   'box-jump',
   // Bound out, stick the landing and bound back at the user's own pace.
   'skater-bound',
+  // One rep is the steps forward and the same steps back, at the user's pace.
+  'squat-walk',
 ];
 
 /** Ballistic and plyometric work gets one suggested beat per rep, no holds. */

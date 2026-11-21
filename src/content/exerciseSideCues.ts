@@ -54,6 +54,11 @@ const lungeRotationLeg: CueFactory = (side) => ({
   explanation: `Det ${sideAdjective(side)} benet är det främre; vrid bröstkorgen över det benet i botten och håll höfterna stilla.`,
 });
 
+const cossackLeg: CueFactory = (side) => ({
+  label: `Sjunk över ${sideWord(side)} ben`,
+  explanation: `Flytta vikten över det ${sideAdjective(side)} benet och sjunk; det andra benet är rakt. Gå bara så djupt du kan styra.`,
+});
+
 const cues: Partial<Record<ExerciseId, CueFactory>> = {
   'copenhagen-hold': (side) => ({
     label: `${sideWord(side)} knä överst på bänken`,
@@ -66,6 +71,7 @@ const cues: Partial<Record<ExerciseId, CueFactory>> = {
   'single-leg-lateral-hop': lateralHopLeg,
   'skater-bound': skaterBoundLeg,
   'lunge-with-rotation': lungeRotationLeg,
+  'cossack-squat': cossackLeg,
   'isometric-lunge-hold': (side) => ({
     label: `${sideWord(side)} ben fram`,
     explanation: `Det ${sideAdjective(side)} benet står fram med låret parallellt med golvet; håll positionen under tiden som visas och byt sedan ben.`,

@@ -35,6 +35,17 @@ it('renders the dumbbell full-body workout with its count and caution', () => {
   expect(screen.getByText(/Du behöver två stadiga hantlar/)).toBeTruthy();
 });
 
+it('renders the kettlebell circuit with its six exercises and honest text', () => {
+  const circuit = readyWorkouts.find((w) => w.id === 'kettlebell-circuit');
+  if (!circuit) throw new Error('missing workout');
+  render(<FixedReadyWorkout workout={circuit} busy={false} onAdd={vi.fn()} />);
+  expect(screen.getByText('Kettlebellcirkel')).toBeTruthy();
+  expect(screen.getByText('6 övningar')).toBeTruthy();
+  expect(screen.getAllByRole('listitem')).toHaveLength(6);
+  expect(screen.getByText(/en kettlebell räcker/)).toBeTruthy();
+  expect(screen.getByText(/ballistisk/)).toBeTruthy();
+});
+
 it('disables the button while busy', () => {
   if (!workout) throw new Error('missing workout');
   render(<FixedReadyWorkout workout={workout} busy onAdd={vi.fn()} />);

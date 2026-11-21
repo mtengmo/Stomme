@@ -244,6 +244,8 @@ describe('exercise library', () => {
     ['sidohopp', 'single-leg-lateral-hop'],
     ['skridskohopp', 'skater-bound'],
     ['utfall med rotation', 'lunge-with-rotation'],
+    ['cossack', 'cossack-squat'],
+    ['knäböjsgång', 'squat-walk'],
     ['boxhopp', 'box-jump'],
     ['höga knän', 'knee-drive'],
     ['knee drives', 'knee-drive'],

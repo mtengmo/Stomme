@@ -385,6 +385,22 @@ describe('ready passes', () => {
   it('rejects an unknown ready id', () => {
     expect(isTrainingProgram(ready(eight, 'nope'))).toBe(false);
   });
+  it('rejects the kettlebell circuit as a ready pass (it is not a running workout)', () => {
+    expect(
+      isTrainingProgram(
+        ready(
+          [
+            'kettlebell-swing',
+            'kettlebell-goblet-squat',
+            'reverse-lunge',
+            'single-leg-rdl',
+          ],
+          'kettlebell-circuit',
+          'regular',
+        ),
+      ),
+    ).toBe(false);
+  });
   it('rejects the full-body workout as a ready pass', () => {
     expect(
       isTrainingProgram(

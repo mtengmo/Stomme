@@ -228,6 +228,7 @@ export const FRAMING: Partial<Record<ExerciseId, string>> = {
 const SEQUENCE_MS: Partial<Record<ExerciseId, number>> = {
   'squat-jump': 4500,
   'box-jump': 5000,
+  'squat-walk': 8000,
   'squat-curl': 8000,
   // Two hops with a leg switch each (the figure cycle is two counted reps).
   'jumping-lunge': 6000,

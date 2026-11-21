@@ -94,6 +94,7 @@ describe('readyProgramPass', () => {
 
   it('returns null for a ready workout that is not a running start', () => {
     expect(readyProgramPass('dumbbell-full-body', prefs('regular'))).toBeNull();
+    expect(readyProgramPass('kettlebell-circuit', prefs('regular'))).toBeNull();
   });
 
   it('returns a copy, not the workout list', () => {

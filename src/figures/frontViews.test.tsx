@@ -50,6 +50,7 @@ describe('authored frontal demonstrations', () => {
       'seated-tibial-rotation',
       'single-leg-lateral-hop',
       'skater-bound',
+      'cossack-squat',
       'in-and-out-jump',
       'lateral-shuffle',
       'goblet-squat',

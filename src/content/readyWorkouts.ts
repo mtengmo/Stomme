@@ -117,6 +117,24 @@ export const readyWorkouts: readonly ReadyWorkout[] = [
     ],
   },
   {
+    id: 'kettlebell-circuit',
+    name: 'Kettlebellcirkel',
+    group: 'legs',
+    fixed: true,
+    summary:
+      'Sex övningar i en cirkel: kettlebellsving, cossack-knäböj, goblet-knäböj, knäböjsgång, bakåtutfall och enbens raka lyft. Sving och goblet-knäböj görs med kettlebell, och en kettlebell räcker. Ett vanligt upplägg är 3 varv. Appen kan inte ställa in varv eller antal per övning: appens vanliga progression sätter antal och vikt, och du kan själv göra hela följden flera gånger.',
+    caution:
+      'Du behöver en kettlebell. Kör långsamt och kontrollerat; du kan göra färre repetitioner eller använda en lättare kettlebell. Kettlebellsvingen är ballistisk: håll ryggen neutral och avbryt vid smärta. Cossack-knäböj och knäböjsgång belastar knä och höft: gå bara så djupt du kan styra och avbryt vid smärta. Passet passar inte vid knä-, höft- eller ryggbesvär. Ändra utrustning, antal och vikt i passet före start.',
+    exerciseIds: [
+      'kettlebell-swing',
+      'cossack-squat',
+      'kettlebell-goblet-squat',
+      'squat-walk',
+      'reverse-lunge',
+      'single-leg-rdl',
+    ],
+  },
+  {
     id: 'dumbbell-full-body',
     name: 'Snabbt helkroppspass med hantlar',
     group: 'full',

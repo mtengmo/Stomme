@@ -98,6 +98,8 @@ export type ExerciseId =
   | 'single-leg-lateral-hop'
   | 'skater-bound'
   | 'lunge-with-rotation'
+  | 'cossack-squat'
+  | 'squat-walk'
   | 'box-jump'
   | 'fast-feet'
   | 'in-and-out-jump'

@@ -127,6 +127,11 @@ export const exerciseMuscles: Record<
     ...bodyweightDetails['single-leg-lateral-hop'],
     qualities: ['power', 'balance'],
   },
+  'cossack-squat': {
+    ...bodyweightDetails['cossack-squat'],
+    qualities: ['balance'],
+  },
+  'squat-walk': { ...bodyweightDetails['squat-walk'], qualities: [] },
   'lunge-with-rotation': {
     ...bodyweightDetails['lunge-with-rotation'],
     qualities: ['balance'],
