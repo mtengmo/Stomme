@@ -19,7 +19,7 @@ Read when you change a figure, pose, view or exercise text after a review. `SKIL
    (`src/figures/constrainedLegs.ts`, opt-in) with `bone`, `limb`, `arm`, `leg`, `foot`,
    `trunk`, `headNeck` from `segmentLengths.ts`; the authored start/middle/end must share the
    lengths (`segmentLengths.test.ts`). Arms under load: `solveTwoBone` (`keyframes.ts`) with the
-   authored lengths, as the `single-leg-hip-thrust` branch of `applyEquipmentPose` does. Family
+   authored lengths, as the `single-leg-hip-thrust` branch of `applyEquipmentPose` does. `solveTwoBone`'s `bend` (1 or -1) picks which way the joint folds, and lengths are the same either way: check the result (side view facing right, bend 1 puts an elbow below the shoulder for a hand held in front of the chest; -1 puts it above, a chicken wing) rather than copying the sign from another exercise. Family
    keyframes (`squatFamilyKeyframes.ts`, `hingeFamilyKeyframes.ts`, `stepUpKeyframes.ts` ...)
    already solve from constants: fix there. Front/oblique (`frontViews.tsx`, which also draws
    their equipment): no segment longer than the profile, front thighs at most 36
